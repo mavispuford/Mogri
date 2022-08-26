@@ -43,7 +43,8 @@
             <Image x:Name="ResultImageView"
                    Grid.Row="2"
                    WidthRequest="{Binding Source={x:Reference ImageView}, Path=Width}"
-                   HeightRequest="{Binding Source={x:Reference ImageView}, Path=Height}"/>
+                   HeightRequest="{Binding Source={x:Reference ImageView}, Path=Height}"
+                   Source="{Binding ResultImageSource}"/>
         </Grid>
     </ScrollView>
 

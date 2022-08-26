@@ -2,8 +2,10 @@
 {
     public interface IFileService
     {
-        Task WriteFileToExternalStorageAsync(string fileName, Stream stream);
+        Task<string> WriteFileToExternalStorageAsync(string fileName, Stream stream);
 
-        Stream GetFileStreamFromExternalStorage(string fileName);
+        //Task<byte[]> GetFileBytesFromExternalStorage(string fileName);
+        Task<Stream> GetFileStreamFromExternalStorage(string fileName, string uriString);
+
     }
 }
