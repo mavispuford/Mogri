@@ -21,6 +21,9 @@ public partial class MainPageViewModel : BaseViewModel, IMainPageViewModel
     [ObservableProperty]
     private double imageHeight;
 
+    [ObservableProperty]
+    private ImageSource resultImageSource;
+
     public MainPageViewModel(IFileService fileService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
@@ -36,6 +39,12 @@ public partial class MainPageViewModel : BaseViewModel, IMainPageViewModel
 
         using var stream = await DrawingView.GetImageStream(MaskLines, new Size(ImageWidth, ImageHeight), Colors.Black.AsPaint());
 
-        await _fileService.WriteFileToExternalStorageAsync("mask.png", stream);
+        var fileName = $"mask.jpg";
+
+        var fileUri = await _fileService.WriteFileToExternalStorageAsync(fileName, stream);
+
+        var newStream = await _fileService.GetFileStreamFromExternalStorage(fileName, fileUri);
+
+        ResultImageSource = ImageSource.FromStream(() => newStream);
     }
 }
