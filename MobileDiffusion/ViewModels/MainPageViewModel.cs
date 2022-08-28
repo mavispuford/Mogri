@@ -13,16 +13,10 @@ public partial class MainPageViewModel : BaseViewModel, IMainPageViewModel
     private readonly IFileService _fileService;
 
     [ObservableProperty]
-    private ObservableCollection<IDrawingLine> maskLines;
+    private string prompt;
 
     [ObservableProperty]
-    private double imageWidth;
-
-    [ObservableProperty]
-    private double imageHeight;
-
-    [ObservableProperty]
-    private ImageSource resultImageSource;
+    private List<ImageSource> resultImageSources = new();
 
     public MainPageViewModel(IFileService fileService)
     {
@@ -30,21 +24,14 @@ public partial class MainPageViewModel : BaseViewModel, IMainPageViewModel
     }
 
     [RelayCommand]
-    private async Task SaveMaskAsync()
+    private async Task Create()
     {
-        if (MaskLines == null)
+        var fakeResults = new List<ImageSource>();
+        for(var i = 0; i < 6; i++)
         {
-            return;
+            fakeResults.Add(ImageSource.FromFile("dotnet_bot"));
         }
 
-        using var stream = await DrawingView.GetImageStream(MaskLines, new Size(ImageWidth, ImageHeight), Colors.Black.AsPaint());
-
-        var fileName = $"mask.jpg";
-
-        var fileUri = await _fileService.WriteFileToExternalStorageAsync(fileName, stream);
-
-        var newStream = await _fileService.GetFileStreamFromExternalStorage(fileName, fileUri);
-
-        ResultImageSource = ImageSource.FromStream(() => newStream);
+        ResultImageSources = fakeResults;
     }
 }

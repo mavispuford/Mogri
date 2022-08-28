@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mctviews="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui"
+             xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
+             x:Class="MobileDiffusion.Views.MaskDrawingPage"
+             Title="MaskDrawingPage"
+             x:DataType="viewModels:IMaskDrawingPageViewModel">
+    <ScrollView>
+        <Grid
+            RowSpacing="10"
+            RowDefinitions="*,auto,auto"
+            Padding="30,0"
+            VerticalOptions="Center">
+
+            <Image x:Name="ImageView"
+                   Grid.Row="0"
+                   Source="dotnet_bot"
+                   Width="{Binding ImageWidth, Mode=OneWayToSource}"
+                   Height="{Binding ImageHeight, Mode=OneWayToSource}"/>
+
+            <BoxView x:Name="MaskBackgroundBoxView"
+                WidthRequest="{Binding Source={x:Reference ImageView}, Path=Width}"
+                HeightRequest="{Binding Source={x:Reference ImageView}, Path=Height}"
+                BackgroundColor="#22EEEEEE"
+                Opacity=".1"/>
+
+            <mctviews:DrawingView 
+                x:Name="DrawingView"
+                Grid.Row="0"
+                LineColor="Red"
+                LineWidth="20"
+                IsMultiLineModeEnabled="true"
+                WidthRequest="{Binding Source={x:Reference ImageView}, Path=Width}"
+                HeightRequest="{Binding Source={x:Reference ImageView}, Path=Height}"
+                Opacity=".5"
+                Lines="{Binding MaskLines, Mode=OneWayToSource}"/>
+
+            <Button Grid.Row="1"
+                    Text="Save Command"
+                    Command="{Binding SaveMaskCommand}"/>
+
+            <Image x:Name="ResultImageView"
+                   Grid.Row="2"
+                   WidthRequest="{Binding Source={x:Reference ImageView}, Path=Width}"
+                   HeightRequest="{Binding Source={x:Reference ImageView}, Path=Height}"
+                   Source="{Binding ResultImageSource}"/>
+        </Grid>
+    </ScrollView>
+</ContentPage>
