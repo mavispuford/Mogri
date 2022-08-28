@@ -6,9 +6,20 @@
     xmlns:views="clr-namespace:MobileDiffusion.Views"
     Shell.FlyoutBehavior="Disabled">
 
-    <ShellContent
+    <TabBar>
+        <Tab Title="Text to Image"
+             Icon="article">
+            <ShellContent ContentTemplate="{DataTemplate views:MainPage}" />
+        </Tab>
+        <Tab Title="Image to Image"
+             Icon="image">
+            <ShellContent ContentTemplate="{DataTemplate views:MaskDrawingPage}" />
+        </Tab>
+    </TabBar>
+
+    <!--<ShellContent
         Title="Home"
         ContentTemplate="{DataTemplate views:MainPage}"
-        Route="MainPage" />
+        Route="MainPage" />-->
 
 </Shell>
