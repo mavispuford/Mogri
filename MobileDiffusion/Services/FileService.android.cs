@@ -68,6 +68,8 @@ public class FileService : IFileService
         catch (Exception e)
         {
             // TODO - Handle exception
+
+            Console.WriteLine($"Error getting requested file \"{fileName}\" \"(uri: {uriString})\"");
         }
 
         return null;
@@ -119,6 +121,8 @@ public class FileService : IFileService
         catch (Exception e)
         {
             // TODO - Handle exception
+
+            Console.WriteLine($"Error writing requested file \"{fileName}\"");
         }
 
         return string.Empty;
