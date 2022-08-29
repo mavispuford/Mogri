@@ -20,6 +20,10 @@ public static class MauiProgram
 			.RegisterViewModels()
 			.RegisterViews();
 
+		builder.Services.AddHttpClient();
+
+		builder.Services.AddSingleton<IStableDiffusionService, StableDiffusionService>();
+
 #if ANDROID
 		builder.Services.AddSingleton<IFileService, FileService>();
 #endif
