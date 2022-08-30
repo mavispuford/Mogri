@@ -6,25 +6,71 @@ namespace MobileDiffusion.Services;
 
 public class FileService : IFileService
 {
-    public async Task<Stream> GetFileStreamFromExternalStorage(string fileName, string uriString)
+    public async Task<Stream> GetFileStreamUsingExactUri(string uriString)
     {
-        if (await Permissions.CheckStatusAsync<Permissions.StorageRead>() != PermissionStatus.Granted)
-        {
-            var status = await Permissions.RequestAsync<Permissions.StorageRead> ();
+        await checkForReadPermission();
 
-            if (status != PermissionStatus.Granted)
-            {
-                throw new PermissionException("The read storage permission has not been granted");
-            }
+        var contentResolver = Platform.CurrentActivity.ContentResolver;
+
+        try
+        {
+            var uri = Android.Net.Uri.Parse(uriString);
+
+            return contentResolver.OpenInputStream(uri);
+        }
+        catch (Exception e)
+        {
+            // TODO - Handle exception
+
+            Console.WriteLine($"Error getting requested file \"(uri: {uriString})\"");
+        }
+
+        return null;
+    }
+
+    public async Task<Stream> GetFileStreamFromExternalStorage(string fileName)
+    {
+        await checkForReadPermission();
+
+        return await getFileStreamFromStorageUsingBaseUri(fileName, MediaStore.Images.Media.ExternalContentUri);
+    }
+
+    public Task<Stream> GetFileStreamFromInternalStorage(string fileName)
+    {
+        var fullPath = Path.Combine(FileSystem.CacheDirectory, fileName);
+
+        try
+        {
+            var reader = new StreamReader(fullPath, true);
+            
+            return Task.FromResult(reader.BaseStream);
+        }
+        catch (Exception e)
+        {
+            // TODO - Handle exception
+
+            Console.WriteLine($"Error reading requested file from \"{fullPath}\"");
+        }
+
+        return null;
+    }
+
+    private Task<Stream> getFileStreamFromStorageUsingBaseUri(string fileName, Android.Net.Uri baseUri)
+    {
+        if (string.IsNullOrEmpty(fileName))
+        {
+            throw new ArgumentNullException(nameof(fileName));
+        }
+
+        if (baseUri == null)
+        {
+            throw new ArgumentNullException(nameof(baseUri));
         }
 
         var contentResolver = Platform.CurrentActivity.ContentResolver;
 
         try
         {
-            var uri = string.IsNullOrEmpty(uriString) ? MediaStore.Images.Media.ExternalContentUri :
-                Android.Net.Uri.Parse(uriString);
-
             var projection = new[]
             {
                 MediaStore.Images.Media.InterfaceConsts.Id,
@@ -36,10 +82,9 @@ public class FileService : IFileService
                 MediaStore.Images.Media.InterfaceConsts.RelativePath
             };
 
-            var selection = string.IsNullOrEmpty(uriString) ? $"{MediaStore.Images.Media.InterfaceConsts.DisplayName} = '{fileName}'" : null;
-            //var selection = $"{MediaStore.Images.Media.InterfaceConsts.Title} = '{Path.GetFileNameWithoutExtension(fileName)}'";
-            var mediaCursor = contentResolver.Query(uri, projection, selection, null, null);
-           
+            var selection = $"{MediaStore.Images.Media.InterfaceConsts.DisplayName} = '{fileName}'";
+            var mediaCursor = contentResolver.Query(baseUri, projection, selection, null, null);
+
             var columnIndexIdIndex = mediaCursor.GetColumnIndexOrThrow(MediaStore.Images.Media.InterfaceConsts.Id);
             var titleIndex = mediaCursor.GetColumnIndexOrThrow(MediaStore.IMediaColumns.Title);
             var displayNameIndex = mediaCursor.GetColumnIndexOrThrow(MediaStore.Images.Media.InterfaceConsts.DisplayName);
@@ -60,37 +105,52 @@ public class FileService : IFileService
                 var documentId = mediaCursor.GetString(documentIdIndex);
                 var relativePath = mediaCursor.GetString(relativePathIndex);
 
-                var contentUri = ContentUris.WithAppendedId(MediaStore.Images.Media.ExternalContentUri, id);
+                var contentUri = ContentUris.WithAppendedId(baseUri, id);
 
-                return contentResolver.OpenInputStream(contentUri);
+                return Task.FromResult(contentResolver.OpenInputStream(contentUri));
             }
         }
         catch (Exception e)
         {
             // TODO - Handle exception
 
-            Console.WriteLine($"Error getting requested file \"{fileName}\" \"(uri: {uriString})\"");
+            Console.WriteLine($"Error getting requested file \"{fileName}\" \"(uri: {baseUri})\"");
         }
 
         return null;
     }
 
+    public async Task<string> WriteFileToInternalStorageAsync(string fileName, Stream stream)
+    {
+        var fullPath = Path.Combine(FileSystem.CacheDirectory, fileName);
+
+        try
+        {
+            using var fileStream = File.Create(fullPath);
+
+            await stream.CopyToAsync(fileStream);
+        }
+        catch (Exception e)
+        {
+            // TODO - Handle exception
+
+            Console.WriteLine($"Error writing requested file \"{fileName}\" to \"{fullPath}\"");
+
+            return null;
+        }
+
+        return fullPath;
+    }
+
     public async Task<string> WriteFileToExternalStorageAsync(string fileName, Stream stream)
     {
-#if ANDROID29_0_OR_GREATER
-        // No need for permissions.
-#else
-        if (await Permissions.CheckStatusAsync<Permissions.StorageWrite>() != PermissionStatus.Granted)
-        {
-            var status = await Permissions.RequestAsync<Permissions.StorageWrite>();
-            
-            if (status != PermissionStatus.Granted)
-            {
-                throw new PermissionException("The write storage permission has not been granted");
-            }
-        }
-#endif
+        await checkForWritePermission();
 
+        return await writeFileToBaseUriAsync(fileName, stream, MediaStore.Images.Media.ExternalContentUri);
+    }
+
+    private async Task<string> writeFileToBaseUriAsync(string fileName, Stream stream, Android.Net.Uri baseUri)
+    {
         var contentValues = new ContentValues();
         contentValues.Put(MediaStore.IMediaColumns.Title, fileName);
         contentValues.Put(MediaStore.IMediaColumns.MimeType, "image/jpg");
@@ -105,7 +165,7 @@ public class FileService : IFileService
 
         try
         {
-            uri = contentResolver.Insert(MediaStore.Images.Media.ExternalContentUri, contentValues);
+            uri = contentResolver.Insert(baseUri, contentValues);
 
             var outputStream = contentResolver.OpenOutputStream(uri);
             await stream.CopyToAsync(outputStream);
@@ -122,9 +182,39 @@ public class FileService : IFileService
         {
             // TODO - Handle exception
 
-            Console.WriteLine($"Error writing requested file \"{fileName}\"");
+            Console.WriteLine($"Error writing requested file \"{fileName}\" to \"{baseUri}\"");
         }
 
         return string.Empty;
+    }
+
+    private async Task checkForReadPermission()
+    {
+        if (await Permissions.CheckStatusAsync<Permissions.StorageRead>() != PermissionStatus.Granted)
+        {
+            var status = await Permissions.RequestAsync<Permissions.StorageRead>();
+
+            if (status != PermissionStatus.Granted)
+            {
+                throw new PermissionException("The read storage permission has not been granted");
+            }
+        }
+    }
+
+    private async Task checkForWritePermission()
+    {
+#if ANDROID29_0_OR_GREATER
+        // No need for permissions.
+#else
+        if (await Permissions.CheckStatusAsync<Permissions.StorageWrite>() != PermissionStatus.Granted)
+        {
+            var status = await Permissions.RequestAsync<Permissions.StorageWrite>();
+            
+            if (status != PermissionStatus.Granted)
+            {
+                throw new PermissionException("The write storage permission has not been granted");
+            }
+        }
+#endif
     }
 }

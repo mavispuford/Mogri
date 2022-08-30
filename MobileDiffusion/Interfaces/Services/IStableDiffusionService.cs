@@ -4,5 +4,7 @@ namespace MobileDiffusion.Interfaces.Services;
 
 public interface IStableDiffusionService
 {
-    public Task SubmitTextToImageRequest(TextToImageRequest request);
+    public Task<bool> CheckServer();
+
+    public Task<IEnumerable<string>> SubmitTextToImageRequest(TextToImageRequest request);
 }
