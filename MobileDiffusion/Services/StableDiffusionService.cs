@@ -15,7 +15,21 @@ namespace MobileDiffusion.Services
             _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
         }
 
-        public async Task SubmitTextToImageRequest(TextToImageRequest request)
+        public async Task<bool> CheckServer()
+        {
+            var client = _httpClientFactory.CreateClient();
+
+            var response = await client.GetAsync($"{Constants.BaseUrl}/ping");
+
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<IEnumerable<string>> SubmitTextToImageRequest(TextToImageRequest request)
         {
             if (request == null)
             {
@@ -29,7 +43,18 @@ namespace MobileDiffusion.Services
                 Encoding.UTF8,
                 MediaTypeNames.Application.Json);
 
-            var response = await client.PostAsync($"{Constants.BaseUrl}/blah", requestBody);
+            var response = await client.PostAsync($"{Constants.BaseUrl}/image", requestBody);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                var textToImageResponse = JsonSerializer.Deserialize<TextToImageResponse>(responseString);
+
+                return textToImageResponse.Output;
+            }
+
+            return Enumerable.Empty<string>();
         }
     }
 }
