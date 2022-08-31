@@ -6,7 +6,10 @@ public interface IMainPageViewModel : IBaseViewModel
 {
     string Prompt { get; set; }
     string PlaceholderPrompt { get; set; }
-
+    double ImageLayoutWidth { get; set; }
+    double ImageWidth { get; set; }
+    double ImageHeight { get; set; }
     List<ImageSource> ResultImageSources { get; set; }
     IAsyncRelayCommand CreateCommand { get; }
+    IAsyncRelayCommand ShowRequestSettingsCommand { get; }
 }

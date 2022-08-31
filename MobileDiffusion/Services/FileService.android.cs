@@ -42,7 +42,7 @@ public class FileService : IFileService
         try
         {
             var reader = new StreamReader(fullPath, true);
-            
+
             return Task.FromResult(reader.BaseStream);
         }
         catch (Exception e)
@@ -128,7 +128,10 @@ public class FileService : IFileService
         {
             using var fileStream = File.Create(fullPath);
 
+            stream.Seek(0, SeekOrigin.Begin);
             await stream.CopyToAsync(fileStream);
+
+            fileStream.Close();
         }
         catch (Exception e)
         {

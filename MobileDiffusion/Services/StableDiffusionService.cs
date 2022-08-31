@@ -2,6 +2,7 @@
 using MobileDiffusion.Models;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using MediaTypeNames = System.Net.Mime.MediaTypeNames;
 
 namespace MobileDiffusion.Services
@@ -39,22 +40,18 @@ namespace MobileDiffusion.Services
             var client = _httpClientFactory.CreateClient();
 
             var requestBody = new StringContent(
-                JsonSerializer.Serialize(request),
+                JsonSerializer.Serialize(request, new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull}),
                 Encoding.UTF8,
                 MediaTypeNames.Application.Json);
 
             var response = await client.PostAsync($"{Constants.BaseUrl}/image", requestBody);
+            response.EnsureSuccessStatusCode();
 
-            if (response.IsSuccessStatusCode)
-            {
-                var responseString = await response.Content.ReadAsStringAsync();
+            var responseString = await response.Content.ReadAsStringAsync();
 
-                var textToImageResponse = JsonSerializer.Deserialize<TextToImageResponse>(responseString);
+            var textToImageResponse = JsonSerializer.Deserialize<TextToImageResponse>(responseString);
 
-                return textToImageResponse.Output;
-            }
-
-            return Enumerable.Empty<string>();
+            return textToImageResponse.Output;
         }
     }
 }
