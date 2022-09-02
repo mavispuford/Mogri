@@ -1,10 +1,35 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:enums="clr-namespace:MobileDiffusion.Enums;assembly=MobileDiffusion"
+             xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
              x:Class="MobileDiffusion.Views.PromptSettingsPage"
              Title="Prompt Settings"
-             Shell.TabBarIsVisible="False">
-    <VerticalStackLayout Padding="30">
-        
-    </VerticalStackLayout>
+             Shell.TabBarIsVisible="False"
+             x:DataType="viewModels:IPromptSettingsPageViewModel">
+    <Grid Padding="30"
+          RowDefinitions="auto, auto, auto, auto, auto, auto, auto"
+          RowSpacing="10"
+          ColumnDefinitions="*,*">
+        <Label Grid.Row="0" Text="Images:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16" />
+        <Entry Grid.Row="0" Grid.Column="1" Placeholder="1" Text="{Binding ImageCount}" Keyboard="Numeric" FontSize="16" MaxLength="2" HorizontalTextAlignment="End" />
+
+        <Label Grid.Row="1" Text="Steps:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+        <Entry Grid.Row="1" Grid.Column="1" Placeholder="50" Text="{Binding Steps}" Keyboard="Numeric" FontSize="16" MaxLength="3" HorizontalTextAlignment="End" />
+
+        <Label Grid.Row="2" Text="Cfg Scale:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+        <Entry Grid.Row="2" Grid.Column="1" Placeholder="7.5" Text="{Binding CfgScale}" Keyboard="Numeric" FontSize="16" MaxLength="6" HorizontalTextAlignment="End" />
+
+        <Label Grid.Row="3" Text="Sampler:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+        <Picker Grid.Row="3" Grid.Column="1" Title="Sampler" ItemsSource="{Binding AvailableSamplerValues}" SelectedItem="{Binding Sampler}" FontSize="16" HorizontalTextAlignment="End" />
+
+        <Label Grid.Row="4" Text="Width:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+        <Picker Grid.Row="4" Grid.Column="1" Title="Width" ItemsSource="{Binding AvailableWidthValues}" SelectedItem="{Binding Width}" FontSize="16" HorizontalTextAlignment="End" />
+
+        <Label Grid.Row="5" Text="Height:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+        <Picker Grid.Row="5" Grid.Column="1" Title="Height" ItemsSource="{Binding AvailableHeightValues}" SelectedItem="{Binding Height}" FontSize="16" HorizontalTextAlignment="End" />
+
+        <Label Grid.Row="6" Text="Seed:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+        <Entry Grid.Row="6" Grid.Column="1" Placeholder="-1 for random" Text="{Binding Seed}" Keyboard="Numeric" FontSize="16" HorizontalTextAlignment="End" />
+    </Grid>
 </ContentPage>
