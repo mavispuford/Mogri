@@ -6,6 +6,8 @@ using MobileDiffusion.Models;
 using System.Text.RegularExpressions;
 using MobileDiffusion.Models.LStein;
 using System.Collections.ObjectModel;
+using MobileDiffusion.Views;
+using CommunityToolkit.Maui.Views;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -122,6 +124,11 @@ public partial class MainPageViewModel : BaseViewModel, IMainPageViewModel
     [RelayCommand]
     private async Task ShowRequestSettings()
     {
+        //var popup = new PromptSettingsPopup();
+        //var result = await Shell.Current.CurrentPage.ShowPopupAsync(popup);
+
+        await Shell.Current.GoToAsync(nameof(PromptSettingsPage));
+
         await Task.CompletedTask;
     }
 }
