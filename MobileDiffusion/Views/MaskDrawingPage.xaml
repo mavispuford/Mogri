@@ -4,7 +4,7 @@
              xmlns:mctviews="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui"
              xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
              x:Class="MobileDiffusion.Views.MaskDrawingPage"
-             Title="MaskDrawingPage"
+             Title="Image to Image"
              x:DataType="viewModels:IMaskDrawingPageViewModel">
     <ScrollView>
         <Grid
