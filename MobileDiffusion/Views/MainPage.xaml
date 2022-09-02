@@ -4,14 +4,11 @@
              xmlns:mctviews="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
-             xmlns:converters="clr-namespace:MobileDiffusion.Converters"
              x:Class="MobileDiffusion.Views.MainPage"
              x:DataType="viewModels:IMainPageViewModel">
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:IsListNotNullOrEmptyConverter x:Key="IsListNotNullOrEmptyConverter" />
-            <converters:ItemCountHasMoreThanNumberConverter x:Key="ItemCountHasMoreThanNumberConverter" />
-            
         </ResourceDictionary>
     </ContentPage.Resources>
     <Grid x:Name="MainGrid"
@@ -49,8 +46,8 @@
             
 
         <Label Grid.Row="3"
-                    Text="Result(s):"
-                    IsVisible="{Binding ResultImageSources, Converter={StaticResource IsListNotNullOrEmptyConverter}}"/>
+               Text="Result(s):"
+               IsVisible="{Binding ResultImageSources, Converter={StaticResource IsListNotNullOrEmptyConverter}}"/>
 
         <ScrollView Grid.Row="4" VerticalOptions="FillAndExpand" VerticalScrollBarVisibility="Never" HorizontalScrollBarVisibility="Never">
             <FlexLayout x:Name="ImageLayout"

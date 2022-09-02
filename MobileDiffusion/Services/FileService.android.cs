@@ -1,5 +1,6 @@
 ﻿using Android.Content;
 using Android.Provider;
+using Android.Service.QuickSettings;
 using MobileDiffusion.Interfaces.Services;
 
 namespace MobileDiffusion.Services;
@@ -145,6 +146,18 @@ public class FileService : IFileService
         return fullPath;
     }
 
+    public async Task<string> WriteFileToInternalStorageAsync(string fileName, byte[] bytes)
+    {
+        using (var stream = new MemoryStream())
+        {
+            await stream.WriteAsync(bytes);
+
+            var uri = await WriteFileToInternalStorageAsync(fileName, stream);
+
+            return uri;
+        }
+    }
+
     public async Task<string> WriteFileToExternalStorageAsync(string fileName, Stream stream)
     {
         await checkForWritePermission();
@@ -208,6 +221,7 @@ public class FileService : IFileService
     {
 #if ANDROID29_0_OR_GREATER
         // No need for permissions.
+        await Task.CompletedTask;
 #else
         if (await Permissions.CheckStatusAsync<Permissions.StorageWrite>() != PermissionStatus.Granted)
         {

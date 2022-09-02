@@ -22,7 +22,7 @@ public static class MauiProgram
 
 		builder.Services.AddHttpClient();
 
-		builder.Services.AddSingleton<IStableDiffusionService, StableDiffusionService>();
+		builder.Services.AddSingleton<IStableDiffusionService, LSteinStableDiffusionService>();
 
 #if ANDROID
 		builder.Services.AddSingleton<IFileService, FileService>();

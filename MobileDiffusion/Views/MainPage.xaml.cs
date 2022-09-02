@@ -9,7 +9,7 @@ public partial class MainPage : ContentPage
 	{
 		InitializeComponent();
 
-		MainGrid.SetBinding(WidthProperty, nameof(IMainPageViewModel.ImageLayoutWidth), BindingMode.OneWayToSource);
+        MainGrid.SetBinding(PaddingProperty, nameof(IMainPageViewModel.MainLayoutPadding), BindingMode.OneWayToSource);
+        MainGrid.SetBinding(WidthProperty, nameof(IMainPageViewModel.MainLayoutWidth), BindingMode.OneWayToSource);
 	}
 }
-
