@@ -3,18 +3,18 @@ using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MobileDiffusion.Models;
-using System.Text.RegularExpressions;
 using MobileDiffusion.Models.LStein;
 using System.Collections.ObjectModel;
 using MobileDiffusion.Views;
-using CommunityToolkit.Maui.Views;
 
 namespace MobileDiffusion.ViewModels;
 
-public partial class MainPageViewModel : BaseViewModel, IMainPageViewModel
+public partial class MainPageViewModel : BaseViewModel, IMainPageViewModel, IQueryAttributable
 {
     private readonly IFileService _fileService;
     private readonly IStableDiffusionService _stableDiffusionService;
+
+    private Settings _settings = new();
 
     [ObservableProperty]
     private string prompt;
@@ -55,38 +55,30 @@ public partial class MainPageViewModel : BaseViewModel, IMainPageViewModel
 
         var finalPrompt = string.IsNullOrEmpty(Prompt) ? PlaceholderPrompt : Prompt;
 
-        var request = new BaseRequest
-        {
-            Prompt = finalPrompt,
-            NumOutputs = 3,
-            Width = 256,
-            Height = 256
-        };
+        _settings.Prompt = finalPrompt;
 
         ImageLayoutWidth = MainLayoutWidth - MainLayoutPadding.HorizontalThickness;
 
-        ImageWidth = request.NumOutputs switch
+        ImageWidth = _settings.NumOutputs switch
         {
             var x when x > 4 => ImageLayoutWidth,
             var x when x > 1 && x <= 4 => ImageLayoutWidth / 2.5,
             var x when x >= 0 => ImageLayoutWidth,
         };
 
-        var ratio = request.Width / request.Height;
+        var ratio = _settings.Width / _settings.Height;
 
         ImageHeight = ImageWidth / ratio;
 
         var sanitizedPrompt = finalPrompt.Replace(" ", "_").ToLower();
         var length = Math.Min(sanitizedPrompt.Length, 100);
-        var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{request.Seed}";
 
         List<LSteinResponseItem> results = new();
-        var imageSources = new List<ImageSource>();
         var imageNumber = 0;
 
         try
         {
-            await foreach (var item in _stableDiffusionService.SubmitTextToImageRequest(request))
+            await foreach (var item in _stableDiffusionService.SubmitTextToImageRequest(_settings))
             {
                 // TODO - Use "step" items to display progress
                 if (!item.Event.Equals("result", StringComparison.OrdinalIgnoreCase))
@@ -96,6 +88,8 @@ public partial class MainPageViewModel : BaseViewModel, IMainPageViewModel
 
                 var imageBytes = await _stableDiffusionService.GetImageBytesAsync(item);
 
+                var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{item.Seed}";
+
                 var uri = await _fileService.WriteFileToInternalStorageAsync($"{fileNameNoExtension}-{imageNumber++}.png", imageBytes);
 
                 ResultImageSources.Add(ImageSource.FromFile(uri));
@@ -103,14 +97,18 @@ public partial class MainPageViewModel : BaseViewModel, IMainPageViewModel
                 results.Add(item);
             }
         }
+        catch (System.Net.WebException webException)
+        {
+            // TODO - Handle this
+
+            return;
+        }
         catch (Exception e)
         {
             // TODO - Handle this
 
             return;
         }
-
-        //ResultImageSources = imageSources;
 
         //var fakeResults = new List<ImageSource>();
         //for (var i = 0; i < 4; i++)
@@ -127,8 +125,19 @@ public partial class MainPageViewModel : BaseViewModel, IMainPageViewModel
         //var popup = new PromptSettingsPopup();
         //var result = await Shell.Current.CurrentPage.ShowPopupAsync(popup);
 
-        await Shell.Current.GoToAsync(nameof(PromptSettingsPage));
+        var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings } };
+
+        await Shell.Current.GoToAsync(nameof(PromptSettingsPage), parameters);
 
         await Task.CompletedTask;
+    }
+
+    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    {
+        if (query.TryGetValue(NavigationParams.PromptSettings, out var promptSettings) &&
+            promptSettings is Settings settings)
+        {
+            _settings = settings;
+        }
     }
 }

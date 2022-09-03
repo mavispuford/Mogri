@@ -9,6 +9,8 @@ namespace MobileDiffusion.Models.LStein
 {
     public class LSteinRequest
     {
+        private static Random random = new Random();
+
         [JsonPropertyName("cfgscale")]
         public string Cfgscale { get; set; }
 
@@ -48,20 +50,20 @@ namespace MobileDiffusion.Models.LStein
         [JsonPropertyName("width")]
         public string Width { get; set; }
         
-        public static LSteinRequest FromBaseRequest(BaseRequest baseRequest)
+        public static LSteinRequest FromSettings(Settings settings)
         {
             var result = new LSteinRequest()
             {
-                Cfgscale = baseRequest.GuidanceScale.ToString(),
-                Height = baseRequest.Height.ToString(),
-                Initimg = baseRequest.InitImage,
-                Iterations = baseRequest.NumOutputs.ToString(),
-                Prompt = baseRequest.Prompt,
-                Sampler = baseRequest.Sampler.ToString(),
-                Seed = baseRequest.Seed.ToString(),
-                Steps = baseRequest.NumInferenceSteps.ToString(),
-                Strength = baseRequest.PromptStrength.ToString(),
-                Width = baseRequest.Width.ToString(),
+                Cfgscale = settings.GuidanceScale.ToString(),
+                Height = settings.Height.ToString(),
+                Initimg = settings.InitImage,
+                Iterations = settings.NumOutputs.ToString(),
+                Prompt = settings.Prompt,
+                Sampler = settings.Sampler.ToString(),
+                Seed = settings.Seed == -1 ? random.Next().ToString() : settings.Seed.ToString(),
+                Steps = settings.NumInferenceSteps.ToString(),
+                Strength = settings.PromptStrength.ToString(),
+                Width = settings.Width.ToString(),
             };
 
             result.UpscaleLevel = String.Empty;
