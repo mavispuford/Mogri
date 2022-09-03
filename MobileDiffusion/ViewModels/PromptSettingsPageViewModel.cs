@@ -72,6 +72,12 @@ public partial class PromptSettingsPageViewModel : BaseViewModel, IPromptSetting
         availableWidthValues = widthValues;
         availableHeightValues = heightValues;
         availableSamplerValues = samplerValues;
+
+        var defaultSettings = new Settings();
+        ImageCountPlaceholder = defaultSettings.NumOutputs.ToString();
+        StepsPlaceholder = defaultSettings.NumInferenceSteps.ToString();
+        CfgScalePlaceholder = defaultSettings.GuidanceScale.ToString();
+        SeedPlaceholder = defaultSettings.Seed.ToString();
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)

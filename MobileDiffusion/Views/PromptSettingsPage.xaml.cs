@@ -6,4 +6,12 @@ public partial class PromptSettingsPage : ContentPage
 	{
 		InitializeComponent();
 	}
+
+	private void Slider_ValueChanged(object sender, ValueChangedEventArgs e)
+	{
+        if (sender is Slider slider)
+		{
+            slider.Value = Math.Round(e.NewValue);
+        }
+    }
 }

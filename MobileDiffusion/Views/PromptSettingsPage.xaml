@@ -19,7 +19,12 @@
             </Image.Behaviors>
         </Image>
         <Label Grid.Row="0" Grid.Column="1" Text="Images:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16" />
-        <Entry Grid.Row="0" Grid.Column="2" Placeholder="{Binding ImageCountPlaceholder}" Text="{Binding ImageCount}" Keyboard="Numeric" FontSize="16" MaxLength="2" HorizontalTextAlignment="End" />
+        <Grid Grid.Row="0" Grid.Column="2" 
+              ColumnDefinitions="*,auto"
+              ColumnSpacing="10">
+            <Slider Grid.Column="0" Minimum="1" Maximum="9" Value="{Binding ImageCount}" ValueChanged="Slider_ValueChanged" />
+            <Label Grid.Column="1" Text="{Binding ImageCount}" VerticalTextAlignment="Center" FontSize="16" />
+        </Grid>
 
         <Image Grid.Row="1" Source="repeat" WidthRequest="32">
             <Image.Behaviors>
@@ -67,7 +72,7 @@
             </Image.Behaviors>
         </Image>
         <Label Grid.Row="6" Grid.Column="1" Text="Seed:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
-        <Entry Grid.Row="6" Grid.Column="2" Placeholder="{Binding SeedPlaceholder}" Text="{Binding Seed}" Keyboard="Numeric" FontSize="16" HorizontalTextAlignment="End" />
+        <Entry Grid.Row="6" Grid.Column="2" Placeholder="{Binding SeedPlaceholder}" Text="{Binding Seed}" Keyboard="Numeric" FontSize="16" HorizontalTextAlignment="End" ClearButtonVisibility="WhileEditing" />
 
         <Button Grid.Row="7" Grid.ColumnSpan="3" Text="Confirm" Command="{Binding ConfirmSettingsCommand}" HorizontalOptions="End" />
     </Grid>
