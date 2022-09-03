@@ -31,14 +31,14 @@ namespace MobileDiffusion.Services
             return false;
         }
 
-        public async IAsyncEnumerable<LSteinResponseItem> SubmitTextToImageRequest(BaseRequest request)
+        public async IAsyncEnumerable<LSteinResponseItem> SubmitTextToImageRequest(Settings settings)
         {
-            if (request == null)
+            if (settings == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw new ArgumentNullException(nameof(settings));
             }
 
-            var convertedRequest = LSteinRequest.FromBaseRequest(request);
+            var convertedRequest = LSteinRequest.FromSettings(settings);
 
             var client = _httpClientFactory.CreateClient();
 
