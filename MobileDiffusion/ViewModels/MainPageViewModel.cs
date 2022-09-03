@@ -20,7 +20,7 @@ public partial class MainPageViewModel : BaseViewModel, IMainPageViewModel, IQue
     private string prompt;
 
     [ObservableProperty]
-    private string placeholderPrompt = "A detailed painting of a kangaroo";
+    private string placeholderPrompt = "An astronaut floating in space, detailed digital drawing, octane render, trending on artstation";
 
     [ObservableProperty]
     private ObservableCollection<ImageSource> resultImageSources = new();
