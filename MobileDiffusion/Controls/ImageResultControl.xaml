@@ -2,16 +2,27 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:MobileDiffusion.Controls;assembly=MobileDiffusion"
-             x:Class="MobileDiffusion.Controls.ImageResultControl">
-    
-        <Grid>
-            <controls:PinchToZoomContainer>
-                <Image Source="waterfront.jpg"
-                       Aspect="AspectFit" />
-            </controls:PinchToZoomContainer>
+             xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
+             x:Class="MobileDiffusion.Controls.ImageResultControl"
+             x:Name="MainControl"
+             HorizontalOptions="Fill"
+             VerticalOptions="Fill"
+             x:DataType="viewModels:IResultItemViewModel">
 
-            <ActivityIndicator HorizontalOptions="Center"
-                                   VerticalOptions="Center"
-                                   IsRunning="{Binding CreateCommand.IsRunning}"/>
-        </Grid>
+    <Grid HorizontalOptions="Fill"
+          VerticalOptions="Fill">
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer Command="{Binding TappedCommand}" />
+        </Grid.GestureRecognizers>
+
+        <Image x:Name="ImageControl" 
+                   Aspect="AspectFit" 
+                   HorizontalOptions="Fill" 
+                   VerticalOptions="Fill"
+                   Scale="0"/>
+
+        <ActivityIndicator HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           IsRunning="{Binding Source={x:Reference MainControl}, Path=IsLoading}"/>
+    </Grid>
 </ContentView>

@@ -18,7 +18,7 @@ public partial class PopupBaseViewModel : IPopupBaseViewModel
     {
     }
 
-    protected void ClosePopup(object? result)
+    protected void ClosePopup(object? result = null)
     {
         _popupService.ClosePopup(this, result);
     }

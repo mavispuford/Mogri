@@ -13,13 +13,32 @@ public static class PopupRegistrations
     {
         builder.Services.AddTransient<PopupSizeConstants>();
 
-        registerPopup<IPromptSettingsPageViewModel, PromptSettingsPopup>(builder.Services);
+        registerPopup<IPromptSettingsPopupViewModel, PromptSettingsPopup>(builder.Services);
+        registerPopup<IResultItemPopupViewModel, ResultItemPopup>(builder.Services);
 
         return builder;
     }
 
+    private static void registerPopup<TPopup>(IServiceCollection serviceCollection)
+    where TPopup : Popup
+    {
+        _registrations[typeof(TPopup).Name] = typeof(TPopup);
+
+        serviceCollection.AddTransient(provider =>
+        {
+            var popup = Activator.CreateInstance(typeof(TPopup)) as TPopup;
+
+            if (popup == null)
+            {
+                throw new InvalidOperationException($"Unable to create a popup of type {typeof(TPopup)}");
+            }
+
+            return popup;
+        });
+    }
+
     private static void registerPopup<TViewModel, TPopup>(IServiceCollection serviceCollection)
-        where TViewModel : IBaseViewModel
+        where TViewModel : IPopupBaseViewModel
         where TPopup : Popup
     {
         _registrations[typeof(TPopup).Name] = typeof(TPopup);

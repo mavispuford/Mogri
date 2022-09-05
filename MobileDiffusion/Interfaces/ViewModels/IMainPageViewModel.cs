@@ -13,6 +13,7 @@ public interface IMainPageViewModel : IBaseViewModel
     double ImageWidth { get; set; }
     double ImageHeight { get; set; }
     ObservableCollection<ImageSource> ResultImageSources { get; set; }
+    ObservableCollection<IResultItemViewModel> Results { get; set; }
     IAsyncRelayCommand CreateCommand { get; }
     IAsyncRelayCommand ShowRequestSettingsCommand { get; }
 }
