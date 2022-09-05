@@ -1,5 +1,8 @@
-﻿namespace MobileDiffusion.Interfaces.ViewModels;
+﻿using System.ComponentModel;
 
-public interface IBaseViewModel : IQueryAttributable
+namespace MobileDiffusion.Interfaces.ViewModels;
+
+public interface IBaseViewModel
 {
+
 }

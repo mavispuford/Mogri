@@ -6,7 +6,7 @@
                xmlns:popups="clr-namespace:MobileDiffusion.Views.Popups"
                xmlns:models="clr-namespace:MobileDiffusion.Models"
                x:Class="MobileDiffusion.Views.Popups.PromptSettingsPopup"
-               x:DataType="viewModels:IPromptSettingsPageViewModel">
+               x:DataType="viewModels:IPromptSettingsPopupViewModel">
     <Grid x:Name="MainGrid"
           Padding="30"
           RowDefinitions="auto, auto, auto, auto, auto, auto, auto, auto, auto"

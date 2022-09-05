@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Maui.Views;
-using MobileDiffusion.Interfaces.ViewModels;
+﻿using MobileDiffusion.Interfaces.ViewModels;
 
 namespace MobileDiffusion.Views;
 
@@ -13,7 +12,6 @@ public partial class MainPage : ContentPage
         MainGrid.SetBinding(WidthProperty, nameof(IMainPageViewModel.MainLayoutWidth), BindingMode.OneWayToSource);
 
         ImageLayout.ChildAdded += ImageLayout_ChildAdded;
-
     }
 
     private void ImageLayout_ChildAdded(object sender, ElementEventArgs e)

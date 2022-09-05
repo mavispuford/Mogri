@@ -8,7 +8,6 @@ public static class ViewRegistrations
     public static MauiAppBuilder RegisterViews(this MauiAppBuilder builder)
     {
         registerPage<IMainPageViewModel, MainPage>(builder.Services);
-        registerPage<IPromptSettingsPageViewModel, PromptSettingsPage>(builder.Services);
 
         return builder;
     }

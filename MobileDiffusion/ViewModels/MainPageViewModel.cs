@@ -8,11 +8,12 @@ using System.Collections.ObjectModel;
 
 namespace MobileDiffusion.ViewModels;
 
-public partial class MainPageViewModel : BaseViewModel, IMainPageViewModel, IQueryAttributable
+public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQueryAttributable
 {
     private readonly IFileService _fileService;
     private readonly IStableDiffusionService _stableDiffusionService;
     private readonly IPopupService _popupService;
+    private readonly IServiceProvider _serviceProvider;
 
     private Settings _settings = new();
 
@@ -24,6 +25,9 @@ public partial class MainPageViewModel : BaseViewModel, IMainPageViewModel, IQue
 
     [ObservableProperty]
     private ObservableCollection<ImageSource> resultImageSources = new();
+
+    [ObservableProperty]
+    private ObservableCollection<IResultItemViewModel> results = new();
 
     [ObservableProperty]
     private double mainLayoutWidth;
@@ -43,17 +47,25 @@ public partial class MainPageViewModel : BaseViewModel, IMainPageViewModel, IQue
     public MainPageViewModel(
         IFileService fileService,
         IStableDiffusionService stableDiffusionService,
-        IPopupService popupService)
+        IPopupService popupService,
+        IServiceProvider serviceProvider)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
     }
 
     [RelayCommand]
     private async Task Create()
     {
         ResultImageSources = new();
+        Results = new();
+
+        for(var i = 0; i < _settings.NumOutputs; i++)
+        {
+            Results.Add(_serviceProvider.GetService<IResultItemViewModel>());
+        }
 
         var finalPrompt = string.IsNullOrEmpty(Prompt) ? PlaceholderPrompt : Prompt;
 
@@ -61,30 +73,35 @@ public partial class MainPageViewModel : BaseViewModel, IMainPageViewModel, IQue
 
         ImageLayoutWidth = MainLayoutWidth - MainLayoutPadding.HorizontalThickness;
 
-        try
+        bool exceptionThrown;
+        do
         {
-            ImageWidth = _settings.NumOutputs switch
+            try
             {
-                var x when x > 4 => ImageLayoutWidth,
-                var x when x > 1 && x <= 4 => ImageLayoutWidth / 2.5,
-                var x when x >= 0 => ImageLayoutWidth,
-            };
+                exceptionThrown = false;
 
-            var ratio = _settings.Width / _settings.Height;
+                ImageWidth = _settings.NumOutputs switch
+                {
+                    var x when x > 4 => ImageLayoutWidth,
+                    var x when x > 1 && x <= 4 => ImageLayoutWidth / 2.5,
+                    var x when x >= 0 => ImageLayoutWidth,
+                };
 
-            ImageHeight = ImageWidth / ratio;
-        }
-        catch
-        {
-            // Null reference exceptions can be thrown here on the view side because
-            // image items in the itemtemplate can be disposed but somehow still linked
-        }
+                var ratio = _settings.Width / _settings.Height;
 
+                ImageHeight = ImageWidth / ratio;
+            }
+            catch
+            {
+                exceptionThrown = true;
+                // Null reference exceptions can be thrown here on the view side because
+                // image items in the itemtemplate can be disposed but somehow still linked
+            }
+        } while (exceptionThrown);
 
         var sanitizedPrompt = finalPrompt.Replace(" ", "_").ToLower();
         var length = Math.Min(sanitizedPrompt.Length, 100);
 
-        List<LSteinResponseItem> results = new();
         var imageNumber = 0;
 
         try
@@ -103,9 +120,10 @@ public partial class MainPageViewModel : BaseViewModel, IMainPageViewModel, IQue
 
                 var uri = await _fileService.WriteFileToInternalStorageAsync($"{fileNameNoExtension}-{imageNumber++}.png", imageBytes);
 
-                ResultImageSources.Add(ImageSource.FromFile(uri));
+                var resultWithNullImageSource = Results.FirstOrDefault(r => r.ImageSource == null);
 
-                results.Add(item);
+                resultWithNullImageSource.ImageSource = ImageSource.FromFile(uri);
+                resultWithNullImageSource.Config = item;
             }
         }
         catch (System.Net.WebException webException)

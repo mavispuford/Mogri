@@ -2,7 +2,7 @@
 
 namespace MobileDiffusion.Interfaces.ViewModels;
 
-public interface IPromptSettingsPageViewModel : IBaseViewModel
+public interface IPromptSettingsPopupViewModel : IPopupBaseViewModel
 {
     List<string> AvailableWidthValues { get; set; }
 

@@ -8,7 +8,7 @@ using MobileDiffusion.Models;
 
 namespace MobileDiffusion.ViewModels;
 
-public partial class PromptSettingsPageViewModel : PopupBaseViewModel, IPromptSettingsPageViewModel
+public partial class PromptSettingsPopupViewModel : PopupBaseViewModel, IPromptSettingsPopupViewModel
 {
     [ObservableProperty]
     private List<string> availableWidthValues = new();
@@ -52,7 +52,7 @@ public partial class PromptSettingsPageViewModel : PopupBaseViewModel, IPromptSe
     [ObservableProperty]
     private string seedPlaceholder;
 
-    public PromptSettingsPageViewModel(IPopupService popupService) : base(popupService)
+    public PromptSettingsPopupViewModel(IPopupService popupService) : base(popupService)
     {
         var widthValues = new List<string>();
         var heightValues = new List<string>();
