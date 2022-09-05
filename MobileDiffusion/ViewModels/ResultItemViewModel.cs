@@ -16,6 +16,9 @@ public partial class ResultItemViewModel : BaseViewModel, IResultItemViewModel
     [ObservableProperty]
     private LSteinResponseItem config;
 
+    [ObservableProperty]
+    private string internalUri;
+
     public ResultItemViewModel(IPopupService popupService)
     {
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));

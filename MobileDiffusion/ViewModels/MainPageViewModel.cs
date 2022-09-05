@@ -122,6 +122,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
                 var resultWithNullImageSource = Results.FirstOrDefault(r => r.ImageSource == null);
 
+                resultWithNullImageSource.InternalUri = uri;
                 resultWithNullImageSource.ImageSource = ImageSource.FromFile(uri);
                 resultWithNullImageSource.Config = item;
             }

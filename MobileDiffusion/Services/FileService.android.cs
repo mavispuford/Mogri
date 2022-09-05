@@ -7,7 +7,9 @@ namespace MobileDiffusion.Services;
 
 public class FileService : IFileService
 {
-    public async Task<Stream> GetFileStreamUsingExactUri(string uriString)
+    private const string extFolderName = "MobileDiffusion/";
+
+    public async Task<Stream> GetFileStreamUsingExactUriAsync(string uriString)
     {
         await checkForReadPermission();
 
@@ -29,14 +31,16 @@ public class FileService : IFileService
         return null;
     }
 
-    public async Task<Stream> GetFileStreamFromExternalStorage(string fileName)
+    public async Task<Stream> GetFileStreamFromExternalStorageAsync(string fileName)
     {
         await checkForReadPermission();
 
         return await getFileStreamFromStorageUsingBaseUri(fileName, MediaStore.Images.Media.ExternalContentUri);
+
+        //return await getFileStreamFromStorageUsingBaseUri(fileName, Android.Net.Uri.WithAppendedPath(MediaStore.Images.Media.ExternalContentUri, extFolderName));
     }
 
-    public Task<Stream> GetFileStreamFromInternalStorage(string fileName)
+    public Task<Stream> GetFileStreamFromInternalStorageAsync(string fileName)
     {
         var fullPath = Path.Combine(FileSystem.CacheDirectory, fileName);
 
@@ -162,6 +166,7 @@ public class FileService : IFileService
     {
         await checkForWritePermission();
 
+        //return await writeFileToBaseUriAsync(fileName, stream, Android.Net.Uri.WithAppendedPath(MediaStore.Images.Media.ExternalContentUri, extFolderName));
         return await writeFileToBaseUriAsync(fileName, stream, MediaStore.Images.Media.ExternalContentUri);
     }
 

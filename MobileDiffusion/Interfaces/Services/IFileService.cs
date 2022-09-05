@@ -2,11 +2,11 @@
 {
     public interface IFileService
     {
-        Task<Stream> GetFileStreamUsingExactUri(string uriString);
+        Task<Stream> GetFileStreamUsingExactUriAsync(string uriString);
 
-        Task<Stream> GetFileStreamFromExternalStorage(string fileName);
+        Task<Stream> GetFileStreamFromExternalStorageAsync(string fileName);
 
-        Task<Stream> GetFileStreamFromInternalStorage(string fileName);
+        Task<Stream> GetFileStreamFromInternalStorageAsync(string fileName);
 
         Task<string> WriteFileToInternalStorageAsync(string fileName, Stream stream);
 
