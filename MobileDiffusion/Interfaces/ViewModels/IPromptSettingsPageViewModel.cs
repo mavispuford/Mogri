@@ -34,5 +34,7 @@ public interface IPromptSettingsPageViewModel : IBaseViewModel
 
     IRelayCommand ResetValuesCommand { get; }
 
+    IRelayCommand CancelCommand { get; }
+
     IRelayCommand ConfirmSettingsCommand { get; }
 }

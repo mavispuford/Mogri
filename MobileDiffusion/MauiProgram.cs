@@ -1,8 +1,4 @@
 ﻿using CommunityToolkit.Maui;
-using MobileDiffusion.Interfaces.Services;
-using MobileDiffusion.Services;
-using Microsoft.Extensions.Http;
-using System.Net;
 
 namespace MobileDiffusion;
 
@@ -18,22 +14,15 @@ public static class MauiProgram
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-			})
+                fonts.AddFont("MaterialIconsRound-Regular.otf", "MaterialIconsRoundRegular");
+            })
 			.UseMauiCommunityToolkit()
+			.RegisterServices()
 			.RegisterViewModels()
-			.RegisterViews();
+			.RegisterViews()
+			.RegisterPopups();
 
-		builder.Services.AddHttpClient();
-        //builder.Services.AddHttpClient("Default").ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
-		//{
-		//	Proxy = new WebProxy() { Address = new Uri("192.168.86.42:8888") }
-		//});
-
-		builder.Services.AddSingleton<IStableDiffusionService, LSteinStableDiffusionService>();
-
-#if ANDROID
-		builder.Services.AddSingleton<IFileService, FileService>();
-#endif
+        builder.Services.AddSingleton(DeviceDisplay.Current);
 
         return builder.Build();
 	}

@@ -5,7 +5,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using MobileDiffusion.Models;
 using MobileDiffusion.Models.LStein;
 using System.Collections.ObjectModel;
-using MobileDiffusion.Views;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -13,6 +12,7 @@ public partial class MainPageViewModel : BaseViewModel, IMainPageViewModel, IQue
 {
     private readonly IFileService _fileService;
     private readonly IStableDiffusionService _stableDiffusionService;
+    private readonly IPopupService _popupService;
 
     private Settings _settings = new();
 
@@ -42,10 +42,12 @@ public partial class MainPageViewModel : BaseViewModel, IMainPageViewModel, IQue
 
     public MainPageViewModel(
         IFileService fileService,
-        IStableDiffusionService stableDiffusionService)
+        IStableDiffusionService stableDiffusionService,
+        IPopupService popupService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
+        _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
     }
 
     [RelayCommand]
@@ -59,16 +61,25 @@ public partial class MainPageViewModel : BaseViewModel, IMainPageViewModel, IQue
 
         ImageLayoutWidth = MainLayoutWidth - MainLayoutPadding.HorizontalThickness;
 
-        ImageWidth = _settings.NumOutputs switch
+        try
         {
-            var x when x > 4 => ImageLayoutWidth,
-            var x when x > 1 && x <= 4 => ImageLayoutWidth / 2.5,
-            var x when x >= 0 => ImageLayoutWidth,
-        };
+            ImageWidth = _settings.NumOutputs switch
+            {
+                var x when x > 4 => ImageLayoutWidth,
+                var x when x > 1 && x <= 4 => ImageLayoutWidth / 2.5,
+                var x when x >= 0 => ImageLayoutWidth,
+            };
 
-        var ratio = _settings.Width / _settings.Height;
+            var ratio = _settings.Width / _settings.Height;
 
-        ImageHeight = ImageWidth / ratio;
+            ImageHeight = ImageWidth / ratio;
+        }
+        catch
+        {
+            // Null reference exceptions can be thrown here on the view side because
+            // image items in the itemtemplate can be disposed but somehow still linked
+        }
+
 
         var sanitizedPrompt = finalPrompt.Replace(" ", "_").ToLower();
         var length = Math.Min(sanitizedPrompt.Length, 100);
@@ -122,17 +133,17 @@ public partial class MainPageViewModel : BaseViewModel, IMainPageViewModel, IQue
     [RelayCommand]
     private async Task ShowRequestSettings()
     {
-        //var popup = new PromptSettingsPopup();
-        //var result = await Shell.Current.CurrentPage.ShowPopupAsync(popup);
-
         var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings } };
 
-        await Shell.Current.GoToAsync(nameof(PromptSettingsPage), parameters);
+        var settings = await _popupService.ShowPopupAsync("PromptSettingsPopup", parameters) as Settings;
 
-        await Task.CompletedTask;
+        if (settings != null)
+        {
+            _settings = settings;
+        }
     }
 
-    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    public override void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (query.TryGetValue(NavigationParams.PromptSettings, out var promptSettings) &&
             promptSettings is Settings settings)

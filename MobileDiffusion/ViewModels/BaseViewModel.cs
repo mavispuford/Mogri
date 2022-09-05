@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using MobileDiffusion.Interfaces.ViewModels;
 
-namespace MobileDiffusion.ViewModels
+namespace MobileDiffusion.ViewModels;
+
+[INotifyPropertyChanged]
+public partial class BaseViewModel : IBaseViewModel
 {
-    [INotifyPropertyChanged]
-
-    public partial class BaseViewModel
+    public virtual void ApplyQueryAttributes(IDictionary<string, object> query)
     {
     }
 }
