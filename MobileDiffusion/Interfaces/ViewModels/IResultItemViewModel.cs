@@ -7,6 +7,8 @@ public interface IResultItemViewModel : IBaseViewModel
 {
     ImageSource ImageSource { get; set; }
 
+    string InternalUri { get; set; }
+
     LSteinResponseItem Config { get; set; }
 
     IAsyncRelayCommand TappedCommand { get; }
