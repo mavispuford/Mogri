@@ -1,12 +1,14 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Maui.Views;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Enums;
+using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Models;
 
 namespace MobileDiffusion.ViewModels;
 
-public partial class PromptSettingsPageViewModel : BaseViewModel, IPromptSettingsPageViewModel, IQueryAttributable
+public partial class PromptSettingsPageViewModel : PopupBaseViewModel, IPromptSettingsPageViewModel
 {
     [ObservableProperty]
     private List<string> availableWidthValues = new();
@@ -50,7 +52,7 @@ public partial class PromptSettingsPageViewModel : BaseViewModel, IPromptSetting
     [ObservableProperty]
     private string seedPlaceholder;
 
-    public PromptSettingsPageViewModel()
+    public PromptSettingsPageViewModel(IPopupService popupService) : base(popupService)
     {
         var widthValues = new List<string>();
         var heightValues = new List<string>();
@@ -80,7 +82,7 @@ public partial class PromptSettingsPageViewModel : BaseViewModel, IPromptSetting
         SeedPlaceholder = defaultSettings.Seed.ToString();
     }
 
-    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    public override void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (!query.TryGetValue(NavigationParams.PromptSettings, out var promptSettings) ||
             promptSettings is not Settings settings)
@@ -98,11 +100,17 @@ public partial class PromptSettingsPageViewModel : BaseViewModel, IPromptSetting
     }
 
     [RelayCommand]
+    private void Cancel()
+    {
+        ClosePopup(null);
+    }
+
+    [RelayCommand]
     private void ConfirmSettings()
     {
-        var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, mapPropertiesToSettings() } };
+        var result = mapPropertiesToSettings();
 
-        Shell.Current.GoToAsync("..", parameters);
+        ClosePopup(result);
     }
 
     private void mapSettingsToProperties(Settings settings)
