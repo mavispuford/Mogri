@@ -1,13 +1,12 @@
 ﻿using Android.Content;
 using Android.Provider;
-using Android.Service.QuickSettings;
 using MobileDiffusion.Interfaces.Services;
 
 namespace MobileDiffusion.Services;
 
 public class FileService : IFileService
 {
-    private const string extFolderName = "MobileDiffusion/";
+    private const string extFolderName = "Pictures/MobileDiffusion/";
 
     public async Task<Stream> GetFileStreamUsingExactUriAsync(string uriString)
     {
@@ -176,6 +175,7 @@ public class FileService : IFileService
         contentValues.Put(MediaStore.IMediaColumns.Title, fileName);
         contentValues.Put(MediaStore.IMediaColumns.MimeType, "image/jpg");
         contentValues.Put(MediaStore.Images.Media.InterfaceConsts.DisplayName, fileName);
+        contentValues.Put(MediaStore.Images.Media.InterfaceConsts.RelativePath, extFolderName);
 
 #if ANDROID30_0_OR_GREATER
         contentValues.Put(MediaStore.Images.Media.InterfaceConsts.IsPending, 1);
