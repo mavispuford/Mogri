@@ -9,4 +9,6 @@ public interface IResultItemPopupViewModel : IPopupBaseViewModel
     IRelayCommand CloseCommand { get; }
 
     IAsyncRelayCommand SaveCommand { get; }
+
+    IRelayCommand UseSeedCommand { get; }
 }

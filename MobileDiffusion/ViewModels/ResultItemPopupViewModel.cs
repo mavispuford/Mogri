@@ -46,4 +46,12 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
         var stream = await _fileService.GetFileStreamFromInternalStorageAsync(resultItem.InternalUri);
         await _fileService.WriteFileToExternalStorageAsync(Path.GetFileName(resultItem.InternalUri), stream);
     }
+
+    [RelayCommand]
+    private void UseSeed()
+    {
+        var result = Models.Settings.FromResultItem(ResultItem);
+
+        ClosePopup(result);
+    }
 }

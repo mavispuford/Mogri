@@ -14,10 +14,13 @@ public partial class ResultItemViewModel : BaseViewModel, IResultItemViewModel
     private ImageSource imageSource;
 
     [ObservableProperty]
-    private LSteinResponseItem config;
+    private LSteinResponseItem responseItem;
 
     [ObservableProperty]
     private string internalUri;
+
+    [ObservableProperty]
+    private IRelayCommand setSettingsCommand;
 
     public ResultItemViewModel(IPopupService popupService)
     {
@@ -38,5 +41,10 @@ public partial class ResultItemViewModel : BaseViewModel, IResultItemViewModel
         };
 
         var result = await _popupService.ShowPopupAsync("ResultItemPopup", parameters);
+
+        if (result is Models.Settings settings)
+        {
+            SetSettingsCommand?.Execute(settings);
+        }
     }
 }

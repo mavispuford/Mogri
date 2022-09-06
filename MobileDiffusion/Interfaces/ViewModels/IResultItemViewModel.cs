@@ -9,7 +9,9 @@ public interface IResultItemViewModel : IBaseViewModel
 
     string InternalUri { get; set; }
 
-    LSteinResponseItem Config { get; set; }
+    LSteinResponseItem ResponseItem { get; set; }
 
     IAsyncRelayCommand TappedCommand { get; }
+
+    IRelayCommand SetSettingsCommand { get; set; }
 }

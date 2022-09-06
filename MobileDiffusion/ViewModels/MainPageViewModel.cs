@@ -24,25 +24,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
     private string placeholderPrompt = "An astronaut floating in space, detailed digital drawing, octane render, trending on artstation";
 
     [ObservableProperty]
-    private ObservableCollection<ImageSource> resultImageSources = new();
-
-    [ObservableProperty]
     private ObservableCollection<IResultItemViewModel> results = new();
-
-    [ObservableProperty]
-    private double mainLayoutWidth;
-
-    [ObservableProperty]
-    private Thickness mainLayoutPadding;
-
-    [ObservableProperty]
-    private double imageLayoutWidth;
-
-    [ObservableProperty]
-    private double imageWidth;
-    
-    [ObservableProperty]
-    private double imageHeight;
 
     public MainPageViewModel(
         IFileService fileService,
@@ -59,48 +41,22 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
     [RelayCommand]
     private async Task Create()
     {
-        ResultImageSources = new();
         Results = new();
 
         for(var i = 0; i < _settings.NumOutputs; i++)
         {
-            Results.Add(_serviceProvider.GetService<IResultItemViewModel>());
+            var resultItem = _serviceProvider.GetService<IResultItemViewModel>();
+
+            resultItem.SetSettingsCommand = new RelayCommand<Settings>(setSettings);
+            Results.Add(resultItem);
         }
 
         var finalPrompt = string.IsNullOrEmpty(Prompt) ? PlaceholderPrompt : Prompt;
 
         _settings.Prompt = finalPrompt;
 
-        ImageLayoutWidth = MainLayoutWidth - MainLayoutPadding.HorizontalThickness;
-
-        bool exceptionThrown;
-        do
-        {
-            try
-            {
-                exceptionThrown = false;
-
-                ImageWidth = _settings.NumOutputs switch
-                {
-                    var x when x > 4 => ImageLayoutWidth,
-                    var x when x > 1 && x <= 4 => ImageLayoutWidth / 2.5,
-                    var x when x >= 0 => ImageLayoutWidth,
-                };
-
-                var ratio = _settings.Width / _settings.Height;
-
-                ImageHeight = ImageWidth / ratio;
-            }
-            catch
-            {
-                exceptionThrown = true;
-                // Null reference exceptions can be thrown here on the view side because
-                // image items in the itemtemplate can be disposed but somehow still linked
-            }
-        } while (exceptionThrown);
-
         var sanitizedPrompt = finalPrompt.Replace(" ", "_").ToLower();
-        var length = Math.Min(sanitizedPrompt.Length, 100);
+        var length = Math.Min(sanitizedPrompt.Length, 90);
 
         var imageNumber = 0;
 
@@ -116,7 +72,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
                 var imageBytes = await _stableDiffusionService.GetImageBytesAsync(item);
 
-                var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{item.Seed}";
+                var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{item.Seed}-{DateTime.Now.Millisecond}";
 
                 var uri = await _fileService.WriteFileToInternalStorageAsync($"{fileNameNoExtension}-{imageNumber++}.png", imageBytes);
 
@@ -124,7 +80,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
                 resultWithNullImageSource.InternalUri = uri;
                 resultWithNullImageSource.ImageSource = ImageSource.FromFile(uri);
-                resultWithNullImageSource.Config = item;
+                resultWithNullImageSource.ResponseItem = item;
             }
         }
         catch (System.Net.WebException webException)
@@ -139,14 +95,6 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
             return;
         }
-
-        //var fakeResults = new List<ImageSource>();
-        //for (var i = 0; i < 4; i++)
-        //{
-        //    fakeResults.Add(ImageSource.FromFile("dotnet_bot"));
-        //}
-
-        //ResultImageSources = fakeResults;
     }
 
     [RelayCommand]
@@ -169,5 +117,15 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
         {
             _settings = settings;
         }
+    }
+
+    private void setSettings(Settings settings)
+    {
+        if (settings == null)
+        {
+            return;
+        }
+
+        _settings = settings;
     }
 }
