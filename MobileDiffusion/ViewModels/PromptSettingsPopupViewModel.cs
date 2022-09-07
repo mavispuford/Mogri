@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Maui.Views;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Enums;
 using MobileDiffusion.Interfaces.Services;
@@ -10,6 +9,8 @@ namespace MobileDiffusion.ViewModels;
 
 public partial class PromptSettingsPopupViewModel : PopupBaseViewModel, IPromptSettingsPopupViewModel
 {
+    private Settings _settings;
+
     [ObservableProperty]
     private List<string> availableWidthValues = new();
 
@@ -90,13 +91,22 @@ public partial class PromptSettingsPopupViewModel : PopupBaseViewModel, IPromptS
             throw new ArgumentException(nameof(NavigationParams.PromptSettings));
         }
 
-        mapSettingsToProperties(settings);
+        _settings = settings.Clone();
+
+        mapSettingsToProperties();
     }
 
     [RelayCommand]
     private void ResetValues()
     {
-        mapSettingsToProperties(new Settings());
+        var defaultSettings = new Settings();
+        ImageCount = defaultSettings.NumOutputs.ToString();
+        Steps = defaultSettings.NumInferenceSteps.ToString();
+        CfgScale = defaultSettings.GuidanceScale.ToString();
+        Sampler = defaultSettings.Sampler.ToString();
+        Width = defaultSettings.Width.ToString();
+        Height = defaultSettings.Height.ToString();
+        Seed = defaultSettings.Seed.ToString();
     }
 
     [RelayCommand]
@@ -108,65 +118,61 @@ public partial class PromptSettingsPopupViewModel : PopupBaseViewModel, IPromptS
     [RelayCommand]
     private void ConfirmSettings()
     {
-        var result = mapPropertiesToSettings();
+        mapPropertiesToSettings();
 
-        ClosePopup(result);
+        ClosePopup(_settings);
     }
 
-    private void mapSettingsToProperties(Settings settings)
+    private void mapSettingsToProperties()
     {
-        ImageCount = settings.NumOutputs.ToString();
-        Steps = settings.NumInferenceSteps.ToString();
-        CfgScale = settings.GuidanceScale.ToString();
-        Sampler = settings.Sampler.ToString();
-        Width = settings.Width.ToString();
-        Height = settings.Height.ToString();
-        Seed = settings.Seed.ToString();
+        ImageCount = _settings.NumOutputs.ToString();
+        Steps = _settings.NumInferenceSteps.ToString();
+        CfgScale = _settings.GuidanceScale.ToString();
+        Sampler = _settings.Sampler.ToString();
+        Width = _settings.Width.ToString();
+        Height = _settings.Height.ToString();
+        Seed = _settings.Seed.ToString();
     }
 
-    private Settings mapPropertiesToSettings()
+    private void mapPropertiesToSettings()
     {
-        var settings = new Settings();
-
         if (int.TryParse(ImageCount, out var imageCount) ||
             int.TryParse(ImageCountPlaceholder, out imageCount))
         {
-            settings.NumOutputs = imageCount;
+            _settings.NumOutputs = imageCount;
         }
 
         if (int.TryParse(Steps, out var steps) ||
             int.TryParse(StepsPlaceholder, out steps))
         {
-            settings.NumInferenceSteps = steps;
+            _settings.NumInferenceSteps = steps;
         }
 
         if (double.TryParse(CfgScale, out var cfgScale) ||
             double.TryParse(CfgScalePlaceholder, out cfgScale))
         {
-            settings.GuidanceScale = cfgScale;
+            _settings.GuidanceScale = cfgScale;
         }
 
         if (Enum.TryParse<Sampler>(Sampler, out var sampler))
         {
-            settings.Sampler = sampler;
+            _settings.Sampler = sampler;
         }
 
         if (double.TryParse(Width, out var width))
         {
-            settings.Width = width;
+            _settings.Width = width;
         }
 
         if (double.TryParse(Height, out var height))
         {
-            settings.Height = height;
+            _settings.Height = height;
         }
 
         if (long.TryParse(Seed, out var seed) ||
             long.TryParse(SeedPlaceholder, out seed))
         {
-            settings.Seed = seed;
+            _settings.Seed = seed;
         }
-
-        return settings;
     }
 }

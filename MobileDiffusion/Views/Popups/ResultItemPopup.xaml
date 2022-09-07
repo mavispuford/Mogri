@@ -36,7 +36,7 @@
             
         </controls:PinchToZoomContainer>
         <Button Grid.Row="1" Grid.Column="0" Text="Use Seed" Command="{Binding UseSeedCommand}" />
-        <Button Grid.Row="1" Grid.Column="1" Text="Image to Image" />
+        <Button Grid.Row="1" Grid.Column="1" Text="Image to Image" Command="{Binding ImageToImageCommand}" />
         <Button Grid.Row="2" Grid.Column="0" Text="Save" Command="{Binding SaveCommand}" />
         <Button Grid.Row="2" Grid.Column="1" Text="Close" Command="{Binding CloseCommand}" />
     </Grid>

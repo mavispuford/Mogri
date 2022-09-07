@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<popups:BasePopup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
+               xmlns:popups="clr-namespace:MobileDiffusion.Views.Popups"
+               xmlns:models="clr-namespace:MobileDiffusion.Models"
+               x:Class="MobileDiffusion.Views.Popups.ImageToImageSettingsPopup"
+               x:DataType="viewModels:IImageToImageSettingsPopupViewModel">
+    <Grid x:Name="MainGrid"
+          Padding="30"
+          RowDefinitions="auto, auto, auto, auto, auto"
+          RowSpacing="10"
+          ColumnSpacing="16"
+          ColumnDefinitions="32,auto,*"
+          HorizontalOptions="CenterAndExpand">
+        <Grid.Resources>
+            <ResourceDictionary>
+                <toolkit:IsNullConverter x:Key="IsNullConverter" />
+                <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+            </ResourceDictionary>
+        </Grid.Resources>
+
+        <Label Grid.Row="0" Grid.ColumnSpan="3" Text="Image to Image" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="18"/>
+        <Image Grid.Row="1" Grid.Column="0" WidthRequest="32">
+            <Image.Source>
+                <FontImageSource Glyph="&#xe421;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
+            </Image.Source>
+        </Image>
+        <Label Grid.Row="1" Grid.Column="1" Text="Strength:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+        <Entry Grid.Row="1" Grid.Column="2" Placeholder="{Binding StrengthPlaceholder}" Text="{Binding Strength}" Keyboard="Numeric" FontSize="16" MaxLength="6" HorizontalTextAlignment="End" />
+
+        <Image Grid.Row="2" Grid.Column="0" WidthRequest="32">
+            <Image.Source>
+                <FontImageSource Glyph="&#xe43e;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
+            </Image.Source>
+        </Image>
+        <Label Grid.Row="2" Grid.Column="1" Text="Source Image:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+
+        <Grid Grid.Row="3" Grid.ColumnSpan="3"
+              HeightRequest="200" WidthRequest="200">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding ShowMediaPickerCommand}" />
+            </Grid.GestureRecognizers>
+            <Label Text="Tap to set source image" HorizontalOptions="Fill" VerticalOptions="Fill" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Padding="20"
+                   IsVisible="{Binding InitImageSource, Converter={StaticResource IsNullConverter}}"/>
+            <Image Source="{Binding InitImageSource}" Aspect="AspectFit" HorizontalOptions="Fill" VerticalOptions="Fill"
+                   IsVisible="{Binding InitImageSource, Converter={StaticResource IsNotNullConverter}}"/>
+        </Grid>
+
+        <HorizontalStackLayout Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Spacing="10" HorizontalOptions="End">
+            <Button Command="{Binding ResetValuesCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" >
+                <Button.ImageSource>
+                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource Tertiary}" />
+                </Button.ImageSource>
+            </Button>
+            <Button Text="Cancel" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
+            <Button Text="Confirm" Command="{Binding ConfirmSettingsCommand}" />
+        </HorizontalStackLayout>
+    </Grid>
+</popups:BasePopup>

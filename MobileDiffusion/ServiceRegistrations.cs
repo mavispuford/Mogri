@@ -1,5 +1,6 @@
 ﻿using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Services;
+using System.Net;
 
 namespace MobileDiffusion;
 
@@ -10,7 +11,7 @@ public static class ServiceRegistrations
         builder.Services.AddHttpClient();
         //builder.Services.AddHttpClient("Default").ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
         //{
-        //	Proxy = new WebProxy() { Address = new Uri("192.168.86.42:8888") }
+        //    Proxy = new WebProxy() { Address = new Uri("192.168.86.42:8888") }
         //});
 
         builder.Services.AddSingleton<IStableDiffusionService, LSteinStableDiffusionService>();

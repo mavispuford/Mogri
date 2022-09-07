@@ -26,6 +26,7 @@ public partial class MainPage : ContentPage
                 1 => imageLayoutWidth,
             };
 
+            // TODO - Rework this - The width/height is currently -1 every time, making the ratio 1:1
             var ratio = visualElement.Width / visualElement.Height;
 
             var imageHeight = imageWidth / ratio;
