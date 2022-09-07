@@ -11,4 +11,6 @@ public interface IResultItemPopupViewModel : IPopupBaseViewModel
     IAsyncRelayCommand SaveCommand { get; }
 
     IRelayCommand UseSeedCommand { get; }
+
+    IAsyncRelayCommand ImageToImageCommand { get; }
 }

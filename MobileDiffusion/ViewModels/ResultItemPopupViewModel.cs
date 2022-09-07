@@ -52,6 +52,37 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
     {
         var result = Models.Settings.FromResultItem(ResultItem);
 
+        result.NumOutputs = 1;
+
         ClosePopup(result);
+    }
+
+    [RelayCommand]
+    private async Task ImageToImage()
+    {
+        try
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                var stream = await _fileService.GetFileStreamFromInternalStorageAsync(resultItem.InternalUri);
+
+                stream.CopyTo(memoryStream);
+                var imageBytes = memoryStream.ToArray();
+
+                var result = Models.Settings.FromResultItem(ResultItem);
+
+                var imageString = Convert.ToBase64String(imageBytes);
+
+                result.NumOutputs = 1;
+                result.Seed = -1;
+                result.InitImage = string.Format(Constants.ImageDataFormat, "image/jpeg", imageString);
+
+                ClosePopup(result);
+            }
+        }
+        catch
+        {
+            // TODO - Handle exceptions
+        }
     }
 }

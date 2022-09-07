@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MobileDiffusion.Models;
-using MobileDiffusion.Models.LStein;
 using System.Collections.ObjectModel;
 
 namespace MobileDiffusion.ViewModels;
@@ -47,7 +46,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
         {
             var resultItem = _serviceProvider.GetService<IResultItemViewModel>();
 
-            resultItem.SetSettingsCommand = new RelayCommand<Settings>(setSettings);
+            resultItem.SetSettingsCommand = new RelayCommand<Settings>(setSettingsFromResultItem);
             Results.Add(resultItem);
         }
 
@@ -98,6 +97,19 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
     }
 
     [RelayCommand]
+    private async Task ShowImageToImageSettings()
+    {
+        var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings } };
+
+        var settings = await _popupService.ShowPopupAsync("ImageToImageSettingsPopup", parameters) as Settings;
+
+        if (settings != null)
+        {
+            _settings = settings;
+        }
+    }
+
+    [RelayCommand]
     private async Task ShowRequestSettings()
     {
         var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings } };
@@ -119,13 +131,26 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
         }
     }
 
-    private void setSettings(Settings settings)
+    private void setSettingsFromResultItem(Settings settings)
     {
         if (settings == null)
         {
             return;
         }
 
+        var initImage = string.Empty;
+
+        if (string.IsNullOrEmpty(settings.InitImage) &&
+            !string.IsNullOrEmpty(_settings.InitImage))
+        {
+            initImage = _settings.InitImage;
+        }
+
         _settings = settings;
+
+        if (!string.IsNullOrEmpty(initImage))
+        {
+            _settings.InitImage = initImage;
+        }
     }
 }

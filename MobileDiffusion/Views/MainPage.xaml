@@ -27,22 +27,34 @@
                 AutoSize="TextChanges"/>
 
         <Grid Grid.Row="2"
-              ColumnDefinitions="80*,20*"
+              ColumnDefinitions="60*,20*,20*"
               ColumnSpacing="10"
               HorizontalOptions="FillAndExpand">
             <Button Grid.Column="0"
                     Text="Create!"
                     Command="{Binding CreateCommand}"/>
 
-            <ImageButton Grid.Column="1"
-                         HeightRequest="40"
-                         CornerRadius="10"
-                         Source="tune"
-                         Command="{Binding ShowRequestSettingsCommand}">
-                <ImageButton.Behaviors>
-                    <toolkit:IconTintColorBehavior TintColor="{StaticResource IndependenceAccent}" />
-                </ImageButton.Behaviors>
-            </ImageButton>
+            <Button Grid.Column="1"
+                    HeightRequest="40"
+                    CornerRadius="10"
+                    HorizontalOptions="Fill"
+                    Command="{Binding ShowRequestSettingsCommand}"
+                    BackgroundColor="Transparent">
+                <Button.ImageSource>
+                    <FontImageSource Glyph="&#xe429;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource IndependenceAccent}" />
+                </Button.ImageSource>
+            </Button>
+            
+            <Button Grid.Column="2"
+                    HeightRequest="40"
+                    CornerRadius="10"
+                    HorizontalOptions="Fill"
+                    Command="{Binding ShowImageToImageSettingsCommand}"
+                    BackgroundColor="Transparent">
+                <Button.ImageSource>
+                    <FontImageSource Glyph="&#xe3f4;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource IndependenceAccent}" />
+                </Button.ImageSource>
+            </Button>
         </Grid>
             
         <Label Grid.Row="3"

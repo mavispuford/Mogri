@@ -9,5 +9,6 @@ public interface IMainPageViewModel : IBaseViewModel
     string PlaceholderPrompt { get; set; }
     ObservableCollection<IResultItemViewModel> Results { get; set; }
     IAsyncRelayCommand CreateCommand { get; }
+    IAsyncRelayCommand ShowImageToImageSettingsCommand { get; }
     IAsyncRelayCommand ShowRequestSettingsCommand { get; }
 }
