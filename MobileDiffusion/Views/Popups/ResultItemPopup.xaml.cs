@@ -12,8 +12,8 @@ public partial class ResultItemPopup : BasePopup
 
         var popupSizeConstants = ServiceHelper.GetService<PopupSizeConstants>();
         
-        MainGrid.WidthRequest = popupSizeConstants.Large.Width;
-        MainGrid.HeightRequest = popupSizeConstants.Large.Height;
+        MainGrid.WidthRequest = popupSizeConstants.ExtraLarge.Width;
+        MainGrid.HeightRequest = popupSizeConstants.ExtraLarge.Height;
 
         var minDimension = Math.Min(MainGrid.WidthRequest, MainGrid.HeightRequest);
 
