@@ -17,6 +17,9 @@
     <Color x:Key="Gray600">#404040</Color>
     <Color x:Key="Gray900">#212121</Color>
     <Color x:Key="Gray950">#141414</Color>
+
+    <Color x:Key="Gray200TwentySixPercent">#44C8C8C8</Color>
+
     <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}"/>
     <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource Secondary}"/>
     <SolidColorBrush x:Key="TertiaryBrush" Color="{StaticResource Tertiary}"/>
@@ -42,6 +45,9 @@
     <Color x:Key="Blue300Accent">#A7CBF6</Color>
 
     <Color x:Key="IndependenceAccent">#545775</Color>
+    <Color x:Key="IndependenceAccentFortyPercent">#66545775</Color>
+
     <Color x:Key="RoyalBlueAccent">#03256C</Color>
+
 
 </ResourceDictionary>

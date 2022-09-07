@@ -35,9 +35,29 @@
                    Source="{Binding ResultItem.ImageSource}"/>
             
         </controls:PinchToZoomContainer>
-        <Button Grid.Row="1" Grid.Column="0" Text="Use Seed" Command="{Binding UseSeedCommand}" />
-        <Button Grid.Row="1" Grid.Column="1" Text="Image to Image" Command="{Binding ImageToImageCommand}" />
-        <Button Grid.Row="2" Grid.Column="0" Text="Save" Command="{Binding SaveCommand}" />
-        <Button Grid.Row="2" Grid.Column="1" Text="Close" Command="{Binding CloseCommand}" />
+        <Button Grid.Row="1" Grid.Column="0" Text="Use Seed" Command="{Binding UseSeedCommand}" 
+                Style="{DynamicResource LargeIconButtonStyle}">
+            <Button.ImageSource>
+                <FontImageSource Glyph="&#xe3a5;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource White}" />
+            </Button.ImageSource>
+        </Button>
+        <Button Grid.Row="1" Grid.Column="1" Text="Image to Image" Command="{Binding ImageToImageCommand}"
+                Style="{DynamicResource LargeIconButtonStyle}">
+            <Button.ImageSource>
+                <FontImageSource Glyph="&#xe3f4;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource White}" />
+            </Button.ImageSource>
+        </Button>
+        <Button Grid.Row="2" Grid.Column="0" Text="Save" Command="{Binding SaveCommand}" 
+                Style="{DynamicResource LargeIconButtonStyle}">
+            <Button.ImageSource>
+                <FontImageSource Glyph="&#xe161;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource White}" />
+            </Button.ImageSource>
+        </Button>
+        <Button Grid.Row="2" Grid.Column="1" Text="Close" Command="{Binding CloseCommand}"
+                Style="{DynamicResource LargeIconButtonStyle}">
+            <Button.ImageSource>
+                <FontImageSource Glyph="&#xe5cd;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource White}" />
+            </Button.ImageSource>
+        </Button>
     </Grid>
 </popups:BasePopup>
