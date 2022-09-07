@@ -6,7 +6,7 @@
     xmlns:views="clr-namespace:MobileDiffusion.Views"
     Shell.FlyoutBehavior="Disabled">
 
-    <TabBar>
+    <TabBar Shell.TabBarUnselectedColor="{StaticResource IndependenceAccent}">
         <Tab Title="Text to Image"
              Icon="article">
             <ShellContent ContentTemplate="{DataTemplate views:MainPage}" />

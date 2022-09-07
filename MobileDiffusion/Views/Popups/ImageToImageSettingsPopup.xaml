@@ -49,7 +49,7 @@
         </Grid>
 
         <HorizontalStackLayout Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Spacing="10" HorizontalOptions="End">
-            <Button Command="{Binding ResetValuesCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" >
+            <Button Command="{Binding ResetValuesCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}">
                 <Button.ImageSource>
                     <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource Tertiary}" />
                 </Button.ImageSource>
