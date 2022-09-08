@@ -71,10 +71,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Platforms\Android\Services\" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <Compile Update="Views\Popups\ImageToImageSettingsPopup.xaml.cs">
 	    <DependentUpon>ImageToImageSettingsPopup.xaml</DependentUpon>
 	  </Compile>
