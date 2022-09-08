@@ -5,6 +5,7 @@ namespace MobileDiffusion.Interfaces.ViewModels;
 
 public interface IMainPageViewModel : IBaseViewModel
 {
+    bool HasInitImage { get; set; }
     string Prompt { get; set; }
     string PlaceholderPrompt { get; set; }
     ObservableCollection<IResultItemViewModel> Results { get; set; }

@@ -1,8 +1,9 @@
 ﻿using Android.Content;
 using Android.Provider;
 using MobileDiffusion.Interfaces.Services;
+using AndroidNet = Android.Net;
 
-namespace MobileDiffusion.Services;
+namespace MobileDiffusion.Platforms.Android.Services;
 
 public class FileService : IFileService
 {
@@ -16,7 +17,7 @@ public class FileService : IFileService
 
         try
         {
-            var uri = Android.Net.Uri.Parse(uriString);
+            var uri = AndroidNet.Uri.Parse(uriString);
 
             return contentResolver.OpenInputStream(uri);
         }
@@ -36,7 +37,7 @@ public class FileService : IFileService
 
         return await getFileStreamFromStorageUsingBaseUri(fileName, MediaStore.Images.Media.ExternalContentUri);
 
-        //return await getFileStreamFromStorageUsingBaseUri(fileName, Android.Net.Uri.WithAppendedPath(MediaStore.Images.Media.ExternalContentUri, extFolderName));
+        //return await getFileStreamFromStorageUsingBaseUri(fileName, AndroidNet.Uri.WithAppendedPath(MediaStore.Images.Media.ExternalContentUri, extFolderName));
     }
 
     public Task<Stream> GetFileStreamFromInternalStorageAsync(string fileName)
@@ -59,7 +60,7 @@ public class FileService : IFileService
         return null;
     }
 
-    private Task<Stream> getFileStreamFromStorageUsingBaseUri(string fileName, Android.Net.Uri baseUri)
+    private Task<Stream> getFileStreamFromStorageUsingBaseUri(string fileName, AndroidNet.Uri baseUri)
     {
         if (string.IsNullOrEmpty(fileName))
         {
@@ -165,11 +166,11 @@ public class FileService : IFileService
     {
         await checkForWritePermission();
 
-        //return await writeFileToBaseUriAsync(fileName, stream, Android.Net.Uri.WithAppendedPath(MediaStore.Images.Media.ExternalContentUri, extFolderName));
+        //return await writeFileToBaseUriAsync(fileName, stream, AndroidNet.Uri.WithAppendedPath(MediaStore.Images.Media.ExternalContentUri, extFolderName));
         return await writeFileToBaseUriAsync(fileName, stream, MediaStore.Images.Media.ExternalContentUri);
     }
 
-    private async Task<string> writeFileToBaseUriAsync(string fileName, Stream stream, Android.Net.Uri baseUri)
+    private async Task<string> writeFileToBaseUriAsync(string fileName, Stream stream, AndroidNet.Uri baseUri)
     {
         var contentValues = new ContentValues();
         contentValues.Put(MediaStore.IMediaColumns.Title, fileName);
@@ -181,7 +182,7 @@ public class FileService : IFileService
         contentValues.Put(MediaStore.Images.Media.InterfaceConsts.IsPending, 1);
 #endif
 
-        Android.Net.Uri uri;
+        AndroidNet.Uri uri;
         var contentResolver = Platform.CurrentActivity.ContentResolver;
 
         try

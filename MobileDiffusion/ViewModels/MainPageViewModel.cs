@@ -17,6 +17,9 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
     private Settings _settings = new();
 
     [ObservableProperty]
+    private bool hasInitImage;
+
+    [ObservableProperty]
     private string prompt;
 
     [ObservableProperty]
@@ -106,6 +109,8 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
         if (settings != null)
         {
             _settings = settings;
+
+            updateHasInitImage();
         }
     }
 
@@ -119,6 +124,8 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
         if (settings != null)
         {
             _settings = settings;
+
+            updateHasInitImage();
         }
     }
 
@@ -128,6 +135,8 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
             promptSettings is Settings settings)
         {
             _settings = settings;
+
+            updateHasInitImage();
         }
     }
 
@@ -152,5 +161,12 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
         {
             _settings.InitImage = initImage;
         }
+
+        updateHasInitImage();
+    }
+
+    private void updateHasInitImage()
+    {
+        HasInitImage = !string.IsNullOrEmpty(_settings?.InitImage);
     }
 }

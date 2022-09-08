@@ -1,6 +1,9 @@
 ﻿using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Services;
-using System.Net;
+
+#if ANDROID
+using MobileDiffusion.Platforms.Android.Services;
+#endif
 
 namespace MobileDiffusion;
 

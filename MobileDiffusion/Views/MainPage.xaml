@@ -11,6 +11,7 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:IsListNotNullOrEmptyConverter x:Key="IsListNotNullOrEmptyConverter" />
+            <toolkit:BoolToObjectConverter x:Key="BoolToColorConverter" TrueObject="{StaticResource Tertiary}" FalseObject="{StaticResource IndependenceAccent}" />
         </ResourceDictionary>
     </ContentPage.Resources>
     <Grid x:Name="MainGrid"
@@ -45,16 +46,16 @@
                 </Button.ImageSource>
             </Button>
             
-            <Button Grid.Column="2"
-                    HeightRequest="40"
+            <ImageButton Grid.Column="2"
+                    HeightRequest="28"
                     CornerRadius="10"
                     HorizontalOptions="Fill"
                     Command="{Binding ShowImageToImageSettingsCommand}"
                     BackgroundColor="Transparent">
-                <Button.ImageSource>
-                    <FontImageSource Glyph="&#xe3f4;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource IndependenceAccent}" />
-                </Button.ImageSource>
-            </Button>
+                <ImageButton.Source>
+                    <FontImageSource Glyph="&#xe3f4;" FontFamily="MaterialIconsRoundRegular" Color="{Binding HasInitImage, Converter={StaticResource BoolToColorConverter}}" />
+                </ImageButton.Source>
+            </ImageButton>
         </Grid>
             
         <Label Grid.Row="3"
