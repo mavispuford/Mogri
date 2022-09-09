@@ -22,6 +22,9 @@ public partial class ResultItemViewModel : BaseViewModel, IResultItemViewModel
     [ObservableProperty]
     private IRelayCommand setSettingsCommand;
 
+    [ObservableProperty]
+    private IRelayCommand setInitImageCommand;
+
     public ResultItemViewModel(IPopupService popupService)
     {
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
@@ -45,6 +48,11 @@ public partial class ResultItemViewModel : BaseViewModel, IResultItemViewModel
         if (result is Models.Settings settings)
         {
             SetSettingsCommand?.Execute(settings);
+        }
+        else if (result is string initImage && 
+            Constants.ImageDataRegex.IsMatch(initImage))
+        {
+            SetInitImageCommand?.Execute(initImage);
         }
     }
 }

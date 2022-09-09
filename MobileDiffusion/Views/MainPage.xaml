@@ -1,19 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<views:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:mctviews="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
              xmlns:controls="clr-namespace:MobileDiffusion.Controls;assembly=MobileDiffusion"
+             xmlns:views="clr-namespace:MobileDiffusion.Views;assembly=MobileDiffusion"
              x:Class="MobileDiffusion.Views.MainPage"
              x:DataType="viewModels:IMainPageViewModel"
              Title="Mobile Diffusion">
-    <ContentPage.Resources>
+    <views:BasePage.Resources>
         <ResourceDictionary>
             <toolkit:IsListNotNullOrEmptyConverter x:Key="IsListNotNullOrEmptyConverter" />
             <toolkit:BoolToObjectConverter x:Key="BoolToColorConverter" TrueObject="{StaticResource Tertiary}" FalseObject="{StaticResource IndependenceAccent}" />
         </ResourceDictionary>
-    </ContentPage.Resources>
+    </views:BasePage.Resources>
     <Grid x:Name="MainGrid"
           RowDefinitions="auto, auto, auto, auto, *"
           Padding="30"
@@ -81,4 +82,4 @@
         </ScrollView>
     </Grid>
 
-</ContentPage>
+</views:BasePage>

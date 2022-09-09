@@ -7,4 +7,12 @@ public class PageViewModel : BaseViewModel, IPageViewModel
     public virtual void ApplyQueryAttributes(IDictionary<string, object> query)
     {
     }
+
+    public virtual void OnAppearing()
+    {
+    }
+
+    public virtual void OnDisappearing()
+    {
+    }
 }
