@@ -2,4 +2,7 @@
 
 public interface IPageViewModel : IQueryAttributable, IBaseViewModel
 {
+    void OnAppearing();
+
+    void OnDisappearing();
 }

@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 
 namespace MobileDiffusion.Interfaces.ViewModels;
 
-public interface IMainPageViewModel : IBaseViewModel
+public interface IMainPageViewModel : IPageViewModel
 {
     bool HasInitImage { get; set; }
     string Prompt { get; set; }

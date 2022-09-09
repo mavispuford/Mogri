@@ -14,4 +14,6 @@ public interface IResultItemViewModel : IBaseViewModel
     IAsyncRelayCommand TappedCommand { get; }
 
     IRelayCommand SetSettingsCommand { get; set; }
+
+    IRelayCommand SetInitImageCommand { get; set; }
 }

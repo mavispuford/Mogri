@@ -50,6 +50,8 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
             var resultItem = _serviceProvider.GetService<IResultItemViewModel>();
 
             resultItem.SetSettingsCommand = new RelayCommand<Settings>(setSettingsFromResultItem);
+            resultItem.SetInitImageCommand = new RelayCommand<string>(setInitImageFromResultItem);
+
             Results.Add(resultItem);
         }
 
@@ -78,11 +80,11 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
                 var uri = await _fileService.WriteFileToInternalStorageAsync($"{fileNameNoExtension}-{imageNumber++}.png", imageBytes);
 
-                var resultWithNullImageSource = Results.FirstOrDefault(r => r.ImageSource == null);
+                var resultWithNullUri = Results.FirstOrDefault(r => string.IsNullOrEmpty(r.InternalUri));
 
-                resultWithNullImageSource.InternalUri = uri;
-                resultWithNullImageSource.ImageSource = ImageSource.FromFile(uri);
-                resultWithNullImageSource.ResponseItem = item;
+                resultWithNullUri.InternalUri = uri;
+                resultWithNullUri.ImageSource = ImageSource.FromFile(uri);
+                resultWithNullUri.ResponseItem = item;
             }
         }
         catch (System.Net.WebException webException)
@@ -165,8 +167,68 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
         updateHasInitImage();
     }
 
+    private void setInitImageFromResultItem(string initImage)
+    {
+        if (string.IsNullOrEmpty(initImage))
+        {
+            return;
+        }
+
+        _settings.InitImage = initImage;
+
+        updateHasInitImage();
+    }
+
     private void updateHasInitImage()
     {
         HasInitImage = !string.IsNullOrEmpty(_settings?.InitImage);
+    }
+
+
+    public override void OnAppearing()
+    {
+        base.OnResume();
+
+        // Possible workaround for the following bugs:
+        // https://github.com/dotnet/maui/issues/9011
+        // https://github.com/dotnet/maui/issues/8809
+        // However, it doesn't work because of this bug:
+        // https://github.com/dotnet/maui/issues/8787
+
+        //refreshImageSources();
+    }
+
+    public override void OnDisappearing()
+    {
+        base.OnSleep();
+
+        // Possible workaround for the following bugs:
+        // https://github.com/dotnet/maui/issues/9011
+        // https://github.com/dotnet/maui/issues/8809
+        // However, it doesn't work because of this bug:
+        // https://github.com/dotnet/maui/issues/8787
+
+        //clearImageSources();
+    }
+
+    private void clearImageSources()
+    {
+        foreach (var result in Results)
+        {
+            result.ImageSource = default(ImageSource);
+        }
+    }
+
+    private void refreshImageSources()
+    {
+        foreach (var result in Results)
+        {
+            if (string.IsNullOrEmpty(result.InternalUri))
+            {
+                continue;
+            }
+
+            result.ImageSource = ImageSource.FromFile(result.InternalUri);
+        }
     }
 }

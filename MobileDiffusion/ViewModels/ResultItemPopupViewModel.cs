@@ -73,11 +73,7 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
 
                 var imageString = Convert.ToBase64String(imageBytes);
 
-                result.NumOutputs = 1;
-                result.Seed = -1;
-                result.InitImage = string.Format(Constants.ImageDataFormat, "image/jpeg", imageString);
-
-                ClosePopup(result);
+                ClosePopup(string.Format(Constants.ImageDataFormat, "image/jpeg", imageString));
             }
         }
         catch
