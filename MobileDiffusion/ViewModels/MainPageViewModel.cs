@@ -4,6 +4,8 @@ using MobileDiffusion.Interfaces.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MobileDiffusion.Models;
 using System.Collections.ObjectModel;
+using static Android.Content.ClipData;
+using MobileDiffusion.Models.LStein;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -45,7 +47,9 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
     {
         Results = new();
 
-        for(var i = 0; i < _settings.NumOutputs; i++)
+        var settings = _settings.Clone();
+
+        for (var i = 0; i < settings.NumOutputs; i++)
         {
             var resultItem = _serviceProvider.GetService<IResultItemViewModel>();
 
@@ -57,7 +61,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
         var finalPrompt = string.IsNullOrEmpty(Prompt) ? PlaceholderPrompt : Prompt;
 
-        _settings.Prompt = finalPrompt;
+        settings.Prompt = finalPrompt;
 
         var sanitizedPrompt = finalPrompt.Replace(" ", "_").ToLower();
         var length = Math.Min(sanitizedPrompt.Length, 90);
@@ -66,25 +70,32 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
         try
         {
-            await foreach (var item in _stableDiffusionService.SubmitTextToImageRequest(_settings))
+            await foreach (var item in _stableDiffusionService.SubmitTextToImageRequest(settings))
             {
-                // TODO - Use "step" items to display progress
-                if (!item.Event.Equals("result", StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                var imageBytes = await _stableDiffusionService.GetImageBytesAsync(item);
-
                 var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{item.Seed}-{DateTime.Now.Millisecond}";
 
-                var uri = await _fileService.WriteFileToInternalStorageAsync($"{fileNameNoExtension}-{imageNumber++}.png", imageBytes);
+                // TODO - Use "step" items to display progress
+                if (item.Event.Equals("result", StringComparison.OrdinalIgnoreCase))
+                {
+                    var result = Results.FirstOrDefault(r => r.ResponseItem == null);
 
-                var resultWithNullUri = Results.FirstOrDefault(r => string.IsNullOrEmpty(r.InternalUri));
+                    result.ResponseItem = item;
 
-                resultWithNullUri.InternalUri = uri;
-                resultWithNullUri.ImageSource = ImageSource.FromFile(uri);
-                resultWithNullUri.ResponseItem = item;
+                    if (!settings.EnableUpscaling && !settings.EnableGfpgan)
+                    {
+                        await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
+                    }
+                }
+                else if (item.Event.Equals("upscaling-done", StringComparison.OrdinalIgnoreCase))
+                {
+                    foreach(var result in Results)
+                    {
+                        if (result != null)
+                        {
+                            await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
+                        }
+                    }                    
+                }
             }
         }
         catch (System.Net.WebException webException)
@@ -99,6 +110,17 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
             return;
         }
+    }
+
+    private async Task retrieveResultImageAsync(IResultItemViewModel result, string fileName, int number)
+    {
+        var imageBytes = await _stableDiffusionService.GetImageBytesAsync(result.ResponseItem);
+
+        var uri = await _fileService.WriteFileToInternalStorageAsync($"{fileName}-{number++}.png", imageBytes);
+
+        result.InternalUri = uri;
+        result.ImageSource = ImageSource.FromFile(uri);
+        result.FinishedLoading = true;
     }
 
     [RelayCommand]
@@ -187,8 +209,6 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
     public override void OnAppearing()
     {
-        base.OnResume();
-
         // Possible workaround for the following bugs:
         // https://github.com/dotnet/maui/issues/9011
         // https://github.com/dotnet/maui/issues/8809
@@ -200,8 +220,6 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
     public override void OnDisappearing()
     {
-        base.OnSleep();
-
         // Possible workaround for the following bugs:
         // https://github.com/dotnet/maui/issues/9011
         // https://github.com/dotnet/maui/issues/8809
