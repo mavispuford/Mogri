@@ -63,9 +63,27 @@ public class LSteinRequest
             Steps = settings.NumInferenceSteps.ToString(),
             Strength = settings.PromptStrength.ToString(),
             Width = settings.Width.ToString(),
+            UpscaleLevel = settings.UpscaleLevel.ToString(),
+            UpscaleStrength = settings.UpscaleStrength.ToString(),
         };
 
-        result.UpscaleLevel = String.Empty;
+        if (settings.EnableGfpgan)
+        {
+            result.GfpganStrength = settings.GfpganStrength.ToString();
+        }
+        else
+        {
+            result.GfpganStrength = "0";
+        }
+
+        if (settings.EnableUpscaling)
+        {
+            result.UpscaleLevel = settings.UpscaleLevel.ToString();
+        }
+        else 
+        {
+            result.UpscaleLevel = string.Empty;
+        }
 
         return result;
     }

@@ -21,6 +21,9 @@ public partial class PromptSettingsPopupViewModel : PopupBaseViewModel, IPromptS
     private List<string> availableSamplerValues = new();
 
     [ObservableProperty]
+    private List<string> availableUpscaleLevelValues = new();
+
+    [ObservableProperty]
     private string imageCount;
 
     [ObservableProperty]
@@ -53,6 +56,27 @@ public partial class PromptSettingsPopupViewModel : PopupBaseViewModel, IPromptS
     [ObservableProperty]
     private string seedPlaceholder;
 
+    [ObservableProperty]
+    private bool enableGfpgan;
+
+    [ObservableProperty]
+    private string gfpganStrength;
+
+    [ObservableProperty]
+    private string gfpganStrengthPlaceholder;
+
+    [ObservableProperty]
+    private bool enableUpscaling;
+
+    [ObservableProperty]
+    private string upscaleLevel;
+
+    [ObservableProperty]
+    private string upscaleStrength;
+
+    [ObservableProperty]
+    private string upscaleStrengthPlaceholder;
+
     public PromptSettingsPopupViewModel(IPopupService popupService) : base(popupService)
     {
         var widthValues = new List<string>();
@@ -72,15 +96,23 @@ public partial class PromptSettingsPopupViewModel : PopupBaseViewModel, IPromptS
             samplerValues.Add(value);
         }
 
+        var upscaleLevelValues = new List<string>
+        {
+            "2","4"
+        };
+
         availableWidthValues = widthValues;
         availableHeightValues = heightValues;
         availableSamplerValues = samplerValues;
+        availableUpscaleLevelValues = upscaleLevelValues;
 
         var defaultSettings = new Settings();
         ImageCountPlaceholder = defaultSettings.NumOutputs.ToString();
         StepsPlaceholder = defaultSettings.NumInferenceSteps.ToString();
         CfgScalePlaceholder = defaultSettings.GuidanceScale.ToString();
         SeedPlaceholder = defaultSettings.Seed.ToString();
+        GfpganStrengthPlaceholder = defaultSettings.GfpganStrength.ToString();
+        UpscaleStrengthPlaceholder = defaultSettings.UpscaleStrength.ToString();
     }
 
     public override void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -107,6 +139,11 @@ public partial class PromptSettingsPopupViewModel : PopupBaseViewModel, IPromptS
         Width = defaultSettings.Width.ToString();
         Height = defaultSettings.Height.ToString();
         Seed = defaultSettings.Seed.ToString();
+        EnableGfpgan = defaultSettings.EnableGfpgan;
+        GfpganStrength = defaultSettings.GfpganStrength.ToString();
+        EnableUpscaling = defaultSettings.EnableUpscaling;
+        UpscaleLevel = defaultSettings.UpscaleLevel.ToString();
+        UpscaleStrength = defaultSettings.UpscaleStrength.ToString();
     }
 
     [RelayCommand]
@@ -132,47 +169,72 @@ public partial class PromptSettingsPopupViewModel : PopupBaseViewModel, IPromptS
         Width = _settings.Width.ToString();
         Height = _settings.Height.ToString();
         Seed = _settings.Seed.ToString();
+        EnableGfpgan = _settings.EnableGfpgan;
+        GfpganStrength = _settings.GfpganStrength.ToString();
+        EnableUpscaling = _settings.EnableUpscaling;
+        UpscaleLevel = _settings.UpscaleLevel == 0 ? "2" : _settings.UpscaleLevel.ToString();
+        UpscaleStrength = _settings.UpscaleStrength.ToString();
     }
 
     private void mapPropertiesToSettings()
     {
-        if (int.TryParse(ImageCount, out var imageCount) ||
-            int.TryParse(ImageCountPlaceholder, out imageCount))
+        if (int.TryParse(ImageCount, out var pImageCount) ||
+            int.TryParse(ImageCountPlaceholder, out pImageCount))
         {
-            _settings.NumOutputs = imageCount;
+            _settings.NumOutputs = pImageCount;
         }
 
-        if (int.TryParse(Steps, out var steps) ||
-            int.TryParse(StepsPlaceholder, out steps))
+        if (int.TryParse(Steps, out var pSteps) ||
+            int.TryParse(StepsPlaceholder, out pSteps))
         {
-            _settings.NumInferenceSteps = steps;
+            _settings.NumInferenceSteps = pSteps;
         }
 
-        if (double.TryParse(CfgScale, out var cfgScale) ||
-            double.TryParse(CfgScalePlaceholder, out cfgScale))
+        if (double.TryParse(CfgScale, out var pCfgScale) ||
+            double.TryParse(CfgScalePlaceholder, out pCfgScale))
         {
-            _settings.GuidanceScale = cfgScale;
+            _settings.GuidanceScale = pCfgScale;
         }
 
-        if (Enum.TryParse<Sampler>(Sampler, out var sampler))
+        if (Enum.TryParse<Sampler>(Sampler, out var pSampler))
         {
-            _settings.Sampler = sampler;
+            _settings.Sampler = pSampler;
         }
 
-        if (double.TryParse(Width, out var width))
+        if (double.TryParse(Width, out var pWidth))
         {
-            _settings.Width = width;
+            _settings.Width = pWidth;
         }
 
-        if (double.TryParse(Height, out var height))
+        if (double.TryParse(Height, out var pHeight))
         {
-            _settings.Height = height;
+            _settings.Height = pHeight;
         }
 
-        if (long.TryParse(Seed, out var seed) ||
-            long.TryParse(SeedPlaceholder, out seed))
+        if (long.TryParse(Seed, out var pSeed) ||
+            long.TryParse(SeedPlaceholder, out pSeed))
         {
-            _settings.Seed = seed;
+            _settings.Seed = pSeed;
+        }
+
+        _settings.EnableGfpgan = EnableGfpgan;
+
+        if (double.TryParse(GfpganStrength, out var pGfpganStrength) ||
+            double.TryParse(GfpganStrengthPlaceholder, out pGfpganStrength))
+        {
+            _settings.GfpganStrength = pGfpganStrength;
+        }
+
+        _settings.EnableUpscaling = EnableUpscaling;
+
+        if (int.TryParse(UpscaleLevel, out var pUpscaleLevel))
+        {
+            _settings.UpscaleLevel = pUpscaleLevel;
+        }
+
+        if (double.TryParse(UpscaleStrength, out var pUpscaleStrength))
+        {
+            _settings.UpscaleStrength = pUpscaleStrength;
         }
     }
 }

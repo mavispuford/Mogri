@@ -16,6 +16,11 @@ namespace MobileDiffusion.Models
         public long Seed { get; set; } = -1;
         public string InitImage { get; set; }
         public string Prompt { get; set; }
+        public bool EnableGfpgan { get; set; } = false;
+        public double GfpganStrength { get; set; } = .75;
+        public bool EnableUpscaling { get; set; } = false;
+        public int UpscaleLevel { get; set; } = 2;
+        public double UpscaleStrength { get; set; } = .75;
 
         public Settings Clone()
         {
@@ -32,6 +37,11 @@ namespace MobileDiffusion.Models
                 Seed = Seed,
                 InitImage = InitImage,
                 Prompt = Prompt,
+                EnableGfpgan = EnableGfpgan,
+                GfpganStrength = GfpganStrength,
+                EnableUpscaling = EnableUpscaling,
+                UpscaleLevel = UpscaleLevel,
+                UpscaleStrength = UpscaleStrength,
             };
 
             return clone;
@@ -46,6 +56,7 @@ namespace MobileDiffusion.Models
 
             var responseItem = resultItem.ResponseItem;
             var config = responseItem.Config;
+            var defaultSettings = new Settings();
 
             var result = new Settings
             {
@@ -92,6 +103,38 @@ namespace MobileDiffusion.Models
             if (double.TryParse(config.Width, out var width))
             {
                 result.Width = width;
+            }
+
+            if (double.TryParse(config.GfpganStrength, out var gfpganStrength))
+            {
+                result.GfpganStrength = gfpganStrength;
+                result.EnableGfpgan = gfpganStrength != 0;
+
+                if (!result.EnableGfpgan)
+                {
+                    result.GfpganStrength = defaultSettings.GfpganStrength;
+                }
+            }
+
+            if (int.TryParse(config.UpscaleLevel, out var upscaleLevel))
+            {
+                result.UpscaleLevel = upscaleLevel;
+                result.EnableUpscaling = upscaleLevel != 0;
+
+                if (!result.EnableUpscaling)
+                {
+                    result.UpscaleLevel = defaultSettings.UpscaleLevel;
+                }
+            }
+
+            if (double.TryParse(config.UpscaleStrength, out var upscaleStrength))
+            {
+                result.UpscaleStrength = upscaleStrength;
+
+                if (!result.EnableUpscaling)
+                {
+                    result.UpscaleStrength = defaultSettings.UpscaleStrength;
+                }
             }
 
             return result;

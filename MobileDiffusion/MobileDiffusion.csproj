@@ -51,17 +51,6 @@
 	<ItemGroup>
 	  <None Remove="Platforms\Android\Resources\xml\network_security_config.xml" />
 	  <None Remove="Resources\Fonts\MaterialIconsRound-Regular.otf" />
-	  <None Remove="Resources\Images\aspect_ratio.svg" />
-	  <None Remove="Resources\Images\background_replace.svg" />
-	  <None Remove="Resources\Images\blur_on.svg" />
-	  <None Remove="Resources\Images\crop.svg" />
-	  <None Remove="Resources\Images\grid.svg" />
-	  <None Remove="Resources\Images\navigate_before.svg" />
-	  <None Remove="Resources\Images\navigate_next.svg" />
-	  <None Remove="Resources\Images\repeat.svg" />
-	  <None Remove="Resources\Images\scale.svg" />
-	  <None Remove="Resources\Images\tune.svg" />
-	  <None Remove="Resources\Images\visibility.svg" />
 	</ItemGroup>
 
 	<ItemGroup>

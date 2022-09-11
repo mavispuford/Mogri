@@ -25,6 +25,9 @@ public partial class ResultItemViewModel : BaseViewModel, IResultItemViewModel
     [ObservableProperty]
     private IRelayCommand setInitImageCommand;
 
+    [ObservableProperty]
+    private bool finishedLoading;
+
     public ResultItemViewModel(IPopupService popupService)
     {
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));

@@ -11,7 +11,8 @@ public partial class PromptSettingsPopup : BasePopup
         InitializeComponent();
 
         var popupSizeConstants = ServiceHelper.GetService<PopupSizeConstants>();
-        MainGrid.WidthRequest = popupSizeConstants.Large.Width;
+        MainGrid.WidthRequest = popupSizeConstants.ExtraLarge.Width;
+        MainGrid.HeightRequest = popupSizeConstants.ExtraLarge.Height;
     }
 
     private void Slider_ValueChanged(object sender, ValueChangedEventArgs e)
