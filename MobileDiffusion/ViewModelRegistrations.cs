@@ -9,7 +9,7 @@ public static class ViewModelRegistrations
     {
         builder.Services.AddTransient<IMainPageViewModel, MainPageViewModel>();
         builder.Services.AddTransient<IImageToImageSettingsPopupViewModel, ImageToImageSettingsPopupViewModel>();
-        builder.Services.AddTransient<IPromptSettingsPopupViewModel, PromptSettingsPopupViewModel>();
+        builder.Services.AddTransient<IPromptSettingsPageViewModel, PromptSettingsPageViewModel>();
         builder.Services.AddTransient<IResultItemViewModel, ResultItemViewModel>();
         builder.Services.AddTransient<IResultItemPopupViewModel, ResultItemPopupViewModel>();
 

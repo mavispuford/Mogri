@@ -10,7 +10,7 @@ public interface IImageToImageSettingsPopupViewModel : IPopupBaseViewModel
 
     ImageSource InitImageSource { get; set; }
 
-    IRelayCommand ResetValuesCommand { get; }
+    IAsyncRelayCommand ResetValuesCommand { get; }
 
     IRelayCommand CancelCommand { get; }
 
