@@ -5,6 +5,7 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
              xmlns:controls="clr-namespace:MobileDiffusion.Controls;assembly=MobileDiffusion"
+             xmlns:converters="clr-namespace:MobileDiffusion.Converters;assembly=MobileDiffusion"
              xmlns:views="clr-namespace:MobileDiffusion.Views;assembly=MobileDiffusion"
              x:Class="MobileDiffusion.Views.MainPage"
              x:DataType="viewModels:IMainPageViewModel"
@@ -13,17 +14,20 @@
         <ResourceDictionary>
             <toolkit:IsListNotNullOrEmptyConverter x:Key="IsListNotNullOrEmptyConverter" />
             <toolkit:BoolToObjectConverter x:Key="BoolToColorConverter" TrueObject="{StaticResource Tertiary}" FalseObject="{StaticResource IndependenceAccent}" />
+            <converters:UnfocusOnCommandExecuteConverter x:Key="UnfocusOnCommandExecuteConverter" />
         </ResourceDictionary>
     </views:BasePage.Resources>
     <Grid x:Name="MainGrid"
-          RowDefinitions="auto, auto, auto, auto, *"
+          RowDefinitions="auto, auto, auto, *"
           Padding="30"
           RowSpacing="10">
 
         <Label Grid.Row="0"
-                Text="Prompt:" />
+               Text="Prompt:"
+               FontSize="Body" />
 
-        <Editor Grid.Row="1"
+        <Editor x:Name="PromptEditor" 
+                Grid.Row="1"
                 Placeholder="{Binding PlaceholderPrompt}" 
                 Text="{Binding Prompt}"
                 AutoSize="TextChanges"/>
@@ -34,36 +38,32 @@
               HorizontalOptions="FillAndExpand">
             <Button Grid.Column="0"
                     Text="Create!"
-                    Command="{Binding CreateCommand}"/>
+                    Command="{Binding CreateCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"/>
 
             <Button Grid.Column="1"
                     HeightRequest="40"
                     CornerRadius="10"
                     HorizontalOptions="Fill"
-                    Command="{Binding ShowRequestSettingsCommand}"
+                    Command="{Binding ShowRequestSettingsCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"
                     BackgroundColor="Transparent">
                 <Button.ImageSource>
                     <FontImageSource Glyph="&#xe429;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource IndependenceAccent}" />
                 </Button.ImageSource>
             </Button>
-            
+
             <ImageButton Grid.Column="2"
                     HeightRequest="28"
                     CornerRadius="10"
                     HorizontalOptions="Fill"
-                    Command="{Binding ShowImageToImageSettingsCommand}"
+                    Command="{Binding ShowImageToImageSettingsCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"
                     BackgroundColor="Transparent">
                 <ImageButton.Source>
                     <FontImageSource Glyph="&#xe3f4;" FontFamily="MaterialIconsRoundRegular" Color="{Binding HasInitImage, Converter={StaticResource BoolToColorConverter}}" />
                 </ImageButton.Source>
             </ImageButton>
         </Grid>
-            
-        <Label Grid.Row="3"
-               Text="Result(s):"
-               IsVisible="{Binding Results, Converter={StaticResource IsListNotNullOrEmptyConverter}}"/>
 
-        <ScrollView Grid.Row="4" VerticalOptions="FillAndExpand" VerticalScrollBarVisibility="Never" HorizontalScrollBarVisibility="Never">
+        <ScrollView Grid.Row="3" VerticalOptions="FillAndExpand" VerticalScrollBarVisibility="Never" HorizontalScrollBarVisibility="Never">
             <FlexLayout x:Name="ImageLayout"
                         BindableLayout.ItemsSource="{Binding Results}" 
                         HorizontalOptions="CenterAndExpand"

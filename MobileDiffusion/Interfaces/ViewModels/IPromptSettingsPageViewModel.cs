@@ -1,9 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using MobileDiffusion.Enums;
 
 namespace MobileDiffusion.Interfaces.ViewModels;
 
-public interface IPromptSettingsPopupViewModel : IPopupBaseViewModel
+public interface IPromptSettingsPageViewModel : IPageViewModel
 {
     List<string> AvailableWidthValues { get; set; }
 
@@ -49,9 +48,9 @@ public interface IPromptSettingsPopupViewModel : IPopupBaseViewModel
 
     string UpscaleStrengthPlaceholder { get; set; }
 
-    IRelayCommand ResetValuesCommand { get; }
+    IAsyncRelayCommand ResetValuesCommand { get; }
 
-    IRelayCommand CancelCommand { get; }
+    IAsyncRelayCommand CancelCommand { get; }
 
-    IRelayCommand ConfirmSettingsCommand { get; }
+    IAsyncRelayCommand ConfirmSettingsCommand { get; }
 }

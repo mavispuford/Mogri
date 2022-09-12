@@ -4,15 +4,11 @@ using MobileDiffusion.Models;
 
 namespace MobileDiffusion.Views.Popups;
 
-public partial class PromptSettingsPopup : BasePopup
+public partial class PromptSettingsPage
 {
-	public PromptSettingsPopup()
+	public PromptSettingsPage()
 	{
         InitializeComponent();
-
-        var popupSizeConstants = ServiceHelper.GetService<PopupSizeConstants>();
-        MainGrid.WidthRequest = popupSizeConstants.ExtraLarge.Width;
-        MainGrid.HeightRequest = popupSizeConstants.ExtraLarge.Height;
     }
 
     private void Slider_ValueChanged(object sender, ValueChangedEventArgs e)

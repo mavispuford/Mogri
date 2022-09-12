@@ -4,8 +4,6 @@ using MobileDiffusion.Interfaces.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MobileDiffusion.Models;
 using System.Collections.ObjectModel;
-using static Android.Content.ClipData;
-using MobileDiffusion.Models.LStein;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -143,14 +141,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
     {
         var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings } };
 
-        var settings = await _popupService.ShowPopupAsync("PromptSettingsPopup", parameters) as Settings;
-
-        if (settings != null)
-        {
-            _settings = settings;
-
-            updateHasInitImage();
-        }
+        await Shell.Current.GoToAsync("PromptSettingsPage", parameters);
     }
 
     public override void ApplyQueryAttributes(IDictionary<string, object> query)

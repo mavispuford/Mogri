@@ -1,13 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Enums;
-using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Models;
 
 namespace MobileDiffusion.ViewModels;
 
-public partial class PromptSettingsPopupViewModel : PopupBaseViewModel, IPromptSettingsPopupViewModel
+public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSettingsPageViewModel
 {
     private Settings _settings;
 
@@ -77,7 +76,7 @@ public partial class PromptSettingsPopupViewModel : PopupBaseViewModel, IPromptS
     [ObservableProperty]
     private string upscaleStrengthPlaceholder;
 
-    public PromptSettingsPopupViewModel(IPopupService popupService) : base(popupService)
+    public PromptSettingsPageViewModel()
     {
         var widthValues = new List<string>();
         var heightValues = new List<string>();
@@ -129,8 +128,15 @@ public partial class PromptSettingsPopupViewModel : PopupBaseViewModel, IPromptS
     }
 
     [RelayCommand]
-    private void ResetValues()
+    private async Task ResetValues()
     {
+        var result = await Shell.Current.DisplayAlert("Confirm Reset", "Are you sure you would like to reset back to defaults?", "RESET", "Cancel");
+        
+        if (!result)
+        {
+            return;
+        }
+
         var defaultSettings = new Settings();
         ImageCount = defaultSettings.NumOutputs.ToString();
         Steps = defaultSettings.NumInferenceSteps.ToString();
@@ -147,17 +153,19 @@ public partial class PromptSettingsPopupViewModel : PopupBaseViewModel, IPromptS
     }
 
     [RelayCommand]
-    private void Cancel()
+    private async Task Cancel()
     {
-        ClosePopup(null);
+        await Shell.Current.GoToAsync("..");
     }
 
     [RelayCommand]
-    private void ConfirmSettings()
+    private async Task ConfirmSettings()
     {
         mapPropertiesToSettings();
 
-        ClosePopup(_settings);
+        var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings } };
+
+        await Shell.Current.GoToAsync("..", parameters);
     }
 
     private void mapSettingsToProperties()

@@ -1,5 +1,6 @@
 ﻿using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Views;
+using MobileDiffusion.Views.Popups;
 
 namespace MobileDiffusion;
 
@@ -8,6 +9,7 @@ public static class ViewRegistrations
     public static MauiAppBuilder RegisterViews(this MauiAppBuilder builder)
     {
         registerPage<IMainPageViewModel, MainPage>(builder.Services);
+        registerPage<IPromptSettingsPageViewModel, PromptSettingsPage>(builder.Services);
 
         return builder;
     }

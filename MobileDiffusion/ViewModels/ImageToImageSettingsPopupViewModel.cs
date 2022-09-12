@@ -37,8 +37,15 @@ public partial class ImageToImageSettingsPopupViewModel : PopupBaseViewModel, II
     }
 
     [RelayCommand]
-    private void ResetValues()
+    private async Task ResetValues()
     {
+        var result = await Shell.Current.DisplayAlert("Confirm Reset", "Are you sure you would like to reset back to defaults?", "RESET", "Cancel");
+
+        if (!result)
+        {
+            return;
+        }
+
         var defaultSettings = new Settings();
         Strength = defaultSettings.PromptStrength.ToString();
         _settings.InitImage = null;
