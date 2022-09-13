@@ -65,7 +65,7 @@ namespace MobileDiffusion.Models
                 Seed = responseItem.Seed,
             };
 
-            if (double.TryParse(config.Cfgscale, out var guidanceScale))
+            if (double.TryParse(config.CfgScale, out var guidanceScale))
             {
                 result.GuidanceScale = guidanceScale;
             }
@@ -85,7 +85,7 @@ namespace MobileDiffusion.Models
                 result.NumOutputs = numOutputs;
             }
 
-            if (Enum.TryParse<Sampler>(config.Sampler, out var sampler))
+            if (Enum.TryParse<Sampler>(config.SamplerName, out var sampler))
             {
                 result.Sampler = sampler;
             }
