@@ -10,6 +10,7 @@ public class LSteinRequest
     public string CfgScale { get; set; }
     
     [JsonPropertyName("fit")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string Fit { get; set; }
 
     [JsonPropertyName("gfpgan_strength")]
@@ -24,8 +25,15 @@ public class LSteinRequest
     [JsonPropertyName("initimg_name")]
     public string InitimgName { get; set; } = string.Empty;
 
+    [JsonPropertyName("invert_mask")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string InvertMask { get; set; }
+
     [JsonPropertyName("iterations")]
     public string Iterations { get; set; }
+
+    [JsonPropertyName("mask")]
+    public string Mask { get; set; }
 
     [JsonPropertyName("prompt")]
     public string Prompt { get; set; }
@@ -35,7 +43,11 @@ public class LSteinRequest
 
     [JsonPropertyName("seed")]
     public string Seed { get; set; }
-    
+
+    [JsonPropertyName("seamless")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string Seamless { get; set; }
+
     [JsonPropertyName("steps")]
     public string Steps { get; set; }
 
@@ -49,50 +61,38 @@ public class LSteinRequest
     public string UpscaleStrength { get; set; }
 
     [JsonPropertyName("variation_amount")]
-    public string VariationAmount { get; set; } = "0";
+    public string VariationAmount { get; set; }
 
     [JsonPropertyName("width")]
     public string Width { get; set; }
 
     [JsonPropertyName("with_variations")]
-    public string WithVariations { get; set; } = string.Empty;
+    public string WithVariations { get; set; }
 
     public static LSteinRequest FromSettings(Settings settings)
     {
         var result = new LSteinRequest
         {
             CfgScale = settings.GuidanceScale.ToString(),
-            Fit = settings.Fit.ToString(),
+            Fit = settings.Fit != Enums.OnOff.Default ? settings.Fit.ToString() : null,
+            GfpganStrength = settings.EnableGfpgan ? settings.GfpganStrength.ToString() : "0",
             Height = settings.Height.ToString(),
             Initimg = settings.InitImage,
+            InvertMask = settings.InvertMask != Enums.OnOff.Default ? settings.InvertMask.ToString() : null,
             Iterations = settings.NumOutputs.ToString(),
+            Mask = settings.Mask,
             Prompt = settings.Prompt,
             SamplerName = settings.Sampler.ToString(),
+            Seamless = settings.Seamless != Enums.OnOff.Default ? settings.Seamless.ToString() : null,
             Seed = settings.Seed == -1 ? random.Next().ToString() : settings.Seed.ToString(),
             Steps = settings.NumInferenceSteps.ToString(),
             Strength = settings.PromptStrength.ToString(),
-            Width = settings.Width.ToString(),
-            UpscaleLevel = settings.UpscaleLevel.ToString(),
+            UpscaleLevel = settings.EnableUpscaling ? settings.UpscaleLevel.ToString() : string.Empty,
             UpscaleStrength = settings.UpscaleStrength.ToString(),
+            VariationAmount = settings.WithVariations == Enums.OnOff.on ? settings.VariationAmount.ToString() : "0",
+            Width = settings.Width.ToString(),
+            WithVariations = settings.WithVariations != Enums.OnOff.Default ? settings.WithVariations.ToString() : string.Empty,
         };
-
-        if (settings.EnableGfpgan)
-        {
-            result.GfpganStrength = settings.GfpganStrength.ToString();
-        }
-        else
-        {
-            result.GfpganStrength = "0";
-        }
-
-        if (settings.EnableUpscaling)
-        {
-            result.UpscaleLevel = settings.UpscaleLevel.ToString();
-        }
-        else 
-        {
-            result.UpscaleLevel = string.Empty;
-        }
 
         return result;
     }

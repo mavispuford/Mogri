@@ -39,11 +39,12 @@ namespace MobileDiffusion.Services
             }
 
             var convertedRequest = LSteinRequest.FromSettings(settings);
+            var stringRequest = JsonSerializer.Serialize(convertedRequest);
 
             var client = _httpClientFactory.CreateClient();
 
             var requestBody = new StringContent(
-                JsonSerializer.Serialize(convertedRequest, new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.Never }),
+                stringRequest,
                 Encoding.UTF8,
                 MediaTypeNames.Application.Json);
 
