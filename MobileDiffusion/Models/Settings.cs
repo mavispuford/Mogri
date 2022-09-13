@@ -5,43 +5,52 @@ namespace MobileDiffusion.Models
 {
     public class Settings
     {
+        public bool EnableGfpgan { get; set; } = false;
+        public bool EnableUpscaling { get; set; } = false;
+        public OnOff Fit { get; set; } = OnOff.on;
+        public double GfpganStrength { get; set; } = .75;
         public double GuidanceScale { get; set; } = 7.5;
-        public Fit Fit { get; set; } = Fit.on;
         public double Height { get; set; } = 512;
-        public double PromptStrength { get; set; } = .75;
-        public double Width { get; set; } = 512;
+        public string InitImage { get; set; }
+        public OnOff InvertMask { get; set; }
+        public string Mask { get; set; }
         public int NumInferenceSteps { get; set; } = 50;
         public int NumOutputs { get; set; } = 1;
-        public Sampler Sampler { get; set; } = Sampler.k_lms;
-        public long Seed { get; set; } = -1;
-        public string InitImage { get; set; }
         public string Prompt { get; set; }
-        public bool EnableGfpgan { get; set; } = false;
-        public double GfpganStrength { get; set; } = .75;
-        public bool EnableUpscaling { get; set; } = false;
+        public double PromptStrength { get; set; } = .75;
+        public Sampler Sampler { get; set; } = Sampler.k_lms;
+        public OnOff Seamless { get; set; }
+        public long Seed { get; set; } = -1;
         public int UpscaleLevel { get; set; } = 2;
         public double UpscaleStrength { get; set; } = .75;
+        public double VariationAmount { get; set; } = .1;
+        public double Width { get; set; } = 512;
+        public OnOff WithVariations { get; set; }
 
         public Settings Clone()
         {
             var clone = new Settings
             {
-                GuidanceScale = GuidanceScale,
+                EnableGfpgan = EnableGfpgan,
+                EnableUpscaling = EnableUpscaling,
                 Fit = Fit,
+                GfpganStrength = GfpganStrength,
+                GuidanceScale = GuidanceScale,
                 Height = Height,
-                PromptStrength = PromptStrength,
-                Width = Width,
+                InitImage = InitImage,
+                Mask = Mask,
                 NumInferenceSteps = NumInferenceSteps,
                 NumOutputs = NumOutputs,
-                Sampler = Sampler,
-                Seed = Seed,
-                InitImage = InitImage,
                 Prompt = Prompt,
-                EnableGfpgan = EnableGfpgan,
-                GfpganStrength = GfpganStrength,
-                EnableUpscaling = EnableUpscaling,
+                PromptStrength = PromptStrength,
+                Sampler = Sampler,
+                Seamless = Seamless,
+                Seed = Seed,
                 UpscaleLevel = UpscaleLevel,
                 UpscaleStrength = UpscaleStrength,
+                VariationAmount = VariationAmount,
+                Width = Width,
+                WithVariations = WithVariations,
             };
 
             return clone;
@@ -61,6 +70,7 @@ namespace MobileDiffusion.Models
             var result = new Settings
             {
                 InitImage = string.IsNullOrEmpty(config.Initimg) ? null : config.Initimg,
+                Mask = string.IsNullOrEmpty(config.Mask) ? null : config.Mask,
                 Prompt = config.Prompt,
                 Seed = responseItem.Seed,
             };
@@ -70,14 +80,30 @@ namespace MobileDiffusion.Models
                 result.GuidanceScale = guidanceScale;
             }
 
-            if (Enum.TryParse<Fit>(config.Fit, out var fit))
+            if (Enum.TryParse<OnOff>(config.Fit, out var fit))
             {
                 result.Fit = fit;
+            }
+
+            if (double.TryParse(config.GfpganStrength, out var gfpganStrength))
+            {
+                result.GfpganStrength = gfpganStrength;
+                result.EnableGfpgan = gfpganStrength != 0;
+
+                if (!result.EnableGfpgan)
+                {
+                    result.GfpganStrength = defaultSettings.GfpganStrength;
+                }
             }
 
             if (double.TryParse(config.Height, out var height))
             {
                 result.Height = height;
+            }
+
+            if (Enum.TryParse<OnOff>(config.InvertMask, out var invertMask))
+            {
+                result.InvertMask = invertMask;
             }
 
             if (int.TryParse(config.Iterations, out var numOutputs))
@@ -90,6 +116,11 @@ namespace MobileDiffusion.Models
                 result.Sampler = sampler;
             }
 
+            if (Enum.TryParse<OnOff>(config.Seamless, out var seamless))
+            {
+                result.Seamless = seamless;
+            }
+
             if (int.TryParse(config.Steps, out var numInferenceSteps))
             {
                 result.NumInferenceSteps = numInferenceSteps;
@@ -98,22 +129,6 @@ namespace MobileDiffusion.Models
             if (double.TryParse(config.Strength, out var strength))
             {
                 result.PromptStrength = strength;
-            }
-
-            if (double.TryParse(config.Width, out var width))
-            {
-                result.Width = width;
-            }
-
-            if (double.TryParse(config.GfpganStrength, out var gfpganStrength))
-            {
-                result.GfpganStrength = gfpganStrength;
-                result.EnableGfpgan = gfpganStrength != 0;
-
-                if (!result.EnableGfpgan)
-                {
-                    result.GfpganStrength = defaultSettings.GfpganStrength;
-                }
             }
 
             if (int.TryParse(config.UpscaleLevel, out var upscaleLevel))
@@ -135,6 +150,21 @@ namespace MobileDiffusion.Models
                 {
                     result.UpscaleStrength = defaultSettings.UpscaleStrength;
                 }
+            }
+
+            if (Enum.TryParse<double>(config.VariationAmount, out var variationAmount))
+            {
+                result.VariationAmount = variationAmount;
+            }
+
+            if (double.TryParse(config.Width, out var width))
+            {
+                result.Width = width;
+            }                       
+
+            if (Enum.TryParse<OnOff>(config.WithVariations, out var withVariations))
+            {
+                result.WithVariations = withVariations;
             }
 
             return result;

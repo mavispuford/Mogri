@@ -1,7 +1,8 @@
 ﻿namespace MobileDiffusion.Enums;
 
-public enum Fit
+public enum OnOff
 {
+    Default,
     on,
     off
 }
