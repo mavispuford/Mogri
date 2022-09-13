@@ -18,4 +18,6 @@ public interface IResultItemViewModel : IBaseViewModel
     IRelayCommand SetInitImageCommand { get; set; }
 
     bool FinishedLoading { get; set; }
+
+    bool Failed { get; set; }
 }

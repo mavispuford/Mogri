@@ -28,6 +28,9 @@ public partial class ResultItemViewModel : BaseViewModel, IResultItemViewModel
     [ObservableProperty]
     private bool finishedLoading;
 
+    [ObservableProperty]
+    private bool failed;
+
     public ResultItemViewModel(IPopupService popupService)
     {
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
