@@ -5,10 +5,10 @@ namespace MobileDiffusion.Models.LStein;
 public class LSteinRequest
 {
     private static Random random = new Random();
-
-    [JsonPropertyName("cfgscale")]
-    public string Cfgscale { get; set; }
-
+    
+    [JsonPropertyName("cfg_scale")]
+    public string CfgScale { get; set; }
+    
     [JsonPropertyName("fit")]
     public string Fit { get; set; }
 
@@ -21,18 +21,21 @@ public class LSteinRequest
     [JsonPropertyName("initimg")]
     public string Initimg { get; set; }
 
+    [JsonPropertyName("initimg_name")]
+    public string InitimgName { get; set; } = string.Empty;
+
     [JsonPropertyName("iterations")]
     public string Iterations { get; set; }
-    
+
     [JsonPropertyName("prompt")]
     public string Prompt { get; set; }
 
-    [JsonPropertyName("sampler")]
-    public string Sampler { get; set; }
+    [JsonPropertyName("sampler_name")]
+    public string SamplerName { get; set; }
 
     [JsonPropertyName("seed")]
     public string Seed { get; set; }
-
+    
     [JsonPropertyName("steps")]
     public string Steps { get; set; }
 
@@ -45,20 +48,26 @@ public class LSteinRequest
     [JsonPropertyName("upscale_strength")]
     public string UpscaleStrength { get; set; }
 
+    [JsonPropertyName("variation_amount")]
+    public string VariationAmount { get; set; } = "0";
+
     [JsonPropertyName("width")]
     public string Width { get; set; }
-    
+
+    [JsonPropertyName("with_variations")]
+    public string WithVariations { get; set; } = string.Empty;
+
     public static LSteinRequest FromSettings(Settings settings)
     {
-        var result = new LSteinRequest()
+        var result = new LSteinRequest
         {
-            Cfgscale = settings.GuidanceScale.ToString(),
+            CfgScale = settings.GuidanceScale.ToString(),
             Fit = settings.Fit.ToString(),
             Height = settings.Height.ToString(),
             Initimg = settings.InitImage,
             Iterations = settings.NumOutputs.ToString(),
             Prompt = settings.Prompt,
-            Sampler = settings.Sampler.ToString(),
+            SamplerName = settings.Sampler.ToString(),
             Seed = settings.Seed == -1 ? random.Next().ToString() : settings.Seed.ToString(),
             Steps = settings.NumInferenceSteps.ToString(),
             Strength = settings.PromptStrength.ToString(),
