@@ -24,7 +24,7 @@
         <Label Grid.Row="0" Grid.ColumnSpan="3" Text="Image to Image" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="18"/>
         <Image Grid.Row="1" Grid.Column="0" WidthRequest="32">
             <Image.Source>
-                <FontImageSource Glyph="&#xe421;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
+                <FontImageSource Glyph="&#xe3e9;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
             </Image.Source>
         </Image>
         <Label Grid.Row="1" Grid.Column="1" Text="Strength:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>

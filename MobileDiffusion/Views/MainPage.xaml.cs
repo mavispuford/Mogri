@@ -24,6 +24,7 @@ public partial class MainPage : BasePage
                 var x when x > 4 => imageLayoutWidth,
                 var x when x > 1 && x <= 4 => imageLayoutWidth / 2.5,
                 1 => imageLayoutWidth,
+                _ => imageLayoutWidth,
             };
 
             // TODO - Rework this - The width/height is currently -1 every time, making the ratio 1:1

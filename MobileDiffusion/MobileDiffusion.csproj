@@ -63,7 +63,7 @@
 	  <Compile Update="Views\Popups\ImageToImageSettingsPopup.xaml.cs">
 	    <DependentUpon>ImageToImageSettingsPopup.xaml</DependentUpon>
 	  </Compile>
-	  <Compile Update="Views\Popups\PromptSettingsPage.xaml.cs">
+	  <Compile Update="Views\PromptSettingsPage.xaml.cs">
 	    <DependentUpon>PromptSettingsPage.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Views\Popups\ResultItemPopup.xaml.cs">
@@ -84,7 +84,7 @@
 	  <MauiXaml Update="Views\Popups\ResultItemPopup.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\Popups\PromptSettingsPage.xaml">
+	  <MauiXaml Update="Views\PromptSettingsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>

@@ -2,7 +2,7 @@ using CommunityToolkit.Maui.Views;
 using MobileDiffusion.Helpers;
 using MobileDiffusion.Models;
 
-namespace MobileDiffusion.Views.Popups;
+namespace MobileDiffusion.Views;
 
 public partial class PromptSettingsPage
 {
