@@ -95,7 +95,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
                     result.ResponseItem = item;
 
-                    if (!settings.EnableUpscaling && !settings.EnableGfpgan)
+                    if (!settings.EnableUpscaling)
                     {
                         await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
                     }

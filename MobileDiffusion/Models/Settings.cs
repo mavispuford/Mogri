@@ -152,7 +152,7 @@ namespace MobileDiffusion.Models
                 }
             }
 
-            if (Enum.TryParse<double>(config.VariationAmount, out var variationAmount))
+            if (double.TryParse(config.VariationAmount, out var variationAmount))
             {
                 result.VariationAmount = variationAmount;
             }
