@@ -9,6 +9,7 @@ public static class ViewRegistrations
     {
         registerPage<IMainPageViewModel, MainPage>(builder.Services);
         registerPage<IPromptSettingsPageViewModel, PromptSettingsPage>(builder.Services);
+        registerPage<IImageToImageSettingsPageViewModel, ImageToImageSettingsPage>(builder.Services);
 
         return builder;
     }

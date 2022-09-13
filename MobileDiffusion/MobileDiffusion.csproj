@@ -60,8 +60,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Views\Popups\ImageToImageSettingsPopup.xaml.cs">
-	    <DependentUpon>ImageToImageSettingsPopup.xaml</DependentUpon>
+	  <Compile Update="Views\ImageToImageSettingsPage.xaml.cs">
+	    <DependentUpon>ImageToImageSettingsPage.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Views\PromptSettingsPage.xaml.cs">
 	    <DependentUpon>PromptSettingsPage.xaml</DependentUpon>
@@ -78,7 +78,7 @@
 	  <MauiXaml Update="Views\MaskDrawingPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\Popups\ImageToImageSettingsPopup.xaml">
+	  <MauiXaml Update="Views\ImageToImageSettingsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Popups\ResultItemPopup.xaml">

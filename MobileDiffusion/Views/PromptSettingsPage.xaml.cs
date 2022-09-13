@@ -4,7 +4,7 @@ using MobileDiffusion.Models;
 
 namespace MobileDiffusion.Views;
 
-public partial class PromptSettingsPage
+public partial class PromptSettingsPage : BasePage
 {
 	public PromptSettingsPage()
 	{
