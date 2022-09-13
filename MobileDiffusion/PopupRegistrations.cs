@@ -13,7 +13,6 @@ public static class PopupRegistrations
     {
         builder.Services.AddTransient<PopupSizeConstants>();
 
-        registerPopup<IImageToImageSettingsPopupViewModel, ImageToImageSettingsPopup>(builder.Services);
         registerPopup<IResultItemPopupViewModel, ResultItemPopup>(builder.Services);
 
         return builder;

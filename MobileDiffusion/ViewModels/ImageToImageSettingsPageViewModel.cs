@@ -1,12 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Models;
 
 namespace MobileDiffusion.ViewModels;
 
-public partial class ImageToImageSettingsPopupViewModel : PopupBaseViewModel, IImageToImageSettingsPopupViewModel
+public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageToImageSettingsPageViewModel
 {
     private Settings _settings;
 
@@ -19,7 +18,7 @@ public partial class ImageToImageSettingsPopupViewModel : PopupBaseViewModel, II
     [ObservableProperty]
     private ImageSource initImageSource;
 
-    public ImageToImageSettingsPopupViewModel(IPopupService popupService) : base(popupService)
+    public ImageToImageSettingsPageViewModel()
     {
     }
 
@@ -53,17 +52,19 @@ public partial class ImageToImageSettingsPopupViewModel : PopupBaseViewModel, II
     }
 
     [RelayCommand]
-    private void Cancel()
+    private async Task Cancel()
     {
-        ClosePopup(null);
+        await Shell.Current.GoToAsync("..");
     }
 
     [RelayCommand]
-    private void ConfirmSettings()
+    private async Task ConfirmSettings()
     {
         mapPropertiesToSettings();
 
-        ClosePopup(_settings);
+        var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings } };
+
+        await Shell.Current.GoToAsync("..", parameters);
     }
 
     private void mapSettingsToProperties()

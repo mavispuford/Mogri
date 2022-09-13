@@ -8,7 +8,7 @@ public static class ViewModelRegistrations
     public static MauiAppBuilder RegisterViewModels(this MauiAppBuilder builder)
     {
         builder.Services.AddTransient<IMainPageViewModel, MainPageViewModel>();
-        builder.Services.AddTransient<IImageToImageSettingsPopupViewModel, ImageToImageSettingsPopupViewModel>();
+        builder.Services.AddTransient<IImageToImageSettingsPageViewModel, ImageToImageSettingsPageViewModel>();
         builder.Services.AddTransient<IPromptSettingsPageViewModel, PromptSettingsPageViewModel>();
         builder.Services.AddTransient<IResultItemViewModel, ResultItemViewModel>();
         builder.Services.AddTransient<IResultItemPopupViewModel, ResultItemPopupViewModel>();

@@ -148,14 +148,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
     {
         var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings } };
 
-        var settings = await _popupService.ShowPopupAsync("ImageToImageSettingsPopup", parameters) as Settings;
-
-        if (settings != null)
-        {
-            _settings = settings;
-
-            updateHasInitImage();
-        }
+        await Shell.Current.GoToAsync("ImageToImageSettingsPage", parameters);
     }
 
     [RelayCommand]

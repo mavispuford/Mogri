@@ -2,7 +2,7 @@
 
 namespace MobileDiffusion.Interfaces.ViewModels;
 
-public interface IImageToImageSettingsPopupViewModel : IPopupBaseViewModel
+public interface IImageToImageSettingsPageViewModel : IPageViewModel
 {
     string Strength { get; set; }
 
@@ -12,9 +12,9 @@ public interface IImageToImageSettingsPopupViewModel : IPopupBaseViewModel
 
     IAsyncRelayCommand ResetValuesCommand { get; }
 
-    IRelayCommand CancelCommand { get; }
+    IAsyncRelayCommand CancelCommand { get; }
 
-    IRelayCommand ConfirmSettingsCommand { get; }
+    IAsyncRelayCommand ConfirmSettingsCommand { get; }
 
     IAsyncRelayCommand ShowMediaPickerCommand { get; }
 }
