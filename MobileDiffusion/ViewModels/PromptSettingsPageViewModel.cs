@@ -82,7 +82,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         var heightValues = new List<string>();
 
 
-        for (var i = 64; i <= 1024; i += 64)
+        for (var i = 64; i <= 2048; i += 64)
         {
             widthValues.Add(i.ToString());
             heightValues.Add(i.ToString());
