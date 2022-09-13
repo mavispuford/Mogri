@@ -18,6 +18,9 @@ namespace MobileDiffusion.Models.LStein
         [JsonPropertyName("seed")]
         public long Seed { get; set; }
 
+        [JsonPropertyName("step")]
+        public int Step { get; set; }
+
         [JsonPropertyName("config")]
         public LSteinConfig Config { get; set; }
     }

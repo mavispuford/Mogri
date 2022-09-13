@@ -20,10 +20,16 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
     private bool hasInitImage;
 
     [ObservableProperty]
+    private bool inProgress;
+
+    [ObservableProperty]
     private string prompt;
 
     [ObservableProperty]
     private string placeholderPrompt = "An astronaut floating in space, detailed digital drawing, octane render, trending on artstation";
+
+    [ObservableProperty]
+    private float progress;
 
     [ObservableProperty]
     private ObservableCollection<IResultItemViewModel> results = new();
@@ -68,8 +74,18 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
         try
         {
+            Progress = 0;
+            InProgress = true;
+
             await foreach (var item in _stableDiffusionService.SubmitTextToImageRequest(settings))
             {
+                if (item.Event.Equals("step", StringComparison.OrdinalIgnoreCase))
+                {
+                    Progress = item.Step / (float)(settings.NumInferenceSteps);
+
+                    continue;
+                }
+
                 var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{item.Seed}-{DateTime.Now.Millisecond}";
 
                 // TODO - Use "step" items to display progress
@@ -107,6 +123,10 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
             // TODO - Handle this
 
             return;
+        }
+        finally
+        {
+            InProgress = false;
         }
     }
 
