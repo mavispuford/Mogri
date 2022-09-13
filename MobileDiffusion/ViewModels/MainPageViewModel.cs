@@ -20,9 +20,6 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
     private bool hasInitImage;
 
     [ObservableProperty]
-    private bool inProgress;
-
-    [ObservableProperty]
     private string prompt;
 
     [ObservableProperty]
@@ -75,7 +72,6 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
         try
         {
             Progress = 0;
-            InProgress = true;
 
             await foreach (var item in _stableDiffusionService.SubmitTextToImageRequest(settings))
             {
@@ -124,9 +120,15 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
             return;
         }
-        finally
+
+        // Any remaining results that weren't set have failed
+        foreach (var result in Results)
         {
-            InProgress = false;
+            if (!result.FinishedLoading)
+            {
+                result.FinishedLoading = true;
+                result.Failed = true;
+            }
         }
     }
 
