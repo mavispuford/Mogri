@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
-             x:Class="MobileDiffusion.Views.Popups.PromptSettingsPage"
+             x:Class="MobileDiffusion.Views.PromptSettingsPage"
              x:DataType="viewModels:IPromptSettingsPageViewModel"
              Shell.PresentationMode="Animated"
              Shell.NavBarIsVisible="True"
@@ -11,7 +11,7 @@
     <ScrollView HorizontalOptions="FillAndExpand">
         <Grid x:Name="MainGrid"
               Padding="30"
-              RowDefinitions="auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto"
+              RowDefinitions="auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto"
               RowSpacing="10"
               ColumnSpacing="16"
               ColumnDefinitions="32,auto,*"
@@ -93,13 +93,21 @@
             <Label Grid.Row="12" Grid.Column="1" Text="Strength:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
             <Entry Grid.Row="12" Grid.Column="2" Placeholder="{Binding UpscaleStrengthPlaceholder}" Text="{Binding UpscaleStrength}" Keyboard="Numeric" FontSize="16" HorizontalTextAlignment="End" />
 
-            <HorizontalStackLayout Grid.Row="13" Grid.ColumnSpan="3" Spacing="10" HorizontalOptions="End">
+            <Image Grid.Row="13" Grid.Column="0" WidthRequest="32">
+                <Image.Source>
+                    <FontImageSource Glyph="&#xe421;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
+                </Image.Source>
+            </Image>
+            <Label Grid.Row="13" Grid.Column="1" Text="Make Seamless:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+            <Switch Grid.Row="13" Grid.Column="2" IsToggled="{Binding MakeSeamless}" />
+
+            <HorizontalStackLayout Grid.Row="14" Grid.ColumnSpan="3" Spacing="10" HorizontalOptions="End">
                 <Button Command="{Binding ResetValuesCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}">
                     <Button.ImageSource>
                         <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource Tertiary}" />
                     </Button.ImageSource>
                 </Button>
-                <!--<Button Text="Cancel" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />-->
+                <Button Text="Cancel" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
                 <Button Text="Apply" Command="{Binding ConfirmSettingsCommand}" WidthRequest="100" />
             </HorizontalStackLayout>
         </Grid>

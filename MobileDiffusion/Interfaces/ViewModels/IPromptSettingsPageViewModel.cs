@@ -48,6 +48,8 @@ public interface IPromptSettingsPageViewModel : IPageViewModel
 
     string UpscaleStrengthPlaceholder { get; set; }
 
+    bool MakeSeamless { get; set; }
+
     IAsyncRelayCommand ResetValuesCommand { get; }
 
     IAsyncRelayCommand CancelCommand { get; }

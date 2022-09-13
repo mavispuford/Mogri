@@ -1,6 +1,5 @@
 ﻿using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Views;
-using MobileDiffusion.Views.Popups;
 
 namespace MobileDiffusion;
 

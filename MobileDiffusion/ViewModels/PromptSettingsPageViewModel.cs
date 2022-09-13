@@ -76,6 +76,9 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     [ObservableProperty]
     private string upscaleStrengthPlaceholder;
 
+    [ObservableProperty]
+    private bool makeSeamless;
+
     public PromptSettingsPageViewModel()
     {
         var widthValues = new List<string>();
@@ -137,18 +140,19 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         }
 
         var defaultSettings = new Settings();
-        ImageCount = defaultSettings.NumOutputs.ToString();
-        Steps = defaultSettings.NumInferenceSteps.ToString();
         CfgScale = defaultSettings.GuidanceScale.ToString();
-        Sampler = defaultSettings.Sampler.ToString();
-        Width = defaultSettings.Width.ToString();
-        Height = defaultSettings.Height.ToString();
-        Seed = defaultSettings.Seed.ToString();
         EnableGfpgan = defaultSettings.EnableGfpgan;
-        GfpganStrength = defaultSettings.GfpganStrength.ToString();
         EnableUpscaling = defaultSettings.EnableUpscaling;
+        GfpganStrength = defaultSettings.GfpganStrength.ToString();
+        Height = defaultSettings.Height.ToString();
+        ImageCount = defaultSettings.NumOutputs.ToString();
+        MakeSeamless = defaultSettings.Seamless == OnOff.on;
+        Sampler = defaultSettings.Sampler.ToString();
+        Seed = defaultSettings.Seed.ToString();
+        Steps = defaultSettings.NumInferenceSteps.ToString();
         UpscaleLevel = defaultSettings.UpscaleLevel.ToString();
         UpscaleStrength = defaultSettings.UpscaleStrength.ToString();
+        Width = defaultSettings.Width.ToString();
     }
 
     [RelayCommand]
@@ -169,53 +173,54 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
 
     private void mapSettingsToProperties()
     {
-        ImageCount = _settings.NumOutputs.ToString();
-        Steps = _settings.NumInferenceSteps.ToString();
         CfgScale = _settings.GuidanceScale.ToString();
-        Sampler = _settings.Sampler.ToString();
-        Width = _settings.Width.ToString();
-        Height = _settings.Height.ToString();
-        Seed = _settings.Seed.ToString();
         EnableGfpgan = _settings.EnableGfpgan;
-        GfpganStrength = _settings.GfpganStrength.ToString();
         EnableUpscaling = _settings.EnableUpscaling;
+        GfpganStrength = _settings.GfpganStrength.ToString();
+        Height = _settings.Height.ToString();
+        ImageCount = _settings.NumOutputs.ToString();
+        MakeSeamless = _settings.Seamless == OnOff.on;
+        Sampler = _settings.Sampler.ToString();
+        Seed = _settings.Seed.ToString();
+        Steps = _settings.NumInferenceSteps.ToString();
         UpscaleLevel = _settings.UpscaleLevel == 0 ? "2" : _settings.UpscaleLevel.ToString();
         UpscaleStrength = _settings.UpscaleStrength.ToString();
+        Width = _settings.Width.ToString();
     }
 
     private void mapPropertiesToSettings()
     {
-        if (int.TryParse(ImageCount, out var pImageCount) ||
-            int.TryParse(ImageCountPlaceholder, out pImageCount))
-        {
-            _settings.NumOutputs = pImageCount;
-        }
-
-        if (int.TryParse(Steps, out var pSteps) ||
-            int.TryParse(StepsPlaceholder, out pSteps))
-        {
-            _settings.NumInferenceSteps = pSteps;
-        }
-
         if (double.TryParse(CfgScale, out var pCfgScale) ||
             double.TryParse(CfgScalePlaceholder, out pCfgScale))
         {
             _settings.GuidanceScale = pCfgScale;
         }
 
-        if (Enum.TryParse<Sampler>(Sampler, out var pSampler))
-        {
-            _settings.Sampler = pSampler;
-        }
+        _settings.EnableGfpgan = EnableGfpgan;
+        _settings.EnableUpscaling = EnableUpscaling;
 
-        if (double.TryParse(Width, out var pWidth))
+        if (double.TryParse(GfpganStrength, out var pGfpganStrength) ||
+            double.TryParse(GfpganStrengthPlaceholder, out pGfpganStrength))
         {
-            _settings.Width = pWidth;
+            _settings.GfpganStrength = pGfpganStrength;
         }
 
         if (double.TryParse(Height, out var pHeight))
         {
             _settings.Height = pHeight;
+        }
+
+        if (int.TryParse(ImageCount, out var pImageCount) ||
+            int.TryParse(ImageCountPlaceholder, out pImageCount))
+        {
+            _settings.NumOutputs = pImageCount;
+        }
+
+        _settings.Seamless = MakeSeamless ? OnOff.on : OnOff.Default;
+
+        if (Enum.TryParse<Sampler>(Sampler, out var pSampler))
+        {
+            _settings.Sampler = pSampler;
         }
 
         if (long.TryParse(Seed, out var pSeed) ||
@@ -224,15 +229,11 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             _settings.Seed = pSeed;
         }
 
-        _settings.EnableGfpgan = EnableGfpgan;
-
-        if (double.TryParse(GfpganStrength, out var pGfpganStrength) ||
-            double.TryParse(GfpganStrengthPlaceholder, out pGfpganStrength))
+        if (int.TryParse(Steps, out var pSteps) ||
+            int.TryParse(StepsPlaceholder, out pSteps))
         {
-            _settings.GfpganStrength = pGfpganStrength;
+            _settings.NumInferenceSteps = pSteps;
         }
-
-        _settings.EnableUpscaling = EnableUpscaling;
 
         if (int.TryParse(UpscaleLevel, out var pUpscaleLevel))
         {
@@ -242,6 +243,11 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         if (double.TryParse(UpscaleStrength, out var pUpscaleStrength))
         {
             _settings.UpscaleStrength = pUpscaleStrength;
+        }
+
+        if (double.TryParse(Width, out var pWidth))
+        {
+            _settings.Width = pWidth;
         }
     }
 }
