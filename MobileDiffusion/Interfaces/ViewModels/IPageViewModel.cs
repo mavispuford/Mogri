@@ -5,4 +5,8 @@ public interface IPageViewModel : IQueryAttributable, IBaseViewModel
     void OnAppearing();
 
     void OnDisappearing();
+
+    void OnNavigatedFrom();
+    
+    void OnNavigatedTo();
 }

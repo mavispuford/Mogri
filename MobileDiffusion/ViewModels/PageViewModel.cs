@@ -15,4 +15,12 @@ public class PageViewModel : BaseViewModel, IPageViewModel
     public virtual void OnDisappearing()
     {
     }
+
+    public virtual void OnNavigatedFrom()
+    {
+    }
+
+    public virtual void OnNavigatedTo()
+    {
+    }
 }
