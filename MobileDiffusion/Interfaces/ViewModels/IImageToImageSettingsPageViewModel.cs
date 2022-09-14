@@ -4,11 +4,17 @@ namespace MobileDiffusion.Interfaces.ViewModels;
 
 public interface IImageToImageSettingsPageViewModel : IPageViewModel
 {
+    bool IsLoadingInitImage { get; set; }
+
+    bool IsLoadingMaskImage { get; set; }
+
     string Strength { get; set; }
 
     string StrengthPlaceholder { get; set; }
 
     ImageSource InitImageSource { get; set; }
+
+    ImageSource MaskImageSource { get; set; }
 
     IAsyncRelayCommand ResetValuesCommand { get; }
 
@@ -16,5 +22,5 @@ public interface IImageToImageSettingsPageViewModel : IPageViewModel
 
     IAsyncRelayCommand ConfirmSettingsCommand { get; }
 
-    IAsyncRelayCommand ShowMediaPickerCommand { get; }
+    IAsyncRelayCommand<bool> ShowMediaPickerCommand { get; }
 }

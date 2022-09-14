@@ -4,18 +4,24 @@
                 xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                 xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
                 xmlns:views="clr-namespace:MobileDiffusion.Views"
+                xmlns:s="clr-namespace:System;assembly=mscorlib"
                 x:Class="MobileDiffusion.Views.ImageToImageSettingsPage"
                 x:DataType="viewModels:IImageToImageSettingsPageViewModel"
                 Shell.PresentationMode="Animated"
                 Shell.NavBarIsVisible="True"
                 Shell.TabBarIsVisible="False"
                 Title="Image to Image Settings">
+    <views:BasePage.Resources>
+        <ResourceDictionary>
+            <toolkit:VariableMultiValueConverter x:Key="AnyTrueConverter" ConditionType="Any" />
+        </ResourceDictionary>
+    </views:BasePage.Resources>
     <Grid RowDefinitions="*,auto"
           Padding="0"
           Margin="0">
         <ScrollView Grid.Row="0" Orientation="Vertical">
             <Grid Padding="30"
-                  RowDefinitions="auto, auto, auto"
+                  RowDefinitions="auto, auto, auto, auto, auto"
                   RowSpacing="10"
                   ColumnSpacing="16"
                   ColumnDefinitions="32,auto,*"
@@ -45,12 +51,56 @@
                 <Grid Grid.Row="2" Grid.ColumnSpan="3"
                         HeightRequest="200" WidthRequest="200">
                     <Grid.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ShowMediaPickerCommand}" />
+                        <TapGestureRecognizer Command="{Binding ShowMediaPickerCommand}">
+                            <TapGestureRecognizer.CommandParameter>
+                                <s:Boolean>True</s:Boolean>
+                            </TapGestureRecognizer.CommandParameter>
+                        </TapGestureRecognizer>
                     </Grid.GestureRecognizers>
                     <Label Text="Tap to set source image" HorizontalOptions="Fill" VerticalOptions="Fill" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Padding="20"
-                            IsVisible="{Binding InitImageSource, Converter={StaticResource IsNullConverter}}"/>
-                    <Image Source="{Binding InitImageSource}" Aspect="AspectFit" HorizontalOptions="Fill" VerticalOptions="Fill"
-                            IsVisible="{Binding InitImageSource, Converter={StaticResource IsNotNullConverter}}"/>
+                           IsVisible="{Binding InitImageSource, Converter={StaticResource IsNullConverter}}"/>
+                    <Image x:Name="InitImage"
+                           Source="{Binding InitImageSource}" Aspect="AspectFit" HorizontalOptions="Fill" VerticalOptions="Fill"
+                           IsVisible="{Binding InitImageSource, Converter={StaticResource IsNotNullConverter}}"/>
+                    <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center">
+                        <ActivityIndicator.IsRunning>
+                            <MultiBinding Converter="{StaticResource AnyTrueConverter}" >
+                                <Binding Source="{x:Reference InitImage}" Path="IsLoading" />
+                                <Binding Path="IsLoadingInitImage" />
+                            </MultiBinding>
+                        </ActivityIndicator.IsRunning>
+                    </ActivityIndicator>
+                </Grid>
+
+                <Image Grid.Row="3" Grid.Column="0" WidthRequest="32">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xe3b9;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
+                    </Image.Source>
+                </Image>
+                <Label Grid.Row="3" Grid.Column="1" Text="Mask Image:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+
+                <Grid Grid.Row="4" Grid.ColumnSpan="3"
+                        HeightRequest="200" WidthRequest="200">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ShowMediaPickerCommand}">
+                            <TapGestureRecognizer.CommandParameter>
+                                <s:Boolean>False</s:Boolean>
+                            </TapGestureRecognizer.CommandParameter>
+                        </TapGestureRecognizer>
+                    </Grid.GestureRecognizers>
+                    <Label Text="Tap to set mask image" HorizontalOptions="Fill" VerticalOptions="Fill" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Padding="20"
+                           IsVisible="{Binding MaskImageSource, Converter={StaticResource IsNullConverter}}"/>
+                    <Image x:Name="MaskImage"
+                           Source="{Binding MaskImageSource}" Aspect="AspectFit" HorizontalOptions="Fill" VerticalOptions="Fill"
+                           IsVisible="{Binding MaskImageSource, Converter={StaticResource IsNotNullConverter}}"/>
+                    <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center">
+                        <ActivityIndicator.IsRunning>
+                            <MultiBinding Converter="{StaticResource AnyTrueConverter}" >
+                                <Binding Source="{x:Reference MaskImage}" Path="IsLoading" />
+                                <Binding Path="IsLoadingMaskImage" />
+                            </MultiBinding>
+                        </ActivityIndicator.IsRunning>
+                    </ActivityIndicator>
                 </Grid>
             </Grid>
         </ScrollView>

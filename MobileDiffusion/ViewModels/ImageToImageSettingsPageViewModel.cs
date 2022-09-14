@@ -2,12 +2,23 @@
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Models;
+using System.Threading;
 
 namespace MobileDiffusion.ViewModels;
 
 public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageToImageSettingsPageViewModel
 {
     private Settings _settings;
+
+    private CancellationTokenSource _initCancellationTokenSource;
+
+    private CancellationTokenSource _maskCancellationTokenSource;
+
+    [ObservableProperty]
+    private bool isLoadingInitImage;
+
+    [ObservableProperty]
+    private bool isLoadingMaskImage;
 
     [ObservableProperty]
     private string strength;
@@ -17,6 +28,9 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
 
     [ObservableProperty]
     private ImageSource initImageSource;
+
+    [ObservableProperty]
+    private ImageSource maskImageSource;
 
     public ImageToImageSettingsPageViewModel()
     {
@@ -31,8 +45,6 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
         }
 
         _settings = settings.Clone();
-
-        mapSettingsToProperties();
     }
 
     [RelayCommand]
@@ -45,15 +57,23 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
             return;
         }
 
+        cancelInitImageLoading();
+        cancelMaskImageLoading();
+
         var defaultSettings = new Settings();
         Strength = defaultSettings.PromptStrength.ToString();
         _settings.InitImage = null;
+        _settings.Mask = null;
         InitImageSource = null;
+        MaskImageSource = null;
     }
 
     [RelayCommand]
     private async Task Cancel()
     {
+        cancelInitImageLoading();
+        cancelMaskImageLoading();
+
         await Shell.Current.GoToAsync("..");
     }
 
@@ -67,32 +87,62 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
         await Shell.Current.GoToAsync("..", parameters);
     }
 
-    private void mapSettingsToProperties()
+    private async void mapSettingsToProperties()
     {
         Strength = _settings.PromptStrength.ToString();
 
-        if (!string.IsNullOrEmpty(_settings.InitImage))
-        {
-            var matchResult = Constants.ImageDataRegex.Match(_settings.InitImage);
+        _initCancellationTokenSource = new CancellationTokenSource();
+        _maskCancellationTokenSource = new CancellationTokenSource();
 
-            if (matchResult.Success)
+        await Task.WhenAll(new[] {
+            Task.Run(async () =>
             {
-                try
+                IsLoadingInitImage = true;
+                InitImageSource = await getImageSourceFromString(_settings.InitImage, _initCancellationTokenSource.Token);
+                IsLoadingInitImage = false;
+            }, _initCancellationTokenSource.Token),
+            Task.Run(async () =>
+            {
+                IsLoadingMaskImage = true;
+                MaskImageSource = await getImageSourceFromString(_settings.Mask, _maskCancellationTokenSource.Token);
+                IsLoadingMaskImage = false;
+            }, _maskCancellationTokenSource.Token),
+        });
+    }
+
+    private Task<ImageSource> getImageSourceFromString(string imageString, CancellationToken token)
+    {
+        if (string.IsNullOrEmpty(imageString))
+        {
+            return Task.FromResult<ImageSource>(null);
+        }
+
+        var matchResult = Constants.ImageDataRegex.Match(imageString);
+
+        if (matchResult.Success)
+        {
+            try
+            {
+                var imageBase64 = matchResult.Groups[Constants.ImageDataCaptureGroupData].Value;
+
+                var imageBytes = Convert.FromBase64String(imageBase64);
+
+                if (token.IsCancellationRequested)
                 {
-                    var imageBase64 = matchResult.Groups[Constants.ImageDataCaptureGroupData].Value;
-
-                    var imageBytes = Convert.FromBase64String(imageBase64);
-
-                    var memoryStream = new MemoryStream(imageBytes);
-
-                    InitImageSource = ImageSource.FromStream(() => memoryStream);
+                    return Task.FromResult<ImageSource>(null);
                 }
-                catch
-                {
-                    // TODO - Handle exceptions
-                }
+
+                var memoryStream = new MemoryStream(imageBytes);
+
+                return Task.FromResult(ImageSource.FromStream(() => memoryStream));
+            }
+            catch
+            {
+                // TODO - Handle exceptions
             }
         }
+
+        return Task.FromResult<ImageSource>(null);
     }
 
     private void mapPropertiesToSettings()
@@ -105,7 +155,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
     }
 
     [RelayCommand]
-    private async Task ShowMediaPicker()
+    private async Task ShowMediaPicker(bool forInitImage)
     {
         try
         {
@@ -115,21 +165,73 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
             {
                 return;
             }
+
+            if (forInitImage)
+            {
+                IsLoadingInitImage = true;
+            }
+            else
+            {
+                IsLoadingMaskImage = true;
+            }
         
             using var fileStream = await fileResult.OpenReadAsync();
             var memoryStream = new MemoryStream();
             await fileStream.CopyToAsync(memoryStream);
             var imageBytes = memoryStream.ToArray();
             var imageString = Convert.ToBase64String(imageBytes);
-
-            _settings.InitImage = string.Format(Constants.ImageDataFormat, fileResult.ContentType, imageString);
-
             memoryStream.Seek(0, SeekOrigin.Begin);
-            InitImageSource = ImageSource.FromStream(() => memoryStream);
+
+            var formattedImageString = string.Format(Constants.ImageDataFormat, fileResult.ContentType, imageString);
+
+            if (forInitImage)
+            {
+                cancelInitImageLoading();
+
+                _settings.InitImage = formattedImageString;
+
+                InitImageSource = ImageSource.FromStream(() => memoryStream);
+            }
+            else
+            {
+                cancelMaskImageLoading();
+
+                _settings.Mask = formattedImageString;
+
+                MaskImageSource = ImageSource.FromStream(() => memoryStream);
+            }
         }
         catch
         {
             // TODO - Handle exceptions
+        }
+        finally
+        {
+            IsLoadingInitImage = false;
+            IsLoadingMaskImage = false;
+        }
+    }
+
+    public override void OnNavigatedTo()
+    {
+        base.OnNavigatedTo();
+
+        mapSettingsToProperties();
+    }
+
+    private void cancelInitImageLoading()
+    {
+        if (_initCancellationTokenSource != null && !_initCancellationTokenSource.IsCancellationRequested)
+        {
+            _initCancellationTokenSource.Cancel();
+        }
+    }
+
+    private void cancelMaskImageLoading()
+    {
+        if (_maskCancellationTokenSource != null && !_maskCancellationTokenSource.IsCancellationRequested)
+        {
+            _maskCancellationTokenSource.Cancel();
         }
     }
 }

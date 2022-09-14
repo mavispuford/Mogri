@@ -27,4 +27,24 @@ public class BasePage : ContentPage
             pageViewModel.OnDisappearing();
         }
     }
+
+	protected override void OnNavigatedFrom(NavigatedFromEventArgs args)
+	{
+		base.OnNavigatedFrom(args);
+        
+		if (BindingContext is IPageViewModel pageViewModel)
+        {
+            pageViewModel.OnNavigatedFrom();
+        }
+    }
+
+	protected override void OnNavigatedTo(NavigatedToEventArgs args)
+	{
+		base.OnNavigatedTo(args);
+
+        if (BindingContext is IPageViewModel pageViewModel)
+        {
+            pageViewModel.OnNavigatedTo();
+        }
+    }
 }

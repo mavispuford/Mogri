@@ -38,24 +38,30 @@ namespace MobileDiffusion.Services
                 throw new ArgumentNullException(nameof(settings));
             }
 
-            var convertedRequest = LSteinRequest.FromSettings(settings);
-            var stringRequest = JsonSerializer.Serialize(convertedRequest);
+            // Because there are images in the request, this can hang the UI for a second or two
+            var requestMessage = await Task.Run(() =>
+            {
+                var convertedRequest = LSteinRequest.FromSettings(settings);
+                var stringRequest = JsonSerializer.Serialize(convertedRequest);
+
+                var requestBody = new StringContent(
+                    stringRequest,
+                    Encoding.UTF8,
+                    MediaTypeNames.Application.Json);
+
+                var url = $"{Constants.BaseUrl}";
+
+                var requestMessage = new HttpRequestMessage
+                {
+                    RequestUri = new Uri(url),
+                    Content = requestBody,
+                    Method = HttpMethod.Post,
+                };
+
+                return requestMessage;
+            });
 
             var client = _httpClientFactory.CreateClient();
-
-            var requestBody = new StringContent(
-                stringRequest,
-                Encoding.UTF8,
-                MediaTypeNames.Application.Json);
-
-            var url = $"{Constants.BaseUrl}";
-
-            var requestMessage = new HttpRequestMessage
-            {
-                RequestUri = new Uri(url),
-                Content = requestBody,
-                Method = HttpMethod.Post,
-            };
 
             using (var response = await client.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead))
             {
