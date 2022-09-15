@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui;
+using SkiaSharp.Views.Maui.Controls.Hosting;
 
 namespace MobileDiffusion;
 
@@ -10,7 +11,8 @@ public static class MauiProgram
 
 		builder
 			.UseMauiApp<App>()
-			.ConfigureFonts(fonts =>
+			.UseSkiaSharp()
+            .ConfigureFonts(fonts =>
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
