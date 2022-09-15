@@ -78,10 +78,26 @@ public partial class SkiaSharpPage : ContentPage
         }
     }
 
+    private void Undo_Button_Clicked(object sender, EventArgs e)
+    {
+        if (!_paths.Any())
+        {
+            return;
+        }
+
+        _paths.Remove(_paths.Last());
+
+        skiaView.InvalidateSurface();
+    }
+
     private void Clear_Button_Clicked(object sender, EventArgs e)
     {
-        _paths = new();
-        _currentPath = null;
+        if (!_paths.Any())
+        {
+            return;
+        }
+
+        _paths.Clear();
 
         skiaView.InvalidateSurface();
     }
