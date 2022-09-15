@@ -84,16 +84,19 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
                 var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{item.Seed}-{DateTime.Now.Millisecond}";
 
-                // TODO - Use "step" items to display progress
                 if (item.Event.Equals("result", StringComparison.OrdinalIgnoreCase))
                 {
                     var result = Results.FirstOrDefault(r => r.ResponseItem == null);
 
                     result.ResponseItem = item;
 
-                    if (!settings.EnableUpscaling)
+                    await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
+                }
+                else if (item.Event.Equals("upscaling-started", StringComparison.OrdinalIgnoreCase))
+                {
+                    foreach (var result in Results)
                     {
-                        await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
+                        result.IsLoading = true;
                     }
                 }
                 else if (item.Event.Equals("upscaling-done", StringComparison.OrdinalIgnoreCase))
@@ -124,9 +127,9 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
         // Any remaining results that weren't set have failed
         foreach (var result in Results)
         {
-            if (!result.FinishedLoading)
+            if (result.IsLoading)
             {
-                result.FinishedLoading = true;
+                result.IsLoading = false;
                 result.Failed = true;
             }
         }
@@ -140,7 +143,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
         result.InternalUri = uri;
         result.ImageSource = ImageSource.FromFile(uri);
-        result.FinishedLoading = true;
+        result.IsLoading = false;
     }
 
     [RelayCommand]

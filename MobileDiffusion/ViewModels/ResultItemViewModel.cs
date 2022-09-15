@@ -26,7 +26,7 @@ public partial class ResultItemViewModel : BaseViewModel, IResultItemViewModel
     private IRelayCommand setInitImageCommand;
 
     [ObservableProperty]
-    private bool finishedLoading;
+    private bool isLoading = true;
 
     [ObservableProperty]
     private bool failed;
