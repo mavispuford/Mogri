@@ -1,4 +1,5 @@
 ﻿using MobileDiffusion.Interfaces.ViewModels;
+using MobileDiffusion.ViewModels;
 using MobileDiffusion.Views;
 
 namespace MobileDiffusion;
@@ -10,6 +11,7 @@ public static class ViewRegistrations
         registerPage<IMainPageViewModel, MainPage>(builder.Services);
         registerPage<IPromptSettingsPageViewModel, PromptSettingsPage>(builder.Services);
         registerPage<IImageToImageSettingsPageViewModel, ImageToImageSettingsPage>(builder.Services);
+        registerPage<IMaskDrawingPageViewModel, MaskDrawingPage>(builder.Services);
 
         return builder;
     }

@@ -43,7 +43,7 @@ public partial class MaskDrawingPageViewModel : BaseViewModel, IMaskDrawingPageV
 
         var fileUri = await _fileService.WriteFileToExternalStorageAsync(fileName, stream);
 
-        var newStream = await _fileService.GetFileStreamUsingExactUriAsync(fileName);
+        var newStream = await _fileService.GetFileStreamUsingExactUriAsync(fileUri);
 
         ResultImageSource = ImageSource.FromStream(() => newStream);
     }
