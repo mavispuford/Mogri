@@ -7,13 +7,13 @@
     Shell.FlyoutBehavior="Disabled">
 
     <TabBar Shell.TabBarUnselectedColor="{StaticResource IndependenceAccent}">
-        <Tab Title="Text to Image"
+        <Tab Title="Generation"
              Icon="article">
             <ShellContent ContentTemplate="{DataTemplate views:MainPage}" />
         </Tab>
-        <Tab Title="Image to Image"
+        <Tab Title="Masking"
              Icon="image">
-            <ShellContent ContentTemplate="{DataTemplate views:MaskDrawingPage}" />
+            <ShellContent ContentTemplate="{DataTemplate views:SkiaSharpPage}" />
         </Tab>
     </TabBar>
 
