@@ -26,6 +26,7 @@
 
         <HorizontalStackLayout Spacing="10"
                                HorizontalOptions="Center">
+            <Button Text="Undo" Clicked="Undo_Button_Clicked"/>
             <Button Text="Clear" Clicked="Clear_Button_Clicked"/>
             <Button Text="Save Canvas" Clicked="Save_Button_Clicked"/>
         </HorizontalStackLayout>
