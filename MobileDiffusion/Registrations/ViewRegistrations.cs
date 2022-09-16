@@ -2,7 +2,7 @@
 using MobileDiffusion.ViewModels;
 using MobileDiffusion.Views;
 
-namespace MobileDiffusion;
+namespace MobileDiffusion.Registrations;
 
 public static class ViewRegistrations
 {

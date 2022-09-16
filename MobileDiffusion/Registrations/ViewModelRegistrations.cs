@@ -1,7 +1,7 @@
 ﻿using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.ViewModels;
 
-namespace MobileDiffusion;
+namespace MobileDiffusion.Registrations;
 
 public static class ViewModelRegistrations
 {
