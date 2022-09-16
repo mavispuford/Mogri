@@ -4,6 +4,10 @@ namespace MobileDiffusion.Interfaces.ViewModels;
 
 public interface IImageToImageSettingsPageViewModel : IPageViewModel
 {
+    bool FitImageServerSide { get; set; }
+
+    bool FitImageClientSide { get; set; }
+
     bool IsLoadingInitImage { get; set; }
 
     bool IsLoadingMaskImage { get; set; }

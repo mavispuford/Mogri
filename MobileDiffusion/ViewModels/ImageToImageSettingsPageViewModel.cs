@@ -15,6 +15,12 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
     private CancellationTokenSource _maskCancellationTokenSource;
 
     [ObservableProperty]
+    private bool fitImageServerSide;
+
+    [ObservableProperty]
+    private bool fitImageClientSide;
+
+    [ObservableProperty]
     private bool isLoadingInitImage;
 
     [ObservableProperty]
@@ -91,6 +97,8 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
     {
         Strength = _settings.PromptStrength.ToString();
 
+        FitImageServerSide = _settings.Fit == Enums.OnOff.on;
+
         _initCancellationTokenSource = new CancellationTokenSource();
         _maskCancellationTokenSource = new CancellationTokenSource();
 
@@ -152,6 +160,8 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
         {
             _settings.PromptStrength = strength;
         }
+
+        _settings.Fit = FitImageServerSide ? Enums.OnOff.on : Enums.OnOff.Default;
     }
 
     [RelayCommand]
