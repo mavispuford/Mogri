@@ -59,7 +59,7 @@ public partial class SkiaSharpPageViewModel : PageViewModel, ISkiaSharpPageViewM
 
                     memStream.Seek(0, SeekOrigin.Begin);
 
-                    var uri = await _fileService.WriteFileToExternalStorageAsync(fileName, memStream);
+                    var uri = await _fileService.WriteFileToExternalStorageAsync(fileName, memStream, true);
                 }
             }
 
