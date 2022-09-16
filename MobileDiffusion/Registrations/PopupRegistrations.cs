@@ -3,7 +3,7 @@ using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Models;
 using MobileDiffusion.Views.Popups;
 
-namespace MobileDiffusion;
+namespace MobileDiffusion.Registrations;
 
 public static class PopupRegistrations
 {

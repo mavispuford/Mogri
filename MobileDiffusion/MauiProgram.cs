@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Maui;
 using SkiaSharp.Views.Maui.Controls.Hosting;
+using MobileDiffusion.Registrations;
 
 namespace MobileDiffusion;
 

@@ -3,6 +3,7 @@
 using CommunityToolkit.Maui.Views;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
+using MobileDiffusion.Registrations;
 
 namespace MobileDiffusion.Services
 {
