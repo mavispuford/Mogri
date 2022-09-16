@@ -8,7 +8,7 @@ using CommunityToolkit.Maui.Views;
 
 namespace MobileDiffusion.ViewModels;
 
-public partial class MaskDrawingPageViewModel : BaseViewModel, IMaskDrawingPageViewModel
+public partial class MaskDrawingPageViewModel : PageViewModel, IMaskDrawingPageViewModel
 {
     private readonly IFileService _fileService;
 

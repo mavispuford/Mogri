@@ -12,6 +12,7 @@ public static class ViewRegistrations
         registerPage<IPromptSettingsPageViewModel, PromptSettingsPage>(builder.Services);
         registerPage<IImageToImageSettingsPageViewModel, ImageToImageSettingsPage>(builder.Services);
         registerPage<IMaskDrawingPageViewModel, MaskDrawingPage>(builder.Services);
+        registerPage<ISkiaSharpPageViewModel, SkiaSharpPage>(builder.Services);
 
         return builder;
     }
