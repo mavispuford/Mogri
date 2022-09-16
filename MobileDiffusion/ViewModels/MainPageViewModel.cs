@@ -13,6 +13,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
     private readonly IStableDiffusionService _stableDiffusionService;
     private readonly IPopupService _popupService;
     private readonly IServiceProvider _serviceProvider;
+    private readonly IImageService _imageService;
 
     private Settings _settings = new();
 
@@ -35,12 +36,14 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
         IFileService fileService,
         IStableDiffusionService stableDiffusionService,
         IPopupService popupService,
-        IServiceProvider serviceProvider)
+        IServiceProvider serviceProvider,
+        IImageService imageService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+        _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
     }
 
     [RelayCommand]
@@ -49,6 +52,16 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
         Results = new();
 
         var settings = _settings.Clone();
+
+        if (settings.FitClientSide)
+        {
+            var imageString = await GetResizedImageStringFromSettings(settings);
+
+            if (!string.IsNullOrEmpty(imageString))
+            {
+                settings.InitImage = imageString;
+            }
+        }
 
         for (var i = 0; i < settings.NumOutputs; i++)
         {
@@ -142,6 +155,31 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
         }
     }
 
+    private async Task<string> GetResizedImageStringFromSettings(Settings settings)
+    {
+        if (string.IsNullOrEmpty(settings.InitImage) ||
+            !settings.FitClientSide)
+        {
+            return string.Empty;
+        }
+
+        var tokenSource = new CancellationTokenSource();
+
+        var stream = await _imageService.GetStreamFromContentTypeStringAsync(settings.InitImage, tokenSource.Token);
+
+        var bytes = _imageService.GetResizedImageStreamBytes(stream, (int)settings.Width, (int)settings.Height);
+
+        if (bytes == null || 
+            bytes.Length == 0)
+        {
+            return string.Empty;
+        }
+
+        var imageString = Convert.ToBase64String(bytes);
+
+        return string.Format(Constants.ImageDataFormat, "image/png", imageString);
+    }
+
     private async Task retrieveResultImageAsync(IResultItemViewModel result, string fileName, int number)
     {
         var imageBytes = await _stableDiffusionService.GetImageBytesAsync(result.ResponseItem);
@@ -221,7 +259,6 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
     {
         HasInitImage = !string.IsNullOrEmpty(_settings?.InitImage);
     }
-
 
     public override void OnAppearing()
     {

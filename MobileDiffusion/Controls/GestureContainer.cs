@@ -34,7 +34,6 @@ public class GestureContainer : ContentView
 
     private void PanGesture_PanUpdated(object sender, PanUpdatedEventArgs e)
     {
-        Console.WriteLine(e.GestureId);
         if (e.StatusType == GestureStatus.Started)
         {
             _initialPanX = Content.TranslationX - _scaleTargetX;

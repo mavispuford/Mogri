@@ -1,13 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Models;
-using System.Threading;
 
 namespace MobileDiffusion.ViewModels;
 
 public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageToImageSettingsPageViewModel
 {
+    private readonly IImageService _imageService;
+
     private Settings _settings;
 
     private CancellationTokenSource _initCancellationTokenSource;
@@ -38,8 +40,9 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
     [ObservableProperty]
     private ImageSource maskImageSource;
 
-    public ImageToImageSettingsPageViewModel()
+    public ImageToImageSettingsPageViewModel(IImageService imageService)
     {
+        _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
     }
 
     public override void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -98,6 +101,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
         Strength = _settings.PromptStrength.ToString();
 
         FitImageServerSide = _settings.Fit == Enums.OnOff.on;
+        FitImageClientSide = _settings.FitClientSide;
 
         _initCancellationTokenSource = new CancellationTokenSource();
         _maskCancellationTokenSource = new CancellationTokenSource();
@@ -106,51 +110,16 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
             Task.Run(async () =>
             {
                 IsLoadingInitImage = true;
-                InitImageSource = await getImageSourceFromString(_settings.InitImage, _initCancellationTokenSource.Token);
+                InitImageSource = await _imageService.GetImageSourceFromContentTypeStringAsync(_settings.InitImage, _initCancellationTokenSource.Token);
                 IsLoadingInitImage = false;
             }, _initCancellationTokenSource.Token),
             Task.Run(async () =>
             {
                 IsLoadingMaskImage = true;
-                MaskImageSource = await getImageSourceFromString(_settings.Mask, _maskCancellationTokenSource.Token);
+                MaskImageSource = await _imageService.GetImageSourceFromContentTypeStringAsync(_settings.Mask, _maskCancellationTokenSource.Token);
                 IsLoadingMaskImage = false;
             }, _maskCancellationTokenSource.Token),
         });
-    }
-
-    private Task<ImageSource> getImageSourceFromString(string imageString, CancellationToken token)
-    {
-        if (string.IsNullOrEmpty(imageString))
-        {
-            return Task.FromResult<ImageSource>(null);
-        }
-
-        var matchResult = Constants.ImageDataRegex.Match(imageString);
-
-        if (matchResult.Success)
-        {
-            try
-            {
-                var imageBase64 = matchResult.Groups[Constants.ImageDataCaptureGroupData].Value;
-
-                var imageBytes = Convert.FromBase64String(imageBase64);
-
-                if (token.IsCancellationRequested)
-                {
-                    return Task.FromResult<ImageSource>(null);
-                }
-
-                var memoryStream = new MemoryStream(imageBytes);
-
-                return Task.FromResult(ImageSource.FromStream(() => memoryStream));
-            }
-            catch
-            {
-                // TODO - Handle exceptions
-            }
-        }
-
-        return Task.FromResult<ImageSource>(null);
     }
 
     private void mapPropertiesToSettings()
@@ -162,6 +131,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
         }
 
         _settings.Fit = FitImageServerSide ? Enums.OnOff.on : Enums.OnOff.Default;
+        _settings.FitClientSide = FitImageClientSide;
     }
 
     [RelayCommand]
