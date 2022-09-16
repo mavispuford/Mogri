@@ -12,6 +12,6 @@
 
         Task<string> WriteFileToInternalStorageAsync(string fileName, byte[] bytes);
 
-        Task<string> WriteFileToExternalStorageAsync(string fileName, Stream stream);
+        Task<string> WriteFileToExternalStorageAsync(string fileName, Stream stream, bool isMask = false);
     }
 }

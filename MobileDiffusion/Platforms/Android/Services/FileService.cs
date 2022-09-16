@@ -9,6 +9,8 @@ public class FileService : IFileService
 {
     private const string extFolderName = "Pictures/MobileDiffusion/";
 
+    private const string extFolderNameMasks = "Pictures/MobileDiffusion/Masks/";
+
     public async Task<Stream> GetFileStreamUsingExactUriAsync(string uriString)
     {
         await checkForReadPermission();
@@ -162,21 +164,21 @@ public class FileService : IFileService
         }
     }
 
-    public async Task<string> WriteFileToExternalStorageAsync(string fileName, Stream stream)
+    public async Task<string> WriteFileToExternalStorageAsync(string fileName, Stream stream, bool isMask = false)
     {
         await checkForWritePermission();
 
         //return await writeFileToBaseUriAsync(fileName, stream, AndroidNet.Uri.WithAppendedPath(MediaStore.Images.Media.ExternalContentUri, extFolderName));
-        return await writeFileToBaseUriAsync(fileName, stream, MediaStore.Images.Media.ExternalContentUri);
+        return await writeFileToBaseUriAsync(fileName, stream, MediaStore.Images.Media.ExternalContentUri, isMask);
     }
 
-    private async Task<string> writeFileToBaseUriAsync(string fileName, Stream stream, AndroidNet.Uri baseUri)
+    private async Task<string> writeFileToBaseUriAsync(string fileName, Stream stream, AndroidNet.Uri baseUri, bool isMask = false)
     {
         var contentValues = new ContentValues();
         contentValues.Put(MediaStore.IMediaColumns.Title, fileName);
         contentValues.Put(MediaStore.IMediaColumns.MimeType, "image/jpg");
         contentValues.Put(MediaStore.Images.Media.InterfaceConsts.DisplayName, fileName);
-        contentValues.Put(MediaStore.Images.Media.InterfaceConsts.RelativePath, extFolderName);
+        contentValues.Put(MediaStore.Images.Media.InterfaceConsts.RelativePath, isMask ? extFolderNameMasks : extFolderName);
 
 #if ANDROID30_0_OR_GREATER
         contentValues.Put(MediaStore.Images.Media.InterfaceConsts.IsPending, 1);
