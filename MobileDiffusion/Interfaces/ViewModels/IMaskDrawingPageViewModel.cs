@@ -4,7 +4,7 @@ using CommunityToolkit.Maui.Core;
 
 namespace MobileDiffusion.Interfaces.ViewModels;
 
-public interface IMaskDrawingPageViewModel : IBaseViewModel
+public interface IMaskDrawingPageViewModel : IPageViewModel
 {
     double ImageWidth { get; set; }
     double ImageHeight { get; set; }

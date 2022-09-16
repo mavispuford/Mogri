@@ -1,5 +1,8 @@
+using MobileDiffusion.Controls;
+using MobileDiffusion.Interfaces.ViewModels;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
+using System.Reflection;
 
 namespace MobileDiffusion.Views;
 
@@ -8,10 +11,23 @@ public partial class SkiaSharpPage : ContentPage
     private List<List<SKPoint>> _paths = new();
     private List<SKPoint> _currentPath;
 
+    public SKBitmap Bitmap
+    {
+        get => (SKBitmap)GetValue(BitmapProperty);
+        set => SetValue(BitmapProperty, value);
+    }
+
+    public static BindableProperty BitmapProperty = BindableProperty.Create(nameof(Bitmap), typeof(SKBitmap), typeof(SkiaSharpPage), propertyChanged: (bindable, oldValue, newValue) =>
+    {
+        ((SkiaSharpPage)bindable).OnSourceBitmapChanged();
+    });
+
     public SkiaSharpPage()
 	{
 		InitializeComponent();
-	}
+
+        this.SetBinding(BitmapProperty, nameof(ISkiaSharpPageViewModel.SourceBitmap));
+    }
 
     private void OnTouch(object sender, SKTouchEventArgs e)
     {
@@ -45,7 +61,12 @@ public partial class SkiaSharpPage : ContentPage
 
         // make sure the canvas is blank
         canvas.Clear(SKColors.Transparent);
-        
+
+        if (Bitmap != null)
+        {
+            canvas.DrawBitmap(Bitmap, Bitmap.Info.Rect, e.Info.Rect);
+        }
+
         if (_paths.Count == 0)
         {
             return;
@@ -109,5 +130,10 @@ public partial class SkiaSharpPage : ContentPage
         var stream = await capture.OpenReadAsync();
 
         ResultImageView.Source = ImageSource.FromStream(() => stream);
+    }
+
+    private void OnSourceBitmapChanged()
+    {
+        skiaView.InvalidateSurface();
     }
 }

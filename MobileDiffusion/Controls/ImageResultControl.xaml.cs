@@ -5,13 +5,13 @@ public partial class ImageResultControl : ContentView
     public static BindableProperty IsLoadingProperty = BindableProperty.Create(nameof(IsLoading),
         typeof(bool), typeof(ImageResultControl), true, propertyChanged: (bindable, oldValue, newValue) =>
         {
-            ((ImageResultControl)bindable).onIsLoadingChanged();
+            ((ImageResultControl)bindable).OnIsLoadingChanged();
         });
 
     public static BindableProperty SourceProperty = BindableProperty.Create(nameof(Source),
         typeof(ImageSource), typeof(ImageResultControl), default(ImageSource), propertyChanged: (bindable, oldValue, newValue) =>
         {
-            ((ImageResultControl)bindable).onImageSourceChanged();
+            ((ImageResultControl)bindable).OnImageSourceChanged();
         });
 		
 	public ImageSource Source
@@ -31,7 +31,7 @@ public partial class ImageResultControl : ContentView
 		InitializeComponent();
 	}
 
-    private void onIsLoadingChanged()
+    private void OnIsLoadingChanged()
     {
         if (!IsLoading && ImageControl.Scale == 0)
         {
@@ -39,7 +39,7 @@ public partial class ImageResultControl : ContentView
         }
     }
 
-	private void onImageSourceChanged()
+	private void OnImageSourceChanged()
 	{
         if (Source != null)
         {

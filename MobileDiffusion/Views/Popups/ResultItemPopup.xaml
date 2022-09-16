@@ -22,7 +22,7 @@
             <TapGestureRecognizer Command="{Binding CloseCommand}" />
         </Grid.GestureRecognizers>
 
-        <controls:PinchToZoomContainer Grid.Row="0"
+        <controls:GestureContainer Grid.Row="0"
                                        Grid.Column="0"
                                        Grid.ColumnSpan="2"
                                        HorizontalOptions="Fill"
@@ -34,7 +34,7 @@
                    VerticalOptions="Center"
                    Source="{Binding ResultItem.InternalUri}"/>
             
-        </controls:PinchToZoomContainer>
+        </controls:GestureContainer>
         <Button Grid.Row="1" Grid.Column="0" Text="Use Seed" Command="{Binding UseSeedCommand}" 
                 Style="{DynamicResource LargeIconButtonStyle}">
             <Button.ImageSource>

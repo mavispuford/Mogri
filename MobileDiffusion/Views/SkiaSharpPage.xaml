@@ -2,16 +2,21 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
+             xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
              x:Class="MobileDiffusion.Views.SkiaSharpPage"
-             Title="SkiaSharpPage">
+             Title="SkiaSharpPage"
+             x:DataType="viewModels:ISkiaSharpPageViewModel">
     <VerticalStackLayout Padding="30"
                          Spacing="10">
+        <Button Text="Load Image" Command="{Binding ShowMediaPickerCommand}"/>
+
         <Grid>
             <Image x:Name="ImageView"
                    Grid.Row="0"
                    Source="dotnet_bot"
                    WidthRequest="250"
-                   HeightRequest="250"/>
+                   HeightRequest="250"
+                   IsVisible="False"/>
 
             <skia:SKCanvasView x:Name="skiaView" 
                             PaintSurface="OnPaintSurface"
@@ -22,17 +27,20 @@
                             VerticalOptions="FillAndExpand"
                             HeightRequest="250"
                             WidthRequest="250"/>
+
+            <ActivityIndicator IsRunning="{Binding IsLoadingImage}" InputTransparent="True" />
         </Grid>
 
         <HorizontalStackLayout Spacing="10"
                                HorizontalOptions="Center">
             <Button Text="Undo" Clicked="Undo_Button_Clicked"/>
             <Button Text="Clear" Clicked="Clear_Button_Clicked"/>
-            <Button Text="Save Canvas" Clicked="Save_Button_Clicked"/>
+            <Button Text="Save Canvas" Command="{Binding SaveCommand}" CommandParameter="{x:Reference skiaView}"/>
         </HorizontalStackLayout>
 
         <Image x:Name="ResultImageView" 
-                WidthRequest="250"
-                HeightRequest="250"/>
+               WidthRequest="250"
+               HeightRequest="250"
+               Source="{Binding SavedImageSource}"/>
     </VerticalStackLayout>
 </ContentPage>
