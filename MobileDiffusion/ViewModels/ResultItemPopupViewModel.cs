@@ -69,11 +69,9 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
                 stream.CopyTo(memoryStream);
                 var imageBytes = memoryStream.ToArray();
 
-                var result = Models.Settings.FromResultItem(ResultItem);
-
                 var imageString = Convert.ToBase64String(imageBytes);
 
-                ClosePopup(string.Format(Constants.ImageDataFormat, "image/jpeg", imageString));
+                ClosePopup(string.Format(Constants.ImageDataFormat, "image/png", imageString));
             }
         }
         catch
