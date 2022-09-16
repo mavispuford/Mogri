@@ -77,12 +77,19 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
             {
                 if (item.Event.Equals("step", StringComparison.OrdinalIgnoreCase))
                 {
-                    Progress = item.Step / (float)(settings.NumInferenceSteps);
+                    if (string.IsNullOrEmpty(settings.InitImage))
+                    {
+                        Progress = item.Step / (float)(settings.NumInferenceSteps);
+                    }
+                    else
+                    {
+                        Progress = item.Step / (float)(settings.NumInferenceSteps * settings.PromptStrength);
+                    }
 
                     continue;
                 }
 
-                var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{item.Seed}-{DateTime.Now.Millisecond}";
+                var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{item.Seed}-{DateTime.Now.Ticks}";
 
                 if (item.Event.Equals("result", StringComparison.OrdinalIgnoreCase))
                 {

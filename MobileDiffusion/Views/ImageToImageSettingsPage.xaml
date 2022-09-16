@@ -74,6 +74,22 @@
 
                 <Image Grid.Row="3" Grid.Column="0" WidthRequest="32">
                     <Image.Source>
+                        <FontImageSource Glyph="&#xe434;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
+                    </Image.Source>
+                </Image>
+                <Label Grid.Row="3" Grid.Column="1" Text="Fit Image (on server):" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+                <Switch Grid.Row="3" Grid.Column="2" IsToggled="{Binding FitImageServerSide}" />
+
+                <Image Grid.Row="4" Grid.Column="0" WidthRequest="32">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xe434;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
+                    </Image.Source>
+                </Image>
+                <Label Grid.Row="4" Grid.Column="1" Text="Fit Image (before sending):" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+                <Switch Grid.Row="4" Grid.Column="2" IsToggled="{Binding FitImageClientSide}" />
+
+                <!--<Image Grid.Row="3" Grid.Column="0" WidthRequest="32">
+                    <Image.Source>
                         <FontImageSource Glyph="&#xe3b9;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
@@ -101,7 +117,7 @@
                             </MultiBinding>
                         </ActivityIndicator.IsRunning>
                     </ActivityIndicator>
-                </Grid>
+                </Grid>-->
             </Grid>
         </ScrollView>
 

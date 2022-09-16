@@ -29,7 +29,18 @@ public partial class SkiaSharpPage : ContentPage
         this.SetBinding(BitmapProperty, nameof(ISkiaSharpPageViewModel.SourceBitmap));
     }
 
-    private void OnTouch(object sender, SKTouchEventArgs e)
+    protected override void OnBindingContextChanged()
+    {
+        base.OnBindingContextChanged();
+
+        if (BindingContext is ISkiaSharpPageViewModel pageViewModel)
+        {
+            pageViewModel.SourceCanvasView = SourceImageCanvasView;
+            pageViewModel.MaskCanvasView = MaskCanvasView;
+        }
+    }
+
+    private void OnTouchMaskSurface(object sender, SKTouchEventArgs e)
     {
         if (e.InContact)
         {
@@ -49,12 +60,12 @@ public partial class SkiaSharpPage : ContentPage
             _currentPath = null;
         }
 
-        skiaView.InvalidateSurface();
+        MaskCanvasView.InvalidateSurface();
 
         e.Handled = true;
     }
 
-    private void OnPaintSurface(object sender, SKPaintSurfaceEventArgs e)
+    private void OnPaintSourceImageSurface(object sender, SKPaintSurfaceEventArgs e)
     {
         // the the canvas and properties
         var canvas = e.Surface.Canvas;
@@ -66,6 +77,15 @@ public partial class SkiaSharpPage : ContentPage
         {
             canvas.DrawBitmap(Bitmap, Bitmap.Info.Rect, e.Info.Rect);
         }
+    }
+
+    private void OnPaintMaskSurface(object sender, SKPaintSurfaceEventArgs e)
+    {
+        // the the canvas and properties
+        var canvas = e.Surface.Canvas;
+
+        // make sure the canvas is blank
+        canvas.Clear(SKColors.Transparent);
 
         if (_paths.Count == 0)
         {
@@ -75,7 +95,8 @@ public partial class SkiaSharpPage : ContentPage
         using var paint = new SKPaint
         {
             //Color = SKColors.Black,
-            IsAntialias = true,
+            FilterQuality = SKFilterQuality.None,
+            IsAntialias = false,
             Style = SKPaintStyle.Stroke,
             StrokeWidth = 10,
             StrokeCap = SKStrokeCap.Round,
@@ -108,7 +129,7 @@ public partial class SkiaSharpPage : ContentPage
 
         _paths.Remove(_paths.Last());
 
-        skiaView.InvalidateSurface();
+        MaskCanvasView.InvalidateSurface();
     }
 
     private void Clear_Button_Clicked(object sender, EventArgs e)
@@ -120,12 +141,12 @@ public partial class SkiaSharpPage : ContentPage
 
         _paths.Clear();
 
-        skiaView.InvalidateSurface();
+        MaskCanvasView.InvalidateSurface();
     }
 
     private async void Save_Button_Clicked(object sender, EventArgs e)
     {
-        var capture = await skiaView.CaptureAsync();
+        var capture = await MaskCanvasView.CaptureAsync();
 
         var stream = await capture.OpenReadAsync();
 
@@ -134,6 +155,6 @@ public partial class SkiaSharpPage : ContentPage
 
     private void OnSourceBitmapChanged()
     {
-        skiaView.InvalidateSurface();
+        SourceImageCanvasView.InvalidateSurface();
     }
 }

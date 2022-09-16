@@ -11,22 +11,21 @@
         <Button Text="Load Image" Command="{Binding ShowMediaPickerCommand}"/>
 
         <Grid>
-            <Image x:Name="ImageView"
-                   Grid.Row="0"
-                   Source="dotnet_bot"
-                   WidthRequest="250"
-                   HeightRequest="250"
-                   IsVisible="False"/>
-
-            <skia:SKCanvasView x:Name="skiaView" 
-                            PaintSurface="OnPaintSurface"
-                            EnableTouchEvents="True"
-                            Touch="OnTouch"
+            <skia:SKCanvasView x:Name="SourceImageCanvasView" 
+                            PaintSurface="OnPaintSourceImageSurface"
                             IgnorePixelScaling="True"
                             HorizontalOptions="FillAndExpand"
                             VerticalOptions="FillAndExpand"
-                            HeightRequest="250"
-                            WidthRequest="250"/>
+                            HeightRequest="250"/>
+
+            <skia:SKCanvasView x:Name="MaskCanvasView" 
+                            PaintSurface="OnPaintMaskSurface"
+                            EnableTouchEvents="True"
+                            Touch="OnTouchMaskSurface"
+                            IgnorePixelScaling="True"
+                            HorizontalOptions="FillAndExpand"
+                            VerticalOptions="FillAndExpand"
+                            HeightRequest="250"/>
 
             <ActivityIndicator IsRunning="{Binding IsLoadingImage}" InputTransparent="True" />
         </Grid>
@@ -35,11 +34,11 @@
                                HorizontalOptions="Center">
             <Button Text="Undo" Clicked="Undo_Button_Clicked"/>
             <Button Text="Clear" Clicked="Clear_Button_Clicked"/>
-            <Button Text="Save Canvas" Command="{Binding SaveCommand}" CommandParameter="{x:Reference skiaView}"/>
+            <Button Text="Save Canvas" Command="{Binding SaveCommand}"/>
         </HorizontalStackLayout>
 
         <Image x:Name="ResultImageView" 
-               WidthRequest="250"
+               HorizontalOptions="FillAndExpand"
                HeightRequest="250"
                Source="{Binding SavedImageSource}"/>
     </VerticalStackLayout>

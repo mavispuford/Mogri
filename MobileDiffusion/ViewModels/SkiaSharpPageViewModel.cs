@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
@@ -18,6 +19,12 @@ public partial class SkiaSharpPageViewModel : PageViewModel, ISkiaSharpPageViewM
     private SKBitmap sourceBitmap;
 
     [ObservableProperty]
+    private SKCanvasView sourceCanvasView;
+
+    [ObservableProperty]
+    private SKCanvasView maskCanvasView;
+
+    [ObservableProperty]
     private ImageSource savedImageSource;
 
     public SkiaSharpPageViewModel(IFileService fileService)
@@ -26,13 +33,42 @@ public partial class SkiaSharpPageViewModel : PageViewModel, ISkiaSharpPageViewM
     }
 
     [RelayCommand]
-    private async Task Save(SKCanvasView view)
+    private async Task Save()
     {
-        var capture = await view.CaptureAsync();
+        if (SourceCanvasView == null ||
+            MaskCanvasView == null)
+        {
+            return;
+        }
+        
+        var maskCapture = await MaskCanvasView.CaptureAsync();
+        var maskStream = await maskCapture.OpenReadAsync();
+        var maskBitmap = SKBitmap.Decode(maskStream);
 
-        var stream = await capture.OpenReadAsync();
+        try
+        {
+            var maskedResultBitmap = CreateMaskedBitmap(SourceBitmap, maskBitmap);
 
-        SavedImageSource = ImageSource.FromStream(() => stream);
+            var fileName = $"Mask-{DateTime.Now.Ticks}.png";
+
+            using (var memStream = new MemoryStream())
+            {
+                using (var skiaStream = new SKManagedWStream(memStream))
+                {
+                    maskedResultBitmap.Encode(skiaStream, SKEncodedImageFormat.Png, 100);
+
+                    memStream.Seek(0, SeekOrigin.Begin);
+
+                    var uri = await _fileService.WriteFileToExternalStorageAsync(fileName, memStream);
+                }
+            }
+
+            await Shell.Current.CurrentPage.DisplaySnackbar($"Image successfully saved as:\n{fileName}", duration: TimeSpan.FromSeconds(3));
+        }
+        catch (Exception e)
+        {
+            //
+        }
     }
 
     [RelayCommand]
@@ -50,9 +86,7 @@ public partial class SkiaSharpPageViewModel : PageViewModel, ISkiaSharpPageViewM
             IsLoadingImage = true;
 
             using var fileStream = await fileResult.OpenReadAsync();
-            //var memoryStream = new MemoryStream();
-            //await fileStream.CopyToAsync(memoryStream);
-
+            
             SourceBitmap = SKBitmap.Decode(fileStream);
         }
         catch
@@ -73,5 +107,63 @@ public partial class SkiaSharpPageViewModel : PageViewModel, ISkiaSharpPageViewM
     public override void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         base.ApplyQueryAttributes(query);
+    }
+
+    unsafe SKBitmap CreateMaskedBitmap(SKBitmap srcBitmap, SKBitmap maskBitmapFull)
+    {
+        if (srcBitmap == null ||
+            maskBitmapFull == null)
+        {
+            return null;
+        }
+
+        var maskBitmap = maskBitmapFull.Resize(srcBitmap.Info, SKFilterQuality.None);
+
+        byte* srcPtr = (byte*)srcBitmap.GetPixels().ToPointer();
+        byte* mskPtr = (byte*)maskBitmap.GetPixels().ToPointer();
+
+        int width = srcBitmap.Width;       // same for both bitmaps
+        int height = srcBitmap.Height;
+
+        SKColorType typeSrc = srcBitmap.ColorType;
+        SKColorType typeMsk = maskBitmap.ColorType;
+
+        var resultBitmap = new SKBitmap(width, height, typeSrc, SKAlphaType.Unpremul);
+        
+        byte* resultPtr = (byte*)resultBitmap.GetPixels().ToPointer();
+
+        for (int row = 0; row < height; row++)
+        {
+            for (int col = 0; col < width; col++)
+            {
+                // Get color from source bitmap
+                byte srcByte1 = *srcPtr++;         // red or blue
+                byte srcByte2 = *srcPtr++;         // green
+                byte srcByte3 = *srcPtr++;         // blue or red
+                byte srcByte4 = *srcPtr++;         // alpha
+
+                // Get color from mask bitmap
+                byte mskByte1 = *mskPtr++;         // red or blue
+                byte mskByte2 = *mskPtr++;         // green
+                byte mskByte3 = *mskPtr++;         // blue or red
+                byte mskByte4 = *mskPtr++;         // alpha
+
+                *resultPtr++ = srcByte1;
+                *resultPtr++ = srcByte2;
+                *resultPtr++ = srcByte3;
+
+                if (mskByte4 != 0)
+                { 
+                    *resultPtr++ = (byte)3;
+                }
+                else
+                {
+                    *resultPtr++ = srcByte4;
+                }
+
+            }
+        }
+
+        return resultBitmap;
     }
 }
