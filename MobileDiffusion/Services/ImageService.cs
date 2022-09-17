@@ -1,5 +1,6 @@
 ﻿using MobileDiffusion.Interfaces.Services;
 using SkiaSharp;
+using System.IO;
 
 namespace MobileDiffusion.Services;
 
@@ -54,7 +55,30 @@ public class ImageService : IImageService
     {
         try
         {
-            var bitmap = SKBitmap.Decode(stream);
+            // Instead of a simple SKBitmap.Decode() call, we're using a codec and SKImageInfo with Unpremul for the
+            // AlphaType to preserve masked image pixel data
+
+            var codec = SKCodec.Create(stream);
+            var info = new SKImageInfo
+            {
+                AlphaType = SKAlphaType.Unpremul,
+                ColorSpace = codec.Info.ColorSpace,
+                ColorType = codec.Info.ColorType,
+                Height = codec.Info.Height,
+                Width = codec.Info.Width,
+            };
+
+            var bitmap = SKBitmap.Decode(codec, info);
+
+            if (bitmap.Width <= width &&
+                bitmap.Height <= height)
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+
+                using var memoryStream = new MemoryStream();
+                stream.CopyTo(memoryStream);
+                return memoryStream.ToArray();
+            }
 
             // 1024 x 512 -> 512 x 512 = 512 x 256
             // 512 x 1024 -> 512 x 512 = 256 x 512
@@ -65,8 +89,6 @@ public class ImageService : IImageService
             var bitmapRatio = bitmapWidthIsBiggest ?
                 bitmap.Width / (float)bitmap.Height :
                 bitmap.Height / (float)bitmap.Width;
-
-            var targetWidthIsBiggest = width > height;
 
             var targetWidth = 0;
             var targetHeight = 0;
