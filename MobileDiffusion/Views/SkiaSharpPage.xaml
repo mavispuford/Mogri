@@ -6,17 +6,21 @@
              x:Class="MobileDiffusion.Views.SkiaSharpPage"
              Title="SkiaSharpPage"
              x:DataType="viewModels:ISkiaSharpPageViewModel">
-    <VerticalStackLayout Padding="30"
-                         Spacing="10">
-        <Button Text="Load Image" Command="{Binding ShowMediaPickerCommand}"/>
+    <Grid Padding="30"
+          RowSpacing="10"
+          RowDefinitions="auto,*,auto">
+        <Button Grid.Row="0"
+                Text="Load Image" Command="{Binding ShowMediaPickerCommand}"/>
 
-        <Grid>
+        <Grid x:Name="MaskGrid"
+              Grid.Row="1"
+              HorizontalOptions="FillAndExpand"
+              VerticalOptions="FillAndExpand">
             <skia:SKCanvasView x:Name="SourceImageCanvasView" 
                             PaintSurface="OnPaintSourceImageSurface"
                             IgnorePixelScaling="True"
                             HorizontalOptions="FillAndExpand"
-                            VerticalOptions="FillAndExpand"
-                            HeightRequest="250"/>
+                            VerticalOptions="FillAndExpand"/>
 
             <skia:SKCanvasView x:Name="MaskCanvasView" 
                             PaintSurface="OnPaintMaskSurface"
@@ -24,22 +28,17 @@
                             Touch="OnTouchMaskSurface"
                             IgnorePixelScaling="True"
                             HorizontalOptions="FillAndExpand"
-                            VerticalOptions="FillAndExpand"
-                            HeightRequest="250"/>
+                            VerticalOptions="FillAndExpand"/>
 
             <ActivityIndicator IsRunning="{Binding IsLoadingImage}" InputTransparent="True" />
         </Grid>
 
-        <HorizontalStackLayout Spacing="10"
+        <HorizontalStackLayout Grid.Row="2"
+                               Spacing="10"
                                HorizontalOptions="Center">
             <Button Text="Undo" Clicked="Undo_Button_Clicked"/>
             <Button Text="Clear" Clicked="Clear_Button_Clicked"/>
             <Button Text="Save Canvas" Command="{Binding SaveCommand}"/>
         </HorizontalStackLayout>
-
-        <Image x:Name="ResultImageView" 
-               HorizontalOptions="FillAndExpand"
-               HeightRequest="250"
-               Source="{Binding SavedImageSource}"/>
-    </VerticalStackLayout>
+    </Grid>
 </ContentPage>
