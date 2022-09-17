@@ -1,3 +1,4 @@
+using Android.Graphics;
 using MobileDiffusion.Controls;
 using MobileDiffusion.Interfaces.ViewModels;
 using SkiaSharp;
@@ -67,6 +68,8 @@ public partial class SkiaSharpPage : ContentPage
 
     private void OnPaintSourceImageSurface(object sender, SKPaintSurfaceEventArgs e)
     {
+        var info = e.Info;
+
         // the the canvas and properties
         var canvas = e.Surface.Canvas;
 
@@ -75,6 +78,15 @@ public partial class SkiaSharpPage : ContentPage
 
         if (Bitmap != null)
         {
+            //float scale = Math.Min((float)info.Width / Bitmap.Width,
+            //           (float)info.Height / Bitmap.Height);
+            //float x = (info.Width - scale * Bitmap.Width) / 2;
+            //float y = (info.Height - scale * Bitmap.Height) / 2;
+            //SKRect destRect = new SKRect(x, y, x + scale * Bitmap.Width,
+            //                                   y + scale * Bitmap.Height);
+
+            //canvas.DrawBitmap(Bitmap, destRect);
+
             canvas.DrawBitmap(Bitmap, Bitmap.Info.Rect, e.Info.Rect);
         }
     }
@@ -144,17 +156,22 @@ public partial class SkiaSharpPage : ContentPage
         MaskCanvasView.InvalidateSurface();
     }
 
-    private async void Save_Button_Clicked(object sender, EventArgs e)
-    {
-        var capture = await MaskCanvasView.CaptureAsync();
-
-        var stream = await capture.OpenReadAsync();
-
-        ResultImageView.Source = ImageSource.FromStream(() => stream);
-    }
-
     private void OnSourceBitmapChanged()
     {
+        float scale = Math.Min((float)MaskGrid.Width / Bitmap.Width,
+                   (float)MaskGrid.Height / Bitmap.Height);
+        float x = ((float)MaskGrid.Width - scale * Bitmap.Width) / 2;
+        float y = ((float)MaskGrid.Height - scale * Bitmap.Height) / 2;
+        SKRect destRect = new SKRect(x, y, x + scale * Bitmap.Width,
+                                           y + scale * Bitmap.Height);
+
+        SourceImageCanvasView.WidthRequest = destRect.Width;
+        SourceImageCanvasView.HeightRequest = destRect.Height;
+        MaskCanvasView.WidthRequest = destRect.Width;
+        MaskCanvasView.HeightRequest = destRect.Height;
+
+        Clear_Button_Clicked(this, new EventArgs());
+
         SourceImageCanvasView.InvalidateSurface();
     }
 }
