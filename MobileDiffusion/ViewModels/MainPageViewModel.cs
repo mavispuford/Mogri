@@ -17,6 +17,10 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
     private Settings _settings = new();
 
+    private string _initImageFirstCharacters;
+    private string _resizedInitImage;
+    private bool _initImageNeedsResize = true;
+
     [ObservableProperty]
     private bool hasInitImage;
 
@@ -49,19 +53,11 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
     [RelayCommand]
     private async Task Create()
     {
+        Progress = 0;
+
         Results = new();
 
         var settings = _settings.Clone();
-
-        if (settings.FitClientSide)
-        {
-            var imageString = await GetResizedImageStringFromSettings(settings);
-
-            if (!string.IsNullOrEmpty(imageString))
-            {
-                settings.InitImage = imageString;
-            }
-        }
 
         for (var i = 0; i < settings.NumOutputs; i++)
         {
@@ -72,6 +68,27 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
             Results.Add(resultItem);
         }
+
+        if (settings.FitClientSide)
+        {
+            if (_initImageNeedsResize)
+            {
+                var imageString = await GetResizedImageStringFromSettingsAsync(settings);
+
+                if (!string.IsNullOrEmpty(imageString))
+                {
+                    settings.InitImage = imageString;
+
+                    _resizedInitImage = imageString;
+                    _initImageNeedsResize = false;
+                }
+            }
+            else
+            {
+                settings.InitImage = _resizedInitImage;
+            }
+        }
+        
 
         var finalPrompt = string.IsNullOrEmpty(Prompt) ? PlaceholderPrompt : Prompt;
 
@@ -84,8 +101,6 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
         try
         {
-            Progress = 0;
-
             await foreach (var item in _stableDiffusionService.SubmitTextToImageRequest(settings))
             {
                 if (item.Event.Equals("step", StringComparison.OrdinalIgnoreCase))
@@ -155,7 +170,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
         }
     }
 
-    private async Task<string> GetResizedImageStringFromSettings(Settings settings)
+    private async Task<string> GetResizedImageStringFromSettingsAsync(Settings settings)
     {
         if (string.IsNullOrEmpty(settings.InitImage) ||
             !settings.FitClientSide)
@@ -165,19 +180,22 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
         var tokenSource = new CancellationTokenSource();
 
-        var stream = await _imageService.GetStreamFromContentTypeStringAsync(settings.InitImage, tokenSource.Token);
-
-        var bytes = _imageService.GetResizedImageStreamBytes(stream, (int)settings.Width, (int)settings.Height);
-
-        if (bytes == null || 
-            bytes.Length == 0)
+        return await Task.Run(async () =>
         {
-            return string.Empty;
-        }
+            var stream = await _imageService.GetStreamFromContentTypeStringAsync(settings.InitImage, tokenSource.Token);
 
-        var imageString = Convert.ToBase64String(bytes);
+            var bytes = _imageService.GetResizedImageStreamBytes(stream, (int)settings.Width, (int)settings.Height);
 
-        return string.Format(Constants.ImageDataFormat, "image/png", imageString);
+            if (bytes == null ||
+                bytes.Length == 0)
+            {
+                return string.Empty;
+            }
+
+            var imageString = Convert.ToBase64String(bytes);
+
+            return string.Format(Constants.ImageDataFormat, "image/png", imageString);
+        }, tokenSource.Token);
     }
 
     private async Task retrieveResultImageAsync(IResultItemViewModel result, string fileName, int number)
@@ -258,6 +276,11 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
     private void updateHasInitImage()
     {
         HasInitImage = !string.IsNullOrEmpty(_settings?.InitImage);
+
+        if (HasInitImage)
+        {
+            _initImageNeedsResize = true;
+        }
     }
 
     public override void OnAppearing()
