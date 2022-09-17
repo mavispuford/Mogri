@@ -40,35 +40,38 @@ public partial class SkiaSharpPageViewModel : PageViewModel, ISkiaSharpPageViewM
         {
             return;
         }
-        
-        var maskCapture = await MaskCanvasView.CaptureAsync();
-        var maskStream = await maskCapture.OpenReadAsync();
-        var maskBitmap = SKBitmap.Decode(maskStream);
 
-        try
+        await Task.Run(async () =>
         {
-            var maskedResultBitmap = CreateMaskedBitmap(SourceBitmap, maskBitmap);
+            var maskCapture = await MaskCanvasView.CaptureAsync();
+            var maskStream = await maskCapture.OpenReadAsync();
+            var maskBitmap = SKBitmap.Decode(maskStream);
 
-            var fileName = $"Mask-{DateTime.Now.Ticks}.png";
-
-            using (var memStream = new MemoryStream())
+            try
             {
-                using (var skiaStream = new SKManagedWStream(memStream))
+                var maskedResultBitmap = CreateMaskedBitmap(SourceBitmap, maskBitmap);
+
+                var fileName = $"Mask-{DateTime.Now.Ticks}.png";
+
+                using (var memStream = new MemoryStream())
                 {
-                    maskedResultBitmap.Encode(skiaStream, SKEncodedImageFormat.Png, 100);
+                    using (var skiaStream = new SKManagedWStream(memStream))
+                    {
+                        maskedResultBitmap.Encode(skiaStream, SKEncodedImageFormat.Png, 100);
 
-                    memStream.Seek(0, SeekOrigin.Begin);
+                        memStream.Seek(0, SeekOrigin.Begin);
 
-                    var uri = await _fileService.WriteFileToExternalStorageAsync(fileName, memStream, true);
+                        var uri = await _fileService.WriteFileToExternalStorageAsync(fileName, memStream, true);
+                    }
                 }
-            }
 
-            await Shell.Current.CurrentPage.DisplaySnackbar($"Image successfully saved as:\n{fileName}", duration: TimeSpan.FromSeconds(3));
-        }
-        catch (Exception e)
-        {
-            //
-        }
+                await Shell.Current.CurrentPage.DisplaySnackbar($"Image successfully saved as:\n{fileName}", duration: TimeSpan.FromSeconds(3));
+            }
+            catch (Exception e)
+            {
+                //
+            }
+        });
     }
 
     [RelayCommand]
@@ -86,8 +89,23 @@ public partial class SkiaSharpPageViewModel : PageViewModel, ISkiaSharpPageViewM
             IsLoadingImage = true;
 
             using var fileStream = await fileResult.OpenReadAsync();
-            
-            SourceBitmap = SKBitmap.Decode(fileStream);
+
+            //SourceBitmap = SKBitmap.Decode(fileStream);
+
+            // Instead of a simple SKBitmap.Decode() call, we're using a codec and SKImageInfo with Unpremul for the
+            // AlphaType so masked images can be reopened after being created
+
+            var codec = SKCodec.Create(fileStream);
+            var info = new SKImageInfo
+            {
+                AlphaType = SKAlphaType.Unpremul,
+                ColorSpace = codec.Info.ColorSpace,
+                ColorType = codec.Info.ColorType,
+                Height = codec.Info.Height,
+                Width = codec.Info.Width,
+            };
+
+            SourceBitmap = SKBitmap.Decode(codec, info);
         }
         catch
         {
