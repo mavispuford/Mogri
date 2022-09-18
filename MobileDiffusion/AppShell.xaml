@@ -8,12 +8,14 @@
 
     <TabBar Shell.TabBarUnselectedColor="{StaticResource IndependenceAccent}">
         <Tab Title="Generation"
-             Icon="article">
+             Icon="article"
+             Route="MainPageTab">
             <ShellContent ContentTemplate="{DataTemplate views:MainPage}" />
         </Tab>
         <Tab Title="Masking"
-             Icon="image">
-            <ShellContent ContentTemplate="{DataTemplate views:SkiaSharpPage}" />
+             Icon="image"
+             Route="MaskPageTab">
+            <ShellContent ContentTemplate="{DataTemplate views:MaskPage}" />
         </Tab>
     </TabBar>
 

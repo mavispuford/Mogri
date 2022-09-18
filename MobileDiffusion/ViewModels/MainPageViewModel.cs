@@ -234,6 +234,14 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
             updateHasInitImage();
         }
+
+        if (query.TryGetValue(NavigationParams.InitImgString, out var initImag) &&
+            initImag is string initImagString)
+        {
+            _settings.InitImage = initImagString;
+
+            updateHasInitImage();
+        }
     }
 
     private void setSettingsFromResultItem(Settings settings)

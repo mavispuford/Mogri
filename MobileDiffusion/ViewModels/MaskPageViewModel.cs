@@ -5,15 +5,16 @@ using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 using SkiaSharp;
 using SkiaSharp.Views.Maui.Controls;
+using Xamarin.Google.Crypto.Tink.Subtle;
 
 namespace MobileDiffusion.ViewModels;
 
-public partial class SkiaSharpPageViewModel : PageViewModel, ISkiaSharpPageViewModel
+public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
 {
     private readonly IFileService _fileService;
     
     [ObservableProperty]
-    private bool isLoadingImage;
+    private bool isBusy;
 
     [ObservableProperty]
     private SKBitmap sourceBitmap;
@@ -27,7 +28,7 @@ public partial class SkiaSharpPageViewModel : PageViewModel, ISkiaSharpPageViewM
     [ObservableProperty]
     private ImageSource savedImageSource;
 
-    public SkiaSharpPageViewModel(IFileService fileService)
+    public MaskPageViewModel(IFileService fileService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
     }
@@ -36,10 +37,15 @@ public partial class SkiaSharpPageViewModel : PageViewModel, ISkiaSharpPageViewM
     private async Task Save()
     {
         if (SourceCanvasView == null ||
-            MaskCanvasView == null)
+            MaskCanvasView == null ||
+            SourceBitmap == null)
         {
+            Toast.Make("There is no image to save.").Show();
+
             return;
         }
+
+        IsBusy = true;
 
         await Task.Run(async () =>
         {
@@ -62,16 +68,46 @@ public partial class SkiaSharpPageViewModel : PageViewModel, ISkiaSharpPageViewM
                         memStream.Seek(0, SeekOrigin.Begin);
 
                         var uri = await _fileService.WriteFileToExternalStorageAsync(fileName, memStream, true);
+
+                        var useAsInitImg = false;
+
+                        var dispatcher = Shell.Current.CurrentPage.Dispatcher;
+                        await dispatcher?.DispatchAsync(async () =>
+                        {
+                            useAsInitImg = await Shell.Current.CurrentPage.DisplayAlert("Use as Source Image?",
+                                $"Image successfully saved as:\n{fileName}\n\nWould you like to use it as the source image?",
+                                "Use Image",
+                                "Close");
+                        });
+
+                        if (useAsInitImg)
+                        {
+                            memStream.Seek(0, SeekOrigin.Begin);
+                            var imageBytes = memStream.ToArray();
+                            var imageString = Convert.ToBase64String(imageBytes);
+
+                            var contentTypeString = string.Format(Constants.ImageDataFormat, "image/png", imageString);
+
+                            var parameters = new Dictionary<string, object>
+                            {
+                                {NavigationParams.InitImgString, contentTypeString }
+                            };
+
+                            await dispatcher?.DispatchAsync(async () =>
+                            {
+                                await Shell.Current.GoToAsync("///MainPageTab", parameters);
+                            });
+                        }
                     }
                 }
-
-                await Shell.Current.CurrentPage.DisplaySnackbar($"Image successfully saved as:\n{fileName}", duration: TimeSpan.FromSeconds(3));
             }
             catch (Exception e)
             {
                 //
             }
         });
+
+        IsBusy = false;
     }
 
     [RelayCommand]
@@ -86,7 +122,7 @@ public partial class SkiaSharpPageViewModel : PageViewModel, ISkiaSharpPageViewM
                 return;
             }
 
-            IsLoadingImage = true;
+            IsBusy = true;
 
             using var fileStream = await fileResult.OpenReadAsync();
 
@@ -113,7 +149,7 @@ public partial class SkiaSharpPageViewModel : PageViewModel, ISkiaSharpPageViewM
         }
         finally
         {
-            IsLoadingImage = false;
+            IsBusy = false;
         }
     }
 

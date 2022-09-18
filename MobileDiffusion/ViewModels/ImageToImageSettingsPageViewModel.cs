@@ -91,7 +91,11 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
     {
         mapPropertiesToSettings();
 
-        var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings } };
+        var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings }, };
+
+        // This works around a weird issue where the parameter sent from the mask page seems to stick and it
+        // overrides what is chosen on this page
+        parameters.Add(NavigationParams.InitImgString, null);
 
         await Shell.Current.GoToAsync("..", parameters);
     }
