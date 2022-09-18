@@ -4,9 +4,10 @@ using SkiaSharp.Views.Maui.Controls;
 
 namespace MobileDiffusion.Interfaces.ViewModels
 {
-    public interface ISkiaSharpPageViewModel : IPageViewModel
+    public interface IMaskPageViewModel : IPageViewModel
     {
-        bool IsLoadingImage { get; set; }
+        bool IsBusy { get; set; }
+
         SKBitmap SourceBitmap { get; set; }
 
         SKCanvasView SourceCanvasView { get; set; }

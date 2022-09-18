@@ -1,13 +1,10 @@
-using Android.Graphics;
-using MobileDiffusion.Controls;
 using MobileDiffusion.Interfaces.ViewModels;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
-using System.Reflection;
 
 namespace MobileDiffusion.Views;
 
-public partial class SkiaSharpPage : ContentPage
+public partial class MaskPage : ContentPage
 {
     private List<List<SKPoint>> _paths = new();
     private List<SKPoint> _currentPath;
@@ -18,23 +15,23 @@ public partial class SkiaSharpPage : ContentPage
         set => SetValue(BitmapProperty, value);
     }
 
-    public static BindableProperty BitmapProperty = BindableProperty.Create(nameof(Bitmap), typeof(SKBitmap), typeof(SkiaSharpPage), propertyChanged: (bindable, oldValue, newValue) =>
+    public static BindableProperty BitmapProperty = BindableProperty.Create(nameof(Bitmap), typeof(SKBitmap), typeof(MaskPage), propertyChanged: (bindable, oldValue, newValue) =>
     {
-        ((SkiaSharpPage)bindable).OnSourceBitmapChanged();
+        ((MaskPage)bindable).OnSourceBitmapChanged();
     });
 
-    public SkiaSharpPage()
+    public MaskPage()
 	{
 		InitializeComponent();
 
-        this.SetBinding(BitmapProperty, nameof(ISkiaSharpPageViewModel.SourceBitmap));
+        this.SetBinding(BitmapProperty, nameof(IMaskPageViewModel.SourceBitmap));
     }
 
     protected override void OnBindingContextChanged()
     {
         base.OnBindingContextChanged();
 
-        if (BindingContext is ISkiaSharpPageViewModel pageViewModel)
+        if (BindingContext is IMaskPageViewModel pageViewModel)
         {
             pageViewModel.SourceCanvasView = SourceImageCanvasView;
             pageViewModel.MaskCanvasView = MaskCanvasView;
