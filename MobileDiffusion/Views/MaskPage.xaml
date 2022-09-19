@@ -4,7 +4,7 @@
              xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
              xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
              x:Class="MobileDiffusion.Views.MaskPage"
-             Title="Mask Page"
+             Title="Masking Page"
              x:DataType="viewModels:IMaskPageViewModel">
     <Grid Padding="30"
           RowSpacing="10"
@@ -39,6 +39,25 @@
         <HorizontalStackLayout Grid.Row="2"
                                Spacing="10"
                                HorizontalOptions="Center">
+            <Border VerticalOptions="FillAndExpand" StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10" />
+                </Border.StrokeShape>
+                <ContentView BackgroundColor="{Binding CurrentColor}"
+                             VerticalOptions="FillAndExpand"
+                             WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
+                    <ContentView.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ShowColorPickerCommand}" />
+                    </ContentView.GestureRecognizers>
+                    <Image HorizontalOptions="Center"
+                           VerticalOptions="Center">
+                        <Image.Source>
+                            <FontImageSource Glyph="&#xe40a;" FontFamily="MaterialIconsRoundRegular" Size="22" Color="{Binding PaletteIconColor}" />
+                        </Image.Source>
+                    </Image>
+                </ContentView>
+            </Border>
+            
             <Button Text="Undo" Clicked="Undo_Button_Clicked"/>
             <Button Text="Clear" Clicked="Clear_Button_Clicked"/>
             <Button Text="Save Canvas" Command="{Binding SaveCommand}"/>

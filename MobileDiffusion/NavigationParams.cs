@@ -7,4 +7,8 @@ public static class NavigationParams
     public const string ImageResultItem = nameof(ImageResultItem);
 
     public const string InitImgString = nameof(InitImgString);
+
+    public const string Color = nameof(Color);
+
+    public const string ColorPalette = nameof(ColorPalette);
 }
