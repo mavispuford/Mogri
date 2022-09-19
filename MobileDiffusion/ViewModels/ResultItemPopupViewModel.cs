@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
@@ -45,6 +46,8 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
     {
         var stream = await _fileService.GetFileStreamFromInternalStorageAsync(resultItem.InternalUri);
         await _fileService.WriteFileToExternalStorageAsync(Path.GetFileName(resultItem.InternalUri), stream);
+
+        await Toast.Make("Image saved.").Show();
     }
 
     [RelayCommand]

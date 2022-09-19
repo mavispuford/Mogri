@@ -1,4 +1,6 @@
+using CommunityToolkit.Maui.Core.Extensions;
 using MobileDiffusion.Interfaces.ViewModels;
+using MobileDiffusion.Models;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
 
@@ -6,8 +8,14 @@ namespace MobileDiffusion.Views;
 
 public partial class MaskPage : ContentPage
 {
-    private List<List<SKPoint>> _paths = new();
-    private List<SKPoint> _currentPath;
+    private List<MaskLine> _lines = new();
+    private MaskLine _currentLine;
+
+    public Color CurrentColor
+    {
+        get => (Color)GetValue(CurrentColorProperty);
+        set => SetValue(CurrentColorProperty, value);
+    }
 
     public SKBitmap Bitmap
     {
@@ -20,11 +28,14 @@ public partial class MaskPage : ContentPage
         ((MaskPage)bindable).OnSourceBitmapChanged();
     });
 
+    public static BindableProperty CurrentColorProperty = BindableProperty.Create(nameof(CurrentColor), typeof(Color), typeof(MaskPage), Colors.Black);
+
     public MaskPage()
 	{
 		InitializeComponent();
 
         this.SetBinding(BitmapProperty, nameof(IMaskPageViewModel.SourceBitmap));
+        this.SetBinding(CurrentColorProperty, nameof(IMaskPageViewModel.CurrentColor));
     }
 
     protected override void OnBindingContextChanged()
@@ -44,18 +55,21 @@ public partial class MaskPage : ContentPage
         {
             if (e.Location is SKPoint location)
             {
-                if (_currentPath == null)
+                if (_currentLine == null)
                 {
-                    _currentPath = new();
-                    _paths.Add(_currentPath);
+                    _currentLine = new()
+                    {
+                        Color = CurrentColor
+                    };
+                    _lines.Add(_currentLine);
                 }
 
-                _currentPath.Add(location);
+                _currentLine.Path.Add(location);
             }
         }
         else
         {
-            _currentPath = null;
+            _currentLine = null;
         }
 
         MaskCanvasView.InvalidateSurface();
@@ -96,7 +110,7 @@ public partial class MaskPage : ContentPage
         // make sure the canvas is blank
         canvas.Clear(SKColors.Transparent);
 
-        if (_paths.Count == 0)
+        if (_lines.Count == 0)
         {
             return;
         }
@@ -113,8 +127,12 @@ public partial class MaskPage : ContentPage
             StrokeJoin = SKStrokeJoin.Round,
         };
 
-        foreach (var points in _paths)
+        foreach (var line in _lines)
         {
+            var points = line.Path;
+
+            paint.Color = new SKColor(line.Color.GetByteRed(), line.Color.GetByteGreen(), line.Color.GetByteBlue());
+
             using var path = new SKPath();
             path.MoveTo(points[0]);
 
@@ -131,24 +149,24 @@ public partial class MaskPage : ContentPage
 
     private void Undo_Button_Clicked(object sender, EventArgs e)
     {
-        if (!_paths.Any())
+        if (!_lines.Any())
         {
             return;
         }
 
-        _paths.Remove(_paths.Last());
+        _lines.Remove(_lines.Last());
 
         MaskCanvasView.InvalidateSurface();
     }
 
     private void Clear_Button_Clicked(object sender, EventArgs e)
     {
-        if (!_paths.Any())
+        if (!_lines.Any())
         {
             return;
         }
 
-        _paths.Clear();
+        _lines.Clear();
 
         MaskCanvasView.InvalidateSurface();
     }

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<popups:BasePopup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                  xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+                  xmlns:controls="clr-namespace:MobileDiffusion.Controls;assembly=MobileDiffusion"
+                  xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
+                  xmlns:popups="clr-namespace:MobileDiffusion.Views.Popups"
+                  x:Class="MobileDiffusion.Views.Popups.ColorPickerPopup"
+                  x:DataType="viewModels:IColorPickerPopupViewModel"
+                  Color="Transparent">
+    <Border Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}"
+            Stroke="Transparent">
+        <Border.StrokeShape>
+            <RoundRectangle CornerRadius="10" />
+        </Border.StrokeShape>
+        <VerticalStackLayout x:Name="MainLayout"
+                             Spacing="10"
+                             Padding="20">
+            <Label Text="Current Color:"
+                   FontAttributes="Bold" 
+                   FontSize="16"/>
+            <Border Stroke="Transparent"
+                    HorizontalOptions="Center"
+                    StrokeThickness="5">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10" />
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Opacity=".5"
+                            Radius="10" 
+                            Offset="5,5" />
+                </Border.Shadow>
+                <BoxView Color="{Binding CurrentColor}"
+                     HeightRequest="100"
+                     WidthRequest="100"/>
+            </Border>
+            
+
+            <Grid ColumnDefinitions="auto,*" 
+                  HorizontalOptions="FillAndExpand">
+                <Label Grid.Column="0"
+                       Text="Hex Value:" 
+                       FontAttributes="Bold" 
+                       FontSize="16"
+                       VerticalTextAlignment="Center"
+                       HorizontalOptions="Fill"/>
+                <Entry Grid.Column="1"
+                       Text="{Binding CurrentColorHexString}"
+                       FontSize="16"
+                       HorizontalOptions="EndAndExpand"
+                       HorizontalTextAlignment="End"
+                       VerticalTextAlignment="End"
+                       IsSpellCheckEnabled="False"
+                       IsTextPredictionEnabled="False"/>
+            </Grid>
+
+            <Label Text="Swatches:"
+                   FontAttributes="Bold" 
+                   FontSize="16"/>
+            <FlexLayout BindableLayout.ItemsSource="{Binding Swatches}"
+                        Wrap="Wrap"
+                        AlignItems="Center"
+                        JustifyContent="Start"
+                        AlignContent="Center">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <BoxView Color="{Binding}"
+                                 WidthRequest="30"
+                                 HeightRequest="30">
+                            <BoxView.GestureRecognizers>
+                                <TapGestureRecognizer 
+                                    Command="{Binding Source={x:RelativeSource AncestorType={x:Type viewModels:IColorPickerPopupViewModel}}, Path=SwatchTappedCommand}" 
+                                    CommandParameter="{Binding}"/>
+                            </BoxView.GestureRecognizers>
+                        </BoxView>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </FlexLayout>
+
+            <HorizontalStackLayout HorizontalOptions="Center"
+                                   Spacing="10">
+                <Button Text="Cancel" 
+                        HorizontalOptions="Center"
+                        Command="{Binding CancelCommand}"/>
+                <Button Text="Confirm" 
+                        HorizontalOptions="Center"
+                        Command="{Binding ConfirmCommand}" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </Border>
+</popups:BasePopup>

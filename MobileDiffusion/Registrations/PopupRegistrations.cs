@@ -14,6 +14,7 @@ public static class PopupRegistrations
         builder.Services.AddTransient<PopupSizeConstants>();
 
         registerPopup<IResultItemPopupViewModel, ResultItemPopup>(builder.Services);
+        registerPopup<IColorPickerPopupViewModel, ColorPickerPopup>(builder.Services);
 
         return builder;
     }
