@@ -8,7 +8,7 @@
                   x:Class="MobileDiffusion.Views.Popups.ColorPickerPopup"
                   x:DataType="viewModels:IColorPickerPopupViewModel"
                   Color="Transparent">
-    <Border Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}"
+    <Border Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource IndependenceAccent}}"
             Stroke="Transparent">
         <Border.StrokeShape>
             <RoundRectangle CornerRadius="10" />
@@ -25,11 +25,6 @@
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="10" />
                 </Border.StrokeShape>
-                <Border.Shadow>
-                    <Shadow Opacity=".5"
-                            Radius="10" 
-                            Offset="5,5" />
-                </Border.Shadow>
                 <BoxView Color="{Binding CurrentColor}"
                      HeightRequest="100"
                      WidthRequest="100"/>
