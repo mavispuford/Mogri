@@ -384,7 +384,8 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
 
                 if (mskByte4 != 0)
                 {
-                    float strength = mskByte4 / 255f;
+                    // Limit the strength to preserve some of the pixel data from the underlying image
+                    float strength = Math.Min(mskByte4 / 255f, 204);
 
                     var sourceColor = new Color();
 
