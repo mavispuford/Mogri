@@ -46,8 +46,8 @@
 
     <Color x:Key="IndependenceAccent">#545775</Color>
     <Color x:Key="IndependenceAccentFortyPercent">#66545775</Color>
+    <Color x:Key="IndependenceAccentSixtyPercent">#99545775</Color>
 
     <Color x:Key="RoyalBlueAccent">#03256C</Color>
-
 
 </ResourceDictionary>

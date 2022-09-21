@@ -1,5 +1,6 @@
 ﻿using Android.Hardware.Lights;
 using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Core.Extensions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
@@ -15,6 +16,7 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
     private readonly IPopupService _popupService;
 
     private List<Color> _colorPalette = new();
+    private Color _paletteIconDarkColor = Colors.Black;
 
     [ObservableProperty]
     private Color currentColor = Colors.Black;
@@ -43,10 +45,23 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
+
+        Application.Current.Resources.TryGetValue("IndependenceAccent", out var independenceColor);
+
+        if (independenceColor is Color paletteIconDarkColor)
+        {
+            _paletteIconDarkColor = paletteIconDarkColor;
+        }
     }
 
     [RelayCommand]
-    private async Task Save()
+    private async Task SaveMask()
+    {
+        await Task.CompletedTask;
+    }
+
+    [RelayCommand]
+    private async Task SaveImage()
     {
         if (SourceCanvasView == null ||
             MaskCanvasView == null ||
@@ -180,7 +195,7 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
         {
             CurrentColor = color;
 
-            PaletteIconColor = CurrentColor.GetLuminosity() > .8 ? Colors.Black : Colors.White;
+            PaletteIconColor = CurrentColor.GetLuminosity() > .8 ? _paletteIconDarkColor : Colors.White;
         }
     }
 
@@ -191,7 +206,7 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
             return null;
         }
 
-        var initColors = new List<Color>
+        var defaultColors = new List<Color>
         {
             Colors.Black,
             Colors.Grey,
@@ -208,16 +223,16 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
             Colors.Purple,
         };
 
-        initColors.Sort(delegate (Color firstColor, Color nextColor)
+        defaultColors.Sort(delegate (Color firstColor, Color nextColor)
         {
             return firstColor.GetHue().CompareTo(nextColor.GetHue());
         });
 
-        var initColorCount = initColors.Count;
+        var defaultColorCount = defaultColors.Count;
 
-        if (targetNumber <= initColorCount)
+        if (targetNumber <= defaultColorCount)
         {
-            return initColors.Take(initColorCount).ToList();
+            return defaultColors.Take(defaultColorCount).ToList();
         }
 
         var smallBitmap = bitmap.Resize(new SKSizeI(16, 16), SKFilterQuality.None);
@@ -236,9 +251,9 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
         do
         {
             var colorsDict = new Dictionary<Color, int>();
-            foreach (var initColor in initColors)
+            foreach (var defaultColor in defaultColors)
             {
-                colorsDict.Add(initColor, 0);
+                colorsDict.Add(defaultColor, 0);
             }
 
             if (iteration > 0)
@@ -292,19 +307,19 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
 
             if (iteration > 10 || colorsDict.Count >= targetNumber)
             {
-                // Sort by popularity
+                // Sort all by popularity
                 var colorsList = colorsDict.ToList();
-                var standardColors = colorsList.GetRange(0, initColorCount).Select(c => c.Key).ToList();
-                var otherColors = colorsList.GetRange(initColorCount, colorsDict.Count - initColorCount);
+                var standardColors = colorsList.GetRange(0, defaultColorCount).Select(c => c.Key).ToList();
+                var otherColors = colorsList.GetRange(defaultColorCount, colorsDict.Count - defaultColorCount);
 
                 otherColors.Sort(delegate (KeyValuePair<Color, int> firstPair, KeyValuePair<Color, int> nextPair)
                 {
                     return nextPair.Value.CompareTo(firstPair.Value);
                 });
 
-                var topColors = otherColors.Take(Math.Min(targetNumber - initColorCount, colorsList.Count)).Select(c => c.Key).ToList();
+                var topColors = otherColors.Take(Math.Min(targetNumber - defaultColorCount, colorsList.Count)).Select(c => c.Key).ToList();
 
-                // Sort by hue
+                // Sort final selection by hue
                 topColors.Sort(delegate (Color firstColor, Color nextColor)
                 {
                     return firstColor.GetHue().CompareTo(nextColor.GetHue());
@@ -341,8 +356,8 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
         byte* srcPtr = (byte*)srcBitmap.GetPixels().ToPointer();
         byte* mskPtr = (byte*)maskBitmap.GetPixels().ToPointer();
 
-        int width = srcBitmap.Width;       // same for both bitmaps
-        int height = srcBitmap.Height;
+        var width = srcBitmap.Width;       // same for both bitmaps
+        var height = srcBitmap.Height;
 
         SKColorType typeSrc = srcBitmap.ColorType;
         SKColorType typeMsk = maskBitmap.ColorType;
@@ -367,17 +382,50 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
                 byte mskByte3 = *mskPtr++;         // blue or red
                 byte mskByte4 = *mskPtr++;         // alpha
 
-                *resultPtr++ = srcByte1;
-                *resultPtr++ = srcByte2;
-                *resultPtr++ = srcByte3;
-                
                 if (mskByte4 != 0)
-                { 
+                {
+                    float strength = mskByte4 / 255f;
+
+                    var sourceColor = new Color();
+
+                    if (typeSrc == SKColorType.Rgba8888)
+                    {
+                        sourceColor = Color.FromRgba(srcByte1, srcByte2, srcByte3, srcByte4);
+                    }
+                    else if (typeSrc == SKColorType.Bgra8888)
+                    {
+                        sourceColor = Color.FromRgba(srcByte3, srcByte2, srcByte1, srcByte4);
+                    }
+
+                    var maskColor = new Color();
+
+                    if (typeMsk == SKColorType.Rgba8888)
+                    {
+                        maskColor = Color.FromRgba(mskByte1, mskByte2, mskByte3, mskByte4);
+                    }
+                    else if (typeMsk == SKColorType.Bgra8888)
+                    {
+                        maskColor = Color.FromRgba(mskByte3, mskByte2, mskByte1, mskByte4);
+                    }
+
+                    var newColor = Color.FromRgba(
+                        sourceColor.Red + strength * (maskColor.Red - sourceColor.Red),
+                        sourceColor.Green + strength * (maskColor.Green - sourceColor.Green),
+                        sourceColor.Blue + strength * (maskColor.Blue - sourceColor.Blue),
+                        1f);
+
+                    *resultPtr++ = typeMsk == SKColorType.Rgba8888 ? newColor.GetByteRed() : newColor.GetByteBlue();
+                    *resultPtr++ = newColor.GetByteGreen();
+                    *resultPtr++ = typeMsk == SKColorType.Rgba8888 ? newColor.GetByteBlue() : newColor.GetByteRed();
+
                     // Set alpha to a near-zero value
-                    *resultPtr++ = (byte)3;
+                    *resultPtr++ = 3;
                 }
                 else
                 {
+                    *resultPtr++ = srcByte1;
+                    *resultPtr++ = srcByte2;
+                    *resultPtr++ = srcByte3;
                     *resultPtr++ = srcByte4;
                 }
 

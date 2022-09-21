@@ -11,22 +11,40 @@ public partial class MaskPage : ContentPage
     private List<MaskLine> _lines = new();
     private MaskLine _currentLine;
 
-    public Color CurrentColor
-    {
-        get => (Color)GetValue(CurrentColorProperty);
-        set => SetValue(CurrentColorProperty, value);
-    }
-
     public SKBitmap Bitmap
     {
         get => (SKBitmap)GetValue(BitmapProperty);
         set => SetValue(BitmapProperty, value);
     }
 
+    public float CurrentAlpha
+    {
+        get => (float)GetValue(CurrentAlphaProperty);
+        set => SetValue(CurrentAlphaProperty, value);
+    }
+
+    public Color CurrentColor
+    {
+        get => (Color)GetValue(CurrentColorProperty);
+        set => SetValue(CurrentColorProperty, value);
+    }
+
+    public float CurrentBrushSize
+    {
+        get => (float)GetValue(CurrentBrushSizeProperty);
+        set => SetValue(CurrentBrushSizeProperty, value);
+    }
+
     public static BindableProperty BitmapProperty = BindableProperty.Create(nameof(Bitmap), typeof(SKBitmap), typeof(MaskPage), propertyChanged: (bindable, oldValue, newValue) =>
     {
         ((MaskPage)bindable).OnSourceBitmapChanged();
     });
+
+    public static BindableProperty CurrentBrushSizeProperty = BindableProperty.Create(nameof(CurrentBrushSize), typeof(float), typeof(MaskPage), 10f);
+
+
+    public static BindableProperty CurrentAlphaProperty = BindableProperty.Create(nameof(CurrentAlpha), typeof(float), typeof(MaskPage), .5f);
+
 
     public static BindableProperty CurrentColorProperty = BindableProperty.Create(nameof(CurrentColor), typeof(Color), typeof(MaskPage), Colors.Black);
 
@@ -51,6 +69,8 @@ public partial class MaskPage : ContentPage
 
     private void OnTouchMaskSurface(object sender, SKTouchEventArgs e)
     {
+        HideSliders();
+
         if (e.InContact)
         {
             if (e.Location is SKPoint location)
@@ -59,6 +79,8 @@ public partial class MaskPage : ContentPage
                 {
                     _currentLine = new()
                     {
+                        Alpha = CurrentAlpha,
+                        BrushSize = CurrentBrushSize,
                         Color = CurrentColor
                     };
                     _lines.Add(_currentLine);
@@ -131,7 +153,12 @@ public partial class MaskPage : ContentPage
         {
             var points = line.Path;
 
-            paint.Color = new SKColor(line.Color.GetByteRed(), line.Color.GetByteGreen(), line.Color.GetByteBlue());
+            paint.StrokeWidth = line.BrushSize;
+            paint.Color = new SKColor(
+                line.Color.GetByteRed(),
+                line.Color.GetByteGreen(), 
+                line.Color.GetByteBlue(),
+                Convert.ToByte((int)(line.Alpha * 255)));
 
             using var path = new SKPath();
             path.MoveTo(points[0]);
@@ -141,14 +168,32 @@ public partial class MaskPage : ContentPage
                 path.ConicTo(points[i - 1], points[i], .5f);
             }
 
-            //path.Close();
-
             canvas.DrawPath(path, paint);
         }
     }
 
+    private void Brush_Size_Button_Clicked(object sender, EventArgs e)
+    {
+        AlphaSliderContainer.IsVisible = false;
+        BrushSizeSliderContainer.IsVisible = !BrushSizeSliderContainer.IsVisible;
+    }
+
+    private void Alpha_Button_Clicked(object sender, EventArgs e)
+    {
+        BrushSizeSliderContainer.IsVisible = false;
+        AlphaSliderContainer.IsVisible = !AlphaSliderContainer.IsVisible;
+    }
+
+    private void HideSliders()
+    {
+        AlphaSliderContainer.IsVisible = false;
+        BrushSizeSliderContainer.IsVisible = false;
+    }
+
     private void Undo_Button_Clicked(object sender, EventArgs e)
     {
+        HideSliders();
+
         if (!_lines.Any())
         {
             return;
@@ -161,6 +206,8 @@ public partial class MaskPage : ContentPage
 
     private void Clear_Button_Clicked(object sender, EventArgs e)
     {
+        HideSliders();
+
         if (!_lines.Any())
         {
             return;

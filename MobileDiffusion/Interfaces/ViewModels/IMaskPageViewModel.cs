@@ -24,6 +24,8 @@ namespace MobileDiffusion.Interfaces.ViewModels
 
         IAsyncRelayCommand ShowMediaPickerCommand { get; }
 
-        IAsyncRelayCommand SaveCommand { get; }
+        IAsyncRelayCommand SaveMaskCommand { get; }
+
+        IAsyncRelayCommand SaveImageCommand { get; }
     }
 }
