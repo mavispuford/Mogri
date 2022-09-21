@@ -164,7 +164,7 @@
                     <Image HorizontalOptions="Center"
                            VerticalOptions="Center">
                         <Image.Source>
-                            <FontImageSource Glyph="&#xe91c;" FontFamily="MaterialIconsRoundRegular" Size="22" Color="White" />
+                            <FontImageSource Glyph="&#xe91c;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
                         </Image.Source>
                     </Image>
                 </ContentView>
@@ -185,7 +185,7 @@
                     <Image HorizontalOptions="Center"
                            VerticalOptions="Center">
                         <Image.Source>
-                            <FontImageSource Glyph="&#xe40a;" FontFamily="MaterialIconsRoundRegular" Size="22" Color="{Binding PaletteIconColor}" />
+                            <FontImageSource Glyph="&#xe40a;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="{Binding PaletteIconColor}" />
                         </Image.Source>
                     </Image>
                 </ContentView>

@@ -11,6 +11,9 @@ public partial class MaskPage : ContentPage
     private List<MaskLine> _lines = new();
     private MaskLine _currentLine;
 
+    private Timer _brushSizeTimer;
+    private Timer _alphaTimer;
+
     public SKBitmap Bitmap
     {
         get => (SKBitmap)GetValue(BitmapProperty);
@@ -40,10 +43,16 @@ public partial class MaskPage : ContentPage
         ((MaskPage)bindable).OnSourceBitmapChanged();
     });
 
-    public static BindableProperty CurrentBrushSizeProperty = BindableProperty.Create(nameof(CurrentBrushSize), typeof(float), typeof(MaskPage), 10f);
+    public static BindableProperty CurrentBrushSizeProperty = BindableProperty.Create(nameof(CurrentBrushSize), typeof(float), typeof(MaskPage), 10f, propertyChanged: (bindable, oldValue, newValue) =>
+    {
+        ((MaskPage)bindable).AutoHideBrushSizeSlider();
+    });
 
 
-    public static BindableProperty CurrentAlphaProperty = BindableProperty.Create(nameof(CurrentAlpha), typeof(float), typeof(MaskPage), .5f);
+    public static BindableProperty CurrentAlphaProperty = BindableProperty.Create(nameof(CurrentAlpha), typeof(float), typeof(MaskPage), .5f, propertyChanged: (bindable, oldValue, newValue) =>
+    {
+        ((MaskPage)bindable).AutoHideAlphaSlider();
+    });
 
 
     public static BindableProperty CurrentColorProperty = BindableProperty.Create(nameof(CurrentColor), typeof(Color), typeof(MaskPage), Colors.Black);
@@ -176,12 +185,58 @@ public partial class MaskPage : ContentPage
     {
         AlphaSliderContainer.IsVisible = false;
         BrushSizeSliderContainer.IsVisible = !BrushSizeSliderContainer.IsVisible;
+
+        if (BrushSizeSliderContainer.IsVisible)
+        {
+            AutoHideBrushSizeSlider();
+        }
     }
 
     private void Alpha_Button_Clicked(object sender, EventArgs e)
     {
         BrushSizeSliderContainer.IsVisible = false;
         AlphaSliderContainer.IsVisible = !AlphaSliderContainer.IsVisible;
+
+        if (AlphaSliderContainer.IsVisible)
+        {
+            AutoHideAlphaSlider();
+        }
+    }
+
+    private void AutoHideBrushSizeSlider()
+    {
+        if (_brushSizeTimer == null)
+        {
+            _brushSizeTimer = new Timer(delegate
+            {
+                Dispatcher.Dispatch(() =>
+                {
+                    BrushSizeSliderContainer.IsVisible = false;
+                });
+            }, null, 3000, -1);
+        }
+        else
+        {
+            _brushSizeTimer.Change(3000, -1);
+        }
+    }
+
+    private void AutoHideAlphaSlider()
+    {
+        if (_alphaTimer == null)
+        {
+            _alphaTimer = new Timer(delegate
+            {
+                Dispatcher.Dispatch(() =>
+                {
+                    AlphaSliderContainer.IsVisible = false;
+                });
+            }, null, 3000, -1);
+        }
+        else
+        {
+            _alphaTimer.Change(3000, -1);
+        }
     }
 
     private void HideSliders()
