@@ -1,4 +1,5 @@
 using CommunityToolkit.Maui.Core.Extensions;
+using Microsoft.Maui.Controls;
 using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Models;
 using SkiaSharp;
@@ -183,24 +184,70 @@ public partial class MaskPage : ContentPage
 
     private void Brush_Size_Button_Clicked(object sender, EventArgs e)
     {
-        AlphaSliderContainer.IsVisible = false;
-        BrushSizeSliderContainer.IsVisible = !BrushSizeSliderContainer.IsVisible;
-
-        if (BrushSizeSliderContainer.IsVisible)
-        {
-            AutoHideBrushSizeSlider();
-        }
+        ShowHideAlphaSlider(false);
+        ShowHideBrushSizeSlider(!BrushSizeSliderContainer.IsVisible);
     }
 
     private void Alpha_Button_Clicked(object sender, EventArgs e)
     {
-        BrushSizeSliderContainer.IsVisible = false;
-        AlphaSliderContainer.IsVisible = !AlphaSliderContainer.IsVisible;
+        ShowHideBrushSizeSlider(false);
+        ShowHideAlphaSlider(!AlphaSliderContainer.IsVisible);
+    }
 
-        if (AlphaSliderContainer.IsVisible)
+    private void ShowHideAlphaSlider(bool show)
+    {
+        if (show)
         {
-            AutoHideAlphaSlider();
+            AlphaSliderContainer.Opacity = 0f;
+            AlphaSliderContainer.IsVisible = true;
         }
+
+        AlphaSliderContainer.AbortAnimation("FadeInOutAlpha");
+        AlphaSliderContainer.Animate("FadeInOutAlpha", value =>
+        {
+            AlphaSliderContainer.Opacity = value;
+        }, AlphaSliderContainer.Opacity, show ? 1 : 0, easing: Easing.CubicInOut, finished: (value, canceled) =>
+        {
+            if (canceled)
+            {
+                return;
+            }
+
+            AlphaSliderContainer.IsVisible = show;
+
+            if (AlphaSliderContainer.IsVisible)
+            {
+                AutoHideAlphaSlider();
+            }
+        });
+    }
+
+    private void ShowHideBrushSizeSlider(bool show)
+    {
+        if (show)
+        {
+            BrushSizeSliderContainer.Opacity = 0f;
+            BrushSizeSliderContainer.IsVisible = true;
+        }
+
+        BrushSizeSliderContainer.AbortAnimation("FadeInOutBrushSize");
+        BrushSizeSliderContainer.Animate("FadeInOutBrushSize", value =>
+        {
+            BrushSizeSliderContainer.Opacity = value;
+        }, BrushSizeSliderContainer.Opacity, show ? 1 : 0, easing: Easing.CubicInOut, finished: (value, canceled) =>
+        {
+            if (canceled)
+            {
+                return;
+            }
+
+            BrushSizeSliderContainer.IsVisible = show;
+
+            if (BrushSizeSliderContainer.IsVisible)
+            {
+                AutoHideBrushSizeSlider();
+            }
+        });
     }
 
     private void AutoHideBrushSizeSlider()
@@ -211,7 +258,7 @@ public partial class MaskPage : ContentPage
             {
                 Dispatcher.Dispatch(() =>
                 {
-                    BrushSizeSliderContainer.IsVisible = false;
+                    ShowHideBrushSizeSlider(false);
                 });
             }, null, 3000, -1);
         }
@@ -229,7 +276,7 @@ public partial class MaskPage : ContentPage
             {
                 Dispatcher.Dispatch(() =>
                 {
-                    AlphaSliderContainer.IsVisible = false;
+                    ShowHideAlphaSlider(false);
                 });
             }, null, 3000, -1);
         }
