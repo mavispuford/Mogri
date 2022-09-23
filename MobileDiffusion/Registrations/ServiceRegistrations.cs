@@ -11,7 +11,7 @@ public static class ServiceRegistrations
 {
     public static MauiAppBuilder RegisterServices(this MauiAppBuilder builder)
     {
-        builder.Services.AddHttpClient("Default", client =>
+        builder.Services.AddHttpClient(Microsoft.Extensions.Options.Options.DefaultName, client =>
         {
             client.Timeout = TimeSpan.FromSeconds(10);
         });/*.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
