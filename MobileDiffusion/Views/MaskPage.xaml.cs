@@ -159,7 +159,6 @@ public partial class MaskPage : ContentPage
 
         using var paint = new SKPaint
         {
-            //Color = SKColors.Black,
             FilterQuality = SKFilterQuality.None,
             IsAntialias = false,
             Style = SKPaintStyle.Stroke,
