@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
+using MobileDiffusion.Models;
 using SkiaSharp;
 using SkiaSharp.Views.Maui.Controls;
 
@@ -17,6 +18,7 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
 
     private List<Color> _colorPalette = new();
     private Color _paletteIconDarkColor = Colors.Black;
+    private string _sourceFileName;
 
     [ObservableProperty]
     private Color currentColor = Colors.Black;
@@ -26,6 +28,9 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
 
     [ObservableProperty]
     private bool isBusy;
+
+    [ObservableProperty]
+    private List<MaskLine> lines = new();
 
     [ObservableProperty]
     private SKBitmap sourceBitmap;
@@ -57,7 +62,23 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
     [RelayCommand]
     private async Task SaveMask()
     {
-        await Task.CompletedTask;
+        if (string.IsNullOrEmpty(_sourceFileName))
+        {
+            await Toast.Make("There is no image loaded to associate with this mask.").Show();
+
+            return;
+        }
+
+        try
+        {
+            var maskUri = await _fileService.WriteMaskFileToAppDataAsync(_sourceFileName, new Mask { Lines = Lines });
+
+            await Toast.Make("Mask saved.").Show();
+        }
+        catch (Exception e)
+        {
+            await Toast.Make("Failed to save mask file. Please try again.").Show();
+        }
     }
 
     [RelayCommand]
@@ -94,7 +115,7 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
 
                         memStream.Seek(0, SeekOrigin.Begin);
 
-                        var uri = await _fileService.WriteFileToExternalStorageAsync(fileName, memStream, true);
+                        var uri = await _fileService.WriteImageFileToExternalStorageAsync(fileName, memStream, true);
 
                         var useAsInitImg = false;
 
@@ -153,8 +174,6 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
 
             using var fileStream = await fileResult.OpenReadAsync();
 
-            //SourceBitmap = SKBitmap.Decode(fileStream);
-
             // Instead of a simple SKBitmap.Decode() call, we're using a codec and SKImageInfo with Unpremul for the
             // AlphaType so masked images can be reopened after being created
 
@@ -169,6 +188,15 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
             };
 
             SourceBitmap = SKBitmap.Decode(codec, info);
+
+            _sourceFileName = fileResult.FileName;
+
+            var mask = await _fileService.GetMaskFileFromAppDataAsync(_sourceFileName);
+
+            if (mask?.Lines != null)
+            {
+                Lines = mask.Lines;
+            }
 
             _colorPalette = ExtractColorPalette(SourceBitmap, 40);
         }

@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using MobileDiffusion.Models;
 using SkiaSharp;
 using SkiaSharp.Views.Maui.Controls;
 
@@ -11,6 +12,8 @@ namespace MobileDiffusion.Interfaces.ViewModels
         Color PaletteIconColor { get; set; }
 
         bool IsBusy { get; set; }
+
+        List<MaskLine> Lines { get; set; }
 
         SKBitmap SourceBitmap { get; set; }
 

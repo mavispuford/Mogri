@@ -2,6 +2,9 @@ namespace MobileDiffusion.Controls;
 
 public partial class ImageResultControl : ContentView
 {
+    public static BindableProperty ImageProperty = BindableProperty.Create(nameof(Image),
+        typeof(Image), typeof(ImageResultControl), default(Image));
+
     public static BindableProperty IsLoadingProperty = BindableProperty.Create(nameof(IsLoading),
         typeof(bool), typeof(ImageResultControl), true, propertyChanged: (bindable, oldValue, newValue) =>
         {
@@ -20,6 +23,12 @@ public partial class ImageResultControl : ContentView
 		set => SetValue(SourceProperty, value);
 	}
 
+    public Image Image
+    {
+        get => (Image)GetValue(ImageProperty);
+        set => SetValue(ImageProperty, value);
+    }
+
     public bool IsLoading
     {
         get => (bool)GetValue(IsLoadingProperty);
@@ -29,6 +38,8 @@ public partial class ImageResultControl : ContentView
     public ImageResultControl()
 	{
 		InitializeComponent();
+
+        Image = ImageControl;
 	}
 
     private void OnIsLoadingChanged()
