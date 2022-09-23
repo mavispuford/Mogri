@@ -1,4 +1,4 @@
-﻿using MobileDiffusion.Interfaces.ViewModels;
+﻿using MobileDiffusion.Controls;
 
 namespace MobileDiffusion.Views;
 
@@ -32,10 +32,17 @@ public partial class MainPage : BasePage
 
             var imageHeight = imageWidth / ratio;
 
-            foreach(View view in ImageLayout.Children)
+            foreach(ImageResultControl imageResult in ImageLayout.Children)
             {
-                view.WidthRequest = imageWidth;
-                view.HeightRequest = imageHeight;
+                if (imageResult.Image != null)
+                {
+                    // Attempt to work around this bug: https://github.com/dotnet/maui/issues/9712
+                    imageResult.Image.WidthRequest = imageWidth;
+                    imageResult.Image.HeightRequest = imageHeight;
+                }
+
+                imageResult.WidthRequest = imageWidth;
+                imageResult.HeightRequest = imageHeight;
             }
         }
     }

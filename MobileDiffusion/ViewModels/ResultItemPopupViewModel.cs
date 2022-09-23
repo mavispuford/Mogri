@@ -45,7 +45,7 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
     private async Task Save()
     {
         var stream = await _fileService.GetFileStreamFromInternalStorageAsync(resultItem.InternalUri);
-        await _fileService.WriteFileToExternalStorageAsync(Path.GetFileName(resultItem.InternalUri), stream);
+        await _fileService.WriteImageFileToExternalStorageAsync(Path.GetFileName(resultItem.InternalUri), stream);
 
         await Toast.Make("Image saved.").Show();
     }

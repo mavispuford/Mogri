@@ -10,34 +10,60 @@
              x:DataType="viewModels:IMaskPageViewModel">
     <Shell.TitleView>
         <HorizontalStackLayout x:Name="TitleViewLayout"
-                               Spacing="30"
+                               Spacing="20"
                                HorizontalOptions="Center"
                                TranslationX="-9">
-            <ImageButton Command="{Binding ShowMediaPickerCommand}">
-                <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe43e;" FontFamily="MaterialIconsRoundRegular" Size="22" Color="White" />
-                </ImageButton.Source>
-            </ImageButton>
-            <ImageButton Clicked="Undo_Button_Clicked">
-                <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe166;" FontFamily="MaterialIconsRoundRegular" Size="22" Color="White" />
-                </ImageButton.Source>
-            </ImageButton>
-            <ImageButton Clicked="Clear_Button_Clicked">
-                <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Size="22" Color="White" />
-                </ImageButton.Source>
-            </ImageButton>
-            <ImageButton Command="{Binding SaveMaskCommand}">
-                <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe161;" FontFamily="MaterialIconsRoundRegular" Size="22" Color="White" />
-                </ImageButton.Source>
-            </ImageButton>
-            <ImageButton Command="{Binding SaveImageCommand}">
-                <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe3f4;" FontFamily="MaterialIconsRoundRegular" Size="22" Color="White" />
-                </ImageButton.Source>
-            </ImageButton>
+            <ContentView VerticalOptions="FillAndExpand" WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
+                <ContentView.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ShowMediaPickerCommand}" />
+                </ContentView.GestureRecognizers>
+                <Image HorizontalOptions="Center" VerticalOptions="Center">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xe43e;" FontFamily="MaterialIconsRoundRegular" Size="22" Color="White" />
+                    </Image.Source>
+                </Image>
+            </ContentView>
+            <ContentView VerticalOptions="FillAndExpand" WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
+                <ContentView.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="Undo_Button_Clicked" />
+                </ContentView.GestureRecognizers>
+                <Image HorizontalOptions="Center"
+                       VerticalOptions="Center">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xe166;" FontFamily="MaterialIconsRoundRegular" Size="22" Color="White" />
+                    </Image.Source>
+                </Image>
+            </ContentView>
+            <ContentView VerticalOptions="FillAndExpand" WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
+                <ContentView.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="Clear_Button_Clicked" />
+                </ContentView.GestureRecognizers>
+                <Image HorizontalOptions="Center" VerticalOptions="Center">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Size="22" Color="White" />
+                    </Image.Source>
+                </Image>
+            </ContentView>
+            <ContentView VerticalOptions="FillAndExpand" WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
+                <ContentView.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding SaveMaskCommand}" />
+                </ContentView.GestureRecognizers>
+                <Image HorizontalOptions="Center" VerticalOptions="Center">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xe161;" FontFamily="MaterialIconsRoundRegular" Size="22" Color="White" />
+                    </Image.Source>
+                </Image>
+            </ContentView>
+            <ContentView VerticalOptions="FillAndExpand" WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
+                <ContentView.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding SaveImageCommand}" />
+                </ContentView.GestureRecognizers>
+                <Image HorizontalOptions="Center" VerticalOptions="Center">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xe3f4;" FontFamily="MaterialIconsRoundRegular" Size="22" Color="White" />
+                    </Image.Source>
+                </Image>
+            </ContentView>
         </HorizontalStackLayout>
     </Shell.TitleView>
     <Grid Padding="30"

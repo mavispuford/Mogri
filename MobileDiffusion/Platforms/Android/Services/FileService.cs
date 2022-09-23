@@ -1,6 +1,9 @@
 ﻿using Android.Content;
 using Android.Provider;
 using MobileDiffusion.Interfaces.Services;
+using MobileDiffusion.Models;
+using System.Text.Json;
+using System.Threading.Tasks;
 using AndroidNet = Android.Net;
 
 namespace MobileDiffusion.Platforms.Android.Services;
@@ -164,19 +167,13 @@ public class FileService : IFileService
         }
     }
 
-    public async Task<string> WriteFileToExternalStorageAsync(string fileName, Stream stream, bool isMask = false)
+    public async Task<string> WriteImageFileToExternalStorageAsync(string fileName, Stream stream, bool isMask = false)
     {
         await checkForWritePermission();
 
-        //return await writeFileToBaseUriAsync(fileName, stream, AndroidNet.Uri.WithAppendedPath(MediaStore.Images.Media.ExternalContentUri, extFolderName));
-        return await writeFileToBaseUriAsync(fileName, stream, MediaStore.Images.Media.ExternalContentUri, isMask);
-    }
-
-    private async Task<string> writeFileToBaseUriAsync(string fileName, Stream stream, AndroidNet.Uri baseUri, bool isMask = false)
-    {
         var contentValues = new ContentValues();
         contentValues.Put(MediaStore.IMediaColumns.Title, fileName);
-        contentValues.Put(MediaStore.IMediaColumns.MimeType, "image/jpg");
+        contentValues.Put(MediaStore.IMediaColumns.MimeType, "image/png");
         contentValues.Put(MediaStore.Images.Media.InterfaceConsts.DisplayName, fileName);
         contentValues.Put(MediaStore.Images.Media.InterfaceConsts.RelativePath, isMask ? extFolderNameMasks : extFolderName);
 
@@ -189,7 +186,7 @@ public class FileService : IFileService
 
         try
         {
-            uri = contentResolver.Insert(baseUri, contentValues);
+            uri = contentResolver.Insert(MediaStore.Images.Media.ExternalContentUri, contentValues);
 
             var outputStream = contentResolver.OpenOutputStream(uri);
             await stream.CopyToAsync(outputStream);
@@ -206,7 +203,78 @@ public class FileService : IFileService
         {
             // TODO - Handle exception
 
-            Console.WriteLine($"Error writing requested file \"{fileName}\" to \"{baseUri}\"");
+            Console.WriteLine($"Error writing requested file \"{fileName}\" to \"{MediaStore.Images.Media.ExternalContentUri}\"");
+        }
+
+        return string.Empty;
+    }
+
+    public async Task<Mask> GetMaskFileFromAppDataAsync(string imageFileName)
+    {
+        await checkForWritePermission();
+
+        var fileNameNoExtension = Path.GetFileNameWithoutExtension(imageFileName);
+        var maskFileName = $"{fileNameNoExtension}.mask";
+        var fullPath = Path.Combine(FileSystem.Current.AppDataDirectory, maskFileName);
+
+        try
+        {
+            if (!File.Exists(fullPath))
+            {
+                return null;
+            }
+
+            using var reader = File.OpenText(fullPath);
+            var contents = await reader.ReadToEndAsync();
+
+            var options = new JsonSerializerOptions();
+            options.Converters.Add(new ColorJsonConverter());
+
+            var mask = JsonSerializer.Deserialize<Mask>(contents, options);
+
+            return mask;
+
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Unable to read requested file \"{maskFileName}\" from \"{fullPath}\"");
+        }
+
+        return null;
+    }
+
+    public async Task<string> WriteMaskFileToAppDataAsync(string imageFileName, Mask mask)
+    {
+        await checkForWritePermission();
+
+        var fileNameNoExtension = Path.GetFileNameWithoutExtension(imageFileName);
+        var maskFileName = $"{fileNameNoExtension}.mask";
+        var fullPath = Path.Combine(FileSystem.Current.AppDataDirectory, maskFileName);
+
+        try
+        {
+            var options = new JsonSerializerOptions();
+            options.Converters.Add(new ColorJsonConverter());
+
+            var maskJson = JsonSerializer.Serialize(mask, options);
+
+            if (File.Exists(fullPath))
+            {
+                File.Delete(fullPath);
+            }
+
+            using var fileStream = File.OpenWrite(fullPath);
+            using var writer = new StreamWriter(fileStream);
+
+            await writer.WriteAsync(maskJson);
+
+            return fullPath;
+        }
+        catch (Exception e)
+        {
+            // TODO - Handle exception
+
+            Console.WriteLine($"Error writing requested file \"{maskFileName}\" to \"{fullPath}\"");
         }
 
         return string.Empty;
