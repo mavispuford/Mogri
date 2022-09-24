@@ -4,6 +4,8 @@ using MobileDiffusion.Interfaces.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MobileDiffusion.Models;
 using System.Collections.ObjectModel;
+using SkiaSharp.Views.Maui.Controls;
+using SkiaSharp;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -205,7 +207,17 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
         var uri = await _fileService.WriteFileToInternalStorageAsync($"{fileName}-{number++}.png", imageBytes);
 
         result.InternalUri = uri;
-        result.ImageSource = ImageSource.FromFile(uri);
+
+        // Using a regular image source crashes the app quite often: https://github.com/dotnet/maui/issues/9712
+        //result.ImageSource = ImageSource.FromFile(uri);
+
+        // Use SkiaSharp's SKBitmapImageSource image source instead
+        var imageSource = new SKBitmapImageSource
+        {
+            Bitmap = SKBitmap.Decode(imageBytes)
+        };
+        result.ImageSource = imageSource;
+
         result.IsLoading = false;
     }
 
