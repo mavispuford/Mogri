@@ -145,6 +145,31 @@
             </VerticalStackLayout>
         </Border>
 
+        <Border HeightRequest="60"
+                WidthRequest="60"
+                StrokeThickness="0"
+                HorizontalOptions="End"
+                VerticalOptions="End"
+                Margin="0,0,10,0"
+                IsVisible="{Binding ShowInitImgRectangle}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="10" />
+            </Border.StrokeShape>
+            <ContentView BackgroundColor="{StaticResource IndependenceAccentSixtyPercent}"
+                         VerticalOptions="FillAndExpand"
+                         WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
+                <ContentView.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ToggleInitImgRectangleCommand}" />
+                </ContentView.GestureRecognizers>
+                <Image HorizontalOptions="Center"
+                       VerticalOptions="Center">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xe65f;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                    </Image.Source>
+                </Image>
+            </ContentView>
+        </Border>
+
         <HorizontalStackLayout Grid.Row="1"
                                x:Name="ButtonsLayout"
                                Spacing="30"
@@ -152,7 +177,8 @@
 
             <Border HeightRequest="60"
                     WidthRequest="60"
-                    StrokeThickness="0">
+                    StrokeThickness="0"
+                    VerticalOptions="End">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="10" />
                 </Border.StrokeShape>
@@ -177,7 +203,8 @@
 
             <Border HeightRequest="60"
                     WidthRequest="60"
-                    StrokeThickness="0">
+                    StrokeThickness="0"
+                    VerticalOptions="End">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="10" />
                 </Border.StrokeShape>
@@ -199,7 +226,8 @@
 
             <Border HeightRequest="60"
                     WidthRequest="60"
-                    StrokeThickness="0">
+                    StrokeThickness="0"
+                    VerticalOptions="End">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="10" />
                 </Border.StrokeShape>
@@ -225,13 +253,13 @@
                     <RoundRectangle CornerRadius="10" />
                 </Border.StrokeShape>
                 <ContentView BackgroundColor="{StaticResource IndependenceAccentSixtyPercent}"
-                             VerticalOptions="FillAndExpand"
-                             WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
+                            VerticalOptions="FillAndExpand"
+                            WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
                     <ContentView.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding ToggleInitImgRectangleCommand}" />
                     </ContentView.GestureRecognizers>
                     <Image HorizontalOptions="Center"
-                           VerticalOptions="Center">
+                        VerticalOptions="Center">
                         <Image.Source>
                             <FontImageSource Glyph="&#xe3c6;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
                         </Image.Source>
