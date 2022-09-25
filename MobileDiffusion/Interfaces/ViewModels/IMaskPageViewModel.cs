@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Models;
 using SkiaSharp;
 using SkiaSharp.Views.Maui.Controls;
@@ -26,6 +25,12 @@ namespace MobileDiffusion.Interfaces.ViewModels
 
         SKRect InitImgRectangle { get; set; }
 
+        bool ShowInitImgRectangle { get; set; }
+
+        IAsyncRelayCommand PrepareForSavingCommand { get; set; }
+
+        IAsyncRelayCommand FinishSavingCommand { get; }
+
         IAsyncRelayCommand ShowColorPickerCommand { get; }
 
         IAsyncRelayCommand ShowMediaPickerCommand { get; }
@@ -33,5 +38,7 @@ namespace MobileDiffusion.Interfaces.ViewModels
         IAsyncRelayCommand SaveMaskCommand { get; }
 
         IAsyncRelayCommand SaveImageCommand { get; }
+
+        IRelayCommand ToggleInitImgRectangleCommand { get; }
     }
 }
