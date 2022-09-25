@@ -105,7 +105,7 @@ public partial class MaskPage : ContentPage
         this.SetBinding(BitmapProperty, nameof(IMaskPageViewModel.SourceBitmap));
         this.SetBinding(CurrentColorProperty, nameof(IMaskPageViewModel.CurrentColor));
         this.SetBinding(LinesProperty, nameof(IMaskPageViewModel.Lines));
-        this.SetBinding(InitImgRectangleProperty, nameof(IMaskPageViewModel.InitImgRectangle));
+        this.SetBinding(InitImgRectangleProperty, nameof(IMaskPageViewModel.InitImgRectangle), BindingMode.OneWayToSource);
         this.SetBinding(ShowInitImgRectangleProperty, nameof(IMaskPageViewModel.ShowInitImgRectangle));
         this.SetBinding(PrepareForSavingCommandProperty, nameof(IMaskPageViewModel.PrepareForSavingCommand), BindingMode.OneWayToSource);
         this.SetBinding(FinishSavingCommandProperty, nameof(IMaskPageViewModel.FinishSavingCommand));
