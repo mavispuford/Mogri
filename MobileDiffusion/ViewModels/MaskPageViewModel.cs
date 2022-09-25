@@ -44,6 +44,9 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
     [ObservableProperty]
     private ImageSource savedImageSource;
 
+    [ObservableProperty]
+    private SKRect initImgRectangle;
+
     public MaskPageViewModel(
         IFileService fileService,
         IPopupService popupService)

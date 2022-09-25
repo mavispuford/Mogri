@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Models;
 using SkiaSharp;
 using SkiaSharp.Views.Maui.Controls;
@@ -22,6 +23,8 @@ namespace MobileDiffusion.Interfaces.ViewModels
         SKCanvasView MaskCanvasView { get; set; }
 
         ImageSource SavedImageSource { get; set; }
+
+        SKRect InitImgRectangle { get; set; }
 
         IAsyncRelayCommand ShowColorPickerCommand { get; }
 
