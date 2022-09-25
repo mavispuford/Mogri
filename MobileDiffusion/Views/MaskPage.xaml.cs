@@ -43,6 +43,12 @@ public partial class MaskPage : ContentPage
         set => SetValue(LinesProperty, value);
     }
 
+    public SKRect InitImgRectangle
+    {
+        get => (SKRect)GetValue(InitImgRectangleProperty);
+        set => SetValue(InitImgRectangleProperty, value);
+    }
+
     public static BindableProperty BitmapProperty = BindableProperty.Create(nameof(Bitmap), typeof(SKBitmap), typeof(MaskPage), propertyChanged: (bindable, oldValue, newValue) =>
     {
         ((MaskPage)bindable).OnSourceBitmapChanged();
@@ -59,10 +65,11 @@ public partial class MaskPage : ContentPage
         ((MaskPage)bindable).AutoHideAlphaSlider();
     });
 
-
     public static BindableProperty CurrentColorProperty = BindableProperty.Create(nameof(CurrentColor), typeof(Color), typeof(MaskPage), Colors.Black);
 
     public static BindableProperty LinesProperty = BindableProperty.Create(nameof(Lines), typeof(List<MaskLine>), typeof(MaskPage), default(List<MaskLine>));
+
+    public static BindableProperty InitImgRectangleProperty = BindableProperty.Create(nameof(InitImgRectangle), typeof(SKRect), typeof(MaskPage), default(SKRect));
 
     public MaskPage()
 	{
@@ -71,6 +78,13 @@ public partial class MaskPage : ContentPage
         this.SetBinding(BitmapProperty, nameof(IMaskPageViewModel.SourceBitmap));
         this.SetBinding(CurrentColorProperty, nameof(IMaskPageViewModel.CurrentColor));
         this.SetBinding(LinesProperty, nameof(IMaskPageViewModel.Lines));
+        this.SetBinding(InitImgRectangleProperty, nameof(IMaskPageViewModel.InitImgRectangle));
+
+        InitImgRectangle = new SKRect(
+            (float)(MaskCanvasView.Width / 2) - 50,
+            (float)(MaskCanvasView.Height / 2) - 50,
+            (float)(MaskCanvasView.Width / 2) + 50, 
+            (float)(MaskCanvasView.Height / 2) + 50);
     }
 
     protected override void OnBindingContextChanged()
@@ -87,11 +101,47 @@ public partial class MaskPage : ContentPage
     private void OnTouchMaskSurface(object sender, SKTouchEventArgs e)
     {
         HideSliders();
-
         if (e.InContact)
         {
             if (e.Location is SKPoint location)
             {
+                if ((_currentLine == null &&
+                    InitImgRectangle.Width > 0 &&
+                    InitImgRectangle.Contains(location)) ||
+                    (_currentLine == null && e.ActionType == SKTouchAction.Moved))
+                {
+                    var offsetX = -(InitImgRectangle.Width / 2);
+                    var offsetY = -(InitImgRectangle.Height / 2);
+
+                    if (location.X + offsetX < 0)
+                    {
+                        offsetX = -location.X;
+                    }
+                    else if (location.X + offsetX + InitImgRectangle.Width > MaskCanvasView.Width)
+                    {
+                        offsetX = (float)MaskCanvasView.Width - location.X - InitImgRectangle.Width;
+                    }
+
+                    if (location.Y + offsetY < 0)
+                    {
+                        offsetY = -location.Y;
+                    }
+                    else if (location.Y + offsetY + InitImgRectangle.Height > MaskCanvasView.Height)
+                    {
+                        offsetY = (float)MaskCanvasView.Height - location.Y - InitImgRectangle.Height;
+                    }
+
+                    location.Offset(offsetX, offsetY);
+
+                    InitImgRectangle = SKRect.Create(location, InitImgRectangle.Size);
+
+                    MaskCanvasView.InvalidateSurface();
+
+                    e.Handled = true;
+
+                    return;
+                }
+
                 if (_currentLine == null)
                 {
                     _currentLine = new()
@@ -189,6 +239,13 @@ public partial class MaskPage : ContentPage
 
             canvas.DrawPath(path, paint);
         }
+
+        canvas.DrawRect(InitImgRectangle, 
+            new SKPaint() { 
+                Color = SKColors.White,
+                Style = SKPaintStyle.Stroke,
+                StrokeWidth = 3,
+            });
     }
 
     private void Brush_Size_Button_Clicked(object sender, EventArgs e)
