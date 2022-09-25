@@ -47,6 +47,12 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
     [ObservableProperty]
     private SKRect initImgRectangle;
 
+    [ObservableProperty]
+    private bool showInitImgRectangle;
+
+    [ObservableProperty]
+    private IAsyncRelayCommand prepareForSavingCommand;
+
     public MaskPageViewModel(
         IFileService fileService,
         IPopupService popupService)
@@ -96,6 +102,12 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
             return;
         }
 
+        await PrepareForSavingCommand?.ExecuteAsync(null);
+    }
+
+    [RelayCommand]
+    private async Task FinishSaving()
+    {
         IsBusy = true;
 
         await Task.Run(async () =>
@@ -228,6 +240,12 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
 
             PaletteIconColor = CurrentColor.GetLuminosity() > .8 ? _paletteIconDarkColor : Colors.White;
         }
+    }
+
+    [RelayCommand]
+    private void ToggleInitImgRectangle()
+    {
+        ShowInitImgRectangle = !ShowInitImgRectangle;
     }
 
     unsafe private List<Color> ExtractColorPalette(SKBitmap bitmap, int targetNumber = 40)
