@@ -17,18 +17,26 @@ public partial class ColorPickerPopupViewModel : PopupBaseViewModel, IColorPicke
     [ObservableProperty]
     private List<Color> swatches = new();
 
+    [ObservableProperty]
+    private List<Color> swatchesFromImage = new();
+
     public ColorPickerPopupViewModel(IPopupService popupService) : base(popupService)
     {
         Swatches = new()
         {
             Colors.Black,
+            Colors.Grey,
             Colors.White,
-            Colors.DarkRed,
             Colors.Red,
-            Colors.DarkGreen,
+            Colors.OrangeRed,
+            Colors.Pink,
+            Colors.Yellow,
             Colors.Green,
-            Colors.DarkBlue,
+            Colors.DarkGreen,
             Colors.Blue,
+            Colors.SkyBlue,
+            Colors.DarkBlue,
+            Colors.Purple,
         };
     }
 
@@ -46,7 +54,7 @@ public partial class ColorPickerPopupViewModel : PopupBaseViewModel, IColorPicke
         if (query.TryGetValue(NavigationParams.ColorPalette, out var colorPaletteParam) &&
             colorPaletteParam is List<Color> colorPalette)
         {
-            Swatches = colorPalette;
+            SwatchesFromImage = colorPalette;
         }
     }
 

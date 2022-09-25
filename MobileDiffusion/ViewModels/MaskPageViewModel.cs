@@ -213,7 +213,7 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
                 Lines = mask.Lines;
             }
 
-            _colorPalette = ExtractColorPalette(SourceBitmap, 40);
+            _colorPalette = ExtractColorPalette(SourceBitmap, 30);
         }
         catch
         {
@@ -248,40 +248,11 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
         ShowInitImgRectangle = !ShowInitImgRectangle;
     }
 
-    unsafe private List<Color> ExtractColorPalette(SKBitmap bitmap, int targetNumber = 40)
+    unsafe private List<Color> ExtractColorPalette(SKBitmap bitmap, int targetNumber = 30)
     {
         if (bitmap == null)
         {
             return null;
-        }
-
-        var defaultColors = new List<Color>
-        {
-            Colors.Black,
-            Colors.Grey,
-            Colors.White,
-            Colors.Red,
-            Colors.OrangeRed,
-            Colors.Pink,
-            Colors.Yellow,
-            Colors.Green,
-            Colors.DarkGreen,
-            Colors.Blue,
-            Colors.SkyBlue,
-            Colors.DarkBlue,
-            Colors.Purple,
-        };
-
-        defaultColors.Sort(delegate (Color firstColor, Color nextColor)
-        {
-            return firstColor.GetHue().CompareTo(nextColor.GetHue());
-        });
-
-        var defaultColorCount = defaultColors.Count;
-
-        if (targetNumber <= defaultColorCount)
-        {
-            return defaultColors.Take(defaultColorCount).ToList();
         }
 
         var smallBitmap = bitmap.Resize(new SKSizeI(16, 16), SKFilterQuality.None);
@@ -300,10 +271,6 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
         do
         {
             var colorsDict = new Dictionary<Color, int>();
-            foreach (var defaultColor in defaultColors)
-            {
-                colorsDict.Add(defaultColor, 0);
-            }
 
             if (iteration > 0)
             {
@@ -357,16 +324,13 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
             if (iteration > 10 || colorsDict.Count >= targetNumber)
             {
                 // Sort all by popularity
-                var colorsList = colorsDict.ToList();
-                var standardColors = colorsList.GetRange(0, defaultColorCount).Select(c => c.Key).ToList();
-                var otherColors = colorsList.GetRange(defaultColorCount, colorsDict.Count - defaultColorCount);
-
-                otherColors.Sort(delegate (KeyValuePair<Color, int> firstPair, KeyValuePair<Color, int> nextPair)
+                var sortedByPopularity = colorsDict.ToList();
+                sortedByPopularity.Sort(delegate (KeyValuePair<Color, int> firstPair, KeyValuePair<Color, int> nextPair)
                 {
                     return nextPair.Value.CompareTo(firstPair.Value);
                 });
 
-                var topColors = otherColors.Take(Math.Min(targetNumber - defaultColorCount, colorsList.Count)).Select(c => c.Key).ToList();
+                var topColors = sortedByPopularity.Take(Math.Min(targetNumber, sortedByPopularity.Count)).Select(c => c.Key).ToList();
 
                 // Sort final selection by hue
                 topColors.Sort(delegate (Color firstColor, Color nextColor)
@@ -374,10 +338,7 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
                     return firstColor.GetHue().CompareTo(nextColor.GetHue());
                 });
 
-                var combinedColors = new List<Color>(standardColors);
-                combinedColors.AddRange(topColors);
-
-                return combinedColors;
+                return topColors;
             }   
         } while (true);
     }
