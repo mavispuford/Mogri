@@ -131,10 +131,13 @@ public partial class MaskPage : ContentPage
         {
             if (e.Location is SKPoint location)
             {
-                if ((_currentLine == null &&
+                if ((ShowInitImgRectangle &&
+                    _currentLine == null &&
                     InitImgRectangle.Width > 0 &&
                     InitImgRectangle.Contains(location)) ||
-                    (_currentLine == null && e.ActionType == SKTouchAction.Moved))
+                    (ShowInitImgRectangle && 
+                    _currentLine == null &&
+                    e.ActionType == SKTouchAction.Moved))
                 {
                     var offsetX = -(InitImgRectangle.Width / 2);
                     var offsetY = -(InitImgRectangle.Height / 2);
