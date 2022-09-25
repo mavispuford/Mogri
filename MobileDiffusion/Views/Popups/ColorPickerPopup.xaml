@@ -71,6 +71,29 @@
                     </DataTemplate>
                 </BindableLayout.ItemTemplate>
             </FlexLayout>
+            
+            <Label Text="From Image:"
+                   FontAttributes="Bold" 
+                   FontSize="16"/>
+            <FlexLayout BindableLayout.ItemsSource="{Binding SwatchesFromImage}"
+                        Wrap="Wrap"
+                        AlignItems="Center"
+                        JustifyContent="Start"
+                        AlignContent="Center">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <BoxView Color="{Binding}"
+                                 WidthRequest="30"
+                                 HeightRequest="30">
+                            <BoxView.GestureRecognizers>
+                                <TapGestureRecognizer 
+                                    Command="{Binding Source={x:RelativeSource AncestorType={x:Type viewModels:IColorPickerPopupViewModel}}, Path=SwatchTappedCommand}" 
+                                    CommandParameter="{Binding}"/>
+                            </BoxView.GestureRecognizers>
+                        </BoxView>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </FlexLayout>
 
             <HorizontalStackLayout HorizontalOptions="Center"
                                    Spacing="10">
