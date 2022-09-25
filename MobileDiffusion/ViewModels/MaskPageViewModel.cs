@@ -484,4 +484,31 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
 
         return resultBitmap;
     }
+
+    private SKBitmap GetCroppedBitmap(SKBitmap bitmap, SKRect cropRect)
+    {
+        if (bitmap == null)
+        {
+            return null;
+        }
+
+        if (cropRect.Width <= 0 ||
+            cropRect.Height <= 0)
+        {
+            return bitmap;
+        }
+
+        var croppedBitmap = new SKBitmap((int)cropRect.Width,
+                                              (int)cropRect.Height);
+        var dest = new SKRect(0, 0, cropRect.Width, cropRect.Height);
+        var source = new SKRect(cropRect.Left, cropRect.Top,
+                                   cropRect.Right, cropRect.Bottom);
+
+        using (var canvas = new SKCanvas(croppedBitmap))
+        {
+            canvas.DrawBitmap(bitmap, source, dest);
+        }
+
+        return croppedBitmap;
+    }
 }
