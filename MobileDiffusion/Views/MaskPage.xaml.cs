@@ -12,7 +12,7 @@ public partial class MaskPage : ContentPage
     private MaskLine _currentLine;
     private Timer _brushSizeTimer;
     private Timer _alphaTimer;
-    private bool _hasShownInitImgRectangle;
+    private bool _hasCreatedInitImgRectangle;
 
     public SKBitmap Bitmap
     {
@@ -56,16 +56,22 @@ public partial class MaskPage : ContentPage
         set => SetValue(ShowInitImgRectangleProperty, value);
     }
 
-    public IAsyncRelayCommand PrepareForSavingCommand
+    public IAsyncRelayCommand<IAsyncRelayCommand> PrepareForSavingCommand
     {
-        get => (IAsyncRelayCommand)GetValue(PrepareForSavingCommandProperty);
+        get => (IAsyncRelayCommand<IAsyncRelayCommand>)GetValue(PrepareForSavingCommandProperty);
         set => SetValue(PrepareForSavingCommandProperty, value);
     }
 
-    public IAsyncRelayCommand FinishSavingCommand
+    public float InitImgRectangleSize
     {
-        get => (IAsyncRelayCommand)GetValue(FinishSavingCommandProperty);
-        set => SetValue(FinishSavingCommandProperty, value);
+        get => (float)GetValue(InitImgRectangleSizeProperty);
+        set => SetValue(InitImgRectangleSizeProperty, value);
+    }
+
+    public double InitImgRectangleScale
+    {
+        get => (double)GetValue(InitImgRectangleScaleProperty);
+        set => SetValue(InitImgRectangleScaleProperty, value);
     }
 
     public static BindableProperty BitmapProperty = BindableProperty.Create(nameof(Bitmap), typeof(SKBitmap), typeof(MaskPage), propertyChanged: (bindable, oldValue, newValue) =>
@@ -85,32 +91,38 @@ public partial class MaskPage : ContentPage
 
     public static BindableProperty CurrentColorProperty = BindableProperty.Create(nameof(CurrentColor), typeof(Color), typeof(MaskPage), Colors.Black);
 
-    public static BindableProperty LinesProperty = BindableProperty.Create(nameof(Lines), typeof(List<MaskLine>), typeof(MaskPage), default(List<MaskLine>));
-
     public static BindableProperty InitImgRectangleProperty = BindableProperty.Create(nameof(InitImgRectangle), typeof(SKRect), typeof(MaskPage), default(SKRect));
 
-    public static BindableProperty FinishSavingCommandProperty = BindableProperty.Create(nameof(FinishSavingCommand), typeof(IAsyncRelayCommand), typeof(MaskPage), default(IAsyncRelayCommand));
+    public static BindableProperty InitImgRectangleScaleProperty = BindableProperty.Create(nameof(InitImgRectangleScale), typeof(double), typeof(MaskPage), 1d);
+
+    public static BindableProperty InitImgRectangleSizeProperty = BindableProperty.Create(nameof(InitImgRectangleSize), typeof(float), typeof(MaskPage), 256f, propertyChanged: (bindable, oldValue, newValue) =>
+    {
+        ((MaskPage)bindable).UpdateInitImgRectangle(true);
+    });
+
+    public static BindableProperty LinesProperty = BindableProperty.Create(nameof(Lines), typeof(List<MaskLine>), typeof(MaskPage), default(List<MaskLine>));
 
     public static BindableProperty PrepareForSavingCommandProperty = BindableProperty.Create(nameof(PrepareForSavingCommand), typeof(IAsyncRelayCommand), typeof(MaskPage), default(IAsyncRelayCommand));
 
     public static BindableProperty ShowInitImgRectangleProperty = BindableProperty.Create(nameof(ShowInitImgRectangle), typeof(bool), typeof(MaskPage), false, propertyChanged: (bindable, oldValue, newValue) =>
     {
-        ((MaskPage)bindable).OnShowInitImgRectangleChanged();
+        ((MaskPage)bindable).UpdateInitImgRectangle(false);
     });
 
     public MaskPage()
-	{
-		InitializeComponent();
+    {
+        InitializeComponent();
 
         this.SetBinding(BitmapProperty, nameof(IMaskPageViewModel.SourceBitmap));
         this.SetBinding(CurrentColorProperty, nameof(IMaskPageViewModel.CurrentColor));
         this.SetBinding(LinesProperty, nameof(IMaskPageViewModel.Lines));
         this.SetBinding(InitImgRectangleProperty, nameof(IMaskPageViewModel.InitImgRectangle), BindingMode.OneWayToSource);
-        this.SetBinding(ShowInitImgRectangleProperty, nameof(IMaskPageViewModel.ShowInitImgRectangle));
+        this.SetBinding(ShowInitImgRectangleProperty, nameof(IMaskPageViewModel.ShowInitImgRectangle), BindingMode.TwoWay);
         this.SetBinding(PrepareForSavingCommandProperty, nameof(IMaskPageViewModel.PrepareForSavingCommand), BindingMode.OneWayToSource);
-        this.SetBinding(FinishSavingCommandProperty, nameof(IMaskPageViewModel.FinishSavingCommand));
+        this.SetBinding(InitImgRectangleScaleProperty, nameof(IMaskPageViewModel.InitImgRectangleScale), BindingMode.OneWayToSource);
+        this.SetBinding(InitImgRectangleSizeProperty, nameof(IMaskPageViewModel.InitImgRectangleSize), BindingMode.OneWay);
 
-        PrepareForSavingCommand = new AsyncRelayCommand(PrepareForSaving);
+        PrepareForSavingCommand = new AsyncRelayCommand<IAsyncRelayCommand>(PrepareForSaving);
     }
 
     protected override void OnBindingContextChanged()
@@ -383,19 +395,32 @@ public partial class MaskPage : ContentPage
         }
     }
 
-    private void OnShowInitImgRectangleChanged()
+    private void UpdateInitImgRectangle(bool sizeChanged)
     {
-        if (Bitmap != null &&
-            ShowInitImgRectangle &&
-            !_hasShownInitImgRectangle)
+        if (Bitmap == null)
+        {
+            return;
+        }
+        
+        var rectSize = (float)(InitImgRectangleSize / InitImgRectangleScale);
+
+        if (sizeChanged)
         {
             InitImgRectangle = new SKRect(
-                (float)(MaskCanvasView.Width / 2) - 50,
-                (float)(MaskCanvasView.Height / 2) - 50,
-                (float)(MaskCanvasView.Width / 2) + 50,
-                (float)(MaskCanvasView.Height / 2) + 50);
+                InitImgRectangle.MidX - (rectSize / 2),
+                InitImgRectangle.MidY - (rectSize / 2),
+                InitImgRectangle.MidX + (rectSize / 2),
+                InitImgRectangle.MidY + (rectSize / 2));
+        }
+        else if (!_hasCreatedInitImgRectangle)
+        {
+            InitImgRectangle = new SKRect(
+                (float)(MaskCanvasView.Width / 2) - (rectSize / 2),
+                (float)(MaskCanvasView.Height / 2) - (rectSize / 2),
+                (float)(MaskCanvasView.Width / 2) + (rectSize / 2),
+                (float)(MaskCanvasView.Height / 2) + (rectSize / 2));
 
-            _hasShownInitImgRectangle = true;
+            _hasCreatedInitImgRectangle = true;
         }
 
         MaskCanvasView.InvalidateSurface();
@@ -437,7 +462,8 @@ public partial class MaskPage : ContentPage
 
     private void OnSourceBitmapChanged()
     {
-        _hasShownInitImgRectangle = false; 
+        ShowInitImgRectangle = false;
+        _hasCreatedInitImgRectangle = false;
 
         float scale = Math.Min((float)MaskGrid.Width / Bitmap.Width,
                    (float)MaskGrid.Height / Bitmap.Height);
@@ -451,13 +477,20 @@ public partial class MaskPage : ContentPage
         MaskCanvasView.WidthRequest = destRect.Width;
         MaskCanvasView.HeightRequest = destRect.Height;
 
+        InitImgRectangleScale = Bitmap.Width / SourceImageCanvasView.Width;
+
         Clear_Button_Clicked(this, new EventArgs());
 
         SourceImageCanvasView.InvalidateSurface();
     }
 
-    private async Task PrepareForSaving()
+    private async Task PrepareForSaving(IAsyncRelayCommand callbackCommand)
     {
+        if (callbackCommand == null)
+        {
+            return;
+        }
+
         var rectangleWasShowing = ShowInitImgRectangle;
 
         if (rectangleWasShowing)
@@ -465,7 +498,7 @@ public partial class MaskPage : ContentPage
             ShowInitImgRectangle = false;
         }
 
-        await FinishSavingCommand.ExecuteAsync(this);
+        await callbackCommand.ExecuteAsync(this);
 
         if (rectangleWasShowing)
         {
@@ -473,3 +506,5 @@ public partial class MaskPage : ContentPage
         }
     }
 }
+
+    

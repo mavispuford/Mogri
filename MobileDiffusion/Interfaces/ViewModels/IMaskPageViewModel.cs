@@ -9,27 +9,35 @@ namespace MobileDiffusion.Interfaces.ViewModels
     {
         Color CurrentColor { get; set; }
 
-        Color PaletteIconColor { get; set; }
+        SKRect InitImgRectangle { get; set; }
+
+        double InitImgRectangleScale { get; set; }
+
+        float InitImgRectangleSize { get; set; }
 
         bool IsBusy { get; set; }
 
         List<MaskLine> Lines { get; set; }
 
-        SKBitmap SourceBitmap { get; set; }
-
-        SKCanvasView SourceCanvasView { get; set; }
-        
         SKCanvasView MaskCanvasView { get; set; }
+
+        Color PaletteIconColor { get; set; }
 
         ImageSource SavedImageSource { get; set; }
 
-        SKRect InitImgRectangle { get; set; }
-
         bool ShowInitImgRectangle { get; set; }
+
+        SKBitmap SourceBitmap { get; set; }
+
+        SKCanvasView SourceCanvasView { get; set; }
+
+        IAsyncRelayCommand BeginCropImageRectCommand { get; }
 
         IAsyncRelayCommand PrepareForSavingCommand { get; set; }
 
         IAsyncRelayCommand FinishSavingCommand { get; }
+
+        IAsyncRelayCommand FinishCroppingInitImgRectangleCommand { get; }
 
         IAsyncRelayCommand ShowColorPickerCommand { get; }
 

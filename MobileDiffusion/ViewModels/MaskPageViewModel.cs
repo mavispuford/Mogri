@@ -27,6 +27,12 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
     private Color paletteIconColor = Colors.White;
 
     [ObservableProperty]
+    private double initImgRectangleScale;
+
+    [ObservableProperty]
+    private float initImgRectangleSize = 256;
+
+    [ObservableProperty]
     private bool isBusy;
 
     [ObservableProperty]
@@ -102,7 +108,22 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
             return;
         }
 
-        await PrepareForSavingCommand?.ExecuteAsync(null);
+        await PrepareForSavingCommand?.ExecuteAsync(FinishSavingCommand);
+    }
+
+    [RelayCommand]
+    private async Task BeginCropImageRect()
+    {
+        if (SourceCanvasView == null ||
+            MaskCanvasView == null ||
+            SourceBitmap == null)
+        {
+            await Toast.Make("There is no image data to crop.").Show();
+
+            return;
+        }
+
+        await PrepareForSavingCommand?.ExecuteAsync(FinishCroppingInitImgRectangleCommand);
     }
 
     [RelayCommand]
@@ -161,6 +182,60 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
                                 await Shell.Current.GoToAsync("///MainPageTab", parameters);
                             });
                         }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                //
+            }
+        });
+
+        IsBusy = false;
+    }
+
+    [RelayCommand]
+    private async Task FinishCroppingInitImgRectangle()
+    {
+        IsBusy = true;
+
+        await Task.Run(async () =>
+        {
+            var maskCapture = await MaskCanvasView.CaptureAsync();
+            var maskStream = await maskCapture.OpenReadAsync();
+            var maskBitmap = SKBitmap.Decode(maskStream);
+
+            try
+            {
+                var maskedResultBitmap = CreateMaskedBitmap(SourceBitmap, maskBitmap);
+
+                var croppedBitmap = GetCroppedBitmap(maskedResultBitmap, InitImgRectangle);
+
+                using (var memStream = new MemoryStream())
+                {
+                    using (var skiaStream = new SKManagedWStream(memStream))
+                    {
+                        croppedBitmap.Encode(skiaStream, SKEncodedImageFormat.Png, 100);
+
+                        memStream.Seek(0, SeekOrigin.Begin);
+
+                        var imageBytes = memStream.ToArray();
+                        var imageString = Convert.ToBase64String(imageBytes);
+
+                        var contentTypeString = string.Format(Constants.ImageDataFormat, "image/png", imageString);
+
+                        var parameters = new Dictionary<string, object>
+                        {
+                            {NavigationParams.InitImgString, contentTypeString }
+                        };
+
+                        var dispatcher = Shell.Current.CurrentPage.Dispatcher;
+                        await dispatcher?.DispatchAsync(async () =>
+                        {
+                            await Shell.Current.GoToAsync("///MainPageTab", parameters);
+
+                            await Toast.Make("Section has been cropped and set as source image.").Show();
+                        });
                     }
                 }
             }
@@ -245,7 +320,23 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
     [RelayCommand]
     private void ToggleInitImgRectangle()
     {
-        ShowInitImgRectangle = !ShowInitImgRectangle;
+        if (!ShowInitImgRectangle)
+        {
+            ShowInitImgRectangle = true;
+        }
+
+        InitImgRectangleSize = InitImgRectangleSize switch 
+        {
+            0f => 256f,
+            256f => 512f,
+            512f => 1024f,
+            1024f => 0f
+        };
+
+        if (InitImgRectangleSize == 0f)
+        {
+            ShowInitImgRectangle = false;
+        }
     }
 
     unsafe private List<Color> ExtractColorPalette(SKBitmap bitmap, int targetNumber = 30)
@@ -459,11 +550,17 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
             return bitmap;
         }
 
-        var croppedBitmap = new SKBitmap((int)cropRect.Width,
-                                              (int)cropRect.Height);
-        var dest = new SKRect(0, 0, cropRect.Width, cropRect.Height);
-        var source = new SKRect(cropRect.Left, cropRect.Top,
-                                   cropRect.Right, cropRect.Bottom);
+        var adjustedRect = new SKRect(
+            (float)(cropRect.Left * InitImgRectangleScale), 
+            (float)(cropRect.Top * InitImgRectangleScale),
+            (float)(cropRect.Right * InitImgRectangleScale), 
+            (float)(cropRect.Bottom * InitImgRectangleScale));
+
+        var croppedBitmap = new SKBitmap((int)adjustedRect.Width,
+                                              (int)adjustedRect.Height);
+        var dest = new SKRect(0, 0, adjustedRect.Width, adjustedRect.Height);
+        var source = new SKRect(adjustedRect.Left, adjustedRect.Top,
+                                   adjustedRect.Right, adjustedRect.Bottom);
 
         using (var canvas = new SKCanvas(croppedBitmap))
         {
