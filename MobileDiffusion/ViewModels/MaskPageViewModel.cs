@@ -14,6 +14,7 @@ namespace MobileDiffusion.ViewModels;
 public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
 {
     private readonly IFileService _fileService;
+    private readonly IImageService _imageService;
     private readonly IPopupService _popupService;
 
     private List<Color> _colorPalette = new();
@@ -61,10 +62,12 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
 
     public MaskPageViewModel(
         IFileService fileService,
-        IPopupService popupService)
+        IPopupService popupService,
+        IImageService imageService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
+        _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
 
         Application.Current.Resources.TryGetValue("IndependenceAccent", out var independenceColor);
 
@@ -226,7 +229,9 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
 
                         var parameters = new Dictionary<string, object>
                         {
-                            {NavigationParams.InitImgString, contentTypeString }
+                            { NavigationParams.ImageWidth, InitImgRectangleSize },
+                            { NavigationParams.ImageHeight, InitImgRectangleSize },
+                            { NavigationParams.InitImgString, contentTypeString },
                         };
 
                         var dispatcher = Shell.Current.CurrentPage.Dispatcher;
@@ -329,7 +334,8 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
         {
             0f => 256f,
             256f => 512f,
-            512f => 1024f,
+            512f => 768f,
+            768f => 1024f,
             1024f => 0f
         };
 
@@ -439,17 +445,30 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
         base.OnNavigatedTo();
     }
 
-    public override void ApplyQueryAttributes(IDictionary<string, object> query)
+    public override async void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         base.ApplyQueryAttributes(query);
 
         if (query.TryGetValue(NavigationParams.CanvasImageString, out var canvasImageString) &&
-            canvasImageString is string formattedString)
+            canvasImageString is string byteString)
         {
-
+            await BeginStitchingAsync(byteString);
         }
     }
 
+    private async Task BeginStitchingAsync(string byteString)
+    {
+        var tokenSource = new CancellationTokenSource();
+
+        using var stream = await _imageService.GetStreamFromContentTypeStringAsync(byteString, tokenSource.Token);
+
+        var stitchBitmap = SKBitmap.Decode(stream);
+
+        var finalBitmap = StitchBitmapIntoSource(SourceBitmap, stitchBitmap, InitImgRectangle);
+
+        SourceBitmap = finalBitmap;
+    }
+    
     unsafe SKBitmap CreateMaskedBitmap(SKBitmap srcBitmap, SKBitmap maskBitmapFull)
     {
         if (srcBitmap == null ||
@@ -556,23 +575,104 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
             return bitmap;
         }
 
-        var adjustedRect = new SKRect(
-            (float)(cropRect.Left * InitImgRectangleScale), 
-            (float)(cropRect.Top * InitImgRectangleScale),
-            (float)(cropRect.Right * InitImgRectangleScale), 
-            (float)(cropRect.Bottom * InitImgRectangleScale));
+        var left = (float)(cropRect.Left * InitImgRectangleScale);
+        var top = (float)(cropRect.Top * InitImgRectangleScale);
 
-        var croppedBitmap = new SKBitmap((int)adjustedRect.Width,
-                                              (int)adjustedRect.Height);
-        var dest = new SKRect(0, 0, adjustedRect.Width, adjustedRect.Height);
+        var adjustedRect = new SKRect(
+            left, 
+            top,
+            left + InitImgRectangleSize, 
+            top + InitImgRectangleSize);
+        
+        var info = new SKImageInfo
+        {
+            AlphaType = SKAlphaType.Unpremul,
+            ColorSpace = bitmap.ColorSpace,
+            ColorType = bitmap.ColorType,
+            Height = (int)InitImgRectangleSize,
+            Width = (int)InitImgRectangleSize,
+        };
+
+        var croppedBitmap = new SKBitmap(info);
+
         var source = new SKRect(adjustedRect.Left, adjustedRect.Top,
                                    adjustedRect.Right, adjustedRect.Bottom);
+        var dest = new SKRect(0, 0, adjustedRect.Width, adjustedRect.Height);
 
         using (var canvas = new SKCanvas(croppedBitmap))
         {
-            canvas.DrawBitmap(bitmap, source, dest);
+            var paint = new SKPaint()
+            {
+                FilterQuality = SKFilterQuality.None,
+                IsAntialias = false,
+            };
+
+            canvas.DrawBitmap(bitmap, source, dest, paint);
         }
 
         return croppedBitmap;
+    }
+
+    private SKBitmap StitchBitmapIntoSource(SKBitmap bitmap, SKBitmap bitmapToStitchIn, SKRect rect)
+    {
+        if (bitmap == null)
+        {
+            return null;
+        }
+
+        if (bitmapToStitchIn == null)
+        {
+            return bitmap;
+        }
+
+        var info = new SKImageInfo
+        {
+            AlphaType = bitmap.AlphaType,
+            ColorSpace = bitmap.ColorSpace,
+            ColorType = bitmap.ColorType,
+            Height = bitmap.Height,
+            Width = bitmap.Width,
+        };
+
+        var resultBitmap = new SKBitmap(info);
+
+        SKRect adjustedRect;
+        
+        if (rect.Width == 0 ||
+            rect.Height == 0)
+        {
+            adjustedRect = bitmap.Info.Rect;
+        }
+        else
+        {
+            adjustedRect = new SKRect(
+                (float)(rect.Left * InitImgRectangleScale),
+                (float)(rect.Top * InitImgRectangleScale),
+                (float)(rect.Right * InitImgRectangleScale),
+                (float)(rect.Bottom * InitImgRectangleScale));
+        }
+
+        var source = new SKRect(0, 0, adjustedRect.Width, adjustedRect.Height);
+        var dest = new SKRect(adjustedRect.Left, adjustedRect.Top, adjustedRect.Right, adjustedRect.Bottom);
+
+        using (var canvas = new SKCanvas(resultBitmap))
+        {
+            var paint = new SKPaint
+            {
+                FilterQuality = SKFilterQuality.High,
+                IsAntialias = true,
+            };
+
+            canvas.DrawBitmap(bitmap, 0, 0);
+
+            // Scale it if the size doesn't match the current init image rectangle
+            var toStitch = bitmapToStitchIn.Width != dest.Width || bitmapToStitchIn.Height != dest.Height ?
+                bitmapToStitchIn.Resize(adjustedRect.Size.ToSizeI(), SKFilterQuality.High) :
+                bitmapToStitchIn;
+
+            canvas.DrawBitmap(toStitch, source, dest);
+        }
+
+        return resultBitmap;
     }
 }
