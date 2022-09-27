@@ -24,6 +24,9 @@ public partial class ResultItemViewModel : BaseViewModel, IResultItemViewModel
 
     [ObservableProperty]
     private IRelayCommand setInitImageCommand;
+    
+    [ObservableProperty]
+    private IRelayCommand setCanvasImageCommand;
 
     [ObservableProperty]
     private bool isLoading = true;
@@ -44,21 +47,32 @@ public partial class ResultItemViewModel : BaseViewModel, IResultItemViewModel
             return;
         }
 
-        var parameters = new Dictionary<string, object>()
+        var parameters = new Dictionary<string, object>
         {
             { NavigationParams.ImageResultItem, this }
         };
 
-        var result = await _popupService.ShowPopupAsync("ResultItemPopup", parameters);
+        var result = (await _popupService.ShowPopupAsync("ResultItemPopup", parameters)) as Dictionary<string, object>;
 
-        if (result is Models.Settings settings)
+        if (result == null)
+        {
+            return;
+        }
+
+        if (result.TryGetValue(NavigationParams.PromptSettings, out var settingsParam) &&
+            settingsParam is Models.Settings settings)
         {
             SetSettingsCommand?.Execute(settings);
         }
-        else if (result is string initImage && 
-            Constants.ImageDataRegex.IsMatch(initImage))
+        else if (result.TryGetValue(NavigationParams.InitImgString, out var initImgParam) && 
+            initImgParam is string initImage)
         {
             SetInitImageCommand?.Execute(initImage);
+        }
+        else if (result.TryGetValue(NavigationParams.CanvasImageString, out var canvasImgParam) &&
+            canvasImgParam is string canvasImage)
+        {
+            SetCanvasImageCommand?.Execute(canvasImage);
         }
     }
 }

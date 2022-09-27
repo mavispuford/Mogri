@@ -442,6 +442,12 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
     public override void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         base.ApplyQueryAttributes(query);
+
+        if (query.TryGetValue(NavigationParams.CanvasImageString, out var canvasImageString) &&
+            canvasImageString is string formattedString)
+        {
+
+        }
     }
 
     unsafe SKBitmap CreateMaskedBitmap(SKBitmap srcBitmap, SKBitmap maskBitmapFull)
