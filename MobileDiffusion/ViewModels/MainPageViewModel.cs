@@ -254,6 +254,18 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
             updateHasInitImage();
         }
+
+        if (query.TryGetValue(NavigationParams.ImageWidth, out var imageWidthParam) &&
+            imageWidthParam is float imageWidth)
+        {
+            _settings.Width = imageWidth;
+        }
+
+        if (query.TryGetValue(NavigationParams.ImageHeight, out var imageHeightParam) &&
+            imageHeightParam is float imageHeight)
+        {
+            _settings.Height = imageHeight;
+        }
     }
 
     private void setSettingsFromResultItem(Settings settings)

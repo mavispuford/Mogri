@@ -100,7 +100,10 @@ public partial class MaskPage : ContentPage
         ((MaskPage)bindable).UpdateInitImgRectangle(true);
     });
 
-    public static BindableProperty LinesProperty = BindableProperty.Create(nameof(Lines), typeof(List<MaskLine>), typeof(MaskPage), default(List<MaskLine>));
+    public static BindableProperty LinesProperty = BindableProperty.Create(nameof(Lines), typeof(List<MaskLine>), typeof(MaskPage), default(List<MaskLine>), propertyChanged: (bindable, oldValue, newValue) =>
+    {
+        ((MaskPage)bindable).OnLinesChanged();
+    });
 
     public static BindableProperty PrepareForSavingCommandProperty = BindableProperty.Create(nameof(PrepareForSavingCommand), typeof(IAsyncRelayCommand), typeof(MaskPage), default(IAsyncRelayCommand));
 
@@ -115,7 +118,7 @@ public partial class MaskPage : ContentPage
 
         this.SetBinding(BitmapProperty, nameof(IMaskPageViewModel.SourceBitmap));
         this.SetBinding(CurrentColorProperty, nameof(IMaskPageViewModel.CurrentColor));
-        this.SetBinding(LinesProperty, nameof(IMaskPageViewModel.Lines));
+        this.SetBinding(LinesProperty, nameof(IMaskPageViewModel.Lines), BindingMode.TwoWay);
         this.SetBinding(InitImgRectangleProperty, nameof(IMaskPageViewModel.InitImgRectangle), BindingMode.OneWayToSource);
         this.SetBinding(ShowInitImgRectangleProperty, nameof(IMaskPageViewModel.ShowInitImgRectangle), BindingMode.TwoWay);
         this.SetBinding(PrepareForSavingCommandProperty, nameof(IMaskPageViewModel.PrepareForSavingCommand), BindingMode.OneWayToSource);
@@ -265,7 +268,7 @@ public partial class MaskPage : ContentPage
                     line.Color.GetByteRed(),
                     line.Color.GetByteGreen(),
                     line.Color.GetByteBlue(),
-                    Convert.ToByte((int)(line.Alpha * 255)));
+                    Convert.ToByte((int)Math.Max(1, line.Alpha * 255)));
 
                 using var path = new SKPath();
                 path.MoveTo(points[0]);
@@ -460,6 +463,11 @@ public partial class MaskPage : ContentPage
         MaskCanvasView.InvalidateSurface();
     }
 
+    private void OnLinesChanged()
+    {
+        MaskCanvasView.InvalidateSurface();
+    }
+
     private void OnSourceBitmapChanged()
     {
         ShowInitImgRectangle = false;
@@ -477,11 +485,12 @@ public partial class MaskPage : ContentPage
         MaskCanvasView.WidthRequest = destRect.Width;
         MaskCanvasView.HeightRequest = destRect.Height;
 
-        InitImgRectangleScale = Bitmap.Width / SourceImageCanvasView.Width;
-
-        Clear_Button_Clicked(this, new EventArgs());
+        // Clear lines
+        //Clear_Button_Clicked(this, new EventArgs());
 
         SourceImageCanvasView.InvalidateSurface();
+
+        InitImgRectangleScale = Bitmap.Width / destRect.Width;
     }
 
     private async Task PrepareForSaving(IAsyncRelayCommand callbackCommand)
@@ -497,6 +506,9 @@ public partial class MaskPage : ContentPage
         {
             ShowInitImgRectangle = false;
         }
+
+        // Wait for canvas to redraw - hack - find a better solution
+        await Task.Delay(100);
 
         await callbackCommand.ExecuteAsync(this);
 

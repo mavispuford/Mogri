@@ -15,27 +15,33 @@ public class ImageService : IImageService
 
         var matchResult = Constants.ImageDataRegex.Match(imageString);
 
+        string toProcess = string.Empty;
+
         if (matchResult.Success)
         {
-            try
-            {
-                var imageBase64 = matchResult.Groups[Constants.ImageDataCaptureGroupData].Value;
-
-                var imageBytes = Convert.FromBase64String(imageBase64);
-
-                if (token.IsCancellationRequested)
-                {
-                    return Task.FromResult<MemoryStream>(null);
-                }
-
-                return Task.FromResult(new MemoryStream(imageBytes));
-            }
-            catch
-            {
-                // TODO - Handle exceptions
-            }
+            toProcess = matchResult.Groups[Constants.ImageDataCaptureGroupData].Value;
+        }
+        else
+        {
+            toProcess = imageString;
         }
 
+        try
+        {
+            var imageBytes = Convert.FromBase64String(toProcess);
+
+            if (token.IsCancellationRequested)
+            {
+                return Task.FromResult<MemoryStream>(null);
+            }
+
+            return Task.FromResult(new MemoryStream(imageBytes));
+        }
+        catch
+        {
+            // TODO - Handle exceptions
+        }
+        
         return Task.FromResult<MemoryStream>(null);
     }
 

@@ -13,4 +13,8 @@ public static class NavigationParams
     public const string ColorPalette = nameof(ColorPalette);
 
     public const string CanvasImageString = nameof(CanvasImageString);
+
+    public const string ImageWidth = nameof(ImageWidth);
+
+    public const string ImageHeight = nameof(ImageHeight);
 }

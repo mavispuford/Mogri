@@ -8,7 +8,7 @@ namespace MobileDiffusion.Models
         public bool EnableGfpgan { get; set; } = false;
         public bool EnableUpscaling { get; set; } = false;
         public OnOff Fit { get; set; } = OnOff.on;
-        public bool FitClientSide { get; set; }
+        public bool FitClientSide { get; set; } = true;
         public double GfpganStrength { get; set; } = .75;
         public double GuidanceScale { get; set; } = 7.5;
         public double Height { get; set; } = 512;
