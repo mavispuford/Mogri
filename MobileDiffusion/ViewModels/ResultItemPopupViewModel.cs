@@ -63,6 +63,17 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
     [RelayCommand]
     private async Task ImageToImage()
     {
+        await SendImageBack(NavigationParams.InitImgString, true);
+    }
+
+    [RelayCommand]
+    private async Task SendToCanvas()
+    {
+        await SendImageBack(NavigationParams.CanvasImageString, false);
+    }
+
+    private async Task SendImageBack(string parameterName, bool asFormattedString)
+    {
         try
         {
             using (var memoryStream = new MemoryStream())
@@ -71,10 +82,14 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
 
                 stream.CopyTo(memoryStream);
                 var imageBytes = memoryStream.ToArray();
-
                 var imageString = Convert.ToBase64String(imageBytes);
 
-                ClosePopup(string.Format(Constants.ImageDataFormat, "image/png", imageString));
+                var parameters = new Dictionary<string, object>
+                {
+                    { parameterName, asFormattedString ? string.Format(Constants.ImageDataFormat, "image/png", imageString) : imageString}
+                };
+
+                ClosePopup(parameters);
             }
         }
         catch

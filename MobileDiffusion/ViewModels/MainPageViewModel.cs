@@ -6,6 +6,7 @@ using MobileDiffusion.Models;
 using System.Collections.ObjectModel;
 using SkiaSharp.Views.Maui.Controls;
 using SkiaSharp;
+using static Android.Hardware.Camera;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -18,8 +19,6 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
     private readonly IImageService _imageService;
 
     private Settings _settings = new();
-
-    private string _initImageFirstCharacters;
     private string _resizedInitImage;
     private bool _initImageNeedsResize = true;
 
@@ -67,6 +66,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
             resultItem.SetSettingsCommand = new RelayCommand<Settings>(setSettingsFromResultItem);
             resultItem.SetInitImageCommand = new RelayCommand<string>(setInitImageFromResultItem);
+            resultItem.SetCanvasImageCommand = new AsyncRelayCommand<string>(setCanvasImageFromResultItem);
 
             Results.Add(resultItem);
         }
@@ -291,6 +291,21 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
         _settings.InitImage = initImage;
 
         updateHasInitImage();
+    }
+
+    private async Task setCanvasImageFromResultItem(string canvasImage)
+    {
+        if (string.IsNullOrEmpty(canvasImage))
+        {
+            return;
+        }
+
+        var parameters = new Dictionary<string, object>
+            {
+                {NavigationParams.CanvasImageString, canvasImage}
+            };
+
+        await Shell.Current.GoToAsync("///MaskPageTab", parameters);
     }
 
     private void updateHasInitImage()
