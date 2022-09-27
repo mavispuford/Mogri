@@ -57,7 +57,12 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
 
         result.NumOutputs = 1;
 
-        ClosePopup(result);
+        var parameters = new Dictionary<string, object>
+        {
+            { NavigationParams.PromptSettings, result }
+        };
+
+        ClosePopup(parameters);
     }
 
     [RelayCommand]
@@ -86,7 +91,7 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
 
                 var parameters = new Dictionary<string, object>
                 {
-                    { parameterName, asFormattedString ? string.Format(Constants.ImageDataFormat, "image/png", imageString) : imageString}
+                    { parameterName, asFormattedString ? string.Format(Constants.ImageDataFormat, "image/png", imageString) : imageString }
                 };
 
                 ClosePopup(parameters);
