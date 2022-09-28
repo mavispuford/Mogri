@@ -17,10 +17,11 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
     private readonly IPopupService _popupService;
     private readonly IServiceProvider _serviceProvider;
     private readonly IImageService _imageService;
-
+    
     private Settings _settings = new();
     private string _resizedInitImage;
     private bool _initImageNeedsResize = true;
+    private float _targetProgress = 0;
 
     [ObservableProperty]
     private bool hasInitImage;
@@ -109,12 +110,21 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
                 {
                     if (string.IsNullOrEmpty(settings.InitImage))
                     {
-                        Progress = item.Step / (float)(settings.NumInferenceSteps);
+                        _targetProgress = item.Step / (float)(settings.NumInferenceSteps);
                     }
                     else
                     {
-                        Progress = item.Step / (float)(settings.NumInferenceSteps * settings.PromptStrength);
+                        _targetProgress = item.Step / (float)(settings.NumInferenceSteps * settings.PromptStrength);
                     }
+
+                    Shell.Current.CurrentPage.AbortAnimation("ProgressAnimation");
+                    
+                    var animation = new Animation(value =>
+                    {
+                        Progress = (float)value;
+                    }, Progress, _targetProgress, Easing.SinOut);
+
+                    animation.Commit(Shell.Current.CurrentPage, "ProgressAnimation", length: 250);
 
                     continue;
                 }
