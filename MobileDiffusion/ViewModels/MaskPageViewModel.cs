@@ -256,23 +256,28 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
     [RelayCommand]
     private async Task ShowMediaPicker()
     {
+        var fileResult = await MediaPicker.PickPhotoAsync();
+
+        if (fileResult == null)
+        {
+            return;
+        }
+
+        using var fileStream = await fileResult.OpenReadAsync();
+
+        await LoadSourceBitmapUsingStream(fileStream, fileResult.FileName);
+    }
+
+    private async Task LoadSourceBitmapUsingStream(Stream stream, string fileName)
+    {
         try
         {
-            var fileResult = await MediaPicker.PickPhotoAsync();
-
-            if (fileResult == null)
-            {
-                return;
-            }
-
             IsBusy = true;
-
-            using var fileStream = await fileResult.OpenReadAsync();
 
             // Instead of a simple SKBitmap.Decode() call, we're using a codec and SKImageInfo with Unpremul for the
             // AlphaType so masked images can be reopened after being created
 
-            var codec = SKCodec.Create(fileStream);
+            var codec = SKCodec.Create(stream);
             var info = new SKImageInfo
             {
                 AlphaType = SKAlphaType.Unpremul,
@@ -282,25 +287,39 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
                 Width = codec.Info.Width,
             };
 
-            SourceBitmap = SKBitmap.Decode(codec, info);
+            var sourceBitmap = SKBitmap.Decode(codec, info);
 
-            _sourceFileName = fileResult.FileName;
+            // Wrap in dispatch call because ApplyQueryAttributes can call this method and it
+            // appears to be called from a non-UI thread.
+            var dispatcher = Dispatcher.GetForCurrentThread();
+            dispatcher.Dispatch(() =>
+            {
+                SourceBitmap = sourceBitmap;
+            });
+
+            _sourceFileName = fileName;
 
             var mask = await _fileService.GetMaskFileFromAppDataAsync(_sourceFileName);
 
             if (mask?.Lines != null)
             {
-                Lines = mask.Lines;
+                dispatcher.Dispatch(() =>
+                {
+                    Lines = mask.Lines;
+                });
             }
 
             _colorPalette = ExtractColorPalette(SourceBitmap, 30);
         }
-        catch
+        catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
             // TODO - Handle exceptions
         }
         finally
         {
+            await stream.DisposeAsync();
+
             IsBusy = false;
         }
     }
@@ -448,11 +467,25 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
     public override async void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         base.ApplyQueryAttributes(query);
-
+        
         if (query.TryGetValue(NavigationParams.CanvasImageString, out var canvasImageString) &&
             canvasImageString is string byteString)
         {
             await BeginStitchingAsync(byteString);
+
+            // Workaround for https://github.com/dotnet/maui/issues/10294
+            query.Remove(NavigationParams.CanvasImageString);
+        }
+
+        if (query.TryGetValue(NavigationParams.AppShareFileUri, out var imageUriFromAppShareParam) &&
+            imageUriFromAppShareParam is string imageUri)
+        {
+            using var stream = await _fileService.GetFileStreamUsingExactUriAsync(imageUri);
+
+            await LoadSourceBitmapUsingStream(stream, Path.GetFileName(imageUri));
+
+            // Workaround for https://github.com/dotnet/maui/issues/10294
+            query.Remove(NavigationParams.AppShareFileUri);
         }
     }
 
