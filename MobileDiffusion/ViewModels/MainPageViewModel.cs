@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using SkiaSharp.Views.Maui.Controls;
 using SkiaSharp;
 using static Android.Hardware.Camera;
+using CommunityToolkit.Maui.Alerts;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -247,7 +248,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
         await Shell.Current.GoToAsync("PromptSettingsPage", parameters);
     }
 
-    public override void ApplyQueryAttributes(IDictionary<string, object> query)
+    public override async void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (query.TryGetValue(NavigationParams.PromptSettings, out var promptSettings) &&
             promptSettings is Settings settings)
@@ -255,6 +256,9 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
             _settings = settings;
 
             updateHasInitImage();
+
+            // Workaround for https://github.com/dotnet/maui/issues/10294
+            query.Remove(NavigationParams.PromptSettings);
         }
 
         if (query.TryGetValue(NavigationParams.InitImgString, out var initImag) &&
@@ -263,18 +267,96 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
             _settings.InitImage = initImagString;
 
             updateHasInitImage();
+
+            // Workaround for https://github.com/dotnet/maui/issues/10294
+            query.Remove(NavigationParams.InitImgString);
         }
 
         if (query.TryGetValue(NavigationParams.ImageWidth, out var imageWidthParam) &&
             imageWidthParam is float imageWidth)
         {
             _settings.Width = imageWidth;
+
+            // Workaround for https://github.com/dotnet/maui/issues/10294
+            query.Remove(NavigationParams.ImageWidth);
         }
 
         if (query.TryGetValue(NavigationParams.ImageHeight, out var imageHeightParam) &&
             imageHeightParam is float imageHeight)
         {
             _settings.Height = imageHeight;
+
+            // Workaround for https://github.com/dotnet/maui/issues/10294
+            query.Remove(NavigationParams.ImageHeight);
+        }
+
+        if (query.TryGetValue(NavigationParams.AppShareFileUri, out var appShareFileUriParam) &&
+            appShareFileUriParam is string imageUri)
+        {
+            query.TryGetValue(NavigationParams.AppShareContentType, out var appShareContentTypeParam);
+
+            await LoadSharedImage(imageUri, appShareContentTypeParam as string);
+
+            // Workaround for https://github.com/dotnet/maui/issues/10294
+            query.Remove(NavigationParams.AppShareFileUri);
+            query.Remove(NavigationParams.AppShareContentType);
+        }
+    }
+
+    private async Task LoadSharedImage(string imageUri, string contentType)
+    {
+        var useAsSourceImage = !await Shell.Current.DisplayAlert(
+                "Where to?",
+                "Would you like to use the image as a source image or put it in the canvas for masking?",
+                "Canvas",
+                "Source Image");
+
+        if (useAsSourceImage)
+        {
+            await SetSourceImageFromUri(imageUri, contentType);
+        }
+        else
+        {
+            var parameters = new Dictionary<string, object>
+            {
+                { NavigationParams.AppShareFileUri, imageUri },
+                { NavigationParams.AppShareContentType, contentType }
+            };
+
+            await Shell.Current.GoToAsync("///MaskPageTab", parameters);
+        }
+    }
+
+    private async Task SetSourceImageFromUri(string imageUri, string contentType)
+    {
+        try
+        {
+            using var stream = await _fileService.GetFileStreamUsingExactUriAsync(imageUri);
+
+            if (stream == null)
+            {
+                Console.WriteLine("Stream is null");
+                throw new FileNotFoundException(imageUri);
+            }
+
+            using var memoryStream = new MemoryStream();
+            await stream.CopyToAsync(memoryStream);
+
+            var imageBytes = memoryStream.ToArray();
+            var imageString = Convert.ToBase64String(imageBytes);
+
+            var formattedImageString = string.Format(Constants.ImageDataFormat, contentType ?? "image/png", imageString);
+
+            _settings.InitImage = formattedImageString;
+        }
+        catch
+        {
+            await Toast.Make("Unable to load requested image. Please try again.").Show();
+            return;
+        }
+        finally
+        {
+            updateHasInitImage();
         }
     }
 

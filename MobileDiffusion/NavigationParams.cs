@@ -17,4 +17,8 @@ public static class NavigationParams
     public const string ImageWidth = nameof(ImageWidth);
 
     public const string ImageHeight = nameof(ImageHeight);
+
+    public const string AppShareFileUri = nameof(AppShareFileUri);
+
+    public const string AppShareContentType = nameof(AppShareContentType);
 }
