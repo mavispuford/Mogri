@@ -1,8 +1,8 @@
-﻿using Android.Hardware.Lights;
-using CommunityToolkit.Maui.Alerts;
+﻿using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core.Extensions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MobileDiffusion.Helpers;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Models;
@@ -20,6 +20,7 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
     private List<Color> _colorPalette = new();
     private Color _paletteIconDarkColor = Colors.Black;
     private string _sourceFileName;
+    private Random _random = new Random();
 
     [ObservableProperty]
     private Color currentColor = Colors.Black;
@@ -292,7 +293,7 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
             // Wrap in dispatch call because ApplyQueryAttributes can call this method and it
             // appears to be called from a non-UI thread.
             var dispatcher = Dispatcher.GetForCurrentThread();
-            dispatcher.Dispatch(() =>
+            await dispatcher.DispatchAsync(() =>
             {
                 SourceBitmap = sourceBitmap;
             });
@@ -303,7 +304,7 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
 
             if (mask?.Lines != null)
             {
-                dispatcher.Dispatch(() =>
+                await dispatcher.DispatchAsync(() =>
                 {
                     Lines = mask.Lines;
                 });
@@ -502,7 +503,7 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
         SourceBitmap = finalBitmap;
     }
     
-    unsafe SKBitmap CreateMaskedBitmap(SKBitmap srcBitmap, SKBitmap maskBitmapFull)
+    private unsafe SKBitmap CreateMaskedBitmap(SKBitmap srcBitmap, SKBitmap maskBitmapFull, bool randomizeMaskPixels = true)
     {
         if (srcBitmap == null ||
             maskBitmapFull == null)
@@ -543,9 +544,6 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
 
                 if (mskByte4 != 0)
                 {
-                    // Limit the strength to preserve some of the pixel data from the underlying image
-                    float strength = Math.Min(mskByte4 / 255f, 204);
-
                     var sourceColor = new Color();
 
                     if (typeSrc == SKColorType.Rgba8888)
@@ -559,6 +557,23 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
 
                     var maskColor = new Color();
 
+                    // This adds randomness to each pixel to add texture to masked portions,
+                    // resulting in a better image overall when processed.
+                    if (randomizeMaskPixels)
+                    {
+                        // This controls how far away each pixel can travel from the original value
+                        const int rngAmount = 100;
+
+                        var pos = _random.Next(0, 1) == 1;
+                        mskByte1 = (byte)MathHelper.Clamp(((int)mskByte1) + (_random.Next(0, rngAmount) * (pos ? 1 : -1)), 0, 255);
+
+                        pos = _random.Next(0, 1) == 1;
+                        mskByte2 = (byte)MathHelper.Clamp(((int)mskByte2) + (_random.Next(0, rngAmount) * (pos ? 1 : -1)), 0, 255);
+                        
+                        pos = _random.Next(0, 1) == 1;
+                        mskByte3 = (byte)MathHelper.Clamp(((int)mskByte3) + (_random.Next(0, rngAmount) * (pos ? 1 : -1)), 0, 255);
+                    }
+
                     if (typeMsk == SKColorType.Rgba8888)
                     {
                         maskColor = Color.FromRgba(mskByte1, mskByte2, mskByte3, mskByte4);
@@ -568,6 +583,10 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
                         maskColor = Color.FromRgba(mskByte3, mskByte2, mskByte1, mskByte4);
                     }
 
+                    // Limit the strength to preserve some of the pixel data from the underlying image
+                    float strength = Math.Min(mskByte4 / 255f, 204);
+
+                    // Interpolate between the source and mask colors using the strength
                     var newColor = Color.FromRgba(
                         sourceColor.Red + strength * (maskColor.Red - sourceColor.Red),
                         sourceColor.Green + strength * (maskColor.Green - sourceColor.Green),
