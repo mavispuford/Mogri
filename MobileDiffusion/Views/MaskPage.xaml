@@ -74,18 +74,24 @@
               HorizontalOptions="FillAndExpand"
               VerticalOptions="FillAndExpand">
             <skia:SKCanvasView x:Name="SourceImageCanvasView" 
-                            PaintSurface="OnPaintSourceImageSurface"
-                            IgnorePixelScaling="True"
-                            HorizontalOptions="FillAndExpand"
-                            VerticalOptions="FillAndExpand"/>
+                               PaintSurface="OnPaintSourceImageSurface"
+                               IgnorePixelScaling="True"
+                               HorizontalOptions="FillAndExpand"
+                               VerticalOptions="FillAndExpand"/>
 
             <skia:SKCanvasView x:Name="MaskCanvasView" 
-                            PaintSurface="OnPaintMaskSurface"
-                            EnableTouchEvents="True"
-                            Touch="OnTouchMaskSurface"
-                            IgnorePixelScaling="True"
-                            HorizontalOptions="FillAndExpand"
-                            VerticalOptions="FillAndExpand"/>
+                               PaintSurface="OnPaintMaskSurface"
+                               EnableTouchEvents="True"
+                               Touch="OnTouchMaskSurface"
+                               IgnorePixelScaling="True"
+                               HorizontalOptions="FillAndExpand"
+                               VerticalOptions="FillAndExpand"/>
+
+            <skia:SKCanvasView x:Name="OutlineCanvasView" 
+                               PaintSurface="OnPaintOutlineSurface"
+                               IgnorePixelScaling="True"
+                               HorizontalOptions="FillAndExpand"
+                               VerticalOptions="FillAndExpand"/>
 
             <ActivityIndicator HorizontalOptions="Center" 
                                VerticalOptions="Center"
