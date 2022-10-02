@@ -87,12 +87,6 @@
                                HorizontalOptions="FillAndExpand"
                                VerticalOptions="FillAndExpand"/>
 
-            <skia:SKCanvasView x:Name="OutlineCanvasView" 
-                               PaintSurface="OnPaintOutlineSurface"
-                               IgnorePixelScaling="True"
-                               HorizontalOptions="FillAndExpand"
-                               VerticalOptions="FillAndExpand"/>
-
             <ActivityIndicator HorizontalOptions="Center" 
                                VerticalOptions="Center"
                                IsRunning="{Binding IsBusy}"
