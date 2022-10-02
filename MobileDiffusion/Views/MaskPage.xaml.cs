@@ -4,7 +4,6 @@ using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Models;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
-using static Android.Renderscripts.Script;
 
 namespace MobileDiffusion.Views;
 
@@ -14,6 +13,7 @@ public partial class MaskPage : ContentPage
     private Timer _brushSizeTimer;
     private Timer _alphaTimer;
     private bool _hasCreatedInitImgRectangle;
+    private bool _isSaving;
 
     public SKBitmap Bitmap
     {
@@ -279,11 +279,45 @@ public partial class MaskPage : ContentPage
                     path.ConicTo(points[i - 1], points[i], .5f);
                 }
 
+                if (!_isSaving && line.Alpha <= .1f)
+                {
+                    const int tiledBitmapSize = 5;
+                    var maskTiledBitmap = new SKBitmap(tiledBitmapSize, tiledBitmapSize);
+
+                    for (var x = 0; x < tiledBitmapSize; x++)
+                    {
+                        for (var y = 0; y < tiledBitmapSize; y++)
+                        {
+                            if (x == y)
+                            {
+                                maskTiledBitmap.SetPixel(x, y, paint.Color.WithAlpha(10));
+                            }
+                            else if (x - 1 == y || x + 1 == y || (x == tiledBitmapSize - 1 && y == 0) || (y == tiledBitmapSize - 1 && x == 0))
+                            {
+                                maskTiledBitmap.SetPixel(x, y, paint.Color.WithAlpha(50));
+                            }
+                            else
+                            {
+                                maskTiledBitmap.SetPixel(x, y, paint.Color.WithAlpha(100));
+                            }
+                        }
+                    }
+
+                    var bitmapShader = SKShader.CreateBitmap(maskTiledBitmap, SKShaderTileMode.Repeat, SKShaderTileMode.Repeat);
+
+                    paint.Shader = bitmapShader;
+                    paint.Color = paint.Color.WithAlpha(255);
+                }
+                else
+                {
+                    paint.Shader = null;
+                }
+
                 canvas.DrawPath(path, paint);
             }
         }
 
-        if (ShowInitImgRectangle)
+        if (!_isSaving && ShowInitImgRectangle)
         {
             canvas.DrawRect(InitImgRectangle,
             new SKPaint()
@@ -293,8 +327,6 @@ public partial class MaskPage : ContentPage
                 StrokeWidth = 3,
             });
         }
-
-        OutlineCanvasView.InvalidateSurface();
     }
 
     private void OnPaintOutlineSurface(object sender, SKPaintSurfaceEventArgs e)
@@ -343,30 +375,7 @@ public partial class MaskPage : ContentPage
                 {
                     path.ConicTo(points[i - 1], points[i], .5f);
                 }
-                const int tiledBitmapSize = 5;
-                var maskTiledBitmap = new SKBitmap(tiledBitmapSize, tiledBitmapSize);
-
-                for(var x = 0; x < tiledBitmapSize; x++)
-                {
-                    for (var y = 0; y < tiledBitmapSize; y++)
-                    {
-                        if (x == y)
-                        {
-                            maskTiledBitmap.SetPixel(x, y, paint.Color.WithAlpha(10));
-                        }
-                        else if (x - 1 == y || x + 1 == y || (x == tiledBitmapSize - 1 && y == 0 ) || (y == tiledBitmapSize - 1 && x == 0))
-                        {
-                            maskTiledBitmap.SetPixel(x, y, paint.Color.WithAlpha(50));
-                        }
-                        else
-                        {
-                            maskTiledBitmap.SetPixel(x, y, paint.Color.WithAlpha(100));
-                        }
-                    }
-                }
-
-                paint.Shader = SKShader.CreateBitmap(maskTiledBitmap, SKShaderTileMode.Repeat, SKShaderTileMode.Repeat);
-
+                
                 canvas.DrawPath(path, paint);
             }
         }
@@ -573,8 +582,6 @@ public partial class MaskPage : ContentPage
         SourceImageCanvasView.HeightRequest = destRect.Height;
         MaskCanvasView.WidthRequest = destRect.Width;
         MaskCanvasView.HeightRequest = destRect.Height;
-        OutlineCanvasView.WidthRequest = destRect.Width;
-        OutlineCanvasView.HeightRequest = destRect.Height;
 
         // Clear lines
         //Clear_Button_Clicked(this, new EventArgs());
@@ -591,22 +598,16 @@ public partial class MaskPage : ContentPage
             return;
         }
 
-        var rectangleWasShowing = ShowInitImgRectangle;
+        _isSaving = true;
 
-        if (rectangleWasShowing)
-        {
-            ShowInitImgRectangle = false;
-        }
+        MaskCanvasView.InvalidateSurface();
 
         // Wait for canvas to redraw - hack - find a better solution
-        await Task.Delay(100);
+        await Task.Delay(300);
 
         await callbackCommand.ExecuteAsync(this);
 
-        if (rectangleWasShowing)
-        {
-            ShowInitImgRectangle = true;
-        }
+        _isSaving = false;
     }
 }
 

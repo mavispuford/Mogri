@@ -261,10 +261,9 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
             query.Remove(NavigationParams.PromptSettings);
         }
 
-        if (query.TryGetValue(NavigationParams.InitImgString, out var initImag) &&
-            initImag is string initImagString)
+        if (query.TryGetValue(NavigationParams.InitImgString, out var initImagParam))
         {
-            _settings.InitImage = initImagString;
+            _settings.InitImage = initImagParam as string;
 
             updateHasInitImage();
 
