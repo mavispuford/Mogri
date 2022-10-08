@@ -87,37 +87,6 @@
                 </Image>
                 <Label Grid.Row="4" Grid.Column="1" Text="Fit Image (before sending):" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
                 <Switch Grid.Row="4" Grid.Column="2" IsToggled="{Binding FitImageClientSide}" />
-
-                <!--<Image Grid.Row="3" Grid.Column="0" WidthRequest="32">
-                    <Image.Source>
-                        <FontImageSource Glyph="&#xe3b9;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
-                    </Image.Source>
-                </Image>
-                <Label Grid.Row="3" Grid.Column="1" Text="Mask Image:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
-
-                <Grid Grid.Row="4" Grid.ColumnSpan="3"
-                        HeightRequest="200" WidthRequest="200">
-                    <Grid.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ShowMediaPickerCommand}">
-                            <TapGestureRecognizer.CommandParameter>
-                                <s:Boolean>False</s:Boolean>
-                            </TapGestureRecognizer.CommandParameter>
-                        </TapGestureRecognizer>
-                    </Grid.GestureRecognizers>
-                    <Label Text="Tap to set mask image" HorizontalOptions="Fill" VerticalOptions="Fill" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Padding="20"
-                           IsVisible="{Binding MaskImageSource, Converter={StaticResource IsNullConverter}}"/>
-                    <Image x:Name="MaskImage"
-                           Source="{Binding MaskImageSource}" Aspect="AspectFit" HorizontalOptions="Fill" VerticalOptions="Fill"
-                           IsVisible="{Binding MaskImageSource, Converter={StaticResource IsNotNullConverter}}"/>
-                    <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center">
-                        <ActivityIndicator.IsRunning>
-                            <MultiBinding Converter="{StaticResource AnyTrueConverter}" >
-                                <Binding Source="{x:Reference MaskImage}" Path="IsLoading" />
-                                <Binding Path="IsLoadingMaskImage" />
-                            </MultiBinding>
-                        </ActivityIndicator.IsRunning>
-                    </ActivityIndicator>
-                </Grid>-->
             </Grid>
         </ScrollView>
 
