@@ -54,6 +54,9 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
         }
 
         _settings = settings.Clone();
+
+        // Workaround for https://github.com/dotnet/maui/issues/10294
+        query.Clear();
     }
 
     [RelayCommand]

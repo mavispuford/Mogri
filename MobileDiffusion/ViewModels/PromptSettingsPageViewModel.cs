@@ -127,6 +127,9 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         _settings = settings.Clone();
 
         mapSettingsToProperties();
+
+        // Workaround for https://github.com/dotnet/maui/issues/10294
+        query.Clear();
     }
 
     [RelayCommand]

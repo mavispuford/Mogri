@@ -72,25 +72,26 @@
         <Grid x:Name="MaskGrid"
               Grid.Row="0"
               HorizontalOptions="FillAndExpand"
-              VerticalOptions="FillAndExpand">
+              VerticalOptions="FillAndExpand"
+              SizeChanged="MaskGrid_SizeChanged">
             <skia:SKCanvasView x:Name="SourceImageCanvasView" 
                                PaintSurface="OnPaintSourceImageSurface"
                                IgnorePixelScaling="True"
-                               HorizontalOptions="FillAndExpand"
-                               VerticalOptions="FillAndExpand"/>
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"/>
 
             <skia:SKCanvasView x:Name="MaskCanvasView" 
                                PaintSurface="OnPaintMaskSurface"
                                EnableTouchEvents="True"
                                Touch="OnTouchMaskSurface"
                                IgnorePixelScaling="True"
-                               HorizontalOptions="FillAndExpand"
-                               VerticalOptions="FillAndExpand"/>
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"/>
 
             <ActivityIndicator HorizontalOptions="Center" 
                                VerticalOptions="Center"
                                IsRunning="{Binding IsBusy}"
-                               InputTransparent="True" />
+                               InputTransparent="True"/>
         </Grid>
 
         <Border Grid.Row="0"

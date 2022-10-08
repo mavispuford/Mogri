@@ -56,6 +56,9 @@ public partial class ColorPickerPopupViewModel : PopupBaseViewModel, IColorPicke
         {
             SwatchesFromImage = colorPalette;
         }
+
+        // Workaround for https://github.com/dotnet/maui/issues/10294
+        query.Clear();
     }
 
     protected override void OnPropertyChanged(PropertyChangedEventArgs e)

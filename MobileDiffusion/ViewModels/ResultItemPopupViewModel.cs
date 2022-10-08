@@ -33,6 +33,9 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
         {
             ClosePopup();
         }
+
+        // Workaround for https://github.com/dotnet/maui/issues/10294
+        query.Clear();
     }
 
     [RelayCommand]
