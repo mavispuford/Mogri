@@ -21,7 +21,9 @@ namespace MobileDiffusion.Services
         {
             var client = _httpClientFactory.CreateClient();
 
-            var response = await client.GetAsync($"{Constants.BaseUrl}");
+            var baseUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
+
+            var response = await client.GetAsync($"{baseUrl}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -49,7 +51,9 @@ namespace MobileDiffusion.Services
                     Encoding.UTF8,
                     MediaTypeNames.Application.Json);
 
-                var url = $"{Constants.BaseUrl}";
+                var baseUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
+
+                var url = $"{baseUrl}";
 
                 var requestMessage = new HttpRequestMessage
                 {
@@ -97,7 +101,9 @@ namespace MobileDiffusion.Services
 
             var client = _httpClientFactory.CreateClient();
 
-            var imageResponse = await client.GetAsync($"{Constants.BaseUrl}/{responseItem.Url.Replace("./", "/")}");
+            var baseUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
+
+            var imageResponse = await client.GetAsync($"{baseUrl}/{responseItem.Url.Replace("./", "/")}");
 
             var imageBytes = await imageResponse.Content.ReadAsByteArrayAsync();
 

@@ -13,4 +13,5 @@ public interface IMainPageViewModel : IPageViewModel
     IAsyncRelayCommand CreateCommand { get; }
     IAsyncRelayCommand ShowImageToImageSettingsCommand { get; }
     IAsyncRelayCommand ShowRequestSettingsCommand { get; }
+    IAsyncRelayCommand ShowAppSettingsCommand { get; }
 }

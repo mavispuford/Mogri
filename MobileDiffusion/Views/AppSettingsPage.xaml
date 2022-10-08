@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
+                xmlns:views="clr-namespace:MobileDiffusion.Views"
+                x:Class="MobileDiffusion.Views.AppSettingsPage"
+                x:DataType="viewModels:IAppSettingsPageViewModel"
+                Shell.PresentationMode="Animated"
+                Shell.NavBarIsVisible="True"
+                Shell.TabBarIsVisible="False"
+                Title="Application Settings">
+    <Grid RowDefinitions="*,auto"
+          Padding="0"
+          Margin="0">
+        <ScrollView Grid.Row="0" Orientation="Vertical">
+            <Grid x:Name="MainGrid"
+              Padding="30"
+              RowDefinitions="auto, auto"
+              RowSpacing="10"
+              ColumnSpacing="16"
+              ColumnDefinitions="32,auto,*"
+              HorizontalOptions="FillAndExpand">
+
+                <Image Grid.Row="0" Grid.Column="0" WidthRequest="32">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xe30a;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
+                    </Image.Source>
+                </Image>
+                <Label Grid.Row="0" Grid.Column="1" Text="Server URL:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+                <Entry Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding ServerUrl}" Placeholder="Ex. http://192.168.0.1" Keyboard="Url"/>
+
+            </Grid>
+        </ScrollView>
+
+        <HorizontalStackLayout Grid.Row="1" Spacing="10" HorizontalOptions="End" Padding="10">
+            <Button Command="{Binding ResetValuesCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}">
+                <Button.ImageSource>
+                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource Tertiary}" />
+                </Button.ImageSource>
+            </Button>
+            <Button Text="Cancel" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
+            <Button Text="Apply" Command="{Binding ConfirmSettingsCommand}" WidthRequest="100" />
+        </HorizontalStackLayout>
+    </Grid>
+
+</views:BasePage>

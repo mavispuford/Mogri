@@ -18,6 +18,14 @@
             <converters:UnfocusOnCommandExecuteConverter x:Key="UnfocusOnCommandExecuteConverter" />
         </ResourceDictionary>
     </views:BasePage.Resources>
+    <views:BasePage.ToolbarItems>
+        <ToolbarItem Text="Settings"
+                     Command="{Binding ShowAppSettingsCommand}">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource Glyph="&#xe8b8;" FontFamily="MaterialIconsRoundRegular" Size="26" Color="White" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </views:BasePage.ToolbarItems>
 
     <Grid RowDefinitions="auto, *" Padding="0" Margin="0" RowSpacing="0">
         <ProgressBar Grid.Row="0"

@@ -71,6 +71,9 @@
 	  <Compile Update="Views\Popups\ColorPickerPopup.xaml.cs">
 	    <DependentUpon>ColorPickerPopup.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Views\AppSettingsPage.xaml.cs">
+	    <DependentUpon>AppSettingsPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\PromptSettingsPage.xaml.cs">
 	    <DependentUpon>PromptSettingsPage.xaml</DependentUpon>
 	  </Compile>
@@ -93,6 +96,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Popups\ResultItemPopup.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\AppSettingsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\PromptSettingsPage.xaml">

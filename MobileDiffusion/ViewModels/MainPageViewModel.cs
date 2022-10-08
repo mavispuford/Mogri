@@ -56,6 +56,16 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
     [RelayCommand]
     private async Task Create()
     {
+        if (!Preferences.Default.ContainsKey(Constants.PreferenceKeys.ServerUrl))
+        {
+            await Shell.Current.CurrentPage.DisplayAlert(
+                "No server URL",
+                "There is no server URL configured. Please set the server URL in app settings and try again.",
+                "OK");
+
+            return;
+        }
+
         Progress = 0;
 
         Results = new();
@@ -230,6 +240,12 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
         result.ImageSource = imageSource;
 
         result.IsLoading = false;
+    }
+
+    [RelayCommand]
+    private async Task ShowAppSettings()
+    {
+        await Shell.Current.GoToAsync("AppSettingsPage");
     }
 
     [RelayCommand]
