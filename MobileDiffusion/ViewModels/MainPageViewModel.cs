@@ -256,9 +256,6 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
             _settings = settings;
 
             updateHasInitImage();
-
-            // Workaround for https://github.com/dotnet/maui/issues/10294
-            query.Remove(NavigationParams.PromptSettings);
         }
 
         if (query.TryGetValue(NavigationParams.InitImgString, out var initImagParam))
@@ -266,27 +263,18 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
             _settings.InitImage = initImagParam as string;
 
             updateHasInitImage();
-
-            // Workaround for https://github.com/dotnet/maui/issues/10294
-            query.Remove(NavigationParams.InitImgString);
         }
 
         if (query.TryGetValue(NavigationParams.ImageWidth, out var imageWidthParam) &&
             imageWidthParam is float imageWidth)
         {
             _settings.Width = imageWidth;
-
-            // Workaround for https://github.com/dotnet/maui/issues/10294
-            query.Remove(NavigationParams.ImageWidth);
         }
 
         if (query.TryGetValue(NavigationParams.ImageHeight, out var imageHeightParam) &&
             imageHeightParam is float imageHeight)
         {
             _settings.Height = imageHeight;
-
-            // Workaround for https://github.com/dotnet/maui/issues/10294
-            query.Remove(NavigationParams.ImageHeight);
         }
 
         if (query.TryGetValue(NavigationParams.AppShareFileUri, out var appShareFileUriParam) &&
@@ -295,11 +283,10 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
             query.TryGetValue(NavigationParams.AppShareContentType, out var appShareContentTypeParam);
 
             await LoadSharedImage(imageUri, appShareContentTypeParam as string);
-
-            // Workaround for https://github.com/dotnet/maui/issues/10294
-            query.Remove(NavigationParams.AppShareFileUri);
-            query.Remove(NavigationParams.AppShareContentType);
         }
+
+        // Workaround for https://github.com/dotnet/maui/issues/10294
+        query.Clear();
     }
 
     private async Task LoadSharedImage(string imageUri, string contentType)

@@ -127,6 +127,13 @@ public partial class MaskPage : ContentPage
         this.SetBinding(InitImgRectangleSizeProperty, nameof(IMaskPageViewModel.InitImgRectangleSize), BindingMode.OneWay);
 
         PrepareForSavingCommand = new AsyncRelayCommand<IAsyncRelayCommand>(PrepareForSaving);
+
+        //SourceImageCanvasView.SizeChanged += SourceImageCanvasView_SizeChanged;
+    }
+
+    private void SourceImageCanvasView_SizeChanged(object sender, EventArgs e)
+    {
+        UpdateCanvasSizes();
     }
 
     protected override void OnBindingContextChanged()
@@ -568,27 +575,35 @@ public partial class MaskPage : ContentPage
 
     private void OnSourceBitmapChanged()
     {
-        ShowInitImgRectangle = false;
-        _hasCreatedInitImgRectangle = false;
+        UpdateCanvasSizes();
+    }
 
-        float scale = Math.Min((float)MaskGrid.Width / Bitmap.Width,
-                   (float)MaskGrid.Height / Bitmap.Height);
-        float x = ((float)MaskGrid.Width - scale * Bitmap.Width) / 2;
-        float y = ((float)MaskGrid.Height - scale * Bitmap.Height) / 2;
-        SKRect destRect = new SKRect(x, y, x + scale * Bitmap.Width,
-                                           y + scale * Bitmap.Height);
+    private void UpdateCanvasSizes()
+    {
+        if (Bitmap == null)
+        {
+            return;
+        }
 
-        SourceImageCanvasView.WidthRequest = destRect.Width;
-        SourceImageCanvasView.HeightRequest = destRect.Height;
-        MaskCanvasView.WidthRequest = destRect.Width;
-        MaskCanvasView.HeightRequest = destRect.Height;
+        var scale = Math.Min((float)MaskGrid.Width / Bitmap.Width,(float)MaskGrid.Height / Bitmap.Height);
+        var width = scale * Bitmap.Width;
+        var height = scale * Bitmap.Height;
+
+        SourceImageCanvasView.WidthRequest = width;
+        SourceImageCanvasView.HeightRequest = height;
+        MaskCanvasView.WidthRequest = width;
+        MaskCanvasView.HeightRequest = height;
 
         // Clear lines
         //Clear_Button_Clicked(this, new EventArgs());
 
+        // Force a measure on both canvas views because setting width/height request doesn't seem to be enough
+        SourceImageCanvasView.Measure(width, height);
         SourceImageCanvasView.InvalidateSurface();
+        MaskCanvasView.Measure(width, height);
+        MaskCanvasView.InvalidateSurface();
 
-        InitImgRectangleScale = Bitmap.Width / destRect.Width;
+        InitImgRectangleScale = Bitmap.Width / width;
     }
 
     private async Task PrepareForSaving(IAsyncRelayCommand callbackCommand)
@@ -609,6 +624,10 @@ public partial class MaskPage : ContentPage
 
         _isSaving = false;
     }
+
+    private void MaskGrid_SizeChanged(object sender, EventArgs e)
+    {
+        UpdateCanvasSizes();
+    }
 }
 
-    

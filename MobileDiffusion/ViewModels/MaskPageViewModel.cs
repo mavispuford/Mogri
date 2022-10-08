@@ -472,10 +472,16 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
         if (query.TryGetValue(NavigationParams.CanvasImageString, out var canvasImageString) &&
             canvasImageString is string byteString)
         {
-            await BeginStitchingAsync(byteString);
+            if (ShowInitImgRectangle)
+            {
+                await BeginStitchingAsync(byteString);
+            }
+            else
+            {
+                using var stream = await _imageService.GetStreamFromContentTypeStringAsync(byteString, new CancellationTokenSource().Token);
 
-            // Workaround for https://github.com/dotnet/maui/issues/10294
-            query.Remove(NavigationParams.CanvasImageString);
+                SourceBitmap = SKBitmap.Decode(stream);
+            }
         }
 
         if (query.TryGetValue(NavigationParams.AppShareFileUri, out var imageUriFromAppShareParam) &&
@@ -484,10 +490,10 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
             using var stream = await _fileService.GetFileStreamUsingExactUriAsync(imageUri);
 
             await LoadSourceBitmapUsingStream(stream, Path.GetFileName(imageUri));
-
-            // Workaround for https://github.com/dotnet/maui/issues/10294
-            query.Remove(NavigationParams.AppShareFileUri);
         }
+
+        // Workaround for https://github.com/dotnet/maui/issues/10294
+        query.Clear();
     }
 
     private async Task BeginStitchingAsync(string byteString)
