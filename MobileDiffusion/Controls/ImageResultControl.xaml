@@ -9,20 +9,26 @@
              VerticalOptions="Fill"
              x:DataType="viewModels:IResultItemViewModel">
 
-    <Grid HorizontalOptions="Fill"
+    <Border StrokeThickness="0">
+        <Border.StrokeShape>
+            <RoundRectangle CornerRadius="10" />
+        </Border.StrokeShape>
+        <Grid HorizontalOptions="Fill"
           VerticalOptions="Fill">
-        <Grid.GestureRecognizers>
-            <TapGestureRecognizer Command="{Binding TappedCommand}" />
-        </Grid.GestureRecognizers>
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding TappedCommand}" />
+            </Grid.GestureRecognizers>
 
-        <Image x:Name="ImageControl" 
-                   Aspect="AspectFit" 
-                   HorizontalOptions="Fill" 
-                   VerticalOptions="Fill"
-                   Scale="0"/>
+            <Image x:Name="ImageControl" 
+               Aspect="AspectFit" 
+               HorizontalOptions="Fill" 
+               VerticalOptions="Fill"
+               Scale="0"/>
 
-        <ActivityIndicator HorizontalOptions="Center"
-                           VerticalOptions="Center"
-                           IsRunning="{Binding Source={x:Reference MainControl}, Path=IsLoading}"/>
-    </Grid>
+            <ActivityIndicator HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               IsRunning="{Binding Source={x:Reference MainControl}, Path=IsLoading}"/>
+        </Grid>
+    </Border>
+    
 </ContentView>

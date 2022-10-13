@@ -20,6 +20,8 @@
 
     <Color x:Key="Gray200TwentySixPercent">#44C8C8C8</Color>
 
+    <Color x:Key="PrimaryEightyPercent">#80FF6F59</Color>
+
     <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}"/>
     <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource Secondary}"/>
     <SolidColorBrush x:Key="TertiaryBrush" Color="{StaticResource Tertiary}"/>
