@@ -28,10 +28,10 @@ internal partial class PromptDescriptorsPageViewModel : PageViewModel, IPromptDe
                 Text = Constants.Descriptors.AndyWarhol,
                 Tags = new List<string>
                 {
-                    Constants.Descriptors.Popular,
-                    Constants.Descriptors.Fantasy,
-                    Constants.Descriptors.Digital2D,
-                    Constants.Descriptors.Digital3D
+                    Constants.Descriptors.PopArt,
+                    Constants.Descriptors.Vivid,
+                    Constants.Descriptors.Iconic,
+                    Constants.Descriptors.Popular
                 }
             },
             new PromptDescriptor
