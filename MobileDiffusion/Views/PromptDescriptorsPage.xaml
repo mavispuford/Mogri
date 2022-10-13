@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                xmlns:models="clr-namespace:MobileDiffusion.Models"
+                xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
+                xmlns:views="clr-namespace:MobileDiffusion.Views"
+                x:Class="MobileDiffusion.Views.PromptDescriptorsPage"
+                x:DataType="viewModels:IPromptDescriptorsPageViewModel"
+                Shell.PresentationMode="Animated"
+                Shell.NavBarIsVisible="True"
+                Shell.TabBarIsVisible="False"
+                Title="Prompt Descriptors">
+    <views:BasePage.Resources>
+        <Style TargetType="Grid">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal" />
+                        <VisualState x:Name="Selected">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor"
+                                        Value="{StaticResource PrimaryEightyPercent}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
+    </views:BasePage.Resources>
+    <Grid RowDefinitions="*,auto"
+          Padding="10"
+          Margin="0">
+
+        <CollectionView Grid.Row="0"
+                        IsGrouped="True"
+                        SelectionMode="Multiple"
+                        ItemsSource="{Binding DescriptorGroups}"
+                        SelectedItems="{Binding SelectedDescriptors}">
+            <CollectionView.GroupHeaderTemplate>
+                <DataTemplate x:DataType="models:PromptDescriptorGroup">
+                    <Label Text="{Binding Name}" 
+                           Padding="0,10"
+                           FontSize="22"
+                           FontAttributes="Bold"/>
+                </DataTemplate>
+            </CollectionView.GroupHeaderTemplate>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:PromptDescriptor">
+                    <Grid ColumnDefinitions="*,*"
+                          Padding="6,10,0,10"
+                          HeightRequest="54">
+                        <Label Grid.Column="0"
+                               Text="{Binding Text}"
+                               VerticalOptions="Center"
+                               FontSize="16"/>
+                        <Label Grid.Column="1" 
+                               VerticalOptions="Center"
+                               Text="{Binding TagsString}"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray200}}"
+                               FontSize="12"
+                               LineBreakMode="WordWrap" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        
+        <HorizontalStackLayout Grid.Row="1" Spacing="10" HorizontalOptions="End" Padding="10">
+            <Button Command="{Binding ResetCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}">
+                <Button.ImageSource>
+                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource Tertiary}" />
+                </Button.ImageSource>
+            </Button>
+            <Button Text="Cancel" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
+            <Button Text="Apply" Command="{Binding ConfirmCommand}" WidthRequest="100" />
+        </HorizontalStackLayout>
+    </Grid>
+
+</views:BasePage>

@@ -15,6 +15,7 @@ public static class ViewModelRegistrations
         builder.Services.AddTransient<IResultItemPopupViewModel, ResultItemPopupViewModel>();
         builder.Services.AddTransient<IResultItemViewModel, ResultItemViewModel>();
         builder.Services.AddTransient<IAppSettingsPageViewModel, AppSettingsPageViewModel>();
+        builder.Services.AddTransient<IPromptDescriptorsPageViewModel, PromptDescriptorsPageViewModel>();
 
         return builder;
     }

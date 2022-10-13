@@ -6,7 +6,6 @@ using MobileDiffusion.Models;
 using System.Collections.ObjectModel;
 using SkiaSharp.Views.Maui.Controls;
 using SkiaSharp;
-using static Android.Hardware.Camera;
 using CommunityToolkit.Maui.Alerts;
 
 namespace MobileDiffusion.ViewModels;
@@ -23,12 +22,19 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
     private string _resizedInitImage;
     private bool _initImageNeedsResize = true;
     private float _targetProgress = 0;
+    private List<PromptDescriptor> _promptDescriptors = new();
 
     [ObservableProperty]
     private bool hasInitImage;
 
     [ObservableProperty]
+    private bool hasPromptDescriptors;
+
+    [ObservableProperty]
     private string prompt;
+
+    [ObservableProperty]
+    private string promptDescriptorsString;
 
     [ObservableProperty]
     private string placeholderPrompt = "An astronaut floating in space, detailed digital drawing, octane render, trending on artstation";
@@ -102,9 +108,13 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
                 settings.InitImage = _resizedInitImage;
             }
         }
-        
 
-        var finalPrompt = string.IsNullOrEmpty(Prompt) ? PlaceholderPrompt : Prompt;
+        var finalPrompt = (string.IsNullOrEmpty(Prompt) ? PlaceholderPrompt : Prompt);
+
+        if (!string.IsNullOrEmpty(PromptDescriptorsString))
+        {
+            finalPrompt += $", {PromptDescriptorsString}";
+        }
 
         settings.Prompt = finalPrompt;
 
@@ -257,6 +267,14 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
     }
 
     [RelayCommand]
+    private async Task ShowPromptDescriptors()
+    {
+        var parameters = new Dictionary<string, object> { { NavigationParams.PromptDescriptors, _promptDescriptors } };
+
+        await Shell.Current.GoToAsync("PromptDescriptorsPage", parameters);
+    }
+
+    [RelayCommand]
     private async Task ShowRequestSettings()
     {
         var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings } };
@@ -299,6 +317,16 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
             query.TryGetValue(NavigationParams.AppShareContentType, out var appShareContentTypeParam);
 
             await LoadSharedImage(imageUri, appShareContentTypeParam as string);
+        }
+
+        if (query.TryGetValue(NavigationParams.PromptDescriptors, out var promptDescriptorsParam) &&
+            promptDescriptorsParam is List<PromptDescriptor> promptDescriptors)
+        {
+            _promptDescriptors = promptDescriptors;
+
+            PromptDescriptorsString = string.Join(", ", _promptDescriptors.Select(d => d.Text));
+
+            HasPromptDescriptors = _promptDescriptors.Any();
         }
 
         // Workaround for https://github.com/dotnet/maui/issues/10294

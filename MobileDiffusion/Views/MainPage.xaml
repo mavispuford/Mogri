@@ -16,6 +16,7 @@
             <toolkit:BoolToObjectConverter x:Key="BoolToColorConverter" TrueObject="{StaticResource Tertiary}" FalseObject="{StaticResource IndependenceAccent}" />
             <toolkit:BoolToObjectConverter x:Key="BoolToOpacityConverter" TrueObject="1" FalseObject="0" />
             <converters:UnfocusOnCommandExecuteConverter x:Key="UnfocusOnCommandExecuteConverter" />
+            <toolkit:IsStringNotNullOrEmptyConverter x:Key="IsStringNotNullOrEmptyConverter" />
         </ResourceDictionary>
     </views:BasePage.Resources>
     <views:BasePage.ToolbarItems>
@@ -28,6 +29,7 @@
     </views:BasePage.ToolbarItems>
 
     <Grid RowDefinitions="auto, *" Padding="0" Margin="0" RowSpacing="0">
+        
         <ProgressBar Grid.Row="0"
                      Margin="0"
                      Progress="{Binding Progress}"
@@ -37,60 +39,89 @@
 
         <Grid x:Name="MainGrid"
               Grid.Row="1"
-              RowDefinitions="auto, auto, auto, *"
-              Padding="30"
-              RowSpacing="10">
+              RowDefinitions="auto, auto, auto, auto, *"
+              Padding="16"
+              RowSpacing="5">
 
-            <Label Grid.Row="0"
-               Text="Prompt:"
-               FontSize="Body" />
+            <Grid Grid.Row="0"
+                  RowDefinitions="auto, auto"
+                  ColumnSpacing="10"
+                  ColumnDefinitions="80*,20*">
+
+                <Label Grid.Column="0" 
+                       Text="Prompt:"
+                       FontSize="Body" />
+
+                <ImageButton Grid.Column="1"
+                             HeightRequest="28"
+                             CornerRadius="10"
+                             HorizontalOptions="Fill"
+                             VerticalOptions="Center"
+                             Command="{Binding ShowPromptDescriptorsCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"
+                             BackgroundColor="Transparent">
+                    <ImageButton.Source>
+                        <FontImageSource Glyph="&#xe873;" FontFamily="MaterialIconsRoundRegular" Color="{Binding HasPromptDescriptors, Converter={StaticResource BoolToColorConverter}}" />
+                    </ImageButton.Source>
+                </ImageButton>
+
+            </Grid>
 
             <Editor x:Name="PromptEditor" 
-                Grid.Row="1"
-                Placeholder="{Binding PlaceholderPrompt}" 
-                Text="{Binding Prompt}"
-                AutoSize="TextChanges"/>
+                    Grid.Row="1"
+                    Placeholder="{Binding PlaceholderPrompt}" 
+                    Text="{Binding Prompt}"
+                    AutoSize="TextChanges"/>
 
-            <Grid Grid.Row="2"
-              ColumnDefinitions="60*,20*,20*"
-              ColumnSpacing="10"
-              HorizontalOptions="FillAndExpand">
+            <Label Grid.Row="2"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="2" 
+                   Text="{Binding PromptDescriptorsString}"
+                   TextColor="{StaticResource Gray600}"
+                   IsVisible="{Binding PromptDescriptorsString, Converter={StaticResource IsStringNotNullOrEmptyConverter}}"
+                   Padding="0,0,0,10"/>
+
+            <Grid Grid.Row="3"
+                  ColumnDefinitions="60*,20*,20*"
+                  ColumnSpacing="10"
+                  HorizontalOptions="FillAndExpand">
+                
                 <Button Grid.Column="0"
-                    Text="Create!"
-                    Command="{Binding CreateCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"/>
+                        Text="Create!"
+                        Command="{Binding CreateCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"/>
 
                 <Button Grid.Column="1"
-                    HeightRequest="40"
-                    CornerRadius="10"
-                    HorizontalOptions="Fill"
-                    Command="{Binding ShowRequestSettingsCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"
-                    BackgroundColor="Transparent">
+                        HeightRequest="40"
+                        CornerRadius="10"
+                        HorizontalOptions="Fill"
+                        Command="{Binding ShowRequestSettingsCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"
+                        BackgroundColor="Transparent">
                     <Button.ImageSource>
                         <FontImageSource Glyph="&#xe429;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource IndependenceAccent}" />
                     </Button.ImageSource>
                 </Button>
 
                 <ImageButton Grid.Column="2"
-                    HeightRequest="28"
-                    CornerRadius="10"
-                    HorizontalOptions="Fill"
-                    Command="{Binding ShowImageToImageSettingsCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"
-                    BackgroundColor="Transparent">
+                             HeightRequest="28"
+                             CornerRadius="10"
+                             HorizontalOptions="Fill"
+                             Command="{Binding ShowImageToImageSettingsCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"
+                             BackgroundColor="Transparent">
                     <ImageButton.Source>
                         <FontImageSource Glyph="&#xe3f4;" FontFamily="MaterialIconsRoundRegular" Color="{Binding HasInitImage, Converter={StaticResource BoolToColorConverter}}" />
                     </ImageButton.Source>
                 </ImageButton>
+                
             </Grid>
 
-            <ScrollView Grid.Row="3" VerticalOptions="FillAndExpand" VerticalScrollBarVisibility="Never" HorizontalScrollBarVisibility="Never">
+            <ScrollView Grid.Row="4" VerticalOptions="FillAndExpand" VerticalScrollBarVisibility="Never" HorizontalScrollBarVisibility="Never">
                 <FlexLayout x:Name="ImageLayout"
-                        BindableLayout.ItemsSource="{Binding Results}" 
-                        HorizontalOptions="CenterAndExpand"
-                        VerticalOptions="Start"
-                        Wrap="Wrap"
-                        JustifyContent="SpaceEvenly"
-                        AlignItems="Start"
-                        AlignContent="SpaceEvenly">
+                            BindableLayout.ItemsSource="{Binding Results}" 
+                            HorizontalOptions="CenterAndExpand"
+                            VerticalOptions="Start"
+                            Wrap="Wrap"
+                            JustifyContent="SpaceEvenly"
+                            AlignItems="Start"
+                            AlignContent="SpaceEvenly">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate x:DataType="viewModels:IResultItemViewModel">
                             <controls:ImageResultControl Source="{Binding ImageSource}"

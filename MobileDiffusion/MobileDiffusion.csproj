@@ -65,6 +65,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Views\PromptDescriptorsPage.xaml.cs">
+	    <DependentUpon>PromptDescriptorsPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\ImageToImageSettingsPage.xaml.cs">
 	    <DependentUpon>ImageToImageSettingsPage.xaml</DependentUpon>
 	  </Compile>
@@ -87,6 +90,9 @@
 
 	<ItemGroup>
 	  <MauiXaml Update="Controls\ImageResultControl.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\PromptDescriptorsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\ImageToImageSettingsPage.xaml">
