@@ -43,28 +43,10 @@
               Padding="16"
               RowSpacing="5">
 
-            <Grid Grid.Row="0"
-                  RowDefinitions="auto, auto"
-                  ColumnSpacing="10"
-                  ColumnDefinitions="80*,20*">
-
-                <Label Grid.Column="0" 
-                       Text="Prompt:"
-                       FontSize="Body" />
-
-                <ImageButton Grid.Column="1"
-                             HeightRequest="28"
-                             CornerRadius="10"
-                             HorizontalOptions="Fill"
-                             VerticalOptions="Center"
-                             Command="{Binding ShowPromptDescriptorsCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"
-                             BackgroundColor="Transparent">
-                    <ImageButton.Source>
-                        <FontImageSource Glyph="&#xe873;" FontFamily="MaterialIconsRoundRegular" Color="{Binding HasPromptDescriptors, Converter={StaticResource BoolToColorConverter}}" />
-                    </ImageButton.Source>
-                </ImageButton>
-
-            </Grid>
+            <Label Grid.Row="0" 
+                   Text="Prompt:"
+                   VerticalOptions="Center"
+                   FontSize="Body" />
 
             <Editor x:Name="PromptEditor" 
                     Grid.Row="1"
@@ -81,7 +63,7 @@
                    Padding="0,0,0,10"/>
 
             <Grid Grid.Row="3"
-                  ColumnDefinitions="60*,20*,20*"
+                  ColumnDefinitions="52*,16*,16*,16*"
                   ColumnSpacing="10"
                   HorizontalOptions="FillAndExpand">
                 
@@ -89,21 +71,33 @@
                         Text="Create!"
                         Command="{Binding CreateCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"/>
 
-                <Button Grid.Column="1"
-                        HeightRequest="40"
-                        CornerRadius="10"
-                        HorizontalOptions="Fill"
-                        Command="{Binding ShowRequestSettingsCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"
-                        BackgroundColor="Transparent">
-                    <Button.ImageSource>
+                <ImageButton Grid.Column="1"
+                             HeightRequest="40"
+                             CornerRadius="10"
+                             HorizontalOptions="CenterAndExpand"
+                             Command="{Binding ShowRequestSettingsCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"
+                             BackgroundColor="Transparent">
+                    <ImageButton.Source>
                         <FontImageSource Glyph="&#xe429;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource IndependenceAccent}" />
-                    </Button.ImageSource>
-                </Button>
+                    </ImageButton.Source>
+                </ImageButton>
 
                 <ImageButton Grid.Column="2"
-                             HeightRequest="28"
+                             HeightRequest="40"
                              CornerRadius="10"
-                             HorizontalOptions="Fill"
+                             HorizontalOptions="CenterAndExpand"
+                             VerticalOptions="Start"
+                             Command="{Binding ShowPromptDescriptorsCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"
+                             BackgroundColor="Transparent">
+                    <ImageButton.Source>
+                        <FontImageSource Glyph="&#xe873;" FontFamily="MaterialIconsRoundRegular" Color="{Binding HasPromptDescriptors, Converter={StaticResource BoolToColorConverter}}" />
+                    </ImageButton.Source>
+                </ImageButton>
+
+                <ImageButton Grid.Column="3"
+                             HeightRequest="40"
+                             CornerRadius="10"
+                             HorizontalOptions="CenterAndExpand"
                              Command="{Binding ShowImageToImageSettingsCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"
                              BackgroundColor="Transparent">
                     <ImageButton.Source>
