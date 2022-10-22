@@ -9,7 +9,8 @@
              VerticalOptions="Fill"
              x:DataType="viewModels:IResultItemViewModel">
 
-    <Border StrokeThickness="0">
+    <Border Background="Transparent"
+            StrokeThickness="0">
         <Border.StrokeShape>
             <RoundRectangle CornerRadius="10" />
         </Border.StrokeShape>
