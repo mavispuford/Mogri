@@ -16,4 +16,6 @@ internal interface IPromptDescriptorsPageViewModel : IPageViewModel
     IAsyncRelayCommand CancelCommand { get; }
 
     IAsyncRelayCommand ConfirmCommand { get; }
+
+    IAsyncRelayCommand<string> FilterCommand { get; }
 }

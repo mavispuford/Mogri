@@ -8,6 +8,8 @@ namespace MobileDiffusion.ViewModels;
 
 internal partial class PromptDescriptorsPageViewModel : PageViewModel, IPromptDescriptorsPageViewModel
 {
+    private List<PromptDescriptorGroup> _allDescriptorGroups = new();
+
     [ObservableProperty]
     private List<PromptDescriptorGroup> _descriptorGroups = new();
 
@@ -21,7 +23,7 @@ internal partial class PromptDescriptorsPageViewModel : PageViewModel, IPromptDe
 
     private void PopulateDescriptors()
     {
-        DescriptorGroups.Add(new PromptDescriptorGroup("Artists", new List<PromptDescriptor>
+        _allDescriptorGroups.Add(new PromptDescriptorGroup("Artists", new List<PromptDescriptor>
         {
             new PromptDescriptor
             {
@@ -67,7 +69,7 @@ internal partial class PromptDescriptorsPageViewModel : PageViewModel, IPromptDe
             }
         }));
 
-        DescriptorGroups.Add(new PromptDescriptorGroup("Art Genres/Movements", new List<PromptDescriptor>
+        _allDescriptorGroups.Add(new PromptDescriptorGroup("Art Genres/Movements", new List<PromptDescriptor>
         {
             new PromptDescriptor
             {
@@ -176,7 +178,7 @@ internal partial class PromptDescriptorsPageViewModel : PageViewModel, IPromptDe
             }
         }));
 
-        DescriptorGroups.Add(new PromptDescriptorGroup("Genres/Moods", new List<PromptDescriptor>
+        _allDescriptorGroups.Add(new PromptDescriptorGroup("Genres/Moods", new List<PromptDescriptor>
         {
             new PromptDescriptor
             {
@@ -195,6 +197,8 @@ internal partial class PromptDescriptorsPageViewModel : PageViewModel, IPromptDe
                 Text = Constants.Descriptors.Fantasy
             }
         }));
+
+        DescriptorGroups = _allDescriptorGroups.ToList();
     }
 
     public override void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -238,5 +242,32 @@ internal partial class PromptDescriptorsPageViewModel : PageViewModel, IPromptDe
         {
             await Cancel();
         }
+    }
+
+    [RelayCommand]
+    private async Task Filter(string filter)
+    {
+        var groups = await Task.Run(() =>
+        {
+            var filteredGroups = new List<PromptDescriptorGroup>();
+
+            foreach (var group in _allDescriptorGroups)
+            {
+                var matches = group.Where(p =>
+                    p.Text.Contains(filter, StringComparison.OrdinalIgnoreCase) ||
+                    (p.Tags != null && p.Tags.Any(t => t.Contains(filter, StringComparison.OrdinalIgnoreCase))));
+
+                if (matches.Any())
+                {
+                    var filteredGroup = new PromptDescriptorGroup(group.Name, matches.ToList());
+
+                    filteredGroups.Add(filteredGroup);
+                }
+            }
+
+            return filteredGroups;
+        });
+
+        DescriptorGroups = groups;
     }
 }
