@@ -41,23 +41,22 @@
             </Image.Source>
         </Image>
 
-        <Border Grid.Row="0"
-                Grid.Column="1">
-            <Border.StrokeShape>
-                <RoundRectangle CornerRadius="10" />
-            </Border.StrokeShape>
-            <Entry x:Name="FilterBar" 
-                   HorizontalOptions="FillAndExpand"
-                   Margin="10,0">
-                <Entry.Behaviors>
-                    <toolkit:EventToCommandBehavior
+        <Entry Grid.Row="0"
+               Grid.Column="1"
+               x:Name="FilterBar" 
+               HorizontalOptions="FillAndExpand"
+               Margin="10,0">
+            <Entry.Background>
+                <SolidColorBrush Color="Transparent"/>
+            </Entry.Background>
+            <Entry.Behaviors>
+                <toolkit:EventToCommandBehavior
                         EventName="TextChanged"
                         Command="{Binding FilterCommand}"
                         CommandParameter="{Binding Source={x:Reference FilterBar}, Path=Text}"/>
-                </Entry.Behaviors>
-            </Entry>
-        </Border>
-        
+            </Entry.Behaviors>
+        </Entry>
+
         <CollectionView x:Name="DescriptorCollectionView"
                         Grid.Row="1"
                         Grid.Column="0"
