@@ -11,7 +11,7 @@ using SkiaSharp.Views.Maui.Controls;
 
 namespace MobileDiffusion.ViewModels;
 
-public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
+public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 {
     private readonly IFileService _fileService;
     private readonly IImageService _imageService;
@@ -61,7 +61,7 @@ public partial class MaskPageViewModel : PageViewModel, IMaskPageViewModel
     [ObservableProperty]
     private IAsyncRelayCommand prepareForSavingCommand;
 
-    public MaskPageViewModel(
+    public CanvasPageViewModel(
         IFileService fileService,
         IPopupService popupService,
         IImageService imageService)

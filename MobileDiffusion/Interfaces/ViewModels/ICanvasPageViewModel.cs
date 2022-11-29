@@ -5,7 +5,7 @@ using SkiaSharp.Views.Maui.Controls;
 
 namespace MobileDiffusion.Interfaces.ViewModels
 {
-    public interface IMaskPageViewModel : IPageViewModel
+    public interface ICanvasPageViewModel : IPageViewModel
     {
         Color CurrentColor { get; set; }
 

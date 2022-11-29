@@ -353,7 +353,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
                 { NavigationParams.AppShareContentType, contentType }
             };
 
-            await Shell.Current.GoToAsync("///MaskPageTab", parameters);
+            await Shell.Current.GoToAsync("///CanvasPageTab", parameters);
         }
     }
 
@@ -439,7 +439,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
                 {NavigationParams.CanvasImageString, canvasImage}
             };
 
-        await Shell.Current.GoToAsync("///MaskPageTab", parameters);
+        await Shell.Current.GoToAsync("///CanvasPageTab", parameters);
     }
 
     private void updateHasInitImage()

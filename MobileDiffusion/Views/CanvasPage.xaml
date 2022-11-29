@@ -5,9 +5,9 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels" 
              xmlns:views="clr-namespace:MobileDiffusion.Views" 
-             x:Class="MobileDiffusion.Views.MaskPage"
+             x:Class="MobileDiffusion.Views.CanvasPage"
              Title="Masking Page"
-             x:DataType="viewModels:IMaskPageViewModel">
+             x:DataType="viewModels:ICanvasPageViewModel">
     <Shell.TitleView>
         <HorizontalStackLayout x:Name="TitleViewLayout"
                                Spacing="20"
@@ -106,7 +106,7 @@
             </Border.StrokeShape>
             <VerticalStackLayout Spacing="0" Padding="20">
 
-                <Label Text="{Binding Source={RelativeSource AncestorType={x:Type views:MaskPage}}, Path=CurrentBrushSize, StringFormat='Size: {0:F0}'}"
+                <Label Text="{Binding Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, Path=CurrentBrushSize, StringFormat='Size: {0:F0}'}"
                        TextColor="White"
                        FontAttributes="Bold"
                        HorizontalOptions="Center"/>
@@ -115,7 +115,7 @@
                         HeightRequest="40"
                         Minimum="1"
                         Maximum="50"
-                        Value="{Binding Source={RelativeSource AncestorType={x:Type views:MaskPage}}, Path=CurrentBrushSize}" />
+                        Value="{Binding Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, Path=CurrentBrushSize}" />
 
             </VerticalStackLayout>
         </Border>
@@ -132,7 +132,7 @@
             </Border.StrokeShape>
             <VerticalStackLayout Spacing="0" Padding="20">
 
-                <Label Text="{Binding Source={RelativeSource AncestorType={x:Type views:MaskPage}}, Path=CurrentAlpha, StringFormat='Alpha: {0:F1}'}"
+                <Label Text="{Binding Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, Path=CurrentAlpha, StringFormat='Alpha: {0:F1}'}"
                        TextColor="White"
                        FontAttributes="Bold"
                        HorizontalOptions="Center"/>
@@ -141,7 +141,7 @@
                         HeightRequest="40"
                         Minimum="0"
                         Maximum=".9"
-                        Value="{Binding Source={RelativeSource AncestorType={x:Type views:MaskPage}}, Path=CurrentAlpha}" />
+                        Value="{Binding Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, Path=CurrentAlpha}" />
 
             </VerticalStackLayout>
         </Border>
@@ -193,9 +193,9 @@
 
                     <Ellipse HorizontalOptions="Center"
                              VerticalOptions="Center"
-                             HeightRequest="{Binding Source={RelativeSource AncestorType={x:Type views:MaskPage}}, Path=CurrentBrushSize}"
-                             WidthRequest="{Binding Source={RelativeSource AncestorType={x:Type views:MaskPage}}, Path=CurrentBrushSize}"
-                             Opacity="{Binding Source={RelativeSource AncestorType={x:Type views:MaskPage}}, Path=CurrentAlpha}"
+                             HeightRequest="{Binding Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, Path=CurrentBrushSize}"
+                             WidthRequest="{Binding Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, Path=CurrentBrushSize}"
+                             Opacity="{Binding Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, Path=CurrentAlpha}"
                              Fill="{Binding CurrentColor}"
                              StrokeThickness="0"/>
 
