@@ -10,7 +10,7 @@ public static class ViewRegistrations
         registerPage<IMainPageViewModel, MainPage>(builder.Services);
         registerPage<IPromptSettingsPageViewModel, PromptSettingsPage>(builder.Services);
         registerPage<IImageToImageSettingsPageViewModel, ImageToImageSettingsPage>(builder.Services);
-        registerPage<IMaskPageViewModel, MaskPage>(builder.Services);
+        registerPage<ICanvasPageViewModel, CanvasPage>(builder.Services);
         registerPage<IAppSettingsPageViewModel, AppSettingsPage>(builder.Services);
         registerPage<IPromptDescriptorsPageViewModel, PromptDescriptorsPage>(builder.Services);
 

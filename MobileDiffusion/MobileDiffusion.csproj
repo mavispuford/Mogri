@@ -65,6 +65,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Views\CanvasPage.xaml.cs">
+	    <DependentUpon>CanvasPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\PromptDescriptorsPage.xaml.cs">
 	    <DependentUpon>PromptDescriptorsPage.xaml</DependentUpon>
 	  </Compile>
@@ -83,8 +86,8 @@
 	  <Compile Update="Views\Popups\ResultItemPopup.xaml.cs">
 	    <DependentUpon>ResultItemPopup.xaml</DependentUpon>
 	  </Compile>
-	  <Compile Update="Views\MaskPage.xaml.cs">
-	    <DependentUpon>MaskPage.xaml</DependentUpon>
+	  <Compile Update="Views\CanvasPage.xaml.cs">
+	    <DependentUpon>CanvasPage.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 
@@ -110,7 +113,7 @@
 	  <MauiXaml Update="Views\PromptSettingsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\MaskPage.xaml">
+	  <MauiXaml Update="Views\CanvasPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>

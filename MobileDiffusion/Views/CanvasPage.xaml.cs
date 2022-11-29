@@ -7,7 +7,7 @@ using SkiaSharp.Views.Maui;
 
 namespace MobileDiffusion.Views;
 
-public partial class MaskPage : ContentPage
+public partial class CanvasPage : ContentPage
 {
     private MaskLine _currentLine;
     private Timer _brushSizeTimer;
@@ -75,56 +75,56 @@ public partial class MaskPage : ContentPage
         set => SetValue(InitImgRectangleScaleProperty, value);
     }
 
-    public static BindableProperty BitmapProperty = BindableProperty.Create(nameof(Bitmap), typeof(SKBitmap), typeof(MaskPage), propertyChanged: (bindable, oldValue, newValue) =>
+    public static BindableProperty BitmapProperty = BindableProperty.Create(nameof(Bitmap), typeof(SKBitmap), typeof(CanvasPage), propertyChanged: (bindable, oldValue, newValue) =>
     {
-        ((MaskPage)bindable).OnSourceBitmapChanged();
+        ((CanvasPage)bindable).OnSourceBitmapChanged();
     });
 
-    public static BindableProperty CurrentBrushSizeProperty = BindableProperty.Create(nameof(CurrentBrushSize), typeof(float), typeof(MaskPage), 10f, propertyChanged: (bindable, oldValue, newValue) =>
+    public static BindableProperty CurrentBrushSizeProperty = BindableProperty.Create(nameof(CurrentBrushSize), typeof(float), typeof(CanvasPage), 10f, propertyChanged: (bindable, oldValue, newValue) =>
     {
-        ((MaskPage)bindable).AutoHideBrushSizeSlider();
+        ((CanvasPage)bindable).AutoHideBrushSizeSlider();
     });
 
-    public static BindableProperty CurrentAlphaProperty = BindableProperty.Create(nameof(CurrentAlpha), typeof(float), typeof(MaskPage), .5f, propertyChanged: (bindable, oldValue, newValue) =>
+    public static BindableProperty CurrentAlphaProperty = BindableProperty.Create(nameof(CurrentAlpha), typeof(float), typeof(CanvasPage), .5f, propertyChanged: (bindable, oldValue, newValue) =>
     {
-        ((MaskPage)bindable).AutoHideAlphaSlider();
+        ((CanvasPage)bindable).AutoHideAlphaSlider();
     });
 
-    public static BindableProperty CurrentColorProperty = BindableProperty.Create(nameof(CurrentColor), typeof(Color), typeof(MaskPage), Colors.Black);
+    public static BindableProperty CurrentColorProperty = BindableProperty.Create(nameof(CurrentColor), typeof(Color), typeof(CanvasPage), Colors.Black);
 
-    public static BindableProperty InitImgRectangleProperty = BindableProperty.Create(nameof(InitImgRectangle), typeof(SKRect), typeof(MaskPage), default(SKRect));
+    public static BindableProperty InitImgRectangleProperty = BindableProperty.Create(nameof(InitImgRectangle), typeof(SKRect), typeof(CanvasPage), default(SKRect));
 
-    public static BindableProperty InitImgRectangleScaleProperty = BindableProperty.Create(nameof(InitImgRectangleScale), typeof(double), typeof(MaskPage), 1d);
+    public static BindableProperty InitImgRectangleScaleProperty = BindableProperty.Create(nameof(InitImgRectangleScale), typeof(double), typeof(CanvasPage), 1d);
 
-    public static BindableProperty InitImgRectangleSizeProperty = BindableProperty.Create(nameof(InitImgRectangleSize), typeof(float), typeof(MaskPage), 256f, propertyChanged: (bindable, oldValue, newValue) =>
+    public static BindableProperty InitImgRectangleSizeProperty = BindableProperty.Create(nameof(InitImgRectangleSize), typeof(float), typeof(CanvasPage), 256f, propertyChanged: (bindable, oldValue, newValue) =>
     {
-        ((MaskPage)bindable).UpdateInitImgRectangle(true);
+        ((CanvasPage)bindable).UpdateInitImgRectangle(true);
     });
 
-    public static BindableProperty LinesProperty = BindableProperty.Create(nameof(Lines), typeof(List<MaskLine>), typeof(MaskPage), default(List<MaskLine>), propertyChanged: (bindable, oldValue, newValue) =>
+    public static BindableProperty LinesProperty = BindableProperty.Create(nameof(Lines), typeof(List<MaskLine>), typeof(CanvasPage), default(List<MaskLine>), propertyChanged: (bindable, oldValue, newValue) =>
     {
-        ((MaskPage)bindable).OnLinesChanged();
+        ((CanvasPage)bindable).OnLinesChanged();
     });
 
-    public static BindableProperty PrepareForSavingCommandProperty = BindableProperty.Create(nameof(PrepareForSavingCommand), typeof(IAsyncRelayCommand), typeof(MaskPage), default(IAsyncRelayCommand));
+    public static BindableProperty PrepareForSavingCommandProperty = BindableProperty.Create(nameof(PrepareForSavingCommand), typeof(IAsyncRelayCommand), typeof(CanvasPage), default(IAsyncRelayCommand));
 
-    public static BindableProperty ShowInitImgRectangleProperty = BindableProperty.Create(nameof(ShowInitImgRectangle), typeof(bool), typeof(MaskPage), false, propertyChanged: (bindable, oldValue, newValue) =>
+    public static BindableProperty ShowInitImgRectangleProperty = BindableProperty.Create(nameof(ShowInitImgRectangle), typeof(bool), typeof(CanvasPage), false, propertyChanged: (bindable, oldValue, newValue) =>
     {
-        ((MaskPage)bindable).UpdateInitImgRectangle(false);
+        ((CanvasPage)bindable).UpdateInitImgRectangle(false);
     });
 
-    public MaskPage()
+    public CanvasPage()
     {
         InitializeComponent();
 
-        this.SetBinding(BitmapProperty, nameof(IMaskPageViewModel.SourceBitmap));
-        this.SetBinding(CurrentColorProperty, nameof(IMaskPageViewModel.CurrentColor));
-        this.SetBinding(LinesProperty, nameof(IMaskPageViewModel.Lines), BindingMode.TwoWay);
-        this.SetBinding(InitImgRectangleProperty, nameof(IMaskPageViewModel.InitImgRectangle), BindingMode.OneWayToSource);
-        this.SetBinding(ShowInitImgRectangleProperty, nameof(IMaskPageViewModel.ShowInitImgRectangle), BindingMode.TwoWay);
-        this.SetBinding(PrepareForSavingCommandProperty, nameof(IMaskPageViewModel.PrepareForSavingCommand), BindingMode.OneWayToSource);
-        this.SetBinding(InitImgRectangleScaleProperty, nameof(IMaskPageViewModel.InitImgRectangleScale), BindingMode.OneWayToSource);
-        this.SetBinding(InitImgRectangleSizeProperty, nameof(IMaskPageViewModel.InitImgRectangleSize), BindingMode.OneWay);
+        this.SetBinding(BitmapProperty, nameof(ICanvasPageViewModel.SourceBitmap));
+        this.SetBinding(CurrentColorProperty, nameof(ICanvasPageViewModel.CurrentColor));
+        this.SetBinding(LinesProperty, nameof(ICanvasPageViewModel.Lines), BindingMode.TwoWay);
+        this.SetBinding(InitImgRectangleProperty, nameof(ICanvasPageViewModel.InitImgRectangle), BindingMode.OneWayToSource);
+        this.SetBinding(ShowInitImgRectangleProperty, nameof(ICanvasPageViewModel.ShowInitImgRectangle), BindingMode.TwoWay);
+        this.SetBinding(PrepareForSavingCommandProperty, nameof(ICanvasPageViewModel.PrepareForSavingCommand), BindingMode.OneWayToSource);
+        this.SetBinding(InitImgRectangleScaleProperty, nameof(ICanvasPageViewModel.InitImgRectangleScale), BindingMode.OneWayToSource);
+        this.SetBinding(InitImgRectangleSizeProperty, nameof(ICanvasPageViewModel.InitImgRectangleSize), BindingMode.OneWay);
 
         PrepareForSavingCommand = new AsyncRelayCommand<IAsyncRelayCommand>(PrepareForSaving);
 
@@ -140,7 +140,7 @@ public partial class MaskPage : ContentPage
     {
         base.OnBindingContextChanged();
 
-        if (BindingContext is IMaskPageViewModel pageViewModel)
+        if (BindingContext is ICanvasPageViewModel pageViewModel)
         {
             pageViewModel.SourceCanvasView = SourceImageCanvasView;
             pageViewModel.MaskCanvasView = MaskCanvasView;

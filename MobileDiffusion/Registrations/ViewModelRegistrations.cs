@@ -10,7 +10,7 @@ public static class ViewModelRegistrations
         builder.Services.AddTransient<IColorPickerPopupViewModel, ColorPickerPopupViewModel>();
         builder.Services.AddTransient<IImageToImageSettingsPageViewModel, ImageToImageSettingsPageViewModel>();
         builder.Services.AddTransient<IMainPageViewModel, MainPageViewModel>();
-        builder.Services.AddTransient<IMaskPageViewModel, MaskPageViewModel>();
+        builder.Services.AddTransient<ICanvasPageViewModel, CanvasPageViewModel>();
         builder.Services.AddTransient<IPromptSettingsPageViewModel, PromptSettingsPageViewModel>();
         builder.Services.AddTransient<IResultItemPopupViewModel, ResultItemPopupViewModel>();
         builder.Services.AddTransient<IResultItemViewModel, ResultItemViewModel>();

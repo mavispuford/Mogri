@@ -14,8 +14,8 @@
         </Tab>
         <Tab Title="Canvas"
              Icon="image"
-             Route="MaskPageTab">
-            <ShellContent ContentTemplate="{DataTemplate views:MaskPage}" />
+             Route="CanvasPageTab">
+            <ShellContent ContentTemplate="{DataTemplate views:CanvasPage}" />
         </Tab>
     </TabBar>
 
