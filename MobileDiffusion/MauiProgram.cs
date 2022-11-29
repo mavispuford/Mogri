@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Maui;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 using MobileDiffusion.Registrations;
+using Microsoft.Maui.Platform;
 
 namespace MobileDiffusion;
 
@@ -26,6 +27,16 @@ public static class MauiProgram
 			.RegisterPopups();
 
         builder.Services.AddSingleton(DeviceDisplay.Current);
+
+#if ANDROID
+		Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("NoUnderline", (h, v) => { 
+			h.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Colors.Transparent.ToPlatform());
+		});
+
+        Microsoft.Maui.Handlers.EditorHandler.Mapper.AppendToMapping("NoUnderline", (h, v) => {
+            h.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Colors.Transparent.ToPlatform());
+        });
+#endif
 
         return builder.Build();
 	}
