@@ -38,6 +38,16 @@ internal partial class PromptDescriptorsPageViewModel : PageViewModel, IPromptDe
             },
             new PromptDescriptor
             {
+                Text = Constants.Descriptors.Banksy,
+                Tags = new List<string>
+                {
+                    Constants.Descriptors.StreetArt,
+                    Constants.Descriptors.Iconic,
+                    Constants.Descriptors.Popular
+                }
+            },
+            new PromptDescriptor
+            {
                 Text = Constants.Descriptors.GregRutkowski,
                 Tags = new List<string>
                 {
@@ -45,6 +55,16 @@ internal partial class PromptDescriptorsPageViewModel : PageViewModel, IPromptDe
                     Constants.Descriptors.Fantasy,
                     Constants.Descriptors.Digital2D,
                     Constants.Descriptors.Digital3D
+                }
+            },
+            new PromptDescriptor
+            {
+                Text = Constants.Descriptors.TimBurton,
+                Tags = new List<string>
+                {
+                    Constants.Descriptors.Expressionism,
+                    Constants.Descriptors.Macabre,
+                    Constants.Descriptors.Horror,
                 }
             },
             new PromptDescriptor
@@ -178,7 +198,7 @@ internal partial class PromptDescriptorsPageViewModel : PageViewModel, IPromptDe
             }
         }));
 
-        _allDescriptorGroups.Add(new PromptDescriptorGroup("Genres/Moods", new List<PromptDescriptor>
+        _allDescriptorGroups.Add(new PromptDescriptorGroup("Entertainment Genres", new List<PromptDescriptor>
         {
             new PromptDescriptor
             {
@@ -190,12 +210,108 @@ internal partial class PromptDescriptorsPageViewModel : PageViewModel, IPromptDe
             },
             new PromptDescriptor
             {
-                Text = Constants.Descriptors.Horror
+                Text = Constants.Descriptors.Animation
+            },
+            new PromptDescriptor
+            {
+                Text = Constants.Descriptors.Apocalypse
+            },
+            new PromptDescriptor
+            {
+                Text = Constants.Descriptors.Biopic
+            },
+            new PromptDescriptor
+            {
+                Text = Constants.Descriptors.Claymation
+            },
+            new PromptDescriptor
+            {
+                Text = Constants.Descriptors.Comedy
+            },
+            new PromptDescriptor
+            {
+                Text = Constants.Descriptors.Crime
+            },
+            new PromptDescriptor
+            {
+                Text = Constants.Descriptors.Documentary
+            },
+            new PromptDescriptor
+            {
+                Text = Constants.Descriptors.Drama
+            },
+            new PromptDescriptor
+            {
+                Text = Constants.Descriptors.Experimental
             },
             new PromptDescriptor
             {
                 Text = Constants.Descriptors.Fantasy
-            }
+            },
+            new PromptDescriptor
+            {
+                Text = Constants.Descriptors.Fiction
+            },
+            new PromptDescriptor
+            {
+                Text = Constants.Descriptors.Historical
+            },
+            new PromptDescriptor
+            {
+                Text = Constants.Descriptors.Horror
+            },
+            new PromptDescriptor
+            {
+                Text = Constants.Descriptors.MartialArts
+            },
+            new PromptDescriptor
+            {
+                Text = Constants.Descriptors.Musical
+            },
+            new PromptDescriptor
+            {
+                Text = Constants.Descriptors.Mystery
+            },
+            new PromptDescriptor
+            {
+                Text = Constants.Descriptors.Opera
+            },
+            new PromptDescriptor
+            {
+                Text = Constants.Descriptors.Psychological
+            },
+            new PromptDescriptor
+            {
+                Text = Constants.Descriptors.Romance
+            },
+            new PromptDescriptor
+            {
+                Text = Constants.Descriptors.RomCom
+            },
+            new PromptDescriptor
+            {
+                Text = Constants.Descriptors.Satire
+            },
+            new PromptDescriptor
+            {
+                Text = Constants.Descriptors.ScienceFiction
+            },
+            new PromptDescriptor
+            {
+                Text = Constants.Descriptors.Sports
+            },
+            new PromptDescriptor
+            {
+                Text = Constants.Descriptors.Thriller
+            },
+            new PromptDescriptor
+            {
+                Text = Constants.Descriptors.Western
+            },
+            new PromptDescriptor
+            {
+                Text = Constants.Descriptors.WarDrama
+            },
         }));
 
         DescriptorGroups = _allDescriptorGroups.ToList();

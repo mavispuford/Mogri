@@ -24,9 +24,11 @@ public static class Constants
         #region Artists
 
         public const string AndyWarhol = "Andy Warhol";
+        public const string Banksy = "Banksy";
         public const string GregRutkowski = "Greg Rutkowski";
         public const string SalvadorDali = "Salvador Dalí";
         public const string StephenGammell = "Stephen Gammell";
+        public const string TimBurton = "Tim Burton";
         public const string TimJacobus = "Tim Jacobus";
 
         #endregion
@@ -46,14 +48,38 @@ public static class Constants
 
         #endregion
 
-        #region Genres
+        #region Entertainment Genres
 
         public const string Action = nameof(Action);
         public const string Adventure = nameof(Adventure);
-        public const string Horror = nameof(Horror);
+        public const string Animation = nameof(Animation);
+        public const string Apocalypse = nameof(Apocalypse);
+        public const string Biopic = nameof(Biopic);
+        public const string Claymation = nameof(Claymation);
+        public const string Comedy = nameof(Comedy);
+        public const string Crime = nameof(Crime);
+        public const string Documentary = nameof(Documentary);
+        public const string Drama = nameof(Drama);
+        public const string Experimental = nameof(Experimental);
         public const string Fantasy = nameof(Fantasy);
+        public const string Fiction = nameof(Fiction);
+        public const string Historical = nameof(Historical);
+        public const string Horror = nameof(Horror);
+        public const string MartialArts = "Martial Arts";
+        public const string Musical = nameof(Musical);
+        public const string Mystery = nameof(Mystery);
+        public const string Opera = nameof(Opera);
+        public const string Psychological = nameof(Psychological);
+        public const string Romance = nameof(Romance);
+        public const string RomCom = "Romantic Comedy";
+        public const string Satire = nameof(Satire);
+        public const string ScienceFiction = "Science Fiction";
+        public const string Sports = nameof(Sports);
+        public const string Thriller = nameof(Thriller);
+        public const string Western = nameof(Western);
+        public const string WarDrama = "War Drama";
 
-        #endregion Genres
+        #endregion Entertainment Genres
 
         #region 2D Mediums
 
@@ -87,6 +113,7 @@ public static class Constants
         public const string Assemblage = nameof(Assemblage);
         public const string Collages = nameof(Collages);
         public const string FoundObjects = "Found Objects";
+        public const string StreetArt = "Street Art";
 
         #endregion Mixed Mediums
 
@@ -129,9 +156,9 @@ public static class Constants
         public const string Intense = nameof(Intense);
         public const string Interpretation = nameof(Interpretation);
         public const string LightAndShadow = "Light and shadow";
+        public const string Macabre = nameof(Macabre);
         public const string Nostalgia = nameof(Nostalgia);
         public const string Popular = nameof(Popular);
-        public const string Psychological = nameof(Psychological);
         public const string Randomized = nameof(Randomized);
         public const string Reality = nameof(Reality);
         public const string Spiritual = nameof(Spiritual);

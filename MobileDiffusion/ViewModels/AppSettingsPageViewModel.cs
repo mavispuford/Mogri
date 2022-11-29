@@ -1,5 +1,4 @@
-﻿using Android.Hardware.Lights;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.ViewModels;
 

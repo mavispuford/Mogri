@@ -12,7 +12,7 @@
              Route="MainPageTab">
             <ShellContent ContentTemplate="{DataTemplate views:MainPage}" />
         </Tab>
-        <Tab Title="Masking"
+        <Tab Title="Canvas"
              Icon="image"
              Route="MaskPageTab">
             <ShellContent ContentTemplate="{DataTemplate views:MaskPage}" />
