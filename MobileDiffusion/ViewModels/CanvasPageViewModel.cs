@@ -78,6 +78,22 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         }
     }
 
+    partial void OnCurrentColorChanged(Color value)
+    {
+        if (value != null)
+        {
+            PaletteIconColor = value.GetLuminosity() > .8 ? _paletteIconDarkColor : Colors.White;
+        }
+    }
+
+    partial void OnSourceBitmapChanged(SKBitmap value)
+    {
+        if (value != null)
+        {
+            _colorPalette = ExtractColorPalette(value, 30);
+        }
+    }
+
     [RelayCommand]
     private async Task SaveMask()
     {
@@ -309,8 +325,6 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                     Lines = mask.Lines;
                 });
             }
-
-            _colorPalette = ExtractColorPalette(SourceBitmap, 30);
         }
         catch (Exception ex)
         {
@@ -332,13 +346,12 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             { NavigationParams.Color, CurrentColor },
             { NavigationParams.ColorPalette, _colorPalette },
         };
+
         var color = await _popupService.ShowPopupAsync("ColorPickerPopup", parameters) as Color;
 
         if (color != null)
         {
             CurrentColor = color;
-
-            PaletteIconColor = CurrentColor.GetLuminosity() > .8 ? _paletteIconDarkColor : Colors.White;
         }
     }
 
