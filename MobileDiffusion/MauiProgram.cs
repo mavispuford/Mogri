@@ -2,6 +2,7 @@
 using SkiaSharp.Views.Maui.Controls.Hosting;
 using MobileDiffusion.Registrations;
 using Microsoft.Maui.Platform;
+using Microsoft.Maui.Handlers;
 
 namespace MobileDiffusion;
 
@@ -29,16 +30,26 @@ public static class MauiProgram
         builder.Services.AddSingleton(DeviceDisplay.Current);
 
 #if ANDROID
-		Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("NoUnderline", (h, v) => { 
+		EntryHandler.Mapper.AppendToMapping("NoUnderline", (h, v) => 
+		{ 
 			h.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Colors.Transparent.ToPlatform());
 		});
 
-        Microsoft.Maui.Handlers.EditorHandler.Mapper.AppendToMapping("NoUnderline", (h, v) => {
+        EditorHandler.Mapper.AppendToMapping("NoUnderline", (h, v) => 
+		{
             h.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Colors.Transparent.ToPlatform());
         });
 
-        Microsoft.Maui.Handlers.PickerHandler.Mapper.AppendToMapping("NoUnderline", (h, v) => {
+        PickerHandler.Mapper.AppendToMapping("NoUnderline", (h, v) => 
+		{
             h.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Colors.Transparent.ToPlatform());
+        });
+
+        // Workaround for bug:
+        // https://github.com/dotnet/maui/issues/9011#issuecomment-1333534818
+        ImageHandler.Mapper.PrependToMapping("Fix Bug 9011", (h, v) =>
+		{
+            h.PlatformView?.Clear();
         });
 #endif
 
