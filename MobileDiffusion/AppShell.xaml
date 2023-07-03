@@ -7,7 +7,7 @@
     Shell.FlyoutBehavior="Disabled">
 
     <TabBar Shell.TabBarUnselectedColor="{StaticResource IndependenceAccent}">
-        <Tab Title="Generation"
+        <Tab Title="Generate"
              Icon="article"
              Route="MainPageTab">
             <ShellContent ContentTemplate="{DataTemplate views:MainPage}" />
@@ -18,10 +18,5 @@
             <ShellContent ContentTemplate="{DataTemplate views:CanvasPage}" />
         </Tab>
     </TabBar>
-
-    <!--<ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate views:MainPage}"
-        Route="MainPage" />-->
 
 </Shell>

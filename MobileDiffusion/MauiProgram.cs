@@ -1,8 +1,8 @@
 ﻿using CommunityToolkit.Maui;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 using MobileDiffusion.Registrations;
-using Microsoft.Maui.Platform;
 using Microsoft.Maui.Handlers;
+using Microsoft.Maui.Platform;
 
 namespace MobileDiffusion;
 
@@ -43,13 +43,6 @@ public static class MauiProgram
         PickerHandler.Mapper.AppendToMapping("NoUnderline", (h, v) => 
 		{
             h.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Colors.Transparent.ToPlatform());
-        });
-
-        // Workaround for bug:
-        // https://github.com/dotnet/maui/issues/9011#issuecomment-1333534818
-        ImageHandler.Mapper.PrependToMapping("Fix Bug 9011", (h, v) =>
-		{
-            h.PlatformView?.Clear();
         });
 #endif
 
