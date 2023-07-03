@@ -7,7 +7,7 @@ using SkiaSharp.Views.Maui;
 
 namespace MobileDiffusion.Views;
 
-public partial class CanvasPage : ContentPage
+public partial class CanvasPage : BasePage
 {
     private MaskLine _currentLine;
     private Timer _brushSizeTimer;

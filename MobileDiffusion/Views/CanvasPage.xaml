@@ -1,71 +1,62 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
-             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels" 
-             xmlns:views="clr-namespace:MobileDiffusion.Views" 
-             x:Class="MobileDiffusion.Views.CanvasPage"
-             Title="Masking Page"
-             x:DataType="viewModels:ICanvasPageViewModel">
+<views:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
+                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+                xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels" 
+                xmlns:views="clr-namespace:MobileDiffusion.Views;assembly=MobileDiffusion" 
+                x:Class="MobileDiffusion.Views.CanvasPage"
+                x:DataType="viewModels:ICanvasPageViewModel">
+
     <Shell.TitleView>
         <HorizontalStackLayout x:Name="TitleViewLayout"
-                               Spacing="20"
+                               Spacing="30"
                                HorizontalOptions="Center"
-                               TranslationX="-9">
-            <ContentView VerticalOptions="FillAndExpand" WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
-                <ContentView.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding ShowMediaPickerCommand}" />
-                </ContentView.GestureRecognizers>
-                <Image HorizontalOptions="Center" VerticalOptions="Center">
-                    <Image.Source>
-                        <FontImageSource Glyph="&#xe43e;" FontFamily="MaterialIconsRoundRegular" Size="22" Color="White" />
-                    </Image.Source>
-                </Image>
-            </ContentView>
-            <ContentView VerticalOptions="FillAndExpand" WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
-                <ContentView.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="Undo_Button_Clicked" />
-                </ContentView.GestureRecognizers>
-                <Image HorizontalOptions="Center"
-                       VerticalOptions="Center">
-                    <Image.Source>
-                        <FontImageSource Glyph="&#xe166;" FontFamily="MaterialIconsRoundRegular" Size="22" Color="White" />
-                    </Image.Source>
-                </Image>
-            </ContentView>
-            <ContentView VerticalOptions="FillAndExpand" WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
-                <ContentView.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="Clear_Button_Clicked" />
-                </ContentView.GestureRecognizers>
-                <Image HorizontalOptions="Center" VerticalOptions="Center">
-                    <Image.Source>
-                        <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Size="22" Color="White" />
-                    </Image.Source>
-                </Image>
-            </ContentView>
-            <ContentView VerticalOptions="FillAndExpand" WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
-                <ContentView.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding SaveMaskCommand}" />
-                </ContentView.GestureRecognizers>
-                <Image HorizontalOptions="Center" VerticalOptions="Center">
-                    <Image.Source>
-                        <FontImageSource Glyph="&#xe161;" FontFamily="MaterialIconsRoundRegular" Size="22" Color="White" />
-                    </Image.Source>
-                </Image>
-            </ContentView>
-            <ContentView VerticalOptions="FillAndExpand" WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
-                <ContentView.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding SaveImageCommand}" />
-                </ContentView.GestureRecognizers>
-                <Image HorizontalOptions="Center" VerticalOptions="Center">
-                    <Image.Source>
-                        <FontImageSource Glyph="&#xe3f4;" FontFamily="MaterialIconsRoundRegular" Size="22" Color="White" />
-                    </Image.Source>
-                </Image>
-            </ContentView>
+                               TranslationX="{OnPlatform Default=0, Android=-9}">
+
+            <ImageButton ToolTipProperties.Text="Add Image"
+                         VerticalOptions="FillAndExpand"
+                         Command="{Binding ShowMediaPickerCommand}">
+                <ImageButton.Source>
+                    <FontImageSource Glyph="&#xe43e;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                </ImageButton.Source>
+            </ImageButton>
+
+            <ImageButton ToolTipProperties.Text="Undo"
+                         VerticalOptions="FillAndExpand"
+                         Clicked="Undo_Button_Clicked">
+                <ImageButton.Source>
+                    <FontImageSource Glyph="&#xe166;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                </ImageButton.Source>
+            </ImageButton>
+
+            <ImageButton ToolTipProperties.Text="Clear Paint"
+                         VerticalOptions="FillAndExpand"
+                         Clicked="Clear_Button_Clicked">
+                <ImageButton.Source>
+                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                </ImageButton.Source>
+            </ImageButton>
+
+            <ImageButton ToolTipProperties.Text="Save Mask"
+                         VerticalOptions="FillAndExpand"
+                         Command="{Binding SaveMaskCommand}">
+                <ImageButton.Source>
+                    <FontImageSource Glyph="&#xe161;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                </ImageButton.Source>
+            </ImageButton>
+
+            <ImageButton ToolTipProperties.Text="Save Image"
+                         VerticalOptions="FillAndExpand"
+                         Command="{Binding SaveImageCommand}">
+                <ImageButton.Source>
+                    <FontImageSource Glyph="&#xe3f4;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                </ImageButton.Source>
+            </ImageButton>
+
         </HorizontalStackLayout>
     </Shell.TitleView>
+
     <Grid Padding="30"
           RowSpacing="10"
           RowDefinitions="*,auto">
@@ -276,4 +267,4 @@
             
         </HorizontalStackLayout>
     </Grid>
-</ContentPage>
+</views:BasePage>
