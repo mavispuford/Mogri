@@ -1,7 +1,6 @@
 ﻿using MobileDiffusion.Models;
 using System.Net.Mime;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Text.Json;
 using MobileDiffusion.Models.LStein;
 using MobileDiffusion.Interfaces.Services;
@@ -33,7 +32,7 @@ namespace MobileDiffusion.Services
             return false;
         }
 
-        public async IAsyncEnumerable<LSteinResponseItem> SubmitTextToImageRequest(Settings settings)
+        public async IAsyncEnumerable<ApiResponse> SubmitTextToImageRequest(Settings settings)
         {
             if (settings == null)
             {
@@ -65,6 +64,21 @@ namespace MobileDiffusion.Services
                 return requestMessage;
             });
 
+            var apiResponse = new ApiResponse
+            {
+                StableDiffusionApi = Enums.StableDiffusionApi.InvokeAI
+            };
+
+            await foreach (var item in submitTextToImageRequestToInvokeAi(requestMessage))
+            {
+                apiResponse.ResponseObject = item;
+
+                yield return apiResponse;
+            }
+        }
+
+        private async IAsyncEnumerable<LSteinResponseItem> submitTextToImageRequestToInvokeAi(HttpRequestMessage requestMessage)
+        {
             var client = _httpClientFactory.CreateClient();
 
             using (var response = await client.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead))
@@ -77,7 +91,7 @@ namespace MobileDiffusion.Services
 
                 string line;
 
-                while ((line = await Task.Run(() => reader.ReadLine())) != null)
+                while ((line = await Task.Run(reader.ReadLine)) != null)
                 {
                     var responseItem = JsonSerializer.Deserialize<LSteinResponseItem>(line);
 
@@ -92,22 +106,29 @@ namespace MobileDiffusion.Services
             }
         }
 
-        public async Task<byte[]> GetImageBytesAsync(LSteinResponseItem responseItem)
+        public async Task<byte[]> GetImageBytesAsync(string url)
         {
-            if (string.IsNullOrEmpty(responseItem?.Url))
+            if (string.IsNullOrEmpty(url))
             {
-                throw new ArgumentNullException(nameof(responseItem));
+                throw new ArgumentNullException(nameof(url));
             }
 
             var client = _httpClientFactory.CreateClient();
 
             var baseUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
 
-            var imageResponse = await client.GetAsync($"{baseUrl}/{responseItem.Url.Replace("./", "/")}");
+            var imageResponse = await client.GetAsync($"{baseUrl}/{url.Replace("./", "/")}");
 
             var imageBytes = await imageResponse.Content.ReadAsByteArrayAsync();
 
             return imageBytes;
+        }
+
+        public Task RefreshResources()
+        {
+            // Not implemented...
+
+            return Task.CompletedTask;
         }
     }
 }
