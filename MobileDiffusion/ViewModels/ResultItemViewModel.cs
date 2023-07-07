@@ -2,7 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
-using MobileDiffusion.Models.LStein;
+using MobileDiffusion.Models;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -14,7 +14,10 @@ public partial class ResultItemViewModel : BaseViewModel, IResultItemViewModel
     private ImageSource imageSource;
 
     [ObservableProperty]
-    private LSteinResponseItem responseItem;
+    private Settings settings;
+
+    [ObservableProperty]
+    private ApiResponse apiResponse;
 
     [ObservableProperty]
     private string internalUri;
@@ -60,7 +63,7 @@ public partial class ResultItemViewModel : BaseViewModel, IResultItemViewModel
         }
 
         if (result.TryGetValue(NavigationParams.PromptSettings, out var settingsParam) &&
-            settingsParam is Models.Settings settings)
+            settingsParam is Settings settings)
         {
             SetSettingsCommand?.Execute(settings);
         }

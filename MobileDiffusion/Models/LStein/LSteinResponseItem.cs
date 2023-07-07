@@ -1,27 +1,136 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using MobileDiffusion.Enums;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
-namespace MobileDiffusion.Models.LStein
+namespace MobileDiffusion.Models.LStein;
+
+public class LSteinResponseItem
 {
-    public class LSteinResponseItem
+    [JsonPropertyName("event")]
+    public string Event { get; set; }
+
+    [JsonPropertyName("url")]
+    public string Url { get; set; }
+
+    [JsonPropertyName("seed")]
+    public long Seed { get; set; }
+
+    [JsonPropertyName("step")]
+    public int Step { get; set; }
+
+    [JsonPropertyName("config")]
+    public LSteinConfig Config { get; set; }
+
+    public static Settings ToSettings(LSteinResponseItem responseItem)
     {
-        [JsonPropertyName("event")]
-        public string Event { get; set; }
+        if (responseItem == null)
+        {
+            return null;
+        }
 
-        [JsonPropertyName("url")]
-        public string Url { get; set; }
+        var config = responseItem.Config;
+        var defaultSettings = new Settings();
 
-        [JsonPropertyName("seed")]
-        public long Seed { get; set; }
+        var result = new Settings
+        {
+            InitImage = string.IsNullOrEmpty(config.Initimg) ? null : config.Initimg,
+            Mask = string.IsNullOrEmpty(config.Mask) ? null : config.Mask,
+            Prompt = config.Prompt,
+            Seed = responseItem.Seed,
+        };
 
-        [JsonPropertyName("step")]
-        public int Step { get; set; }
+        if (double.TryParse(config.CfgScale, out var guidanceScale))
+        {
+            result.GuidanceScale = guidanceScale;
+        }
 
-        [JsonPropertyName("config")]
-        public LSteinConfig Config { get; set; }
+        if (Enum.TryParse<OnOff>(config.Fit, out var fit))
+        {
+            result.Fit = fit;
+        }
+
+        if (double.TryParse(config.GfpganStrength, out var gfpganStrength))
+        {
+            result.GfpganStrength = gfpganStrength;
+            result.EnableGfpgan = gfpganStrength != 0;
+
+            if (!result.EnableGfpgan)
+            {
+                result.GfpganStrength = defaultSettings.GfpganStrength;
+            }
+        }
+
+        if (double.TryParse(config.Height, out var height))
+        {
+            result.Height = height;
+        }
+
+        if (Enum.TryParse<OnOff>(config.InvertMask, out var invertMask))
+        {
+            result.InvertMask = invertMask;
+        }
+
+        if (int.TryParse(config.Iterations, out var numOutputs))
+        {
+            result.NumOutputs = numOutputs;
+        }
+
+        if (Enum.TryParse<Sampler>(config.SamplerName, out var sampler))
+        {
+            result.Sampler = sampler;
+        }
+
+        if (Enum.TryParse<OnOff>(config.Seamless, out var seamless))
+        {
+            result.Seamless = seamless;
+        }
+
+        if (int.TryParse(config.Steps, out var numInferenceSteps))
+        {
+            result.NumInferenceSteps = numInferenceSteps;
+        }
+
+        if (double.TryParse(config.Strength, out var strength))
+        {
+            result.PromptStrength = strength;
+        }
+
+        if (int.TryParse(config.UpscaleLevel, out var upscaleLevel))
+        {
+            result.UpscaleLevel = upscaleLevel;
+            result.EnableUpscaling = upscaleLevel != 0;
+
+            if (!result.EnableUpscaling)
+            {
+                result.UpscaleLevel = defaultSettings.UpscaleLevel;
+            }
+        }
+
+        if (double.TryParse(config.UpscaleStrength, out var upscaleStrength))
+        {
+            result.UpscaleStrength = upscaleStrength;
+
+            if (!result.EnableUpscaling)
+            {
+                result.UpscaleStrength = defaultSettings.UpscaleStrength;
+            }
+        }
+
+        if (double.TryParse(config.VariationAmount, out var variationAmount))
+        {
+            result.VariationAmount = variationAmount;
+        }
+
+        if (double.TryParse(config.Width, out var width))
+        {
+            result.Width = width;
+        }
+
+        if (Enum.TryParse<OnOff>(config.WithVariations, out var withVariations))
+        {
+            result.WithVariations = withVariations;
+        }
+
+        return result;
     }
+
 }

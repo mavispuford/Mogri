@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using MobileDiffusion.Models.LStein;
+using MobileDiffusion.Models;
 
 namespace MobileDiffusion.Interfaces.ViewModels;
 
@@ -7,9 +7,11 @@ public interface IResultItemViewModel : IBaseViewModel
 {
     ImageSource ImageSource { get; set; }
 
+    Settings Settings { get; set; }
+
     string InternalUri { get; set; }
 
-    LSteinResponseItem ResponseItem { get; set; }
+    ApiResponse ApiResponse { get; set; }
 
     IAsyncRelayCommand TappedCommand { get; }
 

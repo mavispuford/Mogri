@@ -7,6 +7,10 @@ using System.Collections.ObjectModel;
 using SkiaSharp.Views.Maui.Controls;
 using SkiaSharp;
 using CommunityToolkit.Maui.Alerts;
+using MobileDiffusion.Models.LStein;
+using MobileDiffusion.Clients.Automatic1111;
+using Newtonsoft.Json;
+using MobileDiffusion.Json;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -17,7 +21,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
     private readonly IPopupService _popupService;
     private readonly IServiceProvider _serviceProvider;
     private readonly IImageService _imageService;
-    
+
     private Settings _settings = new();
     private string _resizedInitImage;
     private bool _initImageNeedsResize = true;
@@ -57,6 +61,21 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
+    }
+
+    public override async void OnNavigatedTo()
+    {
+        base.OnNavigatedTo();
+
+        try
+        {
+            // Wrap in a try/catch because this method is async void (any exceptions would blow up the app)
+            await Task.Run(_stableDiffusionService.RefreshResources);
+        }
+        catch (Exception e)
+        {
+            // TODO - Handle this
+        }
     }
 
     [RelayCommand]
@@ -125,71 +144,110 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
         try
         {
-            await foreach (var item in _stableDiffusionService.SubmitTextToImageRequest(settings))
+            await foreach (var response in _stableDiffusionService.SubmitTextToImageRequest(settings))
             {
-                if (item.Event.Equals("step", StringComparison.OrdinalIgnoreCase))
+                if (response.StableDiffusionApi == Enums.StableDiffusionApi.InvokeAI)
                 {
-                    if (string.IsNullOrEmpty(settings.InitImage))
+                    var item = response.ResponseObject as LSteinResponseItem;
+
+                    if (item.Event.Equals("step", StringComparison.OrdinalIgnoreCase))
                     {
-                        _targetProgress = item.Step / (float)(settings.NumInferenceSteps);
-                    }
-                    else
-                    {
-                        _targetProgress = item.Step / (float)(settings.NumInferenceSteps * settings.PromptStrength);
-                    }
+                        float progress = 0f;
 
-                    Shell.Current.CurrentPage.AbortAnimation("ProgressAnimation");
-                    
-                    var animation = new Animation(value =>
-                    {
-                        Progress = (float)value;
-                    }, Progress, _targetProgress, Easing.SinOut);
-
-                    animation.Commit(Shell.Current.CurrentPage, "ProgressAnimation", length: 250);
-
-                    continue;
-                }
-
-                var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{item.Seed}-{DateTime.Now.Ticks}";
-
-                if (item.Event.Equals("result", StringComparison.OrdinalIgnoreCase))
-                {
-                    var result = Results.FirstOrDefault(r => r.ResponseItem == null);
-
-                    result.ResponseItem = item;
-
-                    await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
-                }
-                else if (item.Event.Equals("upscaling-started", StringComparison.OrdinalIgnoreCase))
-                {
-                    foreach (var result in Results)
-                    {
-                        result.IsLoading = true;
-                    }
-                }
-                else if (item.Event.Equals("upscaling-done", StringComparison.OrdinalIgnoreCase))
-                {
-                    foreach(var result in Results)
-                    {
-                        if (result != null)
+                        if (string.IsNullOrEmpty(settings.InitImage))
                         {
+                            progress = item.Step / (float)(settings.NumInferenceSteps);
+                        }
+                        else
+                        {
+                            progress = item.Step / (float)(settings.NumInferenceSteps * settings.PromptStrength);
+                        }
+
+                        reportProgress(progress);
+
+                        continue;
+                    }
+
+                    var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{item.Seed}-{DateTime.Now.Ticks}";
+
+                    if (item.Event.Equals("result", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var result = Results.FirstOrDefault(r => r.ApiResponse == null);
+
+                        result.ApiResponse = response;
+                        result.Settings = settings.Clone();
+
+                        await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
+                    }
+                    else if (item.Event.Equals("upscaling-started", StringComparison.OrdinalIgnoreCase))
+                    {
+                        foreach (var result in Results)
+                        {
+                            result.IsLoading = true;
+                        }
+                    }
+                    else if (item.Event.Equals("upscaling-done", StringComparison.OrdinalIgnoreCase))
+                    {
+                        foreach (var result in Results)
+                        {
+                            if (result != null)
+                            {
+                                await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
+                            }
+                        }
+                    }
+                }
+                else if (response.StableDiffusionApi == Enums.StableDiffusionApi.Automatic1111)
+                {
+                    reportProgress((float)response.Progress);
+
+                    if (response.ResponseObject is TextToImageResponse autoResponse)
+                    {
+                        var autoResponseInfo = JsonConvert.DeserializeObject<IDictionary<string, object>>(autoResponse.Info, new JsonSerializerSettings
+                        {
+                            ContractResolver = CustomContractResolver.Instance
+                        });
+
+                        foreach (var image in autoResponse.Images)
+                        {
+                            var seeds = autoResponseInfo["all_seeds"] as List<long>;
+                            var seedString = seeds?.ElementAt(imageNumber) ?? settings.Seed + imageNumber;
+
+                            var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{seedString}-{DateTime.Now.Ticks}";
+
+                            var result = Results.FirstOrDefault(r => r.ApiResponse == null);
+
+                            result.ApiResponse = response;
+                            result.Settings = settings.Clone();
+                            result.Settings.Seed = seedString;
+
                             await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
                         }
-                    }                    
+                    }
+                    else if (response.ResponseObject is Modules__api__models__ProgressResponse progressResponse)
+                    {
+                        // TODO - Display "current image"
+                    }              
                 }
             }
+        }
+        catch (System.Net.Sockets.SocketException socketException)
+        {
+            // TODO - Handle timeouts
+
+            //return;
         }
         catch (System.Net.WebException webException)
         {
             // TODO - Handle this
 
-            return;
+            //return;
         }
         catch (Exception e)
         {
             // TODO - Handle this
 
-            return;
+            //return;
         }
 
         // Any remaining results that weren't set have failed
@@ -201,6 +259,20 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
                 result.Failed = true;
             }
         }
+    }
+
+    private void reportProgress(float progress)
+    {
+        _targetProgress = progress;
+
+        Shell.Current.CurrentPage.AbortAnimation("ProgressAnimation");
+
+        var animation = new Animation(value =>
+        {
+            Progress = (float)value;
+        }, Progress, _targetProgress, Easing.SinOut);
+
+        animation.Commit(Shell.Current.CurrentPage, "ProgressAnimation", length: 500);
     }
 
     private async Task<string> GetResizedImageStringFromSettingsAsync(Settings settings)
@@ -233,7 +305,20 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
     private async Task retrieveResultImageAsync(IResultItemViewModel result, string fileName, int number)
     {
-        var imageBytes = await _stableDiffusionService.GetImageBytesAsync(result.ResponseItem);
+        byte[] imageBytes = null;
+
+        if (result.ApiResponse.StableDiffusionApi == Enums.StableDiffusionApi.InvokeAI)
+        {
+            var invokeAiResponse = result.ApiResponse.ResponseObject as LSteinResponseItem;
+
+            imageBytes = await _stableDiffusionService.GetImageBytesAsync(invokeAiResponse.Url);
+        }
+        else if (result.ApiResponse.StableDiffusionApi == Enums.StableDiffusionApi.Automatic1111)
+        {
+            var autoResponse = result.ApiResponse.ResponseObject as TextToImageResponse;
+
+            imageBytes = Convert.FromBase64String(autoResponse.Images.ElementAt(number));
+        }
 
         var uri = await _fileService.WriteFileToInternalStorageAsync($"{fileName}-{number++}.png", imageBytes);
 
