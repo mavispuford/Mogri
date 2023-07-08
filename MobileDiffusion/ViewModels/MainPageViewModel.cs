@@ -69,8 +69,13 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
         try
         {
-            // Wrap in a try/catch because this method is async void (any exceptions would blow up the app)
-            await Task.Run(_stableDiffusionService.RefreshResources);
+            if (!_stableDiffusionService.Initialized)
+            {
+                // Wrap in a try/catch because this method is async void (any exceptions would blow up the app)
+                await Task.Run(_stableDiffusionService.Initialize);
+
+                _settings.Sampler = _stableDiffusionService.Samplers?.FirstOrDefault().Key ?? "Euler";
+            }
         }
         catch (Exception e)
         {
@@ -144,7 +149,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
         try
         {
-            await foreach (var response in _stableDiffusionService.SubmitTextToImageRequest(settings))
+            await foreach (var response in _stableDiffusionService.SubmitImageRequest(settings))
             {
                 if (response.StableDiffusionApi == Enums.StableDiffusionApi.InvokeAI)
                 {
@@ -156,11 +161,11 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
 
                         if (string.IsNullOrEmpty(settings.InitImage))
                         {
-                            progress = item.Step / (float)(settings.NumInferenceSteps);
+                            progress = item.Step / (float)(settings.Steps);
                         }
                         else
                         {
-                            progress = item.Step / (float)(settings.NumInferenceSteps * settings.PromptStrength);
+                            progress = item.Step / (float)(settings.Steps * settings.DenoisingStrength);
                         }
 
                         reportProgress(progress);
@@ -201,14 +206,39 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
                 {
                     reportProgress((float)response.Progress);
 
-                    if (response.ResponseObject is TextToImageResponse autoResponse)
+                    if (response.ResponseObject is TextToImageResponse textToImageResponse)
                     {
-                        var autoResponseInfo = JsonConvert.DeserializeObject<IDictionary<string, object>>(autoResponse.Info, new JsonSerializerSettings
+                        var autoResponseInfo = JsonConvert.DeserializeObject<IDictionary<string, object>>(textToImageResponse.Info, new JsonSerializerSettings
                         {
                             ContractResolver = CustomContractResolver.Instance
                         });
 
-                        foreach (var image in autoResponse.Images)
+                        foreach (var image in textToImageResponse.Images)
+                        {
+                            var seeds = autoResponseInfo["all_seeds"] as List<long>;
+                            var seedString = seeds?.ElementAt(imageNumber) ?? settings.Seed + imageNumber;
+
+                            var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{seedString}-{DateTime.Now.Ticks}";
+
+                            var result = Results.FirstOrDefault(r => r.ApiResponse == null);
+
+                            result.ApiResponse = response;
+                            result.Settings = settings.Clone();
+                            result.Settings.Seed = seedString;
+
+                            await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
+                        }
+                    }
+                    else if (response.ResponseObject is ImageToImageResponse imageToImageResponse)
+                    {
+                        reportProgress((float)response.Progress);
+
+                        var autoResponseInfo = JsonConvert.DeserializeObject<IDictionary<string, object>>(imageToImageResponse.Info, new JsonSerializerSettings
+                        {
+                            ContractResolver = CustomContractResolver.Instance
+                        });
+
+                        foreach (var image in imageToImageResponse.Images)
                         {
                             var seeds = autoResponseInfo["all_seeds"] as List<long>;
                             var seedString = seeds?.ElementAt(imageNumber) ?? settings.Seed + imageNumber;
@@ -315,9 +345,14 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
         }
         else if (result.ApiResponse.StableDiffusionApi == Enums.StableDiffusionApi.Automatic1111)
         {
-            var autoResponse = result.ApiResponse.ResponseObject as TextToImageResponse;
-
-            imageBytes = Convert.FromBase64String(autoResponse.Images.ElementAt(number));
+            if (result.ApiResponse.ResponseObject is TextToImageResponse textToImageResponse)
+            {
+                imageBytes = Convert.FromBase64String(textToImageResponse.Images.ElementAt(number));
+            }
+            else if (result.ApiResponse.ResponseObject is ImageToImageResponse imageToImageResponse)
+            {
+                imageBytes = Convert.FromBase64String(imageToImageResponse.Images.ElementAt(number));
+            }
         }
 
         var uri = await _fileService.WriteFileToInternalStorageAsync($"{fileName}-{number++}.png", imageBytes);

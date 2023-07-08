@@ -73,7 +73,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
         cancelMaskImageLoading();
 
         var defaultSettings = new Settings();
-        Strength = defaultSettings.PromptStrength.ToString();
+        Strength = defaultSettings.DenoisingStrength.ToString();
         _settings.InitImage = null;
         _settings.Mask = null;
         InitImageSource = null;
@@ -101,7 +101,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
 
     private async void mapSettingsToProperties()
     {
-        Strength = _settings.PromptStrength.ToString();
+        Strength = _settings.DenoisingStrength.ToString();
 
         FitImageServerSide = _settings.Fit == Enums.OnOff.on;
         FitImageClientSide = _settings.FitClientSide;
@@ -130,7 +130,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
         if (double.TryParse(Strength, out var strength) ||
             double.TryParse(StrengthPlaceholder, out strength))
         {
-            _settings.PromptStrength = strength;
+            _settings.DenoisingStrength = strength;
         }
 
         _settings.Fit = FitImageServerSide ? Enums.OnOff.on : Enums.OnOff.Default;
