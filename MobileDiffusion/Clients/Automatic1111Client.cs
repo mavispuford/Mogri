@@ -34,7 +34,7 @@ namespace MobileDiffusion.Clients.Automatic1111
 
         private Newtonsoft.Json.JsonSerializerSettings CreateSerializerSettings()
         {
-            var settings = new Newtonsoft.Json.JsonSerializerSettings();
+            var settings = new Newtonsoft.Json.JsonSerializerSettings() { NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore};
             UpdateJsonSerializerSettings(settings);
             return settings;
         }
@@ -13435,71 +13435,74 @@ namespace MobileDiffusion.Clients.Automatic1111
         [Newtonsoft.Json.JsonProperty("init_images", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<object> Init_images { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("resize_mode", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Resize_mode { get; set; } = 0;
+        /// <summary>
+        ///     Sets the resize mode: 0 to upscale by upscaling_resize amount, 1 to upscale up to upscaling_resize_h x upscaling_resize_w.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("resize_mode", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? Resize_mode { get; set; }
 
         [Newtonsoft.Json.JsonProperty("denoising_strength", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public double Denoising_strength { get; set; } = 0.75D;
 
-        [Newtonsoft.Json.JsonProperty("image_cfg_scale", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double Image_cfg_scale { get; set; }
+        [Newtonsoft.Json.JsonProperty("image_cfg_scale", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double? Image_cfg_scale { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("mask", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonProperty("mask", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Mask { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("mask_blur", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Mask_blur { get; set; }
+        [Newtonsoft.Json.JsonProperty("mask_blur", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? Mask_blur { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("mask_blur_x", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Mask_blur_x { get; set; } = 4;
+        [Newtonsoft.Json.JsonProperty("mask_blur_x", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? Mask_blur_x { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("mask_blur_y", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Mask_blur_y { get; set; } = 4;
+        [Newtonsoft.Json.JsonProperty("mask_blur_y", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? Mask_blur_y { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("inpainting_fill", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Inpainting_fill { get; set; } = 0;
+        [Newtonsoft.Json.JsonProperty("inpainting_fill", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? Inpainting_fill { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("inpaint_full_res", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool Inpaint_full_res { get; set; } = true;
+        [Newtonsoft.Json.JsonProperty("inpaint_full_res", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? Inpaint_full_res { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("inpaint_full_res_padding", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Inpaint_full_res_padding { get; set; } = 0;
+        [Newtonsoft.Json.JsonProperty("inpaint_full_res_padding", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? Inpaint_full_res_padding { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("inpainting_mask_invert", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Inpainting_mask_invert { get; set; } = 0;
+        [Newtonsoft.Json.JsonProperty("inpainting_mask_invert", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? Inpainting_mask_invert { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("initial_noise_multiplier", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double Initial_noise_multiplier { get; set; }
+        [Newtonsoft.Json.JsonProperty("initial_noise_multiplier", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double? Initial_noise_multiplier { get; set; }
 
         [Newtonsoft.Json.JsonProperty("prompt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Prompt { get; set; } = "";
 
-        [Newtonsoft.Json.JsonProperty("styles", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonProperty("styles", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<string> Styles { get; set; }
 
         [Newtonsoft.Json.JsonProperty("seed", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public int Seed { get; set; } = -1;
 
-        [Newtonsoft.Json.JsonProperty("subseed", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Subseed { get; set; } = -1;
+        [Newtonsoft.Json.JsonProperty("subseed", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? Subseed { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("subseed_strength", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double Subseed_strength { get; set; } = 0D;
+        [Newtonsoft.Json.JsonProperty("subseed_strength", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double? Subseed_strength { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("seed_resize_from_h", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Seed_resize_from_h { get; set; } = -1;
+        [Newtonsoft.Json.JsonProperty("seed_resize_from_h", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? Seed_resize_from_h { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("seed_resize_from_w", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Seed_resize_from_w { get; set; } = -1;
+        [Newtonsoft.Json.JsonProperty("seed_resize_from_w", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? Seed_resize_from_w { get; set; }
 
         [Newtonsoft.Json.JsonProperty("sampler_name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Sampler_name { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("batch_size", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Batch_size { get; set; } = 1;
+        [Newtonsoft.Json.JsonProperty("batch_size", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? Batch_size { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("n_iter", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int N_iter { get; set; } = 1;
+        [Newtonsoft.Json.JsonProperty("n_iter", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? N_iter { get; set; }
 
         [Newtonsoft.Json.JsonProperty("steps", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public int Steps { get; set; } = 50;
@@ -13513,55 +13516,55 @@ namespace MobileDiffusion.Clients.Automatic1111
         [Newtonsoft.Json.JsonProperty("height", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public int Height { get; set; } = 512;
 
-        [Newtonsoft.Json.JsonProperty("restore_faces", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool Restore_faces { get; set; } = false;
+        [Newtonsoft.Json.JsonProperty("restore_faces", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? Restore_faces { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("tiling", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool Tiling { get; set; } = false;
+        [Newtonsoft.Json.JsonProperty("tiling", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? Tiling { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("do_not_save_samples", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool Do_not_save_samples { get; set; } = false;
+        [Newtonsoft.Json.JsonProperty("do_not_save_samples", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? Do_not_save_samples { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("do_not_save_grid", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool Do_not_save_grid { get; set; } = false;
+        [Newtonsoft.Json.JsonProperty("do_not_save_grid", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? Do_not_save_grid { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("negative_prompt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonProperty("negative_prompt", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Negative_prompt { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("eta", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double Eta { get; set; }
+        [Newtonsoft.Json.JsonProperty("eta", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double? Eta { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("s_min_uncond", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double S_min_uncond { get; set; } = 0D;
+        [Newtonsoft.Json.JsonProperty("s_min_uncond", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double? S_min_uncond { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("s_churn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double S_churn { get; set; } = 0D;
+        [Newtonsoft.Json.JsonProperty("s_churn", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double? S_churn { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("s_tmax", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double S_tmax { get; set; }
+        [Newtonsoft.Json.JsonProperty("s_tmax", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double? S_tmax { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("s_tmin", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double S_tmin { get; set; } = 0D;
+        [Newtonsoft.Json.JsonProperty("s_tmin", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double? S_tmin { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("s_noise", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double S_noise { get; set; } = 1D;
+        [Newtonsoft.Json.JsonProperty("s_noise", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double? S_noise { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("override_settings", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonProperty("override_settings", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public object Override_settings { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("override_settings_restore_afterwards", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool Override_settings_restore_afterwards { get; set; } = true;
+        [Newtonsoft.Json.JsonProperty("override_settings_restore_afterwards", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? Override_settings_restore_afterwards { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("script_args", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonProperty("script_args", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<object> Script_args { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("sampler_index", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonProperty("sampler_index", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Sampler_index { get; set; } = "Euler";
 
         [Newtonsoft.Json.JsonProperty("include_init_images", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public bool Include_init_images { get; set; } = false;
 
-        [Newtonsoft.Json.JsonProperty("script_name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonProperty("script_name", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Script_name { get; set; }
 
         [Newtonsoft.Json.JsonProperty("send_images", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
@@ -13570,7 +13573,7 @@ namespace MobileDiffusion.Clients.Automatic1111
         [Newtonsoft.Json.JsonProperty("save_images", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public bool Save_images { get; set; } = false;
 
-        [Newtonsoft.Json.JsonProperty("alwayson_scripts", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonProperty("alwayson_scripts", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public object Alwayson_scripts { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;

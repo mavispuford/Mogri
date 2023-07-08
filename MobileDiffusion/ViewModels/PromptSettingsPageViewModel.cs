@@ -1,13 +1,17 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Enums;
+using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Models;
+using System.Linq;
 
 namespace MobileDiffusion.ViewModels;
 
 public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSettingsPageViewModel
 {
+    private readonly IStableDiffusionService _stableDiffusionService;
+
     private Settings _settings;
 
     [ObservableProperty]
@@ -79,8 +83,10 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     [ObservableProperty]
     private bool makeSeamless;
 
-    public PromptSettingsPageViewModel()
+    public PromptSettingsPageViewModel(IStableDiffusionService stableDiffusionService)
     {
+        _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
+
         var widthValues = new List<string>();
         var heightValues = new List<string>();
 
@@ -90,12 +96,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             heightValues.Add(i.ToString());
         }
 
-        var samplerValues = new List<string>();
-
-        foreach (var value in Enum.GetNames(typeof(Sampler)))
-        {
-            samplerValues.Add(value);
-        }
+        var samplerValues = _stableDiffusionService.Samplers.Select(s => s.Key).ToList();
 
         var upscaleLevelValues = new List<string>
         {
@@ -109,7 +110,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
 
         var defaultSettings = new Settings();
         ImageCountPlaceholder = defaultSettings.NumOutputs.ToString();
-        StepsPlaceholder = defaultSettings.NumInferenceSteps.ToString();
+        StepsPlaceholder = defaultSettings.Steps.ToString();
         CfgScalePlaceholder = defaultSettings.GuidanceScale.ToString();
         SeedPlaceholder = defaultSettings.Seed.ToString();
         GfpganStrengthPlaceholder = defaultSettings.GfpganStrength.ToString();
@@ -152,7 +153,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         MakeSeamless = defaultSettings.Seamless == OnOff.on;
         Sampler = defaultSettings.Sampler.ToString();
         Seed = defaultSettings.Seed.ToString();
-        Steps = defaultSettings.NumInferenceSteps.ToString();
+        Steps = defaultSettings.Steps.ToString();
         UpscaleLevel = defaultSettings.UpscaleLevel.ToString();
         UpscaleStrength = defaultSettings.UpscaleStrength.ToString();
         Width = defaultSettings.Width.ToString();
@@ -185,7 +186,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         MakeSeamless = _settings.Seamless == OnOff.on;
         Sampler = _settings.Sampler.ToString();
         Seed = _settings.Seed.ToString();
-        Steps = _settings.NumInferenceSteps.ToString();
+        Steps = _settings.Steps.ToString();
         UpscaleLevel = _settings.UpscaleLevel == 0 ? "2" : _settings.UpscaleLevel.ToString();
         UpscaleStrength = _settings.UpscaleStrength.ToString();
         Width = _settings.Width.ToString();
@@ -221,10 +222,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
 
         _settings.Seamless = MakeSeamless ? OnOff.on : OnOff.Default;
 
-        if (Enum.TryParse<Sampler>(Sampler, out var pSampler))
-        {
-            _settings.Sampler = pSampler;
-        }
+        _settings.Sampler = Sampler;
 
         if (long.TryParse(Seed, out var pSeed) ||
             long.TryParse(SeedPlaceholder, out pSeed))
@@ -235,7 +233,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         if (int.TryParse(Steps, out var pSteps) ||
             int.TryParse(StepsPlaceholder, out pSteps))
         {
-            _settings.NumInferenceSteps = pSteps;
+            _settings.Steps = pSteps;
         }
 
         if (int.TryParse(UpscaleLevel, out var pUpscaleLevel))

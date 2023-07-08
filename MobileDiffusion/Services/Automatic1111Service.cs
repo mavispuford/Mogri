@@ -14,9 +14,27 @@ namespace MobileDiffusion.Services
         private ICollection<PromptStyleItem> _promptStyles;
         private ICollection<LoraItem> _loras;
 
+        public bool Initialized { get; private set; }
+
+        public Dictionary<string, string> Samplers { get; private set; } = new();
+
         public Automatic1111Service(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+        }
+
+        public async Task Initialize()
+        {
+            try
+            {
+                await RefreshResources();
+
+                Initialized = true;
+            }
+            catch
+            {
+                // Unable to initialize
+            }
         }
 
         public async Task<bool> CheckServer()
@@ -40,76 +58,30 @@ namespace MobileDiffusion.Services
             throw new NotImplementedException();
         }
 
-        public async IAsyncEnumerable<ApiResponse> SubmitTextToImageRequest(Settings settings)
+        public async IAsyncEnumerable<ApiResponse> SubmitImageRequest(Settings settings)
         {
-            var client = getClient();
-
-            var request = Txt2ImageRequestFromSettings(settings);
-
-            var cancellationTokenSource = new CancellationTokenSource();
-            var progressToken = cancellationTokenSource.Token;
-
-            TextToImageResponse txt2ImgResponse = null;
-
-            var textToImageTask = Task.Run(async () =>
+            if (settings is null)
             {
-                try
-                {
-                    txt2ImgResponse = await client.Text2imgapi_sdapi_v1_txt2img_postAsync(request);
-                }
-                finally
-                {
-                    cancellationTokenSource.Cancel();
-                }
-            });
+                yield break;
+            }
 
-            ApiResponse apiResponse = null;
-            var skipCurrentImage = false;
-
-            while (true)
+            if (string.IsNullOrEmpty(settings.InitImage))
             {
-                try
+                // No image - Just do txt2img
+
+                await foreach (ApiResponse apiResponse in sendTextToImageRequest(settings))
                 {
-                    apiResponse = await Task.Run(async () =>
-                    {
-                        await Task.Delay(500);
-
-                        progressToken.ThrowIfCancellationRequested();
-
-                        var progressGetResponse = await client.Progressapi_sdapi_v1_progress_getAsync(skipCurrentImage);
-
-                        var progress = progressGetResponse.Eta_relative > 0 ? progressGetResponse.Progress : 1d;
-
-                        var progressApiResponse = new ApiResponse
-                        {
-                            StableDiffusionApi = Enums.StableDiffusionApi.Automatic1111,
-                            ResponseObject = progressGetResponse,
-                            Progress = progress
-                        };
-
-                        return progressApiResponse;
-                    }, progressToken);
+                    yield return apiResponse;
                 }
-                catch (OperationCanceledException)
+            }
+            else
+            {
+                // Image included - Do img2img
+
+                await foreach (ApiResponse apiResponse in sendImageToImageRequest(settings))
                 {
-                    // Set the final response
-                    apiResponse = new ApiResponse
-                    {
-                        StableDiffusionApi = Enums.StableDiffusionApi.Automatic1111,
-                        ResponseObject = txt2ImgResponse,
-                        Progress = 1f
-                    };
+                    yield return apiResponse;
                 }
-
-                yield return apiResponse;
-
-                if (textToImageTask.IsCompleted || progressToken.IsCancellationRequested)
-                {
-                    break;
-                }
-
-                // Skip current image every other time
-                skipCurrentImage = !skipCurrentImage;
             }
         }
 
@@ -135,8 +107,14 @@ namespace MobileDiffusion.Services
 
                     _loras = JsonConvert.DeserializeObject<ICollection<LoraItem>>(lorasString);
                 }));
+
+                Samplers.Clear();
+                foreach (var sampler in _samplers)
+                {
+                    Samplers.TryAdd(sampler.Name, sampler.Aliases.FirstOrDefault());
+                }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
 
             }
@@ -153,7 +131,7 @@ namespace MobileDiffusion.Services
             return automaticClient;
         }
 
-        public static StableDiffusionProcessingTxt2Img Txt2ImageRequestFromSettings(Settings settings)
+        private static StableDiffusionProcessingTxt2Img txt2ImageRequestFromSettings(Settings settings)
         {
             var request = new StableDiffusionProcessingTxt2Img();
 
@@ -162,18 +140,175 @@ namespace MobileDiffusion.Services
             request.Restore_faces = settings.EnableGfpgan;
             request.Width = (int)settings.Width;
             request.Height = (int)settings.Height;
-            request.Denoising_strength = settings.PromptStrength;
-            request.Steps = settings.NumInferenceSteps;
+            request.Denoising_strength = settings.DenoisingStrength;
+            request.Steps = settings.Steps;
             request.Seed = settings.Seed;
             request.Tiling = settings.Seamless == Enums.OnOff.on;
             request.Hr_scale = settings.UpscaleLevel;
             request.Prompt = settings.Prompt;
 
             // TODO - Use steps in the UI instead of calculating from a strength value?
-            request.Hr_second_pass_steps = (int)(settings.UpscaleStrength * settings.NumInferenceSteps);
+            request.Hr_second_pass_steps = (int)(settings.UpscaleStrength * settings.Steps);
             //request.Sampler_name = settings.Sampler.ToString();
 
             return request;
+        }
+
+        private static StableDiffusionProcessingImg2Img image2ImageRequestFromSettings(Settings settings)
+        {
+            var request = new StableDiffusionProcessingImg2Img();
+
+            //request.N_iter = 1; // Batches
+            request.Batch_size = settings.NumOutputs;
+            request.Cfg_scale = settings.GuidanceScale;
+            request.Restore_faces = settings.EnableGfpgan;
+            request.Width = (int)settings.Width;
+            request.Height = (int)settings.Height;
+            request.Denoising_strength = settings.DenoisingStrength;
+            request.Steps = settings.Steps;
+            request.Seed = (int)settings.Seed;
+            request.Tiling = settings.Seamless == Enums.OnOff.on;
+            request.Prompt = settings.Prompt;
+
+            request.Init_images = new List<object>
+            {
+                settings.InitImage
+            };
+
+            return request;
+        }
+
+        private async IAsyncEnumerable<ApiResponse> sendTextToImageRequest(Settings settings)
+        {
+            var client = getClient();
+
+            var request = txt2ImageRequestFromSettings(settings);
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            var progressToken = cancellationTokenSource.Token;
+
+            TextToImageResponse txt2ImgResponse = null;
+
+            var textToImageTask = Task.Run(async () =>
+            {
+                try
+                {
+                    txt2ImgResponse = await client.Text2imgapi_sdapi_v1_txt2img_postAsync(request);
+                }
+                finally
+                {
+                    cancellationTokenSource.Cancel();
+                }
+            });
+
+            ApiResponse apiResponse = null;
+            var skipCurrentImage = false;
+
+            while (true)
+            {
+                try
+                {
+                    apiResponse = await getCurrentProgress(client, progressToken, skipCurrentImage);
+                }
+                catch (OperationCanceledException)
+                {
+                    // Set the final response
+                    apiResponse = new ApiResponse
+                    {
+                        StableDiffusionApi = Enums.StableDiffusionApi.Automatic1111,
+                        ResponseObject = txt2ImgResponse,
+                        Progress = 1f
+                    };
+                }
+
+                yield return apiResponse;
+
+                if (textToImageTask.IsCompleted || progressToken.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                // Skip current image every other time
+                skipCurrentImage = !skipCurrentImage;
+            }
+        }
+
+        private async IAsyncEnumerable<ApiResponse> sendImageToImageRequest(Settings settings)
+        {
+            var client = getClient();
+
+            var request = image2ImageRequestFromSettings(settings);
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            var progressToken = cancellationTokenSource.Token;
+
+            ImageToImageResponse img2ImgResponse = null;
+
+            var textToImageTask = Task.Run(async () =>
+            {
+                try
+                {
+                    img2ImgResponse = await client.Img2imgapi_sdapi_v1_img2img_postAsync(request);
+                }
+                finally
+                {
+                    cancellationTokenSource.Cancel();
+                }
+            });
+
+            ApiResponse apiResponse = null;
+            var skipCurrentImage = false;
+
+            while (true)
+            {
+                try
+                {
+                    apiResponse = await getCurrentProgress(client, progressToken, skipCurrentImage);
+                }
+                catch (OperationCanceledException)
+                {
+                    // Set the final response
+                    apiResponse = new ApiResponse
+                    {
+                        StableDiffusionApi = Enums.StableDiffusionApi.Automatic1111,
+                        ResponseObject = img2ImgResponse,
+                        Progress = 1f
+                    };
+                }
+
+                yield return apiResponse;
+
+                if (textToImageTask.IsCompleted || progressToken.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                // Skip current image every other time
+                skipCurrentImage = !skipCurrentImage;
+            }
+        }
+
+        private async Task<ApiResponse> getCurrentProgress(Client client, CancellationToken token, bool skipCurrentImage)
+        {
+            return await Task.Run(async () =>
+            {
+                await Task.Delay(500, token);
+
+                token.ThrowIfCancellationRequested();
+
+                var progressGetResponse = await client.Progressapi_sdapi_v1_progress_getAsync(skipCurrentImage, token);
+
+                var progress = progressGetResponse.Eta_relative > 0 ? progressGetResponse.Progress : 1d;
+
+                var progressApiResponse = new ApiResponse
+                {
+                    StableDiffusionApi = Enums.StableDiffusionApi.Automatic1111,
+                    ResponseObject = progressGetResponse,
+                    Progress = progress
+                };
+
+                return progressApiResponse;
+            });
         }
     }
 }

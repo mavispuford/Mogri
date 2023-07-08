@@ -74,10 +74,7 @@ public class LSteinResponseItem
             result.NumOutputs = numOutputs;
         }
 
-        if (Enum.TryParse<Sampler>(config.SamplerName, out var sampler))
-        {
-            result.Sampler = sampler;
-        }
+        result.Sampler = config.SamplerName;
 
         if (Enum.TryParse<OnOff>(config.Seamless, out var seamless))
         {
@@ -86,12 +83,12 @@ public class LSteinResponseItem
 
         if (int.TryParse(config.Steps, out var numInferenceSteps))
         {
-            result.NumInferenceSteps = numInferenceSteps;
+            result.Steps = numInferenceSteps;
         }
 
         if (double.TryParse(config.Strength, out var strength))
         {
-            result.PromptStrength = strength;
+            result.DenoisingStrength = strength;
         }
 
         if (int.TryParse(config.UpscaleLevel, out var upscaleLevel))

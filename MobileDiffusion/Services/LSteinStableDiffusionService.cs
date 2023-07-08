@@ -11,9 +11,30 @@ namespace MobileDiffusion.Services
     {
         private readonly IHttpClientFactory _httpClientFactory;
 
+        public bool Initialized { get; private set; }
+
+        public Dictionary<string, string> Samplers { get; private set; } = new()
+        {
+            { "k_lms",""},
+            { "ddim",""},
+            { "plms",""},
+            { "k_dpm_2",""},
+            { "k_dpm_2_a",""},
+            { "k_euler",""},
+            { "k_euler_a",""},
+            { "k_heun",""}
+        };
+
         public LSteinStableDiffusionService(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+        }
+
+        public Task Initialize()
+        {
+            Initialized = true;
+
+            return Task.CompletedTask;
         }
 
         public async Task<bool> CheckServer()
@@ -32,7 +53,7 @@ namespace MobileDiffusion.Services
             return false;
         }
 
-        public async IAsyncEnumerable<ApiResponse> SubmitTextToImageRequest(Settings settings)
+        public async IAsyncEnumerable<ApiResponse> SubmitImageRequest(Settings settings)
         {
             if (settings == null)
             {

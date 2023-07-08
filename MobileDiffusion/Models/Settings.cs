@@ -14,11 +14,11 @@ public class Settings
     public string InitImage { get; set; }
     public OnOff InvertMask { get; set; }
     public string Mask { get; set; }
-    public int NumInferenceSteps { get; set; } = 50;
+    public int Steps { get; set; } = 50;
     public int NumOutputs { get; set; } = 1;
     public string Prompt { get; set; }
-    public double PromptStrength { get; set; } = .75;
-    public Sampler Sampler { get; set; } = Sampler.k_lms;
+    public double DenoisingStrength { get; set; } = .75;
+    public string Sampler { get; set; }
     public OnOff Seamless { get; set; }
     public long Seed { get; set; } = -1;
     public int UpscaleLevel { get; set; } = 2;
@@ -40,10 +40,10 @@ public class Settings
             Height = Height,
             InitImage = InitImage,
             Mask = Mask,
-            NumInferenceSteps = NumInferenceSteps,
+            Steps = Steps,
             NumOutputs = NumOutputs,
             Prompt = Prompt,
-            PromptStrength = PromptStrength,
+            DenoisingStrength = DenoisingStrength,
             Sampler = Sampler,
             Seamless = Seamless,
             Seed = Seed,
