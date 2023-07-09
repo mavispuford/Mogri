@@ -13,13 +13,14 @@ public static class ViewRegistrations
         registerPage<ICanvasPageViewModel, CanvasPage>(builder.Services);
         registerPage<IAppSettingsPageViewModel, AppSettingsPage>(builder.Services);
         registerPage<IPromptDescriptorsPageViewModel, PromptDescriptorsPage>(builder.Services);
+        registerPage<IPromptPageViewModel, PromptPage>(builder.Services);
 
         return builder;
     }
 
     private static void registerPage<TViewModel, TPage>(IServiceCollection serviceCollection)
-        where TViewModel : IBaseViewModel
-        where TPage : Page
+        where TViewModel : IPageViewModel
+        where TPage : BasePage
     {
         Routing.RegisterRoute(typeof(TPage).Name, typeof(TPage));
 

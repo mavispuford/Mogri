@@ -9,4 +9,6 @@ public interface IPageViewModel : IQueryAttributable, IBaseViewModel
     void OnNavigatedFrom();
     
     void OnNavigatedTo();
+
+    bool OnBackButtonPressed();
 }

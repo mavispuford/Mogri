@@ -23,4 +23,9 @@ public class PageViewModel : BaseViewModel, IPageViewModel
     public virtual void OnNavigatedTo()
     {
     }
+
+    public virtual bool OnBackButtonPressed()
+    {
+        return false;
+    }
 }
