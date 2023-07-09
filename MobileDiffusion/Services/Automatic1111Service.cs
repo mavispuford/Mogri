@@ -146,6 +146,7 @@ namespace MobileDiffusion.Services
             request.Tiling = settings.Seamless == Enums.OnOff.on;
             request.Hr_scale = settings.UpscaleLevel;
             request.Prompt = settings.Prompt;
+            request.Negative_prompt = settings.NegativePrompt;
             request.Sampler_name = settings.Sampler;
 
             // TODO - Use steps in the UI instead of calculating from a strength value?
@@ -170,6 +171,7 @@ namespace MobileDiffusion.Services
             request.Seed = (int)settings.Seed;
             request.Tiling = settings.Seamless == Enums.OnOff.on;
             request.Prompt = settings.Prompt;
+            request.Negative_prompt = settings.NegativePrompt;
             request.Sampler_name = settings.Sampler;
 
             request.Init_images = new List<object>

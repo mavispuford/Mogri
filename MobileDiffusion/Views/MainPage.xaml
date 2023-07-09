@@ -39,30 +39,31 @@
 
         <Grid x:Name="MainGrid"
               Grid.Row="1"
-              RowDefinitions="auto, auto, auto, auto, *"
+              RowDefinitions="auto, auto, *"
               Padding="16"
               RowSpacing="5">
 
-            <Label Grid.Row="0" 
+            <VerticalStackLayout Grid.Row="0"
+                                 Spacing="8"
+                                 Padding="0,0,0,10">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ShowPromptPageCommand}" />
+                </VerticalStackLayout.GestureRecognizers>
+                <Label  
                    Text="Prompt:"
                    VerticalOptions="Center"
                    FontSize="Body" />
 
-            <Editor x:Name="PromptEditor" 
-                    Grid.Row="1"
-                    Placeholder="{Binding PlaceholderPrompt}" 
-                    Text="{Binding Prompt}"
-                    AutoSize="TextChanges"/>
+                <Label x:Name="PromptEditor" 
+                   Text="{Binding Prompt}"
+                   TextColor="{StaticResource IndependenceAccent}"/>
 
-            <Label Grid.Row="2"
-                   Grid.Column="0"
-                   Grid.ColumnSpan="2" 
-                   Text="{Binding PromptDescriptorsString}"
-                   TextColor="{StaticResource Gray600}"
-                   IsVisible="{Binding PromptDescriptorsString, Converter={StaticResource IsStringNotNullOrEmptyConverter}}"
-                   Padding="0,0,0,10"/>
+                <Label Text="{Binding NegativePrompt}"
+                       TextColor="{StaticResource Primary}"
+                       IsVisible="{Binding NegativePrompt, Converter={StaticResource IsStringNotNullOrEmptyConverter}}"/>
+            </VerticalStackLayout>
 
-            <Grid Grid.Row="3"
+            <Grid Grid.Row="1"
                   ColumnDefinitions="52*,16*,16*,16*"
                   ColumnSpacing="10"
                   HorizontalOptions="FillAndExpand">
@@ -75,7 +76,7 @@
                              HeightRequest="40"
                              CornerRadius="10"
                              HorizontalOptions="CenterAndExpand"
-                             Command="{Binding ShowRequestSettingsCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"
+                             Command="{Binding ShowPromptSettingsCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"
                              BackgroundColor="Transparent">
                     <ImageButton.Source>
                         <FontImageSource Glyph="&#xe429;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource IndependenceAccent}" />
@@ -107,7 +108,7 @@
                 
             </Grid>
 
-            <ScrollView Grid.Row="4" VerticalOptions="FillAndExpand" VerticalScrollBarVisibility="Never" HorizontalScrollBarVisibility="Never">
+            <ScrollView Grid.Row="2" VerticalOptions="FillAndExpand" VerticalScrollBarVisibility="Never" HorizontalScrollBarVisibility="Never">
                 <FlexLayout x:Name="ImageLayout"
                             BindableLayout.ItemsSource="{Binding Results}" 
                             HorizontalOptions="CenterAndExpand"

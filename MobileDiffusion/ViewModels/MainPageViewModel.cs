@@ -14,8 +14,10 @@ using MobileDiffusion.Json;
 
 namespace MobileDiffusion.ViewModels;
 
-public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQueryAttributable
+public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 {
+    const string _defaultPrompt = "An astronaut floating in space, detailed digital drawing, octane render, trending on artstation";
+
     private readonly IFileService _fileService;
     private readonly IStableDiffusionService _stableDiffusionService;
     private readonly IPopupService _popupService;
@@ -35,13 +37,13 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
     private bool hasPromptDescriptors;
 
     [ObservableProperty]
-    private string prompt;
+    private string prompt = _defaultPrompt;
+
+    [ObservableProperty]
+    private string negativePrompt;
 
     [ObservableProperty]
     private string promptDescriptorsString;
-
-    [ObservableProperty]
-    private string placeholderPrompt = "An astronaut floating in space, detailed digital drawing, octane render, trending on artstation";
 
     [ObservableProperty]
     private float progress;
@@ -133,16 +135,17 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
             }
         }
 
-        var finalPrompt = (string.IsNullOrEmpty(Prompt) ? PlaceholderPrompt : Prompt);
+        settings.Prompt = string.IsNullOrEmpty(settings.Prompt) ? _defaultPrompt : settings.Prompt;
 
-        if (!string.IsNullOrEmpty(PromptDescriptorsString))
-        {
-            finalPrompt += $", {PromptDescriptorsString}";
-        }
+        // TODO - Move from prompt descriptors to auto1111 styles
+        //if (!string.IsNullOrEmpty(PromptDescriptorsString))
+        //{
+        //    finalPrompt += $", {PromptDescriptorsString}";
+        //}
 
-        settings.Prompt = finalPrompt;
+        //settings.Prompt = finalPrompt;
 
-        var sanitizedPrompt = finalPrompt.Replace(" ", "_").ToLower();
+        var sanitizedPrompt = settings.Prompt.Replace(" ", "_").ToLower();
         var length = Math.Min(sanitizedPrompt.Length, 90);
 
         var imageNumber = 0;
@@ -395,7 +398,18 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
     }
 
     [RelayCommand]
-    private async Task ShowRequestSettings()
+    private async Task ShowPromptPage()
+    {
+        var parameters = new Dictionary<string, object> {
+            { NavigationParams.PromptPlaceholder, _defaultPrompt },
+            { NavigationParams.PromptSettings, _settings },
+        };
+
+        await Shell.Current.GoToAsync("PromptPage", parameters);
+    }
+
+    [RelayCommand]
+    private async Task ShowPromptSettings()
     {
         var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings } };
 
@@ -408,6 +422,9 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
             promptSettings is Settings settings)
         {
             _settings = settings;
+
+            Prompt = string.IsNullOrEmpty(settings.Prompt) ? _defaultPrompt : settings.Prompt;
+            NegativePrompt = settings.NegativePrompt;
 
             updateHasInitImage();
         }

@@ -12,5 +12,6 @@ public static class NavigationParams
     public const string ImageWidth = nameof(ImageWidth);
     public const string InitImgString = nameof(InitImgString);
     public const string PromptDescriptors = nameof(PromptDescriptors);
+    public const string PromptPlaceholder = nameof(PromptPlaceholder);
     public const string PromptSettings = nameof(PromptSettings);
 }

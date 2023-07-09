@@ -1,4 +1,5 @@
 ﻿using MobileDiffusion.Enums;
+using Newtonsoft.Json;
 
 namespace MobileDiffusion.Models;
 
@@ -17,6 +18,7 @@ public class Settings
     public int Steps { get; set; } = 50;
     public int NumOutputs { get; set; } = 1;
     public string Prompt { get; set; }
+    public string NegativePrompt { get; set; }
     public double DenoisingStrength { get; set; } = .75;
     public string Sampler { get; set; }
     public OnOff Seamless { get; set; }
@@ -29,31 +31,8 @@ public class Settings
 
     public Settings Clone()
     {
-        var clone = new Settings
-        {
-            EnableGfpgan = EnableGfpgan,
-            EnableUpscaling = EnableUpscaling,
-            Fit = Fit,
-            FitClientSide = FitClientSide,
-            GfpganStrength = GfpganStrength,
-            GuidanceScale = GuidanceScale,
-            Height = Height,
-            InitImage = InitImage,
-            Mask = Mask,
-            Steps = Steps,
-            NumOutputs = NumOutputs,
-            Prompt = Prompt,
-            DenoisingStrength = DenoisingStrength,
-            Sampler = Sampler,
-            Seamless = Seamless,
-            Seed = Seed,
-            UpscaleLevel = UpscaleLevel,
-            UpscaleStrength = UpscaleStrength,
-            VariationAmount = VariationAmount,
-            Width = Width,
-            WithVariations = WithVariations,
-        };
+        var json = JsonConvert.SerializeObject(this);
 
-        return clone;
+        return JsonConvert.DeserializeObject<Settings>(json);
     }
 }
