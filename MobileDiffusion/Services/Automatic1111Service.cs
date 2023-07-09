@@ -146,6 +146,7 @@ namespace MobileDiffusion.Services
             request.Tiling = settings.Seamless == Enums.OnOff.on;
             request.Hr_scale = settings.UpscaleLevel;
             request.Prompt = settings.Prompt;
+            request.Sampler_name = settings.Sampler;
 
             // TODO - Use steps in the UI instead of calculating from a strength value?
             request.Hr_second_pass_steps = (int)(settings.UpscaleStrength * settings.Steps);
@@ -169,6 +170,7 @@ namespace MobileDiffusion.Services
             request.Seed = (int)settings.Seed;
             request.Tiling = settings.Seamless == Enums.OnOff.on;
             request.Prompt = settings.Prompt;
+            request.Sampler_name = settings.Sampler;
 
             request.Init_images = new List<object>
             {
@@ -296,7 +298,8 @@ namespace MobileDiffusion.Services
 
                 token.ThrowIfCancellationRequested();
 
-                var progressGetResponse = await client.Progressapi_sdapi_v1_progress_getAsync(skipCurrentImage, token);
+                var progressGetResponse = await client.Progressapi_sdapi_v1_progress_getAsync(true, token);
+                //var progressGetResponse = await client.Progressapi_sdapi_v1_progress_getAsync(skipCurrentImage, token);
 
                 var progress = progressGetResponse.Eta_relative > 0 ? progressGetResponse.Progress : 1d;
 

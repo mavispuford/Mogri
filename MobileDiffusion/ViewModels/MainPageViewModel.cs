@@ -113,7 +113,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
             Results.Add(resultItem);
         }
 
-        if (settings.FitClientSide)
+        if (HasInitImage && settings.FitClientSide)
         {
             if (_initImageNeedsResize)
             {
@@ -565,53 +565,6 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel, IQue
     private void updateHasInitImage()
     {
         HasInitImage = !string.IsNullOrEmpty(_settings?.InitImage);
-
-        if (HasInitImage)
-        {
-            _initImageNeedsResize = true;
-        }
-    }
-
-    public override void OnAppearing()
-    {
-        // Possible workaround for the following bugs:
-        // https://github.com/dotnet/maui/issues/9011
-        // https://github.com/dotnet/maui/issues/8809
-        // However, it doesn't work because of this bug:
-        // https://github.com/dotnet/maui/issues/8787
-
-        //refreshImageSources();
-    }
-
-    public override void OnDisappearing()
-    {
-        // Possible workaround for the following bugs:
-        // https://github.com/dotnet/maui/issues/9011
-        // https://github.com/dotnet/maui/issues/8809
-        // However, it doesn't work because of this bug:
-        // https://github.com/dotnet/maui/issues/8787
-
-        //clearImageSources();
-    }
-
-    private void clearImageSources()
-    {
-        foreach (var result in Results)
-        {
-            result.ImageSource = default(ImageSource);
-        }
-    }
-
-    private void refreshImageSources()
-    {
-        foreach (var result in Results)
-        {
-            if (string.IsNullOrEmpty(result.InternalUri))
-            {
-                continue;
-            }
-
-            result.ImageSource = ImageSource.FromFile(result.InternalUri);
-        }
+        _initImageNeedsResize = true;
     }
 }
