@@ -21,7 +21,7 @@
           Margin="0">
         <ScrollView Grid.Row="0" Orientation="Vertical">
             <Grid Padding="30"
-                  RowDefinitions="auto, auto, auto, auto, auto"
+                  RowDefinitions="auto, auto, auto, auto, auto, auto, auto"
                   RowSpacing="10"
                   ColumnSpacing="16"
                   ColumnDefinitions="32,auto,*"
@@ -49,7 +49,7 @@
                 <Label Grid.Row="1" Grid.Column="1" Text="Source Image:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
 
                 <Grid Grid.Row="2" Grid.ColumnSpan="3"
-                        HeightRequest="200" WidthRequest="200">
+                        HeightRequest="140" WidthRequest="140">
                     <Grid.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding ShowMediaPickerCommand}">
                             <TapGestureRecognizer.CommandParameter>
@@ -74,19 +74,50 @@
 
                 <Image Grid.Row="3" Grid.Column="0" WidthRequest="32">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe434;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe72e;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="3" Grid.Column="1" Text="Fit Image (on server):" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
-                <Switch Grid.Row="3" Grid.Column="2" IsToggled="{Binding FitImageServerSide}" />
+                <Label Grid.Row="3" Grid.Column="1" Text="Mask Image:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
 
-                <Image Grid.Row="4" Grid.Column="0" WidthRequest="32">
+                <Grid Grid.Row="4" Grid.ColumnSpan="3"
+                        HeightRequest="140" WidthRequest="140">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ShowMediaPickerCommand}">
+                            <TapGestureRecognizer.CommandParameter>
+                                <s:Boolean>False</s:Boolean>
+                            </TapGestureRecognizer.CommandParameter>
+                        </TapGestureRecognizer>
+                    </Grid.GestureRecognizers>
+                    <Label Text="Tap to set the mask" HorizontalOptions="Fill" VerticalOptions="Fill" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Padding="20"
+                           IsVisible="{Binding MaskImageSource, Converter={StaticResource IsNullConverter}}"/>
+                    <Image x:Name="MaskImage"
+                           Source="{Binding MaskImageSource}" Aspect="AspectFit" HorizontalOptions="Fill" VerticalOptions="Fill"
+                           IsVisible="{Binding MaskImageSource, Converter={StaticResource IsNotNullConverter}}"/>
+                    <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center">
+                        <ActivityIndicator.IsRunning>
+                            <MultiBinding Converter="{StaticResource AnyTrueConverter}" >
+                                <Binding Source="{x:Reference MaskImage}" Path="IsLoading" />
+                                <Binding Path="IsLoadingMaskImage" />
+                            </MultiBinding>
+                        </ActivityIndicator.IsRunning>
+                    </ActivityIndicator>
+                </Grid>
+
+                <Image Grid.Row="5" Grid.Column="0" WidthRequest="32">
                     <Image.Source>
                         <FontImageSource Glyph="&#xe434;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="4" Grid.Column="1" Text="Fit Image (before sending):" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
-                <Switch Grid.Row="4" Grid.Column="2" IsToggled="{Binding FitImageClientSide}" />
+                <Label Grid.Row="5" Grid.Column="1" Text="Fit Image (on server):" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+                <Switch Grid.Row="5" Grid.Column="2" IsToggled="{Binding FitImageServerSide}" />
+
+                <Image Grid.Row="6" Grid.Column="0" WidthRequest="32">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xe434;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
+                    </Image.Source>
+                </Image>
+                <Label Grid.Row="6" Grid.Column="1" Text="Fit Image (before sending):" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+                <Switch Grid.Row="6" Grid.Column="2" IsToggled="{Binding FitImageClientSide}" />
             </Grid>
         </ScrollView>
 

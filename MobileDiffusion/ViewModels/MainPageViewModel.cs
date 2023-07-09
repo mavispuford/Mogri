@@ -26,6 +26,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
     private Settings _settings = new();
     private string _resizedInitImage;
+    private string _resizedMaskImage;
     private bool _initImageNeedsResize = true;
     private float _targetProgress = 0;
     private List<PromptDescriptor> _promptDescriptors = new();
@@ -119,19 +120,32 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         {
             if (_initImageNeedsResize)
             {
-                var imageString = await GetResizedImageStringFromSettingsAsync(settings);
+                var initImageString = await GetResizedImageStringFromSettingsAsync(settings, settings.InitImage);
 
-                if (!string.IsNullOrEmpty(imageString))
+                if (!string.IsNullOrEmpty(initImageString))
                 {
-                    settings.InitImage = imageString;
+                    settings.InitImage = initImageString;
 
-                    _resizedInitImage = imageString;
+                    _resizedInitImage = initImageString;
                     _initImageNeedsResize = false;
+                }
+
+                if (!string.IsNullOrEmpty(settings.Mask))
+                {
+                    var maskImageString = await GetResizedImageStringFromSettingsAsync(settings, settings.Mask);
+
+                    if (!string.IsNullOrEmpty(maskImageString))
+                    {
+                        settings.Mask = maskImageString;
+
+                        _resizedMaskImage = maskImageString;
+                    }
                 }
             }
             else
             {
                 settings.InitImage = _resizedInitImage;
+                settings.Mask = _resizedMaskImage;
             }
         }
 
@@ -308,9 +322,9 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         animation.Commit(Shell.Current.CurrentPage, "ProgressAnimation", length: 500);
     }
 
-    private async Task<string> GetResizedImageStringFromSettingsAsync(Settings settings)
+    private async Task<string> GetResizedImageStringFromSettingsAsync(Settings settings, string sourceImageString)
     {
-        if (string.IsNullOrEmpty(settings.InitImage) ||
+        if (string.IsNullOrEmpty(sourceImageString) ||
             !settings.FitClientSide)
         {
             return string.Empty;
@@ -320,7 +334,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
         return await Task.Run(async () =>
         {
-            var stream = await _imageService.GetStreamFromContentTypeStringAsync(settings.InitImage, tokenSource.Token);
+            var stream = await _imageService.GetStreamFromContentTypeStringAsync(sourceImageString, tokenSource.Token);
 
             var bytes = _imageService.GetResizedImageStreamBytes(stream, (int)settings.Width, (int)settings.Height);
 
@@ -429,9 +443,16 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             updateHasInitImage();
         }
 
-        if (query.TryGetValue(NavigationParams.InitImgString, out var initImagParam))
+        if (query.TryGetValue(NavigationParams.InitImgString, out var initImageParam))
         {
-            _settings.InitImage = initImagParam as string;
+            _settings.InitImage = initImageParam as string;
+
+            updateHasInitImage();
+        }
+
+        if (query.TryGetValue(NavigationParams.MaskImgString, out var maskImageParam))
+        {
+            _settings.Mask = maskImageParam as string;
 
             updateHasInitImage();
         }

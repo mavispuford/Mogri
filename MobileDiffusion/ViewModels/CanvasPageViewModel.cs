@@ -159,42 +159,55 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
             try
             {
-                var maskedResultBitmap = CreateMaskedBitmap(SourceBitmap, maskBitmap);
+                // If we are combining the mask and the source bitmap
+                //var maskedResultBitmap = CreateMaskedBitmap(SourceBitmap, maskBitmap);
 
                 var fileName = $"Mask-{DateTime.Now.Ticks}.png";
 
-                using (var memStream = new MemoryStream())
+                using (var maskMemStream = new MemoryStream())
                 {
-                    using (var skiaStream = new SKManagedWStream(memStream))
+                    using (var maskSkiaStream = new SKManagedWStream(maskMemStream))
                     {
-                        maskedResultBitmap.Encode(skiaStream, SKEncodedImageFormat.Png, 100);
+                        maskBitmap.Encode(maskSkiaStream, SKEncodedImageFormat.Png, 100);
 
-                        memStream.Seek(0, SeekOrigin.Begin);
+                        //maskedResultBitmap.Encode(skiaStream, SKEncodedImageFormat.Png, 100);
 
-                        var uri = await _fileService.WriteImageFileToExternalStorageAsync(fileName, memStream, true);
+                        maskMemStream.Seek(0, SeekOrigin.Begin);
+
+                        var uri = await _fileService.WriteImageFileToExternalStorageAsync(fileName, maskMemStream, true);
 
                         var useAsInitImg = false;
 
                         var dispatcher = Shell.Current.CurrentPage.Dispatcher;
                         await dispatcher?.DispatchAsync(async () =>
                         {
-                            useAsInitImg = await Shell.Current.CurrentPage.DisplayAlert("Use as Source Image?",
-                                $"Image successfully saved as:\n{fileName}\n\nWould you like to use it as the source image?",
+                            useAsInitImg = await Shell.Current.CurrentPage.DisplayAlert("Use as Source Images?",
+                                $"Mask successfully saved as:\n{fileName}\n\nWould you like to use both as source images?",
                                 "Use Image",
                                 "Close");
                         });
 
                         if (useAsInitImg)
                         {
-                            memStream.Seek(0, SeekOrigin.Begin);
-                            var imageBytes = memStream.ToArray();
-                            var imageString = Convert.ToBase64String(imageBytes);
+                            maskMemStream.Seek(0, SeekOrigin.Begin);
+                            var maskImageBytes = maskMemStream.ToArray();
+                            var maskImageString = Convert.ToBase64String(maskImageBytes);
 
-                            var contentTypeString = string.Format(Constants.ImageDataFormat, "image/png", imageString);
+                            var maskImgContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", maskImageString);
+
+                            using var sourceMemStream = new MemoryStream();
+                            using var sourceSkiaStream = new SKManagedWStream(sourceMemStream);
+                            SourceBitmap.Encode(sourceSkiaStream, SKEncodedImageFormat.Png, 100);
+                            sourceMemStream.Seek(0, SeekOrigin.Begin);
+                            var sourceImageBytes = sourceMemStream.ToArray();
+                            var sourceImageString = Convert.ToBase64String(sourceImageBytes);
+
+                            var sourceImgContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", sourceImageString);
 
                             var parameters = new Dictionary<string, object>
                             {
-                                {NavigationParams.InitImgString, contentTypeString }
+                                {NavigationParams.InitImgString, sourceImgContentTypeString },
+                                {NavigationParams.MaskImgString, maskImgContentTypeString }
                             };
 
                             await dispatcher?.DispatchAsync(async () =>

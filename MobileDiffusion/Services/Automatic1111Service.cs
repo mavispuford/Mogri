@@ -135,6 +135,7 @@ namespace MobileDiffusion.Services
         {
             var request = new StableDiffusionProcessingTxt2Img();
 
+            //request.N_iter = 1; // Number of Batches
             request.Batch_size = settings.NumOutputs;
             request.Cfg_scale = settings.GuidanceScale;
             request.Restore_faces = settings.EnableGfpgan;
@@ -151,7 +152,6 @@ namespace MobileDiffusion.Services
 
             // TODO - Use steps in the UI instead of calculating from a strength value?
             request.Hr_second_pass_steps = (int)(settings.UpscaleStrength * settings.Steps);
-            //request.Sampler_name = settings.Sampler.ToString();
 
             return request;
         }
@@ -160,7 +160,7 @@ namespace MobileDiffusion.Services
         {
             var request = new StableDiffusionProcessingImg2Img();
 
-            //request.N_iter = 1; // Batches
+            //request.N_iter = 1; // Number of Batches
             request.Batch_size = settings.NumOutputs;
             request.Cfg_scale = settings.GuidanceScale;
             request.Restore_faces = settings.EnableGfpgan;
@@ -173,11 +173,11 @@ namespace MobileDiffusion.Services
             request.Prompt = settings.Prompt;
             request.Negative_prompt = settings.NegativePrompt;
             request.Sampler_name = settings.Sampler;
-
             request.Init_images = new List<object>
             {
                 settings.InitImage
             };
+            request.Mask = settings.Mask;
 
             return request;
         }
@@ -207,6 +207,7 @@ namespace MobileDiffusion.Services
 
             ApiResponse apiResponse = null;
             var skipCurrentImage = false;
+            var finished = false;
 
             while (true)
             {
@@ -223,11 +224,13 @@ namespace MobileDiffusion.Services
                         ResponseObject = txt2ImgResponse,
                         Progress = 1f
                     };
+
+                    finished = true;
                 }
 
                 yield return apiResponse;
 
-                if (textToImageTask.IsCompleted || progressToken.IsCancellationRequested)
+                if (finished)
                 {
                     break;
                 }
@@ -262,6 +265,7 @@ namespace MobileDiffusion.Services
 
             ApiResponse apiResponse = null;
             var skipCurrentImage = false;
+            var finished = false;
 
             while (true)
             {
@@ -278,11 +282,13 @@ namespace MobileDiffusion.Services
                         ResponseObject = img2ImgResponse,
                         Progress = 1f
                     };
+
+                    finished = true;
                 }
 
                 yield return apiResponse;
 
-                if (textToImageTask.IsCompleted || progressToken.IsCancellationRequested)
+                if (finished)
                 {
                     break;
                 }
