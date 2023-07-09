@@ -291,6 +291,7 @@ public partial class CanvasPage : BasePage
                     const int tiledBitmapSize = 5;
                     var maskTiledBitmap = new SKBitmap(tiledBitmapSize, tiledBitmapSize);
 
+                    // Make the tiled shader pattern for editor visualization purposes
                     for (var x = 0; x < tiledBitmapSize; x++)
                     {
                         for (var y = 0; y < tiledBitmapSize; y++)
