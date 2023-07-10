@@ -159,62 +159,51 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
             try
             {
-                // If we are combining the mask and the source bitmap
-                //var maskedResultBitmap = CreateMaskedBitmap(SourceBitmap, maskBitmap);
+                // Colorize the source bitmap using the mask, then create a black and white mask
+                var colorizedBitmap = CreateMaskedBitmap(SourceBitmap, maskBitmap);
+                var blackAndWhiteMaskBitmap = CreateBlackAndWhiteMask(maskBitmap);
 
-                var fileName = $"Mask-{DateTime.Now.Ticks}.png";
+                //var fileName = $"Mask-{DateTime.Now.Ticks}.png";
 
                 using (var maskMemStream = new MemoryStream())
                 {
                     using (var maskSkiaStream = new SKManagedWStream(maskMemStream))
                     {
-                        maskBitmap.Encode(maskSkiaStream, SKEncodedImageFormat.Png, 100);
+                        blackAndWhiteMaskBitmap.Encode(maskSkiaStream, SKEncodedImageFormat.Png, 100);
 
                         //maskedResultBitmap.Encode(skiaStream, SKEncodedImageFormat.Png, 100);
 
                         maskMemStream.Seek(0, SeekOrigin.Begin);
 
-                        var uri = await _fileService.WriteImageFileToExternalStorageAsync(fileName, maskMemStream, true);
+                        //var uri = await _fileService.WriteImageFileToExternalStorageAsync(fileName, maskMemStream, true);
 
-                        var useAsInitImg = false;
+                        
+                        maskMemStream.Seek(0, SeekOrigin.Begin);
+                        var maskImageBytes = maskMemStream.ToArray();
+                        var maskImageString = Convert.ToBase64String(maskImageBytes);
+
+                        var maskImgContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", maskImageString);
+
+                        using var colorizedMemStream = new MemoryStream();
+                        using var colorizedSkiaStream = new SKManagedWStream(colorizedMemStream);
+                        colorizedBitmap.Encode(colorizedSkiaStream, SKEncodedImageFormat.Png, 100);
+                        colorizedMemStream.Seek(0, SeekOrigin.Begin);
+                        var colorizedImageBytes = colorizedMemStream.ToArray();
+                        var colorizedImageString = Convert.ToBase64String(colorizedImageBytes);
+
+                        var colorizedImgContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", colorizedImageString);
+
+                        var parameters = new Dictionary<string, object>
+                        {
+                            {NavigationParams.InitImgString, colorizedImgContentTypeString },
+                            {NavigationParams.MaskImgString, maskImgContentTypeString }
+                        };
 
                         var dispatcher = Shell.Current.CurrentPage.Dispatcher;
                         await dispatcher?.DispatchAsync(async () =>
                         {
-                            useAsInitImg = await Shell.Current.CurrentPage.DisplayAlert("Use as Source Images?",
-                                $"Mask successfully saved as:\n{fileName}\n\nWould you like to use both as source images?",
-                                "Use Image",
-                                "Close");
+                            await Shell.Current.GoToAsync("///MainPageTab", parameters);
                         });
-
-                        if (useAsInitImg)
-                        {
-                            maskMemStream.Seek(0, SeekOrigin.Begin);
-                            var maskImageBytes = maskMemStream.ToArray();
-                            var maskImageString = Convert.ToBase64String(maskImageBytes);
-
-                            var maskImgContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", maskImageString);
-
-                            using var sourceMemStream = new MemoryStream();
-                            using var sourceSkiaStream = new SKManagedWStream(sourceMemStream);
-                            SourceBitmap.Encode(sourceSkiaStream, SKEncodedImageFormat.Png, 100);
-                            sourceMemStream.Seek(0, SeekOrigin.Begin);
-                            var sourceImageBytes = sourceMemStream.ToArray();
-                            var sourceImageString = Convert.ToBase64String(sourceImageBytes);
-
-                            var sourceImgContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", sourceImageString);
-
-                            var parameters = new Dictionary<string, object>
-                            {
-                                {NavigationParams.InitImgString, sourceImgContentTypeString },
-                                {NavigationParams.MaskImgString, maskImgContentTypeString }
-                            };
-
-                            await dispatcher?.DispatchAsync(async () =>
-                            {
-                                await Shell.Current.GoToAsync("///MainPageTab", parameters);
-                            });
-                        }
                     }
                 }
             }
@@ -534,7 +523,71 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
         SourceBitmap = finalBitmap;
     }
-    
+
+    private unsafe SKBitmap CreateBlackAndWhiteMask(SKBitmap maskBitmap)
+    {
+        if (maskBitmap == null)
+        {
+            return null;
+        }
+
+        byte* mskPtr = (byte*)maskBitmap.GetPixels().ToPointer();
+
+        var width = maskBitmap.Width;
+        var height = maskBitmap.Height;
+
+        SKColorType typeMsk = maskBitmap.ColorType;
+
+        var resultBitmap = new SKBitmap(width, height, typeMsk, SKAlphaType.Unpremul);
+
+        byte* resultPtr = (byte*)resultBitmap.GetPixels().ToPointer();
+
+        for (int row = 0; row < height; row++)
+        {
+            for (int col = 0; col < width; col++)
+            {
+                // Get color from mask bitmap
+                byte mskByte1 = *mskPtr++;         // red or blue
+                byte mskByte2 = *mskPtr++;         // green
+                byte mskByte3 = *mskPtr++;         // blue or red
+                byte mskByte4 = *mskPtr++;         // alpha
+
+                if (mskByte4 != 0)
+                {
+                    var maskColor = new Color();
+
+                    if (typeMsk == SKColorType.Rgba8888)
+                    {
+                        maskColor = Color.FromRgba(mskByte1, mskByte2, mskByte3, mskByte4);
+                    }
+                    else if (typeMsk == SKColorType.Bgra8888)
+                    {
+                        maskColor = Color.FromRgba(mskByte3, mskByte2, mskByte1, mskByte4);
+                    }
+
+                    float strength = mskByte4 / 255f;
+
+                    var newColor = Color.FromRgba(1f, 1f, 1f, strength);
+
+                    *resultPtr++ = typeMsk == SKColorType.Rgba8888 ? newColor.GetByteRed() : newColor.GetByteBlue();
+                    *resultPtr++ = newColor.GetByteGreen();
+                    *resultPtr++ = typeMsk == SKColorType.Rgba8888 ? newColor.GetByteBlue() : newColor.GetByteRed();
+                    *resultPtr++ = newColor.GetByteAlpha();
+                }
+                else
+                {
+                    *resultPtr++ = mskByte1;
+                    *resultPtr++ = mskByte2;
+                    *resultPtr++ = mskByte3;
+                    *resultPtr++ = mskByte4;
+                }
+
+            }
+        }
+
+        return resultBitmap;
+    }
+
     private unsafe SKBitmap CreateMaskedBitmap(SKBitmap srcBitmap, SKBitmap maskBitmapFull, bool randomizeMaskPixels = true)
     {
         if (srcBitmap == null ||
@@ -616,7 +669,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                     }
 
                     // Limit the strength to preserve some of the pixel data from the underlying image
-                    float strength = Math.Min(mskByte4 / 255f, 204);
+                    float strength = Math.Min(mskByte4, (byte)204) / 255f;
 
                     // Interpolate between the source and mask colors using the strength
                     var newColor = Color.FromRgba(
@@ -628,9 +681,10 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                     *resultPtr++ = typeMsk == SKColorType.Rgba8888 ? newColor.GetByteRed() : newColor.GetByteBlue();
                     *resultPtr++ = newColor.GetByteGreen();
                     *resultPtr++ = typeMsk == SKColorType.Rgba8888 ? newColor.GetByteBlue() : newColor.GetByteRed();
+                    *resultPtr++ = newColor.GetByteAlpha();
 
-                    // Set alpha to a near-zero value
-                    *resultPtr++ = 3;
+                    // Set alpha to a near-zero value for InvokeAI
+                    //*resultPtr++ = 3;
                 }
                 else
                 {

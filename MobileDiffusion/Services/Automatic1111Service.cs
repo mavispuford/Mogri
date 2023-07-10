@@ -178,6 +178,7 @@ namespace MobileDiffusion.Services
                 settings.InitImage
             };
             request.Mask = settings.Mask;
+            request.Inpainting_fill = 1;
 
             return request;
         }
