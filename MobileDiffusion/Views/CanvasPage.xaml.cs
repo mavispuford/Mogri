@@ -14,6 +14,7 @@ public partial class CanvasPage : BasePage
     private Timer _alphaTimer;
     private bool _hasCreatedInitImgRectangle;
     private bool _isSaving;
+    private bool _showMask = true;
 
     public SKBitmap Bitmap
     {
@@ -555,8 +556,15 @@ public partial class CanvasPage : BasePage
         MaskCanvasView.InvalidateSurface();
     }
 
-    private void Clear_Button_Clicked(object sender, EventArgs e)
+    private async void Clear_Button_Clicked(object sender, EventArgs e)
     {
+        var result = await confirmClear();
+
+        if (!result)
+        {
+            return;
+        }
+
         HideSliders();
 
         if (Lines == null || !Lines.Any())
@@ -567,6 +575,11 @@ public partial class CanvasPage : BasePage
         Lines.Clear();
 
         MaskCanvasView.InvalidateSurface();
+    }
+
+    private async Task<bool> confirmClear()
+    {
+        return await DisplayAlert("Clear mask?", "Are you sure you would like to clear the mask?", "YES", "Cancel");
     }
 
     private void OnLinesChanged()
@@ -629,6 +642,14 @@ public partial class CanvasPage : BasePage
     private void MaskGrid_SizeChanged(object sender, EventArgs e)
     {
         UpdateCanvasSizes();
+    }
+
+    private void ToggleMaskButton_Clicked(object sender, EventArgs e)
+    {
+        _showMask = !_showMask;
+
+        MaskCanvasView.AbortAnimation("FadeInOutMaskCanvasView");
+        MaskCanvasView.Animate("FadeInOutMaskCanvasView", value => MaskCanvasView.Opacity = value, MaskCanvasView.Opacity, _showMask ? 1 : 0, easing: Easing.CubicInOut);
     }
 }
 

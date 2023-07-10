@@ -95,7 +95,31 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     }
 
     [RelayCommand]
-    private async Task SaveMask()
+    private async Task Save()
+    {
+        const string maskChoice = "Mask";
+        const string imageChoice = "Image";
+
+        var selection = string.Empty;
+
+        var dispatcher = Shell.Current.CurrentPage.Dispatcher;
+        await dispatcher?.DispatchAsync(async () =>
+        {
+            selection = await Shell.Current.DisplayActionSheet("Save?", "Cancel", null, maskChoice, imageChoice);
+        });
+
+        switch (selection)
+        {
+            case maskChoice:
+                await saveMask();
+                break;
+            case imageChoice:
+                await saveImage();
+                break;
+        }
+    }
+
+    private async Task saveMask()
     {
         if (string.IsNullOrEmpty(_sourceFileName))
         {
@@ -116,8 +140,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         }
     }
 
-    [RelayCommand]
-    private async Task SaveImage()
+    private async Task saveImage()
     {
         if (SourceCanvasView == null ||
             MaskCanvasView == null ||
@@ -129,6 +152,21 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         }
 
         await PrepareForSavingCommand?.ExecuteAsync(FinishSavingCommand);
+    }
+
+    [RelayCommand]
+    private async Task SendToImageToImage()
+    {
+        if (SourceCanvasView == null ||
+            MaskCanvasView == null ||
+            SourceBitmap == null)
+        {
+            await Toast.Make("There is no image to send.").Show();
+
+            return;
+        }
+
+        await PrepareForSavingCommand?.ExecuteAsync(FinishSendingToImageToImageCommand);
     }
 
     [RelayCommand]
@@ -153,6 +191,38 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
         await Task.Run(async () =>
         {
+
+            try
+            {
+                using var memStream = new MemoryStream();
+                using var skiaStream = new SKManagedWStream(memStream);
+
+                SourceBitmap.Encode(skiaStream, SKEncodedImageFormat.Png, 100);
+
+                var fileName = $"CanvasImage-{DateTime.Now.Ticks}.png";
+                memStream.Seek(0, SeekOrigin.Begin);
+                var uri = await _fileService.WriteImageFileToExternalStorageAsync(fileName, memStream, false);
+
+                await Toast.Make($"{fileName} saved.").Show();
+            }
+            catch (Exception e)
+            {
+                //
+
+                await Toast.Make("Failed to save image. Please try again.").Show();
+            }
+        });
+
+        IsBusy = false;
+    }
+
+    [RelayCommand]
+    private async Task FinishSendingToImageToImage()
+    {
+        IsBusy = true;
+
+        await Task.Run(async () =>
+        {
             var maskCapture = await MaskCanvasView.CaptureAsync();
             var maskStream = await maskCapture.OpenReadAsync();
             var maskBitmap = SKBitmap.Decode(maskStream);
@@ -163,46 +233,42 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 var colorizedBitmap = CreateMaskedBitmap(SourceBitmap, maskBitmap);
                 var blackAndWhiteMaskBitmap = CreateBlackAndWhiteMask(maskBitmap);
 
-                using (var maskMemStream = new MemoryStream())
-                {
-                    using (var maskSkiaStream = new SKManagedWStream(maskMemStream))
-                    {
-                        blackAndWhiteMaskBitmap.Encode(maskSkiaStream, SKEncodedImageFormat.Png, 100);
+                using var maskMemStream = new MemoryStream();
+                using var maskSkiaStream = new SKManagedWStream(maskMemStream);
 
-                        // Occasionally helpful for debugging masks
-                        //var fileName = $"Mask-{DateTime.Now.Ticks}.png";
-                        //maskMemStream.Seek(0, SeekOrigin.Begin);
-                        //var uri = await _fileService.WriteImageFileToExternalStorageAsync(fileName, maskMemStream, true);
+                blackAndWhiteMaskBitmap.Encode(maskSkiaStream, SKEncodedImageFormat.Png, 100);
 
+                // Occasionally helpful for debugging masks
+                //var fileName = $"Mask-{DateTime.Now.Ticks}.png";
+                //maskMemStream.Seek(0, SeekOrigin.Begin);
+                //var uri = await _fileService.WriteImageFileToExternalStorageAsync(fileName, maskMemStream, true);
 
-                        maskMemStream.Seek(0, SeekOrigin.Begin);
-                        var maskImageBytes = maskMemStream.ToArray();
-                        var maskImageString = Convert.ToBase64String(maskImageBytes);
+                maskMemStream.Seek(0, SeekOrigin.Begin);
+                var maskImageBytes = maskMemStream.ToArray();
+                var maskImageString = Convert.ToBase64String(maskImageBytes);
 
-                        var maskImgContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", maskImageString);
+                var maskImgContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", maskImageString);
 
-                        using var colorizedMemStream = new MemoryStream();
-                        using var colorizedSkiaStream = new SKManagedWStream(colorizedMemStream);
-                        colorizedBitmap.Encode(colorizedSkiaStream, SKEncodedImageFormat.Png, 100);
-                        colorizedMemStream.Seek(0, SeekOrigin.Begin);
-                        var colorizedImageBytes = colorizedMemStream.ToArray();
-                        var colorizedImageString = Convert.ToBase64String(colorizedImageBytes);
+                using var colorizedMemStream = new MemoryStream();
+                using var colorizedSkiaStream = new SKManagedWStream(colorizedMemStream);
+                colorizedBitmap.Encode(colorizedSkiaStream, SKEncodedImageFormat.Png, 100);
+                colorizedMemStream.Seek(0, SeekOrigin.Begin);
+                var colorizedImageBytes = colorizedMemStream.ToArray();
+                var colorizedImageString = Convert.ToBase64String(colorizedImageBytes);
 
-                        var colorizedImgContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", colorizedImageString);
+                var colorizedImgContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", colorizedImageString);
 
-                        var parameters = new Dictionary<string, object>
+                var parameters = new Dictionary<string, object>
                         {
                             {NavigationParams.InitImgString, colorizedImgContentTypeString },
                             {NavigationParams.MaskImgString, maskImgContentTypeString }
                         };
 
-                        var dispatcher = Shell.Current.CurrentPage.Dispatcher;
-                        await dispatcher?.DispatchAsync(async () =>
-                        {
-                            await Shell.Current.GoToAsync("///MainPageTab", parameters);
-                        });
-                    }
-                }
+                var dispatcher = Shell.Current.CurrentPage.Dispatcher;
+                await dispatcher?.DispatchAsync(async () =>
+                {
+                    await Shell.Current.GoToAsync("///MainPageTab", parameters);
+                });
             }
             catch (Exception e)
             {
@@ -226,39 +292,46 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
             try
             {
-                var maskedResultBitmap = CreateMaskedBitmap(SourceBitmap, maskBitmap);
+                // Colorize the source bitmap using the mask, then create a black and white mask
+                var colorizedBitmap = CreateMaskedBitmap(SourceBitmap, maskBitmap);
+                var blackAndWhiteMaskBitmap = CreateBlackAndWhiteMask(maskBitmap);
 
-                var croppedBitmap = GetCroppedBitmap(maskedResultBitmap, InitImgRectangle);
+                var croppedBitmap = GetCroppedBitmap(colorizedBitmap, InitImgRectangle);
+                var croppedMask = GetCroppedBitmap(blackAndWhiteMaskBitmap, InitImgRectangle);
 
-                using (var memStream = new MemoryStream())
-                {
-                    using (var skiaStream = new SKManagedWStream(memStream))
-                    {
-                        croppedBitmap.Encode(skiaStream, SKEncodedImageFormat.Png, 100);
+                using var croppedBitmapMemStream = new MemoryStream();
+                using var croppedBitmapSkiaStream = new SKManagedWStream(croppedBitmapMemStream);
 
-                        memStream.Seek(0, SeekOrigin.Begin);
+                croppedBitmap.Encode(croppedBitmapSkiaStream, SKEncodedImageFormat.Png, 100);
+                croppedBitmapMemStream.Seek(0, SeekOrigin.Begin);
+                var croppedBitmapImageBytes = croppedBitmapMemStream.ToArray();
+                var croppedBitmapImageString = Convert.ToBase64String(croppedBitmapImageBytes);
+                var croppedBitmapContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", croppedBitmapImageString);
 
-                        var imageBytes = memStream.ToArray();
-                        var imageString = Convert.ToBase64String(imageBytes);
+                using var croppedMaskMemStream = new MemoryStream();
+                using var croppedMaskSkiaStream = new SKManagedWStream(croppedMaskMemStream);
 
-                        var contentTypeString = string.Format(Constants.ImageDataFormat, "image/png", imageString);
+                croppedMask.Encode(croppedMaskSkiaStream, SKEncodedImageFormat.Png, 100);
+                croppedMaskMemStream.Seek(0, SeekOrigin.Begin);
+                var croppedMaskImageBytes = croppedMaskMemStream.ToArray();
+                var croppedMaskImageString = Convert.ToBase64String(croppedMaskImageBytes);
+                var croppedMaskContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", croppedMaskImageString);
 
-                        var parameters = new Dictionary<string, object>
+                var parameters = new Dictionary<string, object>
                         {
                             { NavigationParams.ImageWidth, InitImgRectangleSize },
                             { NavigationParams.ImageHeight, InitImgRectangleSize },
-                            { NavigationParams.InitImgString, contentTypeString },
+                            { NavigationParams.InitImgString, croppedBitmapContentTypeString },
+                            { NavigationParams.MaskImgString, croppedMaskContentTypeString },
                         };
 
-                        var dispatcher = Shell.Current.CurrentPage.Dispatcher;
-                        await dispatcher?.DispatchAsync(async () =>
-                        {
-                            await Shell.Current.GoToAsync("///MainPageTab", parameters);
+                var dispatcher = Shell.Current.CurrentPage.Dispatcher;
+                await dispatcher?.DispatchAsync(async () =>
+                {
+                    await Shell.Current.GoToAsync("///MainPageTab", parameters);
 
-                            await Toast.Make("Section has been cropped and set as source image.").Show();
-                        });
-                    }
-                }
+                    await Toast.Make("Section has been cropped and set as source image.").Show();
+                });
             }
             catch (Exception e)
             {
