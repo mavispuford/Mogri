@@ -42,10 +42,12 @@ public partial class ImageResultControl : ContentView
         Image = ImageControl;
 	}
 
-    private void OnIsLoadingChanged()
+    private async void OnIsLoadingChanged()
     {
         if (!IsLoading && ImageControl.Scale == 0)
         {
+            await Task.Delay(300);
+
             ImageControl.ScaleTo(1, 250u, Easing.CubicInOut);
         }
     }
