@@ -163,21 +163,18 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 var colorizedBitmap = CreateMaskedBitmap(SourceBitmap, maskBitmap);
                 var blackAndWhiteMaskBitmap = CreateBlackAndWhiteMask(maskBitmap);
 
-                //var fileName = $"Mask-{DateTime.Now.Ticks}.png";
-
                 using (var maskMemStream = new MemoryStream())
                 {
                     using (var maskSkiaStream = new SKManagedWStream(maskMemStream))
                     {
                         blackAndWhiteMaskBitmap.Encode(maskSkiaStream, SKEncodedImageFormat.Png, 100);
 
-                        //maskedResultBitmap.Encode(skiaStream, SKEncodedImageFormat.Png, 100);
-
-                        maskMemStream.Seek(0, SeekOrigin.Begin);
-
+                        // Occasionally helpful for debugging masks
+                        //var fileName = $"Mask-{DateTime.Now.Ticks}.png";
+                        //maskMemStream.Seek(0, SeekOrigin.Begin);
                         //var uri = await _fileService.WriteImageFileToExternalStorageAsync(fileName, maskMemStream, true);
 
-                        
+
                         maskMemStream.Seek(0, SeekOrigin.Begin);
                         var maskImageBytes = maskMemStream.ToArray();
                         var maskImageString = Convert.ToBase64String(maskImageBytes);
