@@ -37,16 +37,19 @@ namespace MobileDiffusion.Interfaces.ViewModels
 
         IAsyncRelayCommand FinishSavingCommand { get; }
 
+        IAsyncRelayCommand FinishSendingToImageToImageCommand { get; }
+
+
         IAsyncRelayCommand FinishCroppingInitImgRectangleCommand { get; }
 
         IAsyncRelayCommand ShowColorPickerCommand { get; }
 
         IAsyncRelayCommand ShowMediaPickerCommand { get; }
 
-        IAsyncRelayCommand SaveMaskCommand { get; }
+        IAsyncRelayCommand SaveCommand { get; }
 
-        IAsyncRelayCommand SaveImageCommand { get; }
-
+        IAsyncRelayCommand SendToImageToImageCommand { get; }
+        
         IRelayCommand ToggleInitImgRectangleCommand { get; }
     }
 }

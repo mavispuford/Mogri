@@ -53,6 +53,7 @@
 	  <None Remove="Platforms\Android\Resources\xml\network_security_config.xml" />
 	  <None Remove="Resources\Fonts\MaterialIconsRound-Regular.otf" />
 	  <None Remove="Resources\Images\circle_fill_48.svg" />
+	  <None Remove="Resources\Images\reset_image.svg" />
 	</ItemGroup>
 
 	<ItemGroup>

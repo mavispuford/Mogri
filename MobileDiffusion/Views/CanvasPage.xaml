@@ -11,7 +11,7 @@
     <Shell.TitleView>
         <HorizontalStackLayout x:Name="TitleViewLayout"
                                Spacing="30"
-                               HorizontalOptions="Center"
+                               HorizontalOptions="CenterAndExpand"
                                TranslationX="{OnPlatform Default=0, Android=-9}">
 
             <ImageButton ToolTipProperties.Text="Add Image"
@@ -40,17 +40,28 @@
 
             <ImageButton ToolTipProperties.Text="Save Mask"
                          VerticalOptions="FillAndExpand"
-                         Command="{Binding SaveMaskCommand}">
+                         Command="{Binding SaveCommand}">
                 <ImageButton.Source>
                     <FontImageSource Glyph="&#xe161;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
                 </ImageButton.Source>
             </ImageButton>
 
-            <ImageButton ToolTipProperties.Text="Save Image"
+            <ImageButton ToolTipProperties.Text="Use as source image"
                          VerticalOptions="FillAndExpand"
-                         Command="{Binding SaveImageCommand}">
+                         Command="{Binding SendToImageToImageCommand}"
+                         Source="reset_image.png"
+                         HeightRequest="30"
+                         WidthRequest="30">
+                <ImageButton.Behaviors>
+                    <toolkit:IconTintColorBehavior TintColor="White" />
+                </ImageButton.Behaviors>
+            </ImageButton>
+
+            <ImageButton ToolTipProperties.Text="Toggle mask visibility"
+                         VerticalOptions="FillAndExpand"
+                         Clicked="ToggleMaskButton_Clicked">
                 <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe3f4;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                    <FontImageSource Glyph="&#xe8f4;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
                 </ImageButton.Source>
             </ImageButton>
 
