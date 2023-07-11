@@ -57,7 +57,7 @@ public class ImageService : IImageService
         return ImageSource.FromStream(() => stream);
     }
 
-    public byte[] GetResizedImageStreamBytes(Stream stream, int width, int height)
+    public (byte[] Bytes, int ActualWidth, int ActualHeight) GetResizedImageStreamBytes(Stream stream, int width, int height, bool forceExactSize = false)
     {
         try
         {
@@ -76,6 +76,11 @@ public class ImageService : IImageService
 
             var bitmap = SKBitmap.Decode(codec, info);
 
+            if (forceExactSize)
+            {
+                return resizeBitmap(bitmap, width, height);
+            }
+
             if (bitmap.Width <= width &&
                 bitmap.Height <= height)
             {
@@ -83,7 +88,7 @@ public class ImageService : IImageService
 
                 using var memoryStream = new MemoryStream();
                 stream.CopyTo(memoryStream);
-                return memoryStream.ToArray();
+                return (memoryStream.ToArray(), bitmap.Width, bitmap.Height);
             }
 
             // 1024 x 512 -> 512 x 512 = 512 x 256
@@ -116,24 +121,29 @@ public class ImageService : IImageService
                 targetWidth = (int)roundedWidth;
             }
 
-            var resized = bitmap.Resize(new SKSizeI(targetWidth, targetHeight), SKFilterQuality.None);
-
-            using (var memStream = new MemoryStream())
-            {
-                using (var skiaStream = new SKManagedWStream(memStream))
-                {
-                    resized.Encode(skiaStream, SKEncodedImageFormat.Png, 100);
-
-                    memStream.Seek(0, SeekOrigin.Begin);
-                    return memStream.ToArray();
-                }
-            }
+            return resizeBitmap(bitmap, targetWidth, targetHeight);
         }
         catch
         {
-
+            // TODO - Handle this
         }
 
-        return null;
+        return (null, 0, 0);
+    }
+
+    private (byte[] Bytes, int ActualWidth, int ActualHeight) resizeBitmap(SKBitmap bitmap, int width, int height)
+    {
+        var resized = bitmap.Resize(new SKSizeI(width, height), SKFilterQuality.None);
+
+        using (var memStream = new MemoryStream())
+        {
+            using (var skiaStream = new SKManagedWStream(memStream))
+            {
+                resized.Encode(skiaStream, SKEncodedImageFormat.Png, 100);
+
+                memStream.Seek(0, SeekOrigin.Begin);
+                return (memStream.ToArray(), resized.Width, resized.Height);
+            }
+        }
     }
 }
