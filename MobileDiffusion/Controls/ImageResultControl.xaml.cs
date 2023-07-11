@@ -16,12 +16,12 @@ public partial class ImageResultControl : ContentView
         {
             ((ImageResultControl)bindable).OnImageSourceChanged();
         });
-		
-	public ImageSource Source
-	{
-		get => (ImageSource)GetValue(SourceProperty);
-		set => SetValue(SourceProperty, value);
-	}
+        
+    public ImageSource Source
+    {
+        get => (ImageSource)GetValue(SourceProperty);
+        set => SetValue(SourceProperty, value);
+    }
 
     public Image Image
     {
@@ -36,24 +36,25 @@ public partial class ImageResultControl : ContentView
     }
 
     public ImageResultControl()
-	{
-		InitializeComponent();
+    {
+        InitializeComponent();
 
         Image = ImageControl;
-	}
+    }
 
     private async void OnIsLoadingChanged()
     {
         if (!IsLoading && ImageControl.Scale == 0)
         {
+            // Avoid possible animation hitches caused by image loading
             await Task.Delay(300);
 
             ImageControl.ScaleTo(1, 250u, Easing.CubicInOut);
         }
     }
 
-	private void OnImageSourceChanged()
-	{
+    private void OnImageSourceChanged()
+    {
         if (Source != null)
         {
             ImageControl.Source = Source;

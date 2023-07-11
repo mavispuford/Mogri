@@ -120,25 +120,25 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         {
             if (_initImageNeedsResize)
             {
-                var initImageString = await GetResizedImageStringFromSettingsAsync(settings, settings.InitImage);
+                var initImageResult = await GetResizedImageStringFromSettingsAsync(settings, settings.InitImage);
 
-                if (!string.IsNullOrEmpty(initImageString))
+                if (!string.IsNullOrEmpty(initImageResult.ImageString))
                 {
-                    settings.InitImage = initImageString;
+                    settings.InitImage = initImageResult.ImageString;
 
-                    _resizedInitImage = initImageString;
+                    _resizedInitImage = initImageResult.ImageString;
                     _initImageNeedsResize = false;
                 }
 
                 if (!string.IsNullOrEmpty(settings.Mask))
                 {
-                    var maskImageString = await GetResizedImageStringFromSettingsAsync(settings, settings.Mask);
+                    var maskImageResult = await GetResizedImageStringFromWidthAndHeightAsync(initImageResult.ActualWidth, initImageResult.ActualHeight, settings.Mask, true);
 
-                    if (!string.IsNullOrEmpty(maskImageString))
+                    if (!string.IsNullOrEmpty(maskImageResult.ImageString))
                     {
-                        settings.Mask = maskImageString;
+                        settings.Mask = maskImageResult.ImageString;
 
-                        _resizedMaskImage = maskImageString;
+                        _resizedMaskImage = maskImageResult.ImageString;
                     }
                 }
             }
@@ -322,31 +322,41 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         animation.Commit(Shell.Current.CurrentPage, "ProgressAnimation", length: 500);
     }
 
-    private async Task<string> GetResizedImageStringFromSettingsAsync(Settings settings, string sourceImageString)
+    private Task<(string ImageString, int ActualWidth, int ActualHeight)> GetResizedImageStringFromSettingsAsync(Settings settings, string sourceImageString, bool forceExactSize = false)
     {
         if (string.IsNullOrEmpty(sourceImageString) ||
             !settings.FitClientSide)
         {
-            return string.Empty;
+            return Task.FromResult((string.Empty, 0, 0));
+        }
+
+        return GetResizedImageStringFromWidthAndHeightAsync((int)settings.Width, (int)settings.Height, sourceImageString, forceExactSize);
+    }
+
+    private Task<(string ImageString, int ActualWidth, int ActualHeight)> GetResizedImageStringFromWidthAndHeightAsync(int width, int height, string sourceImageString, bool forceExactSize = false)
+    {
+        if (string.IsNullOrEmpty(sourceImageString))
+        {
+            return Task.FromResult((string.Empty, 0, 0));
         }
 
         var tokenSource = new CancellationTokenSource();
 
-        return await Task.Run(async () =>
+        return Task.Run(async () =>
         {
             var stream = await _imageService.GetStreamFromContentTypeStringAsync(sourceImageString, tokenSource.Token);
 
-            var bytes = _imageService.GetResizedImageStreamBytes(stream, (int)settings.Width, (int)settings.Height);
+            var result = _imageService.GetResizedImageStreamBytes(stream, width, height, forceExactSize);
 
-            if (bytes == null ||
-                bytes.Length == 0)
+            if (result.Bytes == null ||
+                result.Bytes.Length == 0)
             {
-                return string.Empty;
+                return (string.Empty, 0, 0);
             }
 
-            var imageString = Convert.ToBase64String(bytes);
+            var imageString = Convert.ToBase64String(result.Bytes);
 
-            return string.Format(Constants.ImageDataFormat, "image/png", imageString);
+            return (string.Format(Constants.ImageDataFormat, "image/png", imageString), result.ActualWidth, result.ActualHeight);
         }, tokenSource.Token);
     }
 
