@@ -135,8 +135,8 @@ namespace MobileDiffusion.Services
         {
             var request = new StableDiffusionProcessingTxt2Img();
 
-            //request.N_iter = 1; // Number of Batches
-            request.Batch_size = settings.NumOutputs;
+            request.N_iter = settings.NumOutputs; // Number of Batches
+            //request.Batch_size = settings.NumOutputs;
             request.Cfg_scale = settings.GuidanceScale;
             request.Restore_faces = settings.EnableGfpgan;
             request.Width = (int)settings.Width;
@@ -160,8 +160,8 @@ namespace MobileDiffusion.Services
         {
             var request = new StableDiffusionProcessingImg2Img();
 
-            //request.N_iter = 1; // Number of Batches
-            request.Batch_size = settings.NumOutputs;
+            request.N_iter = settings.NumOutputs; // Number of Batches
+            //request.Batch_size = settings.NumOutputs;
             request.Cfg_scale = settings.GuidanceScale;
             request.Restore_faces = settings.EnableGfpgan;
             request.Width = (int)settings.Width;

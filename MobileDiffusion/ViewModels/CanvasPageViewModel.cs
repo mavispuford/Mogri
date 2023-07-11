@@ -294,10 +294,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             {
                 // Colorize the source bitmap using the mask, then create a black and white mask
                 var colorizedBitmap = CreateMaskedBitmap(SourceBitmap, maskBitmap);
-                var blackAndWhiteMaskBitmap = CreateBlackAndWhiteMask(maskBitmap);
-
                 var croppedBitmap = GetCroppedBitmap(colorizedBitmap, InitImgRectangle);
-                var croppedMask = GetCroppedBitmap(blackAndWhiteMaskBitmap, InitImgRectangle);
 
                 using var croppedBitmapMemStream = new MemoryStream();
                 using var croppedBitmapSkiaStream = new SKManagedWStream(croppedBitmapMemStream);
@@ -308,22 +305,37 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 var croppedBitmapImageString = Convert.ToBase64String(croppedBitmapImageBytes);
                 var croppedBitmapContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", croppedBitmapImageString);
 
-                using var croppedMaskMemStream = new MemoryStream();
-                using var croppedMaskSkiaStream = new SKManagedWStream(croppedMaskMemStream);
-
-                croppedMask.Encode(croppedMaskSkiaStream, SKEncodedImageFormat.Png, 100);
-                croppedMaskMemStream.Seek(0, SeekOrigin.Begin);
-                var croppedMaskImageBytes = croppedMaskMemStream.ToArray();
-                var croppedMaskImageString = Convert.ToBase64String(croppedMaskImageBytes);
-                var croppedMaskContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", croppedMaskImageString);
-
                 var parameters = new Dictionary<string, object>
-                        {
-                            { NavigationParams.ImageWidth, InitImgRectangleSize },
-                            { NavigationParams.ImageHeight, InitImgRectangleSize },
-                            { NavigationParams.InitImgString, croppedBitmapContentTypeString },
-                            { NavigationParams.MaskImgString, croppedMaskContentTypeString },
-                        };
+                {
+                    { NavigationParams.ImageWidth, InitImgRectangleSize },
+                    { NavigationParams.ImageHeight, InitImgRectangleSize },
+                    { NavigationParams.InitImgString, croppedBitmapContentTypeString }
+                };
+
+                var croppedMaskContentTypeString = string.Empty;
+
+                if (Lines.Any())
+                {
+                    var sameSizeMaskBitmap = maskBitmap.Resize(colorizedBitmap.Info, SKFilterQuality.None);
+                    var blackAndWhiteMaskBitmap = CreateBlackAndWhiteMask(sameSizeMaskBitmap);
+                    var croppedMask = GetCroppedBitmap(blackAndWhiteMaskBitmap, InitImgRectangle);
+
+                    // Verify that the cropped mask contains anything useful
+                    if (croppedMask.Pixels.Any(p => p.Alpha > 0))
+                    {
+                        using var croppedMaskMemStream = new MemoryStream();
+                        using var croppedMaskSkiaStream = new SKManagedWStream(croppedMaskMemStream);
+
+                        croppedMask.Encode(croppedMaskSkiaStream, SKEncodedImageFormat.Png, 100);
+                        croppedMaskMemStream.Seek(0, SeekOrigin.Begin);
+                        var croppedMaskImageBytes = croppedMaskMemStream.ToArray();
+                        var croppedMaskImageString = Convert.ToBase64String(croppedMaskImageBytes);
+                        croppedMaskContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", croppedMaskImageString);
+                    }
+                }
+
+                // Add the mask if it is empty or not so it can be cleared if there is no data
+                parameters.Add(NavigationParams.MaskImgString, croppedMaskContentTypeString);
 
                 var dispatcher = Shell.Current.CurrentPage.Dispatcher;
                 await dispatcher?.DispatchAsync(async () =>
