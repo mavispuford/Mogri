@@ -180,6 +180,11 @@ namespace MobileDiffusion.Services
             request.Mask = settings.Mask;
             request.Inpainting_fill = 1;
 
+            // Because we colorize the image, blurring the mask would cause some of the colorized pixels to stay
+            request.Mask_blur = 0;
+            request.Mask_blur_x = 0;
+            request.Mask_blur_y = 0;
+
             return request;
         }
 
