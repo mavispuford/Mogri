@@ -1,5 +1,6 @@
 ﻿using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Services;
+using Polly;
 
 #if ANDROID
 using MobileDiffusion.Platforms.Android.Services;
@@ -14,11 +15,10 @@ public static class ServiceRegistrations
         builder.Services.AddHttpClient(Microsoft.Extensions.Options.Options.DefaultName, client =>
         {
             client.Timeout = TimeSpan.FromSeconds(60);
-        });/*.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
+        }).AddTransientHttpErrorPolicy(p => p.WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(500)));
+        /*.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
                   Proxy = new WebProxy() { Address = new Uri("192.168.86.42:8888") }
         });*/
-
-        // TODO - Add Polly using Microsoft.Extensions.Http.Polly
 
         builder.Services.AddSingleton<IStableDiffusionService, Automatic1111Service>();
         //builder.Services.AddSingleton<IStableDiffusionService, LSteinStableDiffusionService>();
