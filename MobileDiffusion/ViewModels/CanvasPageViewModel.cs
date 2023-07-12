@@ -236,24 +236,6 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             {
                 // Colorize the source bitmap using the mask, then create a black and white mask
                 var colorizedBitmap = CreateMaskedBitmap(SourceBitmap, maskBitmap);
-                var blackAndWhiteMaskBitmap = CreateBlackAndWhiteMask(maskBitmap);
-
-                using var maskMemStream = new MemoryStream();
-                using var maskSkiaStream = new SKManagedWStream(maskMemStream);
-
-                blackAndWhiteMaskBitmap.Encode(maskSkiaStream, SKEncodedImageFormat.Png, 100);
-
-                // Occasionally helpful for debugging masks
-                //var fileName = $"Mask-{DateTime.Now.Ticks}.png";
-                //maskMemStream.Seek(0, SeekOrigin.Begin);
-                //var uri = await _fileService.WriteImageFileToExternalStorageAsync(fileName, maskMemStream, true);
-
-                maskMemStream.Seek(0, SeekOrigin.Begin);
-                var maskImageBytes = maskMemStream.ToArray();
-                var maskImageString = Convert.ToBase64String(maskImageBytes);
-
-                var maskImgContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", maskImageString);
-
                 using var colorizedMemStream = new MemoryStream();
                 using var colorizedSkiaStream = new SKManagedWStream(colorizedMemStream);
                 colorizedBitmap.Encode(colorizedSkiaStream, SKEncodedImageFormat.Png, 100);
@@ -264,10 +246,35 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 var colorizedImgContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", colorizedImageString);
 
                 var parameters = new Dictionary<string, object>
-                        {
-                            {NavigationParams.InitImgString, colorizedImgContentTypeString },
-                            {NavigationParams.MaskImgString, maskImgContentTypeString }
-                        };
+                {
+                    {NavigationParams.InitImgString, colorizedImgContentTypeString }
+                };
+
+                var maskImgContentTypeString = string.Empty;
+
+                if (Lines.Any())
+                {
+                    if (maskBitmap.Pixels.Any(p => p.Alpha > 0))
+                    {
+                        var blackAndWhiteMaskBitmap = CreateBlackAndWhiteMask(maskBitmap);
+                        using var maskMemStream = new MemoryStream();
+                        using var maskSkiaStream = new SKManagedWStream(maskMemStream);
+                        blackAndWhiteMaskBitmap.Encode(maskSkiaStream, SKEncodedImageFormat.Png, 100);
+                        maskMemStream.Seek(0, SeekOrigin.Begin);
+                        var maskImageBytes = maskMemStream.ToArray();
+                        var maskImageString = Convert.ToBase64String(maskImageBytes);
+
+                        maskImgContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", maskImageString);
+
+                        // Occasionally helpful for debugging masks
+                        //var fileName = $"Mask-{DateTime.Now.Ticks}.png";
+                        //maskMemStream.Seek(0, SeekOrigin.Begin);
+                        //var uri = await _fileService.WriteImageFileToExternalStorageAsync(fileName, maskMemStream, true);
+                    }
+                }
+
+                // Add the mask if it is empty or not so it can be cleared if there is no data
+                parameters.Add(NavigationParams.MaskImgString, maskImgContentTypeString);
 
                 var dispatcher = Shell.Current.CurrentPage.Dispatcher;
                 await dispatcher?.DispatchAsync(async () =>
