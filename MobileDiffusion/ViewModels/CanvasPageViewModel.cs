@@ -191,6 +191,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
         await Task.Run(async () =>
         {
+            var dispatcher = Shell.Current.CurrentPage.Dispatcher;
 
             try
             {
@@ -203,13 +204,17 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 memStream.Seek(0, SeekOrigin.Begin);
                 var uri = await _fileService.WriteImageFileToExternalStorageAsync(fileName, memStream, false);
 
-                await Toast.Make($"{fileName} saved.").Show();
+                await dispatcher?.DispatchAsync(async () =>
+                {
+                    await Toast.Make($"{fileName} saved.").Show();
+                });
             }
             catch (Exception e)
             {
-                //
-
-                await Toast.Make("Failed to save image. Please try again.").Show();
+                await dispatcher?.DispatchAsync(async () =>
+                {
+                    await Toast.Make("Failed to save image. Please try again.").Show();
+                });
             }
         });
 
