@@ -108,7 +108,7 @@
             </Border.StrokeShape>
             <VerticalStackLayout Spacing="0" Padding="20">
 
-                <Label Text="{Binding Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, Path=CurrentBrushSize, StringFormat='Size: {0:F0}'}"
+                <Label Text="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, StringFormat='Size: {0:F0}'}"
                        TextColor="White"
                        FontAttributes="Bold"
                        HorizontalOptions="Center"/>
@@ -117,7 +117,7 @@
                         HeightRequest="40"
                         Minimum="1"
                         Maximum="50"
-                        Value="{Binding Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, Path=CurrentBrushSize}" />
+                        Value="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}" />
 
             </VerticalStackLayout>
         </Border>
@@ -134,7 +134,7 @@
             </Border.StrokeShape>
             <VerticalStackLayout Spacing="0" Padding="20">
 
-                <Label Text="{Binding Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, Path=CurrentAlpha, StringFormat='Alpha: {0:F1}'}"
+                <Label Text="{Binding CurrentAlpha, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, StringFormat='Alpha: {0:F1}'}"
                        TextColor="White"
                        FontAttributes="Bold"
                        HorizontalOptions="Center"/>
@@ -143,7 +143,7 @@
                         HeightRequest="40"
                         Minimum="0"
                         Maximum=".9"
-                        Value="{Binding Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, Path=CurrentAlpha}" />
+                        Value="{Binding CurrentAlpha, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}" />
 
             </VerticalStackLayout>
         </Border>
@@ -195,9 +195,9 @@
 
                     <Ellipse HorizontalOptions="Center"
                              VerticalOptions="Center"
-                             HeightRequest="{Binding Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, Path=CurrentBrushSize}"
-                             WidthRequest="{Binding Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, Path=CurrentBrushSize}"
-                             Opacity="{Binding Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, Path=CurrentAlpha}"
+                             HeightRequest="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
+                             WidthRequest="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
+                             Opacity="{Binding CurrentAlpha, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
                              Fill="{Binding CurrentColor}"
                              StrokeThickness="0"/>
 

@@ -29,22 +29,15 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     private string _resizedMaskImage;
     private bool _initImageNeedsResize = true;
     private float _targetProgress = 0;
-    private List<PromptDescriptor> _promptDescriptors = new();
 
     [ObservableProperty]
     private bool hasInitImage;
-
-    [ObservableProperty]
-    private bool hasPromptDescriptors;
 
     [ObservableProperty]
     private string prompt = _defaultPrompt;
 
     [ObservableProperty]
     private string negativePrompt;
-
-    [ObservableProperty]
-    private string promptDescriptorsString;
 
     [ObservableProperty]
     private float progress;
@@ -70,17 +63,20 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     {
         base.OnNavigatedTo();
 
+        // Wrap in a try/catch because this method is async void (any exceptions would blow up the app)
+
         try
         {
             if (!_stableDiffusionService.Initialized)
             {
-                // Wrap in a try/catch because this method is async void (any exceptions would blow up the app)
-                await Task.Run(_stableDiffusionService.Initialize);
+                await _stableDiffusionService.InitializeAsync();
 
-                _settings.Sampler = _stableDiffusionService.Samplers?.FirstOrDefault().Key ?? "Euler";
+                var samplers = await _stableDiffusionService.GetSamplersAsync();
+
+                _settings.Sampler = samplers.FirstOrDefault().Key ?? "Euler";
             }
         }
-        catch (Exception e)
+        catch
         {
             // TODO - Handle this
         }
@@ -120,7 +116,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         {
             if (_initImageNeedsResize)
             {
-                var initImageResult = await GetResizedImageStringFromSettingsAsync(settings, settings.InitImage);
+                var initImageResult = await GetResizedImageStringFromSettingsAsync(settings, settings.InitImage, filterImage: true);
 
                 if (!string.IsNullOrEmpty(initImageResult.ImageString))
                 {
@@ -151,14 +147,6 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
         settings.Prompt = string.IsNullOrEmpty(settings.Prompt) ? _defaultPrompt : settings.Prompt;
 
-        // TODO - Move from prompt descriptors to auto1111 styles
-        //if (!string.IsNullOrEmpty(PromptDescriptorsString))
-        //{
-        //    finalPrompt += $", {PromptDescriptorsString}";
-        //}
-
-        //settings.Prompt = finalPrompt;
-
         var sanitizedPrompt = settings.Prompt.Replace(" ", "_").ToLower();
         var length = Math.Min(sanitizedPrompt.Length, 90);
 
@@ -166,7 +154,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
         try
         {
-            await foreach (var response in _stableDiffusionService.SubmitImageRequest(settings))
+            await foreach (var response in _stableDiffusionService.SubmitImageRequestAsync(settings))
             {
                 if (response.StableDiffusionApi == Enums.StableDiffusionApi.InvokeAI)
                 {
@@ -322,7 +310,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         animation.Commit(Shell.Current.CurrentPage, "ProgressAnimation", length: 500);
     }
 
-    private Task<(string ImageString, int ActualWidth, int ActualHeight)> GetResizedImageStringFromSettingsAsync(Settings settings, string sourceImageString, bool forceExactSize = false)
+    private Task<(string ImageString, int ActualWidth, int ActualHeight)> GetResizedImageStringFromSettingsAsync(Settings settings, string sourceImageString, bool forceExactSize = false, bool filterImage = false)
     {
         if (string.IsNullOrEmpty(sourceImageString) ||
             !settings.FitClientSide)
@@ -333,7 +321,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         return GetResizedImageStringFromWidthAndHeightAsync((int)settings.Width, (int)settings.Height, sourceImageString, forceExactSize);
     }
 
-    private Task<(string ImageString, int ActualWidth, int ActualHeight)> GetResizedImageStringFromWidthAndHeightAsync(int width, int height, string sourceImageString, bool forceExactSize = false)
+    private Task<(string ImageString, int ActualWidth, int ActualHeight)> GetResizedImageStringFromWidthAndHeightAsync(int width, int height, string sourceImageString, bool forceExactSize = false, bool filterImage = false)
     {
         if (string.IsNullOrEmpty(sourceImageString))
         {
@@ -346,7 +334,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         {
             var stream = await _imageService.GetStreamFromContentTypeStringAsync(sourceImageString, tokenSource.Token);
 
-            var result = _imageService.GetResizedImageStreamBytes(stream, width, height, forceExactSize);
+            var result = _imageService.GetResizedImageStreamBytes(stream, width, height, forceExactSize, filterImage);
 
             if (result.Bytes == null ||
                 result.Bytes.Length == 0)
@@ -414,14 +402,6 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     }
 
     [RelayCommand]
-    private async Task ShowPromptDescriptors()
-    {
-        var parameters = new Dictionary<string, object> { { NavigationParams.PromptDescriptors, _promptDescriptors } };
-
-        await Shell.Current.GoToAsync("PromptDescriptorsPage", parameters);
-    }
-
-    [RelayCommand]
     private async Task ShowPromptPage()
     {
         var parameters = new Dictionary<string, object> {
@@ -485,16 +465,6 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             query.TryGetValue(NavigationParams.AppShareContentType, out var appShareContentTypeParam);
 
             await LoadSharedImage(imageUri, appShareContentTypeParam as string);
-        }
-
-        if (query.TryGetValue(NavigationParams.PromptDescriptors, out var promptDescriptorsParam) &&
-            promptDescriptorsParam is List<PromptDescriptor> promptDescriptors)
-        {
-            _promptDescriptors = promptDescriptors;
-
-            PromptDescriptorsString = string.Join(", ", _promptDescriptors.Select(d => d.Text));
-
-            HasPromptDescriptors = _promptDescriptors.Any();
         }
 
         // Workaround for https://github.com/dotnet/maui/issues/10294

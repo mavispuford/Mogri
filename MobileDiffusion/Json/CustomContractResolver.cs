@@ -10,7 +10,7 @@ namespace MobileDiffusion.Json;
 /// </summary>
 public class CustomContractResolver : DefaultContractResolver
 {
-    public new static readonly CustomContractResolver Instance = new CustomContractResolver();
+    public static readonly CustomContractResolver Instance = new CustomContractResolver();
 
     protected override JsonContract CreateContract(Type type)
     {

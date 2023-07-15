@@ -5,12 +5,15 @@
                 xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                 xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
                 xmlns:views="clr-namespace:MobileDiffusion.Views"
-                x:Class="MobileDiffusion.Views.PromptDescriptorsPage"
-                x:DataType="viewModels:IPromptDescriptorsPageViewModel"
+                x:Class="MobileDiffusion.Views.PromptStyleSelectionPage"
+                x:DataType="viewModels:IPromptStyleSelectionPageViewModel"
                 Shell.PresentationMode="Animated"
                 Shell.NavBarIsVisible="True"
                 Shell.TabBarIsVisible="False"
-                Title="Prompt Descriptors">
+                Title="Prompt Styles">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior Command="{Binding ConfirmCommand}" />
+    </Shell.BackButtonBehavior>
     <views:BasePage.Resources>
         <Style TargetType="Grid">
             <Setter Property="VisualStateManager.VisualStateGroups">
@@ -35,7 +38,8 @@
           Padding="10"
           Margin="0">
 
-        <Image Grid.Column="0">
+        <Image Grid.Column="0"
+               Grid.Row="0">
             <Image.Source>
                 <FontImageSource Glyph="&#xe8b6;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource IndependenceAccent}" />
             </Image.Source>
@@ -62,44 +66,39 @@
             </Entry>
         </Border>
 
-        <CollectionView x:Name="DescriptorCollectionView"
+        <CollectionView x:Name="StyleCollectionView"
                         Grid.Row="1"
                         Grid.Column="0"
                         Grid.ColumnSpan="2"
-                        IsGrouped="True"
                         SelectionMode="Multiple"
-                        ItemsSource="{Binding DescriptorGroups}"
-                        SelectedItems="{Binding SelectedDescriptors}">
-            <CollectionView.GroupHeaderTemplate>
-                <DataTemplate x:DataType="models:PromptDescriptorGroup">
-                    <Label Text="{Binding Name}" 
-                           Padding="0,10"
-                           FontSize="22"
-                           FontAttributes="Bold"/>
-                </DataTemplate>
-            </CollectionView.GroupHeaderTemplate>
+                        ItemsSource="{Binding AvailablePromptStyles}"
+                        SelectedItems="{Binding SelectedPromptStyles}"
+                        VerticalOptions="StartAndExpand">
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="models:PromptDescriptor">
-                    <Grid ColumnDefinitions="*,*"
-                          WidthRequest="{Binding Source={x:Reference DescriptorCollectionView}, Path=Width}"
-                          Padding="6,10,0,10"
+                <DataTemplate x:DataType="viewModels:IPromptStyleViewModel">
+                    <Grid ColumnDefinitions="*,auto"
+                          Padding="10"
                           HeightRequest="54">
                         <Label Grid.Column="0"
-                               Text="{Binding Text}"
+                               Text="{Binding Name}"
                                VerticalOptions="Center"
                                FontSize="16"/>
-                        <Label Grid.Column="1"
-                               VerticalOptions="Center"
-                               Text="{Binding TagsString}"
-                               TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray200}}"
-                               FontSize="12"
-                               LineBreakMode="WordWrap" />
+                        <ImageButton Grid.Column="1"
+                                     ToolTipProperties.Text="Info"
+                                     VerticalOptions="FillAndExpand"
+                                     Command="{Binding ShowPromptStyleInfoCommand, Source={RelativeSource AncestorType={x:Type viewModels:IPromptStyleSelectionPageViewModel}}}"
+                                     CommandParameter="{Binding .}">
+                            <ImageButton.Source>
+                                <FontImageSource Glyph="&#xe88e;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="{StaticResource IndependenceAccent}" />
+                            </ImageButton.Source>
+                        </ImageButton>
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
-        
+
         <HorizontalStackLayout Grid.Row="2" 
+                               Grid.Column="0"
                                Grid.ColumnSpan="2"
                                Spacing="10"
                                HorizontalOptions="End" 

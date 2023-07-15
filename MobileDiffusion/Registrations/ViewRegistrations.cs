@@ -12,8 +12,8 @@ public static class ViewRegistrations
         registerPage<IImageToImageSettingsPageViewModel, ImageToImageSettingsPage>(builder.Services);
         registerPage<ICanvasPageViewModel, CanvasPage>(builder.Services);
         registerPage<IAppSettingsPageViewModel, AppSettingsPage>(builder.Services);
-        registerPage<IPromptDescriptorsPageViewModel, PromptDescriptorsPage>(builder.Services);
         registerPage<IPromptPageViewModel, PromptPage>(builder.Services);
+        registerPage<IPromptStyleSelectionPageViewModel, PromptStyleSelectionPage>(builder.Services);
 
         return builder;
     }

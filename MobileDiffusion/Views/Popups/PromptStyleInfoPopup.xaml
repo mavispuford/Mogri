@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<popups:BasePopup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                  xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+                  xmlns:controls="clr-namespace:MobileDiffusion.Controls;assembly=MobileDiffusion"
+                  xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
+                  xmlns:popups="clr-namespace:MobileDiffusion.Views.Popups"
+                  x:Class="MobileDiffusion.Views.Popups.PromptStyleInfoPopup"
+                  x:DataType="viewModels:IPromptStyleInfoPopupViewModel"
+                  HorizontalOptions="Fill"
+                  VerticalOptions="Fill"
+                  Color="Transparent">
+    <Border Padding="16"
+            Stroke="Transparent"
+            StrokeShape="RoundRectangle 10">
+        <Border.Resources>
+            <ResourceDictionary>
+                <toolkit:IsStringNotNullOrEmptyConverter x:Key="IsStringNotNullOrEmptyConverter" />
+            </ResourceDictionary>
+        </Border.Resources>
+        <VerticalStackLayout>
+            <ScrollView Orientation="Vertical">
+                <VerticalStackLayout x:Name="MainLayout">
+                    <Label>
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="Name: " FontSize="Medium"/>
+                                <Span Text="{Binding PromptStyle.Name}" FontSize="Medium"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                    <Label Text="Prompt:" FontSize="Medium" IsVisible="{Binding PromptStyle.Prompt, Converter={StaticResource IsStringNotNullOrEmptyConverter}}"/>
+                    <Label Text="{Binding PromptStyle.Prompt}" FontSize="Small" IsVisible="{Binding PromptStyle.Prompt, Converter={StaticResource IsStringNotNullOrEmptyConverter}}"/>
+                    <Label Text="Negative Prompt:" FontSize="Medium"/>
+                    <Label Text="{Binding PromptStyle.NegativePrompt}" FontSize="Small"/>
+                </VerticalStackLayout>
+            </ScrollView>
+            <Button Text="Close" HorizontalOptions="End" Command="{Binding CloseCommand}" />
+        </VerticalStackLayout>
+    </Border>
+        
+</popups:BasePopup>

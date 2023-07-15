@@ -64,7 +64,7 @@
             </VerticalStackLayout>
 
             <Grid Grid.Row="1"
-                  ColumnDefinitions="52*,16*,16*,16*"
+                  ColumnDefinitions="50*,*,20*,20*,*"
                   ColumnSpacing="10"
                   HorizontalOptions="FillAndExpand">
                 
@@ -72,7 +72,7 @@
                         Text="Create!"
                         Command="{Binding CreateCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"/>
 
-                <ImageButton Grid.Column="1"
+                <ImageButton Grid.Column="2"
                              HeightRequest="40"
                              CornerRadius="10"
                              HorizontalOptions="CenterAndExpand"
@@ -80,18 +80,6 @@
                              BackgroundColor="Transparent">
                     <ImageButton.Source>
                         <FontImageSource Glyph="&#xe429;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource IndependenceAccent}" />
-                    </ImageButton.Source>
-                </ImageButton>
-
-                <ImageButton Grid.Column="2"
-                             HeightRequest="40"
-                             CornerRadius="10"
-                             HorizontalOptions="CenterAndExpand"
-                             VerticalOptions="Start"
-                             Command="{Binding ShowPromptDescriptorsCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"
-                             BackgroundColor="Transparent">
-                    <ImageButton.Source>
-                        <FontImageSource Glyph="&#xe873;" FontFamily="MaterialIconsRoundRegular" Color="{Binding HasPromptDescriptors, Converter={StaticResource BoolToColorConverter}}" />
                     </ImageButton.Source>
                 </ImageButton>
 

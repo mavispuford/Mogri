@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <views:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                xmlns:controls="clr-namespace:MobileDiffusion.Controls;assembly=MobileDiffusion"
                 xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
                 xmlns:views="clr-namespace:MobileDiffusion.Views;assembly=MobileDiffusion"
                 x:Class="MobileDiffusion.Views.PromptPage"
@@ -10,31 +11,89 @@
     <Shell.BackButtonBehavior>
         <BackButtonBehavior Command="{Binding ConfirmCommand}" />
     </Shell.BackButtonBehavior>
-    <Grid RowDefinitions="auto,*,auto,*"
+    <Grid RowDefinitions="auto,*,auto,*,auto,*"
           Padding="30">
         <Label Grid.Row="0"
                Text="Prompt:"
                VerticalOptions="Center"
                FontSize="Large" />
 
-        <Editor x:Name="PromptEditor"
-                Grid.Row="1"
-                Text="{Binding Prompt}"
-                Placeholder="{Binding PromptPlaceholder}"
-                AutoSize="TextChanges"
-                TextColor="{StaticResource IndependenceAccent}"
-                FontSize="Body"/>
+        <ScrollView Orientation="Vertical"
+                    Grid.Row="1"
+                    Margin="0,6,0,0">
+
+            <Editor x:Name="PromptEditor"
+                        Text="{Binding Prompt}"
+                        Placeholder="{Binding PromptPlaceholder}"
+                        AutoSize="TextChanges"
+                        TextColor="{StaticResource IndependenceAccent}"
+                        FontSize="Body"/>
+
+        </ScrollView>
+
 
         <Label Grid.Row="2"
                Text="Negative Prompt:"
                VerticalOptions="Center"
                FontSize="Large" />
 
-        <Editor x:Name="NegativePromptEditor" 
-                Grid.Row="3"
-                Text="{Binding NegativePrompt}"
-                TextColor="{StaticResource IndependenceAccent}"
-                AutoSize="TextChanges"
-                FontSize="Body"/>
+        <ScrollView Orientation="Vertical"
+                    Grid.Row="3"
+                    Margin="0,6,0,0">
+
+            <Editor x:Name="NegativePromptEditor"
+                    Text="{Binding NegativePrompt}"
+                    TextColor="{StaticResource IndependenceAccent}"
+                    AutoSize="TextChanges"
+                    FontSize="Body"/>
+
+        </ScrollView>
+
+        <Grid Grid.Row="4"
+              ColumnDefinitions="*,auto,auto,auto"
+              ColumnSpacing="10">
+            <Label Grid.Column="0"
+                       Text="Styles:"
+                       VerticalOptions="Center"
+                       VerticalTextAlignment="Center"
+                       FontSize="Large" />
+
+            <Button Grid.Column="1"
+                    Text="Select"
+                    Command="{Binding ShowPromptStyleSelectionPageCommand}"
+                    VerticalOptions="Center"
+                    ToolTipProperties.Text="Select a new style to add"/>
+
+            <Button Grid.Column="2"
+                    Text="Create"
+                    Command="{Binding ShowPromptStyleCreationPromptCommand}"
+                    VerticalOptions="Center"
+                    ToolTipProperties.Text="Create a new style using your prompt(s)"/>
+
+            <Button Grid.Column="3"
+                    Text="Extract"
+                    Command="{Binding ShowPromptStyleExtractionPromptCommand}"
+                    VerticalOptions="Center"
+                    ToolTipProperties.Text="Extract the prompt(s) from the selected styles"/>
+        </Grid>
+
+        <ScrollView Orientation="Vertical"
+                    Grid.Row="5"
+                    Margin="0,6">
+
+            <FlexLayout Wrap="Wrap"
+                        JustifyContent="Center"
+                        AlignContent="Start"
+                        AlignItems="Start"
+                        BindableLayout.ItemsSource="{Binding SelectedPromptStyles}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <controls:PromptStylePill Scale="0" />
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </FlexLayout>
+
+        </ScrollView>
+
     </Grid>
 </views:BasePage>
