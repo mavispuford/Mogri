@@ -96,17 +96,14 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             heightValues.Add(i.ToString());
         }
 
-        var samplerValues = _stableDiffusionService.Samplers.Select(s => s.Key).ToList();
-
         var upscaleLevelValues = new List<string>
         {
             "2","4"
         };
 
-        availableWidthValues = widthValues;
-        availableHeightValues = heightValues;
-        availableSamplerValues = samplerValues;
-        availableUpscaleLevelValues = upscaleLevelValues;
+        AvailableWidthValues = widthValues;
+        AvailableHeightValues = heightValues;
+        AvailableUpscaleLevelValues = upscaleLevelValues;
 
         var defaultSettings = new Settings();
         ImageCountPlaceholder = defaultSettings.NumOutputs.ToString();
@@ -127,10 +124,26 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
 
         _settings = settings.Clone();
 
-        mapSettingsToProperties();
-
         // Workaround for https://github.com/dotnet/maui/issues/10294
         query.Clear();
+    }
+
+    public override async void OnNavigatedTo()
+    {
+        base.OnNavigatedTo();
+
+        try
+        {
+            var samplers = await _stableDiffusionService.GetSamplersAsync();
+
+            AvailableSamplerValues = samplers.Select(s => s.Key).ToList();
+        }
+        catch
+        {
+            // TODO - Handle this
+        }
+
+        mapSettingsToProperties();
     }
 
     [RelayCommand]
@@ -184,7 +197,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         Height = _settings.Height.ToString();
         ImageCount = _settings.NumOutputs.ToString();
         MakeSeamless = _settings.Seamless == OnOff.on;
-        Sampler = _settings.Sampler.ToString();
+        Sampler = _settings.Sampler;
         Seed = _settings.Seed.ToString();
         Steps = _settings.Steps.ToString();
         UpscaleLevel = _settings.UpscaleLevel == 0 ? "2" : _settings.UpscaleLevel.ToString();

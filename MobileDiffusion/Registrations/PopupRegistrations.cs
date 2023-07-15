@@ -15,6 +15,7 @@ public static class PopupRegistrations
 
         registerPopup<IResultItemPopupViewModel, ResultItemPopup>(builder.Services);
         registerPopup<IColorPickerPopupViewModel, ColorPickerPopup>(builder.Services);
+        registerPopup<IPromptStyleInfoPopupViewModel, PromptStyleInfoPopup>(builder.Services);
 
         return builder;
     }

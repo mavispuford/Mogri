@@ -49,7 +49,7 @@ public partial class ImageResultControl : ContentView
             // Avoid possible animation hitches caused by image loading
             await Task.Delay(300);
 
-            ImageControl.ScaleTo(1, 250u, Easing.CubicInOut);
+            _ = ImageControl.ScaleTo(1, 250u, Easing.CubicInOut);
         }
     }
 

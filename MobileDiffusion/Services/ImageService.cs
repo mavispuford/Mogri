@@ -57,7 +57,7 @@ public class ImageService : IImageService
         return ImageSource.FromStream(() => stream);
     }
 
-    public (byte[] Bytes, int ActualWidth, int ActualHeight) GetResizedImageStreamBytes(Stream stream, int width, int height, bool forceExactSize = false)
+    public (byte[] Bytes, int ActualWidth, int ActualHeight) GetResizedImageStreamBytes(Stream stream, int width, int height, bool forceExactSize = false, bool filterImage = false)
     {
         try
         {
@@ -78,7 +78,7 @@ public class ImageService : IImageService
 
             if (forceExactSize)
             {
-                return resizeBitmap(bitmap, width, height);
+                return resizeBitmap(bitmap, width, height, filterImage);
             }
 
             if (bitmap.Width <= width &&
@@ -121,7 +121,7 @@ public class ImageService : IImageService
                 targetWidth = (int)roundedWidth;
             }
 
-            return resizeBitmap(bitmap, targetWidth, targetHeight);
+            return resizeBitmap(bitmap, targetWidth, targetHeight, filterImage);
         }
         catch
         {
@@ -131,9 +131,9 @@ public class ImageService : IImageService
         return (null, 0, 0);
     }
 
-    private (byte[] Bytes, int ActualWidth, int ActualHeight) resizeBitmap(SKBitmap bitmap, int width, int height)
+    private (byte[] Bytes, int ActualWidth, int ActualHeight) resizeBitmap(SKBitmap bitmap, int width, int height, bool filterImage = false)
     {
-        var resized = bitmap.Resize(new SKSizeI(width, height), SKFilterQuality.None);
+        var resized = bitmap.Resize(new SKSizeI(width, height), filterImage ? SKFilterQuality.High : SKFilterQuality.None);
 
         using (var memStream = new MemoryStream())
         {

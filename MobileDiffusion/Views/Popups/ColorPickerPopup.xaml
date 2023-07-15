@@ -64,7 +64,7 @@
                                  HeightRequest="30">
                             <BoxView.GestureRecognizers>
                                 <TapGestureRecognizer 
-                                    Command="{Binding Source={x:RelativeSource AncestorType={x:Type viewModels:IColorPickerPopupViewModel}}, Path=SwatchTappedCommand}" 
+                                    Command="{Binding SwatchTappedCommand, Source={x:RelativeSource AncestorType={x:Type viewModels:IColorPickerPopupViewModel}}}" 
                                     CommandParameter="{Binding}"/>
                             </BoxView.GestureRecognizers>
                         </BoxView>
@@ -87,7 +87,7 @@
                                  HeightRequest="30">
                             <BoxView.GestureRecognizers>
                                 <TapGestureRecognizer 
-                                    Command="{Binding Source={x:RelativeSource AncestorType={x:Type viewModels:IColorPickerPopupViewModel}}, Path=SwatchTappedCommand}" 
+                                    Command="{Binding SwatchTappedCommand, Source={x:RelativeSource AncestorType={x:Type viewModels:IColorPickerPopupViewModel}}}" 
                                     CommandParameter="{Binding}"/>
                             </BoxView.GestureRecognizers>
                         </BoxView>

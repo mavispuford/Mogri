@@ -1,8 +1,11 @@
 ﻿using MobileDiffusion.Clients.Automatic1111;
+using MobileDiffusion.Helpers;
 using MobileDiffusion.Interfaces.Services;
+using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Models;
 using MobileDiffusion.Models.Automatic1111;
 using Newtonsoft.Json;
+using static Android.App.VoiceInteractor;
 
 namespace MobileDiffusion.Services
 {
@@ -16,18 +19,16 @@ namespace MobileDiffusion.Services
 
         public bool Initialized { get; private set; }
 
-        public Dictionary<string, string> Samplers { get; private set; } = new();
-
         public Automatic1111Service(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
         }
 
-        public async Task Initialize()
+        public async Task InitializeAsync()
         {
             try
             {
-                await RefreshResources();
+                await RefreshResourcesAsync();
 
                 Initialized = true;
             }
@@ -37,7 +38,7 @@ namespace MobileDiffusion.Services
             }
         }
 
-        public async Task<bool> CheckServer()
+        public async Task<bool> CheckServerAsync()
         {
             var client = getClient();
 
@@ -58,7 +59,7 @@ namespace MobileDiffusion.Services
             throw new NotImplementedException();
         }
 
-        public async IAsyncEnumerable<ApiResponse> SubmitImageRequest(Settings settings)
+        public async IAsyncEnumerable<ApiResponse> SubmitImageRequestAsync(Settings settings)
         {
             if (settings is null)
             {
@@ -85,7 +86,7 @@ namespace MobileDiffusion.Services
             }
         }
 
-        public async Task RefreshResources()
+        public async Task RefreshResourcesAsync()
         {
             var client = getClient();
 
@@ -107,12 +108,6 @@ namespace MobileDiffusion.Services
 
                     _loras = JsonConvert.DeserializeObject<ICollection<LoraItem>>(lorasString);
                 }));
-
-                Samplers.Clear();
-                foreach (var sampler in _samplers)
-                {
-                    Samplers.TryAdd(sampler.Name, sampler.Aliases.FirstOrDefault());
-                }
             }
             catch (Exception e)
             {
@@ -146,8 +141,11 @@ namespace MobileDiffusion.Services
             request.Seed = settings.Seed;
             request.Tiling = settings.Seamless == Enums.OnOff.on;
             request.Hr_scale = settings.UpscaleLevel;
-            request.Prompt = settings.Prompt;
-            request.Negative_prompt = settings.NegativePrompt;
+
+            var combinedPromptAndStyles = settings.GetCombinedPromptAndPromptStyles();
+            request.Prompt = combinedPromptAndStyles.Prompt;
+            request.Negative_prompt = combinedPromptAndStyles.NegativePrompt;
+
             request.Sampler_name = settings.Sampler;
 
             // TODO - Use steps in the UI instead of calculating from a strength value?
@@ -170,8 +168,11 @@ namespace MobileDiffusion.Services
             request.Steps = settings.Steps;
             request.Seed = (int)settings.Seed;
             request.Tiling = settings.Seamless == Enums.OnOff.on;
-            request.Prompt = settings.Prompt;
-            request.Negative_prompt = settings.NegativePrompt;
+
+            var combinedPromptAndStyles = settings.GetCombinedPromptAndPromptStyles();
+            request.Prompt = combinedPromptAndStyles.Prompt;
+            request.Negative_prompt = combinedPromptAndStyles.NegativePrompt;
+
             request.Sampler_name = settings.Sampler;
             request.Init_images = new List<object>
             {
@@ -327,5 +328,35 @@ namespace MobileDiffusion.Services
                 return progressApiResponse;
             });
         }
+
+        public Task<Dictionary<string, string>> GetSamplersAsync()
+        {
+            var result = new Dictionary<string, string>();
+
+            foreach (var sampler in _samplers)
+            {
+                result.TryAdd(sampler.Name, sampler.Aliases.FirstOrDefault());
+            }
+
+            return Task.FromResult(result);
+        }
+
+        public Task<List<IPromptStyleViewModel>> GetPromptStylesAsync()
+        {
+            var result = new List<IPromptStyleViewModel>();
+
+            foreach (var item in _promptStyles)
+            {
+                result.Add(new PromptStyleViewModel
+                {
+                    Name = item.Name,
+                    Prompt = item.Prompt,
+                    NegativePrompt = item.Negative_prompt
+                });
+            }
+
+            return Task.FromResult(result);
+        }
+
     }
 }

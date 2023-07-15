@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using MobileDiffusion.Models.LStein;
 using MobileDiffusion.Interfaces.Services;
+using MobileDiffusion.Interfaces.ViewModels;
 
 namespace MobileDiffusion.Services
 {
@@ -13,31 +14,21 @@ namespace MobileDiffusion.Services
 
         public bool Initialized { get; private set; }
 
-        public Dictionary<string, string> Samplers { get; private set; } = new()
-        {
-            { "k_lms",""},
-            { "ddim",""},
-            { "plms",""},
-            { "k_dpm_2",""},
-            { "k_dpm_2_a",""},
-            { "k_euler",""},
-            { "k_euler_a",""},
-            { "k_heun",""}
-        };
+        public List<PromptStyleViewModel> PromptStyles { get; private set; } = new();
 
         public LSteinStableDiffusionService(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
         }
 
-        public Task Initialize()
+        public Task InitializeAsync()
         {
             Initialized = true;
 
             return Task.CompletedTask;
         }
 
-        public async Task<bool> CheckServer()
+        public async Task<bool> CheckServerAsync()
         {
             var client = _httpClientFactory.CreateClient();
 
@@ -53,7 +44,7 @@ namespace MobileDiffusion.Services
             return false;
         }
 
-        public async IAsyncEnumerable<ApiResponse> SubmitImageRequest(Settings settings)
+        public async IAsyncEnumerable<ApiResponse> SubmitImageRequestAsync(Settings settings)
         {
             if (settings == null)
             {
@@ -145,11 +136,33 @@ namespace MobileDiffusion.Services
             return imageBytes;
         }
 
-        public Task RefreshResources()
+        public Task RefreshResourcesAsync()
         {
             // Not implemented...
 
             return Task.CompletedTask;
+        }
+
+        public Task<Dictionary<string, string>> GetSamplersAsync()
+        {
+            var result = new Dictionary<string, string>() 
+            {
+                { "k_lms",""},
+                { "ddim",""},
+                { "plms",""},
+                { "k_dpm_2",""},
+                { "k_dpm_2_a",""},
+                { "k_euler",""},
+                { "k_euler_a",""},
+                { "k_heun",""}
+            };
+
+            return Task.FromResult(result);
+        }
+
+        public Task<List<IPromptStyleViewModel>> GetPromptStylesAsync()
+        {
+            return Task.FromResult(new List<IPromptStyleViewModel>());
         }
     }
 }

@@ -8,45 +8,45 @@ namespace MobileDiffusion;
 
 public static class MauiProgram
 {
-	public static MauiApp CreateMauiApp()
-	{
-		var builder = MauiApp.CreateBuilder();
+    public static MauiApp CreateMauiApp()
+    {
+        var builder = MauiApp.CreateBuilder();
 
-		builder
-			.UseMauiApp<App>()
-			.UseSkiaSharp()
+        builder
+            .UseMauiApp<App>()
+            .UseSkiaSharp()
             .ConfigureFonts(fonts =>
-			{
-				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-				fonts.AddFont("MaterialIconsRound-Regular.otf", "MaterialIconsRoundRegular");
-			})
-			.UseMauiCommunityToolkit()
-			.RegisterServices()
-			.RegisterViewModels()
-			.RegisterViews()
-			.RegisterPopups();
+            {
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                fonts.AddFont("MaterialIconsRound-Regular.otf", "MaterialIconsRoundRegular");
+            })
+            .UseMauiCommunityToolkit()
+            .RegisterServices()
+            .RegisterViewModels()
+            .RegisterViews()
+            .RegisterPopups();
 
         builder.Services.AddSingleton(DeviceDisplay.Current);
 
 #if ANDROID
-		EntryHandler.Mapper.AppendToMapping("NoUnderline", (h, v) => 
-		{ 
-			h.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Colors.Transparent.ToPlatform());
-		});
+        EntryHandler.Mapper.AppendToMapping("NoUnderline", (h, v) => 
+        { 
+            h.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Colors.Transparent.ToPlatform());
+        });
 
         EditorHandler.Mapper.AppendToMapping("NoUnderline", (h, v) => 
-		{
+        {
             h.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Colors.Transparent.ToPlatform());
         });
 
         PickerHandler.Mapper.AppendToMapping("NoUnderline", (h, v) => 
-		{
+        {
             h.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Colors.Transparent.ToPlatform());
         });
 #endif
 
         return builder.Build();
-	}
+    }
 
 }

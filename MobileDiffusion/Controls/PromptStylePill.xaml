@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
+             x:Class="MobileDiffusion.Controls.PromptStylePill"
+             x:DataType="viewModels:IPromptStyleViewModel">
+    <Border BackgroundColor="{StaticResource Gray300}"
+            Stroke="Transparent"
+            StrokeShape="RoundRectangle 25"
+            Padding="20,6,16,6"
+            HeightRequest="50">
+        <HorizontalStackLayout Spacing="6">
+            <Label Text="{Binding Name}" 
+                   TextColor="White" 
+                   HorizontalOptions="Start"
+                   VerticalTextAlignment="Center" 
+                   VerticalOptions="Center"
+                   FontAttributes="Bold" />
+            <ImageButton ToolTipProperties.Text="Remove Style"
+                         VerticalOptions="CenterAndExpand"
+                         HorizontalOptions="End"
+                         Command="{Binding RemovePromptStyleCommand, Source={RelativeSource AncestorType={x:Type viewModels:IPromptPageViewModel}}}"
+                         CommandParameter="{Binding .}">
+                <ImageButton.Source>
+                    <FontImageSource Glyph="&#xe5cd;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                </ImageButton.Source>
+            </ImageButton>
+        </HorizontalStackLayout>
+    </Border>
+</ContentView>

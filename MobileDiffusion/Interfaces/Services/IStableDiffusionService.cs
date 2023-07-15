@@ -1,20 +1,23 @@
-﻿using MobileDiffusion.Models;
+﻿using MobileDiffusion.Interfaces.ViewModels;
+using MobileDiffusion.Models;
 
 namespace MobileDiffusion.Interfaces.Services;
 
 public interface IStableDiffusionService
 {
-    public Task<bool> CheckServer();
+    public Task<bool> CheckServerAsync();
 
-    public IAsyncEnumerable<ApiResponse> SubmitImageRequest(Settings settings);
+    public IAsyncEnumerable<ApiResponse> SubmitImageRequestAsync(Settings settings);
 
     Task<byte[]> GetImageBytesAsync(string url);
 
-    Task Initialize();
+    Task InitializeAsync();
 
-    Task RefreshResources();
+    Task RefreshResourcesAsync();
 
-    Dictionary<string, string> Samplers { get; }
+    Task<Dictionary<string, string>> GetSamplersAsync();
+
+    Task<List<IPromptStyleViewModel>> GetPromptStylesAsync();
 
     bool Initialized { get; }
 }
