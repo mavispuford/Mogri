@@ -64,7 +64,7 @@
             </VerticalStackLayout>
 
             <Grid Grid.Row="1"
-                  ColumnDefinitions="50*,*,20*,20*,*"
+                  ColumnDefinitions="50*,25*,25*"
                   ColumnSpacing="10"
                   HorizontalOptions="FillAndExpand">
                 
@@ -72,27 +72,36 @@
                         Text="Create!"
                         Command="{Binding CreateCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"/>
 
-                <ImageButton Grid.Column="2"
-                             HeightRequest="40"
-                             CornerRadius="10"
-                             HorizontalOptions="CenterAndExpand"
-                             Command="{Binding ShowPromptSettingsCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"
-                             BackgroundColor="Transparent">
-                    <ImageButton.Source>
-                        <FontImageSource Glyph="&#xe429;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource IndependenceAccent}" />
-                    </ImageButton.Source>
-                </ImageButton>
+                <ContentView Grid.Column="1"
+                             HorizontalOptions="Fill"
+                             BackgroundColor="Transparent"
+                             ToolTipProperties.Text="Prompt Settings">
+                    <ContentView.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ShowPromptSettingsCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"/>
+                    </ContentView.GestureRecognizers>
 
-                <ImageButton Grid.Column="3"
-                             HeightRequest="40"
-                             CornerRadius="10"
-                             HorizontalOptions="CenterAndExpand"
-                             Command="{Binding ShowImageToImageSettingsCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"
-                             BackgroundColor="Transparent">
-                    <ImageButton.Source>
-                        <FontImageSource Glyph="&#xe3f4;" FontFamily="MaterialIconsRoundRegular" Color="{Binding HasInitImage, Converter={StaticResource BoolToColorConverter}}" />
-                    </ImageButton.Source>
-                </ImageButton>
+                    <Image VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand">
+                        <Image.Source>
+                            <FontImageSource Glyph="&#xe429;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource IndependenceAccent}" />
+                        </Image.Source>
+                    </Image>
+                </ContentView>
+
+                <ContentView Grid.Column="2"
+                             HorizontalOptions="Fill"
+                             BackgroundColor="Transparent"
+                             ToolTipProperties.Text="Image to Image Settings">
+                    <ContentView.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ShowImageToImageSettingsCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"/>
+                    </ContentView.GestureRecognizers>
+                    
+                    <Image VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand">
+                        <Image.Source>
+                            <FontImageSource Glyph="&#xe3f4;" FontFamily="MaterialIconsRoundRegular" Color="{Binding HasInitImage, Converter={StaticResource BoolToColorConverter}}" />
+                        </Image.Source>
+                    </Image>
+                </ContentView>
+                
                 
             </Grid>
 

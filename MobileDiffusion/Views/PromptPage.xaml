@@ -2,6 +2,7 @@
 <views:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                 xmlns:controls="clr-namespace:MobileDiffusion.Controls;assembly=MobileDiffusion"
+                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                 xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
                 xmlns:views="clr-namespace:MobileDiffusion.Views;assembly=MobileDiffusion"
                 x:Class="MobileDiffusion.Views.PromptPage"
@@ -23,11 +24,11 @@
                     Margin="0,6,0,0">
 
             <Editor x:Name="PromptEditor"
-                        Text="{Binding Prompt}"
-                        Placeholder="{Binding PromptPlaceholder}"
-                        AutoSize="TextChanges"
-                        TextColor="{StaticResource IndependenceAccent}"
-                        FontSize="Body"/>
+                    Text="{Binding Prompt}"
+                    Placeholder="{Binding PromptPlaceholder}"
+                    AutoSize="TextChanges"
+                    TextColor="{StaticResource IndependenceAccent}"
+                    FontSize="Body"/>
 
         </ScrollView>
 
@@ -50,7 +51,7 @@
         </ScrollView>
 
         <Grid Grid.Row="4"
-              ColumnDefinitions="*,auto,auto,auto"
+              ColumnDefinitions="*,auto,auto"
               ColumnSpacing="10">
             <Label Grid.Column="0"
                        Text="Styles:"
@@ -62,15 +63,16 @@
                     Text="Select"
                     Command="{Binding ShowPromptStyleSelectionPageCommand}"
                     VerticalOptions="Center"
-                    ToolTipProperties.Text="Select a new style to add"/>
+                    ToolTipProperties.Text="Select a style to add"/>
 
-            <Button Grid.Column="2"
+            <!-- Not currently supported by Automatic1111 -->
+            <!--<Button Grid.Column="2"
                     Text="Create"
                     Command="{Binding ShowPromptStyleCreationPromptCommand}"
                     VerticalOptions="Center"
-                    ToolTipProperties.Text="Create a new style using your prompt(s)"/>
+                    ToolTipProperties.Text="Create a new style using your prompt(s)"/>-->
 
-            <Button Grid.Column="3"
+            <Button Grid.Column="2"
                     Text="Extract"
                     Command="{Binding ShowPromptStyleExtractionPromptCommand}"
                     VerticalOptions="Center"

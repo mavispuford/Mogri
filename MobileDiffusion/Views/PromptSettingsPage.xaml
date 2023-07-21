@@ -9,17 +9,19 @@
                 Shell.NavBarIsVisible="True"
                 Shell.TabBarIsVisible="False"
                 Title="Prompt Settings">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior Command="{Binding ConfirmSettingsCommand}" />
+    </Shell.BackButtonBehavior>
     <Grid RowDefinitions="*,auto"
           Padding="0"
           Margin="0">
         <ScrollView Grid.Row="0" Orientation="Vertical">
-            <Grid x:Name="MainGrid"
-              Padding="30"
-              RowDefinitions="auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto"
-              RowSpacing="10"
-              ColumnSpacing="16"
-              ColumnDefinitions="32,auto,*"
-              HorizontalOptions="FillAndExpand">
+            <Grid Padding="30"
+                  RowDefinitions="auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto"
+                  RowSpacing="10"
+                  ColumnSpacing="16"
+                  ColumnDefinitions="32,*,auto"
+                  HorizontalOptions="FillAndExpand">
 
                 <Image Grid.Row="0" WidthRequest="32">
                     <Image.Source>

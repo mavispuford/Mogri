@@ -11,9 +11,14 @@
                 Shell.NavBarIsVisible="True"
                 Shell.TabBarIsVisible="False"
                 Title="Image to Image Settings">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior Command="{Binding ConfirmSettingsCommand}" />
+    </Shell.BackButtonBehavior>
     <views:BasePage.Resources>
         <ResourceDictionary>
             <toolkit:VariableMultiValueConverter x:Key="AnyTrueConverter" ConditionType="Any" />
+            <toolkit:IsNullConverter x:Key="IsNullConverter" />
+            <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
         </ResourceDictionary>
     </views:BasePage.Resources>
     <Grid RowDefinitions="*,auto"
@@ -24,14 +29,8 @@
                   RowDefinitions="auto, auto, auto, auto, auto, auto, auto"
                   RowSpacing="10"
                   ColumnSpacing="16"
-                  ColumnDefinitions="32,auto,*"
-                  HorizontalOptions="FillAndExpand">
-                <Grid.Resources>
-                    <ResourceDictionary>
-                        <toolkit:IsNullConverter x:Key="IsNullConverter" />
-                        <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
-                    </ResourceDictionary>
-                </Grid.Resources>
+                  ColumnDefinitions="32,*,auto"
+                  HorizontalOptions="CenterAndExpand">
 
                 <Image Grid.Row="0" Grid.Column="0" WidthRequest="32">
                     <Image.Source>
@@ -53,7 +52,7 @@
                         StrokeShape="RoundRectangle 5"
                         Stroke="Transparent"
                         StrokeThickness="0"
-                        HorizontalOptions="Center">
+                        HorizontalOptions="CenterAndExpand">
                     <Grid Grid.Row="2" Grid.ColumnSpan="3"
                       HeightRequest="140" WidthRequest="140"
                       BackgroundColor="{StaticResource Gray300}">
@@ -92,7 +91,7 @@
                         StrokeShape="RoundRectangle 5"
                         Stroke="Transparent"
                         StrokeThickness="0"
-                        HorizontalOptions="Center">
+                        HorizontalOptions="CenterAndExpand">
                     <Grid HeightRequest="140" WidthRequest="140">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ShowMediaPickerCommand}">
@@ -123,7 +122,7 @@
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="5" Grid.Column="1" Text="Fit Image (on server):" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
-                <Switch Grid.Row="5" Grid.Column="2" IsToggled="{Binding FitImageServerSide}" />
+                <Switch Grid.Row="5" Grid.Column="2" IsToggled="{Binding FitImageServerSide}" BackgroundColor="White" />
 
                 <Image Grid.Row="6" Grid.Column="0" WidthRequest="32">
                     <Image.Source>

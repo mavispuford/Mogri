@@ -15,4 +15,5 @@ public static class NavigationParams
     public const string PromptPlaceholder = nameof(PromptPlaceholder);
     public const string PromptSettings = nameof(PromptSettings);
     public const string PromptStyle = nameof(PromptStyle);
+    public const string Seed = nameof(Seed);
 }

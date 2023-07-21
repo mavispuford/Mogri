@@ -188,6 +188,13 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         await Shell.Current.GoToAsync("..", parameters);
     }
 
+    public override bool OnBackButtonPressed()
+    {
+        ConfirmSettingsCommand.Execute(null);
+
+        return true;
+    }
+
     private void mapSettingsToProperties()
     {
         CfgScale = _settings.GuidanceScale.ToString();

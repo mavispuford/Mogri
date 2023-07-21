@@ -1,5 +1,4 @@
-﻿using Android.Webkit;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
@@ -94,7 +93,7 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
 
         if (accepted)
         {
-            // TODO - Create style
+            // TODO - Create style - Automatic1111 APIs don't currently support this
 
             //await _stableDiffusionService.CreatePromptStyleAsync();
         }
@@ -128,6 +127,8 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
     [RelayCommand]
     private async Task ShowPromptStyleSelectionPage()
     {
+        SetPromptsOnSettings();
+
         var parameters = new Dictionary<string, object>()
         {
             {NavigationParams.PromptSettings, _settings.Clone() }
@@ -139,8 +140,7 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
     [RelayCommand]
     private async Task Confirm()
     {
-        _settings.Prompt = Prompt;
-        _settings.NegativePrompt = NegativePrompt;
+        SetPromptsOnSettings();
 
         var parameters = new Dictionary<string, object>()
         {
@@ -148,6 +148,12 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
         };
 
         await Shell.Current.GoToAsync("..", parameters);
+    }
+
+    private void SetPromptsOnSettings()
+    {
+        _settings.Prompt = Prompt;
+        _settings.NegativePrompt = NegativePrompt;
     }
 
     public override bool OnBackButtonPressed()
