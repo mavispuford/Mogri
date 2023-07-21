@@ -99,6 +99,13 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
         await Shell.Current.GoToAsync("..", parameters);
     }
 
+    public override bool OnBackButtonPressed()
+    {
+        ConfirmSettingsCommand.Execute(null);
+
+        return true;
+    }
+
     private async void mapSettingsToProperties()
     {
         Strength = _settings.DenoisingStrength.ToString();

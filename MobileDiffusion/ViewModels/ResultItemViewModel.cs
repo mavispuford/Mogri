@@ -23,6 +23,9 @@ public partial class ResultItemViewModel : BaseViewModel, IResultItemViewModel
     private string internalUri;
 
     [ObservableProperty]
+    private IRelayCommand setSeedCommand;
+
+    [ObservableProperty]
     private IRelayCommand setSettingsCommand;
 
     [ObservableProperty]
@@ -66,6 +69,11 @@ public partial class ResultItemViewModel : BaseViewModel, IResultItemViewModel
             settingsParam is Settings settings)
         {
             SetSettingsCommand?.Execute(settings);
+        }
+        else if (result.TryGetValue(NavigationParams.Seed, out var seedParam) &&
+            seedParam is long seed)
+        {
+            SetSeedCommand?.Execute(seed);
         }
         else if (result.TryGetValue(NavigationParams.InitImgString, out var initImgParam) && 
             initImgParam is string initImage)

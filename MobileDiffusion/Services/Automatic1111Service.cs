@@ -5,7 +5,6 @@ using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Models;
 using MobileDiffusion.Models.Automatic1111;
 using Newtonsoft.Json;
-using static Android.App.VoiceInteractor;
 
 namespace MobileDiffusion.Services
 {
@@ -357,6 +356,5 @@ namespace MobileDiffusion.Services
 
             return Task.FromResult(result);
         }
-
     }
 }

@@ -85,6 +85,7 @@
                                FontSize="16"/>
                         <ImageButton Grid.Column="1"
                                      ToolTipProperties.Text="Info"
+                                     HorizontalOptions="End"
                                      VerticalOptions="FillAndExpand"
                                      Command="{Binding ShowPromptStyleInfoCommand, Source={RelativeSource AncestorType={x:Type viewModels:IPromptStyleSelectionPageViewModel}}}"
                                      CommandParameter="{Binding .}">

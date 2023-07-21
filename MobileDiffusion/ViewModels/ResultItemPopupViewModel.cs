@@ -56,11 +56,9 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
     [RelayCommand]
     private void UseSeed()
     {
-        ResultItem.Settings.NumOutputs = 1;
-
         var parameters = new Dictionary<string, object>
         {
-            { NavigationParams.PromptSettings, ResultItem.Settings }
+            { NavigationParams.Seed, ResultItem.Settings.Seed }
         };
 
         ClosePopup(parameters);

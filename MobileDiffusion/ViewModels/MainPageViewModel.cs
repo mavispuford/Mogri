@@ -20,7 +20,6 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
     private readonly IFileService _fileService;
     private readonly IStableDiffusionService _stableDiffusionService;
-    private readonly IPopupService _popupService;
     private readonly IServiceProvider _serviceProvider;
     private readonly IImageService _imageService;
 
@@ -48,13 +47,11 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     public MainPageViewModel(
         IFileService fileService,
         IStableDiffusionService stableDiffusionService,
-        IPopupService popupService,
         IServiceProvider serviceProvider,
         IImageService imageService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
-        _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
     }
@@ -105,6 +102,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         {
             var resultItem = _serviceProvider.GetService<IResultItemViewModel>();
 
+            resultItem.SetSeedCommand = new RelayCommand<long>(setSeedFromResultItem);
             resultItem.SetSettingsCommand = new RelayCommand<Settings>(setSettingsFromResultItem);
             resultItem.SetInitImageCommand = new RelayCommand<string>(setInitImageFromResultItem);
             resultItem.SetCanvasImageCommand = new AsyncRelayCommand<string>(setCanvasImageFromResultItem);
@@ -128,7 +126,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
                 if (!string.IsNullOrEmpty(settings.Mask))
                 {
-                    var maskImageResult = await GetResizedImageStringFromWidthAndHeightAsync(initImageResult.ActualWidth, initImageResult.ActualHeight, settings.Mask, true);
+                    var maskImageResult = await GetResizedImageStringFromWidthAndHeightAsync(initImageResult.ActualWidth, initImageResult.ActualHeight, settings.Mask, true, true);
 
                     if (!string.IsNullOrEmpty(maskImageResult.ImageString))
                     {
@@ -459,6 +457,13 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             _settings.Height = imageHeight;
         }
 
+        if (query.TryGetValue(NavigationParams.Seed, out var seedParam) &&
+            seedParam is long seed)
+        {
+            _settings.NumOutputs = 1;
+            _settings.Seed = seed;
+        }
+
         if (query.TryGetValue(NavigationParams.AppShareFileUri, out var appShareFileUriParam) &&
             appShareFileUriParam is string imageUri)
         {
@@ -526,6 +531,12 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         {
             updateHasInitImage();
         }
+    }
+
+    private void setSeedFromResultItem(long seed)
+    {
+        _settings.NumOutputs = 1;
+        _settings.Seed = seed;
     }
 
     private void setSettingsFromResultItem(Settings settings)
