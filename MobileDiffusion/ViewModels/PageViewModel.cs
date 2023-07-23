@@ -16,12 +16,14 @@ public class PageViewModel : BaseViewModel, IPageViewModel
     {
     }
 
-    public virtual void OnNavigatedFrom()
+    public virtual Task OnNavigatedFromAsync()
     {
+        return Task.CompletedTask;
     }
 
-    public virtual void OnNavigatedTo()
+    public virtual Task OnNavigatedToAsync()
     {
+        return Task.CompletedTask;
     }
 
     public virtual bool OnBackButtonPressed()

@@ -6,9 +6,9 @@ public interface IPageViewModel : IQueryAttributable, IBaseViewModel
 
     void OnDisappearing();
 
-    void OnNavigatedFrom();
+    Task OnNavigatedFromAsync();
     
-    void OnNavigatedTo();
+    Task OnNavigatedToAsync();
 
     bool OnBackButtonPressed();
 }

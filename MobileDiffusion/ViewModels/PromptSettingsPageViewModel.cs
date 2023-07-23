@@ -128,9 +128,9 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         query.Clear();
     }
 
-    public override async void OnNavigatedTo()
+    public override async Task OnNavigatedToAsync()
     {
-        base.OnNavigatedTo();
+        await base.OnNavigatedToAsync();
 
         try
         {

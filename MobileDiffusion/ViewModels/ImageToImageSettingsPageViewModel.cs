@@ -202,9 +202,9 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
         }
     }
 
-    public override void OnNavigatedTo()
+    public override async Task OnNavigatedToAsync()
     {
-        base.OnNavigatedTo();
+        await base.OnNavigatedToAsync();
 
         mapSettingsToProperties();
     }

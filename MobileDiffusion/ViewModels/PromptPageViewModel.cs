@@ -57,9 +57,9 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
         query.Clear();
     }
 
-    public override async void OnNavigatedTo()
+    public override async Task OnNavigatedToAsync()
     {
-        base.OnNavigatedTo();
+        await base.OnNavigatedToAsync();
 
         try
         {

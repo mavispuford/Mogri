@@ -23,16 +23,7 @@ public partial class ResultItemViewModel : BaseViewModel, IResultItemViewModel
     private string internalUri;
 
     [ObservableProperty]
-    private IRelayCommand setSeedCommand;
-
-    [ObservableProperty]
-    private IRelayCommand setSettingsCommand;
-
-    [ObservableProperty]
-    private IRelayCommand setInitImageCommand;
-    
-    [ObservableProperty]
-    private IRelayCommand setCanvasImageCommand;
+    private IRelayCommand applyQueryParamsFromResultItemCommand;
 
     [ObservableProperty]
     private bool isLoading = true;
@@ -65,25 +56,6 @@ public partial class ResultItemViewModel : BaseViewModel, IResultItemViewModel
             return;
         }
 
-        if (result.TryGetValue(NavigationParams.PromptSettings, out var settingsParam) &&
-            settingsParam is Settings settings)
-        {
-            SetSettingsCommand?.Execute(settings);
-        }
-        else if (result.TryGetValue(NavigationParams.Seed, out var seedParam) &&
-            seedParam is long seed)
-        {
-            SetSeedCommand?.Execute(seed);
-        }
-        else if (result.TryGetValue(NavigationParams.InitImgString, out var initImgParam) && 
-            initImgParam is string initImage)
-        {
-            SetInitImageCommand?.Execute(initImage);
-        }
-        else if (result.TryGetValue(NavigationParams.CanvasImageString, out var canvasImgParam) &&
-            canvasImgParam is string canvasImage)
-        {
-            SetCanvasImageCommand?.Execute(canvasImage);
-        }
+        ApplyQueryParamsFromResultItemCommand?.Execute(result);
     }
 }
