@@ -16,6 +16,8 @@ namespace MobileDiffusion.Services
         private ICollection<PromptStyleItem> _promptStyles;
         private ICollection<LoraItem> _loras;
 
+        private Task _initializeTask;
+
         public bool Initialized { get; private set; }
 
         public Automatic1111Service(IHttpClientFactory httpClientFactory)
@@ -25,21 +27,21 @@ namespace MobileDiffusion.Services
 
         public async Task InitializeAsync()
         {
-            try
-            {
-                await RefreshResourcesAsync();
+            if (_initializeTask == null || _initializeTask.Status != TaskStatus.Running)
+            { 
+                _initializeTask = RefreshResourcesAsync();
+            }
 
-                Initialized = true;
-            }
-            catch
-            {
-                // Unable to initialize
-            }
+            await _initializeTask;
+
+            _initializeTask = null;
+
+            Initialized = true;
         }
 
         public async Task<bool> CheckServerAsync()
         {
-            var client = getClient();
+            var client = getClient(TimeSpan.FromSeconds(5));
 
             try
             {
@@ -87,36 +89,34 @@ namespace MobileDiffusion.Services
 
         public async Task RefreshResourcesAsync()
         {
-            var client = getClient();
+            var client = getClient(TimeSpan.FromSeconds(10));
 
-            try
+            await Task.WhenAll(Task.Run(async () =>
             {
-                await Task.WhenAll(Task.Run(async () =>
-                {
-                    _samplers = await client.Get_samplers_sdapi_v1_samplers_getAsync();
-                }),
-                Task.Run(async () =>
-                {
-                    _promptStyles = await client.Get_prompt_styles_sdapi_v1_prompt_styles_getAsync();
-                }),
-                Task.Run(async () =>
-                {
-                    var loras = await client.Get_loras_sdapi_v1_loras_getAsync();
-
-                    var lorasString = JsonConvert.SerializeObject(loras);
-
-                    _loras = JsonConvert.DeserializeObject<ICollection<LoraItem>>(lorasString);
-                }));
-            }
-            catch (Exception e)
+                _samplers = await client.Get_samplers_sdapi_v1_samplers_getAsync();
+            }),
+            Task.Run(async () =>
             {
+                _promptStyles = await client.Get_prompt_styles_sdapi_v1_prompt_styles_getAsync();
+            }),
+            Task.Run(async () =>
+            {
+                var loras = await client.Get_loras_sdapi_v1_loras_getAsync();
 
-            }
+                var lorasString = JsonConvert.SerializeObject(loras);
+
+                _loras = JsonConvert.DeserializeObject<ICollection<LoraItem>>(lorasString);
+            }));
         }
 
-        private Client getClient()
+        private Client getClient(TimeSpan? timeout = null)
         {
             var httpClient = _httpClientFactory.CreateClient();
+
+            if (timeout != null)
+            {
+                httpClient.Timeout = timeout.Value;
+            }
 
             var baseUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
 
@@ -190,7 +190,7 @@ namespace MobileDiffusion.Services
 
         private async IAsyncEnumerable<ApiResponse> sendTextToImageRequest(Settings settings)
         {
-            var client = getClient();
+            var client = getClient(TimeSpan.FromSeconds(60));
 
             var request = txt2ImageRequestFromSettings(settings);
 
@@ -248,7 +248,7 @@ namespace MobileDiffusion.Services
 
         private async IAsyncEnumerable<ApiResponse> sendImageToImageRequest(Settings settings)
         {
-            var client = getClient();
+            var client = getClient(TimeSpan.FromSeconds(60));
 
             var request = image2ImageRequestFromSettings(settings);
 
@@ -332,6 +332,11 @@ namespace MobileDiffusion.Services
         {
             var result = new Dictionary<string, string>();
 
+            if (_samplers == null)
+            {
+                return Task.FromResult(result);
+            }
+
             foreach (var sampler in _samplers)
             {
                 result.TryAdd(sampler.Name, sampler.Aliases.FirstOrDefault());
@@ -343,6 +348,11 @@ namespace MobileDiffusion.Services
         public Task<List<IPromptStyleViewModel>> GetPromptStylesAsync()
         {
             var result = new List<IPromptStyleViewModel>();
+
+            if (_promptStyles == null)
+            {
+                return Task.FromResult(result);
+            }
 
             foreach (var item in _promptStyles)
             {

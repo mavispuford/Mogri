@@ -28,23 +28,37 @@ public class BasePage : ContentPage
         }
     }
 
-    protected override void OnNavigatedFrom(NavigatedFromEventArgs args)
+    protected override async void OnNavigatedFrom(NavigatedFromEventArgs args)
     {
-        base.OnNavigatedFrom(args);
-        
-        if (BindingContext is IPageViewModel pageViewModel)
+        try
         {
-            pageViewModel.OnNavigatedFrom();
+            base.OnNavigatedFrom(args);
+
+            if (BindingContext is IPageViewModel pageViewModel)
+            {
+                await pageViewModel.OnNavigatedFromAsync();
+            }
+        }
+        catch
+        {
+            // Specific exceptions should be handled in the VM, catching here to prevent app crashes in an async void method.
         }
     }
 
-    protected override void OnNavigatedTo(NavigatedToEventArgs args)
+    protected override async void OnNavigatedTo(NavigatedToEventArgs args)
     {
-        base.OnNavigatedTo(args);
-
-        if (BindingContext is IPageViewModel pageViewModel)
+        try
         {
-            pageViewModel.OnNavigatedTo();
+            base.OnNavigatedTo(args);
+
+            if (BindingContext is IPageViewModel pageViewModel)
+            {
+                await pageViewModel.OnNavigatedToAsync();
+            }
+        }
+        catch
+        {
+            // Specific exceptions should be handled in the VM, catching here to prevent app crashes in an async void method.
         }
     }
 

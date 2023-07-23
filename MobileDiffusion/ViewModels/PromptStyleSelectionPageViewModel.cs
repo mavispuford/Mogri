@@ -27,9 +27,9 @@ internal partial class PromptStyleSelectionPageViewModel : PageViewModel, IPromp
     }
 
 
-    public override async void OnNavigatedTo()
+    public override async Task OnNavigatedToAsync()
     {
-        base.OnNavigatedTo();
+        await base.OnNavigatedToAsync();
 
         try
         {
@@ -44,7 +44,7 @@ internal partial class PromptStyleSelectionPageViewModel : PageViewModel, IPromp
         }
         catch
         {
-
+            // TODO - Handle this
         }
     }
 

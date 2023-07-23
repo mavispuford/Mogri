@@ -569,9 +569,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         } while (true);
     }
 
-    public override void OnNavigatedTo()
+    public override Task OnNavigatedToAsync()
     {
-        base.OnNavigatedTo();
+        return base.OnNavigatedToAsync();
     }
 
     public override async void ApplyQueryAttributes(IDictionary<string, object> query)

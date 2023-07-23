@@ -56,27 +56,39 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
     }
 
-    public override async void OnNavigatedTo()
+    public override async Task OnNavigatedToAsync()
     {
-        base.OnNavigatedTo();
+        await base.OnNavigatedToAsync();
 
-        // Wrap in a try/catch because this method is async void (any exceptions would blow up the app)
+        await initializeStableDiffusionService();
+    }
+
+    private async Task<bool> initializeStableDiffusionService()
+    {
+        if (_stableDiffusionService.Initialized)
+        {
+            return true;
+        }
 
         try
         {
-            if (!_stableDiffusionService.Initialized)
-            {
-                await _stableDiffusionService.InitializeAsync();
+            await _stableDiffusionService.InitializeAsync();
 
-                var samplers = await _stableDiffusionService.GetSamplersAsync();
+            var samplers = await _stableDiffusionService.GetSamplersAsync();
 
-                _settings.Sampler = samplers.FirstOrDefault().Key ?? "Euler";
-            }
+            _settings.Sampler = samplers?.FirstOrDefault().Key ?? "Euler";
         }
         catch
         {
-            // TODO - Handle this
+            await Shell.Current.CurrentPage.DisplayAlert(
+                "Connection problems",
+                "Unable to connect to the configured server URL. Please double check your app settings/connectivity and try again.",
+                "OK");
+
+            return false;
         }
+
+        return true;
     }
 
     [RelayCommand]
@@ -92,6 +104,11 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             return;
         }
 
+        if (!await initializeStableDiffusionService())
+        {
+            return;
+        }
+
         Progress = 0;
 
         Results = new();
@@ -102,10 +119,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         {
             var resultItem = _serviceProvider.GetService<IResultItemViewModel>();
 
-            resultItem.SetSeedCommand = new RelayCommand<long>(setSeedFromResultItem);
-            resultItem.SetSettingsCommand = new RelayCommand<Settings>(setSettingsFromResultItem);
-            resultItem.SetInitImageCommand = new RelayCommand<string>(setInitImageFromResultItem);
-            resultItem.SetCanvasImageCommand = new AsyncRelayCommand<string>(setCanvasImageFromResultItem);
+            resultItem.ApplyQueryParamsFromResultItemCommand = new RelayCommand<IDictionary<string,object>>(ApplyQueryAttributes);
 
             Results.Add(resultItem);
         }
@@ -413,6 +427,16 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     [RelayCommand]
     private async Task ShowPromptSettings()
     {
+        if (!_stableDiffusionService.Initialized)
+        {
+            // TODO - Show that app is busy here
+
+            if (!await initializeStableDiffusionService())
+            {
+                return;
+            }
+        }
+
         var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings } };
 
         await Shell.Current.GoToAsync("PromptSettingsPage", parameters);
@@ -434,6 +458,9 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         if (query.TryGetValue(NavigationParams.InitImgString, out var initImageParam))
         {
             _settings.InitImage = initImageParam as string;
+            _resizedInitImage = null;
+            _settings.Mask = null;
+            _resizedMaskImage = null;
 
             updateHasInitImage();
         }
@@ -443,6 +470,17 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             _settings.Mask = maskImageParam as string;
 
             updateHasInitImage();
+        }
+
+        if (query.TryGetValue(NavigationParams.CanvasImageString, out var canvasImageParam))
+        {
+
+            var parameters = new Dictionary<string, object>
+            {
+                {NavigationParams.CanvasImageString, canvasImageParam as string}
+            };
+
+            await Shell.Current.GoToAsync("///CanvasPageTab", parameters);
         }
 
         if (query.TryGetValue(NavigationParams.ImageWidth, out var imageWidthParam) &&
@@ -531,64 +569,6 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         {
             updateHasInitImage();
         }
-    }
-
-    private void setSeedFromResultItem(long seed)
-    {
-        _settings.NumOutputs = 1;
-        _settings.Seed = seed;
-    }
-
-    private void setSettingsFromResultItem(Settings settings)
-    {
-        if (settings == null)
-        {
-            return;
-        }
-
-        var initImage = string.Empty;
-
-        if (string.IsNullOrEmpty(settings.InitImage) &&
-            !string.IsNullOrEmpty(_settings.InitImage))
-        {
-            initImage = _settings.InitImage;
-        }
-
-        _settings = settings;
-
-        if (!string.IsNullOrEmpty(initImage))
-        {
-            _settings.InitImage = initImage;
-        }
-
-        updateHasInitImage();
-    }
-
-    private void setInitImageFromResultItem(string initImage)
-    {
-        if (string.IsNullOrEmpty(initImage))
-        {
-            return;
-        }
-
-        _settings.InitImage = initImage;
-
-        updateHasInitImage();
-    }
-
-    private async Task setCanvasImageFromResultItem(string canvasImage)
-    {
-        if (string.IsNullOrEmpty(canvasImage))
-        {
-            return;
-        }
-
-        var parameters = new Dictionary<string, object>
-            {
-                {NavigationParams.CanvasImageString, canvasImage}
-            };
-
-        await Shell.Current.GoToAsync("///CanvasPageTab", parameters);
     }
 
     private void updateHasInitImage()

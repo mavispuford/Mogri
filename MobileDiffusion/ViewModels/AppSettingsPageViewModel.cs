@@ -23,8 +23,6 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
     [RelayCommand]
     private async Task ConfirmSettings()
     {
-        // TODO - Save settings
-
         if (!string.IsNullOrEmpty(ServerUrl))
         {
             Preferences.Default.Set(Constants.PreferenceKeys.ServerUrl, ServerUrl);

@@ -16,11 +16,11 @@ public class Settings
     public string InitImage { get; set; }
     public OnOff InvertMask { get; set; }
     public string Mask { get; set; }
-    public int Steps { get; set; } = 50;
+    public int Steps { get; set; } = 30;
     public int NumOutputs { get; set; } = 1;
     public string Prompt { get; set; }
     public string NegativePrompt { get; set; }
-    public double DenoisingStrength { get; set; } = .75;
+    public double DenoisingStrength { get; set; } = .5;
     public string Sampler { get; set; }
     public OnOff Seamless { get; set; }
     public long Seed { get; set; } = -1;

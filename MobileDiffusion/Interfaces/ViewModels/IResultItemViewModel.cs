@@ -15,13 +15,15 @@ public interface IResultItemViewModel : IBaseViewModel
 
     IAsyncRelayCommand TappedCommand { get; }
 
-    IRelayCommand SetSeedCommand { get; set; }
+    IRelayCommand ApplyQueryParamsFromResultItemCommand { get; set; }
 
-    IRelayCommand SetSettingsCommand { get; set; }
+    //IRelayCommand SetSeedCommand { get; set; }
 
-    IRelayCommand SetInitImageCommand { get; set; }
+    //IRelayCommand SetSettingsCommand { get; set; }
 
-    IRelayCommand SetCanvasImageCommand { get; set; }
+    //IRelayCommand SetInitImageCommand { get; set; }
+
+    //IRelayCommand SetCanvasImageCommand { get; set; }
 
     bool IsLoading { get; set; }
 
