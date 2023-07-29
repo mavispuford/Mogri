@@ -108,8 +108,8 @@
             <ScrollView Grid.Row="2" VerticalOptions="FillAndExpand" VerticalScrollBarVisibility="Never" HorizontalScrollBarVisibility="Never">
                 <FlexLayout x:Name="ImageLayout"
                             BindableLayout.ItemsSource="{Binding Results}" 
-                            HorizontalOptions="CenterAndExpand"
-                            VerticalOptions="Start"
+                            HorizontalOptions="Fill"
+                            VerticalOptions="Fill"
                             Wrap="Wrap"
                             JustifyContent="SpaceEvenly"
                             AlignItems="Start"

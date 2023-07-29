@@ -104,7 +104,7 @@
                 HorizontalOptions="Start"
                 VerticalOptions="End">
             <Border.StrokeShape>
-                <RoundRectangle CornerRadius="10" />
+                <RoundRectangle CornerRadius="50" />
             </Border.StrokeShape>
             <VerticalStackLayout Spacing="0" Padding="20">
 
@@ -130,7 +130,7 @@
                 HorizontalOptions="Center"
                 VerticalOptions="End">
             <Border.StrokeShape>
-                <RoundRectangle CornerRadius="10" />
+                <RoundRectangle CornerRadius="50" />
             </Border.StrokeShape>
             <VerticalStackLayout Spacing="0" Padding="20">
 
@@ -156,7 +156,7 @@
                 Margin="0,0,10,0"
                 IsVisible="{Binding ShowInitImgRectangle}">
             <Border.StrokeShape>
-                <RoundRectangle CornerRadius="10" />
+                <RoundRectangle CornerRadius="50" />
             </Border.StrokeShape>
             <ContentView BackgroundColor="{StaticResource IndependenceAccentSixtyPercent}"
                          VerticalOptions="FillAndExpand"
@@ -183,7 +183,7 @@
                     StrokeThickness="0"
                     VerticalOptions="End">
                 <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="10" />
+                    <RoundRectangle CornerRadius="50" />
                 </Border.StrokeShape>
                 <ContentView x:Name="BrushSizeButton" 
                              BackgroundColor="{StaticResource IndependenceAccentSixtyPercent}"
@@ -193,13 +193,23 @@
                         <TapGestureRecognizer Tapped="Brush_Size_Button_Clicked" />
                     </ContentView.GestureRecognizers>
 
-                    <Ellipse HorizontalOptions="Center"
-                             VerticalOptions="Center"
-                             HeightRequest="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
-                             WidthRequest="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
-                             Opacity="{Binding CurrentAlpha, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
-                             Fill="{Binding CurrentColor}"
-                             StrokeThickness="0"/>
+                    <Grid HorizontalOptions="Center"
+                          VerticalOptions="Center">
+                        
+                        <Ellipse HeightRequest="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
+                                 WidthRequest="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
+                                 Opacity="{Binding CurrentAlpha, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
+                                 Fill="{Binding CurrentColor}"
+                                 StrokeThickness="0"/>
+
+                        <Ellipse HeightRequest="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
+                                 WidthRequest="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
+                                 Fill="Transparent"
+                                 Stroke="{StaticResource Gray200TwentySixPercent}"
+                                 StrokeThickness="1"/>
+                        
+                    </Grid>
+                    
 
                 </ContentView>
             </Border>
@@ -209,7 +219,7 @@
                     StrokeThickness="0"
                     VerticalOptions="End">
                 <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="10" />
+                    <RoundRectangle CornerRadius="50" />
                 </Border.StrokeShape>
                 <ContentView x:Name="AlphaButton"
                          BackgroundColor="{StaticResource IndependenceAccentSixtyPercent}"
@@ -232,7 +242,7 @@
                     StrokeThickness="0"
                     VerticalOptions="End">
                 <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="10" />
+                    <RoundRectangle CornerRadius="50" />
                 </Border.StrokeShape>
                 <ContentView BackgroundColor="{Binding CurrentColor}"
                              VerticalOptions="FillAndExpand"
@@ -253,7 +263,7 @@
                     WidthRequest="60"
                     StrokeThickness="0">
                 <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="10" />
+                    <RoundRectangle CornerRadius="50" />
                 </Border.StrokeShape>
                 <Grid BackgroundColor="{StaticResource IndependenceAccentSixtyPercent}"
                             VerticalOptions="FillAndExpand"

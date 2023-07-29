@@ -12,7 +12,7 @@
     <Border Background="{StaticResource Gray200TwentySixPercent}"
             StrokeThickness="0">
         <Border.StrokeShape>
-            <RoundRectangle CornerRadius="10" />
+            <RoundRectangle CornerRadius="50" />
         </Border.StrokeShape>
         <Grid HorizontalOptions="Fill"
           VerticalOptions="Fill">

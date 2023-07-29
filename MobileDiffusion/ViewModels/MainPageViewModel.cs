@@ -109,6 +109,16 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             return;
         }
 
+        if (!await _stableDiffusionService.CheckServerAsync())
+        {
+            await Shell.Current.CurrentPage.DisplayAlert(
+                "Connection Problems",
+                "Unable to connect to the server. Please verify your connectivity and try again.",
+                "OK");
+
+            return;
+        }
+
         Progress = 0;
 
         Results = new();

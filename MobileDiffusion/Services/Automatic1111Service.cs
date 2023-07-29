@@ -10,6 +10,11 @@ namespace MobileDiffusion.Services
 {
     internal class Automatic1111Service : IStableDiffusionService
     {
+        /// <summary>
+        ///     Some operations take several minutes to complete, especially with older hardware.
+        /// </summary>
+        private const int RequestTimeoutMinutes = 15;
+
         private readonly IHttpClientFactory _httpClientFactory;
 
         private ICollection<SamplerItem> _samplers;
@@ -17,6 +22,7 @@ namespace MobileDiffusion.Services
         private ICollection<LoraItem> _loras;
 
         private Task _initializeTask;
+        private CancellationTokenSource _mainRequestCancellationSource;
 
         public bool Initialized { get; private set; }
 
@@ -190,10 +196,16 @@ namespace MobileDiffusion.Services
 
         private async IAsyncEnumerable<ApiResponse> sendTextToImageRequest(Settings settings)
         {
-            var client = getClient(TimeSpan.FromSeconds(60));
+            var client = getClient(TimeSpan.FromMinutes(RequestTimeoutMinutes));
 
             var request = txt2ImageRequestFromSettings(settings);
 
+            if (_mainRequestCancellationSource?.IsCancellationRequested ?? false)
+            {
+                _mainRequestCancellationSource.Cancel();
+            }
+
+            _mainRequestCancellationSource = new CancellationTokenSource();
             var cancellationTokenSource = new CancellationTokenSource();
             var progressToken = cancellationTokenSource.Token;
 
@@ -207,6 +219,7 @@ namespace MobileDiffusion.Services
                 }
                 finally
                 {
+                    _mainRequestCancellationSource = null;
                     cancellationTokenSource.Cancel();
                 }
             });
@@ -215,7 +228,7 @@ namespace MobileDiffusion.Services
             var skipCurrentImage = false;
             var finished = false;
 
-            while (true)
+            while (!finished)
             {
                 try
                 {
@@ -236,11 +249,6 @@ namespace MobileDiffusion.Services
 
                 yield return apiResponse;
 
-                if (finished)
-                {
-                    break;
-                }
-
                 // Skip current image every other time
                 skipCurrentImage = !skipCurrentImage;
             }
@@ -248,10 +256,16 @@ namespace MobileDiffusion.Services
 
         private async IAsyncEnumerable<ApiResponse> sendImageToImageRequest(Settings settings)
         {
-            var client = getClient(TimeSpan.FromSeconds(60));
+            var client = getClient(TimeSpan.FromMinutes(RequestTimeoutMinutes));
 
             var request = image2ImageRequestFromSettings(settings);
 
+            if (_mainRequestCancellationSource?.IsCancellationRequested ?? false)
+            {
+                _mainRequestCancellationSource.Cancel();
+            }
+
+            _mainRequestCancellationSource = new CancellationTokenSource();
             var cancellationTokenSource = new CancellationTokenSource();
             var progressToken = cancellationTokenSource.Token;
 
@@ -261,10 +275,11 @@ namespace MobileDiffusion.Services
             {
                 try
                 {
-                    img2ImgResponse = await client.Img2imgapi_sdapi_v1_img2img_postAsync(request);
+                    img2ImgResponse = await client.Img2imgapi_sdapi_v1_img2img_postAsync(request, _mainRequestCancellationSource?.Token ?? CancellationToken.None);
                 }
                 finally
                 {
+                    _mainRequestCancellationSource = null;
                     cancellationTokenSource.Cancel();
                 }
             });
@@ -273,7 +288,7 @@ namespace MobileDiffusion.Services
             var skipCurrentImage = false;
             var finished = false;
 
-            while (true)
+            while (!finished)
             {
                 try
                 {
@@ -293,11 +308,6 @@ namespace MobileDiffusion.Services
                 }
 
                 yield return apiResponse;
-
-                if (finished)
-                {
-                    break;
-                }
 
                 // Skip current image every other time
                 skipCurrentImage = !skipCurrentImage;
