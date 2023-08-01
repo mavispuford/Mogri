@@ -54,9 +54,9 @@
                    VerticalOptions="Center"
                    FontSize="Body" />
 
-                <Label x:Name="PromptEditor" 
-                   Text="{Binding Prompt}"
-                   TextColor="{StaticResource IndependenceAccent}"/>
+                <Label 
+                    Text="{Binding Prompt}"
+                    TextColor="{StaticResource IndependenceAccent}"/>
 
                 <Label Text="{Binding NegativePrompt}"
                        TextColor="{StaticResource Primary}"
@@ -64,45 +64,46 @@
             </VerticalStackLayout>
 
             <Grid Grid.Row="1"
-                  ColumnDefinitions="50*,25*,25*"
+                  ColumnDefinitions="52*,16*,16*,16*"
                   ColumnSpacing="10"
                   HorizontalOptions="FillAndExpand">
                 
                 <Button Grid.Column="0"
                         Text="Create!"
-                        Command="{Binding CreateCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"/>
+                        Command="{Binding CreateCommand}"/>
 
-                <ContentView Grid.Column="1"
+                <ImageButton Grid.Column="1"
                              HorizontalOptions="Fill"
                              BackgroundColor="Transparent"
-                             ToolTipProperties.Text="Prompt Settings">
-                    <ContentView.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ShowPromptSettingsCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"/>
-                    </ContentView.GestureRecognizers>
+                             ToolTipProperties.Text="Prompt Settings"
+                             Command="{Binding ShowPromptSettingsCommand}"
+                             Margin="4">
+                    <ImageButton.Source>
+                        <FontImageSource Glyph="&#xe429;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource IndependenceAccent}" />
+                    </ImageButton.Source>
+                </ImageButton>
 
-                    <Image VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand">
-                        <Image.Source>
-                            <FontImageSource Glyph="&#xe429;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource IndependenceAccent}" />
-                        </Image.Source>
-                    </Image>
-                </ContentView>
-
-                <ContentView Grid.Column="2"
+                <ImageButton Grid.Column="2"
                              HorizontalOptions="Fill"
                              BackgroundColor="Transparent"
-                             ToolTipProperties.Text="Image to Image Settings">
-                    <ContentView.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ShowImageToImageSettingsCommand, Converter={StaticResource UnfocusOnCommandExecuteConverter}, ConverterParameter={x:Reference PromptEditor}}"/>
-                    </ContentView.GestureRecognizers>
-                    
-                    <Image VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand">
-                        <Image.Source>
-                            <FontImageSource Glyph="&#xe3f4;" FontFamily="MaterialIconsRoundRegular" Color="{Binding HasInitImage, Converter={StaticResource BoolToColorConverter}}" />
-                        </Image.Source>
-                    </Image>
-                </ContentView>
-                
-                
+                             ToolTipProperties.Text="Image to Image Settings"
+                             Command="{Binding ShowImageToImageSettingsCommand}"
+                             Margin="4">
+                    <ImageButton.Source>
+                        <FontImageSource Glyph="&#xe3f4;" FontFamily="MaterialIconsRoundRegular" Color="{Binding HasInitImage, Converter={StaticResource BoolToColorConverter}}" />
+                    </ImageButton.Source>
+                </ImageButton>
+
+                <ImageButton Grid.Column="3"
+                             HorizontalOptions="Fill"
+                             BackgroundColor="Transparent"
+                             ToolTipProperties.Text="History"
+                             Command="{Binding ShowHistoryCommand}"
+                             Margin="4">
+                    <ImageButton.Source>
+                        <FontImageSource Glyph="&#xe889;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource IndependenceAccent}" />
+                    </ImageButton.Source>
+                </ImageButton>
             </Grid>
 
             <ScrollView Grid.Row="2" VerticalOptions="FillAndExpand" VerticalScrollBarVisibility="Never" HorizontalScrollBarVisibility="Never">

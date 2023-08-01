@@ -14,6 +14,7 @@ public static class ViewRegistrations
         registerPage<IAppSettingsPageViewModel, AppSettingsPage>(builder.Services);
         registerPage<IPromptPageViewModel, PromptPage>(builder.Services);
         registerPage<IPromptStyleSelectionPageViewModel, PromptStyleSelectionPage>(builder.Services);
+        registerPage<IHistoryPageViewModel, HistoryPage>(builder.Services);
 
         return builder;
     }

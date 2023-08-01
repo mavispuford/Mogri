@@ -12,7 +12,8 @@
                   Color="Transparent">
     <Border Padding="16"
             Stroke="Transparent"
-            StrokeShape="RoundRectangle 10">
+            StrokeShape="RoundRectangle 50"
+            Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource IndependenceAccent}}">
         <Border.Resources>
             <ResourceDictionary>
                 <toolkit:IsStringNotNullOrEmptyConverter x:Key="IsStringNotNullOrEmptyConverter" />

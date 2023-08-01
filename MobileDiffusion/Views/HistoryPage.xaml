@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
+                xmlns:views="clr-namespace:MobileDiffusion.Views;assembly=MobileDiffusion"
+                x:Class="MobileDiffusion.Views.HistoryPage"
+                x:DataType="viewModels:IHistoryPageViewModel"
+                Shell.PresentationMode="Animated"
+                Shell.NavBarIsVisible="True"
+                Shell.TabBarIsVisible="False">
+    <Shell.TitleView>
+        <Grid ColumnDefinitions="*,auto"
+              Padding="0,0,10,0">
+            <Label Grid.Column="0"
+                   Text="History"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   TextColor="White"
+                   FontSize="Header"
+                   FontAttributes="Bold"
+                   Padding="-20,0,0,0"/>
+            <ImageButton Grid.Column="1" ToolTipProperties.Text="Clear History"
+                         VerticalOptions="FillAndExpand">
+                <ImageButton.Source>
+                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                </ImageButton.Source>
+            </ImageButton>
+        </Grid>
+    </Shell.TitleView>
+
+    <CollectionView ItemsSource="{Binding ImageSources}"
+                    CanReorderItems="False"
+                    HorizontalOptions="Fill"
+                    VerticalOptions="Fill"
+                    RemainingItemsThreshold="3"
+                    RemainingItemsThresholdReachedCommand="{Binding LoadItemsCommand}"
+                    SelectionMode="None">
+        <CollectionView.ItemsLayout>
+            <GridItemsLayout Orientation="Vertical" 
+                             Span="3"
+                             HorizontalItemSpacing="0"
+                             VerticalItemSpacing="0"/>
+        </CollectionView.ItemsLayout>
+        <CollectionView.ItemTemplate>
+            <DataTemplate>
+                <ImageButton Source="{Binding .}" 
+                             Aspect="AspectFill"
+                             WidthRequest="200"
+                             HeightRequest="200"
+                             Command="{Binding ItemTappedCommand, Source={RelativeSource AncestorType={x:Type viewModels:IHistoryPageViewModel}}}"
+                             CommandParameter="{Binding .}">
+                </ImageButton>
+            </DataTemplate>
+        </CollectionView.ItemTemplate>
+    </CollectionView>
+
+</views:BasePage>

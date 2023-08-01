@@ -396,15 +396,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
         result.InternalUri = uri;
 
-        // Using a regular image source crashes the app quite often: https://github.com/dotnet/maui/issues/9712
-        //result.ImageSource = ImageSource.FromFile(uri);
-
-        // Use SkiaSharp's SKBitmapImageSource image source instead
-        var imageSource = new SKBitmapImageSource
-        {
-            Bitmap = SKBitmap.Decode(imageBytes)
-        };
-        result.ImageSource = imageSource;
+        result.ImageSource = ImageSource.FromFile(uri);
 
         result.IsLoading = false;
     }
@@ -413,6 +405,12 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     private async Task ShowAppSettings()
     {
         await Shell.Current.GoToAsync("AppSettingsPage");
+    }
+
+    [RelayCommand]
+    private async Task ShowHistory()
+    {
+        await Shell.Current.GoToAsync("HistoryPage");
     }
 
     [RelayCommand]
