@@ -47,7 +47,7 @@ public class FileService : IFileService
 
     public Task<Stream> GetFileStreamFromInternalStorageAsync(string fileName)
     {
-        var fullPath = Path.Combine(FileSystem.CacheDirectory, fileName);
+        var fullPath = fileName.Contains(FileSystem.CacheDirectory) ? fileName : Path.Combine(FileSystem.CacheDirectory, fileName);
 
         try
         {
@@ -132,7 +132,7 @@ public class FileService : IFileService
 
     public async Task<string> WriteFileToInternalStorageAsync(string fileName, Stream stream)
     {
-        var fullPath = Path.Combine(FileSystem.CacheDirectory, fileName);
+        var fullPath = fileName.Contains(FileSystem.CacheDirectory) ? fileName : Path.Combine(FileSystem.CacheDirectory, fileName);
 
         try
         {
@@ -309,5 +309,26 @@ public class FileService : IFileService
             }
         }
 #endif
+    }
+
+    public Task<string[]> GetFileListFromInternalStorageAsync(string path = null)
+    {
+        try
+        {
+            var fullPath = path != null ? Path.Combine(FileSystem.CacheDirectory, path) : FileSystem.CacheDirectory;
+
+            return Task.FromResult(Directory.GetFiles(fullPath));
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public Task<bool> FileExistsInInternalStorageAsync(string filePath)
+    {
+        var fullPath = filePath.Contains(FileSystem.CacheDirectory) ? filePath : Path.Combine(FileSystem.CacheDirectory, filePath);
+
+        return Task.FromResult(File.Exists(fullPath));
     }
 }

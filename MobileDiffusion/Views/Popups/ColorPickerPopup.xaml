@@ -9,10 +9,8 @@
                   x:DataType="viewModels:IColorPickerPopupViewModel"
                   Color="Transparent">
     <Border Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource IndependenceAccent}}"
-            Stroke="Transparent">
-        <Border.StrokeShape>
-            <RoundRectangle CornerRadius="10" />
-        </Border.StrokeShape>
+            Stroke="Transparent"
+            StrokeShape="RoundRectangle 50">
         <VerticalStackLayout x:Name="MainLayout"
                              Spacing="10"
                              Padding="20">

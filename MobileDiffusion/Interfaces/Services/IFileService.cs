@@ -4,11 +4,15 @@ namespace MobileDiffusion.Interfaces.Services;
 
 public interface IFileService
 {
+    Task<bool> FileExistsInInternalStorageAsync(string filePath);
+
     Task<Stream> GetFileStreamUsingExactUriAsync(string uriString);
 
     Task<Stream> GetFileStreamFromExternalStorageAsync(string fileName);
 
     Task<Stream> GetFileStreamFromInternalStorageAsync(string fileName);
+
+    Task<string[]> GetFileListFromInternalStorageAsync(string path = null);
 
     Task<Mask> GetMaskFileFromAppDataAsync(string imageFileName);
 

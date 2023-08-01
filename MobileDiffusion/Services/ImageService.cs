@@ -81,8 +81,8 @@ public class ImageService : IImageService
                 return resizeBitmap(bitmap, width, height, filterImage);
             }
 
-            if (bitmap.Width <= width &&
-                bitmap.Height <= height)
+            if (bitmap.Width == width &&
+                bitmap.Height == height)
             {
                 stream.Seek(0, SeekOrigin.Begin);
 
@@ -109,16 +109,20 @@ public class ImageService : IImageService
                 targetWidth = width;
                 var dividedHeight = height / bitmapRatio;
 
-                var roundedHeight = Math.Round(dividedHeight / 64) * 64;
-                targetHeight = (int)roundedHeight;
+                targetHeight = (int)dividedHeight;
+
+                //var roundedHeight = Math.Round(dividedHeight / 64) * 64;
+                //targetHeight = (int)roundedHeight;
             }
             else
             {
                 targetHeight = height;
                 var dividedWidth = width / bitmapRatio;
 
-                var roundedWidth = Math.Round(dividedWidth / 64) * 64;
-                targetWidth = (int)roundedWidth;
+                targetWidth = (int)dividedWidth;
+
+                //var roundedWidth = Math.Round(dividedWidth / 64) * 64;
+                //targetWidth = (int)roundedWidth;
             }
 
             return resizeBitmap(bitmap, targetWidth, targetHeight, filterImage);
