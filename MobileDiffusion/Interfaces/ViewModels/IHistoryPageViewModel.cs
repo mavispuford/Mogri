@@ -6,9 +6,9 @@ namespace MobileDiffusion.Interfaces.ViewModels;
 
 public interface IHistoryPageViewModel : IPageViewModel
 {
-    ObservableCollection<ImageSource> ImageSources { get; set; }
+    ObservableCollection<IHistoryItemViewModel> HistoryItems { get; set; }
 
-    IAsyncRelayCommand<object> ItemTappedCommand { get; }
+    IAsyncRelayCommand<IHistoryItemViewModel> ItemTappedCommand { get; }
 
     IAsyncRelayCommand LoadItemsCommand { get; }
 }

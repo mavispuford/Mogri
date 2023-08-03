@@ -396,7 +396,15 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
         result.InternalUri = uri;
 
-        result.ImageSource = ImageSource.FromFile(uri);
+        // Using a regular image source causes them to disappear when returning to the page: https://github.com/dotnet/maui/issues/15669
+        //result.ImageSource = ImageSource.FromFile(uri);
+
+        // Use SkiaSharp's SKBitmapImageSource image source instead
+        var imageSource = new SKBitmapImageSource
+        {
+            Bitmap = SKBitmap.Decode(imageBytes)
+        };
+        result.ImageSource = imageSource;
 
         result.IsLoading = false;
     }

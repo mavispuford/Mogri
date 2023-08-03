@@ -164,7 +164,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         Height = defaultSettings.Height.ToString();
         ImageCount = defaultSettings.NumOutputs.ToString();
         MakeSeamless = defaultSettings.Seamless == OnOff.on;
-        Sampler = defaultSettings.Sampler.ToString();
+        Sampler = defaultSettings.Sampler;
         Seed = defaultSettings.Seed.ToString();
         Steps = defaultSettings.Steps.ToString();
         UpscaleLevel = defaultSettings.UpscaleLevel.ToString();

@@ -7,6 +7,8 @@ public static class NavigationParams
     public const string CanvasImageString = nameof(CanvasImageString);
     public const string Color = nameof(Color);
     public const string ColorPalette = nameof(ColorPalette);
+    public const string DeletedHistoryItem = nameof(DeletedHistoryItem);
+    public const string HistoryItem = nameof(HistoryItem);
     public const string ImageHeight = nameof(ImageHeight);
     public const string ImageResultItem = nameof(ImageResultItem);
     public const string ImageWidth = nameof(ImageWidth);
