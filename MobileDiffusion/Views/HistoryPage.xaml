@@ -7,28 +7,17 @@
                 x:DataType="viewModels:IHistoryPageViewModel"
                 Shell.PresentationMode="Animated"
                 Shell.NavBarIsVisible="True"
-                Shell.TabBarIsVisible="False">
-    <Shell.TitleView>
-        <Grid ColumnDefinitions="*,auto"
-              Padding="0,0,10,0">
-            <Label Grid.Column="0"
-                   Text="History"
-                   HorizontalOptions="Center"
-                   VerticalOptions="Center"
-                   TextColor="White"
-                   FontSize="Header"
-                   FontAttributes="Bold"
-                   Padding="-20,0,0,0"/>
-            <ImageButton Grid.Column="1" ToolTipProperties.Text="Clear History"
-                         VerticalOptions="FillAndExpand">
-                <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
-                </ImageButton.Source>
-            </ImageButton>
-        </Grid>
-    </Shell.TitleView>
+                Shell.TabBarIsVisible="False"
+                Title="History">
+    <views:BasePage.ToolbarItems>
+        <ToolbarItem Text="Clear History">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </views:BasePage.ToolbarItems>
 
-    <CollectionView ItemsSource="{Binding ImageSources}"
+    <CollectionView ItemsSource="{Binding HistoryItems}"
                     CanReorderItems="False"
                     HorizontalOptions="Fill"
                     VerticalOptions="Fill"
@@ -42,8 +31,8 @@
                              VerticalItemSpacing="0"/>
         </CollectionView.ItemsLayout>
         <CollectionView.ItemTemplate>
-            <DataTemplate>
-                <ImageButton Source="{Binding .}" 
+            <DataTemplate x:DataType="viewModels:IHistoryItemViewModel">
+                <ImageButton Source="{Binding ThumbnailImageSource}"
                              Aspect="AspectFill"
                              WidthRequest="200"
                              HeightRequest="200"

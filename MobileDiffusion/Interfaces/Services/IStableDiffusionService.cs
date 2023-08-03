@@ -11,6 +11,8 @@ public interface IStableDiffusionService
 
     Task<byte[]> GetImageBytesAsync(string url);
 
+    Task<Settings> GetImageInfoAsync(string base64EncodedImage);
+
     Task InitializeAsync();
 
     Task RefreshResourcesAsync();

@@ -317,7 +317,10 @@ public class FileService : IFileService
         {
             var fullPath = path != null ? Path.Combine(FileSystem.CacheDirectory, path) : FileSystem.CacheDirectory;
 
-            return Task.FromResult(Directory.GetFiles(fullPath));
+            var info = new DirectoryInfo(fullPath);
+            var files = info.GetFiles().OrderByDescending(p => p.CreationTime).Select(f => f.FullName).ToArray();
+
+            return Task.FromResult(files);
         }
         catch
         {
@@ -330,5 +333,21 @@ public class FileService : IFileService
         var fullPath = filePath.Contains(FileSystem.CacheDirectory) ? filePath : Path.Combine(FileSystem.CacheDirectory, filePath);
 
         return Task.FromResult(File.Exists(fullPath));
+    }
+
+    public Task<bool> DeleteFileFromInternalStorage(string filePath)
+    {
+        var fullPath = filePath.Contains(FileSystem.CacheDirectory) ? filePath : Path.Combine(FileSystem.CacheDirectory, filePath);
+
+        try
+        {
+            File.Delete(fullPath);
+        }
+        catch
+        {
+            return Task.FromResult(false);
+        }
+
+        return Task.FromResult(true);
     }
 }

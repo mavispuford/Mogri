@@ -9,11 +9,12 @@ namespace MobileDiffusion.ViewModels;
 
 public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 {
-    private const string ThumbnailPrefix = "t.";
     private readonly SemaphoreSlim _semaphore = new(1, 1);
 
     private readonly IFileService _fileService;
     private readonly IImageService _imageService;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly IPopupService _popupService;
 
     private string[] _allImageFileNames;
 
@@ -21,37 +22,70 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     private const int itemTakeCount = 12;
 
     [ObservableProperty]
-    private ObservableCollection<ImageSource> _imageSources = new();
+    private ObservableCollection<IHistoryItemViewModel> _historyItems = new();
 
     public HistoryPageViewModel(IFileService fileService,
-        IImageService imageService)
+        IImageService imageService,
+        IServiceProvider serviceProvider,
+        IPopupService popupService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+        _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
     }
 
     public override async Task OnNavigatedToAsync()
     {
         await base.OnNavigatedToAsync();
 
-        _allImageFileNames = await _fileService.GetFileListFromInternalStorageAsync();
-
-        if (_allImageFileNames != null)
+        _ = Task.Run(async () =>
         {
-            // REMOVE ALL THUMBNAILS - REMOVE AFTER TESTING
-            foreach (var file in _allImageFileNames.Where(s => Path.GetFileName(s).StartsWith(ThumbnailPrefix)).ToArray())
+            // ALL FILES INCLUDING THUMBNAILS
+            var allFiles = await _fileService.GetFileListFromInternalStorageAsync();
+            
+            if (allFiles != null)
             {
-                File.Delete(file);
-            }
+                // Non-thumbnail files only
+                _allImageFileNames = allFiles.Where(s => !Path.GetFileName(s).StartsWith(Constants.ThumbnailPrefix)).ToArray();
 
-            await LoadItems();
-        }
+                // REMOVE ALL THUMBNAILS - REMOVE THIS AFTER TESTING
+                foreach (var file in allFiles.Where(s => Path.GetFileName(s).StartsWith(Constants.ThumbnailPrefix)).ToArray())
+                {
+                    File.Delete(file);
+                }
+
+                await Shell.Current.Dispatcher.DispatchAsync(LoadItems);
+            }
+        });
     }
 
     [RelayCommand]
-    private async Task ItemTapped(object item)
+    private async Task ItemTapped(IHistoryItemViewModel item)
     {
-        await Task.CompletedTask;
+        var popupParameters = new Dictionary<string, object>
+        {
+            { NavigationParams.HistoryItem, item }
+        };
+
+        var result = (await _popupService.ShowPopupAsync("HistoryItemPopup", popupParameters)) as Dictionary<string, object>;
+
+        if (result == null)
+        {
+            return;
+        }
+
+        if (result.ContainsKey(NavigationParams.PromptSettings) ||
+            result.ContainsKey(NavigationParams.InitImgString) ||
+            result.ContainsKey(NavigationParams.CanvasImageString))
+        {
+            await Shell.Current.GoToAsync("..", result);
+        }
+
+        if (result.ContainsKey(NavigationParams.DeletedHistoryItem))
+        {
+            HistoryItems.Remove(item);
+        }
     }
 
     [RelayCommand]
@@ -66,33 +100,14 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
         try
         {
-            await Task.Run(async () =>
+            foreach (var filename in _allImageFileNames.Take(new Range(itemIndex, itemIndex + itemTakeCount)))
             {
-                foreach (var filename in _allImageFileNames.Take(new Range(itemIndex, itemIndex + itemTakeCount)))
-                {
-                    var filenameNoPath = Path.GetFileName(filename);
-                    var directoryOnly = filename.Replace(filenameNoPath, string.Empty);
-                    var thumbnailFilename = $"{ThumbnailPrefix}{filenameNoPath}";
-                    var thumbnailFullPath = Path.Combine(directoryOnly, thumbnailFilename);
+                var historyItem = _serviceProvider.GetService<IHistoryItemViewModel>();
 
-                    if (!await _fileService.FileExistsInInternalStorageAsync(thumbnailFullPath))
-                    {
-                        using var fileStream = await _fileService.GetFileStreamFromInternalStorageAsync(filenameNoPath);
-                        var resized = _imageService.GetResizedImageStreamBytes(fileStream, 256, 256, filterImage: true);
+                HistoryItems.Add(historyItem);
 
-                        await _fileService.WriteFileToInternalStorageAsync(thumbnailFullPath, resized.Bytes);
-                    }
-                    else
-                    {
-                        // File exists
-                    }
-
-                    Shell.Current.Dispatcher.Dispatch(() =>
-                    {
-                        ImageSources.Add(ImageSource.FromFile(thumbnailFullPath));
-                    });
-                }
-            });
+                _ = Task.Run(() => historyItem.InitWith(filename, _fileService, _imageService));
+            }
 
             itemIndex += itemTakeCount;
         }

@@ -4,6 +4,8 @@ namespace MobileDiffusion.Interfaces.Services;
 
 public interface IFileService
 {
+    Task<bool> DeleteFileFromInternalStorage(string filePath);
+
     Task<bool> FileExistsInInternalStorageAsync(string filePath);
 
     Task<Stream> GetFileStreamUsingExactUriAsync(string uriString);

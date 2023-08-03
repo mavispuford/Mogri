@@ -164,5 +164,10 @@ namespace MobileDiffusion.Services
         {
             return Task.FromResult(new List<IPromptStyleViewModel>());
         }
+
+        public Task<Settings> GetImageInfoAsync(string base64EncodedImage)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

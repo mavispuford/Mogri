@@ -5,11 +5,31 @@ using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Models;
 using MobileDiffusion.Models.Automatic1111;
 using Newtonsoft.Json;
+using System.Text.RegularExpressions;
 
 namespace MobileDiffusion.Services
 {
     internal class Automatic1111Service : IStableDiffusionService
     {
+        private static class RegexConstants
+        {
+            public const string Prompt = nameof(Prompt);
+            public const string Steps = nameof(Steps);
+            public const string Sampler = nameof(Sampler);
+            public const string CfgScale = nameof(CfgScale);
+            public const string Seed = nameof(Seed);
+            public const string Width = nameof(Width);
+            public const string Height = nameof(Height);
+            public const string ModelHash = nameof(ModelHash);
+            public const string Model = nameof(Model);
+            public const string DenoisingStrength = nameof(DenoisingStrength);
+            public const string Eta = nameof(Eta);
+            public const string Version = nameof(Version);
+        }
+
+        private static readonly Regex PngInfoRegex = new(@"^(?<Prompt>.*)\nSteps:\s*(?<Steps>\d*),\s*Sampler:\s*(?<Sampler>.*),\s*CFG\s*scale:\s*(?<CfgScale>\d*\.*\d*),\s*Seed:\s*(?<Seed>\d*),\s*Size:\s*(?<Width>\d*)x(?<Height>\d*),\s*Model\s*hash:\s*(?<ModelHash>.*),\s*Model:\s*(?<Model>.*),\s*Denoising\s*strength:\s(?<DenoisingStrength>\d*\.*\d*),\s*Eta:\s*(?<Eta>\d*\.*\d*),\s*Version:\s*(?<Version>v\d*\.*\d*\.*\d*)$", RegexOptions.Compiled);
+        //private static readonly Regex PngInfoRegex = new(@"(?<Prompt>.*)\n", RegexOptions.Compiled);
+
         /// <summary>
         ///     Some operations take several minutes to complete, especially with older hardware.
         /// </summary>
@@ -91,6 +111,37 @@ namespace MobileDiffusion.Services
                     yield return apiResponse;
                 }
             }
+        }
+
+        public async Task<Settings> GetImageInfoAsync(string base64EncodedImage)
+        {
+            var client = getClient(TimeSpan.FromSeconds(10));
+
+            var request = new PNGInfoRequest()
+            {
+                Image = base64EncodedImage
+            };
+
+            var imageInfoResult = await client.Pnginfoapi_sdapi_v1_png_info_postAsync(request);
+
+            if (!string.IsNullOrEmpty(imageInfoResult.Info) && PngInfoRegex.Match(imageInfoResult.Info) is { Success: true } match)
+            {
+                var settings = new Settings
+                {
+                    Prompt = match.Groups[RegexConstants.Prompt].Value,
+                    Steps = int.Parse(match.Groups[RegexConstants.Steps].Value),
+                    Sampler = match.Groups[RegexConstants.Sampler].Value,
+                    GuidanceScale = double.Parse(match.Groups[RegexConstants.CfgScale].Value),
+                    Seed = long.Parse(match.Groups[RegexConstants.Seed].Value),
+                    Width = double.Parse(match.Groups[RegexConstants.Width].Value),
+                    Height = double.Parse(match.Groups[RegexConstants.Height].Value),
+                    DenoisingStrength = double.Parse(match.Groups[RegexConstants.DenoisingStrength].Value),
+                };
+
+                return settings;
+            }
+
+            return null;
         }
 
         public async Task RefreshResourcesAsync()
@@ -206,8 +257,8 @@ namespace MobileDiffusion.Services
             }
 
             _mainRequestCancellationSource = new CancellationTokenSource();
-            var cancellationTokenSource = new CancellationTokenSource();
-            var progressToken = cancellationTokenSource.Token;
+            var progressCancellationTokenSource = new CancellationTokenSource();
+            var progressToken = progressCancellationTokenSource.Token;
 
             TextToImageResponse txt2ImgResponse = null;
 
@@ -215,12 +266,12 @@ namespace MobileDiffusion.Services
             {
                 try
                 {
-                    txt2ImgResponse = await client.Text2imgapi_sdapi_v1_txt2img_postAsync(request);
+                    txt2ImgResponse = await client.Text2imgapi_sdapi_v1_txt2img_postAsync(request, _mainRequestCancellationSource?.Token ?? CancellationToken.None);
                 }
                 finally
                 {
                     _mainRequestCancellationSource = null;
-                    cancellationTokenSource.Cancel();
+                    progressCancellationTokenSource.Cancel();
                 }
             });
 
@@ -266,8 +317,8 @@ namespace MobileDiffusion.Services
             }
 
             _mainRequestCancellationSource = new CancellationTokenSource();
-            var cancellationTokenSource = new CancellationTokenSource();
-            var progressToken = cancellationTokenSource.Token;
+            var progressCancellationTokenSource = new CancellationTokenSource();
+            var progressToken = progressCancellationTokenSource.Token;
 
             ImageToImageResponse img2ImgResponse = null;
 
@@ -280,7 +331,7 @@ namespace MobileDiffusion.Services
                 finally
                 {
                     _mainRequestCancellationSource = null;
-                    cancellationTokenSource.Cancel();
+                    progressCancellationTokenSource.Cancel();
                 }
             });
 

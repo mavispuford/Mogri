@@ -5,8 +5,8 @@
                   xmlns:controls="clr-namespace:MobileDiffusion.Controls;assembly=MobileDiffusion"
                   xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
                   xmlns:popups="clr-namespace:MobileDiffusion.Views.Popups"
-                  x:Class="MobileDiffusion.Views.Popups.ResultItemPopup"
-                  x:DataType="viewModels:IResultItemPopupViewModel"
+                  x:Class="MobileDiffusion.Views.Popups.HistoryItemPopup"
+                  x:DataType="viewModels:IHistoryItemPopupViewModel"
                   HorizontalOptions="Fill"
                   VerticalOptions="Fill"
                   Color="Transparent">
@@ -33,14 +33,20 @@
                    Aspect="AspectFit" 
                    HorizontalOptions="Center"
                    VerticalOptions="Center"
-                   Source="{Binding ResultItem.InternalUri}"/>
+                   Source="{Binding FullImageSource}"/>
             
         </controls:GestureContainer>
         
-        <Button Grid.Row="1" Grid.Column="0" Text="Use Seed" Command="{Binding UseSeedCommand}" 
+        <Button Grid.Row="1" Grid.Column="0" Text="Use Settings" Command="{Binding UseSettingsCommand}" 
                 Style="{DynamicResource LargeIconButtonStyle}">
             <Button.ImageSource>
-                <FontImageSource Glyph="&#xe3a5;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource White}" />
+                <FontImageSource Glyph="&#xe429;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource White}" />
+            </Button.ImageSource>
+        </Button>
+        <Button Grid.Row="1" Grid.Column="1" Text="Delete" Command="{Binding DeleteCommand}" 
+                Style="{DynamicResource LargeIconButtonStyle}">
+            <Button.ImageSource>
+                <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource White}" />
             </Button.ImageSource>
         </Button>
         <Button Grid.Row="1" Grid.Column="2" Text="As Source" Command="{Binding ImageToImageCommand}"

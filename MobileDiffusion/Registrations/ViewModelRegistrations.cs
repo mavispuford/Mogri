@@ -20,6 +20,7 @@ public static class ViewModelRegistrations
         builder.Services.AddTransient<IPromptStyleInfoPopupViewModel, PromptStyleInfoPopupViewModel>();
         builder.Services.AddTransient<IHistoryPageViewModel, HistoryPageViewModel>();
         builder.Services.AddTransient<IHistoryItemViewModel, HistoryItemViewModel>();
+        builder.Services.AddTransient<IHistoryItemPopupViewModel, HistoryItemPopupViewModel>();
 
         return builder;
     }
