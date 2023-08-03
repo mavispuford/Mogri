@@ -14,6 +14,7 @@ namespace MobileDiffusion.Services
         private static class RegexConstants
         {
             public const string Prompt = nameof(Prompt);
+            public const string NegativePrompt = nameof(NegativePrompt);
             public const string Steps = nameof(Steps);
             public const string Sampler = nameof(Sampler);
             public const string CfgScale = nameof(CfgScale);
@@ -27,7 +28,7 @@ namespace MobileDiffusion.Services
             public const string Version = nameof(Version);
         }
 
-        private static readonly Regex PngInfoRegex = new(@"^(?<Prompt>.*)\nSteps:\s*(?<Steps>\d*),\s*Sampler:\s*(?<Sampler>.*),\s*CFG\s*scale:\s*(?<CfgScale>\d*\.*\d*),\s*Seed:\s*(?<Seed>\d*),\s*Size:\s*(?<Width>\d*)x(?<Height>\d*),\s*Model\s*hash:\s*(?<ModelHash>.*),\s*Model:\s*(?<Model>.*),\s*Denoising\s*strength:\s(?<DenoisingStrength>\d*\.*\d*),\s*Eta:\s*(?<Eta>\d*\.*\d*),\s*Version:\s*(?<Version>v\d*\.*\d*\.*\d*)$", RegexOptions.Compiled);
+        private static readonly Regex PngInfoRegex = new(@"^(?<Prompt>.*)(\n)*(Negative\s*prompt:\s*)*(?<NegativePrompt>.*)(\n)*Steps:\s*(?<Steps>\d*),\s*Sampler:\s*(?<Sampler>.*),\s*CFG\s*scale:\s*(?<CfgScale>\d*\.*\d*),\s*Seed:\s*(?<Seed>\d*),\s*Size:\s*(?<Width>\d*)x(?<Height>\d*),\s*Model\s*hash:\s*(?<ModelHash>.*),\s*Model:\s*(?<Model>.*),\s*Denoising\s*strength:\s(?<DenoisingStrength>\d*\.*\d*),\s*(Eta:\s)*(?<Eta>\d*\.*\d*)*,*\s*Version:\s*(?<Version>v\d*\.*\d*\.*\d*)$", RegexOptions.Compiled);
         //private static readonly Regex PngInfoRegex = new(@"(?<Prompt>.*)\n", RegexOptions.Compiled);
 
         /// <summary>
@@ -129,6 +130,7 @@ namespace MobileDiffusion.Services
                 var settings = new Settings
                 {
                     Prompt = match.Groups[RegexConstants.Prompt].Value,
+                    NegativePrompt = match.Groups[RegexConstants.NegativePrompt].Value,
                     Steps = int.Parse(match.Groups[RegexConstants.Steps].Value),
                     Sampler = match.Groups[RegexConstants.Sampler].Value,
                     GuidanceScale = double.Parse(match.Groups[RegexConstants.CfgScale].Value),

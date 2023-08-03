@@ -10,5 +10,7 @@ public interface IHistoryPageViewModel : IPageViewModel
 
     IAsyncRelayCommand<IHistoryItemViewModel> ItemTappedCommand { get; }
 
+    IAsyncRelayCommand ClearHistoryCommand { get; }
+
     IAsyncRelayCommand LoadItemsCommand { get; }
 }

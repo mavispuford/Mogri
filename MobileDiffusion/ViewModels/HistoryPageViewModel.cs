@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 using System.Collections.ObjectModel;
-using System.IO;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -58,6 +57,24 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
                 await Shell.Current.Dispatcher.DispatchAsync(LoadItems);
             }
         });
+    }
+
+    [RelayCommand]
+    private async Task ClearHistory()
+    {
+        var result = await Shell.Current.DisplayAlert("Confirm", "Are you sure you would like to clear all of your history?\n\n**This cannot be undone.**", "CLEAR ALL", "Cancel");
+
+        if (!result)
+        {
+            return;
+        }
+
+        foreach(var filePath in _allImageFileNames)
+        {
+            await _fileService.DeleteFileFromInternalStorage(filePath);
+        }
+
+        HistoryItems.Clear();
     }
 
     [RelayCommand]
