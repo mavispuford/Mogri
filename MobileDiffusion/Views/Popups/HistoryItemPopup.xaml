@@ -18,6 +18,11 @@
           HorizontalOptions="FillAndExpand"
           VerticalOptions="FillAndExpand"
           IsClippedToBounds="False">
+        <Grid.Resources>
+            <ResourceDictionary>
+                <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+            </ResourceDictionary>
+        </Grid.Resources>
         <Grid.GestureRecognizers>
             <TapGestureRecognizer Command="{Binding CloseCommand}" />
         </Grid.GestureRecognizers>
@@ -36,7 +41,16 @@
                    Source="{Binding FullImageSource}"/>
             
         </controls:GestureContainer>
-        
+
+        <Button Grid.Row="0" Grid.Column="1" Text="Info" Command="{Binding ImageInfoCommand}" 
+                Style="{DynamicResource LargeIconButtonStyle}"
+                VerticalOptions="End"
+                IsVisible="{Binding HistoryItem.Settings, Converter={StaticResource IsNotNullConverter}}">
+            <Button.ImageSource>
+                <FontImageSource Glyph="&#xe88e;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource White}" />
+            </Button.ImageSource>
+        </Button>
+
         <Button Grid.Row="1" Grid.Column="0" Text="Use Settings" Command="{Binding UseSettingsCommand}" 
                 Style="{DynamicResource LargeIconButtonStyle}">
             <Button.ImageSource>

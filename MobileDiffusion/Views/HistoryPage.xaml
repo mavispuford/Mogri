@@ -10,7 +10,7 @@
                 Shell.TabBarIsVisible="False"
                 Title="History">
     <views:BasePage.ToolbarItems>
-        <ToolbarItem Text="Clear History">
+        <ToolbarItem Text="Clear History" Command="{Binding ClearHistoryCommand}">
             <ToolbarItem.IconImageSource>
                 <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
             </ToolbarItem.IconImageSource>

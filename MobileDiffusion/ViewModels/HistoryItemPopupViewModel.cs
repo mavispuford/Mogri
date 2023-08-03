@@ -115,7 +115,27 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
     [RelayCommand]
     private async Task ImageInfo()
     {
-        await Task.CompletedTask;
+        if (HistoryItem.Settings == null)
+        {
+            await Shell.Current.DisplayAlert("No Image Info", "Unable to retrieve image info. Please try again later.", "Close");
+
+            return;
+        }
+
+        var message = $"Prompt: {HistoryItem.Settings.Prompt}\n\n" +
+            $"Negative Prompt: {HistoryItem.Settings.NegativePrompt}\n\n" +
+            $"Steps: {HistoryItem.Settings.Steps}, Sampler: {HistoryItem.Settings.Sampler}\n" +
+            $"Guidance Scale (Cfg): {HistoryItem.Settings.GuidanceScale}\n" + 
+            $"Seed: {HistoryItem.Settings.Seed}\n" + 
+            $"Size: {HistoryItem.Settings.Width}x{HistoryItem.Settings.Height}\n" +
+            $"Denoising Strength: {HistoryItem.Settings.DenoisingStrength}";
+
+        var result = await Shell.Current.DisplayAlert("Image Info", message, "Copy to clipboard", "Close");
+
+        if (result)
+        {
+            await Clipboard.Default.SetTextAsync(message);
+        }
     }
 
     [RelayCommand]
