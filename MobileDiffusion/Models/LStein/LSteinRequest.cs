@@ -79,7 +79,7 @@ public class LSteinRequest
             Height = settings.Height.ToString(),
             Initimg = settings.InitImage,
             InvertMask = settings.InvertMask != Enums.OnOff.Default ? settings.InvertMask.ToString() : null,
-            Iterations = settings.NumOutputs.ToString(),
+            Iterations = settings.BatchSize.ToString(),
             Mask = settings.Mask,
             Prompt = settings.Prompt,
             SamplerName = settings.Sampler.ToString(),

@@ -5,31 +5,25 @@ using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Models;
 using MobileDiffusion.Models.Automatic1111;
 using Newtonsoft.Json;
-using System.Text.RegularExpressions;
 
 namespace MobileDiffusion.Services
 {
     internal class Automatic1111Service : IStableDiffusionService
     {
-        private static class RegexConstants
+        private static class PngInfoProperties
         {
-            public const string Prompt = nameof(Prompt);
-            public const string NegativePrompt = nameof(NegativePrompt);
             public const string Steps = nameof(Steps);
             public const string Sampler = nameof(Sampler);
-            public const string CfgScale = nameof(CfgScale);
+            public const string CfgScale = "CFG Scale";
             public const string Seed = nameof(Seed);
-            public const string Width = nameof(Width);
-            public const string Height = nameof(Height);
-            public const string ModelHash = nameof(ModelHash);
+            public const string Size = nameof(Size);
+            public const string ModelHash = "Model hash";
             public const string Model = nameof(Model);
-            public const string DenoisingStrength = nameof(DenoisingStrength);
+            public const string LoraHashes = "Lora hashes";
+            public const string DenoisingStrength = "Denoising strength";
             public const string Eta = nameof(Eta);
             public const string Version = nameof(Version);
         }
-
-        private static readonly Regex PngInfoRegex = new(@"^(?<Prompt>.*)(\n)*(Negative\s*prompt:\s*)*(?<NegativePrompt>.*)(\n)*Steps:\s*(?<Steps>\d*),\s*Sampler:\s*(?<Sampler>.*),\s*CFG\s*scale:\s*(?<CfgScale>\d*\.*\d*),\s*Seed:\s*(?<Seed>\d*),\s*Size:\s*(?<Width>\d*)x(?<Height>\d*),\s*Model\s*hash:\s*(?<ModelHash>.*),\s*Model:\s*(?<Model>.*),\s*Denoising\s*strength:\s(?<DenoisingStrength>\d*\.*\d*),\s*(Eta:\s)*(?<Eta>\d*\.*\d*)*,*\s*Version:\s*(?<Version>v\d*\.*\d*\.*\d*)$", RegexOptions.Compiled);
-        //private static readonly Regex PngInfoRegex = new(@"(?<Prompt>.*)\n", RegexOptions.Compiled);
 
         /// <summary>
         ///     Some operations take several minutes to complete, especially with older hardware.
@@ -125,25 +119,77 @@ namespace MobileDiffusion.Services
 
             var imageInfoResult = await client.Pnginfoapi_sdapi_v1_png_info_postAsync(request);
 
-            if (!string.IsNullOrEmpty(imageInfoResult.Info) && PngInfoRegex.Match(imageInfoResult.Info) is { Success: true } match)
+            if (string.IsNullOrEmpty(imageInfoResult.Info))
             {
-                var settings = new Settings
-                {
-                    Prompt = match.Groups[RegexConstants.Prompt].Value,
-                    NegativePrompt = match.Groups[RegexConstants.NegativePrompt].Value,
-                    Steps = int.Parse(match.Groups[RegexConstants.Steps].Value),
-                    Sampler = match.Groups[RegexConstants.Sampler].Value,
-                    GuidanceScale = double.Parse(match.Groups[RegexConstants.CfgScale].Value),
-                    Seed = long.Parse(match.Groups[RegexConstants.Seed].Value),
-                    Width = double.Parse(match.Groups[RegexConstants.Width].Value),
-                    Height = double.Parse(match.Groups[RegexConstants.Height].Value),
-                    DenoisingStrength = double.Parse(match.Groups[RegexConstants.DenoisingStrength].Value),
-                };
-
-                return settings;
+                return null;
             }
 
-            return null;
+            var newLineSplit = imageInfoResult.Info.Split('\n');
+
+            if (newLineSplit.Length <= 1)
+            {
+                return null;
+            }
+
+            var commaSplit = newLineSplit.LastOrDefault().Split(',');
+
+            var properties = new Dictionary<string, string>();
+
+            foreach (var item in commaSplit)
+            {
+                var itemSplit = item.Trim().Split(": ");
+
+                if (itemSplit.Length == 2)
+                {
+                    properties.TryAdd(itemSplit.First(), itemSplit.Last());
+                }
+            }
+
+            var prompt = newLineSplit[0];
+            var negativePrompt = newLineSplit.Length > 2 ? newLineSplit[1].Trim().Split(": ").Last() : string.Empty;
+
+            var settings = new Settings
+            {
+                Prompt = prompt,
+                NegativePrompt = negativePrompt
+            };
+
+            foreach(var property in properties)
+            {
+                switch (property.Key)
+                {
+                    case PngInfoProperties.Steps:
+                        settings.Steps = int.Parse(property.Value);
+                        break;
+                    case PngInfoProperties.Sampler:
+                        settings.Sampler = property.Value;
+                        break;
+                    case PngInfoProperties.CfgScale:
+                        settings.GuidanceScale = double.Parse(property.Value);
+                        break;
+                    case PngInfoProperties.Seed:
+                        settings.Seed = long.Parse(property.Value);
+                        break;
+                    case PngInfoProperties.Size:
+                        var size = property.Value.Split('x');
+
+                        if (size.Length != 2)
+                        {
+                            break;
+                        }
+                            
+                        settings.Width = double.Parse(size[0]);
+                        settings.Height = double.Parse(size[1]);
+                        break;
+                    case PngInfoProperties.DenoisingStrength:
+                        settings.DenoisingStrength = double.Parse(property.Value);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            return settings;
         }
 
         public async Task RefreshResourcesAsync()
@@ -188,8 +234,8 @@ namespace MobileDiffusion.Services
         {
             var request = new StableDiffusionProcessingTxt2Img();
 
-            request.N_iter = settings.NumOutputs; // Number of Batches
-            //request.Batch_size = settings.NumOutputs;
+            request.N_iter = settings.BatchCount;
+            request.Batch_size = settings.BatchSize;
             request.Cfg_scale = settings.GuidanceScale;
             request.Restore_faces = settings.EnableGfpgan;
             request.Width = (int)settings.Width;
@@ -216,8 +262,8 @@ namespace MobileDiffusion.Services
         {
             var request = new StableDiffusionProcessingImg2Img();
 
-            request.N_iter = settings.NumOutputs; // Number of Batches
-            //request.Batch_size = settings.NumOutputs;
+            request.N_iter = settings.BatchCount;
+            request.Batch_size = settings.BatchSize;
             request.Cfg_scale = settings.GuidanceScale;
             request.Restore_faces = settings.EnableGfpgan;
             request.Width = (int)settings.Width;

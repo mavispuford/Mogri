@@ -48,11 +48,11 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
                 // Non-thumbnail files only
                 _allImageFileNames = allFiles.Where(s => !Path.GetFileName(s).StartsWith(Constants.ThumbnailPrefix)).ToArray();
 
-                // REMOVE ALL THUMBNAILS - REMOVE THIS AFTER TESTING
-                foreach (var file in allFiles.Where(s => Path.GetFileName(s).StartsWith(Constants.ThumbnailPrefix)).ToArray())
-                {
-                    File.Delete(file);
-                }
+                //// REMOVE ALL THUMBNAILS - REMOVE THIS AFTER TESTING
+                //foreach (var file in allFiles.Where(s => Path.GetFileName(s).StartsWith(Constants.ThumbnailPrefix)).ToArray())
+                //{
+                //    File.Delete(file);
+                //}
 
                 await Shell.Current.Dispatcher.DispatchAsync(LoadItems);
             }

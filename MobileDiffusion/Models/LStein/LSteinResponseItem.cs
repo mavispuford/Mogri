@@ -71,7 +71,7 @@ public class LSteinResponseItem
 
         if (int.TryParse(config.Iterations, out var numOutputs))
         {
-            result.NumOutputs = numOutputs;
+            result.BatchSize = numOutputs;
         }
 
         result.Sampler = config.SamplerName;
