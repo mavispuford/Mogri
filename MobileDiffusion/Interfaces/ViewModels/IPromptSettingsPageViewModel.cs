@@ -11,10 +11,10 @@ public interface IPromptSettingsPageViewModel : IPageViewModel
     List<string> AvailableSamplerValues { get; set; }
 
     List<string> AvailableUpscaleLevelValues { get; set; }
+    
+    string BatchCount { get; set; }
 
-    string ImageCount { get; set; }
-
-    string ImageCountPlaceholder { get; set; }
+    string BatchSize { get; set; }
 
     string Steps { get; set; }
 

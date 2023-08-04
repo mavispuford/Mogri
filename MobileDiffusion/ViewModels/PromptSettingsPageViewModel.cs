@@ -4,7 +4,6 @@ using MobileDiffusion.Enums;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Models;
-using System.Linq;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -27,10 +26,10 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     private List<string> availableUpscaleLevelValues = new();
 
     [ObservableProperty]
-    private string imageCount;
+    private string batchCount;
 
     [ObservableProperty]
-    private string imageCountPlaceholder;
+    private string batchSize;
 
     [ObservableProperty]
     private string steps;
@@ -106,7 +105,6 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         AvailableUpscaleLevelValues = upscaleLevelValues;
 
         var defaultSettings = new Settings();
-        ImageCountPlaceholder = defaultSettings.NumOutputs.ToString();
         StepsPlaceholder = defaultSettings.Steps.ToString();
         CfgScalePlaceholder = defaultSettings.GuidanceScale.ToString();
         SeedPlaceholder = defaultSettings.Seed.ToString();
@@ -162,7 +160,8 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         EnableUpscaling = defaultSettings.EnableUpscaling;
         GfpganStrength = defaultSettings.GfpganStrength.ToString();
         Height = defaultSettings.Height.ToString();
-        ImageCount = defaultSettings.NumOutputs.ToString();
+        BatchCount = defaultSettings.BatchCount.ToString();
+        BatchSize = defaultSettings.BatchSize.ToString();
         MakeSeamless = defaultSettings.Seamless == OnOff.on;
         Sampler = defaultSettings.Sampler;
         Seed = defaultSettings.Seed.ToString();
@@ -202,7 +201,8 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         EnableUpscaling = _settings.EnableUpscaling;
         GfpganStrength = _settings.GfpganStrength.ToString();
         Height = _settings.Height.ToString();
-        ImageCount = _settings.NumOutputs.ToString();
+        BatchCount = _settings.BatchCount.ToString();
+        BatchSize = _settings.BatchSize.ToString();
         MakeSeamless = _settings.Seamless == OnOff.on;
         Sampler = _settings.Sampler;
         Seed = _settings.Seed.ToString();
@@ -234,10 +234,14 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             _settings.Height = pHeight;
         }
 
-        if (int.TryParse(ImageCount, out var pImageCount) ||
-            int.TryParse(ImageCountPlaceholder, out pImageCount))
+        if (int.TryParse(BatchCount, out var pBatchCount))
         {
-            _settings.NumOutputs = pImageCount;
+            _settings.BatchCount = pBatchCount;
+        }
+
+        if (int.TryParse(BatchSize, out var pBatchSize))
+        {
+            _settings.BatchSize = pBatchSize;
         }
 
         _settings.Seamless = MakeSeamless ? OnOff.on : OnOff.Default;

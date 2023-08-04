@@ -17,6 +17,12 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private readonly IImageService _imageService;
     private readonly IPopupService _popupService;
 
+    private int _imgRectIndex = 0;
+    private List<int> _supportedImgRectSizes = new()
+    {
+        0,256,512,768,1024,1280,2048
+    };
+
     private List<Color> _colorPalette = new();
     private Color _paletteIconDarkColor = Colors.Black;
     private string _sourceFileName;
@@ -459,14 +465,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             ShowInitImgRectangle = true;
         }
 
-        InitImgRectangleSize = InitImgRectangleSize switch 
-        {
-            0f => 256f,
-            256f => 512f,
-            512f => 768f,
-            768f => 1024f,
-            1024f => 0f
-        };
+        // Cycle through image rectangle sizes
+        InitImgRectangleSize = _supportedImgRectSizes[_imgRectIndex];
+        _imgRectIndex = (_imgRectIndex + 1) % _supportedImgRectSizes.Count;
 
         if (InitImgRectangleSize == 0f)
         {

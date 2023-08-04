@@ -125,7 +125,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
         var settings = _settings.Clone();
 
-        for (var i = 0; i < settings.NumOutputs; i++)
+        for (var i = 0; i < settings.BatchCount * settings.BatchSize; i++)
         {
             var resultItem = _serviceProvider.GetService<IResultItemViewModel>();
 
@@ -249,11 +249,14 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
                             var result = Results.FirstOrDefault(r => r.ApiResponse == null);
 
-                            result.ApiResponse = response;
-                            result.Settings = settings.Clone();
-                            result.Settings.Seed = seedString;
+                            if (result != null)
+                            {
+                                result.ApiResponse = response;
+                                result.Settings = settings.Clone();
+                                result.Settings.Seed = seedString;
 
-                            await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
+                                await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
+                            }
                         }
                     }
                     else if (response.ResponseObject is ImageToImageResponse imageToImageResponse)
@@ -514,7 +517,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         if (query.TryGetValue(NavigationParams.Seed, out var seedParam) &&
             seedParam is long seed)
         {
-            _settings.NumOutputs = 1;
+            _settings.BatchSize = 1;
             _settings.Seed = seed;
         }
 

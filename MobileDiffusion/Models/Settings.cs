@@ -17,7 +17,8 @@ public class Settings
     public OnOff InvertMask { get; set; }
     public string Mask { get; set; }
     public int Steps { get; set; } = 30;
-    public int NumOutputs { get; set; } = 1;
+    public int BatchCount { get; set; } = 1;
+    public int BatchSize { get; set; } = 1;
     public string Prompt { get; set; }
     public string NegativePrompt { get; set; }
     public double DenoisingStrength { get; set; } = .5;

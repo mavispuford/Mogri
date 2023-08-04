@@ -87,6 +87,8 @@
 	  <None Remove="Resources\Fonts\MaterialIconsRound-Regular.otf" />
 	  <None Remove="Resources\Images\circle_fill_48.svg" />
 	  <None Remove="Resources\Images\reset_image.svg" />
+	  <None Remove="Resources\Images\stack.svg" />
+	  <None Remove="Resources\Images\window.svg" />
 	</ItemGroup>
 
 	<ItemGroup>
