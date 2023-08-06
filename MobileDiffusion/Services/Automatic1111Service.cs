@@ -34,6 +34,7 @@ namespace MobileDiffusion.Services
 
         private ICollection<SamplerItem> _samplers;
         private ICollection<PromptStyleItem> _promptStyles;
+        private ICollection<SDModelItem> _models;
         private ICollection<LoraItem> _loras;
 
         private Task _initializeTask;
@@ -211,6 +212,10 @@ namespace MobileDiffusion.Services
                 var lorasString = JsonConvert.SerializeObject(loras);
 
                 _loras = JsonConvert.DeserializeObject<ICollection<LoraItem>>(lorasString);
+            }),
+            Task.Run(async () =>
+            {
+                _models = await client.Get_sd_models_sdapi_v1_sd_models_getAsync();
             }));
         }
 
@@ -471,6 +476,40 @@ namespace MobileDiffusion.Services
                     Prompt = item.Prompt,
                     NegativePrompt = item.Negative_prompt
                 });
+            }
+
+            return Task.FromResult(result);
+        }
+
+        public Task<Dictionary<string, string>> GetModelsAsync()
+        {
+            var result = new Dictionary<string, string>();
+
+            if (_models == null)
+            {
+                return Task.FromResult(result);
+            }
+
+            foreach (var model in _models)
+            {
+                result.TryAdd(model.Title, model.Model_name);
+            }
+
+            return Task.FromResult(result);
+        }
+
+        public Task<Dictionary<string, string>> GetLorasAsync()
+        {
+            var result = new Dictionary<string, string>();
+
+            if (_loras == null)
+            {
+                return Task.FromResult(result);
+            }
+
+            foreach (var lora in _loras)
+            {
+                result.TryAdd(lora.Name, lora.Alias);
             }
 
             return Task.FromResult(result);

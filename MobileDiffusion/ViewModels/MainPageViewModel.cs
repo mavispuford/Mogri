@@ -30,19 +30,22 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     private float _targetProgress = 0;
 
     [ObservableProperty]
-    private bool hasInitImage;
+    private bool _hasInitImage;
 
     [ObservableProperty]
-    private string prompt = _defaultPrompt;
+    private string _prompt = _defaultPrompt;
 
     [ObservableProperty]
-    private string negativePrompt;
+    private string _negativePrompt;
 
     [ObservableProperty]
-    private float progress;
+    private float _progress;
 
     [ObservableProperty]
-    private ObservableCollection<IResultItemViewModel> results = new();
+    private bool _serverConnected;
+
+    [ObservableProperty]
+    private ObservableCollection<IResultItemViewModel> _results = new();
 
     public MainPageViewModel(
         IFileService fileService,
@@ -67,6 +70,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     {
         if (_stableDiffusionService.Initialized)
         {
+            ServerConnected = true;
             return true;
         }
 
@@ -85,9 +89,11 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                 "Unable to connect to the configured server URL. Please double check your app settings/connectivity and try again.",
                 "OK");
 
+            ServerConnected = false;
             return false;
         }
 
+        ServerConnected = true;
         return true;
     }
 

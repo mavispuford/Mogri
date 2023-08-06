@@ -21,5 +21,9 @@ public interface IStableDiffusionService
 
     Task<List<IPromptStyleViewModel>> GetPromptStylesAsync();
 
+    Task<Dictionary<string, string>> GetModelsAsync();
+
+    Task<Dictionary<string, string>> GetLorasAsync();
+
     bool Initialized { get; }
 }

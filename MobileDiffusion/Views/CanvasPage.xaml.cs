@@ -605,6 +605,7 @@ public partial class CanvasPage : BasePage
 
         SourceImageCanvasView.WidthRequest = width;
         SourceImageCanvasView.HeightRequest = height;
+        
         MaskCanvasView.WidthRequest = width;
         MaskCanvasView.HeightRequest = height;
 

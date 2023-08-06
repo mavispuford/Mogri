@@ -15,11 +15,19 @@
             <toolkit:IsListNotNullOrEmptyConverter x:Key="IsListNotNullOrEmptyConverter" />
             <toolkit:BoolToObjectConverter x:Key="BoolToColorConverter" TrueObject="{StaticResource Tertiary}" FalseObject="{StaticResource IndependenceAccent}" />
             <toolkit:BoolToObjectConverter x:Key="BoolToOpacityConverter" TrueObject="1" FalseObject="0" />
-            <converters:UnfocusOnCommandExecuteConverter x:Key="UnfocusOnCommandExecuteConverter" />
+            <toolkit:BoolToObjectConverter x:Key="ConnectivityBoolToImageSourceConverter">
+                <toolkit:BoolToObjectConverter.TrueObject>
+                    <FontImageSource Glyph="&#xe63e;" FontFamily="MaterialIconsRoundRegular" Size="26" Color="White" />
+                </toolkit:BoolToObjectConverter.TrueObject>
+                <toolkit:BoolToObjectConverter.FalseObject>
+                    <FontImageSource Glyph="&#xe648;" FontFamily="MaterialIconsRoundRegular" Size="26" Color="{StaticResource WhiteTwentySixPercent}" />
+                </toolkit:BoolToObjectConverter.FalseObject>
+            </toolkit:BoolToObjectConverter>
             <toolkit:IsStringNotNullOrEmptyConverter x:Key="IsStringNotNullOrEmptyConverter" />
         </ResourceDictionary>
     </views:BasePage.Resources>
     <views:BasePage.ToolbarItems>
+        <ToolbarItem IconImageSource="{Binding ServerConnected, Converter={StaticResource ConnectivityBoolToImageSourceConverter}}" />
         <ToolbarItem Text="Settings"
                      Command="{Binding ShowAppSettingsCommand}">
             <ToolbarItem.IconImageSource>

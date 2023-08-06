@@ -237,11 +237,12 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             var maskCapture = await MaskCanvasView.CaptureAsync();
             var maskStream = await maskCapture.OpenReadAsync();
             var maskBitmap = SKBitmap.Decode(maskStream);
+            var sameSizeMaskBitmap = maskBitmap.Resize(SourceBitmap.Info, SKFilterQuality.High);
 
             try
             {
                 // Colorize the source bitmap using the mask, then create a black and white mask
-                var colorizedBitmap = CreateMaskedBitmap(SourceBitmap, maskBitmap);
+                var colorizedBitmap = CreateMaskedBitmap(SourceBitmap, sameSizeMaskBitmap);
                 using var colorizedMemStream = new MemoryStream();
                 using var colorizedSkiaStream = new SKManagedWStream(colorizedMemStream);
                 colorizedBitmap.Encode(colorizedSkiaStream, SKEncodedImageFormat.Png, 100);
@@ -262,7 +263,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 {
                     if (maskBitmap.Pixels.Any(p => p.Alpha > 0))
                     {
-                        var blackAndWhiteMaskBitmap = CreateBlackAndWhiteMask(maskBitmap);
+                        var blackAndWhiteMaskBitmap = CreateBlackAndWhiteMask(sameSizeMaskBitmap);
                         using var maskMemStream = new MemoryStream();
                         using var maskSkiaStream = new SKManagedWStream(maskMemStream);
                         blackAndWhiteMaskBitmap.Encode(maskSkiaStream, SKEncodedImageFormat.Png, 100);
@@ -307,11 +308,12 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             var maskCapture = await MaskCanvasView.CaptureAsync();
             var maskStream = await maskCapture.OpenReadAsync();
             var maskBitmap = SKBitmap.Decode(maskStream);
+            var sameSizeMaskBitmap = maskBitmap.Resize(SourceBitmap.Info, SKFilterQuality.High);
 
             try
             {
                 // Colorize the source bitmap using the mask, then create a black and white mask
-                var colorizedBitmap = CreateMaskedBitmap(SourceBitmap, maskBitmap);
+                var colorizedBitmap = CreateMaskedBitmap(SourceBitmap, sameSizeMaskBitmap);
                 var croppedBitmap = GetCroppedBitmap(colorizedBitmap, InitImgRectangle);
 
                 using var croppedBitmapMemStream = new MemoryStream();
@@ -334,7 +336,6 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
                 if (Lines.Any())
                 {
-                    var sameSizeMaskBitmap = maskBitmap.Resize(colorizedBitmap.Info, SKFilterQuality.None);
                     var blackAndWhiteMaskBitmap = CreateBlackAndWhiteMask(sameSizeMaskBitmap);
                     var croppedMask = GetCroppedBitmap(blackAndWhiteMaskBitmap, InitImgRectangle);
 
@@ -683,15 +684,16 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         return resultBitmap;
     }
 
-    private unsafe SKBitmap CreateMaskedBitmap(SKBitmap srcBitmap, SKBitmap maskBitmapFull, bool randomizeMaskPixels = true)
+    private unsafe SKBitmap CreateMaskedBitmap(SKBitmap srcBitmap, SKBitmap maskBitmapOrig, bool randomizeMaskPixels = true)
     {
         if (srcBitmap == null ||
-            maskBitmapFull == null)
+            maskBitmapOrig == null)
         {
             return null;
         }
 
-        var maskBitmap = maskBitmapFull.Resize(srcBitmap.Info, SKFilterQuality.None);
+
+        var maskBitmap = (maskBitmapOrig.Width == srcBitmap.Width && maskBitmapOrig.Height == srcBitmap.Height) ? maskBitmapOrig : maskBitmapOrig.Resize(srcBitmap.Info, SKFilterQuality.High);
 
         byte* srcPtr = (byte*)srcBitmap.GetPixels().ToPointer();
         byte* mskPtr = (byte*)maskBitmap.GetPixels().ToPointer();
