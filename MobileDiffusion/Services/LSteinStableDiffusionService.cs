@@ -169,5 +169,15 @@ namespace MobileDiffusion.Services
         {
             throw new NotImplementedException();
         }
+
+        public Task<Dictionary<string, string>> GetModelsAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Dictionary<string, string>> GetLorasAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

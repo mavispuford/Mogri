@@ -9,6 +9,7 @@ public interface IMainPageViewModel : IPageViewModel
     string Prompt { get; set; }
     string NegativePrompt { get; set; }
     float Progress { get; set; }
+    bool ServerConnected { get; set; }
     ObservableCollection<IResultItemViewModel> Results { get; set; }
     IAsyncRelayCommand CreateCommand { get; }
     IAsyncRelayCommand ShowImageToImageSettingsCommand { get; }
