@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.ObjectModel;
+using System.Windows.Input;
 
 namespace MobileDiffusion.Interfaces.ViewModels;
 
@@ -27,4 +28,8 @@ public interface IHistoryPageViewModel : IPageViewModel
     IRelayCommand ToggleSelectionModeCommand { get; }
 
     IRelayCommand SelectionChangedCommand { get; }
+
+    ICommand HideBottomPanelCommand { get; set; }
+
+    ICommand ShowBottomPanelCommand { get; set; }
 }

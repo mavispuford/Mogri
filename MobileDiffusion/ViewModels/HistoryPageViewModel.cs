@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 using System.Collections.ObjectModel;
+using System.Windows.Input;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -35,6 +36,10 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
     [ObservableProperty]
     private bool _isLoading = true;
+
+    public ICommand HideBottomPanelCommand { get; set; }
+
+    public ICommand ShowBottomPanelCommand { get; set; }
 
     public HistoryPageViewModel(IFileService fileService,
         IImageService imageService,
@@ -158,8 +163,14 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         
         if (!SelectionModeEnabled)
         {
+            HideBottomPanelCommand?.Execute(null);
             SelectedItems.Clear();
         }
+        else
+        {
+            ShowBottomPanelCommand?.Execute(null);
+        }
+
 
         SelectionChanged();
     }
