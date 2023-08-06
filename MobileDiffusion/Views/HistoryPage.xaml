@@ -80,7 +80,6 @@
                             <VisualStateGroup x:Name="CommonStates">
                                 <VisualState x:Name="Normal">
                                     <VisualState.Setters>
-                                        <!--<Setter Property="Scale" Value="1" />-->
                                         <Setter Property="animations:AnimationProperties.Animation">
                                             <animations:ScaleToAnimation Scale="1" Easing="{x:Static Easing.CubicInOut}" Length="200" />
                                         </Setter>
@@ -91,8 +90,6 @@
                                 </VisualState>
                                 <VisualState x:Name="Selected">
                                     <VisualState.Setters>
-                                        <!--<Setter Property="Scale" Value=".75" />-->
-
                                         <Setter Property="animations:AnimationProperties.Animation">
                                             <animations:ScaleToAnimation Scale=".75" Easing="{x:Static Easing.CubicInOut}" Length="200" />
                                         </Setter>
