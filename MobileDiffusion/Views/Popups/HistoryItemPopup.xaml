@@ -21,6 +21,7 @@
         <Grid.Resources>
             <ResourceDictionary>
                 <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+                <toolkit:IsNullConverter x:Key="IsNullConverter" />
             </ResourceDictionary>
         </Grid.Resources>
         <Grid.GestureRecognizers>
@@ -42,6 +43,13 @@
             
         </controls:GestureContainer>
 
+        <ActivityIndicator Grid.Row="0" Grid.Column="1"
+                           HorizontalOptions="Center"
+                           VerticalOptions="End"
+                           Margin="0,0,0,10"
+                           IsVisible="{Binding HistoryItem.Settings, Converter={StaticResource IsNullConverter}}"
+                           IsRunning="{Binding HistoryItem.Settings, Converter={StaticResource IsNullConverter}}" />
+
         <Button Grid.Row="0" Grid.Column="1" Text="Info" Command="{Binding ImageInfoCommand}" 
                 Style="{DynamicResource LargeIconButtonStyle}"
                 VerticalOptions="End"
@@ -51,8 +59,15 @@
             </Button.ImageSource>
         </Button>
 
+        <ActivityIndicator Grid.Row="1" Grid.Column="0"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           IsVisible="{Binding HistoryItem.Settings, Converter={StaticResource IsNullConverter}}"
+                           IsRunning="{Binding HistoryItem.Settings, Converter={StaticResource IsNullConverter}}" />
+
         <Button Grid.Row="1" Grid.Column="0" Text="Use Settings" Command="{Binding UseSettingsCommand}" 
-                Style="{DynamicResource LargeIconButtonStyle}">
+                Style="{DynamicResource LargeIconButtonStyle}"
+                IsVisible="{Binding HistoryItem.Settings, Converter={StaticResource IsNotNullConverter}}">
             <Button.ImageSource>
                 <FontImageSource Glyph="&#xe429;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource White}" />
             </Button.ImageSource>

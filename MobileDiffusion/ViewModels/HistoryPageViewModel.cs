@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
@@ -22,6 +23,18 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
     [ObservableProperty]
     private ObservableCollection<IHistoryItemViewModel> _historyItems = new();
+
+    [ObservableProperty]
+    private IList<Object> _selectedItems;
+
+    [ObservableProperty]
+    private bool _selectionModeEnabled;
+
+    [ObservableProperty]
+    private string _selectedItemsText;
+
+    [ObservableProperty]
+    private bool _isLoading = true;
 
     public HistoryPageViewModel(IFileService fileService,
         IImageService imageService,
@@ -55,6 +68,10 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
                 //}
 
                 await Shell.Current.Dispatcher.DispatchAsync(LoadItems);
+            }
+            else
+            {
+                IsLoading = false;
             }
         });
     }
@@ -132,5 +149,57 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         {
             _semaphore.Release();
         }
+    }
+
+    [RelayCommand]
+    private void ToggleSelectionMode()
+    {
+        SelectionModeEnabled = !SelectionModeEnabled;
+        
+        if (!SelectionModeEnabled)
+        {
+            SelectedItems.Clear();
+        }
+
+        SelectionChanged();
+    }
+
+    [RelayCommand]
+    private void SelectionChanged()
+    {
+        var pluralityString = SelectedItems.Count != 1 ? "s" : string.Empty;
+        SelectedItemsText = $"{SelectedItems.Count} item{pluralityString} selected";
+    }
+
+    [RelayCommand]
+    private async Task DeleteSelectedItems()
+    {
+        if (SelectedItems.Count == 0)
+        {
+            return;
+        }
+
+        var pluralityString = SelectedItems.Count != 1 ? "s" : string.Empty;
+        SelectedItemsText = $"{SelectedItems.Count} item{pluralityString} selected";
+
+        var result = await Shell.Current.DisplayAlert("Confirm", $"Delete {SelectedItems.Count} item{pluralityString}?", "DELETE", "Cancel");
+
+        if (!result)
+        {
+            return;
+        }
+
+        foreach (var item in SelectedItems)
+        {
+            if (item is IHistoryItemViewModel viewModel)
+            {
+                await _fileService.DeleteFileFromInternalStorage(viewModel.ThumbnailFileName);
+                await _fileService.DeleteFileFromInternalStorage(viewModel.FileName);
+
+                HistoryItems.Remove(viewModel);
+            }
+        }
+
+        SelectedItems.Clear();
     }
 }

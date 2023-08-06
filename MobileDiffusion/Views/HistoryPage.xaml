@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <views:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                 xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
                 xmlns:views="clr-namespace:MobileDiffusion.Views;assembly=MobileDiffusion"
                 x:Class="MobileDiffusion.Views.HistoryPage"
@@ -9,38 +10,135 @@
                 Shell.NavBarIsVisible="True"
                 Shell.TabBarIsVisible="False"
                 Title="History">
-    <views:BasePage.ToolbarItems>
-        <ToolbarItem Text="Clear History" Command="{Binding ClearHistoryCommand}">
-            <ToolbarItem.IconImageSource>
-                <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
-            </ToolbarItem.IconImageSource>
-        </ToolbarItem>
-    </views:BasePage.ToolbarItems>
+    <Shell.TitleView>
+        <Grid ColumnDefinitions="*,auto,auto" 
+              ColumnSpacing="20"
+              Padding="10,0,10,0">
+            <Label Grid.Column="0" Text="History" VerticalOptions="Center" FontSize="Medium" FontAttributes="Bold" />
 
-    <CollectionView ItemsSource="{Binding HistoryItems}"
-                    CanReorderItems="False"
-                    HorizontalOptions="Fill"
-                    VerticalOptions="Fill"
-                    RemainingItemsThreshold="3"
-                    RemainingItemsThresholdReachedCommand="{Binding LoadItemsCommand}"
-                    SelectionMode="None">
-        <CollectionView.ItemsLayout>
-            <GridItemsLayout Orientation="Vertical" 
-                             Span="3"
-                             HorizontalItemSpacing="0"
-                             VerticalItemSpacing="0"/>
-        </CollectionView.ItemsLayout>
-        <CollectionView.ItemTemplate>
-            <DataTemplate x:DataType="viewModels:IHistoryItemViewModel">
-                <ImageButton Source="{Binding ThumbnailImageSource}"
-                             Aspect="AspectFill"
-                             WidthRequest="200"
-                             HeightRequest="200"
-                             Command="{Binding ItemTappedCommand, Source={RelativeSource AncestorType={x:Type viewModels:IHistoryPageViewModel}}}"
-                             CommandParameter="{Binding .}">
-                </ImageButton>
-            </DataTemplate>
-        </CollectionView.ItemTemplate>
-    </CollectionView>
+            <ImageButton Grid.Column="1" ToolTipProperties.Text="Select" Command="{Binding ToggleSelectionModeCommand}">
+                <ImageButton.Source>
+                    <FontImageSource Glyph="{Binding SelectionModeEnabled, Converter={StaticResource BoolToSelectionModeGlyph}}" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                </ImageButton.Source>
+            </ImageButton>
+
+            <ImageButton Grid.Column="2" ToolTipProperties.Text="Clear History" Command="{Binding ClearHistoryCommand}" IsVisible="{Binding SelectionModeEnabled, Converter={StaticResource InvertedBool}}">
+                <ImageButton.Source>
+                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                </ImageButton.Source>
+            </ImageButton>
+        </Grid>
+    </Shell.TitleView>
+    <views:BasePage.Resources>
+        <ResourceDictionary>
+            <toolkit:InvertedBoolConverter x:Key="InvertedBool" />
+            <toolkit:BoolToObjectConverter x:Key="BoolToSelectionModeGlyph" TrueObject="&#xe5cd;" FalseObject="&#xe86c;" />
+            <toolkit:BoolToObjectConverter x:Key="BoolToLoadingText" TrueObject="Loading history..." FalseObject="There are no items in your history" />
+        </ResourceDictionary>
+    </views:BasePage.Resources>
+    
+    <Grid>
+        <CollectionView ItemsSource="{Binding HistoryItems}"
+                CanReorderItems="False"
+                HorizontalOptions="Fill"
+                VerticalOptions="Fill"
+                RemainingItemsThreshold="3"
+                RemainingItemsThresholdReachedCommand="{Binding LoadItemsCommand}"
+                SelectionMode="Multiple"
+                SelectedItems="{Binding SelectedItems, Mode=TwoWay}">
+            <CollectionView.Behaviors>
+                <toolkit:EventToCommandBehavior
+                    EventName="SelectionChanged"
+                    Command="{Binding SelectionChangedCommand}"/>
+            </CollectionView.Behaviors>
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical" 
+                         Span="3"
+                         HorizontalItemSpacing="0"
+                         VerticalItemSpacing="0"/>
+            </CollectionView.ItemsLayout>
+            <CollectionView.EmptyView>
+                <Grid VerticalOptions="FillAndExpand" RowDefinitions="*,auto,auto,*">
+                    <ActivityIndicator Grid.Row="1" 
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"
+                                       IsVisible="{Binding IsLoading}"
+                                       IsRunning="{Binding IsLoading}" />
+                    <Label Grid.Row="2" Text="{Binding IsLoading, Converter={StaticResource BoolToLoadingText}}"
+                           FontSize="Large"
+                           HorizontalTextAlignment="Center"/>
+                </Grid>
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="viewModels:IHistoryItemViewModel">
+                    <Border StrokeThickness="0" Margin="-1">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal">
+                                    <VisualState.Setters>
+                                        <Setter Property="Scale" Value="1" />
+                                        <Setter Property="StrokeShape" Value="Rectangle" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Selected">
+                                    <VisualState.Setters>
+                                        <Setter Property="Scale" Value=".75" />
+                                        <Setter Property="BackgroundColor" Value="Transparent" />
+                                        <Setter Property="StrokeShape" Value="RoundRectangle 50" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <ImageButton Source="{Binding ThumbnailImageSource}"
+                         Aspect="AspectFill"
+                         WidthRequest="200"
+                         HeightRequest="200"
+                         Command="{Binding ItemTappedCommand, Source={RelativeSource AncestorType={x:Type viewModels:IHistoryPageViewModel}}}"
+                         CommandParameter="{Binding .}"
+                         InputTransparent="{Binding SelectionModeEnabled, Source={RelativeSource AncestorType={x:Type viewModels:IHistoryPageViewModel}}}">
+
+                        </ImageButton>
+                    </Border>
+
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Border VerticalOptions="End" 
+                HeightRequest="80" 
+                Margin="-1"
+                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}"
+                Stroke="Transparent"
+                StrokeThickness="0"
+                StrokeShape="RoundRectangle 50,50,0,0"
+                IsVisible="{Binding SelectionModeEnabled}">
+            <Border.Shadow>
+                <Shadow Brush="Black"
+                        Offset="0,0"
+                        Radius="50"
+                        Opacity="0.8" />
+            </Border.Shadow>
+            <Grid ColumnDefinitions="*,auto">
+                <Label Grid.Column="0" Margin="30,0,0,0" Text="{Binding SelectedItemsText}" FontSize="Medium" VerticalTextAlignment="Center"/>
+
+                <ContentView Grid.Column="1"
+                             Padding="20"
+                             WidthRequest="84"
+                             ToolTipProperties.Text="Delete Selected Item(s)">
+                    <ContentView.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding DeleteSelectedItemsCommand}"/>
+                    </ContentView.GestureRecognizers>
+                    <Image HorizontalOptions="CenterAndExpand"
+                           VerticalOptions="CenterAndExpand"
+                           InputTransparent="True">
+                        <Image.Source>
+                            <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Size="64" Color="White" />
+                        </Image.Source>
+                    </Image>
+                </ContentView>
+
+            </Grid>
+        </Border>
+    </Grid>
 
 </views:BasePage>
