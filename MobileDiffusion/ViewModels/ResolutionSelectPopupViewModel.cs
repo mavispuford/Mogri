@@ -14,6 +14,9 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
     private string _aspectRatioString;
 
     [ObservableProperty]
+    private string _aspectRatioEntryValue;
+
+    [ObservableProperty]
     private double _width;
 
     [ObservableProperty]
@@ -118,6 +121,58 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
         ClosePopup(parameters);
     }
 
+    partial void OnAspectRatioEntryValueChanged(string value)
+    {
+        if (string.IsNullOrEmpty(value) || value == AspectRatioString)
+        {
+            return;
+        }
+
+        var splitValue = value.Split(":");
+
+        if (splitValue.Length != 2 || 
+            !int.TryParse(splitValue[0], out int widthNum) ||
+            widthNum <= 0 ||
+            !int.TryParse(splitValue[1], out int heightNum) ||
+            heightNum <= 0)
+        {
+            return;
+        }
+
+        var originalGcd = greatestCommonDivisor((int)Width, (int)Height);
+
+        var count = 1;
+        int gcd;
+        double newWidthRaw;
+        double newHeightRaw;
+
+        do
+        {
+            gcd = originalGcd / count;
+            newWidthRaw = gcd * widthNum;
+            newHeightRaw = gcd * heightNum;
+
+            count++;
+            if (count > 100)
+            {
+                return;
+            }
+        } while (newWidthRaw < MinimumWidthHeight || newWidthRaw > MaximumWidthHeight ||
+                 newHeightRaw < MinimumWidthHeight || newHeightRaw > MaximumWidthHeight);
+
+        AspectRatioDouble = newWidthRaw / newHeightRaw;
+        AspectRatioString = $"{(int)newWidthRaw / gcd}:{(int)newHeightRaw / gcd}";
+
+        var roundedWidth = double.Clamp(Math.Round((double)newWidthRaw / 64) * 64, MinimumWidthHeight, MaximumWidthHeight);
+        var roundedHeight = double.Clamp(Math.Round((double)newHeightRaw / 64) * 64, MinimumWidthHeight, MaximumWidthHeight);
+
+        Width = roundedWidth;
+        Height = roundedHeight;
+
+        UpdateAllValues(nameof(AspectRatioEntryValue));
+        updateExampleRectangle();
+    }
+
     partial void OnWidthSliderValueChanged(double value)
     {
         updateWidth(value);
@@ -147,6 +202,18 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
     private void updateWidth(double value, bool aspectCorrectedValue = false, params string[] excludeFromUpdate)
     {
         var roundedValue = double.Clamp(Math.Round(value / 64) * 64, MinimumWidthHeight, MaximumWidthHeight);
+
+        if (PreserveAspectRatio && !aspectCorrectedValue)
+        {
+            var calculatedHeight = roundedValue / AspectRatioDouble;
+
+            if (calculatedHeight < MinimumWidthHeight || calculatedHeight > MaximumWidthHeight ||
+                Math.Abs(calculatedHeight % 1) > (double.Epsilon * 100))
+            {
+                return;
+            }
+        }
+
         Width = roundedValue;
 
         if (!aspectCorrectedValue)
@@ -171,6 +238,18 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
     private void updateHeight(double value, bool aspectCorrectedValue = false, params string[] excludeFromUpdate)
     {
         var roundedValue = double.Clamp(Math.Round(value / 64) * 64, MinimumWidthHeight, MaximumWidthHeight);
+
+        if (PreserveAspectRatio && !aspectCorrectedValue)
+        {
+            var calculatedWidth = roundedValue * AspectRatioDouble;
+
+            if (calculatedWidth < MinimumWidthHeight || calculatedWidth > MaximumWidthHeight ||
+                Math.Abs(calculatedWidth % 1) > (double.Epsilon * 100))
+            {
+                return;
+            }
+        }
+
         Height = roundedValue;
 
         if (!aspectCorrectedValue)
@@ -196,6 +275,12 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
     private void UpdateAllValues(params string[] excludeFromUpdate)
     {
 #pragma warning disable MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
+
+        if (excludeFromUpdate == null || !excludeFromUpdate.Contains(nameof(AspectRatioEntryValue)))
+        {
+            _aspectRatioEntryValue = AspectRatioString;
+            OnPropertyChanged(nameof(AspectRatioEntryValue));
+        }
 
         if (excludeFromUpdate == null || !excludeFromUpdate.Contains(nameof(WidthSliderValue)))
         {

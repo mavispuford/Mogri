@@ -45,7 +45,11 @@
 
             <Grid ColumnDefinitions="*,auto">
                 <Label Grid.Column="0" Text="Aspect Ratio:" FontAttributes="Bold" VerticalTextAlignment="Center" />
-                <Label Grid.Column="1" Text="{Binding AspectRatioString}" VerticalOptions="Center" />
+                <Entry Grid.Column="1" x:Name="AspectRatioEntry" Text="{Binding AspectRatioEntryValue}" VerticalOptions="Center">
+                    <Entry.Behaviors>
+                        <toolkit:EventToCommandBehavior EventName="Unfocused" Command="{Binding UpdateAllValuesCommand}" />
+                    </Entry.Behaviors>
+                </Entry>
             </Grid>
 
             <Grid ColumnDefinitions="*,auto">
