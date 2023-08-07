@@ -38,7 +38,7 @@
                     BackgroundColor="{AppThemeBinding Light={StaticResource Gray200TwentySixPercent}, Dark={StaticResource Black}}">
                 <Rectangle WidthRequest="{Binding ExampleRectangleWidth}"
                            HeightRequest="{Binding ExampleRectangleHeight}"
-                           Fill="{AppThemeBinding Light={StaticResource IndependenceAccent}, Dark={StaticResource White}}"
+                           Fill="{StaticResource IndependenceAccent}"
                            HorizontalOptions="Center"
                            VerticalOptions="Center"/>
             </Border>
