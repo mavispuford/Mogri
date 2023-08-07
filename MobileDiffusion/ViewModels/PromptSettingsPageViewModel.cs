@@ -10,14 +10,9 @@ namespace MobileDiffusion.ViewModels;
 public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSettingsPageViewModel
 {
     private readonly IStableDiffusionService _stableDiffusionService;
+    private readonly IPopupService _popupService;
 
     private Settings _settings;
-
-    [ObservableProperty]
-    private List<string> availableWidthValues = new();
-
-    [ObservableProperty]
-    private List<string> availableHeightValues = new();
 
     [ObservableProperty]
     private List<string> availableSamplerValues = new();
@@ -82,26 +77,17 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     [ObservableProperty]
     private bool makeSeamless;
 
-    public PromptSettingsPageViewModel(IStableDiffusionService stableDiffusionService)
+    public PromptSettingsPageViewModel(IStableDiffusionService stableDiffusionService,
+        IPopupService popupService)
     {
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
-
-        var widthValues = new List<string>();
-        var heightValues = new List<string>();
-
-        for (var i = 64; i <= 2048; i += 64)
-        {
-            widthValues.Add(i.ToString());
-            heightValues.Add(i.ToString());
-        }
+        _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
 
         var upscaleLevelValues = new List<string>
         {
             "2","4"
         };
 
-        AvailableWidthValues = widthValues;
-        AvailableHeightValues = heightValues;
         AvailableUpscaleLevelValues = upscaleLevelValues;
 
         var defaultSettings = new Settings();
@@ -185,6 +171,32 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings } };
 
         await Shell.Current.GoToAsync("..", parameters);
+    }
+
+    [RelayCommand]
+    private async Task ShowResolutionSelect()
+    {
+        var parameters = new Dictionary<string, object> {
+            { NavigationParams.Width, Width },
+            { NavigationParams.Height, Height },
+        };
+
+        var result = await _popupService.ShowPopupAsync("ResolutionSelectPopup", parameters) as IDictionary<string, object>;
+
+        if (result != null)
+        {
+            if (result.TryGetValue(NavigationParams.Width, out var widthParam) &&
+                widthParam is double width)
+            {
+                Width = width.ToString();
+            }
+
+            if (result.TryGetValue(NavigationParams.Height, out var heightParam) &&
+                heightParam is double height)
+            {
+                Height = height.ToString();
+            }
+        }
     }
 
     public override bool OnBackButtonPressed()
