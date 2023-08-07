@@ -6,10 +6,7 @@
                   xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
                   xmlns:popups="clr-namespace:MobileDiffusion.Views.Popups"
                   x:Class="MobileDiffusion.Views.Popups.ResultItemPopup"
-                  x:DataType="viewModels:IResultItemPopupViewModel"
-                  HorizontalOptions="Fill"
-                  VerticalOptions="Fill"
-                  Color="Transparent">
+                  x:DataType="viewModels:IResultItemPopupViewModel">
     <Grid x:Name="MainGrid"
           RowDefinitions="*, auto, auto"
           RowSpacing="10"
@@ -17,7 +14,8 @@
           ColumnDefinitions="*, *, *"
           HorizontalOptions="FillAndExpand"
           VerticalOptions="FillAndExpand"
-          IsClippedToBounds="False">
+          IsClippedToBounds="False"
+          Padding="15">
         <Grid.GestureRecognizers>
             <TapGestureRecognizer Command="{Binding CloseCommand}" />
         </Grid.GestureRecognizers>

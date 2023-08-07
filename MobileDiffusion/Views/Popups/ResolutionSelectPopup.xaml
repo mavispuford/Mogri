@@ -7,12 +7,14 @@
                   xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
                   xmlns:popups="clr-namespace:MobileDiffusion.Views.Popups"
                   x:Class="MobileDiffusion.Views.Popups.ResolutionSelectPopup"
-                  x:DataType="viewModels:IResolutionSelectPopupViewModel"
-                  Color="Transparent">
+                  x:DataType="viewModels:IResolutionSelectPopupViewModel">
     <Border x:Name="MainBorder"
             Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource IndependenceAccent}}"
             Stroke="Transparent"
-            StrokeShape="RoundRectangle 50">
+            StrokeShape="RoundRectangle 50"
+            HorizontalOptions="Fill"
+            VerticalOptions="Center"
+            Padding="15">
         <Border.Resources>
             <ResourceDictionary>
                 <Style TargetType="Label">
@@ -59,9 +61,9 @@
                       ColumnSpacing="0"
                       HorizontalOptions="Center">
 
-                    <Rectangle HeightRequest="10" WidthRequest="2" HorizontalOptions="Start" Fill="{StaticResource Gray900}"/>
+                    <Rectangle HeightRequest="10" WidthRequest="2" HorizontalOptions="Start" Fill="{StaticResource Gray400}"/>
                     <Rectangle HeightRequest="2" WidthRequest="{Binding ExampleRectangleWidth}" Fill="{StaticResource Gray300}"/>
-                    <Rectangle HeightRequest="10" WidthRequest="2" HorizontalOptions="End" Fill="{StaticResource Gray900}"/>
+                    <Rectangle HeightRequest="10" WidthRequest="2" HorizontalOptions="End" Fill="{StaticResource Gray400}"/>
 
                     <Label Grid.Row="1"
                            HorizontalTextAlignment="Center"
@@ -77,9 +79,9 @@
                       RowSpacing="0"
                       VerticalOptions="Center">
 
-                    <Rectangle HeightRequest="2" WidthRequest="10" VerticalOptions="Start" Fill="{StaticResource Gray900}"/>
+                    <Rectangle HeightRequest="2" WidthRequest="10" VerticalOptions="Start" Fill="{StaticResource Gray400}"/>
                     <Rectangle HeightRequest="{Binding ExampleRectangleHeight}" WidthRequest="2" Fill="{StaticResource Gray300}"/>
-                    <Rectangle HeightRequest="2" WidthRequest="10" VerticalOptions="End" Fill="{StaticResource Gray900}"/>
+                    <Rectangle HeightRequest="2" WidthRequest="10" VerticalOptions="End" Fill="{StaticResource Gray400}"/>
 
                     <Label Grid.Column="1"
                            VerticalTextAlignment="Center"

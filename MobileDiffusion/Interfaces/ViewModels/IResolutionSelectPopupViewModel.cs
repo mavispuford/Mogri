@@ -38,9 +38,9 @@ public interface IResolutionSelectPopupViewModel : IPopupBaseViewModel
 
     double MaximumWidthHeight { get; set; }
 
-    IRelayCommand CancelCommand { get; }
+    IAsyncRelayCommand CancelCommand { get; }
 
-    IRelayCommand ConfirmCommand { get; }
+    IAsyncRelayCommand ConfirmCommand { get; }
 
     IRelayCommand<string[]> UpdateAllValuesCommand { get; }
 }

@@ -105,14 +105,22 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
         UpdateAllValues();
     }
 
-    [RelayCommand]
-    private void Cancel()
+    public override void OnAppearing()
     {
-        ClosePopup();
+        base.OnAppearing();
+
+        OnPropertyChanged(nameof(ExampleRectangleWidth));
+        OnPropertyChanged(nameof(ExampleRectangleHeight));
     }
 
     [RelayCommand]
-    private void Confirm()
+    private async Task Cancel()
+    {
+        await ClosePopupAsync();
+    }
+
+    [RelayCommand]
+    private async Task Confirm()
     {
         var parameters = new Dictionary<string, object>
         {
@@ -120,7 +128,7 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
             { NavigationParams.Height, Height }
         };
 
-        ClosePopup(parameters);
+        await ClosePopupAsync(parameters);
     }
     
     partial void OnExampleRectangleContainerWidthChanged(double value)

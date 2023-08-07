@@ -1,11 +1,10 @@
 ﻿#nullable enable
 
-using CommunityToolkit.Mvvm.ComponentModel;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
+using MobileDiffusion.ViewModels;
 
-[INotifyPropertyChanged]
-public partial class PopupBaseViewModel : IPopupBaseViewModel
+public partial class PopupBaseViewModel : BaseViewModel, IPopupBaseViewModel
 {
     private readonly IPopupService _popupService;
 
@@ -18,8 +17,41 @@ public partial class PopupBaseViewModel : IPopupBaseViewModel
     {
     }
 
-    protected void ClosePopup(object? result = null)
+    public virtual void OnAppearing()
     {
-        _popupService.ClosePopup(this, result);
     }
+
+    public virtual void OnDisappearing()
+    {
+    }
+
+    public virtual Task OnNavigatedFromAsync()
+    {
+        return Task.CompletedTask;
+    }
+
+    public virtual Task OnNavigatedToAsync()
+    {
+        return Task.CompletedTask;
+    }
+
+    protected Task ClosePopupAsync(object? result = null)
+    {
+        return _popupService.ClosePopupAsync(this, result);
+    }
+
+    public virtual async void OnBackButtonPressed()
+    {
+        try
+        {
+            await Task.Run(async () =>
+            {
+                await ClosePopupAsync();
+            });
+        }
+        catch
+        {
+            // TODO - Handle this
+        }
+    } 
 }

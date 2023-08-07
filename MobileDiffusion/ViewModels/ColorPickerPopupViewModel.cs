@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
-using System.ComponentModel;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -72,15 +71,15 @@ public partial class ColorPickerPopupViewModel : PopupBaseViewModel, IColorPicke
     }
 
     [RelayCommand]
-    private void Cancel()
+    private async Task Cancel()
     {
-        ClosePopup();
+        await ClosePopupAsync();
     }
 
     [RelayCommand]
-    private void Confirm()
+    private async Task Confirm()
     {
-        ClosePopup(CurrentColor);
+        await ClosePopupAsync(CurrentColor);
     }
 
     [RelayCommand]

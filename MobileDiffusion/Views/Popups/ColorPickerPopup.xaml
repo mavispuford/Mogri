@@ -3,17 +3,22 @@
                   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                   xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                   xmlns:controls="clr-namespace:MobileDiffusion.Controls;assembly=MobileDiffusion"
+                  xmlns:mopups="clr-namespace:Mopups.Pages;assembly=Mopups"
                   xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
                   xmlns:popups="clr-namespace:MobileDiffusion.Views.Popups"
                   x:Class="MobileDiffusion.Views.Popups.ColorPickerPopup"
-                  x:DataType="viewModels:IColorPickerPopupViewModel"
-                  Color="Transparent">
+                  x:DataType="viewModels:IColorPickerPopupViewModel">
     <Border Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource IndependenceAccent}}"
             Stroke="Transparent"
-            StrokeShape="RoundRectangle 50">
+            StrokeShape="RoundRectangle 50"
+            VerticalOptions="Center"
+            HorizontalOptions="Center"
+            WidthRequest="300">
         <VerticalStackLayout x:Name="MainLayout"
                              Spacing="10"
-                             Padding="20">
+                             Padding="20"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center">
             <Label Text="Current Color:"
                    FontAttributes="Bold" 
                    FontSize="16"/>

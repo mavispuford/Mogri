@@ -26,7 +26,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
     }
 
-    public override void ApplyQueryAttributes(IDictionary<string, object> query)
+    public override async void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         base.ApplyQueryAttributes(query);
 
@@ -58,7 +58,18 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
         }
         else
         {
-            ClosePopup();
+            // Wrap in Task.Run() so we don't crash if an exception is thrown because we are in an async void
+            try
+            {
+                await Task.Run(async () =>
+                {
+                    await ClosePopupAsync();
+                });
+            }
+            catch
+            {
+                // TODO - Handle this
+            }
         }
 
         // Workaround for https://github.com/dotnet/maui/issues/10294
@@ -83,13 +94,13 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
             { NavigationParams.DeletedHistoryItem, true }
         };
 
-        ClosePopup(parameters);
+        await ClosePopupAsync(parameters);
     }
 
     [RelayCommand]
-    private void Close()
+    private async Task Close()
     {
-        ClosePopup();
+        await ClosePopupAsync();
     }
 
     [RelayCommand]
@@ -102,14 +113,14 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
     }
 
     [RelayCommand]
-    private void UseSettings()
+    private async Task UseSettings()
     {
         var parameters = new Dictionary<string, object>
         {
             { NavigationParams.PromptSettings, HistoryItem.Settings }
         };
 
-        ClosePopup(parameters);
+        await ClosePopupAsync(parameters);
     }
 
     [RelayCommand]
@@ -167,7 +178,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
                     { parameterName, asFormattedString ? string.Format(Constants.ImageDataFormat, "image/png", imageString) : imageString }
                 };
 
-                ClosePopup(parameters);
+                await ClosePopupAsync(parameters);
             }
         }
         catch

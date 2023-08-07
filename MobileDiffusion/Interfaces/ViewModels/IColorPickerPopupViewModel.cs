@@ -12,9 +12,9 @@ public interface IColorPickerPopupViewModel : IPopupBaseViewModel
 
     List<Color> SwatchesFromImage { get; set; }
 
-    IRelayCommand CancelCommand { get; }
+    IAsyncRelayCommand CancelCommand { get; }
 
-    IRelayCommand ConfirmCommand { get; }
+    IAsyncRelayCommand ConfirmCommand { get; }
 
     IRelayCommand<Color> SwatchTappedCommand { get; }
 }

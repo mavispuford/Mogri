@@ -386,5 +386,5 @@
         <Setter Property="TextColor" Value="{StaticResource White}" />
         <Setter Property="ContentLayout" Value="Top, 5" />
     </Style>
-    
+
 </ResourceDictionary>

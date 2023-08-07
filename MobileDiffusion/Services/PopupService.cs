@@ -1,15 +1,16 @@
 ﻿#nullable enable
 
-using CommunityToolkit.Maui.Views;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Registrations;
+using Mopups.Pages;
+using Mopups.Services;
 
 namespace MobileDiffusion.Services
 {
     public class PopupService : IPopupService
     {
-        private static List<Popup> activePopups = new();
+        private static Dictionary<PopupPage, TaskCompletionSource<object?>> activePopups = new();
         
         private readonly IServiceProvider _serviceProvider;
 
@@ -18,10 +19,10 @@ namespace MobileDiffusion.Services
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
-        public Task<object?> ShowPopupAsync(string name, IDictionary<string, object> parameters)
+        public async Task<object?> ShowPopupAsync(string name, IDictionary<string, object> parameters)
         {
             var popupType = PopupRegistrations.GetPopupTypeByName(name);
-            var popup = _serviceProvider.GetService(popupType) as Popup;
+            var popup = _serviceProvider.GetService(popupType) as PopupPage;
 
             if (popup == null)
             {
@@ -34,23 +35,31 @@ namespace MobileDiffusion.Services
                 queryAttributable.ApplyQueryAttributes(parameters);
             }
 
-            activePopups.Add(popup);
+            var tcs = new TaskCompletionSource<object?>();
+            
+            activePopups.Add(popup, tcs);
 
-            return Shell.Current.CurrentPage.ShowPopupAsync(popup);
+            await MopupService.Instance.PushAsync(popup);
+
+            var result = await tcs.Task;
+
+            return result;
         }
 
-        public void ClosePopup(IPopupBaseViewModel viewModel, object? result)
+        public async Task ClosePopupAsync(IPopupBaseViewModel viewModel, object? result)
         {
-            var popup = activePopups.FirstOrDefault(p => p.BindingContext == viewModel);
-
-            if (popup == null)
+            if (!activePopups.Any(p => p.Key.BindingContext == viewModel))
             {
                 return;
             }
 
-            popup.Close(result);
+            var popup = activePopups.First(p => p.Key.BindingContext == viewModel);
 
-            activePopups.Remove(popup);
+            await MopupService.Instance.RemovePageAsync(popup.Key);
+            
+            popup.Value.SetResult(result);
+
+            activePopups.Remove(popup.Key);
         }
     }
 }

@@ -1,7 +1,7 @@
-﻿using CommunityToolkit.Maui.Views;
-using MobileDiffusion.Interfaces.ViewModels;
+﻿using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Models;
 using MobileDiffusion.Views.Popups;
+using Mopups.Pages;
 
 namespace MobileDiffusion.Registrations;
 
@@ -23,7 +23,7 @@ public static class PopupRegistrations
     }
 
     private static void registerPopup<TPopup>(IServiceCollection serviceCollection)
-    where TPopup : Popup
+    where TPopup : PopupPage
     {
         _registrations[typeof(TPopup).Name] = typeof(TPopup);
 
@@ -42,7 +42,7 @@ public static class PopupRegistrations
 
     private static void registerPopup<TViewModel, TPopup>(IServiceCollection serviceCollection)
         where TViewModel : IPopupBaseViewModel
-        where TPopup : Popup
+        where TPopup : PopupPage
     {
         _registrations[typeof(TPopup).Name] = typeof(TPopup);
 

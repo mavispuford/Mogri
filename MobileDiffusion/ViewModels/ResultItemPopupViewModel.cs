@@ -20,7 +20,7 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
     }
 
-    public override void ApplyQueryAttributes(IDictionary<string, object> query)
+    public override async void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         base.ApplyQueryAttributes(query);
 
@@ -31,7 +31,18 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
         }
         else
         {
-            ClosePopup();
+            // Wrap in Task.Run() so we don't crash if an exception is thrown because we are in an async void
+            try
+            {
+                await Task.Run(async () =>
+                {
+                    await ClosePopupAsync();
+                });
+            }
+            catch
+            {
+                // TODO - Handle this
+            }
         }
 
         // Workaround for https://github.com/dotnet/maui/issues/10294
@@ -39,9 +50,9 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
     }
 
     [RelayCommand]
-    private void Close()
+    private async Task Close()
     {
-        ClosePopup();
+        await ClosePopupAsync();
     }
 
     [RelayCommand]
@@ -54,14 +65,14 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
     }
 
     [RelayCommand]
-    private void UseSeed()
+    private async Task UseSeed()
     {
         var parameters = new Dictionary<string, object>
         {
             { NavigationParams.Seed, ResultItem.Settings.Seed }
         };
 
-        ClosePopup(parameters);
+        await ClosePopupAsync(parameters);
     }
 
     [RelayCommand]
@@ -93,7 +104,7 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
                     { parameterName, asFormattedString ? string.Format(Constants.ImageDataFormat, "image/png", imageString) : imageString }
                 };
 
-                ClosePopup(parameters);
+                await ClosePopupAsync(parameters);
             }
         }
         catch

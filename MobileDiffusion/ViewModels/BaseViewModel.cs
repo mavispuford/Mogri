@@ -3,8 +3,7 @@ using MobileDiffusion.Interfaces.ViewModels;
 
 namespace MobileDiffusion.ViewModels;
 
-[INotifyPropertyChanged]
-public partial class BaseViewModel : IBaseViewModel
+public partial class BaseViewModel : ObservableObject, IBaseViewModel
 {
     
 }
