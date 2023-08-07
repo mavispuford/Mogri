@@ -7,6 +7,8 @@ namespace MobileDiffusion.ViewModels;
 
 public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResolutionSelectPopupViewModel
 {
+    const int ResMultiple = 8;
+
     [ObservableProperty]
     private double _aspectRatioDouble;
 
@@ -163,8 +165,8 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
         AspectRatioDouble = newWidthRaw / newHeightRaw;
         AspectRatioString = $"{(int)newWidthRaw / gcd}:{(int)newHeightRaw / gcd}";
 
-        var roundedWidth = double.Clamp(Math.Round((double)newWidthRaw / 64) * 64, MinimumWidthHeight, MaximumWidthHeight);
-        var roundedHeight = double.Clamp(Math.Round((double)newHeightRaw / 64) * 64, MinimumWidthHeight, MaximumWidthHeight);
+        var roundedWidth = double.Clamp(Math.Round((double)newWidthRaw / ResMultiple) * ResMultiple, MinimumWidthHeight, MaximumWidthHeight);
+        var roundedHeight = double.Clamp(Math.Round((double)newHeightRaw / ResMultiple) * ResMultiple, MinimumWidthHeight, MaximumWidthHeight);
 
         Width = roundedWidth;
         Height = roundedHeight;
@@ -201,20 +203,22 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
 
     private void updateWidth(double value, bool aspectCorrectedValue = false, params string[] excludeFromUpdate)
     {
-        var roundedValue = double.Clamp(Math.Round(value / 64) * 64, MinimumWidthHeight, MaximumWidthHeight);
+        var roundedWidth = double.Clamp(Math.Round(value / ResMultiple) * ResMultiple, MinimumWidthHeight, MaximumWidthHeight);
 
         if (PreserveAspectRatio && !aspectCorrectedValue)
         {
-            var calculatedHeight = roundedValue / AspectRatioDouble;
+            var calculatedHeight = roundedWidth / AspectRatioDouble;
+            var roundedHeight = double.Clamp(Math.Round(calculatedHeight / ResMultiple) * ResMultiple, MinimumWidthHeight, MaximumWidthHeight);
+            var ratio = roundedWidth / roundedHeight;
 
-            if (calculatedHeight < MinimumWidthHeight || calculatedHeight > MaximumWidthHeight ||
-                Math.Abs(calculatedHeight % 1) > (double.Epsilon * 100))
+            if (roundedHeight < MinimumWidthHeight || roundedHeight > MaximumWidthHeight ||
+                Math.Abs(AspectRatioDouble - ratio) > .0001d)
             {
                 return;
             }
         }
 
-        Width = roundedValue;
+        Width = roundedWidth;
 
         if (!aspectCorrectedValue)
         {
@@ -237,20 +241,22 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
 
     private void updateHeight(double value, bool aspectCorrectedValue = false, params string[] excludeFromUpdate)
     {
-        var roundedValue = double.Clamp(Math.Round(value / 64) * 64, MinimumWidthHeight, MaximumWidthHeight);
+        var roundedHeight = double.Clamp(Math.Round(value / ResMultiple) * ResMultiple, MinimumWidthHeight, MaximumWidthHeight);
 
         if (PreserveAspectRatio && !aspectCorrectedValue)
         {
-            var calculatedWidth = roundedValue * AspectRatioDouble;
+            var calculatedWidth = roundedHeight * AspectRatioDouble;
+            var roundedWidth = double.Clamp(Math.Round(calculatedWidth / ResMultiple) * ResMultiple, MinimumWidthHeight, MaximumWidthHeight);
+            var ratio = roundedWidth / roundedHeight;
 
-            if (calculatedWidth < MinimumWidthHeight || calculatedWidth > MaximumWidthHeight ||
-                Math.Abs(calculatedWidth % 1) > (double.Epsilon * 100))
+            if (roundedWidth < MinimumWidthHeight || roundedWidth > MaximumWidthHeight ||
+                Math.Abs(AspectRatioDouble - ratio) > .0001d)
             {
                 return;
             }
         }
 
-        Height = roundedValue;
+        Height = roundedHeight;
 
         if (!aspectCorrectedValue)
         {
