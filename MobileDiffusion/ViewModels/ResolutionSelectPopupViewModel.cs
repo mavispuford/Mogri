@@ -122,6 +122,16 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
 
         ClosePopup(parameters);
     }
+    
+    partial void OnExampleRectangleContainerWidthChanged(double value)
+    {
+        updateExampleRectangle();
+    }
+
+    partial void OnExampleRectangleContainerHeightChanged(double value)
+    {
+        updateExampleRectangle();
+    }
 
     partial void OnAspectRatioEntryValueChanged(string value)
     {
@@ -333,6 +343,11 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
 
     private void updateExampleRectangle()
     {
+        if (ExampleRectangleContainerWidth == -1 || ExampleRectangleContainerHeight == -1)
+        {
+            return;
+        }
+
         var isPortrait = Width <= Height;
         
         if (isPortrait)

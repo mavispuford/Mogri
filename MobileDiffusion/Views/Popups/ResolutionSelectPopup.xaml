@@ -29,19 +29,64 @@
                              Spacing="10"
                              Padding="20">
 
-            <Border Width="{Binding ExampleRectangleContainerWidth, Mode=OneWayToSource}"
-                    Height="{Binding ExampleRectangleContainerHeight, Mode=OneWayToSource}"
-                    WidthRequest="200"
-                    HeightRequest="200"
-                    StrokeThickness="4"
-                    Stroke="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
-                    BackgroundColor="{AppThemeBinding Light={StaticResource Gray200TwentySixPercent}, Dark={StaticResource Black}}">
-                <Rectangle WidthRequest="{Binding ExampleRectangleWidth}"
-                           HeightRequest="{Binding ExampleRectangleHeight}"
-                           Fill="{StaticResource IndependenceAccent}"
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center"/>
-            </Border>
+            <Grid RowDefinitions="*,auto,*"
+                  ColumnDefinitions="*,auto,*"
+                  RowSpacing="4"
+                  ColumnSpacing="4"
+                  WidthRequest="240"
+                  HeightRequest="240">
+                <Border Grid.Row="1"
+                        Grid.Column="1"
+                        Width="{Binding ExampleRectangleContainerWidth, Mode=OneWayToSource}"
+                        Height="{Binding ExampleRectangleContainerHeight, Mode=OneWayToSource}"
+                        WidthRequest="200"
+                        HeightRequest="200"
+                        StrokeThickness="4"
+                        Stroke="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray200TwentySixPercent}, Dark={StaticResource Black}}">
+                    <Rectangle WidthRequest="{Binding ExampleRectangleWidth}"
+                               HeightRequest="{Binding ExampleRectangleHeight}"
+                               Fill="{StaticResource IndependenceAccent}"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"/>
+                </Border>
+
+                <!-- Width -->
+                
+                <Grid Grid.Row="2"
+                      Grid.Column="1"
+                      RowDefinitions="auto,auto"
+                      ColumnSpacing="0"
+                      HorizontalOptions="Center">
+
+                    <Rectangle HeightRequest="10" WidthRequest="2" HorizontalOptions="Start" Fill="{StaticResource Gray900}"/>
+                    <Rectangle HeightRequest="2" WidthRequest="{Binding ExampleRectangleWidth}" Fill="{StaticResource Gray300}"/>
+                    <Rectangle HeightRequest="10" WidthRequest="2" HorizontalOptions="End" Fill="{StaticResource Gray900}"/>
+
+                    <Label Grid.Row="1"
+                           HorizontalTextAlignment="Center"
+                           Text="{Binding Width}" />
+
+                </Grid>
+                
+                <!-- Height -->
+
+                <Grid Grid.Row="1"
+                      Grid.Column="2"
+                      ColumnDefinitions="auto,auto"
+                      RowSpacing="0"
+                      VerticalOptions="Center">
+
+                    <Rectangle HeightRequest="2" WidthRequest="10" VerticalOptions="Start" Fill="{StaticResource Gray900}"/>
+                    <Rectangle HeightRequest="{Binding ExampleRectangleHeight}" WidthRequest="2" Fill="{StaticResource Gray300}"/>
+                    <Rectangle HeightRequest="2" WidthRequest="10" VerticalOptions="End" Fill="{StaticResource Gray900}"/>
+
+                    <Label Grid.Column="1"
+                           VerticalTextAlignment="Center"
+                           Text="{Binding Height}" />
+
+                </Grid>
+            </Grid>
 
             <Grid ColumnDefinitions="*,auto">
                 <Label Grid.Column="0" Text="Aspect Ratio:" FontAttributes="Bold" VerticalTextAlignment="Center" />
