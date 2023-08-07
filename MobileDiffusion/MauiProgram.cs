@@ -3,6 +3,7 @@ using SkiaSharp.Views.Maui.Controls.Hosting;
 using MobileDiffusion.Registrations;
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
+using Mopups.Hosting;
 
 namespace MobileDiffusion;
 
@@ -22,6 +23,7 @@ public static class MauiProgram
                 fonts.AddFont("MaterialIconsRound-Regular.otf", "MaterialIconsRoundRegular");
             })
             .UseMauiCommunityToolkit()
+            .ConfigureMopups()
             .RegisterServices()
             .RegisterViewModels()
             .RegisterViews()

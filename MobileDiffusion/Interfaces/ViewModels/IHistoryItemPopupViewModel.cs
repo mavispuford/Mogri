@@ -10,11 +10,11 @@ public interface IHistoryItemPopupViewModel : IPopupBaseViewModel
 
     IAsyncRelayCommand DeleteCommand { get; }
 
-    IRelayCommand CloseCommand { get; }
+    IAsyncRelayCommand CloseCommand { get; }
 
     IAsyncRelayCommand SaveCommand { get; }
 
-    IRelayCommand UseSettingsCommand { get; }
+    IAsyncRelayCommand UseSettingsCommand { get; }
 
     IAsyncRelayCommand ImageToImageCommand { get; }
 

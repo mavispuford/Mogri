@@ -6,5 +6,5 @@ public interface IPromptStyleInfoPopupViewModel : IPopupBaseViewModel
 {
     IPromptStyleViewModel PromptStyle { get; set; }
 
-    IRelayCommand CloseCommand { get; }
+    IAsyncRelayCommand CloseCommand { get; }
 }

@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Maui.Alerts;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
@@ -14,7 +13,7 @@ public partial class PromptStyleInfoPopupViewModel : PopupBaseViewModel, IPrompt
     public PromptStyleInfoPopupViewModel(IPopupService popupService) : base(popupService)
     {}
 
-    public override void ApplyQueryAttributes(IDictionary<string, object> query)
+    public override async void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         base.ApplyQueryAttributes(query);
 
@@ -25,7 +24,18 @@ public partial class PromptStyleInfoPopupViewModel : PopupBaseViewModel, IPrompt
         }
         else
         {
-            ClosePopup();
+            // Wrap in Task.Run() so we don't crash if an exception is thrown because we are in an async void
+            try
+            {
+                await Task.Run(async () =>
+                {
+                    await ClosePopupAsync();
+                });
+            }
+            catch
+            {
+                // TODO - Handle this
+            }
         }
 
         // Workaround for https://github.com/dotnet/maui/issues/10294
@@ -33,8 +43,8 @@ public partial class PromptStyleInfoPopupViewModel : PopupBaseViewModel, IPrompt
     }
 
     [RelayCommand]
-    private void Close()
+    private async Task Close()
     {
-        ClosePopup();
+        await ClosePopupAsync();
     }
 }

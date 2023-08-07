@@ -6,14 +6,13 @@
                   xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
                   xmlns:popups="clr-namespace:MobileDiffusion.Views.Popups"
                   x:Class="MobileDiffusion.Views.Popups.PromptStyleInfoPopup"
-                  x:DataType="viewModels:IPromptStyleInfoPopupViewModel"
-                  HorizontalOptions="Fill"
-                  VerticalOptions="Fill"
-                  Color="Transparent">
+                  x:DataType="viewModels:IPromptStyleInfoPopupViewModel">
     <Border Padding="16"
             Stroke="Transparent"
             StrokeShape="RoundRectangle 50"
-            Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource IndependenceAccent}}">
+            Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource IndependenceAccent}}"
+            HorizontalOptions="Center"
+            VerticalOptions="Center">
         <Border.Resources>
             <ResourceDictionary>
                 <toolkit:IsStringNotNullOrEmptyConverter x:Key="IsStringNotNullOrEmptyConverter" />

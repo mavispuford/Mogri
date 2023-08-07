@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace MobileDiffusion.Interfaces.ViewModels;
 
-namespace MobileDiffusion.Interfaces.ViewModels
+public interface IPopupBaseViewModel : IQueryAttributable, IBaseViewModel
 {
-    public interface IPopupBaseViewModel : IQueryAttributable
-    {
-    }
+    void OnAppearing();
+
+    void OnDisappearing();
+
+    Task OnNavigatedFromAsync();
+
+    Task OnNavigatedToAsync();
+
+    void OnBackButtonPressed();
 }

@@ -6,11 +6,11 @@ public interface IResultItemPopupViewModel : IPopupBaseViewModel
 {
     IResultItemViewModel ResultItem { get; set; }
 
-    IRelayCommand CloseCommand { get; }
+    IAsyncRelayCommand CloseCommand { get; }
 
     IAsyncRelayCommand SaveCommand { get; }
 
-    IRelayCommand UseSeedCommand { get; }
+    IAsyncRelayCommand UseSeedCommand { get; }
 
     IAsyncRelayCommand ImageToImageCommand { get; }
 
