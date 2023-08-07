@@ -106,6 +106,9 @@
 	  <Compile Update="Views\CanvasPage.xaml.cs">
 	    <DependentUpon>CanvasPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Views\Popups\ResolutionSelectPopup.xaml.cs">
+	    <DependentUpon>ResolutionSelectPopup.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\Popups\PromptStyleInfoPopup.xaml.cs">
 	    <DependentUpon>PromptStyleInfoPopup.xaml</DependentUpon>
 	  </Compile>
@@ -143,6 +146,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\HistoryPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Popups\ResolutionSelectPopup.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Popups\PromptStyleInfoPopup.xaml">

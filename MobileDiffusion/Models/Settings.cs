@@ -1,5 +1,4 @@
 ﻿using MobileDiffusion.Enums;
-using MobileDiffusion.Interfaces.ViewModels;
 using Newtonsoft.Json;
 
 namespace MobileDiffusion.Models;
@@ -31,7 +30,7 @@ public class Settings
     public double Width { get; set; } = 512;
     public OnOff WithVariations { get; set; }
     public List<PromptStyleViewModel> PromptStyles { get; set; } = new();
-
+    
     public Settings Clone()
     {
         var json = JsonConvert.SerializeObject(this);

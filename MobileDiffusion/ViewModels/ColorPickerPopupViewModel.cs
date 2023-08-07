@@ -61,18 +61,13 @@ public partial class ColorPickerPopupViewModel : PopupBaseViewModel, IColorPicke
         query.Clear();
     }
 
-    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+    partial void OnCurrentColorHexStringChanged(string value)
     {
-        base.OnPropertyChanged(e);
+        var hexColor = Color.FromArgb(value);
 
-        if (e.PropertyName == nameof(CurrentColorHexString))
+        if (CurrentColor != hexColor)
         {
-            var hexColor = Color.FromArgb(CurrentColorHexString);
-
-            if (CurrentColor != hexColor)
-            {
-                CurrentColor = hexColor;
-            }
+            CurrentColor = hexColor;
         }
     }
 

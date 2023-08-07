@@ -1,5 +1,6 @@
 ﻿using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.ViewModels;
+using MobileDiffusion.Views.Popups;
 
 namespace MobileDiffusion.Registrations;
 
@@ -21,6 +22,7 @@ public static class ViewModelRegistrations
         builder.Services.AddTransient<IHistoryPageViewModel, HistoryPageViewModel>();
         builder.Services.AddTransient<IHistoryItemViewModel, HistoryItemViewModel>();
         builder.Services.AddTransient<IHistoryItemPopupViewModel, HistoryItemPopupViewModel>();
+        builder.Services.AddTransient<IResolutionSelectPopupViewModel, ResolutionSelectPopupViewModel>();
 
         return builder;
     }

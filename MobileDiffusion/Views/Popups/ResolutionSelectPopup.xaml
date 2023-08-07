@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<popups:BasePopup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                  xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+                  xmlns:controls="clr-namespace:MobileDiffusion.Controls;assembly=MobileDiffusion"
+                  xmlns:converters="clr-namespace:MobileDiffusion.Converters;assembly=MobileDiffusion"
+                  xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
+                  xmlns:popups="clr-namespace:MobileDiffusion.Views.Popups"
+                  x:Class="MobileDiffusion.Views.Popups.ResolutionSelectPopup"
+                  x:DataType="viewModels:IResolutionSelectPopupViewModel"
+                  Color="Transparent">
+    <Border x:Name="MainBorder"
+            Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource IndependenceAccent}}"
+            Stroke="Transparent"
+            StrokeShape="RoundRectangle 50">
+        <Border.Resources>
+            <ResourceDictionary>
+                <Style TargetType="Label">
+                    <Setter Property="FontSize" Value="16" />
+                </Style>
+
+                <Style TargetType="Entry">
+                    <Setter Property="FontSize" Value="16" />
+                </Style>
+            </ResourceDictionary>
+        </Border.Resources>
+                
+        <VerticalStackLayout x:Name="MainLayout"
+                             Spacing="10"
+                             Padding="20">
+
+            <Border Width="{Binding ExampleRectangleContainerWidth, Mode=OneWayToSource}"
+                    Height="{Binding ExampleRectangleContainerHeight, Mode=OneWayToSource}"
+                    WidthRequest="200"
+                    HeightRequest="200"
+                    StrokeThickness="4"
+                    Stroke="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource Gray200TwentySixPercent}, Dark={StaticResource Black}}">
+                <Rectangle WidthRequest="{Binding ExampleRectangleWidth}"
+                           HeightRequest="{Binding ExampleRectangleHeight}"
+                           Fill="{AppThemeBinding Light={StaticResource IndependenceAccent}, Dark={StaticResource White}}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+            </Border>
+
+            <Grid ColumnDefinitions="*,auto">
+                <Label Grid.Column="0" Text="Aspect Ratio:" FontAttributes="Bold" VerticalTextAlignment="Center" />
+                <Label Grid.Column="1" Text="{Binding AspectRatioString}" VerticalOptions="Center" />
+            </Grid>
+
+            <Grid ColumnDefinitions="*,auto">
+                <Label Grid.Column="0" Text="Preserve Aspect Ratio" FontAttributes="Bold" VerticalTextAlignment="Center" />
+                <Switch Grid.Column="1" VerticalOptions="Center" IsToggled="{Binding PreserveAspectRatio}" />
+            </Grid>
+
+            <Grid ColumnDefinitions="*,auto">
+                <Label Grid.Column="0" Text="Width (Mult. of 64):" FontAttributes="Bold" VerticalTextAlignment="Center" />
+                <Entry Grid.Column="1" x:Name="WidthEntry" Text="{Binding WidthEntryValue}" Keyboard="Numeric" VerticalOptions="Center">
+                    <Entry.Behaviors>
+                        <toolkit:EventToCommandBehavior EventName="Unfocused" Command="{Binding UpdateAllValuesCommand}" />
+                    </Entry.Behaviors>
+                </Entry>
+            </Grid>
+            <Slider Minimum="{Binding MinimumWidthHeight}" Maximum="{Binding MaximumWidthHeight}" Value="{Binding WidthSliderValue}" DragCompletedCommand="{Binding UpdateAllValuesCommand}" />
+
+            <Grid ColumnDefinitions="*,auto">
+                <Label Grid.Column="0" Text="Height (Mult. of 64):" FontAttributes="Bold" VerticalTextAlignment="Center" />
+                <Entry Grid.Column="1" x:Name="HeightEntry" Text="{Binding HeightEntryValue}" Keyboard="Numeric" VerticalOptions="Center">
+                    <Entry.Behaviors>
+                        <toolkit:EventToCommandBehavior EventName="Unfocused" Command="{Binding UpdateAllValuesCommand}" />
+                    </Entry.Behaviors>
+                </Entry>
+            </Grid>
+            <Slider Minimum="{Binding MinimumWidthHeight}" Maximum="{Binding MaximumWidthHeight}" Value="{Binding HeightSliderValue}" DragCompletedCommand="{Binding UpdateAllValuesCommand}" />
+
+            <HorizontalStackLayout HorizontalOptions="Center"
+                                   Spacing="10">
+                <Button Text="Cancel" 
+                        HorizontalOptions="Center"
+                        Command="{Binding CancelCommand}"/>
+                <Button Text="Confirm" 
+                        HorizontalOptions="Center"
+                        Command="{Binding ConfirmCommand}" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </Border>
+</popups:BasePopup>

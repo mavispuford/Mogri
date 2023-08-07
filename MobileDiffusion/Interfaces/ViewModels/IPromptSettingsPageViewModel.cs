@@ -4,10 +4,6 @@ namespace MobileDiffusion.Interfaces.ViewModels;
 
 public interface IPromptSettingsPageViewModel : IPageViewModel
 {
-    List<string> AvailableWidthValues { get; set; }
-
-    List<string> AvailableHeightValues { get; set; }
-
     List<string> AvailableSamplerValues { get; set; }
 
     List<string> AvailableUpscaleLevelValues { get; set; }
@@ -55,4 +51,6 @@ public interface IPromptSettingsPageViewModel : IPageViewModel
     IAsyncRelayCommand CancelCommand { get; }
 
     IAsyncRelayCommand ConfirmSettingsCommand { get; }
+
+    IAsyncRelayCommand ShowResolutionSelectCommand { get; }
 }
