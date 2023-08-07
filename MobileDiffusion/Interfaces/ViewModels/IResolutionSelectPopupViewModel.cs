@@ -8,6 +8,8 @@ public interface IResolutionSelectPopupViewModel : IPopupBaseViewModel
 
     string AspectRatioString { get; set; }
 
+    string AspectRatioEntryValue { get; set; }
+
     double Width { get; set; }
 
     string WidthEntryValue { get; set; }

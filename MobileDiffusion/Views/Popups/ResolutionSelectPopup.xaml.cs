@@ -20,6 +20,10 @@ public partial class ResolutionSelectPopup : BasePopup
         {
             Command = new RelayCommand(() =>
             {
+                AspectRatioEntry.Unfocus();
+                AspectRatioEntry.IsEnabled = false;
+                AspectRatioEntry.IsEnabled = true;
+
                 WidthEntry.Unfocus();
                 WidthEntry.IsEnabled = false;
                 WidthEntry.IsEnabled = true;
