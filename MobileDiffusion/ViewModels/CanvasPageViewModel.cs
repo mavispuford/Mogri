@@ -252,9 +252,14 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
                 var colorizedImgContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", colorizedImageString);
 
+                // Attempt to match the aspect ratio of the image within the resolution constraints
+                var constrainedDimensions = MathHelper.GetAspectCorrectConstrainedDimensions(colorizedBitmap.Width, colorizedBitmap.Height, 0, 0, MathHelper.DimensionConstraint.UseMaximumWidthHeight);
+
                 var parameters = new Dictionary<string, object>
                 {
-                    {NavigationParams.InitImgString, colorizedImgContentTypeString }
+                    { NavigationParams.ImageWidth, constrainedDimensions.Width },
+                    { NavigationParams.ImageHeight, constrainedDimensions.Height },
+                    { NavigationParams.InitImgString, colorizedImgContentTypeString }
                 };
 
                 var maskImgContentTypeString = string.Empty;
@@ -747,13 +752,13 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                         const int rngAmount = 100;
 
                         var pos = _random.Next(0, 1) == 1;
-                        mskByte1 = (byte)MathHelper.Clamp(((int)mskByte1) + (_random.Next(0, rngAmount) * (pos ? 1 : -1)), 0, 255);
+                        mskByte1 = (byte)int.Clamp(((int)mskByte1) + (_random.Next(0, rngAmount) * (pos ? 1 : -1)), 0, 255);
 
                         pos = _random.Next(0, 1) == 1;
-                        mskByte2 = (byte)MathHelper.Clamp(((int)mskByte2) + (_random.Next(0, rngAmount) * (pos ? 1 : -1)), 0, 255);
+                        mskByte2 = (byte)int.Clamp(((int)mskByte2) + (_random.Next(0, rngAmount) * (pos ? 1 : -1)), 0, 255);
                         
                         pos = _random.Next(0, 1) == 1;
-                        mskByte3 = (byte)MathHelper.Clamp(((int)mskByte3) + (_random.Next(0, rngAmount) * (pos ? 1 : -1)), 0, 255);
+                        mskByte3 = (byte)int.Clamp(((int)mskByte3) + (_random.Next(0, rngAmount) * (pos ? 1 : -1)), 0, 255);
                     }
 
                     if (typeMsk == SKColorType.Rgba8888)

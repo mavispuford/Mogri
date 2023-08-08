@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MobileDiffusion.Helpers;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 
@@ -7,8 +8,6 @@ namespace MobileDiffusion.ViewModels;
 
 public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResolutionSelectPopupViewModel
 {
-    const int ResMultiple = 8;
-
     [ObservableProperty]
     private double _aspectRatioDouble;
 
@@ -55,10 +54,10 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
     private double _exampleRectangleHeight;
 
     [ObservableProperty]
-    private double _minimumWidthHeight = 64;
+    private double _minimumWidthHeight = Constants.MinimumWidthHeight;
 
     [ObservableProperty]
-    private double _maximumWidthHeight = 2048;
+    private double _maximumWidthHeight = Constants.MaximumWidthHeight;
 
     public ResolutionSelectPopupViewModel(IPopupService popupService) : base(popupService)
     {
@@ -101,7 +100,11 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
         // Workaround for https://github.com/dotnet/maui/issues/10294
         query.Clear();
 
-        calculateAspectRatio();
+        var aspectRatioResult = MathHelper.CalculateAspectRatio(Width, Height);
+
+        AspectRatioDouble = aspectRatioResult.AspectRatioDouble;
+        AspectRatioString = aspectRatioResult.AspectRatioString;
+        
         UpdateAllValues();
     }
 
@@ -151,43 +154,23 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
         var splitValue = value.Split(":");
 
         if (splitValue.Length != 2 || 
-            !int.TryParse(splitValue[0], out int widthNum) ||
-            widthNum <= 0 ||
-            !int.TryParse(splitValue[1], out int heightNum) ||
-            heightNum <= 0)
+            !int.TryParse(splitValue[0], out int aspectWidth) ||
+            aspectWidth <= 0 ||
+            !int.TryParse(splitValue[1], out int aspectHeight) ||
+            aspectHeight <= 0)
         {
             return;
         }
 
-        var originalGcd = greatestCommonDivisor((int)Width, (int)Height);
+        var constrainedDimensions = MathHelper.GetAspectCorrectConstrainedDimensions(Width, Height, aspectWidth, aspectHeight, MathHelper.DimensionConstraint.UseMaximumWidthHeight);
 
-        var count = 1;
-        int gcd;
-        double newWidthRaw;
-        double newHeightRaw;
+        var aspectRatioResult = MathHelper.CalculateAspectRatio(constrainedDimensions.Width, constrainedDimensions.Height);
 
-        do
-        {
-            gcd = originalGcd / count;
-            newWidthRaw = gcd * widthNum;
-            newHeightRaw = gcd * heightNum;
+        AspectRatioDouble = aspectRatioResult.AspectRatioDouble;
+        AspectRatioString = aspectRatioResult.AspectRatioString;
 
-            count++;
-            if (count > 100)
-            {
-                return;
-            }
-        } while (newWidthRaw < MinimumWidthHeight || newWidthRaw > MaximumWidthHeight ||
-                 newHeightRaw < MinimumWidthHeight || newHeightRaw > MaximumWidthHeight);
-
-        AspectRatioDouble = newWidthRaw / newHeightRaw;
-        AspectRatioString = $"{(int)newWidthRaw / gcd}:{(int)newHeightRaw / gcd}";
-
-        var roundedWidth = double.Clamp(Math.Round((double)newWidthRaw / ResMultiple) * ResMultiple, MinimumWidthHeight, MaximumWidthHeight);
-        var roundedHeight = double.Clamp(Math.Round((double)newHeightRaw / ResMultiple) * ResMultiple, MinimumWidthHeight, MaximumWidthHeight);
-
-        Width = roundedWidth;
-        Height = roundedHeight;
+        Width = constrainedDimensions.Width;
+        Height = constrainedDimensions.Height;
 
         UpdateAllValues(nameof(AspectRatioEntryValue));
         updateExampleRectangle();
@@ -221,16 +204,16 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
 
     private void updateWidth(double value, bool aspectCorrectedValue = false, params string[] excludeFromUpdate)
     {
-        var roundedWidth = double.Clamp(Math.Round(value / ResMultiple) * ResMultiple, MinimumWidthHeight, MaximumWidthHeight);
+        var roundedWidth = MathHelper.ConstrainDimensionValue(value);
 
         if (PreserveAspectRatio && !aspectCorrectedValue)
         {
             var calculatedHeight = roundedWidth / AspectRatioDouble;
-            var roundedHeight = double.Clamp(Math.Round(calculatedHeight / ResMultiple) * ResMultiple, MinimumWidthHeight, MaximumWidthHeight);
+            var roundedHeight = MathHelper.ConstrainDimensionValue(calculatedHeight);
             var ratio = roundedWidth / roundedHeight;
 
             if (roundedHeight < MinimumWidthHeight || roundedHeight > MaximumWidthHeight ||
-                Math.Abs(AspectRatioDouble - ratio) > .0001d)
+                Math.Abs(AspectRatioDouble - ratio) > .005d)
             {
                 return;
             }
@@ -248,7 +231,10 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
             }
             else
             {
-                calculateAspectRatio();
+                var aspectRatioResult = MathHelper.CalculateAspectRatio(Width, Height);
+
+                AspectRatioDouble = aspectRatioResult.AspectRatioDouble;
+                AspectRatioString = aspectRatioResult.AspectRatioString;
             }
 
             UpdateAllValues(excludeFromUpdate);
@@ -259,16 +245,16 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
 
     private void updateHeight(double value, bool aspectCorrectedValue = false, params string[] excludeFromUpdate)
     {
-        var roundedHeight = double.Clamp(Math.Round(value / ResMultiple) * ResMultiple, MinimumWidthHeight, MaximumWidthHeight);
+        var roundedHeight = MathHelper.ConstrainDimensionValue(value);
 
         if (PreserveAspectRatio && !aspectCorrectedValue)
         {
             var calculatedWidth = roundedHeight * AspectRatioDouble;
-            var roundedWidth = double.Clamp(Math.Round(calculatedWidth / ResMultiple) * ResMultiple, MinimumWidthHeight, MaximumWidthHeight);
+            var roundedWidth = MathHelper.ConstrainDimensionValue(calculatedWidth);
             var ratio = roundedWidth / roundedHeight;
 
             if (roundedWidth < MinimumWidthHeight || roundedWidth > MaximumWidthHeight ||
-                Math.Abs(AspectRatioDouble - ratio) > .0001d)
+                Math.Abs(AspectRatioDouble - ratio) > .005d)
             {
                 return;
             }
@@ -286,7 +272,10 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
             }
             else
             {
-                calculateAspectRatio();
+                var aspectRatioResult = MathHelper.CalculateAspectRatio(Width, Height);
+
+                AspectRatioDouble = aspectRatioResult.AspectRatioDouble;
+                AspectRatioString = aspectRatioResult.AspectRatioString;
             }
 
             UpdateAllValues(excludeFromUpdate);
@@ -330,23 +319,6 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
             OnPropertyChanged(nameof(HeightEntryValue));
         }
 #pragma warning restore MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
-    }
-
-    private void calculateAspectRatio()
-    {
-        if (Width <= 0 || Height <= 0)
-        {
-            return;
-        }
-
-        AspectRatioDouble = Width / Height;
-        var gcd = greatestCommonDivisor((int)Width, (int)Height);
-        AspectRatioString = $"{Width / gcd}:{Height / gcd}"; 
-    }
-
-    private int greatestCommonDivisor(int a, int b)
-    {
-        return b == 0 ? a : greatestCommonDivisor(b, a % b);
     }
 
     private void updateExampleRectangle()

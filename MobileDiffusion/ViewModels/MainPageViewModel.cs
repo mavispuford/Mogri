@@ -508,16 +508,28 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             await Shell.Current.GoToAsync("///CanvasPageTab", parameters);
         }
 
-        if (query.TryGetValue(NavigationParams.ImageWidth, out var imageWidthParam) &&
-            imageWidthParam is float imageWidth)
+        if (query.TryGetValue(NavigationParams.ImageWidth, out var imageWidthParam))
         {
-            _settings.Width = imageWidth;
+            if (imageWidthParam is float imageWidthFloat)
+            {
+                _settings.Width = imageWidthFloat;
+            }
+            else if (imageWidthParam is double imageWidthDouble)
+            {
+                _settings.Width = imageWidthDouble;
+            }
         }
 
-        if (query.TryGetValue(NavigationParams.ImageHeight, out var imageHeightParam) &&
-            imageHeightParam is float imageHeight)
+        if (query.TryGetValue(NavigationParams.ImageHeight, out var imageHeightParam))
         {
-            _settings.Height = imageHeight;
+            if (imageHeightParam is float imageHeightFloat)
+            {
+                _settings.Height = imageHeightFloat;
+            }
+            else if (imageHeightParam is double imageHeightDouble)
+            {
+                _settings.Height = imageHeightDouble;
+            }
         }
 
         if (query.TryGetValue(NavigationParams.Seed, out var seedParam) &&
