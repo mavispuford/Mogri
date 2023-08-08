@@ -1,6 +1,5 @@
 ﻿using MobileDiffusion.Interfaces.Services;
 using SkiaSharp;
-using System.IO;
 
 namespace MobileDiffusion.Services;
 
@@ -57,8 +56,13 @@ public class ImageService : IImageService
         return ImageSource.FromStream(() => stream);
     }
 
-    public (byte[] Bytes, int ActualWidth, int ActualHeight) GetResizedImageStreamBytes(Stream stream, int width, int height, bool forceExactSize = false, bool filterImage = false)
+    public SKBitmap GetSkBitmapFromStream(Stream stream)
     {
+        if (stream == null)
+        {
+            return null;
+        }
+
         try
         {
             // Instead of a simple SKBitmap.Decode() call, we're using a codec and SKImageInfo with Unpremul for the
@@ -74,7 +78,19 @@ public class ImageService : IImageService
                 Width = codec.Info.Width,
             };
 
-            var bitmap = SKBitmap.Decode(codec, info);
+            return SKBitmap.Decode(codec, info);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public (byte[] Bytes, int ActualWidth, int ActualHeight) GetResizedImageStreamBytes(Stream stream, int width, int height, bool forceExactSize = false, bool filterImage = false)
+    {
+        try
+        {
+            var bitmap = GetSkBitmapFromStream(stream);
 
             if (forceExactSize)
             {

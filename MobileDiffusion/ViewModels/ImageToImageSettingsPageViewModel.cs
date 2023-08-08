@@ -1,8 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MobileDiffusion.Helpers;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Models;
+using SkiaSharp.Views.Maui.Controls;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -180,7 +182,17 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
 
                 _settings.InitImage = formattedImageString;
 
-                InitImageSource = ImageSource.FromStream(() => memoryStream);
+                // Attempt to match the aspect ratio of the image within the resolution constraints
+                var bitmap = _imageService.GetSkBitmapFromStream(memoryStream);
+                var constrainedDimensions = MathHelper.GetAspectCorrectConstrainedDimensions(bitmap.Width, bitmap.Height, 0, 0, MathHelper.DimensionConstraint.UseMaximumWidthHeight);
+
+                _settings.Width = constrainedDimensions.Width;
+                _settings.Height = constrainedDimensions.Height;
+                
+                InitImageSource = new SKBitmapImageSource
+                {
+                    Bitmap = bitmap
+                };
             }
             else
             {
