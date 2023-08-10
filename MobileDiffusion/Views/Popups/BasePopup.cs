@@ -19,28 +19,44 @@ public class BasePopup : PopupPage
         CloseWhenBackgroundIsClicked = false;
     }
 
-    protected override void OnAppearing()
+    protected override async void OnAppearing()
     {
-        base.OnAppearing();
-
-        if (BindingContext is IPopupBaseViewModel viewModel)
+        try
         {
-            viewModel.OnAppearing();
+            base.OnAppearing();
+
+            if (BindingContext is IPopupBaseViewModel viewModel)
+            {
+                await viewModel.OnAppearingAsync();
+            }
+        }
+        catch
+        {
+            // Specific exceptions should be handled in the VM, catching here to prevent app crashes in an async void method.
         }
     }
 
-    protected override void OnDisappearing()
+    protected override async void OnDisappearing()
     {
-        base.OnDisappearing();
-
-        if (BindingContext is IPopupBaseViewModel viewModel)
+        try
         {
-            viewModel.OnDisappearing();
+            base.OnDisappearing();
+
+            if (BindingContext is IPopupBaseViewModel viewModel)
+            {
+                await viewModel.OnDisappearingAsync();
+            }
+        }
+        catch
+        {
+            // Specific exceptions should be handled in the VM, catching here to prevent app crashes in an async void method.
         }
     }
 
     protected override async void OnNavigatedFrom(NavigatedFromEventArgs args)
     {
+        // NOTE - THIS DOES NOT SEEM TO GET CALLED
+
         try
         {
             base.OnNavigatedFrom(args);
@@ -58,6 +74,8 @@ public class BasePopup : PopupPage
 
     protected override async void OnNavigatedTo(NavigatedToEventArgs args)
     {
+        // NOTE - THIS DOES NOT SEEM TO GET CALLED
+
         try
         {
             base.OnNavigatedTo(args);

@@ -8,12 +8,14 @@ public class PageViewModel : BaseViewModel, IPageViewModel
     {
     }
 
-    public virtual void OnAppearing()
+    public virtual Task OnAppearingAsync()
     {
+        return Task.CompletedTask;
     }
 
-    public virtual void OnDisappearing()
+    public virtual Task OnDisappearingAsync()
     {
+        return Task.CompletedTask;
     }
 
     public virtual Task OnNavigatedFromAsync()

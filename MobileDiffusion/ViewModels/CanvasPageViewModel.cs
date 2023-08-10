@@ -253,7 +253,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 var colorizedImgContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", colorizedImageString);
 
                 // Attempt to match the aspect ratio of the image within the resolution constraints
-                var constrainedDimensions = MathHelper.GetAspectCorrectConstrainedDimensions(colorizedBitmap.Width, colorizedBitmap.Height, 0, 0, MathHelper.DimensionConstraint.UseMaximumWidthHeight);
+                var constrainedDimensions = MathHelper.GetAspectCorrectConstrainedDimensions(colorizedBitmap.Width, colorizedBitmap.Height, 0, 0, MathHelper.DimensionConstraint.ClosestMatch);
 
                 var parameters = new Dictionary<string, object>
                 {

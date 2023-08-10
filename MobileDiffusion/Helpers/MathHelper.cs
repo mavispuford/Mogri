@@ -31,7 +31,8 @@ public static class MathHelper
     public enum DimensionConstraint
     {
         UseMinimumWidthHeight,
-        UseMaximumWidthHeight
+        UseMaximumWidthHeight,
+        ClosestMatch
     }
 
     public static (double Width, double Height) GetAspectCorrectConstrainedDimensions(double width, double height, double aspectWidth = 0, double aspectHeight = 0, DimensionConstraint dimensionConstraint = DimensionConstraint.UseMaximumWidthHeight)
@@ -52,8 +53,8 @@ public static class MathHelper
         var aspectRatio = aspectWidth / aspectHeight;
         var portrait = aspectWidth < aspectHeight;
 
-        double targetWidth;
-        double targetHeight;
+        double targetWidth = width;
+        double targetHeight = height;
 
         switch (dimensionConstraint)
         {
@@ -82,8 +83,85 @@ public static class MathHelper
                     targetHeight = targetWidth / aspectRatio;
                 }
                 break;
+            case DimensionConstraint.ClosestMatch:
+                var widthWithinBounds = width >= Constants.MinimumWidthHeight && width <= Constants.MaximumWidthHeight;
+                var heightWithinBounds = height >= Constants.MinimumWidthHeight && height <= Constants.MaximumWidthHeight;
+
+                var currentAspectRatio = CalculateAspectRatio(width, height);
+                if (Math.Abs(currentAspectRatio.AspectRatioDouble - aspectRatio) > .001d)
+                {
+                    // Different aspect ratio was requested - Calculate using existing dimensions
+
+                    if (portrait)
+                    {
+                        targetWidth = targetHeight * aspectRatio;
+                    }
+                    else
+                    {
+                        targetHeight = targetWidth / aspectRatio;
+                    }
+
+                    break;
+                }
+
+
+                if (widthWithinBounds && heightWithinBounds)
+                {
+                    // Target width/height were already set above the switch statement
+                    break;
+                }
+
+                if (portrait)
+                {
+                    // Height is taller than max - Set it to max, then calculate target width
+                    if (height > Constants.MaximumWidthHeight)
+                    {
+                        targetHeight = Constants.MaximumWidthHeight;
+                        targetWidth = targetHeight * aspectRatio;
+                    }
+                    else if (height < Constants.MinimumWidthHeight) 
+                    {
+                        // Height is less than minimum, instead calculate off the width
+                        if (!widthWithinBounds)
+                        {
+                            targetWidth = Constants.MinimumWidthHeight;
+                        }
+                        else
+                        {
+                            targetWidth = width;
+                        }
+                        
+                        targetHeight = targetWidth / aspectRatio;
+                    }
+                }
+                else
+                {
+                    // Width is wider than max - Set it to max, then calculate target height
+                    if (width > Constants.MaximumWidthHeight)
+                    {
+                        targetWidth = Constants.MaximumWidthHeight;
+                        targetHeight = targetWidth / aspectRatio;
+                    }
+                    else if (width < Constants.MinimumWidthHeight)
+                    {
+                        // Width is less than minimum, instead calculate off the height
+                        if (!heightWithinBounds)
+                        {
+                            targetHeight = Constants.MinimumWidthHeight;
+                        }
+                        else
+                        {
+                            targetHeight = height;
+                        }
+
+                        targetWidth = targetHeight * aspectRatio;
+                    }
+                }
+
+                
+                break;
             default:
-                return (0, 0);
+                break;
         }        
 
         // Make sure resulting dimensions are multiples of Constants.ResolutionValueDivisor

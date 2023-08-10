@@ -8,6 +8,9 @@ namespace MobileDiffusion.ViewModels;
 
 public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResolutionSelectPopupViewModel
 {
+    private readonly IImageService _imageService;
+    private string _initImgString;
+
     [ObservableProperty]
     private double _aspectRatioDouble;
 
@@ -59,8 +62,10 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
     [ObservableProperty]
     private double _maximumWidthHeight = Constants.MaximumWidthHeight;
 
-    public ResolutionSelectPopupViewModel(IPopupService popupService) : base(popupService)
+    public ResolutionSelectPopupViewModel(IPopupService popupService,
+        IImageService imageService) : base(popupService)
     {
+        _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
     }
 
     public override void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -97,6 +102,13 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
             throw new ArgumentNullException(nameof(height));
         }
 
+        if (query.TryGetValue(NavigationParams.InitImgString, out var initImgParam) &&
+            initImgParam is string initImgString &&
+            !string.IsNullOrEmpty(initImgString))
+        {
+            _initImgString = initImgString;
+        }
+
         // Workaround for https://github.com/dotnet/maui/issues/10294
         query.Clear();
 
@@ -108,12 +120,16 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
         UpdateAllValues();
     }
 
-    public override void OnAppearing()
+    public override async Task OnAppearingAsync()
     {
-        base.OnAppearing();
+        await base.OnAppearingAsync();
 
-        OnPropertyChanged(nameof(ExampleRectangleWidth));
-        OnPropertyChanged(nameof(ExampleRectangleHeight));
+        if (InitImageSource == null)
+        {
+            var initCancellationTokenSource = new CancellationTokenSource();
+
+            InitImageSource = await _imageService.GetImageSourceFromContentTypeStringAsync(_initImgString, initCancellationTokenSource.Token);
+        }
     }
 
     [RelayCommand]
@@ -162,7 +178,7 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
             return;
         }
 
-        var constrainedDimensions = MathHelper.GetAspectCorrectConstrainedDimensions(Width, Height, aspectWidth, aspectHeight, MathHelper.DimensionConstraint.UseMaximumWidthHeight);
+        var constrainedDimensions = MathHelper.GetAspectCorrectConstrainedDimensions(Width, Height, aspectWidth, aspectHeight, MathHelper.DimensionConstraint.ClosestMatch);
 
         var aspectRatioResult = MathHelper.CalculateAspectRatio(constrainedDimensions.Width, constrainedDimensions.Height);
 
@@ -340,5 +356,9 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
             ExampleRectangleWidth = ExampleRectangleContainerWidth;
             ExampleRectangleHeight = ExampleRectangleContainerHeight / AspectRatioDouble;
         }
+
+        // Broadcast every time since there are times where the view doesn't look right
+        OnPropertyChanged(nameof(ExampleRectangleWidth));
+        OnPropertyChanged(nameof(ExampleRectangleHeight));
     }
 }

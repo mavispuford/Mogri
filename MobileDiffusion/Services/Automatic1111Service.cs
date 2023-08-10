@@ -250,7 +250,7 @@ namespace MobileDiffusion.Services
             request.Seed = settings.Seed;
             request.Tiling = settings.Seamless == Enums.OnOff.on;
             request.Hr_scale = settings.UpscaleLevel;
-
+            
             var combinedPromptAndStyles = settings.GetCombinedPromptAndPromptStyles();
             request.Prompt = combinedPromptAndStyles.Prompt;
             request.Negative_prompt = combinedPromptAndStyles.NegativePrompt;
@@ -287,7 +287,7 @@ namespace MobileDiffusion.Services
             {
                 settings.InitImage
             };
-            request.Mask = settings.Mask;
+            request.Mask = !string.IsNullOrEmpty(settings.Mask) ? settings.Mask : null; // Make sure mask is null if it's an empty string
             request.Inpainting_fill = 1;
 
             // Because we colorize the image, blurring the mask would cause some of the colorized pixels to stay
