@@ -179,6 +179,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         var parameters = new Dictionary<string, object> {
             { NavigationParams.Width, Width },
             { NavigationParams.Height, Height },
+            { NavigationParams.InitImgString, _settings.InitImage }
         };
 
         var result = await _popupService.ShowPopupAsync("ResolutionSelectPopup", parameters) as IDictionary<string, object>;

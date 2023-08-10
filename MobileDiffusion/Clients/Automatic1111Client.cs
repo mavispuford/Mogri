@@ -13447,7 +13447,7 @@ namespace MobileDiffusion.Clients.Automatic1111
         [Newtonsoft.Json.JsonProperty("image_cfg_scale", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public double? Image_cfg_scale { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("mask", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonProperty("mask", Required = Newtonsoft.Json.Required.AllowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Mask { get; set; }
 
         [Newtonsoft.Json.JsonProperty("mask_blur", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]

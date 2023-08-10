@@ -108,7 +108,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
         return true;
     }
 
-    private async void mapSettingsToProperties()
+    private async Task mapSettingsToProperties()
     {
         Strength = _settings.DenoisingStrength.ToString();
 
@@ -184,7 +184,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
 
                 // Attempt to match the aspect ratio of the image within the resolution constraints
                 var bitmap = _imageService.GetSkBitmapFromStream(memoryStream);
-                var constrainedDimensions = MathHelper.GetAspectCorrectConstrainedDimensions(bitmap.Width, bitmap.Height, 0, 0, MathHelper.DimensionConstraint.UseMaximumWidthHeight);
+                var constrainedDimensions = MathHelper.GetAspectCorrectConstrainedDimensions(bitmap.Width, bitmap.Height, 0, 0, MathHelper.DimensionConstraint.ClosestMatch);
 
                 _settings.Width = constrainedDimensions.Width;
                 _settings.Height = constrainedDimensions.Height;
@@ -218,7 +218,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
     {
         await base.OnNavigatedToAsync();
 
-        mapSettingsToProperties();
+        await mapSettingsToProperties();
     }
 
     private void cancelInitImageLoading()

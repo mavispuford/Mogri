@@ -2,9 +2,9 @@
 
 public interface IPopupBaseViewModel : IQueryAttributable, IBaseViewModel
 {
-    void OnAppearing();
+    Task OnAppearingAsync();
 
-    void OnDisappearing();
+    Task OnDisappearingAsync();
 
     Task OnNavigatedFromAsync();
 

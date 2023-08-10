@@ -8,23 +8,37 @@ public class BasePage : ContentPage
     {
     }
 
-    protected override void OnAppearing()
+    protected override async void OnAppearing()
     {
-        base.OnAppearing();
-
-        if (BindingContext is IPageViewModel pageViewModel)
+        try
         {
-            pageViewModel.OnAppearing();
+            base.OnAppearing();
+
+            if (BindingContext is IPageViewModel pageViewModel)
+            {
+                await pageViewModel.OnAppearingAsync();
+            }
+        }
+        catch
+        {
+            // Specific exceptions should be handled in the VM, catching here to prevent app crashes in an async void method.
         }
     }
 
-    protected override void OnDisappearing()
+    protected override async void OnDisappearing()
     {
-        base.OnDisappearing();
-
-        if (BindingContext is IPageViewModel pageViewModel)
+        try
         {
-            pageViewModel.OnDisappearing();
+            base.OnAppearing();
+
+            if (BindingContext is IPageViewModel pageViewModel)
+            {
+                await pageViewModel.OnDisappearingAsync();
+            }
+        }
+        catch
+        {
+            // Specific exceptions should be handled in the VM, catching here to prevent app crashes in an async void method.
         }
     }
 

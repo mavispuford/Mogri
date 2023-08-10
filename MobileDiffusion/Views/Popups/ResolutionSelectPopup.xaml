@@ -37,6 +37,7 @@
                   ColumnSpacing="4"
                   WidthRequest="240"
                   HeightRequest="240">
+                
                 <Border Grid.Row="1"
                         Grid.Column="1"
                         Width="{Binding ExampleRectangleContainerWidth, Mode=OneWayToSource}"
@@ -46,11 +47,17 @@
                         StrokeThickness="4"
                         Stroke="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
                         BackgroundColor="{AppThemeBinding Light={StaticResource Gray200TwentySixPercent}, Dark={StaticResource Black}}">
-                    <Rectangle WidthRequest="{Binding ExampleRectangleWidth}"
-                               HeightRequest="{Binding ExampleRectangleHeight}"
-                               Fill="{StaticResource IndependenceAccent}"
-                               HorizontalOptions="Center"
-                               VerticalOptions="Center"/>
+                    <Grid WidthRequest="{Binding ExampleRectangleWidth}"
+                          HeightRequest="{Binding ExampleRectangleHeight}"
+                          HorizontalOptions="Fill"
+                          VerticalOptions="Fill">
+
+                        <Rectangle Fill="{StaticResource IndependenceAccent}" HorizontalOptions="Fill" VerticalOptions="Fill" />
+                        <Image Aspect="Fill" Source="{Binding InitImageSource}" HorizontalOptions="Fill" VerticalOptions="Fill" />
+
+                        <!-- TODO - PUT INIT IMAGE HERE -->
+                    </Grid>
+                    
                 </Border>
 
                 <!-- Width -->
