@@ -11,6 +11,7 @@ public static class Constants
     public const string ThumbnailPrefix = "t.";
     public const double MinimumWidthHeight = 64;
     public const double MaximumWidthHeight = 2048;
+    public const double MaximumDisplayWidthHeight = 2048;
     public const double ResolutionValueDivisor = 8;
 
     public static class PreferenceKeys

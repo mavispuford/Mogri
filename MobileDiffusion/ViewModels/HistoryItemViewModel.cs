@@ -17,7 +17,7 @@ public partial class HistoryItemViewModel : BaseViewModel, IHistoryItemViewModel
     private ImageSource _thumbnailImageSource;
 
     [ObservableProperty]
-    private Settings _settings;
+    private PromptSettings _settings;
 
     public async Task InitWith(string fileName, IFileService fileService, IImageService imageService)
     {

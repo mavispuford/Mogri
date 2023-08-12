@@ -86,12 +86,10 @@ public class ImageService : IImageService
         }
     }
 
-    public (byte[] Bytes, int ActualWidth, int ActualHeight) GetResizedImageStreamBytes(Stream stream, int width, int height, bool forceExactSize = false, bool filterImage = false)
+    public SKBitmap GetResizedSKBitmap(SKBitmap bitmap, int width, int height, bool forceExactSize = false, bool filterImage = false, bool onlyIfLarger = false)
     {
         try
         {
-            var bitmap = GetSkBitmapFromStream(stream);
-
             if (forceExactSize)
             {
                 return resizeBitmap(bitmap, width, height, filterImage);
@@ -100,35 +98,36 @@ public class ImageService : IImageService
             if (bitmap.Width == width &&
                 bitmap.Height == height)
             {
-                stream.Seek(0, SeekOrigin.Begin);
-
-                using var memoryStream = new MemoryStream();
-                stream.CopyTo(memoryStream);
-                return (memoryStream.ToArray(), bitmap.Width, bitmap.Height);
+                return bitmap;
+            }
+            
+            if (onlyIfLarger && 
+                bitmap.Width < width &&
+                bitmap.Height < height)
+            {
+                return bitmap;
             }
 
+            // Scale to target, maintaining the aspect ratio
             // 1024 x 512 -> 512 x 512 = 512 x 256
             // 512 x 1024 -> 512 x 512 = 256 x 512
             // 1024 x 512 -> 512 x 1024 = 512 x 256
 
-            var bitmapWidthIsBiggest = bitmap.Width > bitmap.Height;
+            var landscape = bitmap.Width > bitmap.Height;
 
-            var bitmapRatio = bitmapWidthIsBiggest ?
+            var bitmapRatio = landscape ?
                 bitmap.Width / (float)bitmap.Height :
                 bitmap.Height / (float)bitmap.Width;
 
             var targetWidth = 0;
             var targetHeight = 0;
 
-            if (bitmapWidthIsBiggest)
+            if (landscape)
             {
                 targetWidth = width;
                 var dividedHeight = height / bitmapRatio;
 
                 targetHeight = (int)dividedHeight;
-
-                //var roundedHeight = Math.Round(dividedHeight / 64) * 64;
-                //targetHeight = (int)roundedHeight;
             }
             else
             {
@@ -136,9 +135,6 @@ public class ImageService : IImageService
                 var dividedWidth = width / bitmapRatio;
 
                 targetWidth = (int)dividedWidth;
-
-                //var roundedWidth = Math.Round(dividedWidth / 64) * 64;
-                //targetWidth = (int)roundedWidth;
             }
 
             return resizeBitmap(bitmap, targetWidth, targetHeight, filterImage);
@@ -148,22 +144,38 @@ public class ImageService : IImageService
             // TODO - Handle this
         }
 
+        return null;
+    }
+
+    public (byte[] Bytes, int ActualWidth, int ActualHeight) GetResizedImageStreamBytes(Stream stream, int width, int height, bool forceExactSize = false, bool filterImage = false, bool onlyIfLarger = false)
+    {
+        try
+        {
+            var bitmap = GetSkBitmapFromStream(stream);
+
+            var resizedBitmap = GetResizedSKBitmap(bitmap, width, height, forceExactSize, filterImage, onlyIfLarger);
+
+            using (var memStream = new MemoryStream())
+            {
+                using (var skiaStream = new SKManagedWStream(memStream))
+                {
+                    resizedBitmap.Encode(skiaStream, SKEncodedImageFormat.Png, 100);
+
+                    memStream.Seek(0, SeekOrigin.Begin);
+                    return (memStream.ToArray(), resizedBitmap.Width, resizedBitmap.Height);
+                }
+            }
+        }
+        catch
+        {
+            // TODO - Handle this
+        }
+
         return (null, 0, 0);
     }
 
-    private (byte[] Bytes, int ActualWidth, int ActualHeight) resizeBitmap(SKBitmap bitmap, int width, int height, bool filterImage = false)
+    private SKBitmap resizeBitmap(SKBitmap bitmap, int width, int height, bool filterImage = false)
     {
-        var resized = bitmap.Resize(new SKSizeI(width, height), filterImage ? SKFilterQuality.High : SKFilterQuality.None);
-
-        using (var memStream = new MemoryStream())
-        {
-            using (var skiaStream = new SKManagedWStream(memStream))
-            {
-                resized.Encode(skiaStream, SKEncodedImageFormat.Png, 100);
-
-                memStream.Seek(0, SeekOrigin.Begin);
-                return (memStream.ToArray(), resized.Width, resized.Height);
-            }
-        }
+        return bitmap.Resize(new SKSizeI(width, height), filterImage ? SKFilterQuality.High : SKFilterQuality.None);
     }
 }

@@ -20,7 +20,7 @@ public class LSteinResponseItem
     [JsonPropertyName("config")]
     public LSteinConfig Config { get; set; }
 
-    public static Settings ToSettings(LSteinResponseItem responseItem)
+    public static PromptSettings ToSettings(LSteinResponseItem responseItem)
     {
         if (responseItem == null)
         {
@@ -28,9 +28,9 @@ public class LSteinResponseItem
         }
 
         var config = responseItem.Config;
-        var defaultSettings = new Settings();
+        var defaultSettings = new PromptSettings();
 
-        var result = new Settings
+        var result = new PromptSettings
         {
             InitImage = string.IsNullOrEmpty(config.Initimg) ? null : config.Initimg,
             Mask = string.IsNullOrEmpty(config.Mask) ? null : config.Mask,

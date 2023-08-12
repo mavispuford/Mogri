@@ -4,7 +4,9 @@ using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Models;
 using MobileDiffusion.Models.Automatic1111;
+using MobileDiffusion.ViewModels;
 using Newtonsoft.Json;
+using System.Text.RegularExpressions;
 
 namespace MobileDiffusion.Services
 {
@@ -24,6 +26,8 @@ namespace MobileDiffusion.Services
             public const string Eta = nameof(Eta);
             public const string Version = nameof(Version);
         }
+
+        private Regex _loraRegex = new Regex("<lora:([^:]*):([^>]*)>", RegexOptions.Compiled);
 
         /// <summary>
         ///     Some operations take several minutes to complete, especially with older hardware.
@@ -82,7 +86,7 @@ namespace MobileDiffusion.Services
             throw new NotImplementedException();
         }
 
-        public async IAsyncEnumerable<ApiResponse> SubmitImageRequestAsync(Settings settings)
+        public async IAsyncEnumerable<ApiResponse> SubmitImageRequestAsync(PromptSettings settings)
         {
             if (settings is null)
             {
@@ -109,7 +113,7 @@ namespace MobileDiffusion.Services
             }
         }
 
-        public async Task<Settings> GetImageInfoAsync(string base64EncodedImage)
+        public async Task<PromptSettings> GetImageInfoAsync(string base64EncodedImage)
         {
             var client = getClient(TimeSpan.FromSeconds(10));
 
@@ -147,12 +151,37 @@ namespace MobileDiffusion.Services
             }
 
             var prompt = newLineSplit[0];
+
+            var loraMatches = _loraRegex.Matches(prompt);
+            var loras = new List<LoraViewModel>();
+
+            foreach(var match in loraMatches.Where(m => m.Success))
+            {
+                var name = match.Groups[1].Value;
+
+                if (loras.Any(l => l.Name == name))
+                {
+                    continue;
+                }
+
+                var lora = new LoraViewModel
+                {
+                    Name = name,
+                    Strength = float.Parse(match.Groups[2].Value),
+                };
+
+                loras.Add(lora);
+
+                prompt = prompt.Replace(match.Groups[0].Value, string.Empty);
+            }
+
             var negativePrompt = newLineSplit.Length > 2 ? newLineSplit[1].Trim().Split(": ").Last() : string.Empty;
 
-            var settings = new Settings
+            var settings = new PromptSettings
             {
                 Prompt = prompt,
-                NegativePrompt = negativePrompt
+                NegativePrompt = negativePrompt,
+                Loras = loras
             };
 
             foreach(var property in properties)
@@ -235,7 +264,7 @@ namespace MobileDiffusion.Services
             return automaticClient;
         }
 
-        private static StableDiffusionProcessingTxt2Img txt2ImageRequestFromSettings(Settings settings)
+        private static StableDiffusionProcessingTxt2Img txt2ImageRequestFromSettings(PromptSettings settings)
         {
             var request = new StableDiffusionProcessingTxt2Img();
 
@@ -260,10 +289,15 @@ namespace MobileDiffusion.Services
             // TODO - Use steps in the UI instead of calculating from a strength value?
             request.Hr_second_pass_steps = (int)(settings.UpscaleStrength * settings.Steps);
 
+            foreach (var lora in settings.Loras)
+            {
+                request.Prompt += $" <lora:{lora.Name}:{lora.Strength:F1}>";
+            }
+
             return request;
         }
 
-        private static StableDiffusionProcessingImg2Img image2ImageRequestFromSettings(Settings settings)
+        private static StableDiffusionProcessingImg2Img image2ImageRequestFromSettings(PromptSettings settings)
         {
             var request = new StableDiffusionProcessingImg2Img();
 
@@ -295,10 +329,15 @@ namespace MobileDiffusion.Services
             request.Mask_blur_x = 0;
             request.Mask_blur_y = 0;
 
+            foreach(var lora in settings.Loras)
+            {
+                request.Prompt += $" <lora:{lora.Name}:{lora.Strength:F1}>";
+            }
+
             return request;
         }
 
-        private async IAsyncEnumerable<ApiResponse> sendTextToImageRequest(Settings settings)
+        private async IAsyncEnumerable<ApiResponse> sendTextToImageRequest(PromptSettings settings)
         {
             var client = getClient(TimeSpan.FromMinutes(RequestTimeoutMinutes));
 
@@ -358,7 +397,7 @@ namespace MobileDiffusion.Services
             }
         }
 
-        private async IAsyncEnumerable<ApiResponse> sendImageToImageRequest(Settings settings)
+        private async IAsyncEnumerable<ApiResponse> sendImageToImageRequest(PromptSettings settings)
         {
             var client = getClient(TimeSpan.FromMinutes(RequestTimeoutMinutes));
 
@@ -498,9 +537,9 @@ namespace MobileDiffusion.Services
             return Task.FromResult(result);
         }
 
-        public Task<Dictionary<string, string>> GetLorasAsync()
+        public Task<List<ILoraViewModel>> GetLorasAsync()
         {
-            var result = new Dictionary<string, string>();
+            var result = new List<ILoraViewModel>();
 
             if (_loras == null)
             {
@@ -509,7 +548,11 @@ namespace MobileDiffusion.Services
 
             foreach (var lora in _loras)
             {
-                result.TryAdd(lora.Name, lora.Alias);
+                result.Add(new LoraViewModel
+                {
+                    Alias = lora.Alias,
+                    Name = lora.Name
+                });
             }
 
             return Task.FromResult(result);

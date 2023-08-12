@@ -6,7 +6,7 @@ public static class SettingsHelper
 {
     private const string PromptInsertionConstant = "{prompt}";
 
-    public static (string Prompt, string NegativePrompt) GetCombinedPromptAndPromptStyles(this Settings settings)
+    public static (string Prompt, string NegativePrompt) GetCombinedPromptAndPromptStyles(this PromptSettings settings)
     {
         return GetCombinedPromptAndPromptStyles(settings.Prompt, settings.NegativePrompt, settings.PromptStyles);
     }

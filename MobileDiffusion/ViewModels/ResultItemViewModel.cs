@@ -14,7 +14,7 @@ public partial class ResultItemViewModel : BaseViewModel, IResultItemViewModel
     private ImageSource imageSource;
 
     [ObservableProperty]
-    private Settings settings;
+    private PromptSettings settings;
 
     [ObservableProperty]
     private ApiResponse apiResponse;
@@ -39,7 +39,7 @@ public partial class ResultItemViewModel : BaseViewModel, IResultItemViewModel
     [RelayCommand]
     private async Task Tapped()
     {
-        if (imageSource == default(ImageSource))
+        if (ImageSource == default(ImageSource))
         {
             return;
         }

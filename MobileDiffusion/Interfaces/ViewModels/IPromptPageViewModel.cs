@@ -13,11 +13,19 @@ public interface IPromptPageViewModel : IPageViewModel
 
     List<IPromptStyleViewModel> AvailablePromptStyles { get; set; }
 
+    List<ILoraViewModel> AvailableLoras { get; set; }
+
+    ObservableCollection<ILoraViewModel> SelectedLoras { get; set; }
+
     ObservableCollection<IPromptStyleViewModel> SelectedPromptStyles { get; set; }
 
     IAsyncRelayCommand ConfirmCommand { get; }
 
     IRelayCommand<IPromptStyleViewModel> RemovePromptStyleCommand { get; }
+
+    IRelayCommand<ILoraViewModel> RemoveLoraCommand { get; }
+    
+    IAsyncRelayCommand ShowLoraSelectionPageCommand { get; }
 
     IAsyncRelayCommand ShowPromptStyleCreationPromptCommand { get; }
 

@@ -7,7 +7,7 @@ public interface IResultItemViewModel : IBaseViewModel
 {
     ImageSource ImageSource { get; set; }
 
-    Settings Settings { get; set; }
+    PromptSettings Settings { get; set; }
 
     string InternalUri { get; set; }
 
