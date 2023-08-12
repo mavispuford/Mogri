@@ -69,7 +69,7 @@ public class LSteinRequest
     [JsonPropertyName("with_variations")]
     public string WithVariations { get; set; }
 
-    public static LSteinRequest FromSettings(Settings settings)
+    public static LSteinRequest FromSettings(PromptSettings settings)
     {
         var result = new LSteinRequest
         {

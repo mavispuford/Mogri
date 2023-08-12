@@ -44,7 +44,7 @@ namespace MobileDiffusion.Services
             return false;
         }
 
-        public async IAsyncEnumerable<ApiResponse> SubmitImageRequestAsync(Settings settings)
+        public async IAsyncEnumerable<ApiResponse> SubmitImageRequestAsync(PromptSettings settings)
         {
             if (settings == null)
             {
@@ -165,7 +165,7 @@ namespace MobileDiffusion.Services
             return Task.FromResult(new List<IPromptStyleViewModel>());
         }
 
-        public Task<Settings> GetImageInfoAsync(string base64EncodedImage)
+        public Task<PromptSettings> GetImageInfoAsync(string base64EncodedImage)
         {
             throw new NotImplementedException();
         }
@@ -175,7 +175,7 @@ namespace MobileDiffusion.Services
             throw new NotImplementedException();
         }
 
-        public Task<Dictionary<string, string>> GetLorasAsync()
+        public Task<List<ILoraViewModel>> GetLorasAsync()
         {
             throw new NotImplementedException();
         }

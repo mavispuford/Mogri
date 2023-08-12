@@ -12,7 +12,7 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
 {
     private readonly IStableDiffusionService _stableDiffusionService;
 
-    private Settings _settings;
+    private PromptSettings _settings;
 
     [ObservableProperty]
     private string _prompt;
@@ -27,6 +27,12 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
     private List<IPromptStyleViewModel> _availablePromptStyles = new();
 
     [ObservableProperty]
+    private List<ILoraViewModel> _availableLoras = new();
+
+    [ObservableProperty]
+    private ObservableCollection<ILoraViewModel> _selectedLoras = new();
+
+    [ObservableProperty]
     private ObservableCollection<IPromptStyleViewModel> _selectedPromptStyles = new();
 
     public PromptPageViewModel(IStableDiffusionService stableDiffusionService)
@@ -37,7 +43,7 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
     public override void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (query.TryGetValue(NavigationParams.PromptSettings, out var promptSettings) &&
-            promptSettings is Settings settings)
+            promptSettings is PromptSettings settings)
         {
             _settings = settings.Clone();
         }
@@ -63,14 +69,57 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
 
         try
         {
-            AvailablePromptStyles = await _stableDiffusionService.GetPromptStylesAsync();
+            await Task.WhenAll(
+                Task.Run(async () =>
+                {
+                    AvailablePromptStyles = await _stableDiffusionService.GetPromptStylesAsync();
 
-            if (_settings.PromptStyles?.Any() == true)
-            {
-                var matchingStyles = AvailablePromptStyles.SelectMany(a => _settings.PromptStyles.Where(p => p.Name.Equals(a.Name, StringComparison.Ordinal)));
+                    if (_settings.PromptStyles?.Any() == true)
+                    {
+                        var matchingStyles = AvailablePromptStyles.SelectMany(a => _settings.PromptStyles.Where(p => p.Name.Equals(a.Name, StringComparison.Ordinal)));
 
-                SelectedPromptStyles = new ObservableCollection<IPromptStyleViewModel>(matchingStyles);
-            }
+                        foreach (var style in SelectedPromptStyles.Where(l => !matchingStyles.Any(ms => ms.Name == l.Name)))
+                        {
+                            Shell.Current.Dispatcher.Dispatch(() =>
+                            {
+                                SelectedPromptStyles.Remove(style);
+                            });
+                        }
+
+                        foreach (var style in matchingStyles.Where(s => !SelectedPromptStyles.Any(sl => sl.Name == s.Name)))
+                        {
+                            Shell.Current.Dispatcher.Dispatch(() =>
+                            {
+                                SelectedPromptStyles.Add(style);
+                            });
+                        }
+                    }
+                }),
+                Task.Run(async () =>
+                {
+                    AvailableLoras = await _stableDiffusionService.GetLorasAsync();
+
+                    if (_settings.Loras?.Any() == true)
+                    {
+                        var matchingLoras = AvailableLoras.SelectMany(a => _settings.Loras.Where(p => p.Name.Equals(a.Name, StringComparison.Ordinal)));
+
+                        foreach(var lora in SelectedLoras.Where(l => !matchingLoras.Any(ml => ml.Name == l.Name)))
+                        {
+                            Shell.Current.Dispatcher.Dispatch(() =>
+                            {
+                                SelectedLoras.Remove(lora);
+                            });
+                        }
+
+                        foreach(var lora in matchingLoras.Where(l => !SelectedLoras.Any(sl => sl.Name == l.Name)))
+                        {
+                            Shell.Current.Dispatcher.Dispatch(() =>
+                            {
+                                SelectedLoras.Add(lora);
+                            });
+                        }
+                    }
+                }));
         }
         catch
         {
@@ -84,6 +133,14 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
         SelectedPromptStyles.Remove(promptStyleViewModel);
 
         _settings.PromptStyles = SelectedPromptStyles.Distinct().Select(ps => ps as PromptStyleViewModel).ToList();
+    }
+
+    [RelayCommand]
+    private void RemoveLora(ILoraViewModel loraViewModel)
+    {
+        SelectedLoras.Remove(loraViewModel);
+
+        _settings.Loras = SelectedLoras.Distinct().Select(l => l as LoraViewModel).ToList();
     }
 
     [RelayCommand]
@@ -122,6 +179,19 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
                 RemovePromptStyle(style);
             }
         }
+    }
+
+    [RelayCommand]
+    private async Task ShowLoraSelectionPage()
+    {
+        SetPromptsOnSettings();
+
+        var parameters = new Dictionary<string, object>()
+        {
+            {NavigationParams.PromptSettings, _settings.Clone() }
+        };
+
+        await Shell.Current.GoToAsync("LoraSelectionPage", parameters);
     }
 
     [RelayCommand]

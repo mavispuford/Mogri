@@ -58,8 +58,8 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
     [RelayCommand]
     private async Task Save()
     {
-        var stream = await _fileService.GetFileStreamFromInternalStorageAsync(resultItem.InternalUri);
-        await _fileService.WriteImageFileToExternalStorageAsync(Path.GetFileName(resultItem.InternalUri), stream);
+        var stream = await _fileService.GetFileStreamFromInternalStorageAsync(ResultItem.InternalUri);
+        await _fileService.WriteImageFileToExternalStorageAsync(Path.GetFileName(ResultItem.InternalUri), stream);
 
         await Toast.Make("Image saved.").Show();
     }
@@ -93,7 +93,7 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
         {
             using (var memoryStream = new MemoryStream())
             {
-                var stream = await _fileService.GetFileStreamFromInternalStorageAsync(resultItem.InternalUri);
+                var stream = await _fileService.GetFileStreamFromInternalStorageAsync(ResultItem.InternalUri);
 
                 stream.CopyTo(memoryStream);
                 var imageBytes = memoryStream.ToArray();

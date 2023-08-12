@@ -1,9 +1,10 @@
 ﻿using MobileDiffusion.Enums;
+using MobileDiffusion.ViewModels;
 using Newtonsoft.Json;
 
 namespace MobileDiffusion.Models;
 
-public class Settings
+public class PromptSettings
 {
     public bool EnableGfpgan { get; set; } = false;
     public bool EnableUpscaling { get; set; } = false;
@@ -29,12 +30,13 @@ public class Settings
     public double VariationAmount { get; set; } = .1;
     public double Width { get; set; } = 512;
     public OnOff WithVariations { get; set; }
+    public List<LoraViewModel> Loras { get; set; } = new();
     public List<PromptStyleViewModel> PromptStyles { get; set; } = new();
     
-    public Settings Clone()
+    public PromptSettings Clone()
     {
         var json = JsonConvert.SerializeObject(this);
 
-        return JsonConvert.DeserializeObject<Settings>(json);
+        return JsonConvert.DeserializeObject<PromptSettings>(json);
     }
 }

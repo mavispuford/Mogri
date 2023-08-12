@@ -12,7 +12,7 @@ namespace MobileDiffusion.Converters
     /// </summary>
     public class UnfocusOnCommandExecuteConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value is RelayCommand relayCommand)
             {
@@ -42,7 +42,7 @@ namespace MobileDiffusion.Converters
             return value;
         }
 
-        private void unfocus(object parameter)
+        private void unfocus(object? parameter)
         {
             if (parameter is Editor editor)
             {
@@ -58,7 +58,7 @@ namespace MobileDiffusion.Converters
             }
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

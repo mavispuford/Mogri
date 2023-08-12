@@ -7,11 +7,11 @@ public interface IStableDiffusionService
 {
     public Task<bool> CheckServerAsync();
 
-    public IAsyncEnumerable<ApiResponse> SubmitImageRequestAsync(Settings settings);
+    public IAsyncEnumerable<ApiResponse> SubmitImageRequestAsync(PromptSettings settings);
 
     Task<byte[]> GetImageBytesAsync(string url);
 
-    Task<Settings> GetImageInfoAsync(string base64EncodedImage);
+    Task<PromptSettings> GetImageInfoAsync(string base64EncodedImage);
 
     Task InitializeAsync();
 
@@ -23,7 +23,7 @@ public interface IStableDiffusionService
 
     Task<Dictionary<string, string>> GetModelsAsync();
 
-    Task<Dictionary<string, string>> GetLorasAsync();
+    Task<List<ILoraViewModel>> GetLorasAsync();
 
     bool Initialized { get; }
 }

@@ -15,6 +15,7 @@ public static class ViewRegistrations
         registerPage<IPromptPageViewModel, PromptPage>(builder.Services);
         registerPage<IPromptStyleSelectionPageViewModel, PromptStyleSelectionPage>(builder.Services);
         registerPage<IHistoryPageViewModel, HistoryPage>(builder.Services);
+        registerPage<ILoraSelectionPageViewModel, LoraSelectionPage>(builder.Services);
 
         return builder;
     }

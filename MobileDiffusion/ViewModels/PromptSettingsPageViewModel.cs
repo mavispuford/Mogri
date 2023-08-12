@@ -12,7 +12,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     private readonly IStableDiffusionService _stableDiffusionService;
     private readonly IPopupService _popupService;
 
-    private Settings _settings;
+    private PromptSettings _settings;
 
     [ObservableProperty]
     private List<string> availableSamplerValues = new();
@@ -90,7 +90,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
 
         AvailableUpscaleLevelValues = upscaleLevelValues;
 
-        var defaultSettings = new Settings();
+        var defaultSettings = new PromptSettings();
         StepsPlaceholder = defaultSettings.Steps.ToString();
         CfgScalePlaceholder = defaultSettings.GuidanceScale.ToString();
         SeedPlaceholder = defaultSettings.Seed.ToString();
@@ -101,7 +101,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     public override void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (!query.TryGetValue(NavigationParams.PromptSettings, out var promptSettings) ||
-            promptSettings is not Settings settings)
+            promptSettings is not PromptSettings settings)
         {
             throw new ArgumentException(nameof(NavigationParams.PromptSettings));
         }
@@ -140,7 +140,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             return;
         }
 
-        var defaultSettings = new Settings();
+        var defaultSettings = new PromptSettings();
         CfgScale = defaultSettings.GuidanceScale.ToString();
         EnableGfpgan = defaultSettings.EnableGfpgan;
         EnableUpscaling = defaultSettings.EnableUpscaling;

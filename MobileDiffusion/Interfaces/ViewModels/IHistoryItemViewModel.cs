@@ -11,7 +11,7 @@ public interface IHistoryItemViewModel : IBaseViewModel
 
     ImageSource ThumbnailImageSource { get; set; }
 
-    Settings Settings { get; set; }
+    PromptSettings Settings { get; set; }
 
     Task InitWith(string fileName, IFileService fileService, IImageService imageService);
 }

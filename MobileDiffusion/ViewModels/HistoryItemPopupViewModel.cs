@@ -3,12 +3,15 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
+using SkiaSharp;
+using SkiaSharp.Views.Maui.Controls;
 
 namespace MobileDiffusion.ViewModels;
 
 public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryItemPopupViewModel
 {
     private readonly IFileService _fileService;
+    private readonly IImageService _imageService;
     private readonly IStableDiffusionService _stableDiffusionService;
 
     [ObservableProperty]
@@ -20,9 +23,11 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
     public HistoryItemPopupViewModel(
         IPopupService popupService,
         IFileService fileService,
+        IImageService imageService,
         IStableDiffusionService stableDiffusionService) : base(popupService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
+        _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
     }
 
@@ -34,27 +39,6 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
             historyItemParam is IHistoryItemViewModel historyItem)
         {
             HistoryItem = historyItem;
-
-            if (!string.IsNullOrEmpty(HistoryItem.FileName))
-            {
-                FullImageSource = ImageSource.FromFile(HistoryItem.FileName);
-            }
-
-            if (HistoryItem.Settings == null)
-            {
-                _ = Task.Run(async () =>
-                {
-                    using var imageFileStream = await _fileService.GetFileStreamFromInternalStorageAsync(HistoryItem.FileName);
-                    using var memoryStream = new MemoryStream();
-                    await imageFileStream.CopyToAsync(memoryStream);
-                    var imageString = Convert.ToBase64String(memoryStream.ToArray());
-                    var formattedImageString = string.Format(Constants.ImageDataFormat, "image/png", imageString);
-
-                    var imageInfoSettings = await _stableDiffusionService.GetImageInfoAsync(formattedImageString);
-
-                    HistoryItem.Settings = imageInfoSettings;
-                });
-            }
         }
         else
         {
@@ -74,6 +58,39 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
 
         // Workaround for https://github.com/dotnet/maui/issues/10294
         query.Clear();
+    }
+
+    public override async Task OnAppearingAsync()
+    {
+        if (!string.IsNullOrEmpty(HistoryItem.FileName))
+        {
+            using var fileStream = await _fileService.GetFileStreamFromInternalStorageAsync(HistoryItem.FileName);
+            var bitmap = _imageService.GetSkBitmapFromStream(fileStream);
+            bitmap = _imageService.GetResizedSKBitmap(bitmap, (int)Constants.MaximumDisplayWidthHeight, (int)Constants.MaximumDisplayWidthHeight, filterImage: true, onlyIfLarger: true);
+
+            var imageSource = new SKBitmapImageSource
+            {
+                Bitmap = bitmap
+            };
+
+            FullImageSource = imageSource;
+        }
+
+        if (HistoryItem.Settings == null)
+        {
+            _ = Task.Run(async () =>
+            {
+                using var imageFileStream = await _fileService.GetFileStreamFromInternalStorageAsync(HistoryItem.FileName);
+                using var memoryStream = new MemoryStream();
+                await imageFileStream.CopyToAsync(memoryStream);
+                var imageString = Convert.ToBase64String(memoryStream.ToArray());
+                var formattedImageString = string.Format(Constants.ImageDataFormat, "image/png", imageString);
+
+                var imageInfoSettings = await _stableDiffusionService.GetImageInfoAsync(formattedImageString);
+
+                HistoryItem.Settings = imageInfoSettings;
+            });
+        }
     }
 
     [RelayCommand]

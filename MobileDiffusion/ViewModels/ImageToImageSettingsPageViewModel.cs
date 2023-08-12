@@ -12,7 +12,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
 {
     private readonly IImageService _imageService;
 
-    private Settings _settings;
+    private PromptSettings _settings;
 
     private CancellationTokenSource _initCancellationTokenSource;
 
@@ -50,7 +50,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
     public override void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (!query.TryGetValue(NavigationParams.PromptSettings, out var promptSettings) ||
-            promptSettings is not Settings settings)
+            promptSettings is not PromptSettings settings)
         {
             throw new ArgumentException(nameof(NavigationParams.PromptSettings));
         }
@@ -74,7 +74,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
         cancelInitImageLoading();
         cancelMaskImageLoading();
 
-        var defaultSettings = new Settings();
+        var defaultSettings = new PromptSettings();
         Strength = defaultSettings.DenoisingStrength.ToString();
         _settings.InitImage = null;
         _settings.Mask = null;
@@ -168,7 +168,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
             }
         
             using var fileStream = await fileResult.OpenReadAsync();
-            var memoryStream = new MemoryStream();
+            using var memoryStream = new MemoryStream();
             await fileStream.CopyToAsync(memoryStream);
             var imageBytes = memoryStream.ToArray();
             var imageString = Convert.ToBase64String(imageBytes);

@@ -5,7 +5,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using MobileDiffusion.Models;
 using System.Collections.ObjectModel;
 using SkiaSharp.Views.Maui.Controls;
-using SkiaSharp;
 using CommunityToolkit.Maui.Alerts;
 using MobileDiffusion.Models.LStein;
 using MobileDiffusion.Clients.Automatic1111;
@@ -23,7 +22,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     private readonly IServiceProvider _serviceProvider;
     private readonly IImageService _imageService;
 
-    private Settings _settings = new();
+    private PromptSettings _settings = new();
     private string _resizedInitImage;
     private string _resizedMaskImage;
     private bool _initImageNeedsResize = true;
@@ -341,7 +340,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         animation.Commit(Shell.Current.CurrentPage, "ProgressAnimation", length: 500);
     }
 
-    private Task<(string ImageString, int ActualWidth, int ActualHeight)> GetResizedImageStringFromSettingsAsync(Settings settings, string sourceImageString, bool forceExactSize = false, bool filterImage = false)
+    private Task<(string ImageString, int ActualWidth, int ActualHeight)> GetResizedImageStringFromSettingsAsync(PromptSettings settings, string sourceImageString, bool forceExactSize = false, bool filterImage = false)
     {
         if (string.IsNullOrEmpty(sourceImageString) ||
             !settings.FitClientSide)
@@ -406,12 +405,18 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         result.InternalUri = uri;
 
         // Using a regular image source causes them to disappear when returning to the page: https://github.com/dotnet/maui/issues/15669
+        // ** They also don't seem to work with larger image files **
         //result.ImageSource = ImageSource.FromFile(uri);
+
+        // Resize if too large
+        using var fileStream = await _fileService.GetFileStreamFromInternalStorageAsync(uri);
+        var bitmap = _imageService.GetSkBitmapFromStream(fileStream);
+        bitmap = _imageService.GetResizedSKBitmap(bitmap, (int)Constants.MaximumDisplayWidthHeight, (int)Constants.MaximumDisplayWidthHeight, filterImage: true, onlyIfLarger: true);
 
         // Use SkiaSharp's SKBitmapImageSource image source instead
         var imageSource = new SKBitmapImageSource
         {
-            Bitmap = SKBitmap.Decode(imageBytes)
+            Bitmap = bitmap
         };
         result.ImageSource = imageSource;
 
@@ -470,7 +475,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     public override async void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (query.TryGetValue(NavigationParams.PromptSettings, out var promptSettings) &&
-            promptSettings is Settings settings)
+            promptSettings is PromptSettings settings)
         {
             _settings = settings;
 

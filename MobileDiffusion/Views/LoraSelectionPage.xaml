@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
+                xmlns:views="clr-namespace:MobileDiffusion.Views"
+                x:Class="MobileDiffusion.Views.LoraSelectionPage"
+                Shell.PresentationMode="Animated"
+                Shell.NavBarIsVisible="True"
+                Shell.TabBarIsVisible="False"
+                Title="LoRAs"
+                x:DataType="viewModels:ILoraSelectionPageViewModel">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior Command="{Binding ConfirmCommand}" />
+    </Shell.BackButtonBehavior>
+    <Grid RowDefinitions="*, auto">
+        <Grid RowDefinitions="auto, *" 
+              ColumnDefinitions="auto,*,auto"
+              RowSpacing="12"
+              ColumnSpacing="6"
+              Padding="30">
+
+            <Label Grid.Row="0"
+                   Grid.Column="0"
+                   Text="Lora: "
+                   FontSize="16"
+                   FontAttributes="Bold"
+                   VerticalTextAlignment="Center"/>
+            <Picker x:Name="LoraPicker"
+                    Grid.Row="0" 
+                    Title="Tap to select"
+                    Grid.Column="1"
+                    x:DataType="viewModels:ILoraViewModel"
+                    ItemsSource="{Binding AvailableLoras, Source={x:RelativeSource AncestorType={x:Type viewModels:ILoraSelectionPageViewModel}}}" 
+                    ItemDisplayBinding="{Binding Alias}"
+                    FontSize="Medium"
+                    VerticalTextAlignment="Center"/>
+            <ImageButton Grid.Row="0"
+                         Grid.Column="2"
+                         HorizontalOptions="End" 
+                         Command="{Binding AddCommand}"
+                         CommandParameter="{Binding SelectedItem, Source={x:Reference LoraPicker}}">
+                <ImageButton.Source>
+                    <FontImageSource Glyph="&#xe145;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
+                </ImageButton.Source>
+            </ImageButton>
+
+            <ScrollView Grid.Row="1" 
+                        Grid.Column="0"
+                        Grid.ColumnSpan="3"
+                        VerticalOptions="Start">
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding SelectedLoras}"
+                                     Spacing="10">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="viewModels:ILoraViewModel">
+                            <VerticalStackLayout Spacing="10">
+                                <Rectangle HeightRequest="1" HorizontalOptions="Fill" Fill="{StaticResource Gray200TwentySixPercent}" />
+                                <Label FontSize="Medium" FontAttributes="Bold">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="{Binding Name}" />
+
+                                            <!-- Alias -->
+                                            <!--<Span Text=" (" />
+                                    <Span Text="{Binding Alias}" />
+                                    <Span Text=")" />-->
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+
+                                <Label FontSize="Medium">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="Strength: " />
+                                            <Span Text="{Binding Strength, StringFormat='{0:N1}'}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                                <Slider Minimum=".1" Maximum="2.0" Value="{Binding Strength}" />
+                            </VerticalStackLayout>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </ScrollView>
+
+            
+        </Grid>
+
+        <HorizontalStackLayout Grid.Row="1"
+                               Spacing="10"
+                               HorizontalOptions="End" 
+                               Padding="10">
+            <Button Command="{Binding ResetCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}">
+                <Button.ImageSource>
+                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource Tertiary}" />
+                </Button.ImageSource>
+            </Button>
+            <Button Text="Cancel" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
+            <Button Text="Apply" Command="{Binding ConfirmCommand}" WidthRequest="100" />
+        </HorizontalStackLayout>
+    </Grid>
+    
+</views:BasePage>

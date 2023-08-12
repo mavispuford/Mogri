@@ -12,7 +12,7 @@ internal partial class PromptStyleSelectionPageViewModel : PageViewModel, IPromp
     private readonly IStableDiffusionService _stableDiffusionService;
     private readonly IPopupService _popupService;
     private List<IPromptStyleViewModel> _allPromptStyles = new();
-    private Settings _settings;
+    private PromptSettings _settings;
 
     [ObservableProperty]
     private List<IPromptStyleViewModel> _availablePromptStyles = new();
@@ -53,7 +53,7 @@ internal partial class PromptStyleSelectionPageViewModel : PageViewModel, IPromp
         base.ApplyQueryAttributes(query);
 
         if (query.TryGetValue(NavigationParams.PromptSettings, out var promptSettingsParam) &&
-            promptSettingsParam is Settings promptSettings)
+            promptSettingsParam is PromptSettings promptSettings)
         {
             _settings = promptSettings;
         }
