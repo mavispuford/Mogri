@@ -250,7 +250,7 @@ namespace MobileDiffusion.Services
 
         private Client getClient(TimeSpan? timeout = null)
         {
-            var httpClient = _httpClientFactory.CreateClient();
+            var httpClient = _httpClientFactory.CreateClient(Microsoft.Extensions.Options.Options.DefaultName);
 
             if (timeout != null)
             {

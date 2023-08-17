@@ -15,7 +15,11 @@ public static class ServiceRegistrations
         builder.Services.AddHttpClient(Microsoft.Extensions.Options.Options.DefaultName, client =>
         {
             client.Timeout = TimeSpan.FromSeconds(60);
-        }).AddTransientHttpErrorPolicy(p => p.WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(500)));
+        }).AddTransientHttpErrorPolicy(p => p.WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(500), (message, timeSpan) =>
+        {
+
+        }));
+
         /*.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
                   Proxy = new WebProxy() { Address = new Uri("192.168.86.42:8888") }
         });*/

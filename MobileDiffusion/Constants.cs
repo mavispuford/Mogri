@@ -17,5 +17,7 @@ public static class Constants
     public static class PreferenceKeys
     {
         public const string ServerUrl = nameof(ServerUrl);
+        public const string DefaultWidth = nameof(DefaultWidth);
+        public const string DefaultHeight = nameof(DefaultHeight);
     }
 }

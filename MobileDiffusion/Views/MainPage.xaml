@@ -60,7 +60,8 @@
                 <Label  
                    Text="Prompt:"
                    VerticalOptions="Center"
-                   FontSize="Body" />
+                   FontSize="16"
+                   FontAttributes="Bold"/>
 
                 <Label 
                     Text="{Binding Prompt}"
