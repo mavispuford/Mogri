@@ -504,24 +504,29 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
         if (query.TryGetValue(NavigationParams.CanvasImageString, out var canvasImageParam))
         {
-
             var parameters = new Dictionary<string, object>
             {
                 {NavigationParams.CanvasImageString, canvasImageParam as string}
             };
 
-            await Shell.Current.GoToAsync("///CanvasPageTab", parameters);
+            await Shell.Current.Dispatcher.DispatchAsync(async () =>
+            {
+                await Shell.Current.Navigation.PopToRootAsync();
+                await Shell.Current.GoToAsync("///CanvasPageTab", parameters);
+            });
         }
+
+        double? requestedWidth = null, requestedHeight = null;
 
         if (query.TryGetValue(NavigationParams.ImageWidth, out var imageWidthParam))
         {
             if (imageWidthParam is float imageWidthFloat)
             {
-                _settings.Width = imageWidthFloat;
+                requestedWidth = imageWidthFloat;
             }
             else if (imageWidthParam is double imageWidthDouble)
             {
-                _settings.Width = imageWidthDouble;
+                requestedWidth = imageWidthDouble;
             }
         }
 
@@ -529,11 +534,27 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         {
             if (imageHeightParam is float imageHeightFloat)
             {
-                _settings.Height = imageHeightFloat;
+                requestedHeight = imageHeightFloat;
             }
             else if (imageHeightParam is double imageHeightDouble)
             {
-                _settings.Height = imageHeightDouble;
+                requestedHeight = imageHeightDouble;
+            }
+        }
+
+        if (requestedWidth != null && requestedHeight != null)
+        {
+            if (requestedWidth.Value != _settings.Width ||
+                requestedHeight.Value != _settings.Height)
+            {
+                var resChangeMessage = $"Would you like to change the resolution to {requestedWidth.Value}x{requestedHeight.Value}, or keep it at {_settings.Width}x{_settings.Height}?";
+                var resChangeResult = await Shell.Current.DisplayAlert("Confirm Resolution Change", resChangeMessage, "CHANGE", "Keep");
+
+                if (resChangeResult)
+                {
+                    _settings.Width = requestedWidth.Value;
+                    _settings.Height = requestedHeight.Value;
+                }
             }
         }
 
@@ -554,6 +575,11 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
         // Workaround for https://github.com/dotnet/maui/issues/10294
         query.Clear();
+    }
+
+    public override Task OnAppearingAsync()
+    {
+        return base.OnAppearingAsync();
     }
 
     private async Task LoadSharedImage(string imageUri, string contentType)

@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Java.Lang;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Models;
@@ -19,6 +20,9 @@ public partial class LoraSelectionPageViewModel : PageViewModel, ILoraSelectionP
 
     [ObservableProperty]
     ObservableCollection<ILoraViewModel> _selectedLoras = new();
+
+    [ObservableProperty]
+    ILoraViewModel _loraToAdd;
 
     public LoraSelectionPageViewModel(IStableDiffusionService stableDiffusionService)
     {
@@ -64,17 +68,6 @@ public partial class LoraSelectionPageViewModel : PageViewModel, ILoraSelectionP
     }
 
     [RelayCommand]
-    private void Add(ILoraViewModel loraViewModel)
-    {
-        if (loraViewModel == null)
-        {
-            return;
-        }
-
-        SelectedLoras.Add(loraViewModel);
-    }
-
-    [RelayCommand]
     private async Task Cancel()
     {
         // Not modifying the settings, so just send the same ones back
@@ -111,6 +104,18 @@ public partial class LoraSelectionPageViewModel : PageViewModel, ILoraSelectionP
     }
 
     [RelayCommand]
+    private void Remove(ILoraViewModel loraViewModel)
+    {
+        if (loraViewModel == null)
+        {
+            return;
+        }
+
+        SelectedLoras.Remove(loraViewModel);
+    }
+
+
+    [RelayCommand]
     private void Reset()
     {
         SelectedLoras.Clear();
@@ -121,5 +126,17 @@ public partial class LoraSelectionPageViewModel : PageViewModel, ILoraSelectionP
         ConfirmCommand.Execute(null);
 
         return true;
+    }
+
+    partial void OnLoraToAddChanged(ILoraViewModel value)
+    {
+        if (value == null)
+        {
+            return;
+        }
+
+        SelectedLoras.Add(value);
+
+        LoraToAdd = null;
     }
 }

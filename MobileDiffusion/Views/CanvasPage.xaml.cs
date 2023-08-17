@@ -632,12 +632,14 @@ public partial class CanvasPage : BasePage
 
         MaskCanvasView.InvalidateSurface();
 
-        // Wait for canvas to redraw - hack - find a better solution
+        // Wait for canvas to redraw - hack - find a better solution (maybe the PaintSurface event?)
         await Task.Delay(300);
 
         await callbackCommand.ExecuteAsync(this);
 
         _isSaving = false;
+
+        MaskCanvasView.InvalidateSurface();
     }
 
     private void MaskGrid_SizeChanged(object sender, EventArgs e)
