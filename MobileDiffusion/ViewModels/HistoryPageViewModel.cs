@@ -1,6 +1,4 @@
-﻿using AndroidX.Lifecycle;
-using CommunityToolkit.Maui.Alerts;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
@@ -78,10 +76,8 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
                 await Shell.Current.Dispatcher.DispatchAsync(LoadItems);
             }
-            else
-            {
-                IsLoading = false;
-            }
+
+            IsLoading = false;
         });
     }
 
