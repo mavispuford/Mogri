@@ -9,9 +9,17 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
     [ObservableProperty]
     private string serverUrl;
 
+    [ObservableProperty]
+    private string _defaultWidth;
+    
+    [ObservableProperty]
+    private string _defaultHeight;
+
     public AppSettingsPageViewModel()
     {
         ServerUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
+        DefaultWidth = Preferences.Default.Get<double>(Constants.PreferenceKeys.DefaultWidth, 512).ToString();
+        DefaultHeight = Preferences.Default.Get<double>(Constants.PreferenceKeys.DefaultHeight, 512).ToString();
     }
 
     [RelayCommand]
@@ -28,6 +36,16 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
             Preferences.Default.Set(Constants.PreferenceKeys.ServerUrl, ServerUrl);
         }
 
+        if (!string.IsNullOrEmpty(DefaultWidth) && double.TryParse(DefaultWidth, out double defaultWidth))
+        {
+            Preferences.Default.Set(Constants.PreferenceKeys.DefaultWidth, defaultWidth);
+        }
+
+        if (!string.IsNullOrEmpty(DefaultHeight) && double.TryParse(DefaultHeight, out double defaultHeight))
+        {
+            Preferences.Default.Set(Constants.PreferenceKeys.DefaultHeight, defaultHeight);
+        }
+
         await Shell.Current.GoToAsync("..");
     }
 
@@ -40,5 +58,9 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
         {
             return;
         }
+
+        ServerUrl = string.Empty;
+        DefaultWidth = "512";
+        DefaultHeight = "512";
     }
 }

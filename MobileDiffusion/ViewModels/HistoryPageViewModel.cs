@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Maui.Alerts;
+﻿using AndroidX.Lifecycle;
+using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
@@ -18,6 +19,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     private readonly IPopupService _popupService;
 
     private string[] _allImageFileNames;
+    private string[] _allThumbnailFileNames;
 
     private int itemIndex = 0;
     private const int itemTakeCount = 12;
@@ -66,8 +68,10 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
                 // Non-thumbnail files only
                 _allImageFileNames = allFiles.Where(s => !Path.GetFileName(s).StartsWith(Constants.ThumbnailPrefix)).ToArray();
 
+                _allThumbnailFileNames = allFiles.Where(s => Path.GetFileName(s).StartsWith(Constants.ThumbnailPrefix)).ToArray();
+
                 //// REMOVE ALL THUMBNAILS - REMOVE THIS AFTER TESTING
-                //foreach (var file in allFiles.Where(s => Path.GetFileName(s).StartsWith(Constants.ThumbnailPrefix)).ToArray())
+                //foreach (var file in _allThumbnailFileNames)
                 //{
                 //    File.Delete(file);
                 //}
@@ -91,7 +95,12 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
             return;
         }
 
-        foreach(var filePath in _allImageFileNames)
+        foreach (var filePath in _allImageFileNames)
+        {
+            await _fileService.DeleteFileFromInternalStorage(filePath);
+        }
+
+        foreach (var filePath in _allThumbnailFileNames)
         {
             await _fileService.DeleteFileFromInternalStorage(filePath);
         }

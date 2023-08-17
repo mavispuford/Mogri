@@ -12,7 +12,7 @@ public class PromptSettings
     public bool FitClientSide { get; set; } = true;
     public double GfpganStrength { get; set; } = .75;
     public double GuidanceScale { get; set; } = 7.5;
-    public double Height { get; set; } = 512;
+    public double Height { get; set; } = Preferences.Default.Get<double>(Constants.PreferenceKeys.DefaultWidth, 512);
     public string InitImage { get; set; }
     public OnOff InvertMask { get; set; }
     public string Mask { get; set; }
@@ -28,7 +28,7 @@ public class PromptSettings
     public int UpscaleLevel { get; set; } = 2;
     public double UpscaleStrength { get; set; } = .75;
     public double VariationAmount { get; set; } = .1;
-    public double Width { get; set; } = 512;
+    public double Width { get; set; } = Preferences.Default.Get<double>(Constants.PreferenceKeys.DefaultHeight, 512);
     public OnOff WithVariations { get; set; }
     public List<LoraViewModel> Loras { get; set; } = new();
     public List<PromptStyleViewModel> PromptStyles { get; set; } = new();

@@ -15,7 +15,7 @@
         <ScrollView Grid.Row="0" Orientation="Vertical">
             <Grid x:Name="MainGrid"
               Padding="30"
-              RowDefinitions="auto, auto"
+              RowDefinitions="auto, auto, auto, auto"
               RowSpacing="10"
               ColumnSpacing="16"
               ColumnDefinitions="32,auto,*"
@@ -29,6 +29,16 @@
                 <Label Grid.Row="0" Grid.Column="1" Text="Server URL:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
                 <Entry Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding ServerUrl}" Placeholder="Ex. http://192.168.0.1" Keyboard="Url"/>
 
+                <Image Grid.Row="2" Grid.Column="0" WidthRequest="32">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xe85b;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
+                    </Image.Source>
+                </Image>
+                <Label Grid.Row="2" Grid.Column="1" Text="Default Width:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+                <Entry Grid.Row="2" Grid.Column="2" Text="{Binding DefaultWidth}" Placeholder="512" Keyboard="Numeric"/>
+
+                <Label Grid.Row="3" Grid.Column="1" Text="Default Height:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+                <Entry Grid.Row="3" Grid.Column="2" Text="{Binding DefaultHeight}" Placeholder="512" Keyboard="Numeric"/>
             </Grid>
         </ScrollView>
 
