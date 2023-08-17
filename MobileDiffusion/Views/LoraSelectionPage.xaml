@@ -12,9 +12,9 @@
     <Shell.BackButtonBehavior>
         <BackButtonBehavior Command="{Binding ConfirmCommand}" />
     </Shell.BackButtonBehavior>
-    <Grid RowDefinitions="*, auto">
+    <Grid RowDefinitions="*, auto, auto">
         <Grid RowDefinitions="auto, *" 
-              ColumnDefinitions="auto,*,auto"
+              ColumnDefinitions="auto,*"
               RowSpacing="12"
               ColumnSpacing="6"
               Padding="30">
@@ -33,20 +33,12 @@
                     ItemsSource="{Binding AvailableLoras, Source={x:RelativeSource AncestorType={x:Type viewModels:ILoraSelectionPageViewModel}}}" 
                     ItemDisplayBinding="{Binding Alias}"
                     FontSize="Medium"
-                    VerticalTextAlignment="Center"/>
-            <ImageButton Grid.Row="0"
-                         Grid.Column="2"
-                         HorizontalOptions="End" 
-                         Command="{Binding AddCommand}"
-                         CommandParameter="{Binding SelectedItem, Source={x:Reference LoraPicker}}">
-                <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe145;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
-                </ImageButton.Source>
-            </ImageButton>
+                    VerticalTextAlignment="Center"
+                    SelectedItem="{Binding LoraToAdd, Source={x:RelativeSource AncestorType={x:Type viewModels:ILoraSelectionPageViewModel}}}"/>
 
             <ScrollView Grid.Row="1" 
                         Grid.Column="0"
-                        Grid.ColumnSpan="3"
+                        Grid.ColumnSpan="2"
                         VerticalOptions="Start">
                 <VerticalStackLayout BindableLayout.ItemsSource="{Binding SelectedLoras}"
                                      Spacing="10">
@@ -54,18 +46,30 @@
                         <DataTemplate x:DataType="viewModels:ILoraViewModel">
                             <VerticalStackLayout Spacing="10">
                                 <Rectangle HeightRequest="1" HorizontalOptions="Fill" Fill="{StaticResource Gray200TwentySixPercent}" />
-                                <Label FontSize="Medium" FontAttributes="Bold">
-                                    <Label.FormattedText>
-                                        <FormattedString>
-                                            <Span Text="{Binding Name}" />
+                                <Grid ColumnDefinitions="*, auto">
+                                    <Label Grid.Column="0"
+                                           FontSize="Medium" FontAttributes="Bold">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="{Binding Name}" />
 
-                                            <!-- Alias -->
-                                            <!--<Span Text=" (" />
-                                    <Span Text="{Binding Alias}" />
-                                    <Span Text=")" />-->
-                                        </FormattedString>
-                                    </Label.FormattedText>
-                                </Label>
+                                                <!-- Alias -->
+                                                <!--<Span Text=" (" />
+                                                <Span Text="{Binding Alias}" />
+                                                <Span Text=")" />-->
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+
+                                    <ImageButton Grid.Column="1"
+                                                 HorizontalOptions="End" 
+                                                 Command="{Binding RemoveCommand, Source={x:RelativeSource AncestorType={x:Type viewModels:ILoraSelectionPageViewModel}}}"
+                                                 CommandParameter="{Binding .}">
+                                        <ImageButton.Source>
+                                            <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
+                                        </ImageButton.Source>
+                                    </ImageButton>
+                                </Grid>
 
                                 <Label FontSize="Medium">
                                     <Label.FormattedText>
@@ -85,7 +89,9 @@
             
         </Grid>
 
-        <HorizontalStackLayout Grid.Row="1"
+        <HorizontalStackLayout Grid.Row="2"
+                               Grid.Column="0"
+                               Grid.ColumnSpan="2"
                                Spacing="10"
                                HorizontalOptions="End" 
                                Padding="10">
