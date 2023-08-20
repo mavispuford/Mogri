@@ -547,7 +547,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             if (requestedWidth.Value != _settings.Width ||
                 requestedHeight.Value != _settings.Height)
             {
-                var resChangeMessage = $"Would you like to change the resolution to {requestedWidth.Value}x{requestedHeight.Value}, or keep it at {_settings.Width}x{_settings.Height}?";
+                var resChangeMessage = $"Would you like keep the resolution at {_settings.Width}x{_settings.Height} or CHANGE it to {requestedWidth.Value}x{requestedHeight.Value}?";
                 var resChangeResult = await Shell.Current.DisplayAlert("Confirm Resolution Change", resChangeMessage, "CHANGE", "Keep");
 
                 if (resChangeResult)

@@ -33,6 +33,8 @@ namespace MobileDiffusion.Interfaces.ViewModels
 
         IAsyncRelayCommand BeginCropImageRectCommand { get; }
 
+        IRelayCommand ChangeInitImgRectangleSizeCommand { get; }
+
         IAsyncRelayCommand PrepareForSavingCommand { get; set; }
 
         IAsyncRelayCommand FinishSavingCommand { get; }
