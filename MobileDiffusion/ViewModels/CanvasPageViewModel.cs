@@ -20,7 +20,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private int _imgRectIndex = 0;
     private List<int> _supportedImgRectSizes = new()
     {
-        0,256,512,768,1024,1280,2048
+        256,512,768,1024,1280,2048
     };
 
     private List<Color> _colorPalette = new();
@@ -464,21 +464,17 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     }
 
     [RelayCommand]
-    private void ToggleInitImgRectangle()
+    private void ChangeInitImgRectangleSize()
     {
-        if (!ShowInitImgRectangle)
-        {
-            ShowInitImgRectangle = true;
-        }
-
         // Cycle through image rectangle sizes
         InitImgRectangleSize = _supportedImgRectSizes[_imgRectIndex];
         _imgRectIndex = (_imgRectIndex + 1) % _supportedImgRectSizes.Count;
+    }
 
-        if (InitImgRectangleSize == 0f)
-        {
-            ShowInitImgRectangle = false;
-        }
+    [RelayCommand]
+    private void ToggleInitImgRectangle()
+    {
+        ShowInitImgRectangle = !ShowInitImgRectangle;
     }
 
     unsafe private List<Color> ExtractColorPalette(SKBitmap bitmap, int targetNumber = 30)

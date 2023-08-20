@@ -138,7 +138,7 @@
                        TextColor="White"
                        FontAttributes="Bold"
                        HorizontalOptions="Center"/>
-                
+
                 <Slider WidthRequest="200"
                         HeightRequest="40"
                         Minimum="0"
@@ -148,40 +148,17 @@
             </VerticalStackLayout>
         </Border>
 
-        <Border HeightRequest="60"
-                WidthRequest="60"
-                StrokeThickness="0"
-                HorizontalOptions="End"
-                VerticalOptions="End"
-                Margin="0,0,10,0"
-                IsVisible="{Binding ShowInitImgRectangle}">
-            <Border.StrokeShape>
-                <RoundRectangle CornerRadius="50" />
-            </Border.StrokeShape>
-            <ContentView BackgroundColor="{StaticResource IndependenceAccentSixtyPercent}"
-                         VerticalOptions="FillAndExpand"
-                         WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
-                <ContentView.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding BeginCropImageRectCommand}" />
-                </ContentView.GestureRecognizers>
-                <Image HorizontalOptions="Center"
-                       VerticalOptions="Center">
-                    <Image.Source>
-                        <FontImageSource Glyph="&#xf08b;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
-                    </Image.Source>
-                </Image>
-            </ContentView>
-        </Border>
+        <Grid Grid.Row="1"
+              x:Name="ButtonsLayout"
+              RowDefinitions="60, 60, 60"
+              ColumnDefinitions="60, 60, 60, 60"
+              RowSpacing="15"
+              ColumnSpacing="30"
+              HorizontalOptions="CenterAndExpand">
 
-        <HorizontalStackLayout Grid.Row="1"
-                               x:Name="ButtonsLayout"
-                               Spacing="30"
-                               HorizontalOptions="Center">
-
-            <Border HeightRequest="60"
-                    WidthRequest="60"
-                    StrokeThickness="0"
-                    VerticalOptions="End">
+            <Border Grid.Row="2"
+                    Grid.Column="0"
+                    StrokeThickness="0">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="50" />
                 </Border.StrokeShape>
@@ -214,10 +191,9 @@
                 </ContentView>
             </Border>
 
-            <Border HeightRequest="60"
-                    WidthRequest="60"
-                    StrokeThickness="0"
-                    VerticalOptions="End">
+            <Border Grid.Row="2"
+                    Grid.Column="1"
+                    StrokeThickness="0">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="50" />
                 </Border.StrokeShape>
@@ -237,10 +213,9 @@
                 </ContentView>
             </Border>
 
-            <Border HeightRequest="60"
-                    WidthRequest="60"
-                    StrokeThickness="0"
-                    VerticalOptions="End">
+            <Border Grid.Row="2"
+                    Grid.Column="2"
+                    StrokeThickness="0">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="50" />
                 </Border.StrokeShape>
@@ -259,33 +234,75 @@
                 </ContentView>
             </Border>
 
-            <Border HeightRequest="60"
-                    WidthRequest="60"
-                    StrokeThickness="0">
+            <Border Grid.Row="0"
+                    Grid.Column="3"
+                    StrokeThickness="0"
+                    IsVisible="{Binding ShowInitImgRectangle}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="50" />
+                </Border.StrokeShape>
+                <ContentView BackgroundColor="{StaticResource IndependenceAccentSixtyPercent}"
+                             VerticalOptions="FillAndExpand"
+                             WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
+                    <ContentView.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding BeginCropImageRectCommand}" />
+                    </ContentView.GestureRecognizers>
+                    <Image HorizontalOptions="Center" VerticalOptions="Center">
+                        <Image.Source>
+                            <FontImageSource Glyph="&#xf08b;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                        </Image.Source>
+                    </Image>
+
+                </ContentView>
+            </Border>
+
+            <Border Grid.Row="1"
+                    Grid.Column="3"
+                    StrokeThickness="0"
+                    IsVisible="{Binding ShowInitImgRectangle}">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="50" />
                 </Border.StrokeShape>
                 <Grid BackgroundColor="{StaticResource IndependenceAccentSixtyPercent}"
-                            VerticalOptions="FillAndExpand"
-                            WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
+                      VerticalOptions="FillAndExpand"
+                      WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
                     <Grid.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ToggleInitImgRectangleCommand}" />
+                        <TapGestureRecognizer Command="{Binding ChangeInitImgRectangleSizeCommand}" />
                     </Grid.GestureRecognizers>
-                    <Image HorizontalOptions="Center"
-                        VerticalOptions="Center">
+                    <Image HorizontalOptions="Center" VerticalOptions="Center">
                         <Image.Source>
-                            <FontImageSource Glyph="&#xe3c6;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                            <FontImageSource Glyph="&#xe85b;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
                         </Image.Source>
                     </Image>
                     <Label Text="{Binding Path=InitImgRectangleSize, StringFormat='{0:F0}'}"
                            HorizontalTextAlignment="Center"
                            VerticalTextAlignment="End"
                            TextColor="White"
-                           IsVisible="{Binding ShowInitImgRectangle}"
-                           Padding="0,0,0,2"/>
+                           Padding="0,0,0,1"/>
                 </Grid>
             </Border>
-            
-        </HorizontalStackLayout>
+
+            <Border Grid.Row="2"
+                    Grid.Column="3"
+                    StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="50" />
+                </Border.StrokeShape>
+                <ContentView BackgroundColor="{StaticResource IndependenceAccentSixtyPercent}"
+                            VerticalOptions="FillAndExpand"
+                            WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
+                    <ContentView.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ToggleInitImgRectangleCommand}" />
+                    </ContentView.GestureRecognizers>
+                    <Image HorizontalOptions="Center"
+                        VerticalOptions="Center">
+                        <Image.Source>
+                            <FontImageSource Glyph="&#xe3c6;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                        </Image.Source>
+                    </Image>
+                </ContentView>
+            </Border>
+
+        </Grid>
     </Grid>
 </views:BasePage>
