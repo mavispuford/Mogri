@@ -7,7 +7,7 @@
                   xmlns:popups="clr-namespace:MobileDiffusion.Views.Popups"
                   x:Class="MobileDiffusion.Views.Popups.PromptStyleInfoPopup"
                   x:DataType="viewModels:IPromptStyleInfoPopupViewModel">
-    <Border Padding="16"
+    <Border Padding="15"
             Stroke="Transparent"
             StrokeShape="RoundRectangle 50"
             Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource IndependenceAccent}}"

@@ -55,7 +55,6 @@
                         <Rectangle Fill="{StaticResource IndependenceAccent}" HorizontalOptions="Fill" VerticalOptions="Fill" />
                         <Image Aspect="Fill" Source="{Binding InitImageSource}" HorizontalOptions="Fill" VerticalOptions="Fill" />
 
-                        <!-- TODO - PUT INIT IMAGE HERE -->
                     </Grid>
                     
                 </Border>
@@ -131,7 +130,7 @@
             </Grid>
             <Slider Minimum="{Binding MinimumWidthHeight}" Maximum="{Binding MaximumWidthHeight}" Value="{Binding HeightSliderValue}" DragCompletedCommand="{Binding UpdateAllValuesCommand}" />
 
-            <HorizontalStackLayout HorizontalOptions="Center"
+            <HorizontalStackLayout HorizontalOptions="End"
                                    Spacing="10">
                 <Button Text="Cancel" 
                         HorizontalOptions="Center"
