@@ -8,21 +8,26 @@
                   xmlns:popups="clr-namespace:MobileDiffusion.Views.Popups"
                   x:Class="MobileDiffusion.Views.Popups.ColorPickerPopup"
                   x:DataType="viewModels:IColorPickerPopupViewModel">
+    <popups:BasePopup.Resources>
+        <ResourceDictionary>
+            <toolkit:IsListNotNullOrEmptyConverter x:Key="ListNotNullOrEmpty" />
+        </ResourceDictionary>
+    </popups:BasePopup.Resources>
     <Border Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource IndependenceAccent}}"
             Stroke="Transparent"
             StrokeShape="RoundRectangle 50"
             VerticalOptions="Center"
             HorizontalOptions="Center"
+            Padding="15"
             WidthRequest="300">
         <VerticalStackLayout x:Name="MainLayout"
                              Spacing="10"
-                             Padding="20"
                              HorizontalOptions="Center"
                              VerticalOptions="Center">
             <Label Text="Current Color:"
                    FontAttributes="Bold" 
                    FontSize="16"/>
-            <Border Stroke="Transparent"
+            <Border Stroke="{StaticResource BlackSeventyThreePercent}"
                     HorizontalOptions="Center"
                     StrokeThickness="5">
                 <Border.StrokeShape>
@@ -32,25 +37,24 @@
                      HeightRequest="100"
                      WidthRequest="100"/>
             </Border>
-            
 
-            <Grid ColumnDefinitions="auto,*" 
-                  HorizontalOptions="FillAndExpand">
-                <Label Grid.Column="0"
+            <FlexLayout HorizontalOptions="Fill">
+                <Label FlexLayout.Grow="1"
                        Text="Hex Value:" 
                        FontAttributes="Bold" 
                        FontSize="16"
                        VerticalTextAlignment="Center"
                        HorizontalOptions="Fill"/>
-                <Entry Grid.Column="1"
+                <Entry FlexLayout.Grow="2"
                        Text="{Binding CurrentColorHexString}"
                        FontSize="16"
-                       HorizontalOptions="EndAndExpand"
+                       HorizontalOptions="Fill"
+                       VerticalOptions="Fill"
                        HorizontalTextAlignment="End"
                        VerticalTextAlignment="End"
                        IsSpellCheckEnabled="False"
                        IsTextPredictionEnabled="False"/>
-            </Grid>
+            </FlexLayout>
 
             <Label Text="Swatches:"
                    FontAttributes="Bold" 
@@ -77,12 +81,14 @@
             
             <Label Text="From Image:"
                    FontAttributes="Bold" 
-                   FontSize="16"/>
+                   FontSize="16"
+                   IsVisible="{Binding SwatchesFromImage, Converter={StaticResource ListNotNullOrEmpty}}"/>
             <FlexLayout BindableLayout.ItemsSource="{Binding SwatchesFromImage}"
                         Wrap="Wrap"
                         AlignItems="Center"
                         JustifyContent="Start"
-                        AlignContent="Center">
+                        AlignContent="Center"
+                        IsVisible="{Binding SwatchesFromImage, Converter={StaticResource ListNotNullOrEmpty}}">
                 <BindableLayout.ItemTemplate>
                     <DataTemplate>
                         <BoxView Color="{Binding}"
@@ -98,7 +104,7 @@
                 </BindableLayout.ItemTemplate>
             </FlexLayout>
 
-            <HorizontalStackLayout HorizontalOptions="Center"
+            <HorizontalStackLayout HorizontalOptions="End"
                                    Spacing="10">
                 <Button Text="Cancel" 
                         HorizontalOptions="Center"

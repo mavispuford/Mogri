@@ -122,7 +122,7 @@
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="5" Grid.Column="1" Text="Fit Image (on server):" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
-                <Switch Grid.Row="5" Grid.Column="2" IsToggled="{Binding FitImageServerSide}" BackgroundColor="White" />
+                <Switch Grid.Row="5" Grid.Column="2" IsToggled="{Binding FitImageServerSide}" />
 
                 <Image Grid.Row="6" Grid.Column="0" WidthRequest="32">
                     <Image.Source>

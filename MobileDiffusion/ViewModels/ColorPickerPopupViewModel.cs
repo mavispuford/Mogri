@@ -8,16 +8,16 @@ namespace MobileDiffusion.ViewModels;
 public partial class ColorPickerPopupViewModel : PopupBaseViewModel, IColorPickerPopupViewModel
 {
     [ObservableProperty]
-    private Color currentColor;
+    private Color _currentColor;
 
     [ObservableProperty]
-    private string currentColorHexString;
+    private string _currentColorHexString;
 
     [ObservableProperty]
-    private List<Color> swatches = new();
+    private List<Color> _swatches = new();
 
     [ObservableProperty]
-    private List<Color> swatchesFromImage = new();
+    private List<Color> _swatchesFromImage = new();
 
     public ColorPickerPopupViewModel(IPopupService popupService) : base(popupService)
     {
@@ -62,11 +62,18 @@ public partial class ColorPickerPopupViewModel : PopupBaseViewModel, IColorPicke
 
     partial void OnCurrentColorHexStringChanged(string value)
     {
-        var hexColor = Color.FromArgb(value);
-
-        if (CurrentColor != hexColor)
+        try
         {
-            CurrentColor = hexColor;
+            var hexColor = Color.FromArgb(value);
+
+            if (CurrentColor != hexColor)
+            {
+                CurrentColor = hexColor;
+            }
+        }
+        catch
+        {
+            // Invalid color
         }
     }
 
