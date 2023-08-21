@@ -7,6 +7,19 @@
                 xmlns:views="clr-namespace:MobileDiffusion.Views;assembly=MobileDiffusion" 
                 x:Class="MobileDiffusion.Views.CanvasPage"
                 x:DataType="viewModels:ICanvasPageViewModel">
+    <views:BasePage.Resources>
+        <ResourceDictionary>
+            <toolkit:BoolToObjectConverter x:Key="BoolToShowMaskTextConverter" TrueObject="Hide Mask Layer" FalseObject="Show Mask Layer" />
+            <toolkit:BoolToObjectConverter x:Key="BoolToEyeConverter">
+                <toolkit:BoolToObjectConverter.TrueObject>
+                    <FontImageSource Glyph="&#xe8f5;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                </toolkit:BoolToObjectConverter.TrueObject>
+                <toolkit:BoolToObjectConverter.FalseObject>
+                    <FontImageSource Glyph="&#xe8f4;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                </toolkit:BoolToObjectConverter.FalseObject>
+            </toolkit:BoolToObjectConverter>
+        </ResourceDictionary>
+    </views:BasePage.Resources>
 
     <Shell.TitleView>
         <HorizontalStackLayout x:Name="TitleViewLayout"
@@ -57,25 +70,23 @@
                 </ImageButton.Behaviors>
             </ImageButton>
 
-            <ImageButton ToolTipProperties.Text="Toggle mask visibility"
+            <ImageButton ToolTipProperties.Text="{Binding ShowMaskLayer, Converter={StaticResource BoolToShowMaskTextConverter}}"
                          VerticalOptions="FillAndExpand"
-                         Clicked="ToggleMaskButton_Clicked">
-                <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe8f4;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
-                </ImageButton.Source>
-            </ImageButton>
+                         Command="{Binding ToggleMaskLayerVisibilityCommand}"
+                         HeightRequest="30"
+                         WidthRequest="30"
+                         Source="{Binding ShowMaskLayer, Converter={StaticResource BoolToEyeConverter}}"/>
 
         </HorizontalStackLayout>
     </Shell.TitleView>
 
     <Grid Padding="30"
-          RowSpacing="10"
-          RowDefinitions="*,auto">
+          RowSpacing="10">
         <Grid x:Name="MaskGrid"
-              Grid.Row="0"
-              HorizontalOptions="FillAndExpand"
-              VerticalOptions="FillAndExpand"
-              SizeChanged="MaskGrid_SizeChanged">
+              HorizontalOptions="CenterAndExpand"
+              VerticalOptions="CenterAndExpand"
+              SizeChanged="MaskGrid_SizeChanged"
+              Padding="0,0,0,100">
             <skia:SKCanvasView x:Name="SourceImageCanvasView" 
                                PaintSurface="OnPaintSourceImageSurface"
                                IgnorePixelScaling="True"
@@ -96,65 +107,42 @@
                                InputTransparent="True"/>
         </Grid>
 
-        <Border Grid.Row="0"
-                x:Name="BrushSizeSliderContainer"
-                Background="{StaticResource IndependenceAccent}"
-                Stroke="Transparent"
-                IsVisible="False"
-                HorizontalOptions="Start"
-                VerticalOptions="End">
-            <Border.StrokeShape>
-                <RoundRectangle CornerRadius="50" />
-            </Border.StrokeShape>
-            <VerticalStackLayout Spacing="0" Padding="20">
-
-                <Label Text="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, StringFormat='Size: {0:F0}'}"
-                       TextColor="White"
-                       FontAttributes="Bold"
-                       HorizontalOptions="Center"/>
-
-                <Slider WidthRequest="200"
-                        HeightRequest="40"
-                        Minimum="1"
-                        Maximum="50"
-                        Value="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}" />
-
-            </VerticalStackLayout>
-        </Border>
-
-        <Border Grid.Row="0"
-                x:Name="AlphaSliderContainer"
-                Background="{StaticResource IndependenceAccent}"
-                Stroke="Transparent"
-                IsVisible="False"
-                HorizontalOptions="Center"
-                VerticalOptions="End">
-            <Border.StrokeShape>
-                <RoundRectangle CornerRadius="50" />
-            </Border.StrokeShape>
-            <VerticalStackLayout Spacing="0" Padding="20">
-
-                <Label Text="{Binding CurrentAlpha, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, StringFormat='Alpha: {0:F1}'}"
-                       TextColor="White"
-                       FontAttributes="Bold"
-                       HorizontalOptions="Center"/>
-
-                <Slider WidthRequest="200"
-                        HeightRequest="40"
-                        Minimum="0"
-                        Maximum=".9"
-                        Value="{Binding CurrentAlpha, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}" />
-
-            </VerticalStackLayout>
-        </Border>
-
-        <Grid Grid.Row="1"
-              x:Name="ButtonsLayout"
+        <Grid x:Name="ButtonsLayout"
               RowDefinitions="60, 60, 60"
               ColumnDefinitions="60, 60, 60, 60"
               RowSpacing="15"
               ColumnSpacing="30"
-              HorizontalOptions="CenterAndExpand">
+              HorizontalOptions="CenterAndExpand"
+              VerticalOptions="End">
+
+            <Border Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    x:Name="BrushSizeSliderContainer"
+                    Background="{StaticResource IndependenceAccent}"
+                    Stroke="Transparent"
+                    IsVisible="False"
+                    HorizontalOptions="Start"
+                    VerticalOptions="End">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="50" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="0" Padding="20">
+
+                    <Label Text="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, StringFormat='Size: {0:F0}'}"
+               TextColor="White"
+               FontAttributes="Bold"
+               HorizontalOptions="Center"/>
+
+                    <Slider WidthRequest="200"
+                HeightRequest="40"
+                Minimum="1"
+                Maximum="50"
+                Value="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}" />
+
+                </VerticalStackLayout>
+            </Border>
 
             <Border Grid.Row="2"
                     Grid.Column="0"
@@ -189,6 +177,35 @@
                     
 
                 </ContentView>
+            </Border>
+
+            <Border Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    x:Name="AlphaSliderContainer"
+                    Background="{StaticResource IndependenceAccent}"
+                    Stroke="Transparent"
+                    IsVisible="False"
+                    HorizontalOptions="Center"
+                    VerticalOptions="End">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="50" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="0" Padding="20">
+
+                    <Label Text="{Binding CurrentAlpha, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, StringFormat='Alpha: {0:F1}'}"
+               TextColor="White"
+               FontAttributes="Bold"
+               HorizontalOptions="Center"/>
+
+                    <Slider WidthRequest="200"
+                HeightRequest="40"
+                Minimum="0"
+                Maximum=".9"
+                Value="{Binding CurrentAlpha, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}" />
+
+                </VerticalStackLayout>
             </Border>
 
             <Border Grid.Row="2"

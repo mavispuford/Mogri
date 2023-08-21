@@ -58,6 +58,12 @@ public partial class CanvasPage : BasePage
         set => SetValue(ShowInitImgRectangleProperty, value);
     }
 
+    public bool ShowMaskLayer
+    {
+        get => (bool)GetValue(ShowMaskLayerProperty);
+        set => SetValue(ShowMaskLayerProperty, value);
+    }
+
     public IAsyncRelayCommand<IAsyncRelayCommand> PrepareForSavingCommand
     {
         get => (IAsyncRelayCommand<IAsyncRelayCommand>)GetValue(PrepareForSavingCommandProperty);
@@ -114,6 +120,11 @@ public partial class CanvasPage : BasePage
         ((CanvasPage)bindable).UpdateInitImgRectangle(false);
     });
 
+    public static BindableProperty ShowMaskLayerProperty = BindableProperty.Create(nameof(ShowMaskLayer), typeof(bool), typeof(CanvasPage), true, propertyChanged: (bindable, oldValue, newValue) =>
+    {
+        ((CanvasPage)bindable).UpdateMaskLayer();
+    });
+
     public CanvasPage()
     {
         InitializeComponent();
@@ -126,6 +137,7 @@ public partial class CanvasPage : BasePage
         this.SetBinding(PrepareForSavingCommandProperty, nameof(ICanvasPageViewModel.PrepareForSavingCommand), BindingMode.OneWayToSource);
         this.SetBinding(InitImgRectangleScaleProperty, nameof(ICanvasPageViewModel.InitImgRectangleScale), BindingMode.OneWayToSource);
         this.SetBinding(InitImgRectangleSizeProperty, nameof(ICanvasPageViewModel.InitImgRectangleSize), BindingMode.OneWay);
+        this.SetBinding(ShowMaskLayerProperty, nameof(ICanvasPageViewModel.ShowMaskLayer), BindingMode.OneWay);
 
         PrepareForSavingCommand = new AsyncRelayCommand<IAsyncRelayCommand>(PrepareForSaving);
 
@@ -647,12 +659,10 @@ public partial class CanvasPage : BasePage
         UpdateCanvasSizes();
     }
 
-    private void ToggleMaskButton_Clicked(object sender, EventArgs e)
+    private void UpdateMaskLayer()
     {
-        _showMask = !_showMask;
-
         MaskCanvasView.AbortAnimation("FadeInOutMaskCanvasView");
-        MaskCanvasView.Animate("FadeInOutMaskCanvasView", value => MaskCanvasView.Opacity = value, MaskCanvasView.Opacity, _showMask ? 1 : 0, easing: Easing.CubicInOut);
+        MaskCanvasView.Animate("FadeInOutMaskCanvasView", value => MaskCanvasView.Opacity = value, MaskCanvasView.Opacity, ShowMaskLayer ? 1 : 0, easing: Easing.CubicInOut);
     }
 }
 
