@@ -27,6 +27,8 @@ namespace MobileDiffusion.Interfaces.ViewModels
 
         bool ShowInitImgRectangle { get; set; }
 
+        bool ShowMaskLayer { get; set; }
+
         SKBitmap SourceBitmap { get; set; }
 
         SKCanvasView SourceCanvasView { get; set; }
@@ -41,7 +43,6 @@ namespace MobileDiffusion.Interfaces.ViewModels
 
         IAsyncRelayCommand FinishSendingToImageToImageCommand { get; }
 
-
         IAsyncRelayCommand FinishCroppingInitImgRectangleCommand { get; }
 
         IAsyncRelayCommand ShowColorPickerCommand { get; }
@@ -53,5 +54,7 @@ namespace MobileDiffusion.Interfaces.ViewModels
         IAsyncRelayCommand SendToImageToImageCommand { get; }
         
         IRelayCommand ToggleInitImgRectangleCommand { get; }
+
+        IRelayCommand ToggleMaskLayerVisibilityCommand { get; }
     }
 }

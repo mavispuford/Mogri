@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Maui.Alerts;
+﻿using AndroidX.Fragment.App.StrictMode;
+using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core.Extensions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -29,43 +30,46 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private Random _random = new Random();
 
     [ObservableProperty]
-    private Color currentColor = Colors.Black;
+    private Color _currentColor = Colors.Black;
 
     [ObservableProperty]
-    private Color paletteIconColor = Colors.White;
+    private Color _paletteIconColor = Colors.White;
 
     [ObservableProperty]
-    private double initImgRectangleScale;
+    private double _initImgRectangleScale;
 
     [ObservableProperty]
-    private float initImgRectangleSize = 256;
+    private float _initImgRectangleSize;
 
     [ObservableProperty]
-    private bool isBusy;
+    private bool _isBusy;
 
     [ObservableProperty]
-    private List<MaskLine> lines = new();
+    private List<MaskLine> _lines = new();
 
     [ObservableProperty]
-    private SKBitmap sourceBitmap;
+    private SKBitmap _sourceBitmap;
 
     [ObservableProperty]
-    private SKCanvasView sourceCanvasView;
+    private SKCanvasView _sourceCanvasView;
 
     [ObservableProperty]
-    private SKCanvasView maskCanvasView;
+    private SKCanvasView _maskCanvasView;
 
     [ObservableProperty]
-    private ImageSource savedImageSource;
+    private ImageSource _savedImageSource;
 
     [ObservableProperty]
-    private SKRect initImgRectangle;
+    private SKRect _initImgRectangle;
 
     [ObservableProperty]
-    private bool showInitImgRectangle;
+    private bool _showInitImgRectangle;
 
     [ObservableProperty]
-    private IAsyncRelayCommand prepareForSavingCommand;
+    private bool _showMaskLayer = true;
+
+    [ObservableProperty]
+    private IAsyncRelayCommand _prepareForSavingCommand;
 
     public CanvasPageViewModel(
         IFileService fileService,
@@ -82,6 +86,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         {
             _paletteIconDarkColor = paletteIconDarkColor;
         }
+
+        InitImgRectangleSize = _supportedImgRectSizes[_imgRectIndex];
     }
 
     partial void OnCurrentColorChanged(Color value)
@@ -467,14 +473,25 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private void ChangeInitImgRectangleSize()
     {
         // Cycle through image rectangle sizes
-        InitImgRectangleSize = _supportedImgRectSizes[_imgRectIndex];
         _imgRectIndex = (_imgRectIndex + 1) % _supportedImgRectSizes.Count;
+        InitImgRectangleSize = _supportedImgRectSizes[_imgRectIndex];
     }
 
     [RelayCommand]
     private void ToggleInitImgRectangle()
     {
         ShowInitImgRectangle = !ShowInitImgRectangle;
+
+        if (ShowInitImgRectangle)
+        {
+            ShowMaskLayer = true;
+        }
+    }
+
+    [RelayCommand]
+    private void ToggleMaskLayerVisibility()
+    {
+        ShowMaskLayer = !ShowMaskLayer;
     }
 
     unsafe private List<Color> ExtractColorPalette(SKBitmap bitmap, int targetNumber = 30)
