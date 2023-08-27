@@ -34,7 +34,7 @@
 
                 <Image Grid.Row="0" Grid.Column="0" WidthRequest="32">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe3e9;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe3e9;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="0" Grid.Column="1" Text="Strength:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
@@ -42,7 +42,7 @@
 
                 <Image Grid.Row="1" Grid.Column="0" WidthRequest="32">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe3f4;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe3f4;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="1" Grid.Column="1" Text="Source Image:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
@@ -81,7 +81,7 @@
 
                 <Image Grid.Row="3" Grid.Column="0" WidthRequest="32">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe72e;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe72e;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="3" Grid.Column="1" Text="Mask Image:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
@@ -118,7 +118,7 @@
 
                 <Image Grid.Row="5" Grid.Column="0" WidthRequest="32">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe434;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe434;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="5" Grid.Column="1" Text="Fit Image (on server):" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
@@ -126,7 +126,7 @@
 
                 <Image Grid.Row="6" Grid.Column="0" WidthRequest="32">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe434;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe434;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="6" Grid.Column="1" Text="Fit Image (before sending):" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
@@ -137,7 +137,7 @@
         <HorizontalStackLayout Grid.Row="1" Spacing="10" HorizontalOptions="End" Padding="10">
             <Button Command="{Binding ResetValuesCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}">
                 <Button.ImageSource>
-                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource Tertiary}" />
+                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Color="{StaticResource Tertiary}" />
                 </Button.ImageSource>
             </Button>
             <Button Text="Cancel" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />

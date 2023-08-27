@@ -20,7 +20,10 @@ public static class MauiProgram
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                fonts.AddFont("MaterialIconsRound-Regular.otf", "MaterialIconsRoundRegular");
+                fonts.AddFont("MaterialSymbolsRounded100.ttf", "MaterialIconsRound100");
+                fonts.AddFont("MaterialSymbolsRounded300.ttf", "MaterialIconsRound300");
+                fonts.AddFont("MaterialSymbolsRounded400.ttf", "MaterialIconsRound400");
+                fonts.AddFont("MaterialSymbolsRounded700.ttf", "MaterialIconsRound700");
             })
             .UseMauiCommunityToolkit()
             .ConfigureMopups()

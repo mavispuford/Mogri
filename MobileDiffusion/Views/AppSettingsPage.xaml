@@ -23,7 +23,7 @@
 
                 <Image Grid.Row="0" Grid.Column="0" WidthRequest="32">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe30a;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe30a;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="0" Grid.Column="1" Text="Server URL:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
@@ -31,7 +31,7 @@
 
                 <Image Grid.Row="2" Grid.Column="0" WidthRequest="32">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe85b;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe85b;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="2" Grid.Column="1" Text="Default Width:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
@@ -45,7 +45,7 @@
         <HorizontalStackLayout Grid.Row="1" Spacing="10" HorizontalOptions="End" Padding="10">
             <Button Command="{Binding ResetValuesCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}">
                 <Button.ImageSource>
-                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource Tertiary}" />
+                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Color="{StaticResource Tertiary}" />
                 </Button.ImageSource>
             </Button>
             <Button Text="Cancel" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />

@@ -85,7 +85,10 @@
 
 	<ItemGroup>
 	  <None Remove="Platforms\Android\Resources\xml\network_security_config.xml" />
-	  <None Remove="Resources\Fonts\MaterialIconsRound-Regular.otf" />
+	  <None Remove="Resources\Fonts\MaterialSymbolsRounded100.ttf" />
+	  <None Remove="Resources\Fonts\MaterialSymbolsRounded300.ttf" />
+	  <None Remove="Resources\Fonts\MaterialSymbolsRounded400.ttf" />
+	  <None Remove="Resources\Fonts\MaterialSymbolsRounded700.ttf" />
 	  <None Remove="Resources\Images\circle_fill_48.svg" />
 	  <None Remove="Resources\Images\reset_image.svg" />
 	  <None Remove="Resources\Images\stack.svg" />
