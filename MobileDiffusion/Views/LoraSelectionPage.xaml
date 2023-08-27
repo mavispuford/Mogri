@@ -22,7 +22,7 @@
             <Label Grid.Row="0"
                    Grid.Column="0"
                    Text="Lora: "
-                   FontSize="16"
+                   FontSize="18"
                    FontAttributes="Bold"
                    VerticalTextAlignment="Center"/>
             <Picker x:Name="LoraPicker"
@@ -32,7 +32,7 @@
                     x:DataType="viewModels:ILoraViewModel"
                     ItemsSource="{Binding AvailableLoras, Source={x:RelativeSource AncestorType={x:Type viewModels:ILoraSelectionPageViewModel}}}" 
                     ItemDisplayBinding="{Binding Alias}"
-                    FontSize="Medium"
+                    FontSize="18"
                     VerticalTextAlignment="Center"
                     SelectedItem="{Binding LoraToAdd, Source={x:RelativeSource AncestorType={x:Type viewModels:ILoraSelectionPageViewModel}}}"/>
 
@@ -48,33 +48,25 @@
                                 <Rectangle HeightRequest="1" HorizontalOptions="Fill" Fill="{StaticResource Gray200TwentySixPercent}" />
                                 <Grid ColumnDefinitions="*, auto">
                                     <Label Grid.Column="0"
-                                           FontSize="Medium" FontAttributes="Bold">
-                                        <Label.FormattedText>
-                                            <FormattedString>
-                                                <Span Text="{Binding Name}" />
-
-                                                <!-- Alias -->
-                                                <!--<Span Text=" (" />
-                                                <Span Text="{Binding Alias}" />
-                                                <Span Text=")" />-->
-                                            </FormattedString>
-                                        </Label.FormattedText>
-                                    </Label>
+                                           FontSize="18" 
+                                           FontAttributes="Bold"
+                                           VerticalTextAlignment="Center"
+                                           Text="{Binding Name}" />
 
                                     <ImageButton Grid.Column="1"
                                                  HorizontalOptions="End" 
                                                  Command="{Binding RemoveCommand, Source={x:RelativeSource AncestorType={x:Type viewModels:ILoraSelectionPageViewModel}}}"
                                                  CommandParameter="{Binding .}">
                                         <ImageButton.Source>
-                                            <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Size="32" Color="{StaticResource Tertiary}" />
+                                            <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                                         </ImageButton.Source>
                                     </ImageButton>
                                 </Grid>
 
-                                <Label FontSize="Medium">
+                                <Label FontSize="18">
                                     <Label.FormattedText>
                                         <FormattedString>
-                                            <Span Text="Strength: " />
+                                            <Span Text="Strength: " FontAttributes="Bold"/>
                                             <Span Text="{Binding Strength, StringFormat='{0:N1}'}" />
                                         </FormattedString>
                                     </Label.FormattedText>
@@ -97,7 +89,7 @@
                                Padding="10">
             <Button Command="{Binding ResetCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}">
                 <Button.ImageSource>
-                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Color="{StaticResource Tertiary}" />
+                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Color="{StaticResource Tertiary}" />
                 </Button.ImageSource>
             </Button>
             <Button Text="Cancel" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />

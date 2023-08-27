@@ -7,6 +7,10 @@ namespace MobileDiffusion.Interfaces.ViewModels
 {
     public interface ICanvasPageViewModel : IPageViewModel
     {
+        List<IPaintingToolViewModel> AvailableTools { get; set; }
+
+        IPaintingToolViewModel CurrentTool { get; set; }
+
         Color CurrentColor { get; set; }
 
         SKRect InitImgRectangle { get; set; }

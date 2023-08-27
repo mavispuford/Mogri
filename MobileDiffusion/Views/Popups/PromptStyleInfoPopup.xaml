@@ -21,18 +21,18 @@
         <VerticalStackLayout>
             <ScrollView Orientation="Vertical">
                 <VerticalStackLayout x:Name="MainLayout">
-                    <Label>
+                    <Label FontSize="18">
                         <Label.FormattedText>
                             <FormattedString>
-                                <Span Text="Name: " FontSize="Medium"/>
-                                <Span Text="{Binding PromptStyle.Name}" FontSize="Medium"/>
+                                <Span Text="Name: " FontAttributes="Bold"/>
+                                <Span Text="{Binding PromptStyle.Name}"/>
                             </FormattedString>
                         </Label.FormattedText>
                     </Label>
-                    <Label Text="Prompt:" FontSize="Medium" IsVisible="{Binding PromptStyle.Prompt, Converter={StaticResource IsStringNotNullOrEmptyConverter}}"/>
-                    <Label Text="{Binding PromptStyle.Prompt}" FontSize="Small" IsVisible="{Binding PromptStyle.Prompt, Converter={StaticResource IsStringNotNullOrEmptyConverter}}"/>
-                    <Label Text="Negative Prompt:" FontSize="Medium"/>
-                    <Label Text="{Binding PromptStyle.NegativePrompt}" FontSize="Small"/>
+                    <Label Text="Prompt:" FontSize="18" IsVisible="{Binding PromptStyle.Prompt, Converter={StaticResource IsStringNotNullOrEmptyConverter}}" FontAttributes="Bold"/>
+                    <Label Text="{Binding PromptStyle.Prompt}" FontSize="14" IsVisible="{Binding PromptStyle.Prompt, Converter={StaticResource IsStringNotNullOrEmptyConverter}}"/>
+                    <Label Text="Negative Prompt:" FontSize="18" FontAttributes="Bold"/>
+                    <Label Text="{Binding PromptStyle.NegativePrompt}" FontSize="14"/>
                 </VerticalStackLayout>
             </ScrollView>
             <Button Text="Close" HorizontalOptions="End" Command="{Binding CloseCommand}" />

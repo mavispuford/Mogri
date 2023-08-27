@@ -20,13 +20,13 @@
 
             <ImageButton Grid.Column="1" ToolTipProperties.Text="Select" Command="{Binding ToggleSelectionModeCommand}">
                 <ImageButton.Source>
-                    <FontImageSource Glyph="{Binding SelectionModeEnabled, Converter={StaticResource BoolToSelectionModeGlyph}}" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                    <FontImageSource Glyph="{Binding SelectionModeEnabled, Converter={StaticResource BoolToSelectionModeGlyph}}" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
                 </ImageButton.Source>
             </ImageButton>
 
             <ImageButton Grid.Column="2" ToolTipProperties.Text="Clear History" Command="{Binding ClearHistoryCommand}" IsVisible="{Binding SelectionModeEnabled, Converter={StaticResource InvertedBool}}">
                 <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
                 </ImageButton.Source>
             </ImageButton>
         </Grid>
@@ -163,7 +163,7 @@
                            VerticalOptions="CenterAndExpand"
                            InputTransparent="True">
                         <Image.Source>
-                            <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Size="64" Color="{StaticResource Primary}" />
+                            <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Size="64" Color="{StaticResource Primary}" />
                         </Image.Source>
                     </Image>
                 </ContentView>

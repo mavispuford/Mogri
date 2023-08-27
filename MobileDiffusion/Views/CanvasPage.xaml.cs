@@ -14,7 +14,7 @@ public partial class CanvasPage : BasePage
     private Timer _alphaTimer;
     private bool _hasCreatedInitImgRectangle;
     private bool _isSaving;
-    private bool _showMask = true;
+    private bool _hapticsEnabled = false;
 
     public SKBitmap Bitmap
     {
@@ -38,6 +38,12 @@ public partial class CanvasPage : BasePage
     {
         get => (float)GetValue(CurrentBrushSizeProperty);
         set => SetValue(CurrentBrushSizeProperty, value);
+    }
+
+    public IPaintingToolViewModel CurrentTool
+    {
+        get => (IPaintingToolViewModel)GetValue(CurrentToolProperty);
+        set => SetValue(CurrentToolProperty, value);
     }
 
     public List<MaskLine> Lines
@@ -99,6 +105,8 @@ public partial class CanvasPage : BasePage
 
     public static BindableProperty CurrentColorProperty = BindableProperty.Create(nameof(CurrentColor), typeof(Color), typeof(CanvasPage), Colors.Black);
 
+    public static BindableProperty CurrentToolProperty = BindableProperty.Create(nameof(CurrentTool), typeof(IPaintingToolViewModel), typeof(CanvasPage), null);
+
     public static BindableProperty InitImgRectangleProperty = BindableProperty.Create(nameof(InitImgRectangle), typeof(SKRect), typeof(CanvasPage), default(SKRect));
 
     public static BindableProperty InitImgRectangleScaleProperty = BindableProperty.Create(nameof(InitImgRectangleScale), typeof(double), typeof(CanvasPage), 1d);
@@ -131,6 +139,7 @@ public partial class CanvasPage : BasePage
 
         this.SetBinding(BitmapProperty, nameof(ICanvasPageViewModel.SourceBitmap));
         this.SetBinding(CurrentColorProperty, nameof(ICanvasPageViewModel.CurrentColor));
+        this.SetBinding(CurrentToolProperty, nameof(ICanvasPageViewModel.CurrentTool));
         this.SetBinding(LinesProperty, nameof(ICanvasPageViewModel.Lines), BindingMode.TwoWay);
         this.SetBinding(InitImgRectangleProperty, nameof(ICanvasPageViewModel.InitImgRectangle), BindingMode.OneWayToSource);
         this.SetBinding(ShowInitImgRectangleProperty, nameof(ICanvasPageViewModel.ShowInitImgRectangle), BindingMode.TwoWay);
@@ -142,6 +151,18 @@ public partial class CanvasPage : BasePage
         PrepareForSavingCommand = new AsyncRelayCommand<IAsyncRelayCommand>(PrepareForSaving);
 
         //SourceImageCanvasView.SizeChanged += SourceImageCanvasView_SizeChanged;
+    }
+
+    protected override void OnNavigatedTo(NavigatedToEventArgs args)
+    {
+        base.OnNavigatedTo(args);
+
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(500);
+
+            _hapticsEnabled = true;
+        });
     }
 
     private void SourceImageCanvasView_SizeChanged(object sender, EventArgs e)
@@ -212,7 +233,8 @@ public partial class CanvasPage : BasePage
                     {
                         Alpha = CurrentAlpha,
                         BrushSize = CurrentBrushSize,
-                        Color = CurrentColor
+                        Color = CurrentColor,
+                        Type = CurrentTool?.Type ?? MaskLine.MaskLineType.Paint
                     };
 
                     Lines ??= new();
@@ -282,14 +304,26 @@ public partial class CanvasPage : BasePage
 
             foreach (var line in Lines)
             {
-                var points = line.Path;
+                if (line.Type == MaskLine.MaskLineType.Paint)
+                {
+                    paint.BlendMode = SKBlendMode.SrcOver;
+
+                    paint.Color = new SKColor(
+                        line.Color.GetByteRed(),
+                        line.Color.GetByteGreen(),
+                        line.Color.GetByteBlue(),
+                        Convert.ToByte((int)Math.Max(1, line.Alpha * 255)));
+                }
+                else
+                {
+                    paint.BlendMode = SKBlendMode.Src;
+
+                    paint.Color = SKColors.Transparent;
+                }
 
                 paint.StrokeWidth = line.BrushSize;
-                paint.Color = new SKColor(
-                    line.Color.GetByteRed(),
-                    line.Color.GetByteGreen(),
-                    line.Color.GetByteBlue(),
-                    Convert.ToByte((int)Math.Max(1, line.Alpha * 255)));
+                
+                var points = line.Path;
 
                 using var path = new SKPath();
                 path.MoveTo(points[0]);
@@ -415,12 +449,16 @@ public partial class CanvasPage : BasePage
 
     private void Brush_Size_Button_Clicked(object sender, EventArgs e)
     {
+        vibrate(HapticFeedbackType.Click);
+
         ShowHideAlphaSlider(false);
         ShowHideBrushSizeSlider(!BrushSizeSliderContainer.IsVisible);
     }
 
     private void Alpha_Button_Clicked(object sender, EventArgs e)
     {
+        vibrate(HapticFeedbackType.Click);
+
         ShowHideBrushSizeSlider(false);
         ShowHideAlphaSlider(!AlphaSliderContainer.IsVisible);
     }
@@ -663,6 +701,25 @@ public partial class CanvasPage : BasePage
     {
         MaskCanvasView.AbortAnimation("FadeInOutMaskCanvasView");
         MaskCanvasView.Animate("FadeInOutMaskCanvasView", value => MaskCanvasView.Opacity = value, MaskCanvasView.Opacity, ShowMaskLayer ? 1 : 0, easing: Easing.CubicInOut);
+    }
+
+    private void ToolCarouselView_CurrentItemChanged(object sender, CurrentItemChangedEventArgs e)
+    {
+        vibrate(HapticFeedbackType.Click);
+    }
+
+    private void vibrate(HapticFeedbackType type)
+    {
+        if (_hapticsEnabled &&
+            HapticFeedback.Default.IsSupported)
+        {
+            HapticFeedback.Default.Perform(type);
+        }
+    }
+
+    private void Vibrate_Button_Tapped(object sender, TappedEventArgs e)
+    {
+        vibrate(HapticFeedbackType.Click);
     }
 }
 

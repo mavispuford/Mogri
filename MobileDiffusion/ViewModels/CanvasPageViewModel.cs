@@ -1,5 +1,4 @@
-﻿using AndroidX.Fragment.App.StrictMode;
-using CommunityToolkit.Maui.Alerts;
+﻿using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core.Extensions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -28,6 +27,12 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private Color _paletteIconDarkColor = Colors.Black;
     private string _sourceFileName;
     private Random _random = new Random();
+
+    [ObservableProperty]
+    private List<IPaintingToolViewModel> _availableTools = new();
+
+    [ObservableProperty]
+    private IPaintingToolViewModel _currentTool;
 
     [ObservableProperty]
     private Color _currentColor = Colors.Black;
@@ -88,6 +93,22 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         }
 
         InitImgRectangleSize = _supportedImgRectSizes[_imgRectIndex];
+
+        AvailableTools.Add(new PaintingToolViewModel
+        {
+            Name = "Brush",
+            IconCode = "\ue3ae",
+            Type = MaskLine.MaskLineType.Paint
+        });
+
+        AvailableTools.Add(new PaintingToolViewModel
+        {
+            Name = "Eraser",
+            IconCode = "\ue6d0",
+            Type = MaskLine.MaskLineType.Erase
+        });
+
+        CurrentTool = AvailableTools.FirstOrDefault();
     }
 
     partial void OnCurrentColorChanged(Color value)

@@ -12,10 +12,10 @@
             <toolkit:BoolToObjectConverter x:Key="BoolToShowMaskTextConverter" TrueObject="Hide Mask Layer" FalseObject="Show Mask Layer" />
             <toolkit:BoolToObjectConverter x:Key="BoolToEyeConverter">
                 <toolkit:BoolToObjectConverter.TrueObject>
-                    <FontImageSource Glyph="&#xe8f5;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                    <FontImageSource Glyph="&#xe8f5;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
                 </toolkit:BoolToObjectConverter.TrueObject>
                 <toolkit:BoolToObjectConverter.FalseObject>
-                    <FontImageSource Glyph="&#xe8f4;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                    <FontImageSource Glyph="&#xe8f4;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
                 </toolkit:BoolToObjectConverter.FalseObject>
             </toolkit:BoolToObjectConverter>
         </ResourceDictionary>
@@ -31,7 +31,7 @@
                          VerticalOptions="FillAndExpand"
                          Command="{Binding ShowMediaPickerCommand}">
                 <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe43e;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                    <FontImageSource Glyph="&#xe43e;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
                 </ImageButton.Source>
             </ImageButton>
 
@@ -39,7 +39,7 @@
                          VerticalOptions="FillAndExpand"
                          Clicked="Undo_Button_Clicked">
                 <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe166;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                    <FontImageSource Glyph="&#xe166;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
                 </ImageButton.Source>
             </ImageButton>
 
@@ -47,7 +47,7 @@
                          VerticalOptions="FillAndExpand"
                          Clicked="Clear_Button_Clicked">
                 <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
                 </ImageButton.Source>
             </ImageButton>
 
@@ -55,7 +55,7 @@
                          VerticalOptions="FillAndExpand"
                          Command="{Binding SaveCommand}">
                 <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe161;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                    <FontImageSource Glyph="&#xe161;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
                 </ImageButton.Source>
             </ImageButton>
 
@@ -80,9 +80,11 @@
         </HorizontalStackLayout>
     </Shell.TitleView>
 
-    <Grid Padding="30"
-          RowSpacing="10">
+    <Grid Padding="30,10,30,10"
+          RowSpacing="10"
+          RowDefinitions="auto,*">
         <Grid x:Name="MaskGrid"
+              Grid.Row="1"
               HorizontalOptions="CenterAndExpand"
               VerticalOptions="CenterAndExpand"
               SizeChanged="MaskGrid_SizeChanged"
@@ -107,7 +109,46 @@
                                InputTransparent="True"/>
         </Grid>
 
-        <Grid x:Name="ButtonsLayout"
+        <Grid Grid.Row="0"
+              HorizontalOptions="Center"
+              VerticalOptions="Start">
+            <CarouselView CurrentItem="{Binding CurrentTool}"
+                          ItemsSource="{Binding AvailableTools}"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center"
+                          HeightRequest="58"
+                          WidthRequest="58"
+                          Loop="False"
+                          CurrentItemChanged="ToolCarouselView_CurrentItemChanged">
+                <CarouselView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Horizontal"
+                                       SnapPointsAlignment="Center"
+                                       SnapPointsType="MandatorySingle"
+                                       ItemSpacing="0"/>
+                </CarouselView.ItemsLayout>
+                <CarouselView.ItemTemplate>
+                    <DataTemplate x:DataType="viewModels:IPaintingToolViewModel">
+                        <Image WidthRequest="50" HeightRequest="50">
+                            <Image.Source>
+                                <FontImageSource Glyph="{Binding IconCode}" FontFamily="MaterialIconsRound400" Size="50" Color="{StaticResource Primary}" />
+                            </Image.Source>
+                        </Image>
+                    </DataTemplate>
+                </CarouselView.ItemTemplate>
+            </CarouselView>
+            <Border WidthRequest="60"
+                    HeightRequest="60"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"
+                    Stroke="{StaticResource IndependenceAccent}"
+                    StrokeThickness="4"
+                    StrokeShape="RoundRectangle 50"
+                    BackgroundColor="Transparent"/>
+        </Grid>
+        
+
+        <Grid x:Name="BottomButtonsLayout"
+              Grid.Row="1"
               RowDefinitions="60, 60, 60"
               ColumnDefinitions="60, 60, 60, 60"
               RowSpacing="15"
@@ -224,7 +265,7 @@
                     <Image HorizontalOptions="Center"
                            VerticalOptions="Center">
                         <Image.Source>
-                            <FontImageSource Glyph="&#xe91c;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                            <FontImageSource Glyph="&#xe91c;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
                         </Image.Source>
                     </Image>
                 </ContentView>
@@ -240,12 +281,12 @@
                              VerticalOptions="FillAndExpand"
                              WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
                     <ContentView.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ShowColorPickerCommand}" />
+                        <TapGestureRecognizer Command="{Binding ShowColorPickerCommand}" Tapped="Vibrate_Button_Tapped" />
                     </ContentView.GestureRecognizers>
                     <Image HorizontalOptions="Center"
                            VerticalOptions="Center">
                         <Image.Source>
-                            <FontImageSource Glyph="&#xe40a;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="{Binding PaletteIconColor}" />
+                            <FontImageSource Glyph="&#xe40a;" FontFamily="MaterialIconsRound400" Size="30" Color="{Binding PaletteIconColor}" />
                         </Image.Source>
                     </Image>
                 </ContentView>
@@ -262,11 +303,11 @@
                              VerticalOptions="FillAndExpand"
                              WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
                     <ContentView.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding BeginCropImageRectCommand}" />
+                        <TapGestureRecognizer Command="{Binding BeginCropImageRectCommand}" Tapped="Vibrate_Button_Tapped" />
                     </ContentView.GestureRecognizers>
                     <Image HorizontalOptions="Center" VerticalOptions="Center">
                         <Image.Source>
-                            <FontImageSource Glyph="&#xf08b;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                            <FontImageSource Glyph="&#xf08b;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
                         </Image.Source>
                     </Image>
 
@@ -284,11 +325,11 @@
                       VerticalOptions="FillAndExpand"
                       WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
                     <Grid.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ChangeInitImgRectangleSizeCommand}" />
+                        <TapGestureRecognizer Command="{Binding ChangeInitImgRectangleSizeCommand}" Tapped="Vibrate_Button_Tapped" />
                     </Grid.GestureRecognizers>
                     <Image HorizontalOptions="Center" VerticalOptions="Center">
                         <Image.Source>
-                            <FontImageSource Glyph="&#xe85b;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                            <FontImageSource Glyph="&#xe85b;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
                         </Image.Source>
                     </Image>
                     <Label Text="{Binding Path=InitImgRectangleSize, StringFormat='{0:F0}'}"
@@ -309,12 +350,12 @@
                             VerticalOptions="FillAndExpand"
                             WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
                     <ContentView.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ToggleInitImgRectangleCommand}" />
+                        <TapGestureRecognizer Command="{Binding ToggleInitImgRectangleCommand}" Tapped="Vibrate_Button_Tapped" />
                     </ContentView.GestureRecognizers>
                     <Image HorizontalOptions="Center"
                         VerticalOptions="Center">
                         <Image.Source>
-                            <FontImageSource Glyph="&#xe3c6;" FontFamily="MaterialIconsRoundRegular" Size="30" Color="White" />
+                            <FontImageSource Glyph="&#xe3c6;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
                         </Image.Source>
                     </Image>
                 </ContentView>
