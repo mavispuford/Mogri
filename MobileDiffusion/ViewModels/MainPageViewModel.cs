@@ -324,6 +324,8 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                 result.Failed = true;
             }
         }
+
+        vibrate(HapticFeedbackType.LongPress);
     }
 
     private void reportProgress(float progress)
@@ -643,5 +645,13 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     {
         HasInitImage = !string.IsNullOrEmpty(_settings?.InitImage);
         _initImageNeedsResize = true;
+    }
+
+    private void vibrate(HapticFeedbackType type)
+    {
+        if (HapticFeedback.Default.IsSupported)
+        {
+            HapticFeedback.Default.Perform(type);
+        }
     }
 }
