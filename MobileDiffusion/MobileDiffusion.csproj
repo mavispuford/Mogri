@@ -74,7 +74,6 @@
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
-		<MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
 
 		<!-- Custom Fonts -->
 		<MauiFont Include="Resources\Fonts\*" />
@@ -90,9 +89,6 @@
 	  <None Remove="Resources\Fonts\MaterialSymbolsRounded400.ttf" />
 	  <None Remove="Resources\Fonts\MaterialSymbolsRounded700.ttf" />
 	  <None Remove="Resources\Images\circle_fill_48.svg" />
-	  <None Remove="Resources\Images\reset_image.svg" />
-	  <None Remove="Resources\Images\stack.svg" />
-	  <None Remove="Resources\Images\window.svg" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -193,6 +189,10 @@
 	  <MauiXaml Update="Views\CanvasPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Resources\Images\" />
 	</ItemGroup>
 
 </Project>

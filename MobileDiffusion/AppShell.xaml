@@ -8,13 +8,17 @@
 
     <TabBar Shell.TabBarUnselectedColor="{StaticResource IndependenceAccent}">
         <Tab Title="Generate"
-             Icon="article"
              Route="MainPageTab">
+            <Tab.Icon>
+                <FontImageSource Glyph="&#xef42;" FontFamily="MaterialIconsRound400" />
+            </Tab.Icon>
             <ShellContent ContentTemplate="{DataTemplate views:MainPage}" />
         </Tab>
         <Tab Title="Canvas"
-             Icon="image"
              Route="CanvasPageTab">
+            <Tab.Icon>
+                <FontImageSource Glyph="&#xe3f4;" FontFamily="MaterialIconsRound400" />
+            </Tab.Icon>
             <ShellContent ContentTemplate="{DataTemplate views:CanvasPage}" />
         </Tab>
     </TabBar>

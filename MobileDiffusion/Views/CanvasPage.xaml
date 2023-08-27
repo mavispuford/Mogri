@@ -12,10 +12,10 @@
             <toolkit:BoolToObjectConverter x:Key="BoolToShowMaskTextConverter" TrueObject="Hide Mask Layer" FalseObject="Show Mask Layer" />
             <toolkit:BoolToObjectConverter x:Key="BoolToEyeConverter">
                 <toolkit:BoolToObjectConverter.TrueObject>
-                    <FontImageSource Glyph="&#xe8f5;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
+                    <FontImageSource Glyph="&#xe8f5;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
                 </toolkit:BoolToObjectConverter.TrueObject>
                 <toolkit:BoolToObjectConverter.FalseObject>
-                    <FontImageSource Glyph="&#xe8f4;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
+                    <FontImageSource Glyph="&#xe8f4;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
                 </toolkit:BoolToObjectConverter.FalseObject>
             </toolkit:BoolToObjectConverter>
         </ResourceDictionary>
@@ -31,7 +31,7 @@
                          VerticalOptions="FillAndExpand"
                          Command="{Binding ShowMediaPickerCommand}">
                 <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe43e;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
+                    <FontImageSource Glyph="&#xe43e;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
                 </ImageButton.Source>
             </ImageButton>
 
@@ -39,7 +39,7 @@
                          VerticalOptions="FillAndExpand"
                          Clicked="Undo_Button_Clicked">
                 <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe166;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
+                    <FontImageSource Glyph="&#xe166;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
                 </ImageButton.Source>
             </ImageButton>
 
@@ -47,7 +47,7 @@
                          VerticalOptions="FillAndExpand"
                          Clicked="Clear_Button_Clicked">
                 <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
+                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
                 </ImageButton.Source>
             </ImageButton>
 
@@ -55,16 +55,18 @@
                          VerticalOptions="FillAndExpand"
                          Command="{Binding SaveCommand}">
                 <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe161;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
+                    <FontImageSource Glyph="&#xe161;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
                 </ImageButton.Source>
             </ImageButton>
 
             <ImageButton ToolTipProperties.Text="Use as source image"
                          VerticalOptions="FillAndExpand"
                          Command="{Binding SendToImageToImageCommand}"
-                         Source="reset_image.png"
-                         HeightRequest="30"
-                         WidthRequest="30">
+                         HeightRequest="32"
+                         WidthRequest="32">
+                <ImageButton.Source>
+                    <FontImageSource Glyph="&#xf824;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
+                </ImageButton.Source>
                 <ImageButton.Behaviors>
                     <toolkit:IconTintColorBehavior TintColor="White" />
                 </ImageButton.Behaviors>
@@ -73,8 +75,8 @@
             <ImageButton ToolTipProperties.Text="{Binding ShowMaskLayer, Converter={StaticResource BoolToShowMaskTextConverter}}"
                          VerticalOptions="FillAndExpand"
                          Command="{Binding ToggleMaskLayerVisibilityCommand}"
-                         HeightRequest="30"
-                         WidthRequest="30"
+                         HeightRequest="32"
+                         WidthRequest="32"
                          Source="{Binding ShowMaskLayer, Converter={StaticResource BoolToEyeConverter}}"/>
 
         </HorizontalStackLayout>

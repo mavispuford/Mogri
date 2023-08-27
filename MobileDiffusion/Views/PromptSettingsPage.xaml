@@ -24,20 +24,20 @@
                   ColumnDefinitions="32,*,auto"
                   HorizontalOptions="FillAndExpand">
 
-                <Image Grid.Row="0" WidthRequest="32" HeightRequest="32" Source="stack">
-                    <Image.Behaviors>
-                        <toolkit:IconTintColorBehavior TintColor="{StaticResource Tertiary}" />
-                    </Image.Behaviors>
+                <Image Grid.Row="0" WidthRequest="32" HeightRequest="32">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xf609;" FontFamily="MaterialIconsRound300" Size="30" Color="{StaticResource Tertiary}" />
+                    </Image.Source>
                 </Image>
                 <Label Grid.Row="0" Grid.Column="1" Text="Batch Count:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16" />
                 <Label Grid.Row="0" Grid.Column="2" Text="{Binding BatchCount}" VerticalTextAlignment="Center" FontSize="16" />
 
                 <Slider Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Minimum="1" Maximum="9" Value="{Binding BatchCount}" ValueChanged="Slider_ValueChanged" HeightRequest="50" />
 
-                <Image Grid.Row="2" WidthRequest="32" HeightRequest="32" Source="window">
-                    <Image.Behaviors>
-                        <toolkit:IconTintColorBehavior TintColor="{StaticResource Tertiary}" />
-                    </Image.Behaviors>
+                <Image Grid.Row="2" WidthRequest="32" HeightRequest="32">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xf088;" FontFamily="MaterialIconsRound300" Size="30" Color="{StaticResource Tertiary}" />
+                    </Image.Source>
                 </Image>
                 <Label Grid.Row="2" Grid.Column="1" Text="Batch Size:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16" />
                 <Label Grid.Row="2" Grid.Column="2" Text="{Binding BatchSize}" VerticalTextAlignment="Center" FontSize="16" />
