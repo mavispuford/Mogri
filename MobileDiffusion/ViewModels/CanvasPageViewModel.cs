@@ -515,6 +515,18 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         ShowMaskLayer = !ShowMaskLayer;
     }
 
+    [RelayCommand]
+    private void SelectTool(IPaintingToolViewModel tool)
+    {
+        if (tool == null ||
+            CurrentTool == tool)
+        {
+            return;
+        }
+
+        CurrentTool = tool;
+    }
+
     unsafe private List<Color> ExtractColorPalette(SKBitmap bitmap, int targetNumber = 30)
     {
         if (bitmap == null)
