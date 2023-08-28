@@ -60,5 +60,7 @@ namespace MobileDiffusion.Interfaces.ViewModels
         IRelayCommand ToggleInitImgRectangleCommand { get; }
 
         IRelayCommand ToggleMaskLayerVisibilityCommand { get; }
+
+        IRelayCommand<IPaintingToolViewModel> SelectToolCommand { get; }
     }
 }
