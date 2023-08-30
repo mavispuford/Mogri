@@ -140,36 +140,38 @@
                             </ImageButton.Source>
 
                             <VisualStateManager.VisualStateGroups>
-                                <VisualStateGroup x:Name="CommonStates">
-                                    <VisualState x:Name="CurrentItem">
-                                        <VisualState.Setters>
-                                            <Setter Property="animations:AnimationProperties.Animation">
-                                                <animations:ScaleToAnimation Scale="1" Easing="{x:Static Easing.CubicInOut}" Length="200" />
-                                            </Setter>
-                                        </VisualState.Setters>
-                                    </VisualState>
-                                    <VisualState x:Name="PreviousItem">
-                                        <VisualState.Setters>
-                                            <Setter Property="animations:AnimationProperties.Animation">
-                                                <animations:ScaleToAnimation Scale=".75" Easing="{x:Static Easing.CubicInOut}" Length="200" />
-                                            </Setter>
-                                        </VisualState.Setters>
-                                    </VisualState>
-                                    <VisualState x:Name="NextItem">
-                                        <VisualState.Setters>
-                                            <Setter Property="animations:AnimationProperties.Animation">
-                                                <animations:ScaleToAnimation Scale=".75" Easing="{x:Static Easing.CubicInOut}" Length="200" />
-                                            </Setter>
-                                        </VisualState.Setters>
-                                    </VisualState>
-                                    <VisualState x:Name="DefaultItem">
-                                        <VisualState.Setters>
-                                            <Setter Property="animations:AnimationProperties.Animation">
-                                                <animations:ScaleToAnimation Scale=".75" Easing="{x:Static Easing.CubicInOut}" Length="200" />
-                                            </Setter>
-                                        </VisualState.Setters>
-                                    </VisualState>
-                                </VisualStateGroup>
+                                <VisualStateGroupList>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="CurrentItem">
+                                            <VisualState.Setters>
+                                                <Setter Property="animations:AnimationProperties.Animation">
+                                                    <animations:ScaleToAnimation Scale="1" Easing="{x:Static Easing.CubicInOut}" Length="200" />
+                                                </Setter>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="PreviousItem">
+                                            <VisualState.Setters>
+                                                <Setter Property="animations:AnimationProperties.Animation">
+                                                    <animations:ScaleToAnimation Scale=".75" Easing="{x:Static Easing.CubicInOut}" Length="200" />
+                                                </Setter>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="NextItem">
+                                            <VisualState.Setters>
+                                                <Setter Property="animations:AnimationProperties.Animation">
+                                                    <animations:ScaleToAnimation Scale=".75" Easing="{x:Static Easing.CubicInOut}" Length="200" />
+                                                </Setter>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="DefaultItem">
+                                            <VisualState.Setters>
+                                                <Setter Property="animations:AnimationProperties.Animation">
+                                                    <animations:ScaleToAnimation Scale=".75" Easing="{x:Static Easing.CubicInOut}" Length="200" />
+                                                </Setter>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateGroupList>
                             </VisualStateManager.VisualStateGroups>
                         </ImageButton>
                     </DataTemplate>
