@@ -77,32 +77,34 @@
                     <Border StrokeThickness="0" Margin="-1"
                             BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}">
                         <VisualStateManager.VisualStateGroups>
-                            <VisualStateGroup x:Name="CommonStates">
-                                <VisualState x:Name="Normal">
-                                    <VisualState.Setters>
-                                        <Setter Property="animations:AnimationProperties.Animation">
-                                            <animations:ScaleToAnimation Scale="1" Easing="{x:Static Easing.CubicInOut}" Length="200" />
-                                        </Setter>
+                            <VisualStateGroupList>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal">
+                                        <VisualState.Setters>
+                                            <Setter Property="animations:AnimationProperties.Animation">
+                                                <animations:ScaleToAnimation Scale="1" Easing="{x:Static Easing.CubicInOut}" Length="200" />
+                                            </Setter>
 
-                                        <Setter Property="BackgroundColor" Value="Transparent" />
-                                        <Setter Property="StrokeShape" Value="Rectangle" />
-                                    </VisualState.Setters>
-                                </VisualState>
-                                <VisualState x:Name="Selected">
-                                    <VisualState.Setters>
-                                        <Setter Property="animations:AnimationProperties.Animation">
-                                            <animations:ScaleToAnimation Scale=".75" Easing="{x:Static Easing.CubicInOut}" Length="200" />
-                                        </Setter>
-                                        
-                                        <Setter Property="BackgroundColor" Value="Transparent" />
-                                        <Setter Property="StrokeShape" Value="RoundRectangle 50" />
-                                    </VisualState.Setters>
-                                </VisualState>
+                                            <Setter Property="BackgroundColor" Value="Transparent" />
+                                            <Setter Property="StrokeShape" Value="Rectangle" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Selected">
+                                        <VisualState.Setters>
+                                            <Setter Property="animations:AnimationProperties.Animation">
+                                                <animations:ScaleToAnimation Scale=".75" Easing="{x:Static Easing.CubicInOut}" Length="200" />
+                                            </Setter>
 
-                                <VisualState x:Name="PointerOver" />
-                                <VisualState x:Name="Pressed" />
+                                            <Setter Property="BackgroundColor" Value="Transparent" />
+                                            <Setter Property="StrokeShape" Value="RoundRectangle 50" />
+                                        </VisualState.Setters>
+                                    </VisualState>
 
-                            </VisualStateGroup>
+                                    <VisualState x:Name="PointerOver" />
+                                    <VisualState x:Name="Pressed" />
+
+                                </VisualStateGroup>
+                            </VisualStateGroupList>
                         </VisualStateManager.VisualStateGroups>
                         <ImageButton Source="{Binding ThumbnailImageSource}"
                                      Aspect="AspectFill"
