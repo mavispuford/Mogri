@@ -338,20 +338,18 @@ public class SegmentationService : ISegmentationService
         Console.WriteLine($"Arrays values are the same.");
     }
 
-    private SKBitmap GetImageFromMaskTensor(Tensor<float> mask)
+    private SKBitmap GetImageFromMaskTensor(Tensor<float> tensor)
     {
         var pixelIndex = 0;
+
+        var maskArray = tensor.ToArray();
 
         var result = new SKBitmap(_imageWidth, _imageHeight);
         for (var y = 0; y < _imageHeight; y++)
         {
             for (var x = 0; x < _imageWidth; x++)
             {
-                var pixelByte = (byte)(mask[pixelIndex++] * 255f);
-                //byte pixelR = (byte)(mask[pixelIndex++] * 255f);
-                //byte pixelG = (byte)(mask[pixelIndex++] * 255f);
-                //byte pixelB = (byte)(mask[pixelIndex++] * 255f);
-                //byte pixelA = (byte)(mask[pixelIndex++] * 255f);
+                var pixelByte = (byte)(maskArray[pixelIndex++] * 255f);
 
                 if (pixelByte > 0)
                 {

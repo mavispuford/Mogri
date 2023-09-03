@@ -702,6 +702,9 @@ public partial class CanvasPage : BasePage
         MaskCanvasView.WidthRequest = width;
         MaskCanvasView.HeightRequest = height;
 
+        SegmentationMaskCanvasView.WidthRequest = width;
+        SegmentationMaskCanvasView.HeightRequest = height;
+
         // Clear lines
         //Clear_Button_Clicked(this, new EventArgs());
 
@@ -710,6 +713,8 @@ public partial class CanvasPage : BasePage
         SourceImageCanvasView.InvalidateSurface();
         MaskCanvasView.Measure(width, height);
         MaskCanvasView.InvalidateSurface();
+        SegmentationMaskCanvasView.Measure(width, height);
+        SegmentationMaskCanvasView.InvalidateSurface();
 
         InitImgRectangleScale = Bitmap.Width / width;
     }
