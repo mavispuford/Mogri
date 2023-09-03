@@ -1,5 +1,6 @@
 using CommunityToolkit.Maui.Core.Extensions;
 using CommunityToolkit.Mvvm.Input;
+using MobileDiffusion.Enums;
 using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Models;
 using SkiaSharp;
@@ -76,6 +77,12 @@ public partial class CanvasPage : BasePage
         set => SetValue(PrepareForSavingCommandProperty, value);
     }
 
+    public IAsyncRelayCommand<SKPoint> DoSegmentationCommand
+    {
+        get => (IAsyncRelayCommand<SKPoint>)GetValue(DoSegmentationCommandProperty);
+        set => SetValue(DoSegmentationCommandProperty, value);
+    }
+
     public float InitImgRectangleSize
     {
         get => (float)GetValue(InitImgRectangleSizeProperty);
@@ -123,6 +130,8 @@ public partial class CanvasPage : BasePage
 
     public static BindableProperty PrepareForSavingCommandProperty = BindableProperty.Create(nameof(PrepareForSavingCommand), typeof(IAsyncRelayCommand), typeof(CanvasPage), default(IAsyncRelayCommand));
 
+    public static BindableProperty DoSegmentationCommandProperty = BindableProperty.Create(nameof(DoSegmentationCommand), typeof(IAsyncRelayCommand<SKPoint>), typeof(CanvasPage), default(IAsyncRelayCommand<SKPoint>));
+
     public static BindableProperty ShowInitImgRectangleProperty = BindableProperty.Create(nameof(ShowInitImgRectangle), typeof(bool), typeof(CanvasPage), false, propertyChanged: (bindable, oldValue, newValue) =>
     {
         ((CanvasPage)bindable).UpdateInitImgRectangle(false);
@@ -147,7 +156,8 @@ public partial class CanvasPage : BasePage
         this.SetBinding(InitImgRectangleScaleProperty, nameof(ICanvasPageViewModel.InitImgRectangleScale), BindingMode.OneWayToSource);
         this.SetBinding(InitImgRectangleSizeProperty, nameof(ICanvasPageViewModel.InitImgRectangleSize), BindingMode.OneWay);
         this.SetBinding(ShowMaskLayerProperty, nameof(ICanvasPageViewModel.ShowMaskLayer), BindingMode.OneWay);
-
+        this.SetBinding(DoSegmentationCommandProperty, nameof(ICanvasPageViewModel.DoSegmentationCommand), BindingMode.OneWay);
+        
         PrepareForSavingCommand = new AsyncRelayCommand<IAsyncRelayCommand>(PrepareForSaving);
 
         //SourceImageCanvasView.SizeChanged += SourceImageCanvasView_SizeChanged;
@@ -186,7 +196,8 @@ public partial class CanvasPage : BasePage
         HideSliders();
         if (e.InContact)
         {
-            if (e.Location is SKPoint location)
+            if (e.Location is SKPoint location && CurrentTool != null && 
+                (CurrentTool.Type == ToolType.PaintBrush || CurrentTool.Type == ToolType.Eraser))
             {
                 if (ShowInitImgRectangle &&
                     _currentLine == null &&
@@ -234,7 +245,7 @@ public partial class CanvasPage : BasePage
                         Alpha = CurrentAlpha,
                         BrushSize = CurrentBrushSize,
                         Color = CurrentColor,
-                        Type = CurrentTool?.Type ?? MaskLine.MaskLineType.Paint
+                        Type = CurrentTool?.Effect ?? MaskEffect.Paint
                     };
 
                     Lines ??= new();
@@ -244,6 +255,14 @@ public partial class CanvasPage : BasePage
 
                 _currentLine.Path.Add(location);
             }
+        }
+        else if (e.Location is SKPoint location && CurrentTool != null && CurrentTool.Type == ToolType.PaintBucket)
+        {
+            DoSegmentationCommand?.Execute(location);
+
+            // Handle paint bucket logic
+
+            _currentLine = null;
         }
         else
         {
@@ -304,7 +323,7 @@ public partial class CanvasPage : BasePage
 
             foreach (var line in Lines)
             {
-                if (line.Type == MaskLine.MaskLineType.Paint)
+                if (line.Type == MaskEffect.Paint)
                 {
                     paint.BlendMode = SKBlendMode.SrcOver;
 

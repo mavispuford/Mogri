@@ -37,6 +37,10 @@ namespace MobileDiffusion.Interfaces.ViewModels
 
         SKCanvasView SourceCanvasView { get; set; }
 
+        bool SettingSegmentationImage { get; set; }
+        
+        bool HasSegmentationImage { get; set; }
+
         IAsyncRelayCommand BeginCropImageRectCommand { get; }
 
         IRelayCommand ChangeInitImgRectangleSizeCommand { get; }
@@ -63,6 +67,6 @@ namespace MobileDiffusion.Interfaces.ViewModels
 
         IRelayCommand<IPaintingToolViewModel> SelectToolCommand { get; }
 
-        IAsyncRelayCommand DoSegmentationCommand { get; }
+        IAsyncRelayCommand<SKPoint> DoSegmentationCommand { get; }
     }
 }

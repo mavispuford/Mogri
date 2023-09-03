@@ -4,5 +4,6 @@ namespace MobileDiffusion.Interfaces.Services;
 
 public interface ISegmentationService
 {
-    Task DoSegmentation(SKBitmap bitmap);
+    Task<bool> SetImage(SKBitmap bitmap);
+    Task DoSegmentation(SKPoint location);
 }

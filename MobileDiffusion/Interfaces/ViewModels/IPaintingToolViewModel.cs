@@ -1,5 +1,4 @@
-﻿using static MobileDiffusion.Models.MaskLine;
-
+﻿using MobileDiffusion.Enums;
 namespace MobileDiffusion.Interfaces.ViewModels;
 
 public interface IPaintingToolViewModel : IBaseViewModel
@@ -8,5 +7,9 @@ public interface IPaintingToolViewModel : IBaseViewModel
 
     public string IconCode { get; set; }
 
-    public MaskLineType Type { get; set; }
+    public MaskEffect Effect { get; set; }
+
+    public ToolType Type { get; set; }
+
+    public bool IsLoading { get; set; }
 }

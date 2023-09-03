@@ -22,6 +22,10 @@ public class SegmentationService : ISegmentationService
     private InferenceSession _encoderSession;
     private InferenceSession _decoderSession;
 
+    private int _imageWidth;
+    private int _imageHeight;
+    private Tensor<float> _imageEmbedding;
+
     public SegmentationService(IImageService imageService)
     {
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
@@ -66,79 +70,105 @@ public class SegmentationService : ISegmentationService
         _decoderSession = new InferenceSession(_decoderModel, sessionOptions);
     }
 
-    public async Task DoSegmentation(SKBitmap bitmap)
+    public async Task<bool> SetImage(SKBitmap bitmap)
     {
+        if (bitmap == null)
+        {
+            return false;
+        }
+
         await _initTask.ConfigureAwait(false);
 
-        if (bitmap == null)
+        try
+        {
+            // STEP - Preprocess SKBitmap image so it matches expected color format/dimensions
+
+            Console.WriteLine($"Provided image size: {bitmap.Width}x{bitmap.Height} pixels");
+
+            var processedBitmap = PreprocessImage(bitmap);
+
+            Console.WriteLine($"Resized image size: {processedBitmap.Width}x{processedBitmap.Height} pixels");
+
+            // STEP - Create inputs for image encoder
+
+            var imageDataTensor = ImageToDenseTensor(processedBitmap);
+
+            //imageDataTensor = NormalizeAndPadImageTensor(imageDataTensor);
+
+            var encoderInputs = new NamedOnnxValue[] { NamedOnnxValue.CreateFromTensor("input_image", imageDataTensor) };
+
+            var encoderInputMeta = _encoderSession.InputMetadata;
+            var encoderOutputMeta = _encoderSession.OutputMetadata;
+
+            // STEP - Run image encoder
+
+            using (var encoderResult = _encoderSession.Run(encoderInputs))
+            {
+                _imageEmbedding = encoderResult.First().AsTensor<float>();
+                _imageWidth = bitmap.Width;
+                _imageHeight = bitmap.Height;
+            }
+        }
+        catch (Exception ex)
+        {
+            _imageWidth = 0;
+            _imageHeight = 0;
+            return false;
+        }
+
+        return true;
+    }
+
+    public async Task DoSegmentation(SKPoint location)
+    {
+        if (_imageEmbedding == null ||
+            _imageWidth == 0 ||
+            _imageHeight == 0 ||
+            location.IsEmpty)
         {
             return;
         }
 
-        // STEP - Preprocess SKBitmap image so it matches expected color format/dimensions
+        await _initTask.ConfigureAwait(false);
 
-        Console.WriteLine($"Provided image size: {bitmap.Width}x{bitmap.Height} pixels");
+        // STEP - Use image encoder output (image embeddings) as decoder input
 
-        var processedBitmap = PreprocessImage(bitmap);
+        var decoderInputMeta = _decoderSession.InputMetadata;
+        var decoderOutputMeta = _decoderSession.OutputMetadata;
 
-        Console.WriteLine($"Resized image size: {processedBitmap.Width}x{processedBitmap.Height} pixels");
+        // TODO - Transform tap coordinates
+        var xCoord = location.X;
+        var yCoord = location.Y;
 
-        // STEP - Create inputs for image encoder
+        var pointCoords = new DenseTensor<float>(new float[] { xCoord, yCoord, 0, 0 }, new int[] { 1, 2, 2 });
+        var pointLabels = new DenseTensor<float>(new float[] { 0, -1 }, new int[] { 1, 2 });
+        var maskInput = new DenseTensor<float>(new float[256 * 256], new int[] { 1, 1, 256, 256 });
+        var hasMask = new DenseTensor<float>(new float[] { 0 }, new int[] { 1 });
+        var originalImageSize = new DenseTensor<float>(new float[] { _imageHeight, _imageWidth }, new int[] { 2 });
 
-        var imageDataTensor = ImageToDenseTensor(processedBitmap);
+        var decoderInputs = new NamedOnnxValue[] {
+                    NamedOnnxValue.CreateFromTensor("image_embeddings", _imageEmbedding),
+                    NamedOnnxValue.CreateFromTensor("point_coords", pointCoords),
+                    NamedOnnxValue.CreateFromTensor("point_labels", pointLabels),
+                    NamedOnnxValue.CreateFromTensor("mask_input", maskInput),
+                    NamedOnnxValue.CreateFromTensor("has_mask_input", hasMask),
+                    NamedOnnxValue.CreateFromTensor("orig_im_size", originalImageSize)
+        };
 
-        //imageDataTensor = NormalizeAndPadImageTensor(imageDataTensor);
+        // STEP -  Run decoder using inputs
 
-        var encoderInputs = new NamedOnnxValue[] { NamedOnnxValue.CreateFromTensor("input_image", imageDataTensor) };
-
-        var encoderInputMeta = _encoderSession.InputMetadata;
-        var encoderOutputMeta = _encoderSession.OutputMetadata;
-
-        // STEP - Run image encoder
-
-        using (var encoderResult = _encoderSession.Run(encoderInputs))
+        using (var results = _decoderSession.Run(decoderInputs))
         {
-            var imageEmbedding = encoderResult.First();
+            // Retrieve the output tensor(s)
+            var masksTensor = results.First(r => r.Name == "masks").AsTensor<float>();
+            var iouPredictionsTensor = results.First(r => r.Name == "iou_predictions").AsTensor<float>();
+            var lowResMasksTensor = results.First(r => r.Name == "low_res_masks").AsTensor<float>();
 
-            // STEP - Use image encoder output (image embeddings) as decoder input
-
-            var decoderInputMeta = _decoderSession.InputMetadata;
-            var decoderOutputMeta = _decoderSession.OutputMetadata;
-
-            // x and y represent tap coordinates
-            var xCoord = 0;
-            var yCoord = 0;
-            var pointCoords = new DenseTensor<float>(new float[] { xCoord, yCoord, 0, 0 }, new int[] { 1, 2, 2 });
-            var pointLabels = new DenseTensor<float>(new float[] { 0, -1 }, new int[] { 1, 2 });
-            var maskInput = new DenseTensor<float>(new float[256 * 256], new int[] { 1, 1, 256, 256 });
-            var hasMask = new DenseTensor<float>(new float[] { 0 }, new int[] { 1 });
-            var originalImageSize = new DenseTensor<float>(new float[] { bitmap.Height, bitmap.Width }, new int[] { 2 });
-
-            var decoderInputs = new NamedOnnxValue[]
-                        {
-                        imageEmbedding,
-                        NamedOnnxValue.CreateFromTensor("point_coords", pointCoords),
-                        NamedOnnxValue.CreateFromTensor("point_labels", pointLabels),
-                        NamedOnnxValue.CreateFromTensor("mask_input", maskInput),
-                        NamedOnnxValue.CreateFromTensor("has_mask_input", hasMask),
-                        NamedOnnxValue.CreateFromTensor("orig_im_size", originalImageSize)
-                        };
-
-            // STEP -  Run decoder using inputs
-
-            using (var results = _decoderSession.Run(decoderInputs))
-            {
-                // Retrieve the output tensor(s)
-                var masksTensor = results.First(r => r.Name == "masks").AsTensor<float>();
-                var iouPredictionsTensor = results.First(r => r.Name == "iou_predictions").AsTensor<float>();
-                var lowResMasksTensor = results.First(r => r.Name == "low_res_masks").AsTensor<float>();
-
-                // Convert the output tensor(s) to a float array
-                var masks = masksTensor.ToArray();
-                var iouPredictions = iouPredictionsTensor.ToArray();
-                var lowResMasks = lowResMasksTensor.ToArray();
-            }
-        }
+            // Convert the output tensor(s) to a float array
+            var masks = masksTensor.ToArray();
+            var iouPredictions = iouPredictionsTensor.ToArray();
+            var lowResMasks = lowResMasksTensor.ToArray();
+        }   
     }
 
     private SKBitmap PreprocessImage(SKBitmap bitmap)
@@ -167,6 +197,9 @@ public class SegmentationService : ISegmentationService
             x.SetValue(i, (inputValue - meanValue) / stdValue);
         }
 
+        // Skip padding for now
+
+        /*
         // Get the current height and width
         var w = x.Dimensions[^1];
         var h = x.Dimensions[^2];
@@ -176,7 +209,7 @@ public class SegmentationService : ISegmentationService
         var padw = imgSize - w;
 
         // Pad the tensor manually
-        x = PadTensor(x, padw, padh);
+        x = PadTensor(x, padw, padh);*/
 
         return x;
     }
