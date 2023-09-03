@@ -14,6 +14,7 @@ namespace MobileDiffusion.ViewModels;
 
 public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 {
+    private readonly object _setSegmentationImageLock = new();
     private readonly IFileService _fileService;
     private readonly IImageService _imageService;
     private readonly IPopupService _popupService;
@@ -30,6 +31,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private string _sourceFileName;
     private Random _random = new Random();
     private bool _doingSegmentation = false;
+    private CancellationTokenSource _setSegmentationImageCancellationTokenSource;
+    private int _setSegmentationImageRequestCount = 0;
 
     [ObservableProperty]
     private List<IPaintingToolViewModel> _availableTools = new();
@@ -57,6 +60,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
     [ObservableProperty]
     private SKBitmap _sourceBitmap;
+
+    [ObservableProperty]
+    private SKBitmap _segmentationBitmap;
 
     [ObservableProperty]
     private SKCanvasView _sourceCanvasView;
@@ -150,13 +156,31 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             {
                 var paintBucketTool = AvailableTools.FirstOrDefault(t => t.Type == ToolType.PaintBucket);
 
-                paintBucketTool.IsLoading = true;
-                SettingSegmentationImage = true;
+                lock (_setSegmentationImageLock)
+                {
+                    _setSegmentationImageRequestCount++;
 
-                HasSegmentationImage = await _segmentationService.SetImage(value);
+                    paintBucketTool.IsLoading = true;
+                    SettingSegmentationImage = true;
+                }
 
-                paintBucketTool.IsLoading = false;
-                SettingSegmentationImage = false;
+                if (!_setSegmentationImageCancellationTokenSource?.IsCancellationRequested ?? false)
+                {
+                    _setSegmentationImageCancellationTokenSource.Cancel();
+                }
+
+                _setSegmentationImageCancellationTokenSource = new CancellationTokenSource();
+
+                HasSegmentationImage = await _segmentationService.SetImage(value, _setSegmentationImageCancellationTokenSource?.Token ?? CancellationToken.None);
+
+                lock (_setSegmentationImageLock)
+                {
+                    _setSegmentationImageRequestCount--;
+
+                    paintBucketTool.IsLoading = _setSegmentationImageRequestCount > 0;
+                    SettingSegmentationImage = _setSegmentationImageRequestCount > 0;
+                }
+
             });
         }
     }
@@ -455,7 +479,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     }
 
     [RelayCommand]
-    private async Task DoSegmentation(SKPoint tapLocation)
+    private async Task DoSegmentation((SKPoint Location, IAsyncRelayCommand<SKBitmap> Callback) argsTuple)
     {
         if (_doingSegmentation)
         {
@@ -486,7 +510,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         _doingSegmentation = true;
         IsBusy = true;
 
-        await _segmentationService.DoSegmentation(tapLocation);
+        var maskBitmap = await _segmentationService.DoSegmentation(argsTuple.Location);
+
+        argsTuple.Callback?.Execute(maskBitmap);
 
         IsBusy = false;
         _doingSegmentation = false;
