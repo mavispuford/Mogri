@@ -16,6 +16,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private readonly IFileService _fileService;
     private readonly IImageService _imageService;
     private readonly IPopupService _popupService;
+    private readonly ISegmentationService _segmentationService;
 
     private int _imgRectIndex = 0;
     private List<int> _supportedImgRectSizes = new()
@@ -79,11 +80,13 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     public CanvasPageViewModel(
         IFileService fileService,
         IPopupService popupService,
-        IImageService imageService)
+        IImageService imageService,
+        ISegmentationService segmentationService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
+        _segmentationService = segmentationService ?? throw new ArgumentNullException(nameof(segmentationService));
 
         Application.Current.Resources.TryGetValue("IndependenceAccent", out var independenceColor);
 
@@ -418,6 +421,17 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         using var fileStream = await fileResult.OpenReadAsync();
 
         await LoadSourceBitmapUsingStream(fileStream, fileResult.FileName);
+    }
+
+    [RelayCommand]
+    private async Task DoSegmentation()
+    {
+        if (SourceBitmap == null)
+        {
+            return;
+        }
+
+        await _segmentationService.DoSegmentation(SourceBitmap);
     }
 
     private async Task LoadSourceBitmapUsingStream(Stream stream, string fileName)
