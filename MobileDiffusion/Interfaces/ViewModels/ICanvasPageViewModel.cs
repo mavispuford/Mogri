@@ -62,5 +62,7 @@ namespace MobileDiffusion.Interfaces.ViewModels
         IRelayCommand ToggleMaskLayerVisibilityCommand { get; }
 
         IRelayCommand<IPaintingToolViewModel> SelectToolCommand { get; }
+
+        IAsyncRelayCommand DoSegmentationCommand { get; }
     }
 }

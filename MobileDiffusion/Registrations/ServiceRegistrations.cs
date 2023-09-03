@@ -28,6 +28,7 @@ public static class ServiceRegistrations
         //builder.Services.AddSingleton<IStableDiffusionService, LSteinStableDiffusionService>();
         builder.Services.AddSingleton<IPopupService, PopupService>();
         builder.Services.AddSingleton<IImageService, ImageService>();
+        builder.Services.AddSingleton<ISegmentationService, SegmentationService>();
 
 #if ANDROID
         builder.Services.AddSingleton<IFileService, FileService>();
