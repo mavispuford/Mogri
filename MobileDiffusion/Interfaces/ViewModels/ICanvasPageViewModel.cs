@@ -35,6 +35,8 @@ namespace MobileDiffusion.Interfaces.ViewModels
 
         SKBitmap SourceBitmap { get; set; }
 
+        SKBitmap SegmentationBitmap { get; set; }
+
         SKCanvasView SourceCanvasView { get; set; }
 
         bool SettingSegmentationImage { get; set; }
@@ -67,6 +69,6 @@ namespace MobileDiffusion.Interfaces.ViewModels
 
         IRelayCommand<IPaintingToolViewModel> SelectToolCommand { get; }
 
-        IAsyncRelayCommand<SKPoint> DoSegmentationCommand { get; }
+        IAsyncRelayCommand<(SKPoint Location, IAsyncRelayCommand<SKBitmap> Callback)> DoSegmentationCommand { get; }
     }
 }

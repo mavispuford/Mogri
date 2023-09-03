@@ -343,7 +343,7 @@ namespace MobileDiffusion.Services
 
             var request = txt2ImageRequestFromSettings(settings);
 
-            if (_mainRequestCancellationSource?.IsCancellationRequested ?? false)
+            if (!_mainRequestCancellationSource?.IsCancellationRequested ?? false)
             {
                 _mainRequestCancellationSource.Cancel();
             }

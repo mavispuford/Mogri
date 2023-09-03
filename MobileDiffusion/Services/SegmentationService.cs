@@ -24,7 +24,7 @@ public class SegmentationService : ISegmentationService
 
     private int _imageWidth;
     private int _imageHeight;
-    private Tensor<float> _imageEmbedding;
+    private Tensor<float> _imageEmbeddings;
 
     public SegmentationService(IImageService imageService)
     {
@@ -70,7 +70,7 @@ public class SegmentationService : ISegmentationService
         _decoderSession = new InferenceSession(_decoderModel, sessionOptions);
     }
 
-    public async Task<bool> SetImage(SKBitmap bitmap)
+    public async Task<bool> SetImage(SKBitmap bitmap, CancellationToken token)
     {
         if (bitmap == null)
         {
@@ -81,11 +81,17 @@ public class SegmentationService : ISegmentationService
 
         try
         {
+            Console.WriteLine($"** SegmentationService.SetImage() STARTED **");
+
+            token.ThrowIfCancellationRequested();
+
             // STEP - Preprocess SKBitmap image so it matches expected color format/dimensions
 
             Console.WriteLine($"Provided image size: {bitmap.Width}x{bitmap.Height} pixels");
 
             var processedBitmap = PreprocessImage(bitmap);
+
+            token.ThrowIfCancellationRequested();
 
             Console.WriteLine($"Resized image size: {processedBitmap.Width}x{processedBitmap.Height} pixels");
 
@@ -93,61 +99,74 @@ public class SegmentationService : ISegmentationService
 
             var imageDataTensor = ImageToDenseTensor(processedBitmap);
 
+            token.ThrowIfCancellationRequested();
+
             //imageDataTensor = NormalizeAndPadImageTensor(imageDataTensor);
+
+            token.ThrowIfCancellationRequested();
 
             var encoderInputs = new NamedOnnxValue[] { NamedOnnxValue.CreateFromTensor("input_image", imageDataTensor) };
 
             var encoderInputMeta = _encoderSession.InputMetadata;
             var encoderOutputMeta = _encoderSession.OutputMetadata;
 
+            token.ThrowIfCancellationRequested();
+
             // STEP - Run image encoder
 
             using (var encoderResult = _encoderSession.Run(encoderInputs))
             {
-                _imageEmbedding = encoderResult.First().AsTensor<float>();
+                _imageEmbeddings = encoderResult.First().AsTensor<float>();
                 _imageWidth = bitmap.Width;
                 _imageHeight = bitmap.Height;
             }
         }
         catch (Exception ex)
         {
+            _imageEmbeddings = null;
             _imageWidth = 0;
             _imageHeight = 0;
             return false;
+        }
+        finally
+        {
+            Console.WriteLine($"** SegmentationService.SetImage() FINISHED **");
         }
 
         return true;
     }
 
-    public async Task DoSegmentation(SKPoint location)
+    public async Task<SKBitmap> DoSegmentation(SKPoint location)
     {
-        if (_imageEmbedding == null ||
+        if (_imageEmbeddings == null ||
             _imageWidth == 0 ||
             _imageHeight == 0 ||
             location.IsEmpty)
         {
-            return;
+            return null;
         }
 
         await _initTask.ConfigureAwait(false);
 
-        // STEP - Use image encoder output (image embeddings) as decoder input
+        try
+        {
+            // STEP - Use image encoder output (image embeddings) as decoder input
 
-        var decoderInputMeta = _decoderSession.InputMetadata;
-        var decoderOutputMeta = _decoderSession.OutputMetadata;
+            var decoderInputMeta = _decoderSession.InputMetadata;
+            var decoderOutputMeta = _decoderSession.OutputMetadata;
 
-        // TODO - Transform tap coordinates
-        var xCoord = location.X;
-        var yCoord = location.Y;
+            // TODO - Transform tap coordinates
+            var xCoord = location.X;
+            var yCoord = location.Y;
 
-        var pointCoords = new DenseTensor<float>(new float[] { xCoord, yCoord, 0, 0 }, new int[] { 1, 2, 2 });
-        var pointLabels = new DenseTensor<float>(new float[] { 0, -1 }, new int[] { 1, 2 });
-        var maskInput = new DenseTensor<float>(new float[256 * 256], new int[] { 1, 1, 256, 256 });
-        var hasMask = new DenseTensor<float>(new float[] { 0 }, new int[] { 1 });
-        var originalImageSize = new DenseTensor<float>(new float[] { _imageHeight, _imageWidth }, new int[] { 2 });
+            var pointCoords = new DenseTensor<float>(new float[] { xCoord, yCoord, 0, 0 }, new int[] { 1, 2, 2 });
+            var pointLabels = new DenseTensor<float>(new float[] { 0, -1 }, new int[] { 1, 2 });
+            var maskInput = new DenseTensor<float>(new float[256 * 256], new int[] { 1, 1, 256, 256 });
+            var hasMask = new DenseTensor<float>(new float[] { 0 }, new int[] { 1 });
+            var originalImageSize = new DenseTensor<float>(new float[] { _imageHeight, _imageWidth }, new int[] { 2 });
 
-        var decoderInputs = new NamedOnnxValue[] {
-                    NamedOnnxValue.CreateFromTensor("image_embeddings", _imageEmbedding),
+            var decoderInputs = new NamedOnnxValue[] {
+                    NamedOnnxValue.CreateFromTensor("image_embeddings", _imageEmbeddings),
                     NamedOnnxValue.CreateFromTensor("point_coords", pointCoords),
                     NamedOnnxValue.CreateFromTensor("point_labels", pointLabels),
                     NamedOnnxValue.CreateFromTensor("mask_input", maskInput),
@@ -155,20 +174,29 @@ public class SegmentationService : ISegmentationService
                     NamedOnnxValue.CreateFromTensor("orig_im_size", originalImageSize)
         };
 
-        // STEP -  Run decoder using inputs
+            // STEP -  Run decoder using inputs
 
-        using (var results = _decoderSession.Run(decoderInputs))
+            using (var results = _decoderSession.Run(decoderInputs))
+            {
+                // Retrieve the output tensor(s)
+                var maskTensor = results.First(r => r.Name == "masks").AsTensor<float>();
+                var iouPredictionsTensor = results.First(r => r.Name == "iou_predictions").AsTensor<float>();
+                var lowResMasksTensor = results.First(r => r.Name == "low_res_masks").AsTensor<float>();
+
+                // Convert the output tensor(s) to a float array
+                var mask = maskTensor.ToArray();
+                var iouPredictions = iouPredictionsTensor.ToArray();
+                var lowResMasks = lowResMasksTensor.ToArray();
+
+                var dimensions = maskTensor.Dimensions.ToArray();
+
+                return GetImageFromMaskTensor(maskTensor);
+            }
+        }
+        catch
         {
-            // Retrieve the output tensor(s)
-            var masksTensor = results.First(r => r.Name == "masks").AsTensor<float>();
-            var iouPredictionsTensor = results.First(r => r.Name == "iou_predictions").AsTensor<float>();
-            var lowResMasksTensor = results.First(r => r.Name == "low_res_masks").AsTensor<float>();
-
-            // Convert the output tensor(s) to a float array
-            var masks = masksTensor.ToArray();
-            var iouPredictions = iouPredictionsTensor.ToArray();
-            var lowResMasks = lowResMasksTensor.ToArray();
-        }   
+            return null;
+        }
     }
 
     private SKBitmap PreprocessImage(SKBitmap bitmap)
@@ -308,6 +336,31 @@ public class SegmentationService : ISegmentationService
         }
 
         Console.WriteLine($"Arrays values are the same.");
+    }
+
+    private SKBitmap GetImageFromMaskTensor(Tensor<float> mask)
+    {
+        var pixelIndex = 0;
+
+        var result = new SKBitmap(_imageWidth, _imageHeight);
+        for (var y = 0; y < _imageHeight; y++)
+        {
+            for (var x = 0; x < _imageWidth; x++)
+            {
+                var pixelByte = (byte)(mask[pixelIndex++] * 255f);
+                //byte pixelR = (byte)(mask[pixelIndex++] * 255f);
+                //byte pixelG = (byte)(mask[pixelIndex++] * 255f);
+                //byte pixelB = (byte)(mask[pixelIndex++] * 255f);
+                //byte pixelA = (byte)(mask[pixelIndex++] * 255f);
+
+                if (pixelByte > 0)
+                {
+                    result.SetPixel(x, y, SKColors.Black);
+                }
+            }
+        }
+
+        return result;
     }
 
 }
