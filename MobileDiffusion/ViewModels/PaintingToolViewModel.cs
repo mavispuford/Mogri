@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using MobileDiffusion.Enums;
 using MobileDiffusion.Interfaces.ViewModels;
-using static MobileDiffusion.Models.MaskLine;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -13,5 +13,11 @@ public partial class PaintingToolViewModel : BaseViewModel, IPaintingToolViewMod
     private string _iconCode;
 
     [ObservableProperty]
-    private MaskLineType _type;
+    private MaskEffect _effect;
+
+    [ObservableProperty]
+    private ToolType _type;
+
+    [ObservableProperty]
+    private bool _isLoading;
 }

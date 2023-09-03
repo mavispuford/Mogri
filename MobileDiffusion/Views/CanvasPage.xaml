@@ -11,6 +11,7 @@
     <views:BasePage.Resources>
         <ResourceDictionary>
             <toolkit:BoolToObjectConverter x:Key="BoolToShowMaskTextConverter" TrueObject="Hide Mask Layer" FalseObject="Show Mask Layer" />
+            <toolkit:BoolToObjectConverter x:Key="BoolToHalfOpacityConverter" TrueObject=".5" FalseObject="1" />
             <toolkit:BoolToObjectConverter x:Key="BoolToEyeConverter">
                 <toolkit:BoolToObjectConverter.TrueObject>
                     <FontImageSource Glyph="&#xe8f5;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
@@ -120,9 +121,9 @@
                           HorizontalOptions="Center"
                           VerticalOptions="Center"
                           HeightRequest="58"
-                          WidthRequest="180"
+                          WidthRequest="300"
                           Loop="False"
-                          PeekAreaInsets="58"
+                          PeekAreaInsets="120"
                           CurrentItemChanged="ToolCarouselView_CurrentItemChanged">
                 <CarouselView.ItemsLayout>
                     <LinearItemsLayout Orientation="Horizontal"
@@ -132,12 +133,18 @@
                 </CarouselView.ItemsLayout>
                 <CarouselView.ItemTemplate>
                     <DataTemplate x:DataType="viewModels:IPaintingToolViewModel">
-                        <ImageButton WidthRequest="50" HeightRequest="50" 
-                                     Command="{Binding SelectToolCommand, Source={RelativeSource AncestorType={x:Type viewModels:ICanvasPageViewModel}}}"
-                                     CommandParameter="{Binding .}">
-                            <ImageButton.Source>
-                                <FontImageSource Glyph="{Binding IconCode}" FontFamily="MaterialIconsRound400" Size="50" Color="{StaticResource Primary}" />
-                            </ImageButton.Source>
+                        <Grid>
+                            <ImageButton WidthRequest="50" 
+                                         HeightRequest="50" 
+                                         Command="{Binding SelectToolCommand, Source={RelativeSource AncestorType={x:Type viewModels:ICanvasPageViewModel}}}"
+                                         CommandParameter="{Binding .}"
+                                         Opacity="{Binding IsLoading, Converter={StaticResource BoolToHalfOpacityConverter}}">
+                                <ImageButton.Source>
+                                    <FontImageSource Glyph="{Binding IconCode}" FontFamily="MaterialIconsRound400" Size="50" Color="{StaticResource Primary}" />
+                                </ImageButton.Source>
+                            </ImageButton>
+
+                            <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center" IsRunning="{Binding IsLoading}" InputTransparent="True"/>
 
                             <VisualStateManager.VisualStateGroups>
                                 <VisualStateGroupList>
@@ -173,7 +180,7 @@
                                     </VisualStateGroup>
                                 </VisualStateGroupList>
                             </VisualStateManager.VisualStateGroups>
-                        </ImageButton>
+                        </Grid>
                     </DataTemplate>
                 </CarouselView.ItemTemplate>
             </CarouselView>
@@ -307,27 +314,6 @@
                            VerticalOptions="Center">
                         <Image.Source>
                             <FontImageSource Glyph="&#xe91c;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
-                        </Image.Source>
-                    </Image>
-                </ContentView>
-            </Border>
-
-            <Border Grid.Row="1"
-                    Grid.Column="2"
-                    StrokeThickness="0">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="50" />
-                </Border.StrokeShape>
-                <ContentView BackgroundColor="{StaticResource IndependenceAccentSixtyPercent}"
-                             VerticalOptions="FillAndExpand"
-                             WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
-                    <ContentView.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding DoSegmentationCommand}" Tapped="Vibrate_Button_Tapped" />
-                    </ContentView.GestureRecognizers>
-                    <Image HorizontalOptions="Center"
-                           VerticalOptions="Center">
-                        <Image.Source>
-                            <FontImageSource Glyph="&#xe997;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
                         </Image.Source>
                     </Image>
                 </ContentView>

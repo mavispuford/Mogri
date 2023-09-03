@@ -2,6 +2,7 @@
 using CommunityToolkit.Maui.Core.Extensions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MobileDiffusion.Enums;
 using MobileDiffusion.Helpers;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
@@ -28,6 +29,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private Color _paletteIconDarkColor = Colors.Black;
     private string _sourceFileName;
     private Random _random = new Random();
+    private bool _doingSegmentation = false;
 
     [ObservableProperty]
     private List<IPaintingToolViewModel> _availableTools = new();
@@ -75,6 +77,12 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private bool _showMaskLayer = true;
 
     [ObservableProperty]
+    private bool _settingSegmentationImage = false;
+
+    [ObservableProperty]
+    private bool _hasSegmentationImage = false;
+
+    [ObservableProperty]
     private IAsyncRelayCommand _prepareForSavingCommand;
 
     public CanvasPageViewModel(
@@ -101,14 +109,24 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         {
             Name = "Brush",
             IconCode = "\ue3ae",
-            Type = MaskLine.MaskLineType.Paint
+            Effect = MaskEffect.Paint,
+            Type = ToolType.PaintBrush
         });
 
         AvailableTools.Add(new PaintingToolViewModel
         {
             Name = "Eraser",
             IconCode = "\ue6d0",
-            Type = MaskLine.MaskLineType.Erase
+            Effect = MaskEffect.Erase,
+            Type = ToolType.Eraser
+        });
+
+        AvailableTools.Add(new PaintingToolViewModel
+        {
+            Name = "Paint Bucket",
+            IconCode = "\ue997",
+            Effect = MaskEffect.Erase,
+            Type = ToolType.PaintBucket
         });
 
         CurrentTool = AvailableTools.FirstOrDefault();
@@ -127,6 +145,19 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         if (value != null)
         {
             _colorPalette = ExtractColorPalette(value, 30);
+
+            _ = Task.Run(async () =>
+            {
+                var paintBucketTool = AvailableTools.FirstOrDefault(t => t.Type == ToolType.PaintBucket);
+
+                paintBucketTool.IsLoading = true;
+                SettingSegmentationImage = true;
+
+                HasSegmentationImage = await _segmentationService.SetImage(value);
+
+                paintBucketTool.IsLoading = false;
+                SettingSegmentationImage = false;
+            });
         }
     }
 
@@ -424,14 +455,41 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     }
 
     [RelayCommand]
-    private async Task DoSegmentation()
+    private async Task DoSegmentation(SKPoint tapLocation)
     {
-        if (SourceBitmap == null)
+        if (_doingSegmentation)
         {
             return;
         }
 
-        await _segmentationService.DoSegmentation(SourceBitmap);
+        if (SourceBitmap == null)
+        {
+            await Shell.Current.DisplayAlert("No image", "There is no image on the canvas. Add an image and try again.", "OK");
+
+            return;
+        }
+
+        if (!HasSegmentationImage)
+        {
+            if (SettingSegmentationImage)
+            {
+                await Shell.Current.DisplayAlert("Processing...", "The current image is still processing. Please try again.", "OK");
+            }
+            else
+            {
+                await Shell.Current.DisplayAlert("Problem", "There was a problem processing the current image. Please add an image and try again.", "OK");
+            }
+
+            return;
+        }
+
+        _doingSegmentation = true;
+        IsBusy = true;
+
+        await _segmentationService.DoSegmentation(tapLocation);
+
+        IsBusy = false;
+        _doingSegmentation = false;
     }
 
     private async Task LoadSourceBitmapUsingStream(Stream stream, string fileName)
