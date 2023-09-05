@@ -277,7 +277,9 @@ public partial class CanvasPage : BasePage
         {
             _currentLine = null;
 
-            DoSegmentationCommand?.Execute((location, SegmentationCallbackCommand));
+            var pixelPoint = new SKPoint(location.X * (float)InitImgRectangleScale, location.Y * (float)InitImgRectangleScale);
+
+            DoSegmentationCommand?.Execute((pixelPoint, SegmentationCallbackCommand));
         }
         else
         {
@@ -682,6 +684,8 @@ public partial class CanvasPage : BasePage
 
     private void OnSourceBitmapChanged()
     {
+        SegmentationBitmap = null;
+
         UpdateCanvasSizes();
     }
 
