@@ -551,13 +551,17 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
             var mask = await _fileService.GetMaskFileFromAppDataAsync(_sourceFileName);
 
-            if (mask?.Lines != null)
+            await dispatcher.DispatchAsync(() =>
             {
-                await dispatcher.DispatchAsync(() =>
+                if (mask?.Lines != null)
                 {
                     Lines = mask.Lines;
-                });
-            }
+                }
+                else
+                {
+                    Lines.Clear();
+                }
+            });
         }
         catch (Exception ex)
         {
