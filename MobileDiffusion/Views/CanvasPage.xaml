@@ -2,6 +2,7 @@
 <views:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                 xmlns:animations="clr-namespace:MobileDiffusion.Animations;assembly=MobileDiffusion"
+                xmlns:enums="clr-namespace:MobileDiffusion.Enums" 
                 xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
                 xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                 xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels" 
@@ -103,7 +104,8 @@
                                PaintSurface="OnPaintSegmentationImageSurface"
                                IgnorePixelScaling="True"
                                HorizontalOptions="Center"
-                               VerticalOptions="Center"/>
+                               VerticalOptions="Center"
+                               Opacity=".4"/>
             
             <skia:SKCanvasView x:Name="MaskCanvasView" 
                                PaintSurface="OnPaintMaskSurface"
@@ -199,6 +201,25 @@
                     StrokeShape="RoundRectangle 50"
                     BackgroundColor="Transparent"/>
         </Grid>
+
+        <HorizontalStackLayout x:Name="ContextButtonsLayout"
+                               Grid.Row="1"
+                               BackgroundColor="Transparent"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Start"
+                               IsVisible="{Binding ShowContextMenu}"
+                               Spacing="8"
+                               Margin="0,-12,0,0"
+                               RadioButtonGroup.GroupName="SegmentationMode"
+                               RadioButtonGroup.SelectedValue="{Binding SegmentationMode}">
+            <HorizontalStackLayout.GestureRecognizers>
+                <TapGestureRecognizer />
+            </HorizontalStackLayout.GestureRecognizers>
+            <RadioButton Content="Add" Value="{x:Static enums:SegmentationMode.AddArea}" HorizontalOptions="Start" IsChecked="True"/>
+            <RadioButton Content="Remove" Value="{x:Static enums:SegmentationMode.RemoveArea}" HorizontalOptions="Start"/>
+            <Button Text="Apply" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" BorderColor="{StaticResource IndependenceAccentSixtyPercent}" BorderWidth="1" Command="{Binding ApplySegmentationMaskCommand}" />
+            <Button Text="Clear" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" BorderColor="{StaticResource IndependenceAccentSixtyPercent}" BorderWidth="1" Command="{Binding ClearSegmentationMaskCommand}"/>
+        </HorizontalStackLayout>
         
 
         <Grid x:Name="BottomButtonsLayout"
