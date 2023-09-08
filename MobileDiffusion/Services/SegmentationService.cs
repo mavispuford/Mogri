@@ -380,7 +380,7 @@ public class SegmentationService : ISegmentationService
         var maskArray = tensor.ToArray();
         var pixelIndex = 0;
         var result = new SKBitmap(_imageWidth, _imageHeight, SKColorType.Rgba8888, SKAlphaType.Premul);
-        var maskColor = SKColors.Red.WithAlpha(150);
+        var maskColor = SKColors.Red;
 
         using (var pixmap = result.PeekPixels())
         {

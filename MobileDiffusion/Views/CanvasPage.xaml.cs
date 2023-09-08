@@ -89,9 +89,9 @@ public partial class CanvasPage : BasePage
         set => SetValue(SegmentationCallbackCommandProperty, value);
     }
 
-    public IAsyncRelayCommand<(SKPoint Location, IAsyncRelayCommand<SKBitmap> Callback)> DoSegmentationCommand
+    public IAsyncRelayCommand<SKPoint> DoSegmentationCommand
     {
-        get => (IAsyncRelayCommand<(SKPoint Location, IAsyncRelayCommand<SKBitmap> Callback)>)GetValue(DoSegmentationCommandProperty);
+        get => (IAsyncRelayCommand<SKPoint>)GetValue(DoSegmentationCommandProperty);
         set => SetValue(DoSegmentationCommandProperty, value);
     }
 
@@ -112,7 +112,10 @@ public partial class CanvasPage : BasePage
         ((CanvasPage)bindable).OnSourceBitmapChanged();
     });
 
-    public static BindableProperty SegmentationBitmapProperty = BindableProperty.Create(nameof(SegmentationBitmap), typeof(SKBitmap), typeof(CanvasPage));
+    public static BindableProperty SegmentationBitmapProperty = BindableProperty.Create(nameof(SegmentationBitmap), typeof(SKBitmap), typeof(CanvasPage), propertyChanged: (bindable, oldValue, newValue) =>
+    {
+        ((CanvasPage)bindable).OnSegmentationBitmapChanged();
+    });
 
     public static BindableProperty CurrentBrushSizeProperty = BindableProperty.Create(nameof(CurrentBrushSize), typeof(float), typeof(CanvasPage), 10f, propertyChanged: (bindable, oldValue, newValue) =>
     {
@@ -146,7 +149,7 @@ public partial class CanvasPage : BasePage
     
     public static BindableProperty SegmentationCallbackCommandProperty = BindableProperty.Create(nameof(SegmentationCallbackCommand), typeof(IAsyncRelayCommand<SKBitmap>), typeof(CanvasPage), default(IAsyncRelayCommand<SKBitmap>));
 
-    public static BindableProperty DoSegmentationCommandProperty = BindableProperty.Create(nameof(DoSegmentationCommand), typeof(IAsyncRelayCommand<(SKPoint Location, IAsyncRelayCommand<SKBitmap> Callback)>), typeof(CanvasPage), default(IAsyncRelayCommand<(SKPoint Location, IAsyncRelayCommand<SKBitmap> Callback)>));
+    public static BindableProperty DoSegmentationCommandProperty = BindableProperty.Create(nameof(DoSegmentationCommand), typeof(IAsyncRelayCommand<SKPoint>), typeof(CanvasPage), default(IAsyncRelayCommand<SKPoint>));
 
     public static BindableProperty ShowInitImgRectangleProperty = BindableProperty.Create(nameof(ShowInitImgRectangle), typeof(bool), typeof(CanvasPage), false, propertyChanged: (bindable, oldValue, newValue) =>
     {
@@ -173,9 +176,9 @@ public partial class CanvasPage : BasePage
         this.SetBinding(InitImgRectangleSizeProperty, nameof(ICanvasPageViewModel.InitImgRectangleSize), BindingMode.OneWay);
         this.SetBinding(ShowMaskLayerProperty, nameof(ICanvasPageViewModel.ShowMaskLayer), BindingMode.OneWay);
         this.SetBinding(DoSegmentationCommandProperty, nameof(ICanvasPageViewModel.DoSegmentationCommand), BindingMode.OneWay);
-        
+        this.SetBinding(SegmentationBitmapProperty, nameof(ICanvasPageViewModel.SegmentationBitmap), BindingMode.TwoWay);
+
         PrepareForSavingCommand = new AsyncRelayCommand<IAsyncRelayCommand>(PrepareForSaving);
-        SegmentationCallbackCommand = new AsyncRelayCommand<SKBitmap>(SegmentationCallback);
         
         //SourceImageCanvasView.SizeChanged += SourceImageCanvasView_SizeChanged;
     }
@@ -279,7 +282,7 @@ public partial class CanvasPage : BasePage
 
             var pixelPoint = new SKPoint(location.X * (float)InitImgRectangleScale, location.Y * (float)InitImgRectangleScale);
 
-            DoSegmentationCommand?.Execute((pixelPoint, SegmentationCallbackCommand));
+            DoSegmentationCommand?.Execute(pixelPoint);
         }
         else
         {
@@ -774,13 +777,9 @@ public partial class CanvasPage : BasePage
         vibrate(HapticFeedbackType.Click);
     }
 
-    private Task SegmentationCallback(SKBitmap mask)
+    private void OnSegmentationBitmapChanged()
     {
-        SegmentationBitmap = mask;
-
         SegmentationMaskCanvasView.InvalidateSurface();
-
-        return Task.CompletedTask;
     }
 }
 

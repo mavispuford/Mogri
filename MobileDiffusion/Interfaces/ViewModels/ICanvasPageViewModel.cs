@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using MobileDiffusion.Enums;
 using MobileDiffusion.Models;
 using SkiaSharp;
 using SkiaSharp.Views.Maui.Controls;
@@ -43,6 +44,10 @@ namespace MobileDiffusion.Interfaces.ViewModels
         
         bool HasSegmentationImage { get; set; }
 
+        bool ShowContextMenu { get; set; }
+
+        SegmentationMode SegmentationMode { get; set; }
+
         IAsyncRelayCommand BeginCropImageRectCommand { get; }
 
         IRelayCommand ChangeInitImgRectangleSizeCommand { get; }
@@ -69,6 +74,10 @@ namespace MobileDiffusion.Interfaces.ViewModels
 
         IRelayCommand<IPaintingToolViewModel> SelectToolCommand { get; }
 
-        IAsyncRelayCommand<(SKPoint Location, IAsyncRelayCommand<SKBitmap> Callback)> DoSegmentationCommand { get; }
+        IAsyncRelayCommand<SKPoint> DoSegmentationCommand { get; }
+
+        IAsyncRelayCommand ApplySegmentationMaskCommand { get; }
+
+        IAsyncRelayCommand ClearSegmentationMaskCommand { get; }
     }
 }

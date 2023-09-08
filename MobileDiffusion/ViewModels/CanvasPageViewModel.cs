@@ -89,6 +89,12 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private bool _hasSegmentationImage = false;
 
     [ObservableProperty]
+    private bool _showContextMenu = false;
+
+    [ObservableProperty]
+    private SegmentationMode _segmentationMode = SegmentationMode.AddArea;
+
+    [ObservableProperty]
     private IAsyncRelayCommand _prepareForSavingCommand;
 
     public CanvasPageViewModel(
@@ -479,7 +485,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     }
 
     [RelayCommand]
-    private async Task DoSegmentation((SKPoint Location, IAsyncRelayCommand<SKBitmap> Callback) argsTuple)
+    private async Task DoSegmentation(SKPoint location)
     {
         if (_doingSegmentation)
         {
@@ -510,12 +516,58 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         _doingSegmentation = true;
         IsBusy = true;
 
-        var maskBitmap = await _segmentationService.DoSegmentation(argsTuple.Location);
+        var maskBitmap = await _segmentationService.DoSegmentation(location);
 
-        argsTuple.Callback?.Execute(maskBitmap);
+        if (maskBitmap != null)
+        {
+            if (SegmentationBitmap == null)
+            {
+                SegmentationBitmap = maskBitmap;
+            }
+            else
+            {
+                var newBitmap = new SKBitmap(SegmentationBitmap.Info);
 
+                using (var combineCanvas = new SKCanvas(newBitmap))
+                {
+                    var paint = new SKPaint
+                    {
+                        BlendMode = SKBlendMode.SrcOver
+                    };
+
+                    combineCanvas.DrawBitmap(SegmentationBitmap, 0, 0, paint);
+
+                    paint.BlendMode = SegmentationMode == SegmentationMode.AddArea ? SKBlendMode.SrcOver : SKBlendMode.DstOut;
+
+                    combineCanvas.DrawBitmap(maskBitmap, 0, 0, paint);
+                }
+
+                SegmentationBitmap?.Dispose();
+                SegmentationBitmap = null;
+
+                SegmentationBitmap = newBitmap;
+            }
+        }
+        
         IsBusy = false;
         _doingSegmentation = false;
+    }
+
+    [RelayCommand]
+    private Task ApplySegmentationMask()
+    {
+        // TODO - Apply
+
+        return Task.CompletedTask;
+    }
+
+    [RelayCommand]
+    private Task ClearSegmentationMask()
+    {
+        SegmentationBitmap?.Dispose();
+        SegmentationBitmap = null;
+
+        return Task.CompletedTask;
     }
 
     private async Task LoadSourceBitmapUsingStream(Stream stream, string fileName)
@@ -1062,5 +1114,15 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         }
 
         return resultBitmap;
+    }
+
+    partial void OnCurrentToolChanged(IPaintingToolViewModel value)
+    {
+        if (value == null)
+        {
+            return;
+        }
+
+        ShowContextMenu = value.Type == ToolType.PaintBucket;
     }
 }
