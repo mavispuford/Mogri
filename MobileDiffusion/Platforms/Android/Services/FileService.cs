@@ -2,8 +2,8 @@
 using Android.Provider;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Models;
+using MobileDiffusion.ViewModels;
 using System.Text.Json;
-using System.Threading.Tasks;
 using AndroidNet = Android.Net;
 
 namespace MobileDiffusion.Platforms.Android.Services;
@@ -209,7 +209,7 @@ public class FileService : IFileService
         return string.Empty;
     }
 
-    public async Task<Mask> GetMaskFileFromAppDataAsync(string imageFileName)
+    public async Task<MaskViewModel> GetMaskFileFromAppDataAsync(string imageFileName)
     {
         await checkForWritePermission();
 
@@ -230,7 +230,7 @@ public class FileService : IFileService
             var options = new JsonSerializerOptions();
             options.Converters.Add(new ColorJsonConverter());
 
-            var mask = JsonSerializer.Deserialize<Mask>(contents, options);
+            var mask = JsonSerializer.Deserialize<MaskViewModel>(contents, options);
 
             return mask;
 
@@ -243,7 +243,7 @@ public class FileService : IFileService
         return null;
     }
 
-    public async Task<string> WriteMaskFileToAppDataAsync(string imageFileName, Mask mask)
+    public async Task<string> WriteMaskFileToAppDataAsync(string imageFileName, MaskViewModel mask)
     {
         await checkForWritePermission();
 

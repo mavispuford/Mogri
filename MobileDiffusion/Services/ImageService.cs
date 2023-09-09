@@ -125,14 +125,14 @@ public class ImageService : IImageService
             if (landscape)
             {
                 targetWidth = width;
-                var dividedHeight = height / bitmapRatio;
+                var dividedHeight = width / bitmapRatio;
 
                 targetHeight = (int)dividedHeight;
             }
             else
             {
                 targetHeight = height;
-                var dividedWidth = width / bitmapRatio;
+                var dividedWidth = height / bitmapRatio;
 
                 targetWidth = (int)dividedWidth;
             }

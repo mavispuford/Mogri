@@ -6,9 +6,9 @@ using MobileDiffusion.Enums;
 using MobileDiffusion.Helpers;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
-using MobileDiffusion.Models;
 using SkiaSharp;
 using SkiaSharp.Views.Maui.Controls;
+using System.Collections.ObjectModel;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -41,6 +41,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private IPaintingToolViewModel _currentTool;
 
     [ObservableProperty]
+    private float _currentAlpha = .5f;
+
+    [ObservableProperty]
     private Color _currentColor = Colors.Black;
 
     [ObservableProperty]
@@ -56,7 +59,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private bool _isBusy;
 
     [ObservableProperty]
-    private List<MaskLine> _lines = new();
+    private ObservableCollection<CanvasActionViewModel> _canvasActions = new();
 
     [ObservableProperty]
     private SKBitmap _sourceBitmap;
@@ -227,7 +230,10 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
         try
         {
-            var maskUri = await _fileService.WriteMaskFileToAppDataAsync(_sourceFileName, new Mask { Lines = Lines });
+            var maskUri = await _fileService.WriteMaskFileToAppDataAsync(_sourceFileName, 
+                new MaskViewModel { 
+                    Lines = CanvasActions.Where(ca => ca is MaskLineViewModel).Select(ml => (MaskLineViewModel)ml).ToList() 
+                });
 
             await Toast.Make("Mask saved.").Show();
         }
@@ -355,7 +361,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
                 var maskImgContentTypeString = string.Empty;
 
-                if (Lines.Any())
+                if (CanvasActions.Any(c => c.CanvasActionType == CanvasActionType.Mask))
                 {
                     if (maskBitmap.Pixels.Any(p => p.Alpha > 0))
                     {
@@ -430,7 +436,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
                 var croppedMaskContentTypeString = string.Empty;
 
-                if (Lines.Any())
+                if (CanvasActions.Any(c => c.CanvasActionType == CanvasActionType.Mask))
                 {
                     var blackAndWhiteMaskBitmap = CreateBlackAndWhiteMask(sameSizeMaskBitmap);
                     var croppedMask = GetCroppedBitmap(blackAndWhiteMaskBitmap, InitImgRectangle);
@@ -554,20 +560,41 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     }
 
     [RelayCommand]
-    private Task ApplySegmentationMask()
+    private async Task ApplySegmentationMask()
     {
-        // TODO - Apply
+        if (SegmentationBitmap == null)
+        {
+            return;
+        }
 
-        return Task.CompletedTask;
+        IsBusy = true;
+
+        var maskBitmap = await Task.Run(() =>
+        {
+            return CreateMaskBitmapFromSegmentationMask(SegmentationBitmap, CurrentColor.WithAlpha(CurrentAlpha));
+        });
+
+        var segmentationMask = new SegmentationMaskViewModel
+        {
+            CanvasActionType = CanvasActionType.Mask,
+            Color = CurrentColor.WithAlpha(CurrentAlpha),
+            Bitmap = maskBitmap
+        };
+
+        CanvasActions.Add(segmentationMask);
+
+        MaskCanvasView?.InvalidateSurface();
+
+        ClearSegmentationMask();
+
+        IsBusy = false;
     }
 
     [RelayCommand]
-    private Task ClearSegmentationMask()
+    private void ClearSegmentationMask()
     {
         SegmentationBitmap?.Dispose();
         SegmentationBitmap = null;
-
-        return Task.CompletedTask;
     }
 
     private async Task LoadSourceBitmapUsingStream(Stream stream, string fileName)
@@ -600,6 +627,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             });
 
             _sourceFileName = fileName;
+            CanvasActions.Clear();
 
             var mask = await _fileService.GetMaskFileFromAppDataAsync(_sourceFileName);
 
@@ -607,11 +635,10 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             {
                 if (mask?.Lines != null)
                 {
-                    Lines = mask.Lines;
-                }
-                else
-                {
-                    Lines.Clear();
+                    foreach(var line in mask.Lines)
+                    {
+                        CanvasActions.Add(line);
+                    }
                 }
             });
         }
@@ -889,6 +916,54 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         return resultBitmap;
     }
 
+    private unsafe SKBitmap CreateMaskBitmapFromSegmentationMask(SKBitmap segmentationBitmap, Color maskColor)
+    {
+        if (segmentationBitmap == null || maskColor == null)
+        {
+            return null;
+        }
+
+        byte* srcPtr = (byte*)segmentationBitmap.GetPixels().ToPointer();
+
+        var width = segmentationBitmap.Width;
+        var height = segmentationBitmap.Height;
+
+        SKColorType colorType = segmentationBitmap.ColorType;
+
+        var resultBitmap = new SKBitmap(segmentationBitmap.Info.Width, segmentationBitmap.Info.Height, SKColorType.Rgba8888, SKAlphaType.Unpremul);
+
+        byte* resultPtr = (byte*)resultBitmap.GetPixels().ToPointer();
+
+        for (int row = 0; row < height; row++)
+        {
+            for (int col = 0; col < width; col++)
+            {
+                // Get color from source bitmap
+                byte srcByte1 = *srcPtr++;         // red or blue
+                byte srcByte2 = *srcPtr++;         // green
+                byte srcByte3 = *srcPtr++;         // blue or red
+                byte srcByte4 = *srcPtr++;         // alpha
+
+                if (srcByte4 != 0)
+                {
+                    *resultPtr++ = colorType == SKColorType.Rgba8888 ? maskColor.GetByteRed() : maskColor.GetByteBlue();
+                    *resultPtr++ = maskColor.GetByteGreen();
+                    *resultPtr++ = colorType == SKColorType.Rgba8888 ? maskColor.GetByteBlue() : maskColor.GetByteRed();
+                    *resultPtr++ = byte.Max(1, maskColor.GetByteAlpha());
+                }
+                else
+                {
+                    *resultPtr++ = srcByte1;
+                    *resultPtr++ = srcByte2;
+                    *resultPtr++ = srcByte3;
+                    *resultPtr++ = srcByte4;
+                }
+            }
+        }
+
+        return resultBitmap;
+    }
+
     private unsafe SKBitmap CreateMaskedBitmap(SKBitmap srcBitmap, SKBitmap maskBitmapOrig, bool randomizeMaskPixels = true)
     {
         if (srcBitmap == null ||
@@ -896,7 +971,6 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         {
             return null;
         }
-
 
         var maskBitmap = (maskBitmapOrig.Width == srcBitmap.Width && maskBitmapOrig.Height == srcBitmap.Height) ? maskBitmapOrig : maskBitmapOrig.Resize(srcBitmap.Info, SKFilterQuality.High);
 

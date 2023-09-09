@@ -29,6 +29,8 @@ public class SegmentationService : ISegmentationService
     private float _scaleY;
     private Tensor<float> _imageEmbeddings;
 
+    public SKColor MaskColor => SKColors.Red;
+
     public SegmentationService(IImageService imageService)
     {
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
@@ -350,7 +352,6 @@ public class SegmentationService : ISegmentationService
         var maskArray = tensor.ToArray();
         var pixelIndex = 0;
         var result = new SKBitmap(_imageWidth, _imageHeight, SKColorType.Rgba8888, SKAlphaType.Premul);
-        var maskColor = SKColors.Red.WithAlpha(150);
 
         for (var y = 0; y < _imageHeight; y++)
         {
@@ -362,7 +363,7 @@ public class SegmentationService : ISegmentationService
 
                 if (transformed > 0.0)
                 {
-                    result.SetPixel(x, y, maskColor);
+                    result.SetPixel(x, y, MaskColor);
                 }
             }
         }
@@ -380,7 +381,6 @@ public class SegmentationService : ISegmentationService
         var maskArray = tensor.ToArray();
         var pixelIndex = 0;
         var result = new SKBitmap(_imageWidth, _imageHeight, SKColorType.Rgba8888, SKAlphaType.Premul);
-        var maskColor = SKColors.Red;
 
         using (var pixmap = result.PeekPixels())
         {
@@ -397,10 +397,10 @@ public class SegmentationService : ISegmentationService
                     if (transformed > 0)
                     {
                         var pixelPtr = pixels + y * pixelStride + x * 4; // Assuming 32-bit RGBA format
-                        pixelPtr[0] = maskColor.Red;    // Red
-                        pixelPtr[1] = maskColor.Green;  // Green
-                        pixelPtr[2] = maskColor.Blue;   // Blue
-                        pixelPtr[3] = maskColor.Alpha;  // Alpha
+                        pixelPtr[0] = MaskColor.Red;    // Red
+                        pixelPtr[1] = MaskColor.Green;  // Green
+                        pixelPtr[2] = MaskColor.Blue;   // Blue
+                        pixelPtr[3] = MaskColor.Alpha;  // Alpha
                     }
                 }
             }

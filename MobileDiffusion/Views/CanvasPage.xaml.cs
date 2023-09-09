@@ -2,15 +2,16 @@ using CommunityToolkit.Maui.Core.Extensions;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Enums;
 using MobileDiffusion.Interfaces.ViewModels;
-using MobileDiffusion.Models;
+using MobileDiffusion.ViewModels;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
+using System.Collections.ObjectModel;
 
 namespace MobileDiffusion.Views;
 
 public partial class CanvasPage : BasePage
 {
-    private MaskLine _currentLine;
+    private MaskLineViewModel _currentLine;
     private Timer _brushSizeTimer;
     private Timer _alphaTimer;
     private bool _hasCreatedInitImgRectangle;
@@ -53,10 +54,10 @@ public partial class CanvasPage : BasePage
         set => SetValue(CurrentToolProperty, value);
     }
 
-    public List<MaskLine> Lines
+    public ObservableCollection<CanvasActionViewModel> CanvasActions
     {
-        get => (List<MaskLine>)GetValue(LinesProperty);
-        set => SetValue(LinesProperty, value);
+        get => (ObservableCollection<CanvasActionViewModel>)GetValue(CanvasActionsProperty);
+        set => SetValue(CanvasActionsProperty, value);
     }
 
     public SKRect InitImgRectangle
@@ -140,9 +141,9 @@ public partial class CanvasPage : BasePage
         ((CanvasPage)bindable).UpdateInitImgRectangle(true);
     });
 
-    public static BindableProperty LinesProperty = BindableProperty.Create(nameof(Lines), typeof(List<MaskLine>), typeof(CanvasPage), default(List<MaskLine>), propertyChanged: (bindable, oldValue, newValue) =>
+    public static BindableProperty CanvasActionsProperty = BindableProperty.Create(nameof(CanvasActions), typeof(ObservableCollection<CanvasActionViewModel>), typeof(CanvasPage), default(ObservableCollection<CanvasActionViewModel>), propertyChanged: (bindable, oldValue, newValue) =>
     {
-        ((CanvasPage)bindable).OnLinesChanged();
+        ((CanvasPage)bindable).OnCanvasActionsChanged();
     });
 
     public static BindableProperty PrepareForSavingCommandProperty = BindableProperty.Create(nameof(PrepareForSavingCommand), typeof(IAsyncRelayCommand), typeof(CanvasPage), default(IAsyncRelayCommand));
@@ -166,9 +167,10 @@ public partial class CanvasPage : BasePage
         InitializeComponent();
 
         this.SetBinding(BitmapProperty, nameof(ICanvasPageViewModel.SourceBitmap));
+        this.SetBinding(CurrentAlphaProperty, nameof(ICanvasPageViewModel.CurrentAlpha));
         this.SetBinding(CurrentColorProperty, nameof(ICanvasPageViewModel.CurrentColor));
         this.SetBinding(CurrentToolProperty, nameof(ICanvasPageViewModel.CurrentTool));
-        this.SetBinding(LinesProperty, nameof(ICanvasPageViewModel.Lines), BindingMode.TwoWay);
+        this.SetBinding(CanvasActionsProperty, nameof(ICanvasPageViewModel.CanvasActions), BindingMode.TwoWay);
         this.SetBinding(InitImgRectangleProperty, nameof(ICanvasPageViewModel.InitImgRectangle), BindingMode.OneWayToSource);
         this.SetBinding(ShowInitImgRectangleProperty, nameof(ICanvasPageViewModel.ShowInitImgRectangle), BindingMode.TwoWay);
         this.SetBinding(PrepareForSavingCommandProperty, nameof(ICanvasPageViewModel.PrepareForSavingCommand), BindingMode.OneWayToSource);
@@ -262,15 +264,16 @@ public partial class CanvasPage : BasePage
                 {
                     _currentLine = new()
                     {
+                        CanvasActionType = CanvasActionType.Mask,
                         Alpha = CurrentAlpha,
                         BrushSize = CurrentBrushSize,
                         Color = CurrentColor,
-                        Type = CurrentTool?.Effect ?? MaskEffect.Paint
+                        MaskEffect = CurrentTool?.Effect ?? MaskEffect.Paint
                     };
 
-                    Lines ??= new();
+                    CanvasActions ??= new();
 
-                    Lines.Add(_currentLine);
+                    CanvasActions.Add(_currentLine);
                 }
 
                 _currentLine.Path.Add(location);
@@ -297,8 +300,6 @@ public partial class CanvasPage : BasePage
     private void OnPaintSourceImageSurface(object sender, SKPaintSurfaceEventArgs e)
     {
         var canvas = e.Surface.Canvas;
-
-        // Make sure the canvas is blank
         canvas.Clear(SKColors.Transparent);
 
         if (Bitmap != null)
@@ -318,93 +319,14 @@ public partial class CanvasPage : BasePage
 
     private void OnPaintMaskSurface(object sender, SKPaintSurfaceEventArgs e)
     {
-        // the the canvas and properties
         var canvas = e.Surface.Canvas;
-
-        // make sure the canvas is blank
         canvas.Clear(SKColors.Transparent);
 
-        if (Lines != null &&
-            Lines.Any())
+        if (CanvasActions != null)
         {
-            using var paint = new SKPaint
+            foreach (var canvasAction in CanvasActions.Where(ca => ca.CanvasActionType == CanvasActionType.Mask))
             {
-                FilterQuality = SKFilterQuality.None,
-                IsAntialias = false,
-                Style = SKPaintStyle.Stroke,
-                StrokeWidth = 10,
-                StrokeCap = SKStrokeCap.Round,
-                StrokeMiter = 0,
-                StrokeJoin = SKStrokeJoin.Round,
-            };
-
-            foreach (var line in Lines)
-            {
-                if (line.Type == MaskEffect.Paint)
-                {
-                    paint.BlendMode = SKBlendMode.SrcOver;
-
-                    paint.Color = new SKColor(
-                        line.Color.GetByteRed(),
-                        line.Color.GetByteGreen(),
-                        line.Color.GetByteBlue(),
-                        Convert.ToByte((int)Math.Max(1, line.Alpha * 255)));
-                }
-                else
-                {
-                    paint.BlendMode = SKBlendMode.Src;
-
-                    paint.Color = SKColors.Transparent;
-                }
-
-                paint.StrokeWidth = line.BrushSize;
-                
-                var points = line.Path;
-
-                using var path = new SKPath();
-                path.MoveTo(points[0]);
-
-                for (var i = 1; i < points.Count; i++)
-                {
-                    path.ConicTo(points[i - 1], points[i], .5f);
-                }
-
-                if (!_isSaving && line.Alpha <= .1f)
-                {
-                    const int tiledBitmapSize = 5;
-                    var maskTiledBitmap = new SKBitmap(tiledBitmapSize, tiledBitmapSize);
-
-                    // Make the tiled shader pattern for editor visualization purposes
-                    for (var x = 0; x < tiledBitmapSize; x++)
-                    {
-                        for (var y = 0; y < tiledBitmapSize; y++)
-                        {
-                            if (x == y)
-                            {
-                                maskTiledBitmap.SetPixel(x, y, paint.Color.WithAlpha(10));
-                            }
-                            else if (x - 1 == y || x + 1 == y || (x == tiledBitmapSize - 1 && y == 0) || (y == tiledBitmapSize - 1 && x == 0))
-                            {
-                                maskTiledBitmap.SetPixel(x, y, paint.Color.WithAlpha(50));
-                            }
-                            else
-                            {
-                                maskTiledBitmap.SetPixel(x, y, paint.Color.WithAlpha(100));
-                            }
-                        }
-                    }
-
-                    var bitmapShader = SKShader.CreateBitmap(maskTiledBitmap, SKShaderTileMode.Repeat, SKShaderTileMode.Repeat);
-
-                    paint.Shader = bitmapShader;
-                    paint.Color = paint.Color.WithAlpha(255);
-                }
-                else
-                {
-                    paint.Shader = null;
-                }
-
-                canvas.DrawPath(path, paint);
+                canvasAction.Execute(canvas, e.Info, _isSaving);
             }
         }
 
@@ -423,10 +345,8 @@ public partial class CanvasPage : BasePage
     private void OnPaintSegmentationImageSurface(object sender, SKPaintSurfaceEventArgs e)
     {
         var canvas = e.Surface.Canvas;
-
-        // Make sure the canvas is blank
         canvas.Clear(SKColors.Transparent);
-
+        
         if (SegmentationBitmap != null)
         {
             canvas.DrawBitmap(SegmentationBitmap, SegmentationBitmap.Info.Rect, e.Info.Rect);
@@ -440,8 +360,8 @@ public partial class CanvasPage : BasePage
         // Make sure the canvas is blank
         canvas.Clear(SKColors.Transparent);
 
-        if (Lines != null &&
-            Lines.Any())
+        if (CanvasActions != null &&
+            CanvasActions.Any())
         {
             using var paint = new SKPaint
             {
@@ -454,32 +374,35 @@ public partial class CanvasPage : BasePage
                 StrokeJoin = SKStrokeJoin.Round,
             };
 
-            foreach (var line in Lines)
+            foreach (var canvasAction in CanvasActions)
             {
-                if (line.Alpha > .1f)
+                if (canvasAction is MaskLineViewModel maskLine)
                 {
-                    continue;
+                    if (maskLine.Alpha > .1f)
+                    {
+                        continue;
+                    }
+
+                    var points = maskLine.Path;
+
+                    paint.StrokeWidth = maskLine.BrushSize;
+
+                    paint.Color = new SKColor(
+                        maskLine.Color.GetByteRed(),
+                        maskLine.Color.GetByteGreen(),
+                        maskLine.Color.GetByteBlue(),
+                        maskLine.Color.GetByteAlpha());
+
+                    using var path = new SKPath();
+                    path.MoveTo(points[0]);
+
+                    for (var i = 1; i < points.Count; i++)
+                    {
+                        path.ConicTo(points[i - 1], points[i], .5f);
+                    }
+
+                    canvas.DrawPath(path, paint);
                 }
-
-                var points = line.Path;
-
-                paint.StrokeWidth = line.BrushSize;
-
-                paint.Color = new SKColor(
-                    line.Color.GetByteRed(),
-                    line.Color.GetByteGreen(),
-                    line.Color.GetByteBlue(),
-                    line.Color.GetByteAlpha());
-
-                using var path = new SKPath();
-                path.MoveTo(points[0]);
-
-                for (var i = 1; i < points.Count; i++)
-                {
-                    path.ConicTo(points[i - 1], points[i], .5f);
-                }
-                
-                canvas.DrawPath(path, paint);
             }
         }
         
@@ -644,12 +567,12 @@ public partial class CanvasPage : BasePage
     {
         HideSliders();
 
-        if (Lines == null || !Lines.Any())
+        if (CanvasActions == null || !CanvasActions.Any())
         {
             return;
         }
 
-        Lines.Remove(Lines.Last());
+        CanvasActions.Remove(CanvasActions.Last());
 
         MaskCanvasView.InvalidateSurface();
     }
@@ -665,12 +588,12 @@ public partial class CanvasPage : BasePage
 
         HideSliders();
 
-        if (Lines == null || !Lines.Any())
+        if (CanvasActions == null || !CanvasActions.Any())
         {
             return;
         }
 
-        Lines.Clear();
+        CanvasActions.Clear();
 
         MaskCanvasView.InvalidateSurface();
     }
@@ -680,7 +603,7 @@ public partial class CanvasPage : BasePage
         return await DisplayAlert("Clear mask?", "Are you sure you would like to clear the mask?", "YES", "Cancel");
     }
 
-    private void OnLinesChanged()
+    private void OnCanvasActionsChanged()
     {
         MaskCanvasView.InvalidateSurface();
     }
