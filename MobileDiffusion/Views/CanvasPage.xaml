@@ -21,6 +21,7 @@
                     <FontImageSource Glyph="&#xe8f4;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
                 </toolkit:BoolToObjectConverter.FalseObject>
             </toolkit:BoolToObjectConverter>
+            <toolkit:EnumToBoolConverter x:Key="EnumToBool" />
         </ResourceDictionary>
     </views:BasePage.Resources>
 
@@ -106,7 +107,8 @@
                                IgnorePixelScaling="True"
                                HorizontalOptions="Center"
                                VerticalOptions="Center"
-                               Opacity=".4"/>
+                               Opacity=".4"
+                               IsVisible="{Binding CurrentTool.Type, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:ToolType.PaintBucket}}"/>
             
             <skia:SKCanvasView x:Name="MaskCanvasView" 
                                PaintSurface="OnPaintMaskSurface"
@@ -208,7 +210,7 @@
                                BackgroundColor="Transparent"
                                HorizontalOptions="Center"
                                VerticalOptions="Start"
-                               IsVisible="{Binding ShowContextMenu}"
+                               IsVisible="{Binding CurrentTool.Type, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:ToolType.PaintBucket}}"
                                Spacing="8"
                                Margin="0,-12,0,0"
                                RadioButtonGroup.GroupName="SegmentationMode"
