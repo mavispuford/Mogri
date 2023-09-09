@@ -1,83 +1,85 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Enums;
-using MobileDiffusion.Models;
+using MobileDiffusion.ViewModels;
 using SkiaSharp;
 using SkiaSharp.Views.Maui.Controls;
+using System.Collections.ObjectModel;
 
-namespace MobileDiffusion.Interfaces.ViewModels
+namespace MobileDiffusion.Interfaces.ViewModels;
+
+public interface ICanvasPageViewModel : IPageViewModel
 {
-    public interface ICanvasPageViewModel : IPageViewModel
-    {
-        List<IPaintingToolViewModel> AvailableTools { get; set; }
+    List<IPaintingToolViewModel> AvailableTools { get; set; }
 
-        IPaintingToolViewModel CurrentTool { get; set; }
+    IPaintingToolViewModel CurrentTool { get; set; }
 
-        Color CurrentColor { get; set; }
+    float CurrentAlpha { get; set; }
 
-        SKRect InitImgRectangle { get; set; }
+    Color CurrentColor { get; set; }
 
-        double InitImgRectangleScale { get; set; }
+    SKRect InitImgRectangle { get; set; }
 
-        float InitImgRectangleSize { get; set; }
+    double InitImgRectangleScale { get; set; }
 
-        bool IsBusy { get; set; }
+    float InitImgRectangleSize { get; set; }
 
-        List<MaskLine> Lines { get; set; }
+    bool IsBusy { get; set; }
 
-        SKCanvasView MaskCanvasView { get; set; }
+    ObservableCollection<CanvasActionViewModel> CanvasActions { get; set; }
 
-        Color PaletteIconColor { get; set; }
+    SKCanvasView MaskCanvasView { get; set; }
 
-        ImageSource SavedImageSource { get; set; }
+    Color PaletteIconColor { get; set; }
 
-        bool ShowInitImgRectangle { get; set; }
+    ImageSource SavedImageSource { get; set; }
 
-        bool ShowMaskLayer { get; set; }
+    bool ShowInitImgRectangle { get; set; }
 
-        SKBitmap SourceBitmap { get; set; }
+    bool ShowMaskLayer { get; set; }
 
-        SKBitmap SegmentationBitmap { get; set; }
+    SKBitmap SourceBitmap { get; set; }
 
-        SKCanvasView SourceCanvasView { get; set; }
+    SKBitmap SegmentationBitmap { get; set; }
 
-        bool SettingSegmentationImage { get; set; }
-        
-        bool HasSegmentationImage { get; set; }
+    SKCanvasView SourceCanvasView { get; set; }
 
-        bool ShowContextMenu { get; set; }
+    bool SettingSegmentationImage { get; set; }
+    
+    bool HasSegmentationImage { get; set; }
 
-        SegmentationMode SegmentationMode { get; set; }
+    bool ShowContextMenu { get; set; }
 
-        IAsyncRelayCommand BeginCropImageRectCommand { get; }
+    SegmentationMode SegmentationMode { get; set; }
 
-        IRelayCommand ChangeInitImgRectangleSizeCommand { get; }
+    IAsyncRelayCommand BeginCropImageRectCommand { get; }
 
-        IAsyncRelayCommand PrepareForSavingCommand { get; set; }
+    IRelayCommand ChangeInitImgRectangleSizeCommand { get; }
 
-        IAsyncRelayCommand FinishSavingCommand { get; }
+    IAsyncRelayCommand PrepareForSavingCommand { get; set; }
 
-        IAsyncRelayCommand FinishSendingToImageToImageCommand { get; }
+    IAsyncRelayCommand FinishSavingCommand { get; }
 
-        IAsyncRelayCommand FinishCroppingInitImgRectangleCommand { get; }
+    IAsyncRelayCommand FinishSendingToImageToImageCommand { get; }
 
-        IAsyncRelayCommand ShowColorPickerCommand { get; }
+    IAsyncRelayCommand FinishCroppingInitImgRectangleCommand { get; }
 
-        IAsyncRelayCommand ShowMediaPickerCommand { get; }
+    IAsyncRelayCommand ShowColorPickerCommand { get; }
 
-        IAsyncRelayCommand SaveCommand { get; }
+    IAsyncRelayCommand ShowMediaPickerCommand { get; }
 
-        IAsyncRelayCommand SendToImageToImageCommand { get; }
-        
-        IRelayCommand ToggleInitImgRectangleCommand { get; }
+    IAsyncRelayCommand SaveCommand { get; }
 
-        IRelayCommand ToggleMaskLayerVisibilityCommand { get; }
+    IAsyncRelayCommand SendToImageToImageCommand { get; }
+    
+    IRelayCommand ToggleInitImgRectangleCommand { get; }
 
-        IRelayCommand<IPaintingToolViewModel> SelectToolCommand { get; }
+    IRelayCommand ToggleMaskLayerVisibilityCommand { get; }
 
-        IAsyncRelayCommand<SKPoint> DoSegmentationCommand { get; }
+    IRelayCommand<IPaintingToolViewModel> SelectToolCommand { get; }
 
-        IAsyncRelayCommand ApplySegmentationMaskCommand { get; }
+    IAsyncRelayCommand<SKPoint> DoSegmentationCommand { get; }
 
-        IAsyncRelayCommand ClearSegmentationMaskCommand { get; }
-    }
+    IAsyncRelayCommand ApplySegmentationMaskCommand { get; }
+
+    IRelayCommand ClearSegmentationMaskCommand { get; }
 }

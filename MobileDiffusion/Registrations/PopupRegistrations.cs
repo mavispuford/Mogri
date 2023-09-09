@@ -11,8 +11,6 @@ public static class PopupRegistrations
 
     public static MauiAppBuilder RegisterPopups(this MauiAppBuilder builder)
     {
-        builder.Services.AddTransient<PopupSizeConstants>();
-
         registerPopup<IResultItemPopupViewModel, ResultItemPopup>(builder.Services);
         registerPopup<IColorPickerPopupViewModel, ColorPickerPopup>(builder.Services);
         registerPopup<IPromptStyleInfoPopupViewModel, PromptStyleInfoPopup>(builder.Services);

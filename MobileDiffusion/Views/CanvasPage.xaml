@@ -93,12 +93,13 @@
               HorizontalOptions="CenterAndExpand"
               VerticalOptions="CenterAndExpand"
               SizeChanged="MaskGrid_SizeChanged"
-              Padding="0,0,0,100">
+              Padding="0,0,0,80">
             <skia:SKCanvasView x:Name="SourceImageCanvasView" 
                                PaintSurface="OnPaintSourceImageSurface"
                                IgnorePixelScaling="True"
                                HorizontalOptions="Center"
-                               VerticalOptions="Center"/>
+                               VerticalOptions="Center"
+                               BackgroundColor="{StaticResource Gray200TwentySixPercent}"/>
 
             <skia:SKCanvasView x:Name="SegmentationMaskCanvasView" 
                                PaintSurface="OnPaintSegmentationImageSurface"
@@ -310,7 +311,7 @@
                 </Border.StrokeShape>
                 <VerticalStackLayout Spacing="0" Padding="20">
 
-                    <Label Text="{Binding CurrentAlpha, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, StringFormat='Alpha: {0:F1}'}"
+                    <Label Text="{Binding CurrentAlpha, StringFormat='Alpha: {0:F1}'}"
                TextColor="White"
                FontAttributes="Bold"
                HorizontalOptions="Center"/>
@@ -319,7 +320,7 @@
                 HeightRequest="40"
                 Minimum="0"
                 Maximum=".9"
-                Value="{Binding CurrentAlpha, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}" />
+                Value="{Binding CurrentAlpha}" />
 
                 </VerticalStackLayout>
             </Border>

@@ -1,4 +1,4 @@
-﻿using MobileDiffusion.Models;
+﻿using MobileDiffusion.ViewModels;
 
 namespace MobileDiffusion.Interfaces.Services;
 
@@ -16,13 +16,13 @@ public interface IFileService
 
     Task<string[]> GetFileListFromInternalStorageAsync(string path = null);
 
-    Task<Mask> GetMaskFileFromAppDataAsync(string imageFileName);
+    Task<MaskViewModel> GetMaskFileFromAppDataAsync(string imageFileName);
 
     Task<string> WriteFileToInternalStorageAsync(string fileName, Stream stream);
 
     Task<string> WriteFileToInternalStorageAsync(string fileName, byte[] bytes);
 
-    Task<string> WriteMaskFileToAppDataAsync(string imageFileName, Mask mask);
+    Task<string> WriteMaskFileToAppDataAsync(string imageFileName, MaskViewModel mask);
 
     Task<string> WriteImageFileToExternalStorageAsync(string fileName, Stream stream, bool isMask = false);
 }
