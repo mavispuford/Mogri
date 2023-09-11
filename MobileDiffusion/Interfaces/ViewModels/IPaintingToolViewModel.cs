@@ -1,15 +1,19 @@
 ﻿using MobileDiffusion.Enums;
+using MobileDiffusion.ViewModels.CanvasContextButtons;
+
 namespace MobileDiffusion.Interfaces.ViewModels;
 
 public interface IPaintingToolViewModel : IBaseViewModel
 {
-    public string Name { get; set; }
+    string Name { get; set; }
 
-    public string IconCode { get; set; }
+    string IconCode { get; set; }
 
-    public MaskEffect Effect { get; set; }
+    MaskEffect Effect { get; set; }
 
-    public ToolType Type { get; set; }
+    ToolType Type { get; set; }
 
-    public bool IsLoading { get; set; }
+    bool IsLoading { get; set; }
+
+    List<CanvasContextButtonViewModel> ContextButtons { get; set; }
 }

@@ -61,7 +61,9 @@ public partial class MaskLineViewModel : CanvasActionViewModel
             path.ConicTo(points[i - 1], points[i], .5f);
         }
 
-        if (!isSaving && Alpha <= .1f && _bitmapShader != null)
+        if (MaskEffect == MaskEffect.Paint &&
+            !isSaving && Alpha <= .1f && 
+            _bitmapShader != null)
         {
             paint.Shader = _bitmapShader;
             paint.Color = paint.Color.WithAlpha(255);

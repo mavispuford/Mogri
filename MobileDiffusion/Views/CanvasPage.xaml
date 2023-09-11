@@ -91,37 +91,38 @@
           RowDefinitions="auto,*">
         <Grid x:Name="MaskGrid"
               Grid.Row="1"
-              HorizontalOptions="CenterAndExpand"
-              VerticalOptions="CenterAndExpand"
+              HorizontalOptions="FillAndExpand"
+              VerticalOptions="FillAndExpand"
               SizeChanged="MaskGrid_SizeChanged"
-              Padding="0,0,0,80">
+              Margin="0,0,0,80">
             <skia:SKCanvasView x:Name="SourceImageCanvasView" 
-                               PaintSurface="OnPaintSourceImageSurface"
-                               IgnorePixelScaling="True"
-                               HorizontalOptions="Center"
-                               VerticalOptions="Center"
-                               BackgroundColor="{StaticResource Gray200TwentySixPercent}"/>
+                   PaintSurface="OnPaintSourceImageSurface"
+                   IgnorePixelScaling="True"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   BackgroundColor="{StaticResource Gray200TwentySixPercent}"/>
 
-            <skia:SKCanvasView x:Name="SegmentationMaskCanvasView" 
-                               PaintSurface="OnPaintSegmentationImageSurface"
-                               IgnorePixelScaling="True"
-                               HorizontalOptions="Center"
-                               VerticalOptions="Center"
-                               Opacity=".4"
-                               IsVisible="{Binding CurrentTool.Type, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:ToolType.PaintBucket}}"/>
-            
-            <skia:SKCanvasView x:Name="MaskCanvasView" 
-                               PaintSurface="OnPaintMaskSurface"
-                               EnableTouchEvents="True"
-                               Touch="OnTouchMaskSurface"
-                               IgnorePixelScaling="True"
-                               HorizontalOptions="Center"
-                               VerticalOptions="Center"/>
+                <skia:SKCanvasView x:Name="SegmentationMaskCanvasView" 
+                   PaintSurface="OnPaintSegmentationImageSurface"
+                   IgnorePixelScaling="True"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   Opacity=".4"
+                   IsVisible="{Binding CurrentTool.Type, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:ToolType.PaintBucket}}"/>
+
+                <skia:SKCanvasView x:Name="MaskCanvasView" 
+                   PaintSurface="OnPaintMaskSurface"
+                   EnableTouchEvents="True"
+                   Touch="OnTouchMaskSurface"
+                   IgnorePixelScaling="True"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"/>
 
             <ActivityIndicator HorizontalOptions="Center" 
-                               VerticalOptions="Center"
-                               IsRunning="{Binding IsBusy}"
-                               InputTransparent="True"/>
+                   VerticalOptions="Center"
+                   IsRunning="{Binding IsBusy}"
+                   InputTransparent="True"/>
+
         </Grid>
 
         <Grid Grid.Row="0"
