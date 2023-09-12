@@ -360,7 +360,7 @@
                              VerticalOptions="FillAndExpand"
                              WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
                     <ContentView.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ShowColorPickerCommand}" Tapped="Vibrate_Button_Tapped" />
+                        <TapGestureRecognizer Command="{Binding ShowColorPickerCommand}" />
                     </ContentView.GestureRecognizers>
                     <Image HorizontalOptions="Center"
                            VerticalOptions="Center">

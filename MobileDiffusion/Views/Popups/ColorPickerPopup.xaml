@@ -63,7 +63,8 @@
                         Wrap="Wrap"
                         AlignItems="Center"
                         JustifyContent="Start"
-                        AlignContent="Center">
+                        AlignContent="Center"
+                        HorizontalOptions="Center">
                 <BindableLayout.ItemTemplate>
                     <DataTemplate>
                         <BoxView Color="{Binding}"
@@ -88,6 +89,7 @@
                         AlignItems="Center"
                         JustifyContent="Start"
                         AlignContent="Center"
+                        HorizontalOptions="Center"
                         IsVisible="{Binding SwatchesFromImage, Converter={StaticResource ListNotNullOrEmpty}}">
                 <BindableLayout.ItemTemplate>
                     <DataTemplate>
