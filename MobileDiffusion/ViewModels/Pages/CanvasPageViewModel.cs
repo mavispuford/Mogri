@@ -9,6 +9,9 @@ using MobileDiffusion.Interfaces.ViewModels;
 using SkiaSharp;
 using SkiaSharp.Views.Maui.Controls;
 using System.Collections.ObjectModel;
+using Accord.Imaging.ColorReduction;
+using ColorMine.ColorSpaces;
+using ColorMine.ColorSpaces.Comparisons;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -159,10 +162,10 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     {
         if (value != null)
         {
-            _colorPalette = ExtractColorPalette(value, 30);
-
             _ = Task.Run(async () =>
             {
+                _colorPalette = ExtractColorPaletteMedianCut(value, 50);
+
                 var paintBucketTool = AvailableTools.FirstOrDefault(t => t.Type == ToolType.PaintBucket);
 
                 lock (_setSegmentationImageLock)
@@ -658,6 +661,11 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     [RelayCommand]
     private async Task ShowColorPicker()
     {
+        if (HapticFeedback.Default.IsSupported)
+        {
+            HapticFeedback.Default.Perform(HapticFeedbackType.Click);
+        }
+
         var parameters = new Dictionary<string, object> {
             { NavigationParams.Color, CurrentColor },
             { NavigationParams.ColorPalette, _colorPalette },
@@ -708,99 +716,91 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         CurrentTool = tool;
     }
 
-    unsafe private List<Color> ExtractColorPalette(SKBitmap bitmap, int targetNumber = 30)
+    unsafe private List<Color> ExtractColorPaletteMedianCut(SKBitmap bitmap, int targetNumber = 30)
     {
         if (bitmap == null)
         {
             return null;
         }
 
-        var smallBitmap = bitmap.Resize(new SKSizeI(16, 16), SKFilterQuality.None);
+        var smallBitmap = bitmap.Width * bitmap.Height > 128 * 128 ? bitmap.Resize(new SKSizeI(128, 128), SKFilterQuality.None) : bitmap;
 
         SKColorType colorType = smallBitmap.ColorType;
 
         var width = smallBitmap.Width;
         var height = smallBitmap.Height;
 
-        var tolerance = .4f;
-        var iteration = 0;
+        var quantizer = new MedianCutQuantizer();
 
-        // Start with more tolerance, and decrease it each iteration until we get a palette with the requested
-        // number of swatches
+        byte* bitmapPtr = (byte*)smallBitmap.GetPixels().ToPointer();
 
-        do
+        for (int row = 0; row < height; row++)
         {
-            var colorsDict = new Dictionary<Color, int>();
-
-            if (iteration > 0)
+            for (int col = 0; col < width; col++)
             {
-                tolerance /= (2 * iteration);
-            }
+                // Get color from bitmap
+                byte byte1 = *bitmapPtr++;         // red or blue
+                byte byte2 = *bitmapPtr++;         // green
+                byte byte3 = *bitmapPtr++;         // blue or red
+                byte byte4 = *bitmapPtr++;         // alpha
 
-            iteration++;
-
-            byte* bitmapPtr = (byte*)smallBitmap.GetPixels().ToPointer();
-
-            for (int row = 0; row < height; row++)
-            {
-                for (int col = 0; col < width; col++)
+                if (colorType == SKColorType.Rgba8888)
                 {
-                    // Get color from bitmap
-                    byte byte1 = *bitmapPtr++;         // red or blue
-                    byte byte2 = *bitmapPtr++;         // green
-                    byte byte3 = *bitmapPtr++;         // blue or red
-                    byte byte4 = *bitmapPtr++;         // alpha
+                    quantizer.AddColor(System.Drawing.Color.FromArgb(byte4, byte1, byte2, byte3));
+                }
+                else if (colorType == SKColorType.Bgra8888)
+                {
+                    quantizer.AddColor(System.Drawing.Color.FromArgb(byte4, byte3, byte2, byte1));
+                }
+            }
+        }
 
-                    Color color = null;
+        // Quantize the colors
+        var quantizedColors = quantizer.GetPalette(targetNumber);
 
-                    if (colorType == SKColorType.Rgba8888)
-                    {
-                        color = Color.FromRgba(byte1, byte2, byte3, (byte)255);
-                    }
-                    else if (colorType == SKColorType.Bgra8888)
-                    {
-                        color = Color.FromRgba(byte3, byte2, byte1, (byte)255);
-                    }
+        const double minDeltaE = 5;
 
-                    if (color == null)
-                    {
-                        continue;
-                    }
+        // Filter distinct colors based on Delta E
+        var distinctColors = new List<Color>();
+        foreach (var color in quantizedColors)
+        {
+            var colorRgb = new Rgb
+            {
+                R = color.R,
+                G = color.G,
+                B = color.B
+            };
+            bool isDistinct = true;
 
-                    var matchingColor =
-                        colorsDict.Keys.FirstOrDefault(c => Math.Abs(c.GetHue() - color.GetHue()) < tolerance);
+            foreach (var existingColor in distinctColors)
+            {
+                var existingRgb = new Rgb
+                {
+                    R = existingColor.Red * 255,
+                    G = existingColor.Green * 255,
+                    B = existingColor.Blue * 255
+                };
 
-                    if (matchingColor != null)
-                    {
-                        colorsDict[matchingColor]++;
-                    }
-                    else
-                    {
-                        colorsDict[color] = 1;
-                    }
+                if (colorRgb.Compare(existingRgb, new Cie1976Comparison()) < minDeltaE)
+                {
+                    isDistinct = false;
+                    break;
                 }
             }
 
-            if (iteration > 10 || colorsDict.Count >= targetNumber)
+            if (isDistinct)
             {
-                // Sort all by popularity
-                var sortedByPopularity = colorsDict.ToList();
-                sortedByPopularity.Sort(delegate (KeyValuePair<Color, int> firstPair, KeyValuePair<Color, int> nextPair)
-                {
-                    return nextPair.Value.CompareTo(firstPair.Value);
-                });
+                distinctColors.Add(new Color(color.R, color.G, color.B));
+            }
+        }
 
-                var topColors = sortedByPopularity.Take(Math.Min(targetNumber, sortedByPopularity.Count)).Select(c => c.Key).ToList();
+        // Sort final selection by hue
+        distinctColors.Sort((firstColor, nextColor) =>
+        {
+            return firstColor.GetHue().CompareTo(nextColor.GetHue());
+        });
 
-                // Sort final selection by hue
-                topColors.Sort(delegate (Color firstColor, Color nextColor)
-                {
-                    return firstColor.GetHue().CompareTo(nextColor.GetHue());
-                });
-
-                return topColors;
-            }   
-        } while (true);
+        return distinctColors;
     }
 
     public override Task OnNavigatedToAsync()
@@ -1023,7 +1023,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                     if (randomizeMaskPixels)
                     {
                         // This controls how far away each pixel can travel from the original value
-                        const int rngAmount = 100;
+                        const int rngAmount = 50;
 
                         var pos = _random.Next(0, 1) == 1;
                         mskByte1 = (byte)int.Clamp(((int)mskByte1) + (_random.Next(0, rngAmount) * (pos ? 1 : -1)), 0, 255);
