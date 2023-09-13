@@ -9,7 +9,6 @@ using MobileDiffusion.Interfaces.ViewModels;
 using SkiaSharp;
 using SkiaSharp.Views.Maui.Controls;
 using System.Collections.ObjectModel;
-using Accord.Imaging.ColorReduction;
 using ColorMine.ColorSpaces;
 using ColorMine.ColorSpaces.Comparisons;
 
@@ -98,6 +97,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private bool _showContextMenu = false;
 
     [ObservableProperty]
+    private bool _gettingColorPalette = false;
+
+    [ObservableProperty]
     private SegmentationMode _segmentationMode = SegmentationMode.AddArea;
 
     [ObservableProperty]
@@ -164,7 +166,11 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         {
             _ = Task.Run(async () =>
             {
-                _colorPalette = ExtractColorPaletteMedianCut(value, 50);
+                GettingColorPalette = true;
+
+                _colorPalette = ExtractColorPalette(value, 48);
+
+                GettingColorPalette = false;
 
                 var paintBucketTool = AvailableTools.FirstOrDefault(t => t.Type == ToolType.PaintBucket);
 
@@ -716,21 +722,23 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         CurrentTool = tool;
     }
 
-    unsafe private List<Color> ExtractColorPaletteMedianCut(SKBitmap bitmap, int targetNumber = 30)
+    unsafe private List<Color> ExtractColorPalette(SKBitmap bitmap, int targetNumber = 30)
     {
         if (bitmap == null)
         {
             return null;
         }
 
-        var smallBitmap = bitmap.Width * bitmap.Height > 128 * 128 ? bitmap.Resize(new SKSizeI(128, 128), SKFilterQuality.None) : bitmap;
+        const int maxSize = 128;
+
+        var smallBitmap = _imageService.GetResizedSKBitmap(bitmap, maxSize, maxSize, false, false, false);
 
         SKColorType colorType = smallBitmap.ColorType;
 
         var width = smallBitmap.Width;
         var height = smallBitmap.Height;
 
-        var quantizer = new MedianCutQuantizer();
+        var allColors = new HashSet<Rgb>();
 
         byte* bitmapPtr = (byte*)smallBitmap.GetPixels().ToPointer();
 
@@ -746,61 +754,106 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
                 if (colorType == SKColorType.Rgba8888)
                 {
-                    quantizer.AddColor(System.Drawing.Color.FromArgb(byte4, byte1, byte2, byte3));
+                    allColors.Add(new Rgb
+                    {
+                        R = byte1,
+                        G = byte2,
+                        B = byte3
+                    });
                 }
                 else if (colorType == SKColorType.Bgra8888)
                 {
-                    quantizer.AddColor(System.Drawing.Color.FromArgb(byte4, byte3, byte2, byte1));
+                    allColors.Add(new Rgb
+                    {
+                        R = byte3,
+                        G = byte2,
+                        B = byte1
+                    });
                 }
             }
         }
 
-        // Quantize the colors
-        var quantizedColors = quantizer.GetPalette(targetNumber);
+        var colorSpaceComparison = new Cie1976Comparison();
+        double minDeltaE = 10;
 
-        const double minDeltaE = 5;
+        var distinctRgbList = allColors.ToList();
 
-        // Filter distinct colors based on Delta E
-        var distinctColors = new List<Color>();
-        foreach (var color in quantizedColors)
+        do
         {
-            var colorRgb = new Rgb
-            {
-                R = color.R,
-                G = color.G,
-                B = color.B
-            };
-            bool isDistinct = true;
+            // Filter to distinct colors using an increasing Delta E each step
+            distinctRgbList = filterColors(distinctRgbList, minDeltaE++);
+        } while (distinctRgbList.Count > targetNumber);
+        
+        List<Rgb> filterColors(List<Rgb> sourceList, double minDeltaE)
+        {
+            var result = new List<Rgb>();
 
-            foreach (var existingColor in distinctColors)
+            foreach (var rgb in sourceList)
             {
-                var existingRgb = new Rgb
-                {
-                    R = existingColor.Red * 255,
-                    G = existingColor.Green * 255,
-                    B = existingColor.Blue * 255
-                };
+                bool isDistinct = true;
 
-                if (colorRgb.Compare(existingRgb, new Cie1976Comparison()) < minDeltaE)
+                foreach (var existingRgb in result)
                 {
-                    isDistinct = false;
-                    break;
+                    if (rgb.Compare(existingRgb, colorSpaceComparison) < minDeltaE)
+                    {
+                        isDistinct = false;
+                        break;
+                    }
+                }
+
+                if (isDistinct)
+                {
+                    result.Add(rgb);
                 }
             }
 
-            if (isDistinct)
-            {
-                distinctColors.Add(new Color(color.R, color.G, color.B));
-            }
+            return result;
         }
 
-        // Sort final selection by hue
-        distinctColors.Sort((firstColor, nextColor) =>
+        distinctRgbList.Sort((firstColor, secondColor) =>
         {
-            return firstColor.GetHue().CompareTo(nextColor.GetHue());
+            var step1 = ClusteredHueLumValueStep(firstColor, 8);
+            var step2 = ClusteredHueLumValueStep(secondColor, 8);
+
+            if (step1.h2 != step2.h2)
+            {
+                return step1.h2.CompareTo(step2.h2);
+            }
+            else if (step1.lum != step2.lum)
+            {
+                return step1.lum.CompareTo(step2.lum);
+            }
+            else
+            {
+                return step1.v2.CompareTo(step2.v2);
+            }
         });
 
-        return distinctColors;
+        var distinctColors = distinctRgbList.Select(rgb => new Color((byte)rgb.R, (byte)rgb.G, (byte)rgb.B));
+
+        return distinctColors.ToList();
+    }
+
+    public static (int h2, double lum, int v2) ClusteredHueLumValueStep(Rgb color, int repetitions = 1)
+    {
+        double lumTest = Math.Sqrt(0.241 * color.R + 0.691 * color.G + 0.068 * color.B);
+
+        var hsv = color.To<Hsv>();
+        var hsl = hsv.To<Hsl>();
+        var lum = hsl.L;
+
+        int h2 = (int)(hsv.H * repetitions);
+        int lum2 = (int)(lum * repetitions);
+        int v2 = (int)(hsv.V * repetitions);
+
+        // TODO - Reverse luminosity sorting to smooth color layout
+        //if (h2 % 2 == 1)
+        //{
+        //    v2 = repetitions - v2;
+        //    lum2 = repetitions - lum2;
+        //}
+
+        return (h2, lum2, v2);
     }
 
     public override Task OnNavigatedToAsync()

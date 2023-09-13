@@ -22,6 +22,7 @@
                 </toolkit:BoolToObjectConverter.FalseObject>
             </toolkit:BoolToObjectConverter>
             <toolkit:EnumToBoolConverter x:Key="EnumToBool" />
+            <toolkit:InvertedBoolConverter x:Key="InvertedBool" />
         </ResourceDictionary>
     </views:BasePage.Resources>
 
@@ -352,23 +353,31 @@
 
             <Border Grid.Row="2"
                     Grid.Column="2"
-                    StrokeThickness="0">
+                    StrokeThickness="0"
+                    IsEnabled="{Binding GettingColorPalette, Converter={StaticResource InvertedBool}}">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="50" />
                 </Border.StrokeShape>
-                <ContentView BackgroundColor="{Binding CurrentColor}"
-                             VerticalOptions="FillAndExpand"
-                             WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
-                    <ContentView.GestureRecognizers>
+                <Grid BackgroundColor="{Binding CurrentColor}"
+                      VerticalOptions="FillAndExpand"
+                      WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
+                    <Grid.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding ShowColorPickerCommand}" />
-                    </ContentView.GestureRecognizers>
+                    </Grid.GestureRecognizers>
+
                     <Image HorizontalOptions="Center"
                            VerticalOptions="Center">
                         <Image.Source>
                             <FontImageSource Glyph="&#xe40a;" FontFamily="MaterialIconsRound400" Size="30" Color="{Binding PaletteIconColor}" />
                         </Image.Source>
                     </Image>
-                </ContentView>
+
+                    <ActivityIndicator HorizontalOptions="Center" 
+                                       VerticalOptions="Center"
+                                       IsRunning="{Binding GettingColorPalette}"
+                                       InputTransparent="True"/>
+                </Grid>
+                
             </Border>
 
             <Border Grid.Row="0"
