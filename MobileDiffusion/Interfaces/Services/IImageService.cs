@@ -9,4 +9,5 @@ public interface IImageService
     Task<ImageSource> GetImageSourceFromContentTypeStringAsync(string imageString, CancellationToken token);
     (byte[] Bytes, int ActualWidth, int ActualHeight) GetResizedImageStreamBytes(Stream stream, int width, int height, bool forceExactSize = false, bool filterImage = false, bool onlyIfLarger = false);
     SKBitmap GetResizedSKBitmap(SKBitmap bitmap, int width, int height, bool forceExactSize = false, bool filterImage = false, bool onlyIfLarger = false);
+    List<Color> ExtractColorPalette(SKBitmap bitmap, int targetNumber = 30);
 }
