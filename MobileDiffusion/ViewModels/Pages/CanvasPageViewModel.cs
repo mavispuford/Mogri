@@ -9,8 +9,7 @@ using MobileDiffusion.Interfaces.ViewModels;
 using SkiaSharp;
 using SkiaSharp.Views.Maui.Controls;
 using System.Collections.ObjectModel;
-using ColorMine.ColorSpaces;
-using ColorMine.ColorSpaces.Comparisons;
+using MobileDiffusion.ViewModels.CanvasContextButtons;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -52,10 +51,10 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private Color _paletteIconColor = Colors.White;
 
     [ObservableProperty]
-    private double _initImgRectangleScale;
+    private double _boundingBoxScale;
 
     [ObservableProperty]
-    private float _initImgRectangleSize;
+    private float _boundingBoxSize;
 
     [ObservableProperty]
     private bool _isBusy;
@@ -79,10 +78,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private ImageSource _savedImageSource;
 
     [ObservableProperty]
-    private SKRect _initImgRectangle;
-
-    [ObservableProperty]
-    private bool _showInitImgRectangle;
+    private SKRect _boundingBox;
 
     [ObservableProperty]
     private bool _showMaskLayer = true;
@@ -123,14 +119,20 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             _paletteIconDarkColor = paletteIconDarkColor;
         }
 
-        InitImgRectangleSize = _supportedImgRectSizes[_imgRectIndex];
+        BoundingBoxSize = _supportedImgRectSizes[_imgRectIndex];
 
         AvailableTools.Add(new PaintingToolViewModel
         {
             Name = "Brush",
             IconCode = "\ue3ae",
             Effect = MaskEffect.Paint,
-            Type = ToolType.PaintBrush
+            Type = ToolType.PaintBrush,
+            ContextButtons = new List<CanvasContextButtonViewModel>
+            {
+                new BrushSizeContextButtonViewModel(this),
+                new AlphaContextButtonViewModel(this),
+                new ColorPickerContextButtonViewModel(this),
+            }
         });
 
         AvailableTools.Add(new PaintingToolViewModel
@@ -138,7 +140,11 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             Name = "Eraser",
             IconCode = "\ue6d0",
             Effect = MaskEffect.Erase,
-            Type = ToolType.Eraser
+            Type = ToolType.Eraser,
+            ContextButtons = new List<CanvasContextButtonViewModel>
+            {
+                new BrushSizeContextButtonViewModel(this)
+            }
         });
 
         AvailableTools.Add(new PaintingToolViewModel
@@ -146,7 +152,25 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             Name = "Paint Bucket",
             IconCode = "\ue997",
             Effect = MaskEffect.Paint,
-            Type = ToolType.PaintBucket
+            Type = ToolType.PaintBucket,
+            ContextButtons = new List<CanvasContextButtonViewModel>
+            {
+                new AlphaContextButtonViewModel(this),
+                new ColorPickerContextButtonViewModel(this),
+            }
+        });
+
+        AvailableTools.Add(new PaintingToolViewModel
+        {
+            Name = "Bounding Box",
+            IconCode = "\ue3c6",
+            Effect = MaskEffect.None,
+            Type = ToolType.BoundingBox,
+            ContextButtons = new List<CanvasContextButtonViewModel>
+            {
+                new BoundingBoxSizeContextButtonViewModel(this),
+                new SnipContextButtonViewModel(this),
+            }
         });
 
         // Placeholder for gesture paint bucket - Might just be added into the base control
@@ -304,7 +328,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             return;
         }
 
-        await PrepareForSavingCommand?.ExecuteAsync(FinishCroppingInitImgRectangleCommand);
+        await PrepareForSavingCommand?.ExecuteAsync(FinishCroppingWithBoundingBoxCommand);
     }
 
     [RelayCommand]
@@ -421,7 +445,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     }
 
     [RelayCommand]
-    private async Task FinishCroppingInitImgRectangle()
+    private async Task FinishCroppingWithBoundingBox()
     {
         IsBusy = true;
 
@@ -436,7 +460,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             {
                 // Colorize the source bitmap using the mask, then create a black and white mask
                 var colorizedBitmap = CreateMaskedBitmap(SourceBitmap, sameSizeMaskBitmap);
-                var croppedBitmap = GetCroppedBitmap(colorizedBitmap, InitImgRectangle);
+                var croppedBitmap = GetCroppedBitmap(colorizedBitmap, BoundingBox);
 
                 using var croppedBitmapMemStream = new MemoryStream();
                 using var croppedBitmapSkiaStream = new SKManagedWStream(croppedBitmapMemStream);
@@ -449,8 +473,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
                 var parameters = new Dictionary<string, object>
                 {
-                    { NavigationParams.ImageWidth, InitImgRectangleSize },
-                    { NavigationParams.ImageHeight, InitImgRectangleSize },
+                    { NavigationParams.ImageWidth, BoundingBoxSize },
+                    { NavigationParams.ImageHeight, BoundingBoxSize },
                     { NavigationParams.InitImgString, croppedBitmapContentTypeString }
                 };
 
@@ -459,7 +483,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 if (CanvasActions.Any(c => c.CanvasActionType == CanvasActionType.Mask))
                 {
                     var blackAndWhiteMaskBitmap = CreateBlackAndWhiteMask(sameSizeMaskBitmap);
-                    var croppedMask = GetCroppedBitmap(blackAndWhiteMaskBitmap, InitImgRectangle);
+                    var croppedMask = GetCroppedBitmap(blackAndWhiteMaskBitmap, BoundingBox);
 
                     // Verify that the cropped mask contains anything useful
                     if (croppedMask.Pixels.Any(p => p.Alpha > 0))
@@ -697,22 +721,11 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     }
 
     [RelayCommand]
-    private void ChangeInitImgRectangleSize()
+    private void ChangeBoundingBoxSize()
     {
         // Cycle through image rectangle sizes
         _imgRectIndex = (_imgRectIndex + 1) % _supportedImgRectSizes.Count;
-        InitImgRectangleSize = _supportedImgRectSizes[_imgRectIndex];
-    }
-
-    [RelayCommand]
-    private void ToggleInitImgRectangle()
-    {
-        ShowInitImgRectangle = !ShowInitImgRectangle;
-
-        if (ShowInitImgRectangle)
-        {
-            ShowMaskLayer = true;
-        }
+        BoundingBoxSize = _supportedImgRectSizes[_imgRectIndex];
     }
 
     [RelayCommand]
@@ -745,7 +758,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         if (query.TryGetValue(NavigationParams.CanvasImageString, out var canvasImageString) &&
             canvasImageString is string byteString)
         {
-            if (ShowInitImgRectangle)
+            if (CurrentTool != null && CurrentTool.Type == ToolType.BoundingBox)
             {
                 await BeginStitchingAsync(byteString);
             }
@@ -777,7 +790,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
         var stitchBitmap = SKBitmap.Decode(stream);
 
-        var finalBitmap = StitchBitmapIntoSource(SourceBitmap, stitchBitmap, InitImgRectangle);
+        var finalBitmap = StitchBitmapIntoSource(SourceBitmap, stitchBitmap, BoundingBox);
 
         SourceBitmap = finalBitmap;
     }
@@ -1019,22 +1032,22 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             return bitmap;
         }
 
-        var left = (float)(cropRect.Left * InitImgRectangleScale);
-        var top = (float)(cropRect.Top * InitImgRectangleScale);
+        var left = (float)(cropRect.Left * BoundingBoxScale);
+        var top = (float)(cropRect.Top * BoundingBoxScale);
 
         var adjustedRect = new SKRect(
             left, 
             top,
-            left + InitImgRectangleSize, 
-            top + InitImgRectangleSize);
+            left + BoundingBoxSize, 
+            top + BoundingBoxSize);
         
         var info = new SKImageInfo
         {
             AlphaType = SKAlphaType.Unpremul,
             ColorSpace = bitmap.ColorSpace,
             ColorType = bitmap.ColorType,
-            Height = (int)InitImgRectangleSize,
-            Width = (int)InitImgRectangleSize,
+            Height = (int)BoundingBoxSize,
+            Width = (int)BoundingBoxSize,
         };
 
         var croppedBitmap = new SKBitmap(info);
@@ -1090,10 +1103,10 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         else
         {
             adjustedRect = new SKRect(
-                (float)(rect.Left * InitImgRectangleScale),
-                (float)(rect.Top * InitImgRectangleScale),
-                (float)(rect.Right * InitImgRectangleScale),
-                (float)(rect.Bottom * InitImgRectangleScale));
+                (float)(rect.Left * BoundingBoxScale),
+                (float)(rect.Top * BoundingBoxScale),
+                (float)(rect.Right * BoundingBoxScale),
+                (float)(rect.Bottom * BoundingBoxScale));
         }
 
         var source = new SKRect(0, 0, adjustedRect.Width, adjustedRect.Height);

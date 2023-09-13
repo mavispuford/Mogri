@@ -17,11 +17,11 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     Color CurrentColor { get; set; }
 
-    SKRect InitImgRectangle { get; set; }
+    SKRect BoundingBox { get; set; }
 
-    double InitImgRectangleScale { get; set; }
+    double BoundingBoxScale { get; set; }
 
-    float InitImgRectangleSize { get; set; }
+    float BoundingBoxSize { get; set; }
 
     bool IsBusy { get; set; }
 
@@ -32,8 +32,6 @@ public interface ICanvasPageViewModel : IPageViewModel
     Color PaletteIconColor { get; set; }
 
     ImageSource SavedImageSource { get; set; }
-
-    bool ShowInitImgRectangle { get; set; }
 
     bool ShowMaskLayer { get; set; }
 
@@ -55,7 +53,7 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     IAsyncRelayCommand BeginCropImageRectCommand { get; }
 
-    IRelayCommand ChangeInitImgRectangleSizeCommand { get; }
+    IRelayCommand ChangeBoundingBoxSizeCommand { get; }
 
     IAsyncRelayCommand PrepareForSavingCommand { get; set; }
 
@@ -63,7 +61,7 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     IAsyncRelayCommand FinishSendingToImageToImageCommand { get; }
 
-    IAsyncRelayCommand FinishCroppingInitImgRectangleCommand { get; }
+    IAsyncRelayCommand FinishCroppingWithBoundingBoxCommand { get; }
 
     IAsyncRelayCommand ShowColorPickerCommand { get; }
 
@@ -73,8 +71,6 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     IAsyncRelayCommand SendToImageToImageCommand { get; }
     
-    IRelayCommand ToggleInitImgRectangleCommand { get; }
-
     IRelayCommand ToggleMaskLayerVisibilityCommand { get; }
 
     IRelayCommand<IPaintingToolViewModel> SelectToolCommand { get; }

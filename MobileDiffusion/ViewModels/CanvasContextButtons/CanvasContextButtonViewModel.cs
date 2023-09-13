@@ -14,7 +14,12 @@ public partial class CanvasContextButtonViewModel : BaseViewModel
     [ObservableProperty]
     private ICanvasPageViewModel _parentPage;
 
-    public void Update()
+    public CanvasContextButtonViewModel(ICanvasPageViewModel parentPage)
+    {
+        ParentPage = parentPage ?? throw new NullReferenceException(nameof(parentPage));
+    }
+
+    public virtual void Update()
     {
         IsVisible = ParentPage?.CurrentTool?.ContextButtons?.Contains(this) ?? false;
     }

@@ -196,230 +196,202 @@
             <Button Text="Apply" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" BorderColor="{StaticResource IndependenceAccentSixtyPercent}" BorderWidth="1" Command="{Binding ApplySegmentationMaskCommand}" />
             <Button Text="Clear" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" BorderColor="{StaticResource IndependenceAccentSixtyPercent}" BorderWidth="1" Command="{Binding ClearSegmentationMaskCommand}"/>
         </HorizontalStackLayout>
-        
 
-        <Grid x:Name="BottomButtonsLayout"
-              Grid.Row="1"
-              RowDefinitions="60, 60, 60"
-              ColumnDefinitions="60, 60, 60, 60"
-              RowSpacing="15"
-              ColumnSpacing="30"
-              HorizontalOptions="CenterAndExpand"
-              VerticalOptions="End">
+        <VerticalStackLayout Grid.Row="1"
+                             HorizontalOptions="FillAndExpand"
+                             VerticalOptions="End"
+                             Spacing="15">
+            
+            <Grid x:Name="SecondaryButtonsLayout">
+                <Border x:Name="BrushSizeSliderContainer"
+                        BackgroundColor="{StaticResource IndependenceAccent}"
+                        Stroke="Transparent"
+                        IsVisible="False"
+                        HorizontalOptions="Start"
+                        VerticalOptions="End">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="50" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="0" Padding="20">
 
-            <Border Grid.Row="0"
-                    Grid.RowSpan="2"
-                    Grid.Column="0"
-                    Grid.ColumnSpan="3"
-                    x:Name="BrushSizeSliderContainer"
-                    Background="{StaticResource IndependenceAccent}"
-                    Stroke="Transparent"
-                    IsVisible="False"
-                    HorizontalOptions="Start"
-                    VerticalOptions="End">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="50" />
-                </Border.StrokeShape>
-                <VerticalStackLayout Spacing="0" Padding="20">
+                        <Label Text="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, StringFormat='Size: {0:F0}'}"
+                               TextColor="White"
+                               FontAttributes="Bold"
+                               HorizontalOptions="Center"/>
 
-                    <Label Text="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, StringFormat='Size: {0:F0}'}"
-               TextColor="White"
-               FontAttributes="Bold"
-               HorizontalOptions="Center"/>
+                        <Slider WidthRequest="200"
+                                HeightRequest="40"
+                                Minimum="1"
+                                Maximum="50"
+                                Value="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}" />
 
-                    <Slider WidthRequest="200"
-                HeightRequest="40"
-                Minimum="1"
-                Maximum="50"
-                Value="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}" />
+                    </VerticalStackLayout>
+                </Border>
 
-                </VerticalStackLayout>
-            </Border>
+                <Border x:Name="AlphaSliderContainer"
+                        BackgroundColor="{StaticResource IndependenceAccent}"
+                        Stroke="Transparent"
+                        IsVisible="False"
+                        HorizontalOptions="Center"
+                        VerticalOptions="End">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="50" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="0" Padding="20">
 
-            <Border Grid.Row="2"
-                    Grid.Column="0"
+                        <Label Text="{Binding CurrentAlpha, StringFormat='Alpha: {0:F1}'}"
+                               TextColor="White"
+                               FontAttributes="Bold"
+                               HorizontalOptions="Center"/>
+
+                        <Slider WidthRequest="200"
+                                HeightRequest="40"
+                                Minimum="0"
+                                Maximum=".9"
+                                Value="{Binding CurrentAlpha}" />
+
+                    </VerticalStackLayout>
+                </Border>
+
+            </Grid>
+
+            <HorizontalStackLayout x:Name="BottomButtonsLayout"
+                                   HorizontalOptions="CenterAndExpand"
+                                   Spacing="30">
+
+                <Border x:Name="BrushSizeButton" 
+                    BackgroundColor="{StaticResource IndependenceAccent}"
+                    HeightRequest="60"
+                    WidthRequest="60"
                     StrokeThickness="0">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="50" />
-                </Border.StrokeShape>
-                <ContentView x:Name="BrushSizeButton" 
-                             BackgroundColor="{StaticResource IndependenceAccentSixtyPercent}"
-                             VerticalOptions="FillAndExpand"
-                             WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
-                    <ContentView.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="Brush_Size_Button_Clicked" />
-                    </ContentView.GestureRecognizers>
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="50" />
+                    </Border.StrokeShape>
+                    <ContentView>
+                        <ContentView.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="Brush_Size_Button_Clicked" />
+                        </ContentView.GestureRecognizers>
 
-                    <Grid HorizontalOptions="Center"
+                        <Grid HorizontalOptions="Center"
                           VerticalOptions="Center">
-                        
-                        <Ellipse HeightRequest="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
+
+                            <Ellipse HeightRequest="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
                                  WidthRequest="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
                                  Opacity="{Binding CurrentAlpha, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
                                  Fill="{Binding CurrentColor}"
                                  StrokeThickness="0"/>
 
-                        <Ellipse HeightRequest="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
+                            <Ellipse HeightRequest="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
                                  WidthRequest="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
                                  Fill="Transparent"
                                  Stroke="{StaticResource Gray200TwentySixPercent}"
                                  StrokeThickness="1"/>
-                        
-                    </Grid>
-                    
 
-                </ContentView>
-            </Border>
+                        </Grid>
 
-            <Border Grid.Row="0"
-                    Grid.RowSpan="2"
-                    Grid.Column="0"
-                    Grid.ColumnSpan="3"
-                    x:Name="AlphaSliderContainer"
-                    Background="{StaticResource IndependenceAccent}"
-                    Stroke="Transparent"
-                    IsVisible="False"
-                    HorizontalOptions="Center"
-                    VerticalOptions="End">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="50" />
-                </Border.StrokeShape>
-                <VerticalStackLayout Spacing="0" Padding="20">
 
-                    <Label Text="{Binding CurrentAlpha, StringFormat='Alpha: {0:F1}'}"
-               TextColor="White"
-               FontAttributes="Bold"
-               HorizontalOptions="Center"/>
+                    </ContentView>
+                </Border>
 
-                    <Slider WidthRequest="200"
-                HeightRequest="40"
-                Minimum="0"
-                Maximum=".9"
-                Value="{Binding CurrentAlpha}" />
-
-                </VerticalStackLayout>
-            </Border>
-
-            <Border Grid.Row="2"
-                    Grid.Column="1"
-                    StrokeThickness="0">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="50" />
-                </Border.StrokeShape>
-                <ContentView x:Name="AlphaButton"
-                         BackgroundColor="{StaticResource IndependenceAccentSixtyPercent}"
-                         VerticalOptions="FillAndExpand"
-                         WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
-                    <ContentView.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="Alpha_Button_Clicked" />
-                    </ContentView.GestureRecognizers>
-                    <Image HorizontalOptions="Center"
-                           VerticalOptions="Center">
-                        <Image.Source>
-                            <FontImageSource Glyph="&#xe91c;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
-                        </Image.Source>
-                    </Image>
-                </ContentView>
-            </Border>
-
-            <Border Grid.Row="2"
-                    Grid.Column="2"
+                <Border x:Name="AlphaButton"
+                    BackgroundColor="{StaticResource IndependenceAccent}"
                     StrokeThickness="0"
-                    IsEnabled="{Binding GettingColorPalette, Converter={StaticResource InvertedBool}}">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="50" />
-                </Border.StrokeShape>
-                <Grid BackgroundColor="{Binding CurrentColor}"
-                      VerticalOptions="FillAndExpand"
-                      WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
-                    <Grid.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ShowColorPickerCommand}" />
-                    </Grid.GestureRecognizers>
-
-                    <Image HorizontalOptions="Center"
+                    WidthRequest="60"
+                    HeightRequest="60">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="50" />
+                    </Border.StrokeShape>
+                    <ContentView>
+                        <ContentView.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="Alpha_Button_Clicked" />
+                        </ContentView.GestureRecognizers>
+                        <Image HorizontalOptions="Center"
                            VerticalOptions="Center">
-                        <Image.Source>
-                            <FontImageSource Glyph="&#xe40a;" FontFamily="MaterialIconsRound400" Size="30" Color="{Binding PaletteIconColor}" />
-                        </Image.Source>
-                    </Image>
+                            <Image.Source>
+                                <FontImageSource Glyph="&#xe91c;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
+                            </Image.Source>
+                        </Image>
+                    </ContentView>
+                </Border>
 
-                    <ActivityIndicator HorizontalOptions="Center" 
+                <Border x:Name="ColorPaletteButton"
+                    BackgroundColor="{StaticResource IndependenceAccent}"
+                    StrokeThickness="0"
+                    IsEnabled="{Binding GettingColorPalette, Converter={StaticResource InvertedBool}}"
+                    WidthRequest="60"
+                    HeightRequest="60">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="50" />
+                    </Border.StrokeShape>
+                    <Grid BackgroundColor="{Binding CurrentColor}">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ShowColorPickerCommand}" />
+                        </Grid.GestureRecognizers>
+
+                        <Image HorizontalOptions="Center"
+                           VerticalOptions="Center">
+                            <Image.Source>
+                                <FontImageSource Glyph="&#xe40a;" FontFamily="MaterialIconsRound400" Size="30" Color="{Binding PaletteIconColor}" />
+                            </Image.Source>
+                        </Image>
+
+                        <ActivityIndicator HorizontalOptions="Center" 
                                        VerticalOptions="Center"
                                        IsRunning="{Binding GettingColorPalette}"
                                        InputTransparent="True"/>
-                </Grid>
-                
-            </Border>
+                    </Grid>
 
-            <Border Grid.Row="0"
-                    Grid.Column="3"
+                </Border>
+
+                <Border x:Name="SnipButton"
+                    BackgroundColor="{StaticResource IndependenceAccent}"
                     StrokeThickness="0"
-                    IsVisible="{Binding ShowInitImgRectangle}">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="50" />
-                </Border.StrokeShape>
-                <ContentView BackgroundColor="{StaticResource IndependenceAccentSixtyPercent}"
-                             VerticalOptions="FillAndExpand"
-                             WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
-                    <ContentView.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding BeginCropImageRectCommand}" Tapped="Vibrate_Button_Tapped" />
-                    </ContentView.GestureRecognizers>
-                    <Image HorizontalOptions="Center" VerticalOptions="Center">
-                        <Image.Source>
-                            <FontImageSource Glyph="&#xf08b;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
-                        </Image.Source>
-                    </Image>
+                    WidthRequest="60"
+                    HeightRequest="60">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="50" />
+                    </Border.StrokeShape>
+                    <ContentView>
+                        <ContentView.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding BeginCropImageRectCommand}" Tapped="Vibrate_Button_Tapped" />
+                        </ContentView.GestureRecognizers>
+                        <Image HorizontalOptions="Center" VerticalOptions="Center">
+                            <Image.Source>
+                                <FontImageSource Glyph="&#xf08b;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
+                            </Image.Source>
+                        </Image>
 
-                </ContentView>
-            </Border>
+                    </ContentView>
+                </Border>
 
-            <Border Grid.Row="1"
-                    Grid.Column="3"
+                <Border x:Name="BoundingBoxSizeButton"
+                    BackgroundColor="{StaticResource IndependenceAccent}"
                     StrokeThickness="0"
-                    IsVisible="{Binding ShowInitImgRectangle}">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="50" />
-                </Border.StrokeShape>
-                <Grid BackgroundColor="{StaticResource IndependenceAccentSixtyPercent}"
-                      VerticalOptions="FillAndExpand"
-                      WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
-                    <Grid.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ChangeInitImgRectangleSizeCommand}" Tapped="Vibrate_Button_Tapped" />
-                    </Grid.GestureRecognizers>
-                    <Image HorizontalOptions="Center" VerticalOptions="Center">
-                        <Image.Source>
-                            <FontImageSource Glyph="&#xe85b;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
-                        </Image.Source>
-                    </Image>
-                    <Label Text="{Binding Path=InitImgRectangleSize, StringFormat='{0:F0}'}"
+                    WidthRequest="60"
+                    HeightRequest="60">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="50" />
+                    </Border.StrokeShape>
+                    <Grid>
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ChangeBoundingBoxSizeCommand}" Tapped="Vibrate_Button_Tapped" />
+                        </Grid.GestureRecognizers>
+                        <Image HorizontalOptions="Center" VerticalOptions="Center">
+                            <Image.Source>
+                                <FontImageSource Glyph="&#xe85b;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
+                            </Image.Source>
+                        </Image>
+                        <Label Text="{Binding Path=BoundingBoxSize, StringFormat='{0:F0}'}"
                            HorizontalTextAlignment="Center"
                            VerticalTextAlignment="End"
                            TextColor="White"
                            Padding="0,0,0,1"/>
-                </Grid>
-            </Border>
+                    </Grid>
+                </Border>
 
-            <Border Grid.Row="2"
-                    Grid.Column="3"
-                    StrokeThickness="0">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="50" />
-                </Border.StrokeShape>
-                <ContentView BackgroundColor="{StaticResource IndependenceAccentSixtyPercent}"
-                            VerticalOptions="FillAndExpand"
-                            WidthRequest="{Binding Source={RelativeSource Mode=Self}, Path=Height}">
-                    <ContentView.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ToggleInitImgRectangleCommand}" Tapped="Vibrate_Button_Tapped" />
-                    </ContentView.GestureRecognizers>
-                    <Image HorizontalOptions="Center"
-                        VerticalOptions="Center">
-                        <Image.Source>
-                            <FontImageSource Glyph="&#xe3c6;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
-                        </Image.Source>
-                    </Image>
-                </ContentView>
-            </Border>
+            </HorizontalStackLayout>
 
-        </Grid>
+        </VerticalStackLayout>
+        
     </Grid>
 </views:BasePage>
