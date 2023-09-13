@@ -49,6 +49,8 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     bool ShowContextMenu { get; set; }
 
+    bool GettingColorPalette { get; set; }
+
     SegmentationMode SegmentationMode { get; set; }
 
     IAsyncRelayCommand BeginCropImageRectCommand { get; }
