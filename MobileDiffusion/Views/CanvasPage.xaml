@@ -343,6 +343,31 @@
 
                 </Border>
 
+                <Border x:Name="BoundingBoxSizeButton"
+                        BackgroundColor="{StaticResource IndependenceAccent}"
+                        StrokeThickness="0"
+                        WidthRequest="60"
+                        HeightRequest="60">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="50" />
+                    </Border.StrokeShape>
+                    <Grid>
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ChangeBoundingBoxSizeCommand}" Tapped="Vibrate_Button_Tapped" />
+                        </Grid.GestureRecognizers>
+                        <Image HorizontalOptions="Center" Margin="0,0,0,16">
+                            <Image.Source>
+                                <FontImageSource Glyph="&#xe85b;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
+                            </Image.Source>
+                        </Image>
+                        <Label Text="{Binding Path=BoundingBoxSize, StringFormat='{0:F0}'}"
+                               HorizontalTextAlignment="Center"
+                               VerticalTextAlignment="End"
+                               TextColor="White"
+                               Margin="0,0,0,6"/>
+                    </Grid>
+                </Border>
+
                 <Border x:Name="SnipButton"
                     BackgroundColor="{StaticResource IndependenceAccent}"
                     StrokeThickness="0"
@@ -362,31 +387,6 @@
                         </Image>
 
                     </ContentView>
-                </Border>
-
-                <Border x:Name="BoundingBoxSizeButton"
-                    BackgroundColor="{StaticResource IndependenceAccent}"
-                    StrokeThickness="0"
-                    WidthRequest="60"
-                    HeightRequest="60">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="50" />
-                    </Border.StrokeShape>
-                    <Grid>
-                        <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding ChangeBoundingBoxSizeCommand}" Tapped="Vibrate_Button_Tapped" />
-                        </Grid.GestureRecognizers>
-                        <Image HorizontalOptions="Center" VerticalOptions="Center">
-                            <Image.Source>
-                                <FontImageSource Glyph="&#xe85b;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
-                            </Image.Source>
-                        </Image>
-                        <Label Text="{Binding Path=BoundingBoxSize, StringFormat='{0:F0}'}"
-                           HorizontalTextAlignment="Center"
-                           VerticalTextAlignment="End"
-                           TextColor="White"
-                           Padding="0,0,0,1"/>
-                    </Grid>
                 </Border>
 
             </HorizontalStackLayout>
