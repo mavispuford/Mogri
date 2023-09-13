@@ -22,5 +22,6 @@ public partial class PaintingToolViewModel : BaseViewModel, IPaintingToolViewMod
     [ObservableProperty]
     private bool _isLoading;
 
-    public List<CanvasContextButtonViewModel> ContextButtons { get; set; }
+    [ObservableProperty]
+    List<CanvasContextButtonViewModel> _contextButtons;
 }

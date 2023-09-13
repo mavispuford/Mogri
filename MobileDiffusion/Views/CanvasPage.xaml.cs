@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Enums;
 using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.ViewModels;
+using MobileDiffusion.ViewModels.CanvasContextButtons;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using System.Collections.ObjectModel;
@@ -14,7 +15,7 @@ public partial class CanvasPage : BasePage
     private MaskLineViewModel _currentLine;
     private Timer _brushSizeTimer;
     private Timer _alphaTimer;
-    private bool _hasCreatedInitImgRectangle;
+    private bool _hasCreatedBoundingBox;
     private bool _isSaving;
     private bool _hapticsEnabled = false;
 
@@ -60,16 +61,16 @@ public partial class CanvasPage : BasePage
         set => SetValue(CanvasActionsProperty, value);
     }
 
-    public SKRect InitImgRectangle
+    public SKRect BoundingBox
     {
-        get => (SKRect)GetValue(InitImgRectangleProperty);
-        set => SetValue(InitImgRectangleProperty, value);
+        get => (SKRect)GetValue(BoundingBoxProperty);
+        set => SetValue(BoundingBoxProperty, value);
     }
 
-    public bool ShowInitImgRectangle
+    public bool ShowBoundingBox
     {
-        get => (bool)GetValue(ShowInitImgRectangleProperty);
-        set => SetValue(ShowInitImgRectangleProperty, value);
+        get => (bool)GetValue(ShowBoundingBoxProperty);
+        set => SetValue(ShowBoundingBoxProperty, value);
     }
 
     public bool ShowMaskLayer
@@ -96,16 +97,16 @@ public partial class CanvasPage : BasePage
         set => SetValue(DoSegmentationCommandProperty, value);
     }
 
-    public float InitImgRectangleSize
+    public float BoundingBoxSize
     {
-        get => (float)GetValue(InitImgRectangleSizeProperty);
-        set => SetValue(InitImgRectangleSizeProperty, value);
+        get => (float)GetValue(BoundingBoxSizeProperty);
+        set => SetValue(BoundingBoxSizeProperty, value);
     }
 
-    public double InitImgRectangleScale
+    public double BoundingBoxScale
     {
-        get => (double)GetValue(InitImgRectangleScaleProperty);
-        set => SetValue(InitImgRectangleScaleProperty, value);
+        get => (double)GetValue(BoundingBoxScaleProperty);
+        set => SetValue(BoundingBoxScaleProperty, value);
     }
 
     public static BindableProperty BitmapProperty = BindableProperty.Create(nameof(Bitmap), typeof(SKBitmap), typeof(CanvasPage), propertyChanged: (bindable, oldValue, newValue) =>
@@ -130,15 +131,21 @@ public partial class CanvasPage : BasePage
 
     public static BindableProperty CurrentColorProperty = BindableProperty.Create(nameof(CurrentColor), typeof(Color), typeof(CanvasPage), Colors.Black);
 
-    public static BindableProperty CurrentToolProperty = BindableProperty.Create(nameof(CurrentTool), typeof(IPaintingToolViewModel), typeof(CanvasPage), null);
-
-    public static BindableProperty InitImgRectangleProperty = BindableProperty.Create(nameof(InitImgRectangle), typeof(SKRect), typeof(CanvasPage), default(SKRect));
-
-    public static BindableProperty InitImgRectangleScaleProperty = BindableProperty.Create(nameof(InitImgRectangleScale), typeof(double), typeof(CanvasPage), 1d);
-
-    public static BindableProperty InitImgRectangleSizeProperty = BindableProperty.Create(nameof(InitImgRectangleSize), typeof(float), typeof(CanvasPage), 256f, propertyChanged: (bindable, oldValue, newValue) =>
+    public static BindableProperty CurrentToolProperty = BindableProperty.Create(nameof(CurrentTool), typeof(IPaintingToolViewModel), typeof(CanvasPage), null, propertyChanged: (bindable, oldValue, newValue) =>
     {
-        ((CanvasPage)bindable).UpdateInitImgRectangle(true);
+        ((CanvasPage)bindable).OnCurrentToolChanged();
+    });
+
+    public static BindableProperty BoundingBoxProperty = BindableProperty.Create(nameof(BoundingBox), typeof(SKRect), typeof(CanvasPage), default(SKRect));
+
+    public static BindableProperty BoundingBoxScaleProperty = BindableProperty.Create(nameof(BoundingBoxScale), typeof(double), typeof(CanvasPage), 1d, propertyChanged: (bindable, oldValue, newValue) =>
+    {
+        ((CanvasPage)bindable).UpdateBoundingBox(true);
+    });
+
+    public static BindableProperty BoundingBoxSizeProperty = BindableProperty.Create(nameof(BoundingBoxSize), typeof(float), typeof(CanvasPage), 0f, propertyChanged: (bindable, oldValue, newValue) =>
+    {
+        ((CanvasPage)bindable).UpdateBoundingBox(true);
     });
 
     public static BindableProperty CanvasActionsProperty = BindableProperty.Create(nameof(CanvasActions), typeof(ObservableCollection<CanvasActionViewModel>), typeof(CanvasPage), default(ObservableCollection<CanvasActionViewModel>), propertyChanged: (bindable, oldValue, newValue) =>
@@ -152,9 +159,9 @@ public partial class CanvasPage : BasePage
 
     public static BindableProperty DoSegmentationCommandProperty = BindableProperty.Create(nameof(DoSegmentationCommand), typeof(IAsyncRelayCommand<SKPoint>), typeof(CanvasPage), default(IAsyncRelayCommand<SKPoint>));
 
-    public static BindableProperty ShowInitImgRectangleProperty = BindableProperty.Create(nameof(ShowInitImgRectangle), typeof(bool), typeof(CanvasPage), false, propertyChanged: (bindable, oldValue, newValue) =>
+    public static BindableProperty ShowBoundingBoxProperty = BindableProperty.Create(nameof(ShowBoundingBox), typeof(bool), typeof(CanvasPage), false, propertyChanged: (bindable, oldValue, newValue) =>
     {
-        ((CanvasPage)bindable).UpdateInitImgRectangle(false);
+        ((CanvasPage)bindable).UpdateBoundingBox(false);
     });
 
     public static BindableProperty ShowMaskLayerProperty = BindableProperty.Create(nameof(ShowMaskLayer), typeof(bool), typeof(CanvasPage), true, propertyChanged: (bindable, oldValue, newValue) =>
@@ -171,11 +178,10 @@ public partial class CanvasPage : BasePage
         this.SetBinding(CurrentColorProperty, nameof(ICanvasPageViewModel.CurrentColor));
         this.SetBinding(CurrentToolProperty, nameof(ICanvasPageViewModel.CurrentTool));
         this.SetBinding(CanvasActionsProperty, nameof(ICanvasPageViewModel.CanvasActions), BindingMode.TwoWay);
-        this.SetBinding(InitImgRectangleProperty, nameof(ICanvasPageViewModel.InitImgRectangle), BindingMode.OneWayToSource);
-        this.SetBinding(ShowInitImgRectangleProperty, nameof(ICanvasPageViewModel.ShowInitImgRectangle), BindingMode.TwoWay);
+        this.SetBinding(BoundingBoxProperty, nameof(ICanvasPageViewModel.BoundingBox), BindingMode.OneWayToSource);
         this.SetBinding(PrepareForSavingCommandProperty, nameof(ICanvasPageViewModel.PrepareForSavingCommand), BindingMode.OneWayToSource);
-        this.SetBinding(InitImgRectangleScaleProperty, nameof(ICanvasPageViewModel.InitImgRectangleScale), BindingMode.OneWayToSource);
-        this.SetBinding(InitImgRectangleSizeProperty, nameof(ICanvasPageViewModel.InitImgRectangleSize), BindingMode.OneWay);
+        this.SetBinding(BoundingBoxScaleProperty, nameof(ICanvasPageViewModel.BoundingBoxScale), BindingMode.OneWayToSource);
+        this.SetBinding(BoundingBoxSizeProperty, nameof(ICanvasPageViewModel.BoundingBoxSize), BindingMode.TwoWay);
         this.SetBinding(ShowMaskLayerProperty, nameof(ICanvasPageViewModel.ShowMaskLayer), BindingMode.OneWay);
         this.SetBinding(DoSegmentationCommandProperty, nameof(ICanvasPageViewModel.DoSegmentationCommand), BindingMode.OneWay);
         this.SetBinding(SegmentationBitmapProperty, nameof(ICanvasPageViewModel.SegmentationBitmap), BindingMode.TwoWay);
@@ -219,39 +225,38 @@ public partial class CanvasPage : BasePage
         if (e.InContact)
         {
             if (e.Location is SKPoint location && CurrentTool != null && 
-                (CurrentTool.Type == ToolType.PaintBrush || CurrentTool.Type == ToolType.Eraser))
+                (CurrentTool.Type == ToolType.PaintBrush || CurrentTool.Type == ToolType.Eraser || CurrentTool.Type == ToolType.BoundingBox))
             {
-                if (ShowInitImgRectangle &&
-                    _currentLine == null &&
-                    ((InitImgRectangle.Width > 0 &&
-                     InitImgRectangle.Height > 0 &&
-                     InitImgRectangle.Contains(location)) ||
-                     e.ActionType == SKTouchAction.Moved))
+                if (ShowBoundingBox && 
+                    CurrentTool.Type == ToolType.BoundingBox &&
+                    BoundingBox.Width > 0 &&
+                    BoundingBox.Height > 0 &&
+                    BoundingBox.Contains(location))
                 {
-                    var offsetX = -(InitImgRectangle.Width / 2);
-                    var offsetY = -(InitImgRectangle.Height / 2);
+                    var offsetX = -(BoundingBox.Width / 2);
+                    var offsetY = -(BoundingBox.Height / 2);
 
                     if (location.X + offsetX < 0)
                     {
                         offsetX = -location.X;
                     }
-                    else if (location.X + offsetX + InitImgRectangle.Width > MaskCanvasView.Width)
+                    else if (location.X + offsetX + BoundingBox.Width > MaskCanvasView.Width)
                     {
-                        offsetX = (float)MaskCanvasView.Width - location.X - InitImgRectangle.Width;
+                        offsetX = (float)MaskCanvasView.Width - location.X - BoundingBox.Width;
                     }
 
                     if (location.Y + offsetY < 0)
                     {
                         offsetY = -location.Y;
                     }
-                    else if (location.Y + offsetY + InitImgRectangle.Height > MaskCanvasView.Height)
+                    else if (location.Y + offsetY + BoundingBox.Height > MaskCanvasView.Height)
                     {
-                        offsetY = (float)MaskCanvasView.Height - location.Y - InitImgRectangle.Height;
+                        offsetY = (float)MaskCanvasView.Height - location.Y - BoundingBox.Height;
                     }
 
                     location.Offset(offsetX, offsetY);
 
-                    InitImgRectangle = SKRect.Create(location, InitImgRectangle.Size);
+                    BoundingBox = SKRect.Create(location, BoundingBox.Size);
 
                     MaskCanvasView.InvalidateSurface();
 
@@ -283,7 +288,7 @@ public partial class CanvasPage : BasePage
         {
             _currentLine = null;
 
-            var pixelPoint = new SKPoint(location.X * (float)InitImgRectangleScale, location.Y * (float)InitImgRectangleScale);
+            var pixelPoint = new SKPoint(location.X * (float)BoundingBoxScale, location.Y * (float)BoundingBoxScale);
 
             DoSegmentationCommand?.Execute(pixelPoint);
         }
@@ -330,9 +335,9 @@ public partial class CanvasPage : BasePage
             }
         }
 
-        if (!_isSaving && ShowInitImgRectangle)
+        if (!_isSaving && ShowBoundingBox)
         {
-            canvas.DrawRect(InitImgRectangle,
+            canvas.DrawRect(BoundingBox,
             new SKPaint()
             {
                 Color = SKColors.White,
@@ -406,9 +411,9 @@ public partial class CanvasPage : BasePage
             }
         }
         
-        if (ShowInitImgRectangle)
+        if (ShowBoundingBox)
         {
-            canvas.DrawRect(InitImgRectangle,
+            canvas.DrawRect(BoundingBox,
             new SKPaint()
             {
                 Color = SKColors.White,
@@ -526,32 +531,29 @@ public partial class CanvasPage : BasePage
         }
     }
 
-    private void UpdateInitImgRectangle(bool sizeChanged)
-    {
-        if (Bitmap == null)
-        {
-            return;
-        }
-        
-        var rectSize = (float)(InitImgRectangleSize / InitImgRectangleScale);
+    private void UpdateBoundingBox(bool sizeChanged)
+    {        
+        var rectSize = (float)(BoundingBoxSize / BoundingBoxScale);
 
-        if (sizeChanged)
+        if (!_hasCreatedBoundingBox &&
+            MaskCanvasView.Width != -1 &&
+            MaskCanvasView.Height != -1)
         {
-            InitImgRectangle = new SKRect(
-                InitImgRectangle.MidX - (rectSize / 2),
-                InitImgRectangle.MidY - (rectSize / 2),
-                InitImgRectangle.MidX + (rectSize / 2),
-                InitImgRectangle.MidY + (rectSize / 2));
-        }
-        else if (!_hasCreatedInitImgRectangle)
-        {
-            InitImgRectangle = new SKRect(
+            BoundingBox = new SKRect(
                 (float)(MaskCanvasView.Width / 2) - (rectSize / 2),
                 (float)(MaskCanvasView.Height / 2) - (rectSize / 2),
                 (float)(MaskCanvasView.Width / 2) + (rectSize / 2),
                 (float)(MaskCanvasView.Height / 2) + (rectSize / 2));
 
-            _hasCreatedInitImgRectangle = true;
+            _hasCreatedBoundingBox = true;
+        }
+        else if (sizeChanged)
+        {
+            BoundingBox = new SKRect(
+                BoundingBox.MidX - (rectSize / 2),
+                BoundingBox.MidY - (rectSize / 2),
+                BoundingBox.MidX + (rectSize / 2),
+                BoundingBox.MidY + (rectSize / 2));
         }
 
         MaskCanvasView.InvalidateSurface();
@@ -646,7 +648,7 @@ public partial class CanvasPage : BasePage
         SegmentationMaskCanvasView.Measure(width, height);
         SegmentationMaskCanvasView.InvalidateSurface();
 
-        InitImgRectangleScale = Bitmap.Width / width;
+        BoundingBoxScale = Bitmap.Width / width;
     }
 
     private async Task PrepareForSaving(IAsyncRelayCommand callbackCommand)
@@ -703,6 +705,47 @@ public partial class CanvasPage : BasePage
     private void OnSegmentationBitmapChanged()
     {
         SegmentationMaskCanvasView.InvalidateSurface();
+    }
+
+    private void OnCurrentToolChanged()
+    {
+        if (CurrentTool?.ContextButtons == null)
+        {
+            ShowBoundingBox = false;
+            return;
+        }
+
+        ShowBoundingBox = CurrentTool.Type == ToolType.BoundingBox;
+
+        BrushSizeButton.IsVisible = false;
+        AlphaButton.IsVisible = false;
+        ColorPaletteButton.IsVisible = false;
+        SnipButton.IsVisible = false;
+        BoundingBoxSizeButton.IsVisible = false;
+
+        foreach (var contextButton in CurrentTool.ContextButtons)
+        {
+            switch (contextButton)
+            {
+                case BrushSizeContextButtonViewModel:
+                    BrushSizeButton.IsVisible = true;
+                    break;
+                case AlphaContextButtonViewModel:
+                    AlphaButton.IsVisible = true;
+                    break;
+                case ColorPickerContextButtonViewModel:
+                    ColorPaletteButton.IsVisible = true;
+                    break;
+                case SnipContextButtonViewModel:
+                    SnipButton.IsVisible = true;
+                    break;
+                case BoundingBoxSizeContextButtonViewModel:
+                    BoundingBoxSizeButton.IsVisible = true;
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }
 

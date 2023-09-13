@@ -2,6 +2,7 @@
 
 public enum MaskEffect
 {
+    None,
     Paint,
     Erase
 }

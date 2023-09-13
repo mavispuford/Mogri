@@ -4,5 +4,6 @@ public enum ToolType
 {
     PaintBrush,
     Eraser,
-    PaintBucket
+    PaintBucket,
+    BoundingBox
 }
