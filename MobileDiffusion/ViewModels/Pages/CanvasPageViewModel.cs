@@ -145,9 +145,18 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         {
             Name = "Paint Bucket",
             IconCode = "\ue997",
-            Effect = MaskEffect.Erase,
+            Effect = MaskEffect.Paint,
             Type = ToolType.PaintBucket
         });
+
+        // Placeholder for gesture paint bucket - Might just be added into the base control
+        //AvailableTools.Add(new PaintingToolViewModel
+        //{
+        //    Name = "Paint Bucket",
+        //    IconCode = "\ue155",
+        //    Effect = MaskEffect.Paint,
+        //    Type = ToolType.PaintBucket
+        //});
 
         CurrentTool = AvailableTools.FirstOrDefault();
     }

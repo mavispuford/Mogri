@@ -2,6 +2,7 @@
 <views:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                 xmlns:animations="clr-namespace:MobileDiffusion.Animations;assembly=MobileDiffusion"
+                xmlns:controls="clr-namespace:MobileDiffusion.Controls" 
                 xmlns:enums="clr-namespace:MobileDiffusion.Enums" 
                 xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
                 xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
@@ -12,7 +13,6 @@
     <views:BasePage.Resources>
         <ResourceDictionary>
             <toolkit:BoolToObjectConverter x:Key="BoolToShowMaskTextConverter" TrueObject="Hide Mask Layer" FalseObject="Show Mask Layer" />
-            <toolkit:BoolToObjectConverter x:Key="BoolToHalfOpacityConverter" TrueObject=".5" FalseObject="1" />
             <toolkit:BoolToObjectConverter x:Key="BoolToEyeConverter">
                 <toolkit:BoolToObjectConverter.TrueObject>
                     <FontImageSource Glyph="&#xe8f5;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
@@ -129,82 +129,53 @@
         <Grid Grid.Row="0"
               HorizontalOptions="Center"
               VerticalOptions="Start">
-            <CarouselView CurrentItem="{Binding CurrentTool}"
-                          ItemsSource="{Binding AvailableTools}"
-                          HorizontalOptions="Center"
-                          VerticalOptions="Center"
-                          HeightRequest="58"
-                          WidthRequest="300"
-                          Loop="False"
-                          PeekAreaInsets="120"
-                          CurrentItemChanged="ToolCarouselView_CurrentItemChanged">
-                <CarouselView.ItemsLayout>
+            <CollectionView SelectedItem="{Binding CurrentTool}"
+                            ItemsSource="{Binding AvailableTools}"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            HeightRequest="58"
+                            SelectionChanged="ToolCollectionView_SelectedItemChanged"
+                            SelectionMode="Single"
+                            HorizontalScrollBarVisibility="Never"
+                            VerticalScrollBarVisibility="Never">
+                <CollectionView.ItemsLayout>
                     <LinearItemsLayout Orientation="Horizontal"
                                        SnapPointsAlignment="Center"
                                        SnapPointsType="MandatorySingle"
                                        ItemSpacing="0"/>
-                </CarouselView.ItemsLayout>
-                <CarouselView.ItemTemplate>
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="viewModels:IPaintingToolViewModel">
-                        <Grid>
-                            <ImageButton WidthRequest="50" 
-                                         HeightRequest="50" 
-                                         Command="{Binding SelectToolCommand, Source={RelativeSource AncestorType={x:Type viewModels:ICanvasPageViewModel}}}"
-                                         CommandParameter="{Binding .}"
-                                         Opacity="{Binding IsLoading, Converter={StaticResource BoolToHalfOpacityConverter}}">
-                                <ImageButton.Source>
-                                    <FontImageSource Glyph="{Binding IconCode}" FontFamily="MaterialIconsRound400" Size="50" Color="{StaticResource Primary}" />
-                                </ImageButton.Source>
-                            </ImageButton>
-
-                            <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center" IsRunning="{Binding IsLoading}" InputTransparent="True"/>
-
+                        <controls:ToolControl>
                             <VisualStateManager.VisualStateGroups>
                                 <VisualStateGroupList>
                                     <VisualStateGroup x:Name="CommonStates">
-                                        <VisualState x:Name="CurrentItem">
+                                        <VisualState x:Name="Normal">
                                             <VisualState.Setters>
-                                                <Setter Property="animations:AnimationProperties.Animation">
+                                                <Setter Property="BackgroundColor" Value="Transparent" />
+                                                <Setter Property="IconColor" Value="{StaticResource IndependenceAccentSixtyPercent}" />
+                                                <Setter Property="animations:AnimationProperties.Animations">
+                                                    <animations:ScaleToAnimation Scale=".75" Easing="{x:Static Easing.CubicInOut}" Length="200" />
+                                                </Setter>
+                                            </VisualState.Setters>
+                                        </VisualState>
+
+                                        <VisualState x:Name="Selected">
+                                            <VisualState.Setters>
+                                                <Setter Property="BackgroundColor" Value="Transparent" />
+                                                <Setter Property="IconColor" Value="{StaticResource Primary}" />
+                                                <Setter Property="animations:AnimationProperties.Animations">
                                                     <animations:ScaleToAnimation Scale="1" Easing="{x:Static Easing.CubicInOut}" Length="200" />
-                                                </Setter>
-                                            </VisualState.Setters>
-                                        </VisualState>
-                                        <VisualState x:Name="PreviousItem">
-                                            <VisualState.Setters>
-                                                <Setter Property="animations:AnimationProperties.Animation">
-                                                    <animations:ScaleToAnimation Scale=".75" Easing="{x:Static Easing.CubicInOut}" Length="200" />
-                                                </Setter>
-                                            </VisualState.Setters>
-                                        </VisualState>
-                                        <VisualState x:Name="NextItem">
-                                            <VisualState.Setters>
-                                                <Setter Property="animations:AnimationProperties.Animation">
-                                                    <animations:ScaleToAnimation Scale=".75" Easing="{x:Static Easing.CubicInOut}" Length="200" />
-                                                </Setter>
-                                            </VisualState.Setters>
-                                        </VisualState>
-                                        <VisualState x:Name="DefaultItem">
-                                            <VisualState.Setters>
-                                                <Setter Property="animations:AnimationProperties.Animation">
-                                                    <animations:ScaleToAnimation Scale=".75" Easing="{x:Static Easing.CubicInOut}" Length="200" />
                                                 </Setter>
                                             </VisualState.Setters>
                                         </VisualState>
                                     </VisualStateGroup>
                                 </VisualStateGroupList>
                             </VisualStateManager.VisualStateGroups>
-                        </Grid>
+                        </controls:ToolControl>
                     </DataTemplate>
-                </CarouselView.ItemTemplate>
-            </CarouselView>
-            <Border WidthRequest="60"
-                    HeightRequest="60"
-                    VerticalOptions="Center"
-                    HorizontalOptions="Center"
-                    Stroke="{StaticResource IndependenceAccent}"
-                    StrokeThickness="4"
-                    StrokeShape="RoundRectangle 50"
-                    BackgroundColor="Transparent"/>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
         </Grid>
 
         <HorizontalStackLayout x:Name="ContextButtonsLayout"
