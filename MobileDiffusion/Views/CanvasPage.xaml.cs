@@ -681,7 +681,7 @@ public partial class CanvasPage : BasePage
         MaskCanvasView.Animate("FadeInOutMaskCanvasView", value => MaskCanvasView.Opacity = value, MaskCanvasView.Opacity, ShowMaskLayer ? 1 : 0, easing: Easing.CubicInOut);
     }
 
-    private void ToolCarouselView_CurrentItemChanged(object sender, CurrentItemChangedEventArgs e)
+    private void ToolCollectionView_SelectedItemChanged(object sender, SelectionChangedEventArgs e)
     {
         vibrate(HapticFeedbackType.Click);
     }

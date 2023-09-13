@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:animations="clr-namespace:MobileDiffusion.Animations;assembly=MobileDiffusion"
+             xmlns:controls="clr-namespace:MobileDiffusion.Controls" 
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels" 
+             x:Class="MobileDiffusion.Controls.ToolControl"
+             x:DataType="viewModels:IPaintingToolViewModel"
+             x:Name="ThisControl">
+    <ContentView.Resources>
+        <ResourceDictionary>
+            
+            <toolkit:BoolToObjectConverter x:Key="BoolToHalfOpacityConverter" TrueObject=".5" FalseObject="1" />
+            
+        </ResourceDictionary>
+    </ContentView.Resources>
+    
+    <Grid>
+
+        <ImageButton WidthRequest="50" 
+                     HeightRequest="50" 
+                     Command="{Binding SelectToolCommand, Source={RelativeSource AncestorType={x:Type viewModels:ICanvasPageViewModel}}}"
+                     CommandParameter="{Binding .}"
+                     Opacity="{Binding IsLoading, Converter={StaticResource BoolToHalfOpacityConverter}}"
+                     ToolTipProperties.Text="{Binding Name}">
+
+            <ImageButton.Source>
+                <FontImageSource x:Name="FontImageSource" Glyph="{Binding IconCode}" FontFamily="MaterialIconsRound400" Size="50" />
+            </ImageButton.Source>
+        </ImageButton>
+
+        <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center" IsRunning="{Binding IsLoading}" InputTransparent="True"/>
+
+        <Border WidthRequest="58"
+                HeightRequest="58"
+                VerticalOptions="Center"
+                HorizontalOptions="Center"
+                Stroke="{StaticResource IndependenceAccent}"
+                StrokeThickness="4"
+                StrokeShape="RoundRectangle 50"
+                BackgroundColor="Transparent"
+                Opacity="0">
+        </Border>
+    </Grid>
+</ContentView>
