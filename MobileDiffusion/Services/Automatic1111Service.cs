@@ -55,7 +55,17 @@ namespace MobileDiffusion.Services
         {
             if (_initializeTask == null || _initializeTask.Status != TaskStatus.Running)
             { 
-                _initializeTask = RefreshResourcesAsync();
+                _initializeTask = await Task.Run(async () =>
+                {
+                    // For some reason in .NET 8 (not .NET 7), if we don't manually get an HttpClient and make any GET call before the Automatic1111 client uses it,
+                    // We'll get the following exception: {System.ObjectDisposedException: Cannot access a disposed object. Object name: 'AndroidMessageHandler'.
+                    var httpClient = getHttpClient(TimeSpan.FromSeconds(5));
+                    var baseUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
+                    var response = await httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, baseUrl)).ConfigureAwait(false);
+                }).ContinueWith(async task =>
+                {
+                    await RefreshResourcesAsync();
+                });
             }
 
             await _initializeTask;
@@ -67,11 +77,12 @@ namespace MobileDiffusion.Services
 
         public async Task<bool> CheckServerAsync()
         {
-            var client = getClient(TimeSpan.FromSeconds(5));
+            var httpClient = getHttpClient(TimeSpan.FromSeconds(5));
+            var auto1111Client = getAuto1111Client(httpClient);
 
             try
             {
-                await client._lambda__internal_ping_getAsync();
+                await auto1111Client._lambda__internal_ping_getAsync();
 
                 return true;
             }
@@ -115,14 +126,15 @@ namespace MobileDiffusion.Services
 
         public async Task<PromptSettings> GetImageInfoAsync(string base64EncodedImage)
         {
-            var client = getClient(TimeSpan.FromSeconds(10));
+            var httpClient = getHttpClient(TimeSpan.FromSeconds(10));
+            var auto1111Client = getAuto1111Client(httpClient);
 
             var request = new PNGInfoRequest()
             {
                 Image = base64EncodedImage
             };
 
-            var imageInfoResult = await client.Pnginfoapi_sdapi_v1_png_info_postAsync(request);
+            var imageInfoResult = await auto1111Client.Pnginfoapi_sdapi_v1_png_info_postAsync(request);
 
             if (string.IsNullOrEmpty(imageInfoResult.Info))
             {
@@ -224,19 +236,20 @@ namespace MobileDiffusion.Services
 
         public async Task RefreshResourcesAsync()
         {
-            var client = getClient(TimeSpan.FromSeconds(10));
-
+            var httpClient = getHttpClient(TimeSpan.FromSeconds(10));
+            var auto1111Client = getAuto1111Client(httpClient);
+            
             await Task.WhenAll(Task.Run(async () =>
             {
-                _samplers = await client.Get_samplers_sdapi_v1_samplers_getAsync();
+                _samplers = await auto1111Client.Get_samplers_sdapi_v1_samplers_getAsync();
             }),
             Task.Run(async () =>
             {
-                _promptStyles = await client.Get_prompt_styles_sdapi_v1_prompt_styles_getAsync();
+                _promptStyles = await auto1111Client.Get_prompt_styles_sdapi_v1_prompt_styles_getAsync();
             }),
             Task.Run(async () =>
             {
-                var loras = await client.Get_loras_sdapi_v1_loras_getAsync();
+                var loras = await auto1111Client.Get_loras_sdapi_v1_loras_getAsync();
 
                 var lorasString = JsonConvert.SerializeObject(loras);
 
@@ -244,17 +257,27 @@ namespace MobileDiffusion.Services
             }),
             Task.Run(async () =>
             {
-                _models = await client.Get_sd_models_sdapi_v1_sd_models_getAsync();
+                _models = await auto1111Client.Get_sd_models_sdapi_v1_sd_models_getAsync();
             }));
         }
 
-        private Client getClient(TimeSpan? timeout = null)
+        private HttpClient getHttpClient(TimeSpan? timeout = null)
         {
             var httpClient = _httpClientFactory.CreateClient(Microsoft.Extensions.Options.Options.DefaultName);
 
             if (timeout != null)
             {
                 httpClient.Timeout = timeout.Value;
+            }
+
+            return httpClient;
+        }
+
+        private Client getAuto1111Client(HttpClient httpClient)
+        {
+            if (httpClient == null)
+            {
+                throw new ArgumentNullException(nameof(httpClient));
             }
 
             var baseUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
@@ -339,7 +362,8 @@ namespace MobileDiffusion.Services
 
         private async IAsyncEnumerable<ApiResponse> sendTextToImageRequest(PromptSettings settings)
         {
-            var client = getClient(TimeSpan.FromMinutes(RequestTimeoutMinutes));
+            var httpClient = getHttpClient(TimeSpan.FromMinutes(RequestTimeoutMinutes));
+            var auto1111Client = getAuto1111Client(httpClient);
 
             var request = txt2ImageRequestFromSettings(settings);
 
@@ -358,7 +382,7 @@ namespace MobileDiffusion.Services
             {
                 try
                 {
-                    txt2ImgResponse = await client.Text2imgapi_sdapi_v1_txt2img_postAsync(request, _mainRequestCancellationSource?.Token ?? CancellationToken.None);
+                    txt2ImgResponse = await auto1111Client.Text2imgapi_sdapi_v1_txt2img_postAsync(request, _mainRequestCancellationSource?.Token ?? CancellationToken.None);
                 }
                 finally
                 {
@@ -375,7 +399,7 @@ namespace MobileDiffusion.Services
             {
                 try
                 {
-                    apiResponse = await getCurrentProgress(client, progressToken, skipCurrentImage);
+                    apiResponse = await getCurrentProgress(auto1111Client, progressToken, skipCurrentImage);
                 }
                 catch (OperationCanceledException)
                 {
@@ -399,7 +423,8 @@ namespace MobileDiffusion.Services
 
         private async IAsyncEnumerable<ApiResponse> sendImageToImageRequest(PromptSettings settings)
         {
-            var client = getClient(TimeSpan.FromMinutes(RequestTimeoutMinutes));
+            var httpClient = getHttpClient(TimeSpan.FromMinutes(RequestTimeoutMinutes));
+            var auto1111Client = getAuto1111Client(httpClient);
 
             var request = image2ImageRequestFromSettings(settings);
 
@@ -418,7 +443,7 @@ namespace MobileDiffusion.Services
             {
                 try
                 {
-                    img2ImgResponse = await client.Img2imgapi_sdapi_v1_img2img_postAsync(request, _mainRequestCancellationSource?.Token ?? CancellationToken.None);
+                    img2ImgResponse = await auto1111Client.Img2imgapi_sdapi_v1_img2img_postAsync(request, _mainRequestCancellationSource?.Token ?? CancellationToken.None);
                 }
                 finally
                 {
@@ -435,7 +460,7 @@ namespace MobileDiffusion.Services
             {
                 try
                 {
-                    apiResponse = await getCurrentProgress(client, progressToken, skipCurrentImage);
+                    apiResponse = await getCurrentProgress(auto1111Client, progressToken, skipCurrentImage);
                 }
                 catch (OperationCanceledException)
                 {

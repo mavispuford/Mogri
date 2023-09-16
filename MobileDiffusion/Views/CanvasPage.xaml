@@ -208,10 +208,8 @@
                         Stroke="Transparent"
                         IsVisible="False"
                         HorizontalOptions="Start"
-                        VerticalOptions="End">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="50" />
-                    </Border.StrokeShape>
+                        VerticalOptions="End"
+                        StrokeShape="RoundRectangle 10">
                     <VerticalStackLayout Spacing="0" Padding="20">
 
                         <Label Text="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, StringFormat='Size: {0:F0}'}"
@@ -233,10 +231,8 @@
                         Stroke="Transparent"
                         IsVisible="False"
                         HorizontalOptions="Center"
-                        VerticalOptions="End">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="50" />
-                    </Border.StrokeShape>
+                        VerticalOptions="End"
+                        StrokeShape="RoundRectangle 10">
                     <VerticalStackLayout Spacing="0" Padding="20">
 
                         <Label Text="{Binding CurrentAlpha, StringFormat='Alpha: {0:F1}'}"
@@ -260,13 +256,11 @@
                                    Spacing="30">
 
                 <Border x:Name="BrushSizeButton" 
-                    BackgroundColor="{StaticResource IndependenceAccent}"
-                    HeightRequest="60"
-                    WidthRequest="60"
-                    StrokeThickness="0">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="50" />
-                    </Border.StrokeShape>
+                        BackgroundColor="{StaticResource IndependenceAccent}"
+                        HeightRequest="60"
+                        WidthRequest="60"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 10">
                     <ContentView>
                         <ContentView.GestureRecognizers>
                             <TapGestureRecognizer Tapped="Brush_Size_Button_Clicked" />
@@ -294,13 +288,11 @@
                 </Border>
 
                 <Border x:Name="AlphaButton"
-                    BackgroundColor="{StaticResource IndependenceAccent}"
-                    StrokeThickness="0"
-                    WidthRequest="60"
-                    HeightRequest="60">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="50" />
-                    </Border.StrokeShape>
+                        BackgroundColor="{StaticResource IndependenceAccent}"
+                        StrokeThickness="0"
+                        WidthRequest="60"
+                        HeightRequest="60"
+                        StrokeShape="RoundRectangle 10">
                     <ContentView>
                         <ContentView.GestureRecognizers>
                             <TapGestureRecognizer Tapped="Alpha_Button_Clicked" />
@@ -315,14 +307,12 @@
                 </Border>
 
                 <Border x:Name="ColorPaletteButton"
-                    BackgroundColor="{StaticResource IndependenceAccent}"
-                    StrokeThickness="0"
-                    IsEnabled="{Binding GettingColorPalette, Converter={StaticResource InvertedBool}}"
-                    WidthRequest="60"
-                    HeightRequest="60">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="50" />
-                    </Border.StrokeShape>
+                        BackgroundColor="{StaticResource IndependenceAccent}"
+                        StrokeThickness="0"
+                        IsEnabled="{Binding GettingColorPalette, Converter={StaticResource InvertedBool}}"
+                        WidthRequest="60"
+                        HeightRequest="60"
+                        StrokeShape="RoundRectangle 10">
                     <Grid BackgroundColor="{Binding CurrentColor}">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ShowColorPickerCommand}" />
@@ -347,10 +337,8 @@
                         BackgroundColor="{StaticResource IndependenceAccent}"
                         StrokeThickness="0"
                         WidthRequest="60"
-                        HeightRequest="60">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="50" />
-                    </Border.StrokeShape>
+                        HeightRequest="60"
+                        StrokeShape="RoundRectangle 10">
                     <Grid>
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ChangeBoundingBoxSizeCommand}" Tapped="Vibrate_Button_Tapped" />
@@ -369,13 +357,11 @@
                 </Border>
 
                 <Border x:Name="SnipButton"
-                    BackgroundColor="{StaticResource IndependenceAccent}"
-                    StrokeThickness="0"
-                    WidthRequest="60"
-                    HeightRequest="60">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="50" />
-                    </Border.StrokeShape>
+                        BackgroundColor="{StaticResource IndependenceAccent}"
+                        StrokeThickness="0"
+                        WidthRequest="60"
+                        HeightRequest="60"
+                        StrokeShape="RoundRectangle 10">
                     <ContentView>
                         <ContentView.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding BeginCropImageRectCommand}" Tapped="Vibrate_Button_Tapped" />

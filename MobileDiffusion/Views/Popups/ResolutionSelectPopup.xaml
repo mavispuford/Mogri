@@ -11,7 +11,7 @@
     <Border x:Name="MainBorder"
             Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource IndependenceAccent}}"
             Stroke="Transparent"
-            StrokeShape="RoundRectangle 50"
+            StrokeShape="RoundRectangle 10"
             HorizontalOptions="Fill"
             VerticalOptions="Center"
             Padding="15">

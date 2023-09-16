@@ -10,10 +10,8 @@
              x:DataType="viewModels:IResultItemViewModel">
 
     <Border Background="{StaticResource Gray200TwentySixPercent}"
-            StrokeThickness="0">
-        <Border.StrokeShape>
-            <RoundRectangle CornerRadius="50" />
-        </Border.StrokeShape>
+            StrokeThickness="0"
+            StrokeShape="RoundRectangle 10">
         <Grid HorizontalOptions="Fill"
           VerticalOptions="Fill">
             <Grid.GestureRecognizers>
