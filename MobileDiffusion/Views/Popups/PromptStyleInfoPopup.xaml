@@ -9,7 +9,7 @@
                   x:DataType="viewModels:IPromptStyleInfoPopupViewModel">
     <Border Padding="15"
             Stroke="Transparent"
-            StrokeShape="RoundRectangle 50"
+            StrokeShape="RoundRectangle 10"
             Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource IndependenceAccent}}"
             HorizontalOptions="Center"
             VerticalOptions="Center">

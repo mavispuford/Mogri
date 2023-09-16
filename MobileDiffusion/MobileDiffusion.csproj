@@ -8,7 +8,6 @@
 		<OutputType>Exe</OutputType>
 		<RootNamespace>MobileDiffusion</RootNamespace>
 		<UseMaui>true</UseMaui>
-		<MauiVersion>8.0.0-preview.6.8686</MauiVersion>
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<LangVersion>latest</LangVersion>
@@ -17,7 +16,7 @@
 		<ApplicationTitle>MobileDiffusion</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.mobilediffusion</ApplicationId>
+		<ApplicationId>com.mavispuford.mobilediffusion</ApplicationId>
 		<ApplicationIdGuid>95046DF2-A0B6-4A07-9ED5-3CA03F6DBA54</ApplicationIdGuid>
 
 		<!-- Versions -->
@@ -95,17 +94,17 @@
 
 	<ItemGroup>
 	  <PackageReference Include="ColorMinePortable" Version="2.0.4" />
-	  <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.0-preview.6.8686" />
+	  <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.0-rc.1.9171" />
 	  <PackageReference Include="CommunityToolkit.Maui" Version="5.3.0" />
 	  <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
-	  <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
-	  <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="7.0.9" />
+	  <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0-rc.1.23419.4" />
+	  <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="8.0.0-rc.1.23421.29" />
 	  <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.15.1" />
 	  <PackageReference Include="Mopups" Version="1.1.1" />
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-	  <PackageReference Include="SkiaSharp" Version="2.88.4-preview.89" />
-	  <PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.4-preview.89" />
-	  <PackageReference Include="SkiaSharp.Views.Maui.Core" Version="2.88.4-preview.89" />
+	  <PackageReference Include="SkiaSharp" Version="2.88.6-preview.1.2" />
+	  <PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.6-preview.1.2" />
+	  <PackageReference Include="SkiaSharp.Views.Maui.Core" Version="2.88.6-preview.1.2" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -200,6 +199,10 @@
 
 	<ItemGroup>
 	  <Folder Include="Resources\Images\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="8.0.0-rc.1.9171" />
 	</ItemGroup>
 
 </Project>

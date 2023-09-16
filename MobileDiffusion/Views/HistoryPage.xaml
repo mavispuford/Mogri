@@ -96,7 +96,7 @@
                                             </Setter>
 
                                             <Setter Property="BackgroundColor" Value="Transparent" />
-                                            <Setter Property="StrokeShape" Value="RoundRectangle 50" />
+                                            <Setter Property="StrokeShape" Value="RoundRectangle 10" />
                                         </VisualState.Setters>
                                     </VisualState>
 
@@ -128,7 +128,7 @@
                 BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}"
                 Stroke="Transparent"
                 StrokeThickness="0"
-                StrokeShape="RoundRectangle 50,50,0,0">
+                StrokeShape="RoundRectangle 10,10,0,0">
             <Border.Shadow>
                 <Shadow Brush="Black"
                         Offset="0,0"

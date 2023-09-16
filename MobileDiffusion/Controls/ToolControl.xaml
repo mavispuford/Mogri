@@ -38,7 +38,7 @@
                 HorizontalOptions="Center"
                 Stroke="{StaticResource IndependenceAccent}"
                 StrokeThickness="4"
-                StrokeShape="RoundRectangle 50"
+                StrokeShape="RoundRectangle 10"
                 BackgroundColor="Transparent"
                 Opacity="0">
         </Border>

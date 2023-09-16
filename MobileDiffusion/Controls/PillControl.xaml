@@ -7,7 +7,7 @@
              x:Name="ThisControl">
     <Border BackgroundColor="{StaticResource Gray300}"
             Stroke="Transparent"
-            StrokeShape="RoundRectangle 50"
+            StrokeShape="RoundRectangle 10"
             Padding="20,6,16,6"
             HeightRequest="50">
         <HorizontalStackLayout Spacing="6">

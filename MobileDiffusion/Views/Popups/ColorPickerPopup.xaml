@@ -15,7 +15,7 @@
     </popups:BasePopup.Resources>
     <Border Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource IndependenceAccent}}"
             Stroke="Transparent"
-            StrokeShape="RoundRectangle 50"
+            StrokeShape="RoundRectangle 10"
             VerticalOptions="Center"
             HorizontalOptions="Center"
             Padding="15"
@@ -29,10 +29,8 @@
                    FontSize="16"/>
             <Border Stroke="{StaticResource BlackSeventyThreePercent}"
                     HorizontalOptions="Center"
-                    StrokeThickness="5">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="10" />
-                </Border.StrokeShape>
+                    StrokeThickness="5"
+                    StrokeShape="RoundRectangle 10">
                 <BoxView Color="{Binding CurrentColor}"
                      HeightRequest="100"
                      WidthRequest="100"/>
