@@ -30,7 +30,7 @@ public partial class MaskLineViewModel : CanvasActionViewModel
             FilterQuality = SKFilterQuality.None,
             IsAntialias = false,
             Style = SKPaintStyle.Stroke,
-            StrokeWidth = 10,
+            StrokeWidth = BrushSize,
             StrokeCap = SKStrokeCap.Round,
             StrokeMiter = 0,
             StrokeJoin = SKStrokeJoin.Round,
@@ -48,8 +48,6 @@ public partial class MaskLineViewModel : CanvasActionViewModel
 
             paint.Color = SKColors.Transparent;
         }
-
-        paint.StrokeWidth = BrushSize;
 
         var points = Path;
 

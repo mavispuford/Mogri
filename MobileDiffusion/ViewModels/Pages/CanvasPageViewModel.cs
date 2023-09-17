@@ -535,9 +535,11 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     }
 
     [RelayCommand]
-    private async Task DoSegmentation(SKPoint location)
+    private async Task DoSegmentation(SKPoint[] points)
     {
-        if (_doingSegmentation)
+        if (_doingSegmentation ||
+            points == null ||
+            points.Length == 0)
         {
             return;
         }
@@ -566,8 +568,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         _doingSegmentation = true;
         IsBusy = true;
 
-        var maskBitmap = await _segmentationService.DoSegmentation(location);
-
+        var maskBitmap = await _segmentationService.DoSegmentation(points);
+        
         if (maskBitmap != null)
         {
             if (SegmentationBitmap == null)
