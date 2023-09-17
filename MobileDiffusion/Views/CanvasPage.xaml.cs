@@ -13,6 +13,7 @@ namespace MobileDiffusion.Views;
 public partial class CanvasPage : BasePage
 {
     private MaskLineViewModel _currentLine;
+    private MaskLineViewModel _segmentationLine;
     private Timer _brushSizeTimer;
     private Timer _alphaTimer;
     private bool _hasCreatedBoundingBox;
@@ -91,9 +92,9 @@ public partial class CanvasPage : BasePage
         set => SetValue(SegmentationCallbackCommandProperty, value);
     }
 
-    public IAsyncRelayCommand<SKPoint> DoSegmentationCommand
+    public IAsyncRelayCommand<SKPoint[]> DoSegmentationCommand
     {
-        get => (IAsyncRelayCommand<SKPoint>)GetValue(DoSegmentationCommandProperty);
+        get => (IAsyncRelayCommand<SKPoint[]>)GetValue(DoSegmentationCommandProperty);
         set => SetValue(DoSegmentationCommandProperty, value);
     }
 
@@ -157,7 +158,7 @@ public partial class CanvasPage : BasePage
     
     public static BindableProperty SegmentationCallbackCommandProperty = BindableProperty.Create(nameof(SegmentationCallbackCommand), typeof(IAsyncRelayCommand<SKBitmap>), typeof(CanvasPage), default(IAsyncRelayCommand<SKBitmap>));
 
-    public static BindableProperty DoSegmentationCommandProperty = BindableProperty.Create(nameof(DoSegmentationCommand), typeof(IAsyncRelayCommand<SKPoint>), typeof(CanvasPage), default(IAsyncRelayCommand<SKPoint>));
+    public static BindableProperty DoSegmentationCommandProperty = BindableProperty.Create(nameof(DoSegmentationCommand), typeof(IAsyncRelayCommand<SKPoint[]>), typeof(CanvasPage), default(IAsyncRelayCommand<SKPoint[]>));
 
     public static BindableProperty ShowBoundingBoxProperty = BindableProperty.Create(nameof(ShowBoundingBox), typeof(bool), typeof(CanvasPage), false, propertyChanged: (bindable, oldValue, newValue) =>
     {
@@ -222,85 +223,133 @@ public partial class CanvasPage : BasePage
     private void OnTouchMaskSurface(object sender, SKTouchEventArgs e)
     {
         HideSliders();
-        if (e.InContact)
+
+        if (e.Location is SKPoint location && CurrentTool != null)
         {
-            if (e.Location is SKPoint location && CurrentTool != null && 
-                (CurrentTool.Type == ToolType.PaintBrush || CurrentTool.Type == ToolType.Eraser || CurrentTool.Type == ToolType.BoundingBox))
+            // InContact == Finger currently touching down
+            if (e.InContact)
             {
-                if (ShowBoundingBox && 
-                    CurrentTool.Type == ToolType.BoundingBox &&
-                    BoundingBox.Width > 0 &&
-                    BoundingBox.Height > 0 &&
-                    BoundingBox.Contains(location))
+                switch (CurrentTool.Type)
                 {
-                    var offsetX = -(BoundingBox.Width / 2);
-                    var offsetY = -(BoundingBox.Height / 2);
+                    case ToolType.BoundingBox:
+                        if (ShowBoundingBox &&
+                            BoundingBox.Width > 0 &&
+                            BoundingBox.Height > 0 &&
+                            BoundingBox.Contains(location))
+                        {
+                            var offsetX = -(BoundingBox.Width / 2);
+                            var offsetY = -(BoundingBox.Height / 2);
 
-                    if (location.X + offsetX < 0)
-                    {
-                        offsetX = -location.X;
-                    }
-                    else if (location.X + offsetX + BoundingBox.Width > MaskCanvasView.Width)
-                    {
-                        offsetX = (float)MaskCanvasView.Width - location.X - BoundingBox.Width;
-                    }
+                            if (location.X + offsetX < 0)
+                            {
+                                offsetX = -location.X;
+                            }
+                            else if (location.X + offsetX + BoundingBox.Width > MaskCanvasView.Width)
+                            {
+                                offsetX = (float)MaskCanvasView.Width - location.X - BoundingBox.Width;
+                            }
 
-                    if (location.Y + offsetY < 0)
-                    {
-                        offsetY = -location.Y;
-                    }
-                    else if (location.Y + offsetY + BoundingBox.Height > MaskCanvasView.Height)
-                    {
-                        offsetY = (float)MaskCanvasView.Height - location.Y - BoundingBox.Height;
-                    }
+                            if (location.Y + offsetY < 0)
+                            {
+                                offsetY = -location.Y;
+                            }
+                            else if (location.Y + offsetY + BoundingBox.Height > MaskCanvasView.Height)
+                            {
+                                offsetY = (float)MaskCanvasView.Height - location.Y - BoundingBox.Height;
+                            }
 
-                    location.Offset(offsetX, offsetY);
+                            location.Offset(offsetX, offsetY);
 
-                    BoundingBox = SKRect.Create(location, BoundingBox.Size);
+                            BoundingBox = SKRect.Create(location, BoundingBox.Size);
+                        }
 
-                    MaskCanvasView.InvalidateSurface();
+                        break;
+                    case ToolType.PaintBrush:
+                    case ToolType.Eraser:
+                        if (_currentLine == null)
+                        {
+                            _currentLine = new()
+                            {
+                                CanvasActionType = CanvasActionType.Mask,
+                                Alpha = CurrentAlpha,
+                                BrushSize = CurrentBrushSize,
+                                Color = CurrentColor,
+                                MaskEffect = CurrentTool?.Effect ?? MaskEffect.Paint
+                            };
 
-                    e.Handled = true;
+                            CanvasActions?.Add(_currentLine);
+                        }
 
-                    return;
+                        _currentLine.Path.Add(location);
+
+                        break;
+                    case ToolType.PaintBucket:
+                        _segmentationLine ??= new()
+                            {
+                                CanvasActionType = CanvasActionType.Mask,
+                                Alpha = .75f,
+                                BrushSize = 10f,
+                                Color = Colors.White,
+                                MaskEffect = MaskEffect.Paint
+                            };
+
+                        _segmentationLine.Path.Add(location);
+
+                        break;
+
                 }
-
-                if (_currentLine == null)
-                {
-                    _currentLine = new()
-                    {
-                        CanvasActionType = CanvasActionType.Mask,
-                        Alpha = CurrentAlpha,
-                        BrushSize = CurrentBrushSize,
-                        Color = CurrentColor,
-                        MaskEffect = CurrentTool?.Effect ?? MaskEffect.Paint
-                    };
-
-                    CanvasActions ??= new();
-
-                    CanvasActions.Add(_currentLine);
-                }
-
-                _currentLine.Path.Add(location);
             }
-        }
-        else if (e.Location is SKPoint location && CurrentTool != null && CurrentTool.Type == ToolType.PaintBucket)
-        {
-            _currentLine = null;
+            else
+            {
+                // Touch/click has been released
 
-            var pixelPoint = new SKPoint(location.X * (float)BoundingBoxScale, location.Y * (float)BoundingBoxScale);
+                _currentLine = null;
 
-            DoSegmentationCommand?.Execute(pixelPoint);
-        }
-        else
-        {
-            _currentLine = null;
+                if (CurrentTool.Type == ToolType.PaintBucket)
+                {
+                    if (_segmentationLine != null && 
+                        _segmentationLine.Path.Count > 1)
+                    {
+                        var left = _segmentationLine.Path.Min(p => p.X);
+                        var right = _segmentationLine.Path.Max(p => p.X);
+                        var top = _segmentationLine.Path.Min(p => p.Y);
+                        var bottom = _segmentationLine.Path.Max(p => p.Y);
+
+                        var bounds = new SKRect(left, top, right, bottom);
+
+                        if (bounds.Size.Width < 10 &&
+                            bounds.Size.Height < 10)
+                        {
+                            var pixelPoint = getPixelPoint(location);
+
+                            DoSegmentationCommand?.Execute([pixelPoint]);
+                        }
+                        else
+                        {
+                            var topLeft = getPixelPoint(new SKPoint(left, top));
+                            var bottomRight = getPixelPoint(new SKPoint(right, bottom));
+
+                            DoSegmentationCommand?.Execute([topLeft, bottomRight]);
+                        }
+                    }
+                    else
+                    {
+                        var pixelPoint = getPixelPoint(location);
+
+                        DoSegmentationCommand?.Execute([pixelPoint]);
+                    }
+
+                    _segmentationLine = null;
+                }
+            }
         }
 
         MaskCanvasView.InvalidateSurface();
 
         e.Handled = true;
     }
+
+    private SKPoint getPixelPoint(SKPoint location) => new SKPoint(location.X * (float)BoundingBoxScale, location.Y * (float)BoundingBoxScale);
 
     private void OnPaintSourceImageSurface(object sender, SKPaintSurfaceEventArgs e)
     {
@@ -333,6 +382,11 @@ public partial class CanvasPage : BasePage
             {
                 canvasAction.Execute(canvas, e.Info, _isSaving);
             }
+        }
+
+        if (_segmentationLine != null)
+        {
+            _segmentationLine.Execute(canvas, e.Info, _isSaving);
         }
 
         if (!_isSaving && ShowBoundingBox)

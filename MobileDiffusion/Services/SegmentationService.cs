@@ -144,12 +144,12 @@ public class SegmentationService : ISegmentationService
         return true;
     }
 
-    public async Task<SKBitmap> DoSegmentation(SKPoint location)
+    public async Task<SKBitmap> DoSegmentation(SKPoint[] points)
     {
         if (_imageEmbeddings == null ||
             _imageWidth == 0 ||
             _imageHeight == 0 ||
-            location.IsEmpty)
+            points.Length == 0)
         {
             return null;
         }
@@ -164,13 +164,27 @@ public class SegmentationService : ISegmentationService
 
                 var decoderInputMeta = _decoderSession.InputMetadata;
                 var decoderOutputMeta = _decoderSession.OutputMetadata;
-                
-                // Transform tap coordinates based on scaled input image
-                var xCoord = location.X * _scaleX;
-                var yCoord = location.Y * _scaleY;
 
-                var pointCoords = new DenseTensor<float>(new float[] { xCoord, yCoord, 0, 0 }, new int[] { 1, 2, 2 });
-                var pointLabels = new DenseTensor<float>(new float[] { 0, -1 }, new int[] { 1, 2 });
+                // Transform tap coordinates based on scaled input image
+                var pointCoordsScaled = new List<float>();
+                var labels = new List<float>();
+
+                for (int i = 0; i < points.Length; i++)
+                {
+                    var point = points[i];
+                    pointCoordsScaled.Add(point.X * _scaleX);
+                    pointCoordsScaled.Add(point.Y * _scaleY);
+
+                    labels.Add(i + 2);
+                }
+
+                // Add padding coordinate and batch index
+                pointCoordsScaled.Add(0);
+                pointCoordsScaled.Add(0);
+                labels.Add(-1);
+
+                var pointCoords = new DenseTensor<float>(pointCoordsScaled.ToArray(), new int[] { 1, pointCoordsScaled.Count / 2, 2 });
+                var pointLabels = new DenseTensor<float>(labels.ToArray(), new int[] { 1, labels.Count });
                 var maskInput = new DenseTensor<float>(new float[256 * 256], new int[] { 1, 1, 256, 256 });
                 var hasMask = new DenseTensor<float>(new float[] { 0 }, new int[] { 1 });
                 var originalImageSize = new DenseTensor<float>(new float[] { _imageHeight, _imageWidth }, new int[] { 2 });
@@ -202,7 +216,7 @@ public class SegmentationService : ISegmentationService
                     return GetImageFromMaskTensorPointer(maskTensor);
                 }
             }
-            catch
+            catch (Exception ex)
             {
                 return null;
             }

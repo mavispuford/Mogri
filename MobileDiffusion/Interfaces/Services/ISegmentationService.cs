@@ -6,5 +6,5 @@ public interface ISegmentationService
 {
     SKColor MaskColor { get; }
     Task<bool> SetImage(SKBitmap bitmap, CancellationToken token);
-    Task<SKBitmap> DoSegmentation(SKPoint location);
+    Task<SKBitmap> DoSegmentation(SKPoint[] points);
 }

@@ -75,7 +75,7 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     IRelayCommand<IPaintingToolViewModel> SelectToolCommand { get; }
 
-    IAsyncRelayCommand<SKPoint> DoSegmentationCommand { get; }
+    IAsyncRelayCommand<SKPoint[]> DoSegmentationCommand { get; }
 
     IAsyncRelayCommand ApplySegmentationMaskCommand { get; }
 
