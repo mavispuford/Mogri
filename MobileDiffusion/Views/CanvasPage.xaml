@@ -103,7 +103,7 @@
                    VerticalOptions="Center"
                    BackgroundColor="{StaticResource Gray200TwentySixPercent}"/>
 
-                <skia:SKCanvasView x:Name="SegmentationMaskCanvasView" 
+            <skia:SKCanvasView x:Name="SegmentationMaskCanvasView" 
                    PaintSurface="OnPaintSegmentationImageSurface"
                    IgnorePixelScaling="True"
                    HorizontalOptions="Center"
@@ -111,10 +111,16 @@
                    Opacity=".4"
                    IsVisible="{Binding CurrentTool.Type, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:ToolType.PaintBucket}}"/>
 
-                <skia:SKCanvasView x:Name="MaskCanvasView" 
+            <skia:SKCanvasView x:Name="MaskCanvasView" 
                    PaintSurface="OnPaintMaskSurface"
+                   IgnorePixelScaling="True"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"/>
+
+            <skia:SKCanvasView x:Name="TemporaryCanvasView" 
+                   PaintSurface="OnPaintTemporarySurface"
                    EnableTouchEvents="True"
-                   Touch="OnTouchMaskSurface"
+                   Touch="OnTouchTemporarySurface"
                    IgnorePixelScaling="True"
                    HorizontalOptions="Center"
                    VerticalOptions="Center"/>

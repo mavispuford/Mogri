@@ -141,7 +141,7 @@ public partial class CanvasPage : BasePage
 
     public static BindableProperty BoundingBoxScaleProperty = BindableProperty.Create(nameof(BoundingBoxScale), typeof(double), typeof(CanvasPage), 1d, propertyChanged: (bindable, oldValue, newValue) =>
     {
-        ((CanvasPage)bindable).UpdateBoundingBox(true);
+        ((CanvasPage)bindable).UpdateBoundingBox(true, true);
     });
 
     public static BindableProperty BoundingBoxSizeProperty = BindableProperty.Create(nameof(BoundingBoxSize), typeof(float), typeof(CanvasPage), 0f, propertyChanged: (bindable, oldValue, newValue) =>
@@ -188,8 +188,17 @@ public partial class CanvasPage : BasePage
         this.SetBinding(SegmentationBitmapProperty, nameof(ICanvasPageViewModel.SegmentationBitmap), BindingMode.TwoWay);
 
         PrepareForSavingCommand = new AsyncRelayCommand<IAsyncRelayCommand>(PrepareForSaving);
-        
-        //SourceImageCanvasView.SizeChanged += SourceImageCanvasView_SizeChanged;
+
+        TemporaryCanvasView.SizeChanged += TemporaryCanvasView_SizeChanged;
+    }
+
+    private void TemporaryCanvasView_SizeChanged(object sender, EventArgs e)
+    {
+        if (TemporaryCanvasView.Width != -1 &&
+            TemporaryCanvasView.Height != -1)
+        {
+            UpdateBoundingBox(true, true);
+        }
     }
 
     protected override void OnNavigatedTo(NavigatedToEventArgs args)
@@ -220,7 +229,7 @@ public partial class CanvasPage : BasePage
         }
     }
 
-    private void OnTouchMaskSurface(object sender, SKTouchEventArgs e)
+    private void OnTouchTemporarySurface(object sender, SKTouchEventArgs e)
     {
         HideSliders();
 
@@ -276,22 +285,25 @@ public partial class CanvasPage : BasePage
                                 Color = CurrentColor,
                                 MaskEffect = CurrentTool?.Effect ?? MaskEffect.Paint
                             };
-
-                            CanvasActions?.Add(_currentLine);
                         }
 
                         _currentLine.Path.Add(location);
 
+                        if (_currentLine.MaskEffect == MaskEffect.Erase)
+                        {
+                            MaskCanvasView.InvalidateSurface();
+                        }
+
                         break;
                     case ToolType.PaintBucket:
                         _segmentationLine ??= new()
-                            {
-                                CanvasActionType = CanvasActionType.Mask,
-                                Alpha = .75f,
-                                BrushSize = 10f,
-                                Color = Colors.White,
-                                MaskEffect = MaskEffect.Paint
-                            };
+                        {
+                            CanvasActionType = CanvasActionType.Mask,
+                            Alpha = .75f,
+                            BrushSize = 10f,
+                            Color = Colors.White,
+                            MaskEffect = MaskEffect.Paint
+                        };
 
                         _segmentationLine.Path.Add(location);
 
@@ -303,11 +315,17 @@ public partial class CanvasPage : BasePage
             {
                 // Touch/click has been released
 
-                _currentLine = null;
+                if (_currentLine != null)
+                {
+                    CanvasActions?.Add(_currentLine);
+                    _currentLine = null;
+
+                    MaskCanvasView.InvalidateSurface();
+                }
 
                 if (CurrentTool.Type == ToolType.PaintBucket)
                 {
-                    if (_segmentationLine != null && 
+                    if (_segmentationLine != null &&
                         _segmentationLine.Path.Count > 1)
                     {
                         var left = _segmentationLine.Path.Min(p => p.X);
@@ -344,7 +362,7 @@ public partial class CanvasPage : BasePage
             }
         }
 
-        MaskCanvasView.InvalidateSurface();
+        TemporaryCanvasView.InvalidateSurface();
 
         e.Handled = true;
     }
@@ -384,12 +402,28 @@ public partial class CanvasPage : BasePage
             }
         }
 
+        if (_currentLine != null && _currentLine.MaskEffect == MaskEffect.Erase)
+        {
+            _currentLine.Execute(canvas, e.Info, _isSaving);
+        }
+    }
+
+    private void OnPaintTemporarySurface(object sender, SKPaintSurfaceEventArgs e)
+    {
+        var canvas = e.Surface.Canvas;
+        canvas.Clear(SKColors.Transparent);
+
+        if (_currentLine != null && _currentLine.MaskEffect == MaskEffect.Paint)
+        {
+            _currentLine.Execute(canvas, e.Info, _isSaving);
+        }
+
         if (_segmentationLine != null)
         {
             _segmentationLine.Execute(canvas, e.Info, _isSaving);
         }
 
-        if (!_isSaving && ShowBoundingBox)
+        if (ShowBoundingBox)
         {
             canvas.DrawRect(BoundingBox,
             new SKPaint()
@@ -409,71 +443,6 @@ public partial class CanvasPage : BasePage
         if (SegmentationBitmap != null)
         {
             canvas.DrawBitmap(SegmentationBitmap, SegmentationBitmap.Info.Rect, e.Info.Rect);
-        }
-    }
-
-    private void OnPaintOutlineSurface(object sender, SKPaintSurfaceEventArgs e)
-    {
-        var canvas = e.Surface.Canvas;
-
-        // Make sure the canvas is blank
-        canvas.Clear(SKColors.Transparent);
-
-        if (CanvasActions != null &&
-            CanvasActions.Any())
-        {
-            using var paint = new SKPaint
-            {
-                FilterQuality = SKFilterQuality.None,
-                IsAntialias = false,
-                Style = SKPaintStyle.Stroke,
-                StrokeWidth = 10,
-                StrokeCap = SKStrokeCap.Round,
-                StrokeMiter = 0,
-                StrokeJoin = SKStrokeJoin.Round,
-            };
-
-            foreach (var canvasAction in CanvasActions)
-            {
-                if (canvasAction is MaskLineViewModel maskLine)
-                {
-                    if (maskLine.Alpha > .1f)
-                    {
-                        continue;
-                    }
-
-                    var points = maskLine.Path;
-
-                    paint.StrokeWidth = maskLine.BrushSize;
-
-                    paint.Color = new SKColor(
-                        maskLine.Color.GetByteRed(),
-                        maskLine.Color.GetByteGreen(),
-                        maskLine.Color.GetByteBlue(),
-                        maskLine.Color.GetByteAlpha());
-
-                    using var path = new SKPath();
-                    path.MoveTo(points[0]);
-
-                    for (var i = 1; i < points.Count; i++)
-                    {
-                        path.ConicTo(points[i - 1], points[i], .5f);
-                    }
-
-                    canvas.DrawPath(path, paint);
-                }
-            }
-        }
-        
-        if (ShowBoundingBox)
-        {
-            canvas.DrawRect(BoundingBox,
-            new SKPaint()
-            {
-                Color = SKColors.White,
-                Style = SKPaintStyle.Stroke,
-                StrokeWidth = 3,
-            });
         }
     }
 
@@ -585,19 +554,19 @@ public partial class CanvasPage : BasePage
         }
     }
 
-    private void UpdateBoundingBox(bool sizeChanged)
+    private void UpdateBoundingBox(bool sizeChanged, bool resetPosition = false)
     {        
         var rectSize = (float)(BoundingBoxSize / BoundingBoxScale);
 
-        if (!_hasCreatedBoundingBox &&
-            MaskCanvasView.Width != -1 &&
-            MaskCanvasView.Height != -1)
+        if ((!_hasCreatedBoundingBox || resetPosition) &&
+            TemporaryCanvasView.Width != -1 &&
+            TemporaryCanvasView.Height != -1)
         {
             BoundingBox = new SKRect(
-                (float)(MaskCanvasView.Width / 2) - (rectSize / 2),
-                (float)(MaskCanvasView.Height / 2) - (rectSize / 2),
-                (float)(MaskCanvasView.Width / 2) + (rectSize / 2),
-                (float)(MaskCanvasView.Height / 2) + (rectSize / 2));
+                (float)(TemporaryCanvasView.Width / 2) - (rectSize / 2),
+                (float)(TemporaryCanvasView.Height / 2) - (rectSize / 2),
+                (float)(TemporaryCanvasView.Width / 2) + (rectSize / 2),
+                (float)(TemporaryCanvasView.Height / 2) + (rectSize / 2));
 
             _hasCreatedBoundingBox = true;
         }
@@ -610,7 +579,7 @@ public partial class CanvasPage : BasePage
                 BoundingBox.MidY + (rectSize / 2));
         }
 
-        MaskCanvasView.InvalidateSurface();
+        TemporaryCanvasView.InvalidateSurface();
     }
 
     private void HideSliders()
@@ -691,6 +660,9 @@ public partial class CanvasPage : BasePage
         SegmentationMaskCanvasView.WidthRequest = width;
         SegmentationMaskCanvasView.HeightRequest = height;
 
+        TemporaryCanvasView.WidthRequest = width;
+        TemporaryCanvasView.HeightRequest = height;
+
         // Clear lines
         //Clear_Button_Clicked(this, new EventArgs());
 
@@ -701,6 +673,8 @@ public partial class CanvasPage : BasePage
         MaskCanvasView.InvalidateSurface();
         SegmentationMaskCanvasView.Measure(width, height);
         SegmentationMaskCanvasView.InvalidateSurface();
+        TemporaryCanvasView.Measure(width, height);
+        TemporaryCanvasView.InvalidateSurface();
 
         BoundingBoxScale = Bitmap.Width / width;
     }
