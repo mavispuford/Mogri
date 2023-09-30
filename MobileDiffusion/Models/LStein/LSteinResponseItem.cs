@@ -104,11 +104,11 @@ public class LSteinResponseItem
 
         if (double.TryParse(config.UpscaleStrength, out var upscaleStrength))
         {
-            result.UpscaleStrength = upscaleStrength;
+            result.UpscaleSteps = (int)(upscaleStrength * numInferenceSteps);
 
             if (!result.EnableUpscaling)
             {
-                result.UpscaleStrength = defaultSettings.UpscaleStrength;
+                result.UpscaleSteps = defaultSettings.UpscaleSteps;
             }
         }
 

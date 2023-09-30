@@ -179,5 +179,10 @@ namespace MobileDiffusion.Services
         {
             throw new NotImplementedException();
         }
+
+        public Task<List<IUpscalerViewModel>> GetUpscalersAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

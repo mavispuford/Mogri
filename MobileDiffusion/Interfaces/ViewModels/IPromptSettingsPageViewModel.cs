@@ -7,7 +7,9 @@ public interface IPromptSettingsPageViewModel : IPageViewModel
     List<string> AvailableSamplerValues { get; set; }
 
     List<string> AvailableUpscaleLevelValues { get; set; }
-    
+
+    List<string> AvailableUpscalerValues { get; set; }
+
     string BatchCount { get; set; }
 
     string BatchSize { get; set; }
@@ -38,11 +40,13 @@ public interface IPromptSettingsPageViewModel : IPageViewModel
     
     bool EnableUpscaling { get; set; }
 
+    string Upscaler { get; set; }
+
     string UpscaleLevel { get; set; }
 
-    string UpscaleStrength { get; set; } 
+    string UpscaleSteps { get; set; } 
 
-    string UpscaleStrengthPlaceholder { get; set; }
+    string UpscaleStepsPlaceholder { get; set; }
 
     bool MakeSeamless { get; set; }
 

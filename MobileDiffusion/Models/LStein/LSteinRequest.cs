@@ -88,7 +88,7 @@ public class LSteinRequest
             Steps = settings.Steps.ToString(),
             Strength = settings.DenoisingStrength.ToString(),
             UpscaleLevel = settings.EnableUpscaling ? settings.UpscaleLevel.ToString() : string.Empty,
-            UpscaleStrength = settings.UpscaleStrength.ToString(),
+            UpscaleStrength = (settings.Steps / settings.UpscaleSteps > 0 ? settings.UpscaleSteps : 1).ToString(),
             VariationAmount = settings.WithVariations == Enums.OnOff.on ? settings.VariationAmount.ToString() : "0",
             Width = settings.Width.ToString(),
             WithVariations = settings.WithVariations != Enums.OnOff.Default ? settings.WithVariations.ToString() : string.Empty,

@@ -25,5 +25,7 @@ public interface IStableDiffusionService
 
     Task<List<ILoraViewModel>> GetLorasAsync();
 
+    Task<List<IUpscalerViewModel>> GetUpscalersAsync();
+
     bool Initialized { get; }
 }

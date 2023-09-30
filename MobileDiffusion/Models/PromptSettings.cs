@@ -25,8 +25,9 @@ public class PromptSettings
     public string Sampler { get; set; }
     public OnOff Seamless { get; set; }
     public long Seed { get; set; } = -1;
+    public string Upscaler { get; set; }
     public int UpscaleLevel { get; set; } = 2;
-    public double UpscaleStrength { get; set; } = .75;
+    public int UpscaleSteps { get; set; } = 10;
     public double VariationAmount { get; set; } = .1;
     public double Width { get; set; } = Preferences.Default.Get<double>(Constants.PreferenceKeys.DefaultHeight, 512);
     public OnOff WithVariations { get; set; }

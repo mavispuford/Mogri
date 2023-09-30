@@ -564,6 +564,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             seedParam is long seed)
         {
             _settings.BatchSize = 1;
+            _settings.BatchCount = 1;
             _settings.Seed = seed;
         }
 
