@@ -15,67 +15,73 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     private PromptSettings _settings;
 
     [ObservableProperty]
-    private List<string> availableSamplerValues = new();
+    private List<string> _availableSamplerValues = new();
 
     [ObservableProperty]
-    private List<string> availableUpscaleLevelValues = new();
+    private List<string> _availableUpscaleLevelValues = new();
 
     [ObservableProperty]
-    private string batchCount;
+    private List<string> _availableUpscalerValues = new();
 
     [ObservableProperty]
-    private string batchSize;
+    private string _batchCount;
 
     [ObservableProperty]
-    private string steps;
+    private string _batchSize;
 
     [ObservableProperty]
-    private string stepsPlaceholder;
+    private string _steps;
 
     [ObservableProperty]
-    private string cfgScale;
+    private string _stepsPlaceholder;
 
     [ObservableProperty]
-    private string cfgScalePlaceholder;
+    private string _cfgScale;
+
+    [ObservableProperty]
+    private string _cfgScalePlaceholder;
     
     [ObservableProperty]
-    private string sampler;
+    private string _sampler;
 
     [ObservableProperty]
-    private string width;
+    private string _width;
 
     [ObservableProperty]
-    private string height;
+    private string _height;
 
     [ObservableProperty]
-    private string seed;
+    private string _seed;
 
     [ObservableProperty]
-    private string seedPlaceholder;
+    private string _seedPlaceholder;
 
     [ObservableProperty]
-    private bool enableGfpgan;
+    private bool _enableGfpgan;
 
     [ObservableProperty]
-    private string gfpganStrength;
+    private string _gfpganStrength;
 
     [ObservableProperty]
-    private string gfpganStrengthPlaceholder;
+    private string _gfpganStrengthPlaceholder;
 
     [ObservableProperty]
-    private bool enableUpscaling;
+    private bool _enableUpscaling;
 
     [ObservableProperty]
-    private string upscaleLevel;
+    private string _upscaler; 
+    
+    [ObservableProperty]
+    private string _upscaleLevel;
 
     [ObservableProperty]
-    private string upscaleStrength;
+    private string _upscaleSteps;
 
     [ObservableProperty]
-    private string upscaleStrengthPlaceholder;
+    private string _upscaleStepsPlaceholder;
 
     [ObservableProperty]
-    private bool makeSeamless;
+    private bool _makeSeamless;
 
     public PromptSettingsPageViewModel(IStableDiffusionService stableDiffusionService,
         IPopupService popupService)
@@ -95,7 +101,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         CfgScalePlaceholder = defaultSettings.GuidanceScale.ToString();
         SeedPlaceholder = defaultSettings.Seed.ToString();
         GfpganStrengthPlaceholder = defaultSettings.GfpganStrength.ToString();
-        UpscaleStrengthPlaceholder = defaultSettings.UpscaleStrength.ToString();
+        UpscaleStepsPlaceholder = defaultSettings.UpscaleSteps.ToString();
     }
 
     public override void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -121,6 +127,10 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             var samplers = await _stableDiffusionService.GetSamplersAsync();
 
             AvailableSamplerValues = samplers.Select(s => s.Key).ToList();
+
+            var upscalers = await _stableDiffusionService.GetUpscalersAsync();
+
+            AvailableUpscalerValues = upscalers.Select(u => u.Name).ToList();
         }
         catch
         {
@@ -152,8 +162,9 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         Sampler = defaultSettings.Sampler;
         Seed = defaultSettings.Seed.ToString();
         Steps = defaultSettings.Steps.ToString();
+        Upscaler = defaultSettings.Upscaler.ToString();
         UpscaleLevel = defaultSettings.UpscaleLevel.ToString();
-        UpscaleStrength = defaultSettings.UpscaleStrength.ToString();
+        UpscaleSteps = defaultSettings.UpscaleSteps.ToString();
         Width = defaultSettings.Width.ToString();
     }
 
@@ -220,8 +231,9 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         Sampler = _settings.Sampler;
         Seed = _settings.Seed.ToString();
         Steps = _settings.Steps.ToString();
+        Upscaler = _settings.Upscaler;
         UpscaleLevel = _settings.UpscaleLevel == 0 ? "2" : _settings.UpscaleLevel.ToString();
-        UpscaleStrength = _settings.UpscaleStrength.ToString();
+        UpscaleSteps= _settings.UpscaleSteps.ToString();
         Width = _settings.Width.ToString();
     }
 
@@ -278,9 +290,11 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             _settings.UpscaleLevel = pUpscaleLevel;
         }
 
-        if (double.TryParse(UpscaleStrength, out var pUpscaleStrength))
+        _settings.Upscaler = Upscaler;
+
+        if (int.TryParse(UpscaleSteps, out var pUpscaleSteps))
         {
-            _settings.UpscaleStrength = pUpscaleStrength;
+            _settings.UpscaleSteps = pUpscaleSteps;
         }
 
         if (double.TryParse(Width, out var pWidth))

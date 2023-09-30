@@ -158,6 +158,16 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
             $"Size: {HistoryItem.Settings.Width}x{HistoryItem.Settings.Height}\n" +
             $"Denoising Strength: {HistoryItem.Settings.DenoisingStrength}";
 
+        if (HistoryItem.Settings.EnableUpscaling &&
+            !string.IsNullOrEmpty(HistoryItem.Settings.Upscaler) &&
+            HistoryItem.Settings.UpscaleLevel > 0 &&
+            HistoryItem.Settings.UpscaleSteps > 0)
+        {
+            message += $"\nUpscaler: {HistoryItem.Settings.Upscaler}\n" +
+                $"Upscale Level: {HistoryItem.Settings.UpscaleLevel}\n" +
+                $"Upscale Steps: {HistoryItem.Settings.UpscaleSteps}\n";
+        }
+
         var result = await Shell.Current.DisplayAlert("Image Info", message, "Copy to clipboard", "Close");
 
         if (result)

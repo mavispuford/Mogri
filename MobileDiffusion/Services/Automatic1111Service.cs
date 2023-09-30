@@ -25,6 +25,9 @@ namespace MobileDiffusion.Services
             public const string DenoisingStrength = "Denoising strength";
             public const string Eta = nameof(Eta);
             public const string Version = nameof(Version);
+            public const string HiresUpscaler = "Hires upscaler";
+            public const string HiresUpscale = "Hires upscale";
+            public const string HiresSteps = "Hires steps";
         }
 
         private Regex _loraRegex = new Regex("<lora:([^:]*):([^>]*)>", RegexOptions.Compiled);
@@ -40,6 +43,7 @@ namespace MobileDiffusion.Services
         private ICollection<PromptStyleItem> _promptStyles;
         private ICollection<SDModelItem> _models;
         private ICollection<LoraItem> _loras;
+        private ICollection<UpscalerItem> _upscalers;
 
         private Task _initializeTask;
         private CancellationTokenSource _mainRequestCancellationSource;
@@ -198,36 +202,53 @@ namespace MobileDiffusion.Services
 
             foreach(var property in properties)
             {
-                switch (property.Key)
+                try
                 {
-                    case PngInfoProperties.Steps:
-                        settings.Steps = int.Parse(property.Value);
-                        break;
-                    case PngInfoProperties.Sampler:
-                        settings.Sampler = property.Value;
-                        break;
-                    case PngInfoProperties.CfgScale:
-                        settings.GuidanceScale = double.Parse(property.Value);
-                        break;
-                    case PngInfoProperties.Seed:
-                        settings.Seed = long.Parse(property.Value);
-                        break;
-                    case PngInfoProperties.Size:
-                        var size = property.Value.Split('x');
-
-                        if (size.Length != 2)
-                        {
+                    switch (property.Key)
+                    {
+                        case PngInfoProperties.Steps:
+                            settings.Steps = int.Parse(property.Value);
                             break;
-                        }
-                            
-                        settings.Width = double.Parse(size[0]);
-                        settings.Height = double.Parse(size[1]);
-                        break;
-                    case PngInfoProperties.DenoisingStrength:
-                        settings.DenoisingStrength = double.Parse(property.Value);
-                        break;
-                    default:
-                        break;
+                        case PngInfoProperties.Sampler:
+                            settings.Sampler = property.Value;
+                            break;
+                        case PngInfoProperties.CfgScale:
+                            settings.GuidanceScale = double.Parse(property.Value);
+                            break;
+                        case PngInfoProperties.Seed:
+                            settings.Seed = long.Parse(property.Value);
+                            break;
+                        case PngInfoProperties.Size:
+                            var size = property.Value.Split('x');
+
+                            if (size.Length != 2)
+                            {
+                                break;
+                            }
+
+                            settings.Width = double.Parse(size[0]);
+                            settings.Height = double.Parse(size[1]);
+                            break;
+                        case PngInfoProperties.DenoisingStrength:
+                            settings.DenoisingStrength = double.Parse(property.Value);
+                            break;
+                        case PngInfoProperties.HiresUpscaler:
+                            settings.Upscaler = property.Value;
+                            settings.EnableUpscaling = !string.IsNullOrEmpty(property.Value);
+                            break;
+                        case PngInfoProperties.HiresUpscale:
+                            settings.UpscaleLevel = int.Parse(property.Value);
+                            break;
+                        case PngInfoProperties.HiresSteps:
+                            settings.UpscaleSteps = int.Parse(property.Value);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                catch
+                {
+                    // Skip to the next property
                 }
             }
 
@@ -258,6 +279,10 @@ namespace MobileDiffusion.Services
             Task.Run(async () =>
             {
                 _models = await auto1111Client.Get_sd_models_sdapi_v1_sd_models_getAsync();
+            }),
+            Task.Run(async () =>
+            {
+                _upscalers = await auto1111Client.Get_upscalers_sdapi_v1_upscalers_getAsync();
             }));
         }
 
@@ -301,16 +326,21 @@ namespace MobileDiffusion.Services
             request.Steps = settings.Steps;
             request.Seed = settings.Seed;
             request.Tiling = settings.Seamless == Enums.OnOff.on;
+
+            // Hires Fix
+            request.Enable_hr = settings.EnableUpscaling &&
+                !string.IsNullOrEmpty(settings.Upscaler) &&
+                settings.UpscaleLevel > 0 &&
+                settings.UpscaleSteps > 0;
             request.Hr_scale = settings.UpscaleLevel;
-            
+            request.Hr_second_pass_steps = settings.UpscaleSteps;
+            request.Hr_upscaler = settings.Upscaler;
+
             var combinedPromptAndStyles = settings.GetCombinedPromptAndPromptStyles();
             request.Prompt = combinedPromptAndStyles.Prompt;
             request.Negative_prompt = combinedPromptAndStyles.NegativePrompt;
 
             request.Sampler_name = settings.Sampler;
-
-            // TODO - Use steps in the UI instead of calculating from a strength value?
-            request.Hr_second_pass_steps = (int)(settings.UpscaleStrength * settings.Steps);
 
             foreach (var lora in settings.Loras)
             {
@@ -577,6 +607,28 @@ namespace MobileDiffusion.Services
                 {
                     Alias = lora.Alias,
                     Name = lora.Name
+                });
+            }
+
+            return Task.FromResult(result);
+        }
+
+        public Task<List<IUpscalerViewModel>> GetUpscalersAsync()
+        {
+            var result = new List<IUpscalerViewModel>();
+
+            if (_upscalers == null)
+            {
+                return Task.FromResult(result);
+            }
+
+            foreach (var upscaler in _upscalers)
+            {
+                result.Add(new UpscalerViewModel
+                {
+                    Name = upscaler.Name,
+                    ModelName = upscaler.Model_name,
+                    Scale = upscaler.Scale,
                 });
             }
 
