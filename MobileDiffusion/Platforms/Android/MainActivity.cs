@@ -6,8 +6,11 @@ using Android.OS;
 
 namespace MobileDiffusion;
 
-[Activity(Theme = "@style/Maui.SplashTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
-[IntentFilter(new[] {Android.Content.Intent.ActionSend}, Categories = new[] { Android.Content.Intent.CategoryDefault }, DataMimeType = "image/*")]
+[Activity(Theme = "@style/Maui.SplashTheme", 
+    MainLauncher = true,
+    LaunchMode = LaunchMode.SingleTask, 
+    ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
+[IntentFilter(new[] { Intent.ActionSend}, Categories = new[] { Intent.CategoryDefault }, DataMimeType = "image/*")]
 public class MainActivity : MauiAppCompatActivity
 {
     public override void OnConfigurationChanged(Configuration newConfig)
@@ -28,24 +31,57 @@ public class MainActivity : MauiAppCompatActivity
 
         var intent = Intent;
 
-        if (intent.Action == Intent.ActionSend &&
-            intent.Extras.Get(Intent.ExtraStream) is Android.Net.Uri uri)
+        checkForSharedImageIntent(intent);
+    }
+
+    protected override void OnNewIntent(Intent intent)
+    {
+        checkForSharedImageIntent(intent);
+
+        base.OnNewIntent(intent);
+    }
+
+    private async void checkForSharedImageIntent(Intent intent)
+    {
+        if (intent?.Action == null ||
+            intent.Action != Intent.ActionSend)
         {
-            var parameters = new Dictionary<string, object>
-            {
-                { NavigationParams.AppShareFileUri, uri.ToString() },
-                { NavigationParams.AppShareContentType, intent.Type }
-            };
+            return;
+        }
 
-            // Outputting some things from the console because the app crashes when sharing files while the 
-            // debugger is attached. See: https://github.com/dotnet/maui/issues/10384
-            Console.WriteLine("ACTION_SEND Intent received. Navigating with these parameters:");
-            foreach(var param in parameters)
+        if (intent.Extras.Get(Intent.ExtraStream) is Android.Net.Uri uri)
+        {
+            try
             {
-                Console.WriteLine($"{param.Key}\t\t : {param.Value}");
+                // Because this method is an async void, run this in a Task.Run for safer exception handling
+                await Task.Run(async () =>
+                {
+                    var parameters = new Dictionary<string, object>
+                    {
+                        { NavigationParams.AppShareFileUri, uri.ToString() },
+                        { NavigationParams.AppShareContentType, intent.Type }
+                    };
+
+                    // Outputting some things from the console because the app crashes when sharing files while the 
+                    // debugger is attached. See: https://github.com/dotnet/maui/issues/10384
+                    Console.WriteLine("ACTION_SEND Intent received. Navigating with these parameters:");
+                    foreach (var param in parameters)
+                    {
+                        Console.WriteLine($"{param.Key}\t\t : {param.Value}");
+                    }
+
+                    var dispatcher = Dispatcher.GetForCurrentThread() ?? Microsoft.Maui.Controls.Application.Current.MainPage.Dispatcher;
+
+                    await dispatcher.DispatchAsync(async () =>
+                    {
+                        await Shell.Current.GoToAsync("///MainPageTab", parameters);
+                    });
+                });
             }
-
-            await Shell.Current.GoToAsync("///MainPageTab", parameters);
+            catch
+            {
+                // Do nothing.
+            }
         }
     }
 }
