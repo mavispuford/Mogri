@@ -6,5 +6,5 @@ class FadeToAnimation : BaseAnimation
 {
     public double Opacity { get; set; }
 
-    public override Task Animate(VisualElement view) => view.FadeTo(Opacity, Length, Easing);
+    public override Task Animate(VisualElement view, CancellationToken token = default) => view.FadeTo(Opacity, Length, Easing);
 }

@@ -990,7 +990,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                     }
 
                     // Limit the strength to preserve some of the pixel data from the underlying image
-                    float strength = Math.Min(mskByte4, (byte)204) / 255f;
+                    //float strength = Math.Min(mskByte4, (byte)204) / 255f;
+
+                    float strength = mskByte4 / 255f;
 
                     // Interpolate between the source and mask colors using the strength
                     var newColor = Color.FromRgba(

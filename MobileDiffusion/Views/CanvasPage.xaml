@@ -241,7 +241,7 @@
                         StrokeShape="RoundRectangle 10">
                     <VerticalStackLayout Spacing="0" Padding="20">
 
-                        <Label Text="{Binding CurrentAlpha, StringFormat='Alpha: {0:F1}'}"
+                        <Label Text="{Binding CurrentAlpha, StringFormat='Alpha: {0:F2}'}"
                                TextColor="White"
                                FontAttributes="Bold"
                                HorizontalOptions="Center"/>
@@ -249,7 +249,7 @@
                         <Slider WidthRequest="200"
                                 HeightRequest="40"
                                 Minimum="0"
-                                Maximum=".9"
+                                Maximum="1.0"
                                 Value="{Binding CurrentAlpha}" />
 
                     </VerticalStackLayout>

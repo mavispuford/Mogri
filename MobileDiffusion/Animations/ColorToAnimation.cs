@@ -13,7 +13,7 @@ public class ColorToAnimation : BaseAnimation
 
     public BindableProperty BindableProperty { get; set; }
 
-    public override Task Animate(VisualElement view) => view.ColorTo(FromColor, ToColor, color => {
-        view.SetValue(BindableProperty, color);
-    }, Length, Easing);
+
+    public override Task Animate(VisualElement view, CancellationToken token = default) => 
+        view.ColorTo(FromColor, ToColor, color => view.SetValue(BindableProperty, color));
 }
