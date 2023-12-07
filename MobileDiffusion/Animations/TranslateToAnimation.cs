@@ -22,9 +22,5 @@ class TranslateToAnimation : BaseAnimation
         set => SetValue(TranslationYProperty, value);
     }
 
-
-    //public double TranslationX { get; set; }
-    //public double TranslationY { get; set; }
-
-    public override Task Animate(VisualElement view) => view.TranslateTo(TranslationX, TranslationY, Length, Easing);
+    public override Task Animate(VisualElement view, CancellationToken token = default) => view.TranslateTo(TranslationX, TranslationY, Length, Easing);
 }
