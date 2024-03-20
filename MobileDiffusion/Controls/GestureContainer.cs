@@ -54,6 +54,9 @@ public class GestureContainer : ContentView
                 Content.Scale = currentScale;
                 Content.TranslationX = newXOffset;
                 Content.TranslationY = newYOffset;
+
+                clampTranslation();
+
                 break;
 
             case GestureStatus.Completed:
@@ -150,9 +153,9 @@ public class GestureContainer : ContentView
     {
         return velocity switch
         {
-            > maxDelta / 2 => .008,
-            > maxDelta / 3 => .006,
-            _ => .004
+            > maxDelta / 2 => .006,
+            > maxDelta / 3 => .004,
+            _ => .002
         };
     }
 
