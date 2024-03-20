@@ -1,24 +1,20 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.Maui.Controls;
+using MobileDiffusion.Helpers;
+using System.Diagnostics;
 
 namespace MobileDiffusion.Controls;
 
 public class GestureContainer : ContentView
 {
-    double _currentScale = 1;
-    double _startScale = 1;
-    double _scaleOffsetX = 0;
-    double _scaleOffsetY = 0;
-
-    double _scaleTargetX = 0;
-    double _scaleTargetY = 0;
-    double _panTargetX = 0;
-    double _panTargetY = 0;
-
-    double _initialPanX = 0;
-    double _initialPanY = 0;
-
-    DateTime _lastGestureCompleteTime;
-    int _gestureTimeMinMs = 200;
+    private const double maxDelta = 50;
+    private double currentScale = 1;
+    private double startScale = 1;
+    private Point startOffset = new Point();
+    private bool isPanning = false;
+    private double prevTotalX = 0;
+    private double prevTotalY = 0;
+    private double totalXDelta = 0;
+    private double totalYDelta = 0;
 
     public GestureContainer()
     {
@@ -27,101 +23,130 @@ public class GestureContainer : ContentView
         
         var pinchGesture = new PinchGestureRecognizer();
         pinchGesture.PinchUpdated += OnPinchUpdated;
-
+        
         GestureRecognizers.Add(panGesture);
         GestureRecognizers.Add(pinchGesture);
     }
 
-    private void PanGesture_PanUpdated(object sender, PanUpdatedEventArgs e)
-    {
-        if (e.StatusType == GestureStatus.Started)
-        {
-            _initialPanX = Content.TranslationX - _scaleTargetX;
-            _initialPanY = Content.TranslationY - _scaleTargetY;
-
-            _panTargetX = _initialPanX + e.TotalX;
-            _panTargetY = _initialPanY + e.TotalY;
-        }
-        else if (e.StatusType == GestureStatus.Running)
-        {
-            _panTargetX = _initialPanX + e.TotalX;
-            _panTargetY = _initialPanY + e.TotalY;
-        }
-        else if (e.StatusType == GestureStatus.Completed)
-        {
-            _lastGestureCompleteTime = DateTime.Now;
-        }
-
-        if ((DateTime.Now - _lastGestureCompleteTime).TotalMilliseconds < _gestureTimeMinMs)
-        {
-            return;
-        }
-
-        updateTranslation();
-    }
-
     void OnPinchUpdated(object sender, PinchGestureUpdatedEventArgs e)
     {
-
+        // Ignore pinch events when no ViewPortOrigin is defined
         if (e.Status == GestureStatus.Started)
         {
-            // Store the current scale factor applied to the wrapped user interface element,
-            // and zero the components for the center point of the translate transform.
-            _startScale = Content.Scale;
-            Content.AnchorX = 0;
-            Content.AnchorY = 0;
+            // Store the current scale factor to make deltas relative
+            startScale = currentScale;
+            // Store the current offset
+            startOffset = new Point(Content.TranslationX / currentScale, Content.TranslationY / currentScale);
         }
-        else if (e.Status == GestureStatus.Running)
+
+        // Handle the pinch gestures
+        switch (e.Status)
         {
-            // Calculate the scale factor to be applied.
-            _currentScale += (e.Scale - 1) * _startScale;
-            _currentScale = Math.Max(1, _currentScale);
+            case GestureStatus.Running:
+                // Calculate the scale delta
+                currentScale += (e.Scale - 1) * startScale;
+                currentScale = Math.Max(1, currentScale);
 
-            // The ScaleOrigin is in relative coordinates to the wrapped user interface element,
-            // so get the X pixel coordinate.
-            double renderedX = Content.X + _scaleOffsetX;
-            double deltaX = renderedX / Width;
-            double deltaWidth = Width / (Content.Width * _startScale);
-            double originX = (e.ScaleOrigin.X - deltaX) * deltaWidth;
+                double newXOffset = (startOffset.X + e.ScaleOrigin.X) * currentScale;
+                double newYOffset = (startOffset.Y + e.ScaleOrigin.Y) * currentScale;
 
-            // The ScaleOrigin is in relative coordinates to the wrapped user interface element,
-            // so get the Y pixel coordinate.
-            double renderedY = Content.Y + _scaleOffsetY;
-            double deltaY = renderedY / Height;
-            double deltaHeight = Height / (Content.Height * _startScale);
-            double originY = (e.ScaleOrigin.Y - deltaY) * deltaHeight;
+                // Apply the scale and offset
+                Content.Scale = currentScale;
+                Content.TranslationX = newXOffset;
+                Content.TranslationY = newYOffset;
+                break;
 
-            // Calculate the transformed element pixel coordinates.
-            double targetX = _scaleOffsetX - (originX * Content.Width) * (_currentScale - _startScale);
-            double targetY = _scaleOffsetY - (originY * Content.Height) * (_currentScale - _startScale);
-
-            // Apply translation based on the change in origin.
-            _scaleTargetX = Math.Clamp(targetX, -Content.Width * (_currentScale - 1), 0);
-            _scaleTargetY = Math.Clamp(targetY, -Content.Height * (_currentScale - 1), 0);
-
-            // Apply scale factor
-            Content.Scale = _currentScale;
+            case GestureStatus.Completed:
+                // Store the final scale
+                startScale = currentScale;
+                break;
         }
-        else if (e.Status == GestureStatus.Completed)
-        {
-            // Store the translation delta's of the wrapped user interface element.
-            _scaleOffsetX = Content.TranslationX;
-            _scaleOffsetY = Content.TranslationY;
-
-            _lastGestureCompleteTime = DateTime.Now;
-        }
-
-        if ((DateTime.Now - _lastGestureCompleteTime).TotalMilliseconds < _gestureTimeMinMs)
-        {
-            return;
-        }
-
-        updateTranslation();
     }
 
-    private void updateTranslation()
+    private void PanGesture_PanUpdated(object sender, PanUpdatedEventArgs e)
     {
-        Content.TranslationX = _panTargetX + _scaleTargetX;
-        Content.TranslationY = _panTargetY + _scaleTargetY;
+        switch (e.StatusType)
+        {
+            case GestureStatus.Started:
+                // Do nothing
+                break;
+
+            case GestureStatus.Running:
+                if (Content.AnimationIsRunning("TranslationAnimationX"))
+                {
+                    Content.AbortAnimation("TranslationAnimationX");
+                }
+
+                if (Content.AnimationIsRunning("TranslationAnimationY"))
+                {
+                    Content.AbortAnimation("TranslationAnimationY");
+                }
+
+                // This lives here instead of in the Started status because if the user is pinching to zoom and they lift one finger,
+                // the pan gesture jumps straight to the Running status instead of hitting Started first.
+                if (!isPanning)
+                {
+                    totalXDelta = 0;
+                    totalYDelta = 0;
+                    prevTotalX = 0;
+                    prevTotalY = 0;
+                    isPanning = true;
+                }
+
+                totalXDelta = e.TotalX - prevTotalX;
+                totalYDelta = e.TotalY - prevTotalY;
+
+                // Prevent jumps if the user was pinching to zoom and they lift one finger up while the other is still touching
+                if (totalXDelta > 50 || totalYDelta > 50)
+                {
+                    totalXDelta = 0;
+                    totalYDelta = 0;
+                }
+
+                Content.TranslationX += totalXDelta;
+                Content.TranslationY += totalYDelta;
+
+                prevTotalX = e.TotalX;
+                prevTotalY = e.TotalY;
+
+                break;
+
+            case GestureStatus.Completed:
+                var dragX = getDrag(totalXDelta);
+
+                Content.AnimateKinetic("TranslationAnimationX", (distance, velocityX) =>
+                {
+                    Content.TranslationX += distance;
+
+                    return true;
+                }, totalXDelta / 10, dragX);
+
+                var dragY = getDrag(totalYDelta);
+
+                Content.AnimateKinetic("TranslationAnimationY", (distance, velocityY) =>
+                {
+                    Content.TranslationY += distance;
+
+                    return true;
+                }, totalYDelta / 10, dragY);
+
+                isPanning = false;
+                break;
+        }
+    }
+
+    /// <summary>
+    ///     Gets an adjusted drag value based on the input velocity.
+    /// </summary>
+    /// <param name="velocity">The velocity.</param>
+    /// <returns>The drag value.</returns>
+    private static double getDrag(double velocity)
+    {
+        return velocity switch
+        {
+            > maxDelta / 2 => .008,
+            > maxDelta / 3 => .006,
+            _ => .004
+        };
     }
 }
