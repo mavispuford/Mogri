@@ -9,12 +9,12 @@ public class GestureContainer : ContentView
     private const double maxDelta = 50;
     private double currentScale = 1;
     private double startScale = 1;
-    private Point startOffset = new Point();
-    private bool isPanning = false;
-    private double prevTotalX = 0;
-    private double prevTotalY = 0;
-    private double totalXDelta = 0;
-    private double totalYDelta = 0;
+    private Point startOffset = new ();
+    private bool isPanning;
+    private double prevTotalX;
+    private double prevTotalY;
+    private double totalXDelta;
+    private double totalYDelta;
 
     public GestureContainer()
     {
@@ -47,8 +47,8 @@ public class GestureContainer : ContentView
                 currentScale += (e.Scale - 1) * startScale;
                 currentScale = Math.Max(1, currentScale);
 
-                double newXOffset = (startOffset.X + e.ScaleOrigin.X) * currentScale;
-                double newYOffset = (startOffset.Y + e.ScaleOrigin.Y) * currentScale;
+                var newXOffset = (startOffset.X + e.ScaleOrigin.X) * currentScale;
+                var newYOffset = (startOffset.Y + e.ScaleOrigin.Y) * currentScale;
 
                 // Apply the scale and offset
                 Content.Scale = currentScale;
@@ -97,7 +97,7 @@ public class GestureContainer : ContentView
                 totalYDelta = e.TotalY - prevTotalY;
 
                 // Prevent jumps if the user was pinching to zoom and they lift one finger up while the other is still touching
-                if (totalXDelta > 50 || totalYDelta > 50)
+                if (totalXDelta > maxDelta || totalYDelta > maxDelta)
                 {
                     totalXDelta = 0;
                     totalYDelta = 0;
@@ -105,6 +105,8 @@ public class GestureContainer : ContentView
 
                 Content.TranslationX += totalXDelta;
                 Content.TranslationY += totalYDelta;
+
+                clampTranslation();
 
                 prevTotalX = e.TotalX;
                 prevTotalY = e.TotalY;
@@ -118,6 +120,8 @@ public class GestureContainer : ContentView
                 {
                     Content.TranslationX += distance;
 
+                    clampTranslation();
+
                     return true;
                 }, totalXDelta / 10, dragX);
 
@@ -126,6 +130,8 @@ public class GestureContainer : ContentView
                 Content.AnimateKinetic("TranslationAnimationY", (distance, velocityY) =>
                 {
                     Content.TranslationY += distance;
+
+                    clampTranslation();
 
                     return true;
                 }, totalYDelta / 10, dragY);
@@ -148,5 +154,14 @@ public class GestureContainer : ContentView
             > maxDelta / 3 => .006,
             _ => .004
         };
+    }
+
+    private void clampTranslation()
+    {
+        var maxTranslationX = (Content.Width / 2) * currentScale;
+        var maxTranslationY = (Content.Height / 2) * currentScale;
+
+        Content.TranslationX = double.Clamp(Content.TranslationX, -maxTranslationX, maxTranslationX);
+        Content.TranslationY = double.Clamp(Content.TranslationY, -maxTranslationY, maxTranslationY);
     }
 }
