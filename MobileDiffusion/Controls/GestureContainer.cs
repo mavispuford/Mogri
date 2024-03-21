@@ -2,12 +2,17 @@
 
 public class GestureContainer : ContentView
 {
+    private const int afterPinchDelay = 100;
     private const double maxDelta = 50;
     private double currentScale = 1;
     private double startScale = 1;
     private Point startOffset = new ();
     private bool canPan = true;
     private bool isPanning;
+    private double scaleOriginX;
+    private double scaleOriginY;
+    private double scalePivotX;
+    private double scalePivotY;
     private double prevTotalX;
     private double prevTotalY;
     private double totalXDelta;
@@ -49,26 +54,34 @@ public class GestureContainer : ContentView
             return;
         }
 
-        // Ignore pinch events when no ViewPortOrigin is defined
-        if (e.Status == GestureStatus.Started)
-        {
-            // Store the current scale factor to make deltas relative
-            startScale = currentScale;
-            // Store the current offset
-            startOffset = new Point(Content.TranslationX / currentScale, Content.TranslationY / currentScale);
-            canPan = false;
-        }
-
         // Handle the pinch gestures
         switch (e.Status)
         {
+            case GestureStatus.Started:
+                // Store the current scale factor to make deltas relative
+                startScale = currentScale;
+                // Store the current offset
+                startOffset = new Point(Content.TranslationX / currentScale, Content.TranslationY / currentScale);
+
+                // Convert ScaleOrigin to actual coordinates
+                scaleOriginX = Content.Width * e.ScaleOrigin.X;
+                scaleOriginY = Content.Height * e.ScaleOrigin.Y;
+
+                scalePivotX = scaleOriginX - (Content.Width / 2);
+                scalePivotY = scaleOriginY - (Content.Height / 2);
+
+                canPan = false;
+
+                break;
             case GestureStatus.Running:
                 // Calculate the scale delta
                 currentScale += (e.Scale - 1) * startScale;
                 currentScale = Math.Max(1, currentScale);
 
-                var newXOffset = (startOffset.X + e.ScaleOrigin.X) * currentScale;
-                var newYOffset = (startOffset.Y + e.ScaleOrigin.Y) * currentScale;
+                var scaleFactor = (1 - currentScale / startScale);
+
+                var newXOffset = startOffset.X * currentScale + scalePivotX * scaleFactor;
+                var newYOffset = startOffset.Y * currentScale + scalePivotY * scaleFactor;
 
                 // Apply the scale and offset
                 Content.Scale = currentScale;
@@ -76,7 +89,6 @@ public class GestureContainer : ContentView
                 Content.TranslationY = newYOffset;
 
                 clampTranslation();
-
                 break;
 
             case GestureStatus.Completed:
@@ -90,13 +102,12 @@ public class GestureContainer : ContentView
                     pinchTimer = new(state =>
                     {
                         canPan = true;
-                    }, null, 50, Timeout.Infinite);
+                    }, null, afterPinchDelay, Timeout.Infinite);
                 }
                 catch
                 {
                     canPan = true;
                 }
-                
                 break;
         }
     }
