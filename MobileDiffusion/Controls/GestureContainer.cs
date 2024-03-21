@@ -16,6 +16,22 @@ public class GestureContainer : ContentView
     private double totalXDelta;
     private double totalYDelta;
 
+    public bool EnablePanning
+    {
+        get => (bool)GetValue(EnablePanningProperty);
+        set => SetValue(EnablePanningProperty, value);
+    }
+
+    public bool EnableZooming
+    {
+        get => (bool)GetValue(EnableZoomingProperty);
+        set => SetValue(EnableZoomingProperty, value);
+    }
+
+    public static readonly BindableProperty EnablePanningProperty = BindableProperty.Create(nameof(EnablePanning), typeof(bool), typeof(GestureContainer), true);
+
+    public static readonly BindableProperty EnableZoomingProperty = BindableProperty.Create(nameof(EnableZooming), typeof(bool), typeof(GestureContainer), true);
+
     public GestureContainer()
     {
         var panGesture = new PanGestureRecognizer();
@@ -30,6 +46,11 @@ public class GestureContainer : ContentView
 
     void OnPinchUpdated(object sender, PinchGestureUpdatedEventArgs e)
     {
+        if (!EnableZooming)
+        {
+            return;
+        }
+
         // Ignore pinch events when no ViewPortOrigin is defined
         if (e.Status == GestureStatus.Started)
         {
@@ -68,6 +89,11 @@ public class GestureContainer : ContentView
 
     private void PanGesture_PanUpdated(object sender, PanUpdatedEventArgs e)
     {
+        if (!EnablePanning)
+        {
+            return;
+        }
+
         switch (e.StatusType)
         {
             case GestureStatus.Started:
