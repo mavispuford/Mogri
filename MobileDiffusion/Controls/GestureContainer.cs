@@ -1,8 +1,4 @@
-﻿using Microsoft.Maui.Controls;
-using MobileDiffusion.Helpers;
-using System.Diagnostics;
-
-namespace MobileDiffusion.Controls;
+﻿namespace MobileDiffusion.Controls;
 
 public class GestureContainer : ContentView
 {
@@ -10,11 +6,13 @@ public class GestureContainer : ContentView
     private double currentScale = 1;
     private double startScale = 1;
     private Point startOffset = new ();
+    private bool canPan = true;
     private bool isPanning;
     private double prevTotalX;
     private double prevTotalY;
     private double totalXDelta;
     private double totalYDelta;
+    private Timer pinchTimer;
 
     public bool EnablePanning
     {
@@ -58,6 +56,7 @@ public class GestureContainer : ContentView
             startScale = currentScale;
             // Store the current offset
             startOffset = new Point(Content.TranslationX / currentScale, Content.TranslationY / currentScale);
+            canPan = false;
         }
 
         // Handle the pinch gestures
@@ -83,13 +82,28 @@ public class GestureContainer : ContentView
             case GestureStatus.Completed:
                 // Store the final scale
                 startScale = currentScale;
+
+                try
+                {
+                    pinchTimer?.Dispose();
+                    // Add a small timer to enable panning again to avoid weird motion after a pinch
+                    pinchTimer = new(state =>
+                    {
+                        canPan = true;
+                    }, null, 50, Timeout.Infinite);
+                }
+                catch
+                {
+                    canPan = true;
+                }
+                
                 break;
         }
     }
 
     private void PanGesture_PanUpdated(object sender, PanUpdatedEventArgs e)
     {
-        if (!EnablePanning)
+        if (!EnablePanning || !canPan)
         {
             return;
         }
