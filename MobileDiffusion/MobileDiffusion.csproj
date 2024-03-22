@@ -94,7 +94,7 @@
 
 	<ItemGroup>
 	  <PackageReference Include="ColorMinePortable" Version="2.0.4" />
-	  <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.10" />
+	  <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.14" />
 	  <PackageReference Include="CommunityToolkit.Maui" Version="7.0.1" />
 	  <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
 	  <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
@@ -202,7 +202,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="8.0.10" />
+	  <PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="8.0.14" />
 	</ItemGroup>
 
 </Project>
