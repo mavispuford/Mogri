@@ -50,7 +50,7 @@ public class GestureContainer : ContentView
 
     void OnPinchUpdated(object sender, PinchGestureUpdatedEventArgs e)
     {
-        if (!EnableZooming || !canZoom)
+        if (!EnableZooming)
         {
             return;
         }
@@ -72,9 +72,16 @@ public class GestureContainer : ContentView
                 scalePivotY = scaleOriginY - (Content.Height / 2);
 
                 canPan = false;
+                canZoom = true;
 
                 break;
             case GestureStatus.Running:
+                if (!canZoom)
+                {
+                    return;
+                }
+
+
                 // Calculate the scale delta
                 currentScale += (e.Scale - 1) * startScale;
                 currentScale = Math.Max(1, currentScale);
@@ -87,12 +94,7 @@ public class GestureContainer : ContentView
                     Content.TranslationY != 0)
                 {
                     canZoom = false;
-                    Content.TranslateTo(0, 0, 250u, Easing.CubicInOut).ContinueWith(async arg =>
-                    {
-                        await Task.Delay(100);
-                        
-                        canZoom = true;
-                    });
+                    Content.TranslateTo(0, 0, 250u, Easing.CubicInOut);
                 }
                 else
                 {
