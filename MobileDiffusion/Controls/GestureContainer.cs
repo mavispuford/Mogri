@@ -8,6 +8,7 @@ public class GestureContainer : ContentView
     private double startScale = 1;
     private Point startOffset = new ();
     private bool canPan = true;
+    private bool canZoom = true;
     private bool isPanning;
     private double scaleOriginX;
     private double scaleOriginY;
@@ -49,7 +50,7 @@ public class GestureContainer : ContentView
 
     void OnPinchUpdated(object sender, PinchGestureUpdatedEventArgs e)
     {
-        if (!EnableZooming)
+        if (!EnableZooming || !canZoom)
         {
             return;
         }
@@ -78,17 +79,33 @@ public class GestureContainer : ContentView
                 currentScale += (e.Scale - 1) * startScale;
                 currentScale = Math.Max(1, currentScale);
 
-                var scaleFactor = (1 - currentScale / startScale);
-
-                var newXOffset = startOffset.X * currentScale + scalePivotX * scaleFactor;
-                var newYOffset = startOffset.Y * currentScale + scalePivotY * scaleFactor;
-
-                // Apply the scale and offset
                 Content.Scale = currentScale;
-                Content.TranslationX = newXOffset;
-                Content.TranslationY = newYOffset;
 
-                clampTranslation();
+                if (currentScale == 1 && 
+                    !Content.AnimationIsRunning(nameof(Microsoft.Maui.Controls.ViewExtensions.TranslateTo)) &&
+                    Content.TranslationX != 0 &&
+                    Content.TranslationY != 0)
+                {
+                    canZoom = false;
+                    Content.TranslateTo(0, 0, 250u, Easing.CubicInOut).ContinueWith(async arg =>
+                    {
+                        await Task.Delay(100);
+                        
+                        canZoom = true;
+                    });
+                }
+                else
+                {
+                    var scaleFactor = (1 - currentScale / startScale);
+                    var newXOffset = (startOffset.X * currentScale) + (scalePivotX * scaleFactor);
+                    var newYOffset = (startOffset.Y * currentScale) + (scalePivotY * scaleFactor);
+
+                    Content.TranslationX = newXOffset;
+                    Content.TranslationY = newYOffset;
+
+                    clampTranslation();
+                }
+
                 break;
 
             case GestureStatus.Completed:
@@ -114,7 +131,7 @@ public class GestureContainer : ContentView
 
     private void PanGesture_PanUpdated(object sender, PanUpdatedEventArgs e)
     {
-        if (!EnablePanning || !canPan)
+        if (!EnablePanning || !canPan || currentScale == 1)
         {
             return;
         }
