@@ -185,7 +185,7 @@ public class GestureContainer : ContentView
             case GestureStatus.Completed:
                 var dragX = getDrag(totalXDelta);
 
-                Content.AnimateKinetic("TranslationAnimationX", (distance, velocityX) =>
+                Content.AnimateKinetic("TranslationAnimationX", (distance, _) =>
                 {
                     if (Content.AnimationIsRunning(nameof(MauiControls.ViewExtensions.TranslateTo)))
                     {
@@ -202,7 +202,7 @@ public class GestureContainer : ContentView
 
                 var dragY = getDrag(totalYDelta);
 
-                Content.AnimateKinetic("TranslationAnimationY", (distance, velocityY) =>
+                Content.AnimateKinetic("TranslationAnimationY", (distance, _) =>
                 {
                     if (Content.AnimationIsRunning(nameof(MauiControls.ViewExtensions.TranslateTo)))
                     {
