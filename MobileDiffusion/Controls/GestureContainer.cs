@@ -1,4 +1,6 @@
-﻿namespace MobileDiffusion.Controls;
+﻿using MauiControls = Microsoft.Maui.Controls;
+
+namespace MobileDiffusion.Controls;
 
 public class GestureContainer : ContentView
 {
@@ -89,10 +91,12 @@ public class GestureContainer : ContentView
                 Content.Scale = currentScale;
 
                 if (currentScale == 1 && 
-                    !Content.AnimationIsRunning(nameof(Microsoft.Maui.Controls.ViewExtensions.TranslateTo)) &&
+                    !Content.AnimationIsRunning(nameof(MauiControls.ViewExtensions.TranslateTo)) &&
                     Content.TranslationX != 0 &&
                     Content.TranslationY != 0)
                 {
+                    cancelTranslationAnimations();
+
                     canZoom = false;
                     Content.TranslateTo(0, 0, 250u, Easing.CubicInOut);
                 }
@@ -145,15 +149,7 @@ public class GestureContainer : ContentView
                 break;
 
             case GestureStatus.Running:
-                if (Content.AnimationIsRunning("TranslationAnimationX"))
-                {
-                    Content.AbortAnimation("TranslationAnimationX");
-                }
-
-                if (Content.AnimationIsRunning("TranslationAnimationY"))
-                {
-                    Content.AbortAnimation("TranslationAnimationY");
-                }
+                cancelTranslationAnimations();
 
                 // This lives here instead of in the Started status because if the user is pinching to zoom and they lift one finger,
                 // the pan gesture jumps straight to the Running status instead of hitting Started first.
@@ -191,6 +187,12 @@ public class GestureContainer : ContentView
 
                 Content.AnimateKinetic("TranslationAnimationX", (distance, velocityX) =>
                 {
+                    if (Content.AnimationIsRunning(nameof(MauiControls.ViewExtensions.TranslateTo)))
+                    {
+
+                        return false;
+                    }
+                    
                     Content.TranslationX += distance;
 
                     clampTranslation();
@@ -202,6 +204,11 @@ public class GestureContainer : ContentView
 
                 Content.AnimateKinetic("TranslationAnimationY", (distance, velocityY) =>
                 {
+                    if (Content.AnimationIsRunning(nameof(MauiControls.ViewExtensions.TranslateTo)))
+                    {
+                        return false;
+                    }
+
                     Content.TranslationY += distance;
 
                     clampTranslation();
@@ -210,6 +217,7 @@ public class GestureContainer : ContentView
                 }, totalYDelta / 10, dragY);
 
                 isPanning = false;
+
                 break;
         }
     }
@@ -236,5 +244,18 @@ public class GestureContainer : ContentView
 
         Content.TranslationX = double.Clamp(Content.TranslationX, -maxTranslationX, maxTranslationX);
         Content.TranslationY = double.Clamp(Content.TranslationY, -maxTranslationY, maxTranslationY);
+    }
+
+    private void cancelTranslationAnimations()
+    {
+        if (Content.AnimationIsRunning("TranslationAnimationX"))
+        {
+            Content.AbortAnimation("TranslationAnimationX");
+        }
+
+        if (Content.AnimationIsRunning("TranslationAnimationY"))
+        {
+            Content.AbortAnimation("TranslationAnimationY");
+        }
     }
 }
