@@ -29,12 +29,11 @@
                    FontSize="16"/>
             <Border Stroke="{StaticResource BlackSeventyThreePercent}"
                     HorizontalOptions="Center"
-                    StrokeThickness="5"
-                    StrokeShape="RoundRectangle 10">
-                <BoxView Color="{Binding CurrentColor}"
-                     HeightRequest="100"
-                     WidthRequest="100"/>
-            </Border>
+                    StrokeThickness="2"
+                    StrokeShape="RoundRectangle 10"
+                    BackgroundColor="{Binding CurrentColor}"
+                    HeightRequest="100"
+                    WidthRequest="100"/>
 
             <FlexLayout HorizontalOptions="Fill">
                 <Label FlexLayout.Grow="1"
