@@ -13,6 +13,9 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     private readonly IPopupService _popupService;
 
     private PromptSettings _settings;
+    
+    [ObservableProperty]
+    private List<IModelViewModel> _availableModelValues = new();
 
     [ObservableProperty]
     private List<string> _availableSamplerValues = new();
@@ -40,7 +43,10 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
 
     [ObservableProperty]
     private string _cfgScalePlaceholder;
-    
+
+    [ObservableProperty]
+    private IModelViewModel _model;
+
     [ObservableProperty]
     private string _sampler;
 
@@ -131,6 +137,10 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             var upscalers = await _stableDiffusionService.GetUpscalersAsync();
 
             AvailableUpscalerValues = upscalers.Select(u => u.Name).ToList();
+
+            var models = await _stableDiffusionService.GetModelsAsync();
+
+            AvailableModelValues = models;
         }
         catch
         {
@@ -159,6 +169,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         BatchCount = defaultSettings.BatchCount.ToString();
         BatchSize = defaultSettings.BatchSize.ToString();
         MakeSeamless = defaultSettings.Seamless == OnOff.on;
+        Model = defaultSettings.Model;
         Sampler = defaultSettings.Sampler;
         Seed = defaultSettings.Seed.ToString();
         Steps = defaultSettings.Steps.ToString();
@@ -178,6 +189,8 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     private async Task ConfirmSettings()
     {
         mapPropertiesToSettings();
+
+        await _stableDiffusionService.SaveSettingsAsync(_settings);
 
         var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings } };
 
@@ -228,6 +241,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         BatchCount = _settings.BatchCount.ToString();
         BatchSize = _settings.BatchSize.ToString();
         MakeSeamless = _settings.Seamless == OnOff.on;
+        Model = AvailableModelValues?.FirstOrDefault(m => m.Key == _settings.Model.Key);
         Sampler = _settings.Sampler;
         Seed = _settings.Seed.ToString();
         Steps = _settings.Steps.ToString();
@@ -270,6 +284,11 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         }
 
         _settings.Seamless = MakeSeamless ? OnOff.on : OnOff.Default;
+
+        if (Model != null)
+        {
+            _settings.Model = (ModelViewModel)Model;
+        }
 
         _settings.Sampler = Sampler;
 

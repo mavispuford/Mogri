@@ -80,6 +80,8 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             var samplers = await _stableDiffusionService.GetSamplersAsync();
 
             _settings.Sampler = samplers?.FirstOrDefault().Key ?? "Euler";
+
+            _settings.Model = (ModelViewModel)await _stableDiffusionService.GetSelectedModelAsync();
         }
         catch
         {

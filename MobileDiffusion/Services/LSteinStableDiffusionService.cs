@@ -170,17 +170,27 @@ namespace MobileDiffusion.Services
             throw new NotImplementedException();
         }
 
-        public Task<Dictionary<string, string>> GetModelsAsync()
-        {
-            throw new NotImplementedException();
-        }
-
         public Task<List<ILoraViewModel>> GetLorasAsync()
         {
             throw new NotImplementedException();
         }
 
         public Task<List<IUpscalerViewModel>> GetUpscalersAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SaveSettingsAsync(PromptSettings settings)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<IModelViewModel>> GetModelsAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IModelViewModel> GetSelectedModelAsync()
         {
             throw new NotImplementedException();
         }
