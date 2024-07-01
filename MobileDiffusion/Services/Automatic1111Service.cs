@@ -6,6 +6,7 @@ using MobileDiffusion.Models;
 using MobileDiffusion.Models.Automatic1111;
 using MobileDiffusion.ViewModels;
 using Newtonsoft.Json;
+using System.Dynamic;
 using System.Text.RegularExpressions;
 
 namespace MobileDiffusion.Services
@@ -38,27 +39,31 @@ namespace MobileDiffusion.Services
         private const int RequestTimeoutMinutes = 15;
 
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IServiceProvider _serviceProvider;
 
         private ICollection<SamplerItem> _samplers;
         private ICollection<PromptStyleItem> _promptStyles;
         private ICollection<SDModelItem> _models;
         private ICollection<LoraItem> _loras;
         private ICollection<UpscalerItem> _upscalers;
+        private Options _options;
 
         private Task _initializeTask;
         private CancellationTokenSource _mainRequestCancellationSource;
 
         public bool Initialized { get; private set; }
 
-        public Automatic1111Service(IHttpClientFactory httpClientFactory)
+        public Automatic1111Service(IHttpClientFactory httpClientFactory,
+            IServiceProvider serviceProvider)
         {
             _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
         public async Task InitializeAsync()
         {
             if (_initializeTask == null || _initializeTask.Status != TaskStatus.Running)
-            { 
+            {
                 _initializeTask = await Task.Run(async () =>
                 {
                     // For some reason in .NET 8 (not .NET 7), if we don't manually get an HttpClient and make any GET call before the Automatic1111 client uses it,
@@ -171,7 +176,7 @@ namespace MobileDiffusion.Services
             var loraMatches = _loraRegex.Matches(prompt);
             var loras = new List<LoraViewModel>();
 
-            foreach(var match in loraMatches.Where(m => m.Success))
+            foreach (var match in loraMatches.Where(m => m.Success))
             {
                 var name = match.Groups[1].Value;
 
@@ -200,7 +205,7 @@ namespace MobileDiffusion.Services
                 Loras = loras
             };
 
-            foreach(var property in properties)
+            foreach (var property in properties)
             {
                 try
                 {
@@ -259,7 +264,7 @@ namespace MobileDiffusion.Services
         {
             var httpClient = getHttpClient(TimeSpan.FromSeconds(10));
             var auto1111Client = getAuto1111Client(httpClient);
-            
+
             await Task.WhenAll(Task.Run(async () =>
             {
                 _samplers = await auto1111Client.Get_samplers_sdapi_v1_samplers_getAsync();
@@ -283,6 +288,10 @@ namespace MobileDiffusion.Services
             Task.Run(async () =>
             {
                 _upscalers = await auto1111Client.Get_upscalers_sdapi_v1_upscalers_getAsync();
+            }),
+            Task.Run(async () =>
+            {
+                _options = await auto1111Client.Get_config_sdapi_v1_options_getAsync();
             }));
         }
 
@@ -382,7 +391,7 @@ namespace MobileDiffusion.Services
             request.Mask_blur_x = 0;
             request.Mask_blur_y = 0;
 
-            foreach(var lora in settings.Loras)
+            foreach (var lora in settings.Loras)
             {
                 request.Prompt += $" <lora:{lora.Name}:{lora.Strength:F1}>";
             }
@@ -536,6 +545,14 @@ namespace MobileDiffusion.Services
             });
         }
 
+        private async Task retrieveOptionsAsync()
+        {
+            var httpClient = getHttpClient(TimeSpan.FromMinutes(RequestTimeoutMinutes));
+            var auto1111Client = getAuto1111Client(httpClient);
+
+            _options = await auto1111Client.Get_config_sdapi_v1_options_getAsync();
+        }
+
         public Task<Dictionary<string, string>> GetSamplersAsync()
         {
             var result = new Dictionary<string, string>();
@@ -575,9 +592,9 @@ namespace MobileDiffusion.Services
             return Task.FromResult(result);
         }
 
-        public Task<Dictionary<string, string>> GetModelsAsync()
+        public Task<List<IModelViewModel>> GetModelsAsync()
         {
-            var result = new Dictionary<string, string>();
+            var result = new List<IModelViewModel>();
 
             if (_models == null)
             {
@@ -586,7 +603,12 @@ namespace MobileDiffusion.Services
 
             foreach (var model in _models)
             {
-                result.TryAdd(model.Title, model.Model_name);
+                var viewModel = _serviceProvider.GetService<IModelViewModel>();
+
+                viewModel.DisplayName = model.Model_name;
+                viewModel.Key = model.Title;
+
+                result.Add(viewModel);
             }
 
             return Task.FromResult(result);
@@ -613,6 +635,21 @@ namespace MobileDiffusion.Services
             return Task.FromResult(result);
         }
 
+        public Task<IModelViewModel> GetSelectedModelAsync()
+        {
+            var result = _serviceProvider.GetService<IModelViewModel>();
+
+            var selectedModel = _models.FirstOrDefault(m => m.Title == _options.Sd_model_checkpoint);
+
+            if (selectedModel != null)
+            {
+                result.DisplayName = selectedModel.Model_name;
+                result.Key = selectedModel.Title;
+            }
+
+            return Task.FromResult(result);
+        }
+
         public Task<List<IUpscalerViewModel>> GetUpscalersAsync()
         {
             var result = new List<IUpscalerViewModel>();
@@ -633,6 +670,39 @@ namespace MobileDiffusion.Services
             }
 
             return Task.FromResult(result);
+        }
+
+        public async Task SaveSettingsAsync(PromptSettings settings)
+        {
+            var httpClient = getHttpClient(TimeSpan.FromMinutes(RequestTimeoutMinutes));
+            var auto1111Client = getAuto1111Client(httpClient);
+
+            if (_options == null)
+            {
+                _options = await auto1111Client.Get_config_sdapi_v1_options_getAsync();
+            }
+
+            var request = new ExpandoObject();
+
+            if (settings.Model != null)
+            {
+                var selectedModel = _models.FirstOrDefault(m => m.Title == settings.Model.Key);
+
+                if (selectedModel != null ||
+                    _options.Sd_model_checkpoint != selectedModel.Title)
+                {
+                    request.TryAdd(nameof(_options.Sd_model_checkpoint).ToLower(), selectedModel.Title);
+                }
+            }
+
+            var requestObjects = (IDictionary<string, object>)request;
+            
+            if (!requestObjects.Any())
+            {
+                return;
+            }
+
+            var response = await auto1111Client.Set_config_sdapi_v1_options_postAsync(request);
         }
     }
 }
