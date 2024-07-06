@@ -49,7 +49,7 @@ public partial class ResultItemViewModel : BaseViewModel, IResultItemViewModel
             { NavigationParams.ImageResultItem, this }
         };
 
-        var result = (await _popupService.ShowPopupAsync("ResultItemPopup", parameters)) as Dictionary<string, object>;
+        var result = (await _popupService.ShowPopupForResultAsync("ResultItemPopup", parameters)) as Dictionary<string, object>;
 
         if (result == null)
         {

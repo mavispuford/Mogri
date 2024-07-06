@@ -42,7 +42,9 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
     [ObservableProperty]
     private ImageSource maskImageSource;
 
-    public ImageToImageSettingsPageViewModel(IImageService imageService)
+    public ImageToImageSettingsPageViewModel(
+        IImageService imageService,
+        ILoadingService loadingService) : base(loadingService)
     {
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
     }

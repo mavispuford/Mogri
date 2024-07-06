@@ -105,7 +105,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         IFileService fileService,
         IPopupService popupService,
         IImageService imageService,
-        ISegmentationService segmentationService)
+        ISegmentationService segmentationService,
+        ILoadingService loadingService) : base(loadingService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
@@ -714,7 +715,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             { NavigationParams.ColorPalette, _colorPalette },
         };
 
-        var color = await _popupService.ShowPopupAsync("ColorPickerPopup", parameters) as Color;
+        var color = await _popupService.ShowPopupForResultAsync("ColorPickerPopup", parameters) as Color;
 
         if (color != null)
         {

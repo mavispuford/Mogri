@@ -44,7 +44,8 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     public HistoryPageViewModel(IFileService fileService,
         IImageService imageService,
         IServiceProvider serviceProvider,
-        IPopupService popupService)
+        IPopupService popupService,
+        ILoadingService loadingService) : base(loadingService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
@@ -112,7 +113,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
             { NavigationParams.HistoryItem, item }
         };
 
-        var result = (await _popupService.ShowPopupAsync("HistoryItemPopup", popupParameters)) as Dictionary<string, object>;
+        var result = (await _popupService.ShowPopupForResultAsync("HistoryItemPopup", popupParameters)) as Dictionary<string, object>;
 
         if (result == null)
         {

@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 
 namespace MobileDiffusion.ViewModels;
@@ -15,7 +16,7 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
     [ObservableProperty]
     private string _defaultHeight;
 
-    public AppSettingsPageViewModel()
+    public AppSettingsPageViewModel(ILoadingService loadingService) : base(loadingService)
     {
         ServerUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
         DefaultWidth = Preferences.Default.Get<double>(Constants.PreferenceKeys.DefaultWidth, 512).ToString();

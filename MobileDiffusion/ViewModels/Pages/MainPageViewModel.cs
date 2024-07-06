@@ -50,7 +50,8 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         IFileService fileService,
         IStableDiffusionService stableDiffusionService,
         IServiceProvider serviceProvider,
-        IImageService imageService)
+        IImageService imageService,
+        ILoadingService loadingService) : base(loadingService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
@@ -73,8 +74,11 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             return true;
         }
 
+
         try
         {
+            await LoadingService.ShowAsync("Initializing...");
+
             await _stableDiffusionService.InitializeAsync();
 
             var samplers = await _stableDiffusionService.GetSamplersAsync();
@@ -92,6 +96,10 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
             ServerConnected = false;
             return false;
+        }
+        finally
+        {
+            await LoadingService.HideAsync();
         }
 
         ServerConnected = true;

@@ -29,6 +29,7 @@ public static class ServiceRegistrations
         builder.Services.AddSingleton<IPopupService, PopupService>();
         builder.Services.AddSingleton<IImageService, ImageService>();
         builder.Services.AddSingleton<ISegmentationService, SegmentationService>();
+        builder.Services.AddSingleton<ILoadingService, LoadingService>();
 
 #if ANDROID
         builder.Services.AddSingleton<IFileService, FileService>();
