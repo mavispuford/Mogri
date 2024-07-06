@@ -1,9 +1,17 @@
-﻿using MobileDiffusion.Interfaces.ViewModels;
+﻿using MobileDiffusion.Interfaces.Services;
+using MobileDiffusion.Interfaces.ViewModels;
 
 namespace MobileDiffusion.ViewModels;
 
 public class PageViewModel : BaseViewModel, IPageViewModel
 {
+    protected ILoadingService LoadingService { get; set; }
+
+    public PageViewModel(ILoadingService loadingService)
+    {
+        LoadingService = loadingService ?? throw new ArgumentNullException(nameof(loadingService));
+    }
+
     public virtual void ApplyQueryAttributes(IDictionary<string, object> query)
     {
     }

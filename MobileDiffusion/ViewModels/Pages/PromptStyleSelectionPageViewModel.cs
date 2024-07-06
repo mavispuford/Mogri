@@ -20,7 +20,10 @@ internal partial class PromptStyleSelectionPageViewModel : PageViewModel, IPromp
     [ObservableProperty]
     private ObservableCollection<object> _selectedPromptStyles = new();
 
-    public PromptStyleSelectionPageViewModel(IStableDiffusionService stableDiffusionService, IPopupService popupService)
+    public PromptStyleSelectionPageViewModel(
+        IStableDiffusionService stableDiffusionService,
+        IPopupService popupService,
+        ILoadingService loadingService) : base(loadingService)
     {
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
@@ -137,7 +140,7 @@ internal partial class PromptStyleSelectionPageViewModel : PageViewModel, IPromp
             { NavigationParams.PromptStyle, promptStyleViewModel }
         };
 
-        await _popupService.ShowPopupAsync("PromptStyleInfoPopup", parameters);
+        await _popupService.ShowPopupForResultAsync("PromptStyleInfoPopup", parameters);
     }
 
     public override bool OnBackButtonPressed()

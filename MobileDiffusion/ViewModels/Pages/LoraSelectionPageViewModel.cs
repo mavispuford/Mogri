@@ -23,7 +23,9 @@ public partial class LoraSelectionPageViewModel : PageViewModel, ILoraSelectionP
     [ObservableProperty]
     ILoraViewModel _loraToAdd;
 
-    public LoraSelectionPageViewModel(IStableDiffusionService stableDiffusionService)
+    public LoraSelectionPageViewModel(
+        IStableDiffusionService stableDiffusionService,
+        ILoadingService loadingService) : base(loadingService)
     {
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
     }

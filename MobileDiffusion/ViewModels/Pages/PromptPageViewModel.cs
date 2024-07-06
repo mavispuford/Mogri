@@ -35,7 +35,9 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
     [ObservableProperty]
     private ObservableCollection<IPromptStyleViewModel> _selectedPromptStyles = new();
 
-    public PromptPageViewModel(IStableDiffusionService stableDiffusionService)
+    public PromptPageViewModel(
+        IStableDiffusionService stableDiffusionService,
+        ILoadingService loadingService) : base(loadingService)
     {
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
     }

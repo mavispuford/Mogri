@@ -114,6 +114,9 @@
 	  <Compile Update="Views\CanvasPage.xaml.cs">
 	    <DependentUpon>CanvasPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Views\Popups\LoadingPopup.xaml.cs">
+	    <DependentUpon>LoadingPopup.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\Popups\ResolutionSelectPopup.xaml.cs">
 	    <DependentUpon>ResolutionSelectPopup.xaml</DependentUpon>
 	  </Compile>
@@ -160,6 +163,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\LoraSelectionPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Popups\LoadingPopup.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Popups\ResolutionSelectPopup.xaml">

@@ -89,8 +89,10 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     [ObservableProperty]
     private bool _makeSeamless;
 
-    public PromptSettingsPageViewModel(IStableDiffusionService stableDiffusionService,
-        IPopupService popupService)
+    public PromptSettingsPageViewModel(
+        IStableDiffusionService stableDiffusionService,
+        IPopupService popupService,
+        ILoadingService loadingService) : base(loadingService)
     {
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
@@ -188,13 +190,23 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     [RelayCommand]
     private async Task ConfirmSettings()
     {
-        mapPropertiesToSettings();
+        await LoadingService.ShowAsync("Saving...");
 
-        await _stableDiffusionService.SaveSettingsAsync(_settings);
+        try
+        {
+            mapPropertiesToSettings();
 
-        var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings } };
+            await _stableDiffusionService.SaveSettingsAsync(_settings);
 
-        await Shell.Current.GoToAsync("..", parameters);
+            var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings } };
+
+            await Shell.Current.GoToAsync("..", parameters);
+        }
+        finally
+        {
+            await LoadingService.HideAsync();
+        }
+        
     }
 
     [RelayCommand]
@@ -206,7 +218,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             { NavigationParams.InitImgString, _settings.InitImage }
         };
 
-        var result = await _popupService.ShowPopupAsync("ResolutionSelectPopup", parameters) as IDictionary<string, object>;
+        var result = await _popupService.ShowPopupForResultAsync("ResolutionSelectPopup", parameters) as IDictionary<string, object>;
 
         if (result != null)
         {
