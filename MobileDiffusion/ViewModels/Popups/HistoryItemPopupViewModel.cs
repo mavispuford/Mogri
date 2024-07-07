@@ -156,7 +156,8 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
             $"Guidance Scale (Cfg): {HistoryItem.Settings.GuidanceScale}\n" + 
             $"Seed: {HistoryItem.Settings.Seed}\n" + 
             $"Size: {HistoryItem.Settings.Width}x{HistoryItem.Settings.Height}\n" +
-            $"Denoising Strength: {HistoryItem.Settings.DenoisingStrength}";
+            $"Denoising Strength: {HistoryItem.Settings.DenoisingStrength}\n" +
+            $"Model: {HistoryItem.Settings.Model.DisplayName}";
 
         if (HistoryItem.Settings.EnableUpscaling &&
             !string.IsNullOrEmpty(HistoryItem.Settings.Upscaler) &&

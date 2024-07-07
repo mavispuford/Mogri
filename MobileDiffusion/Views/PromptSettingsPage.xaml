@@ -30,7 +30,7 @@
                   RowDefinitions="auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto"
                   RowSpacing="10"
                   ColumnSpacing="16"
-                  ColumnDefinitions="32,*,auto"
+                  ColumnDefinitions="32,auto,*"
                   HorizontalOptions="FillAndExpand">
 
                 <Image Grid.Row="0" WidthRequest="32" HeightRequest="32">
@@ -75,10 +75,17 @@
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="6" Grid.Column="1" Text="Model:" Style="{StaticResource SettingLabel}"/>
-                <Picker Grid.Row="6" Grid.Column="2" Title="Model" 
-                        ItemsSource="{Binding AvailableModelValues}"
-                        SelectedItem="{Binding Model}" 
-                        FontSize="16" HorizontalTextAlignment="End"/>
+                <ScrollView 
+                    Grid.Row="6" Grid.Column="2"
+                    Orientation="Horizontal"
+                    HorizontalOptions="End">
+                    <Picker Title="Model" 
+                            ItemsSource="{Binding AvailableModelValues}"
+                            SelectedItem="{Binding Model}" 
+                            FontSize="16" 
+                            HorizontalTextAlignment="End"
+                            HorizontalOptions="End"/>
+                </ScrollView>
 
                 <Image Grid.Row="7" WidthRequest="32">
                     <Image.Source>

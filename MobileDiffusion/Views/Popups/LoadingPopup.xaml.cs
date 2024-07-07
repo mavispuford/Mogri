@@ -21,6 +21,8 @@ public partial class LoadingPopup : BasePopup, IQueryAttributable
         {
             MessageLabel.Text = (string)message;
         }
+
+        query.Clear();
     }
 
     protected override bool OnBackButtonPressed()
