@@ -247,6 +247,26 @@ namespace MobileDiffusion.Services
                         case PngInfoProperties.HiresSteps:
                             settings.UpscaleSteps = int.Parse(property.Value);
                             break;
+                        case PngInfoProperties.Model:
+                            if (settings.Model == null)
+                            {
+                                var matchingModel = _models.FirstOrDefault(m => m.Model_name == property.Value);
+                                if (matchingModel != null)
+                                {
+                                    settings.Model = (ModelViewModel)convertModelToViewModel(matchingModel);
+                                }
+                            }
+                            break;
+                        case PngInfoProperties.ModelHash:
+                            if (settings.Model == null)
+                            {
+                                var matchingModel = _models.FirstOrDefault(m => m.Hash == property.Value);
+                                if (matchingModel != null)
+                                {
+                                    settings.Model = (ModelViewModel)convertModelToViewModel(matchingModel);
+                                }
+                            }
+                            break;
                         default:
                             break;
                     }
@@ -255,6 +275,11 @@ namespace MobileDiffusion.Services
                 {
                     // Skip to the next property
                 }
+            }
+
+            if (settings.Model == null)
+            {
+                settings.Model = (ModelViewModel)await GetSelectedModelAsync();
             }
 
             return settings;
@@ -603,15 +628,27 @@ namespace MobileDiffusion.Services
 
             foreach (var model in _models)
             {
-                var viewModel = _serviceProvider.GetService<IModelViewModel>();
-
-                viewModel.DisplayName = model.Model_name;
-                viewModel.Key = model.Title;
+                var viewModel = convertModelToViewModel(model);
 
                 result.Add(viewModel);
             }
 
             return Task.FromResult(result);
+        }
+
+        private IModelViewModel convertModelToViewModel(SDModelItem model)
+        {
+            if (model == null)
+            {
+                return null;
+            }
+
+            var viewModel = _serviceProvider.GetService<IModelViewModel>();
+
+            viewModel.DisplayName = model.Model_name;
+            viewModel.Key = model.Title;
+
+            return viewModel;
         }
 
         public Task<List<ILoraViewModel>> GetLorasAsync()

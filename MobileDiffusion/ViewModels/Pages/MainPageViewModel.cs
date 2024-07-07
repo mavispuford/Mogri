@@ -489,6 +489,39 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         if (query.TryGetValue(NavigationParams.PromptSettings, out var promptSettings) &&
             promptSettings is PromptSettings settings)
         {
+            if (settings.Model != null)
+            {
+                var modelChangeResult = true;
+
+                if (_settings.Model != null &&
+                    settings.Model.Key != _settings.Model.Key)
+                {
+                    var modelChangeMessage = $"Would you like keep current model ({_settings.Model.DisplayName}) or CHANGE it to \"{settings.Model.DisplayName}\"?";
+
+                    modelChangeResult = await Shell.Current.DisplayAlert("Confirm Model Change", modelChangeMessage, "CHANGE", "Keep");
+                }
+
+                if (modelChangeResult)
+                {
+                    try
+                    {
+                        await LoadingService.ShowAsync("Saving...");
+
+                        // Commit model change
+                        await _stableDiffusionService.SaveSettingsAsync(settings);
+                    }
+                    finally
+                    {
+                        await LoadingService.HideAsync();
+                    }
+                }
+                else
+                {
+                    // Keep currently selected model
+                    settings.Model = _settings.Model;
+                }
+            }
+
             _settings = settings;
 
             Prompt = string.IsNullOrEmpty(settings.Prompt) ? _defaultPrompt : settings.Prompt;

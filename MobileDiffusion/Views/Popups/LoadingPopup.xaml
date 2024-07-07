@@ -18,12 +18,14 @@
 
         <VerticalStackLayout VerticalOptions="Center"
                              Spacing="8">
+            
             <ActivityIndicator IsRunning="True"/>
 
             <Label 
                 x:Name="MessageLabel" 
                 HorizontalTextAlignment="Center"
                 FontSize="16"/>
+            
         </VerticalStackLayout>
         
     </Border>
