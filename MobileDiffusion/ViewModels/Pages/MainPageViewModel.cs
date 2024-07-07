@@ -491,7 +491,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         {
             if (settings.Model != null)
             {
-                var modelChangeResult = true;
+                var modelChangeResult = _settings.Model == null;
 
                 if (_settings.Model != null &&
                     settings.Model.Key != _settings.Model.Key)

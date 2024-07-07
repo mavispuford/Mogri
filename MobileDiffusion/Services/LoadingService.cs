@@ -1,4 +1,6 @@
 ﻿using MobileDiffusion.Interfaces.Services;
+using MobileDiffusion.Views.Popups;
+using Mopups.Services;
 
 namespace MobileDiffusion.Services;
 
@@ -34,6 +36,12 @@ public class LoadingService : ILoadingService
 
         try
         {
+            // Already showing...
+            if (MopupService.Instance.PopupStack.FirstOrDefault(p => p is LoadingPopup) is LoadingPopup loadingPopup)
+            {
+                return;
+            }
+
             await _popupService.ShowPopupAsync(_loadingPopupName, new Dictionary<string, object>()
             {
                 { NavigationParams.LoadingMessage, loadingMessage }
