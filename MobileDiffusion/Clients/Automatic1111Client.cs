@@ -13447,6 +13447,9 @@ namespace MobileDiffusion.Clients.Automatic1111
         [Newtonsoft.Json.JsonProperty("mask", Required = Newtonsoft.Json.Required.AllowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Mask { get; set; }
 
+        [Newtonsoft.Json.JsonProperty("mask_round", Required = Newtonsoft.Json.Required.AllowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? Mask_round { get; set; }
+
         [Newtonsoft.Json.JsonProperty("mask_blur", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public int? Mask_blur { get; set; }
 

@@ -491,34 +491,38 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         {
             if (settings.Model != null)
             {
-                var modelChangeResult = _settings.Model == null;
-
-                if (_settings.Model != null &&
-                    settings.Model.Key != _settings.Model.Key)
+                try
                 {
-                    var modelChangeMessage = $"Would you like keep current model ({_settings.Model.DisplayName}) or CHANGE it to \"{settings.Model.DisplayName}\"?";
+                    await LoadingService.ShowAsync("Refreshing...");
 
-                    modelChangeResult = await Shell.Current.DisplayAlert("Confirm Model Change", modelChangeMessage, "CHANGE", "Keep");
-                }
+                    _settings.Model = (ModelViewModel)await _stableDiffusionService.GetSelectedModelAsync();
 
-                if (modelChangeResult)
-                {
-                    try
+                    var modelChangeResult = _settings.Model?.Key == null;
+
+                    if (_settings.Model != null &&
+                        settings.Model.Key != _settings.Model.Key)
+                    {
+                        var modelChangeMessage = $"Would you like keep current model ({_settings.Model.DisplayName}) or CHANGE it to \"{settings.Model.DisplayName}\"?";
+
+                        modelChangeResult = await Shell.Current.DisplayAlert("Confirm Model Change", modelChangeMessage, "CHANGE", "Keep");
+                    }
+
+                    if (modelChangeResult)
                     {
                         await LoadingService.ShowAsync("Saving...");
 
                         // Commit model change
                         await _stableDiffusionService.SaveSettingsAsync(settings);
                     }
-                    finally
+                    else
                     {
-                        await LoadingService.HideAsync();
+                        // Keep currently selected model
+                        settings.Model = _settings.Model;
                     }
                 }
-                else
+                finally
                 {
-                    // Keep currently selected model
-                    settings.Model = _settings.Model;
+                    await LoadingService.HideAsync();
                 }
             }
 
