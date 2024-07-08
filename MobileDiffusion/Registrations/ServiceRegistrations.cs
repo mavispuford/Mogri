@@ -1,6 +1,7 @@
 ﻿using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Services;
 using Polly;
+using System.Net;
 
 #if ANDROID
 using MobileDiffusion.Platforms.Android.Services;
@@ -19,10 +20,10 @@ public static class ServiceRegistrations
         {
 
         }));
-
-        /*.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
-                  Proxy = new WebProxy() { Address = new Uri("192.168.86.42:8888") }
-        });*/
+        //.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+        //{
+        //    Proxy = new WebProxy() { Address = new Uri("192.168.68.72:8888") }
+        //});
 
         builder.Services.AddSingleton<IStableDiffusionService, Automatic1111Service>();
         //builder.Services.AddSingleton<IStableDiffusionService, LSteinStableDiffusionService>();

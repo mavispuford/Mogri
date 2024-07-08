@@ -826,33 +826,46 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 byte mskByte3 = *mskPtr++;         // blue or red
                 byte mskByte4 = *mskPtr++;         // alpha
 
+                // TODO - Make this configurable per SD service, since they accept different masks
+                // Also, mask expectations can change even in the same SD repo
                 if (mskByte4 != 0)
                 {
-                    var maskColor = new Color();
+                    // Pure black
+                    *resultPtr++ = 0;
+                    *resultPtr++ = 0;
+                    *resultPtr++ = 0;
+                    *resultPtr++ = 255;
 
-                    if (typeMsk == SKColorType.Rgba8888)
-                    {
-                        maskColor = Color.FromRgba(mskByte1, mskByte2, mskByte3, mskByte4);
-                    }
-                    else if (typeMsk == SKColorType.Bgra8888)
-                    {
-                        maskColor = Color.FromRgba(mskByte3, mskByte2, mskByte1, mskByte4);
-                    }
+                    // White with transparency
+                    //*resultPtr++ = 255;
+                    //*resultPtr++ = 255;
+                    //*resultPtr++ = 255;
+                    //*resultPtr++ = mskByte4;
 
-                    float strength = mskByte4 / 255f;
-
-                    var newColor = Color.FromRgba(1f, 1f, 1f, strength);
-
-                    *resultPtr++ = typeMsk == SKColorType.Rgba8888 ? newColor.GetByteRed() : newColor.GetByteBlue();
-                    *resultPtr++ = newColor.GetByteGreen();
-                    *resultPtr++ = typeMsk == SKColorType.Rgba8888 ? newColor.GetByteBlue() : newColor.GetByteRed();
-                    *resultPtr++ = newColor.GetByteAlpha();
+                    // Shades of grey with no transparency, based on the alpha
+                    //*resultPtr++ = mskByte4;
+                    //*resultPtr++ = mskByte4;
+                    //*resultPtr++ = mskByte4;
+                    //*resultPtr++ = 255;
                 }
                 else
                 {
-                    *resultPtr++ = mskByte1;
-                    *resultPtr++ = mskByte2;
-                    *resultPtr++ = mskByte3;
+                    // Fully transparent
+                    //*resultPtr++ = 0;
+                    //*resultPtr++ = 0;
+                    //*resultPtr++ = 0;
+                    //*resultPtr++ = 0;
+
+                    // Pure black
+                    //*resultPtr++ = 0;
+                    //*resultPtr++ = 0;
+                    //*resultPtr++ = 0;
+                    //*resultPtr++ = 255;
+
+                    // White with transparency
+                    *resultPtr++ = 255;
+                    *resultPtr++ = 255;
+                    *resultPtr++ = 255;
                     *resultPtr++ = mskByte4;
                 }
 
@@ -971,13 +984,13 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                         // This controls how far away each pixel can travel from the original value
                         const int rngAmount = 50;
 
-                        var pos = _random.Next(0, 1) == 1;
+                        var pos = _random.Next(0, 2) == 1;
                         mskByte1 = (byte)int.Clamp(((int)mskByte1) + (_random.Next(0, rngAmount) * (pos ? 1 : -1)), 0, 255);
 
-                        pos = _random.Next(0, 1) == 1;
+                        pos = _random.Next(0, 2) == 1;
                         mskByte2 = (byte)int.Clamp(((int)mskByte2) + (_random.Next(0, rngAmount) * (pos ? 1 : -1)), 0, 255);
                         
-                        pos = _random.Next(0, 1) == 1;
+                        pos = _random.Next(0, 2) == 1;
                         mskByte3 = (byte)int.Clamp(((int)mskByte3) + (_random.Next(0, rngAmount) * (pos ? 1 : -1)), 0, 255);
                     }
 

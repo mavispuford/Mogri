@@ -415,6 +415,7 @@ namespace MobileDiffusion.Services
             request.Mask_blur = 0;
             request.Mask_blur_x = 0;
             request.Mask_blur_y = 0;
+            request.Mask_round = false;
 
             foreach (var lora in settings.Loras)
             {
@@ -740,6 +741,8 @@ namespace MobileDiffusion.Services
             }
 
             var response = await auto1111Client.Set_config_sdapi_v1_options_postAsync(request);
+
+            await RefreshResourcesAsync();
         }
     }
 }
