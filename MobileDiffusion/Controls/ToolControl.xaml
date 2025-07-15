@@ -40,7 +40,8 @@
                 StrokeThickness="4"
                 StrokeShape="RoundRectangle 10"
                 BackgroundColor="Transparent"
-                Opacity="0">
+                Opacity="0"
+                InputTransparent="True">
         </Border>
     </Grid>
 </ContentView>

@@ -9,7 +9,8 @@
                 xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels" 
                 xmlns:views="clr-namespace:MobileDiffusion.Views;assembly=MobileDiffusion" 
                 x:Class="MobileDiffusion.Views.CanvasPage"
-                x:DataType="viewModels:ICanvasPageViewModel">
+                x:DataType="viewModels:ICanvasPageViewModel"
+                x:Name="ThisPage">
     <views:BasePage.Resources>
         <ResourceDictionary>
             <toolkit:BoolToObjectConverter x:Key="BoolToShowMaskTextConverter" TrueObject="Hide Mask Layer" FalseObject="Show Mask Layer" />
@@ -218,7 +219,7 @@
                         StrokeShape="RoundRectangle 10">
                     <VerticalStackLayout Spacing="0" Padding="20">
 
-                        <Label Text="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, StringFormat='Size: {0:F0}'}"
+                        <Label Text="{Binding CurrentBrushSize, StringFormat='Size: {0:F0}'}"
                                TextColor="White"
                                FontAttributes="Bold"
                                HorizontalOptions="Center"/>
@@ -227,7 +228,7 @@
                                 HeightRequest="40"
                                 Minimum="1"
                                 Maximum="50"
-                                Value="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}" />
+                                Value="{Binding CurrentBrushSize}" />
 
                     </VerticalStackLayout>
                 </Border>
@@ -275,14 +276,14 @@
                         <Grid HorizontalOptions="Center"
                           VerticalOptions="Center">
 
-                            <Ellipse HeightRequest="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
-                                 WidthRequest="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
-                                 Opacity="{Binding CurrentAlpha, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
+                            <Ellipse HeightRequest="{Binding CurrentBrushSize}"
+                                 WidthRequest="{Binding CurrentBrushSize}"
+                                 Opacity="{Binding CurrentAlpha}"
                                  Fill="{Binding CurrentColor}"
                                  StrokeThickness="0"/>
 
-                            <Ellipse HeightRequest="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
-                                 WidthRequest="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
+                            <Ellipse HeightRequest="{Binding CurrentBrushSize}"
+                                 WidthRequest="{Binding CurrentBrushSize}"
                                  Fill="Transparent"
                                  Stroke="{StaticResource Gray200TwentySixPercent}"
                                  StrokeThickness="1"/>

@@ -92,6 +92,8 @@ public partial class ColorPickerPopupViewModel : PopupBaseViewModel, IColorPicke
     [RelayCommand]
     private void SwatchTapped(Color color)
     {
+        color ??= Colors.Black;
+
         CurrentColor = color;
         CurrentColorHexString = CurrentColor.ToHex();
     }
