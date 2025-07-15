@@ -32,9 +32,9 @@ public partial class CanvasPage : BasePage
         set => SetValue(SegmentationBitmapProperty, value);
     }
 
-    public float CurrentAlpha
+    public double CurrentAlpha
     {
-        get => (float)GetValue(CurrentAlphaProperty);
+        get => (double)GetValue(CurrentAlphaProperty);
         set => SetValue(CurrentAlphaProperty, value);
     }
 
@@ -44,9 +44,9 @@ public partial class CanvasPage : BasePage
         set => SetValue(CurrentColorProperty, value);
     }
 
-    public float CurrentBrushSize
+    public double CurrentBrushSize
     {
-        get => (float)GetValue(CurrentBrushSizeProperty);
+        get => (double)GetValue(CurrentBrushSizeProperty);
         set => SetValue(CurrentBrushSizeProperty, value);
     }
 
@@ -120,12 +120,12 @@ public partial class CanvasPage : BasePage
         ((CanvasPage)bindable).OnSegmentationBitmapChanged();
     });
 
-    public static BindableProperty CurrentBrushSizeProperty = BindableProperty.Create(nameof(CurrentBrushSize), typeof(float), typeof(CanvasPage), 10f, propertyChanged: (bindable, oldValue, newValue) =>
+    public static BindableProperty CurrentBrushSizeProperty = BindableProperty.Create(nameof(CurrentBrushSize), typeof(double), typeof(CanvasPage), 10d, propertyChanged: (bindable, oldValue, newValue) =>
     {
         ((CanvasPage)bindable).AutoHideBrushSizeSlider();
     });
 
-    public static BindableProperty CurrentAlphaProperty = BindableProperty.Create(nameof(CurrentAlpha), typeof(float), typeof(CanvasPage), .5f, propertyChanged: (bindable, oldValue, newValue) =>
+    public static BindableProperty CurrentAlphaProperty = BindableProperty.Create(nameof(CurrentAlpha), typeof(double), typeof(CanvasPage), .5d, propertyChanged: (bindable, oldValue, newValue) =>
     {
         ((CanvasPage)bindable).AutoHideAlphaSlider();
     });
@@ -176,6 +176,7 @@ public partial class CanvasPage : BasePage
 
         this.SetBinding(BitmapProperty, nameof(ICanvasPageViewModel.SourceBitmap));
         this.SetBinding(CurrentAlphaProperty, nameof(ICanvasPageViewModel.CurrentAlpha));
+        this.SetBinding(CurrentBrushSizeProperty, nameof(ICanvasPageViewModel.CurrentBrushSize));
         this.SetBinding(CurrentColorProperty, nameof(ICanvasPageViewModel.CurrentColor));
         this.SetBinding(CurrentToolProperty, nameof(ICanvasPageViewModel.CurrentTool));
         this.SetBinding(CanvasActionsProperty, nameof(ICanvasPageViewModel.CanvasActions), BindingMode.TwoWay);
@@ -280,8 +281,8 @@ public partial class CanvasPage : BasePage
                             _currentLine = new()
                             {
                                 CanvasActionType = CanvasActionType.Mask,
-                                Alpha = CurrentAlpha,
-                                BrushSize = CurrentBrushSize,
+                                Alpha = (float)CurrentAlpha,
+                                BrushSize = (float)CurrentBrushSize,
                                 Color = CurrentColor,
                                 MaskEffect = CurrentTool?.Effect ?? MaskEffect.Paint
                             };

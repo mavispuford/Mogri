@@ -18,7 +18,7 @@
                    VerticalOptions="Center"
                    FontAttributes="Bold" />
             <ImageButton ToolTipProperties.Text="{Binding TooltipText, Source={x:Reference ThisControl}}"
-                         VerticalOptions="CenterAndExpand"
+                         VerticalOptions="Center"
                          HorizontalOptions="End"
                          Command="{Binding Command, Source={x:Reference ThisControl}}"
                          CommandParameter="{Binding CommandParameter, Source={x:Reference ThisControl}}">

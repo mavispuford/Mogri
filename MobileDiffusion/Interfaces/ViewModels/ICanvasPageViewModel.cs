@@ -13,7 +13,9 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     IPaintingToolViewModel CurrentTool { get; set; }
 
-    float CurrentAlpha { get; set; }
+    double CurrentAlpha { get; set; }
+
+    double CurrentBrushSize { get; set; }
 
     Color CurrentColor { get; set; }
 

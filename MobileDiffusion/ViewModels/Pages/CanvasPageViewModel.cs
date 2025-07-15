@@ -42,7 +42,10 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private IPaintingToolViewModel _currentTool;
 
     [ObservableProperty]
-    private float _currentAlpha = .5f;
+    private double _currentAlpha = .5f;
+
+    [ObservableProperty]
+    private double _currentBrushSize = 10d;
 
     [ObservableProperty]
     private Color _currentColor = Colors.Black;
@@ -618,13 +621,13 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
         var maskBitmap = await Task.Run(() =>
         {
-            return CreateMaskBitmapFromSegmentationMask(SegmentationBitmap, CurrentColor.WithAlpha(CurrentAlpha));
+            return CreateMaskBitmapFromSegmentationMask(SegmentationBitmap, CurrentColor.WithAlpha((float)CurrentAlpha));
         });
 
         var segmentationMask = new SegmentationMaskViewModel
         {
             CanvasActionType = CanvasActionType.Mask,
-            Color = CurrentColor.WithAlpha(CurrentAlpha),
+            Color = CurrentColor.WithAlpha((float)CurrentAlpha),
             Bitmap = maskBitmap
         };
 
