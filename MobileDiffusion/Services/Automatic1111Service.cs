@@ -62,6 +62,14 @@ namespace MobileDiffusion.Services
 
         public async Task InitializeAsync()
         {
+            var baseUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
+
+            if (string.IsNullOrEmpty(baseUrl) || !baseUrl.Contains("http"))
+            {
+                Initialized = false;
+                return;
+            }
+
             if (_initializeTask == null || _initializeTask.Status != TaskStatus.Running)
             {
                 _initializeTask = await Task.Run(async () =>
@@ -69,7 +77,6 @@ namespace MobileDiffusion.Services
                     // For some reason in .NET 8 (not .NET 7), if we don't manually get an HttpClient and make any GET call before the Automatic1111 client uses it,
                     // We'll get the following exception: {System.ObjectDisposedException: Cannot access a disposed object. Object name: 'AndroidMessageHandler'.
                     var httpClient = getHttpClient(TimeSpan.FromSeconds(5));
-                    var baseUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
                     var response = await httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, baseUrl)).ConfigureAwait(false);
                 }).ContinueWith(async task =>
                 {

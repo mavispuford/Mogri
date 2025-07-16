@@ -74,12 +74,17 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             return true;
         }
 
-
         try
         {
             await LoadingService.ShowAsync("Initializing...");
 
             await _stableDiffusionService.InitializeAsync();
+
+            if (!_stableDiffusionService.Initialized)
+            {
+                ServerConnected = false;
+                return false;
+            }
 
             var samplers = await _stableDiffusionService.GetSamplersAsync();
 
