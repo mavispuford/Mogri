@@ -148,7 +148,7 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
     [RelayCommand]
     private async Task ShowPromptStyleCreationPrompt()
     {
-        var accepted = await Shell.Current.DisplayAlert("Create Style?", "Would you like to create a style using the existing prompts?", "OK", "Cancel");
+        var accepted = await Shell.Current.DisplayAlertAsync("Create Style?", "Would you like to create a style using the existing prompts?", "OK", "Cancel");
 
         if (accepted)
         {
@@ -161,7 +161,7 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
     [RelayCommand]
     private async Task ShowPromptStyleExtractionPrompt()
     {
-        var accepted = await Shell.Current.DisplayAlert("Extract Style?", "Would you like to extract the prompts from the selected styles?", "OK", "Cancel");
+        var accepted = await Shell.Current.DisplayAlertAsync("Extract Style?", "Would you like to extract the prompts from the selected styles?", "OK", "Cancel");
 
         if (accepted && SelectedPromptStyles.Any())
         {

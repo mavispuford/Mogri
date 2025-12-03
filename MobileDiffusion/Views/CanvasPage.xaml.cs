@@ -626,7 +626,7 @@ public partial class CanvasPage : BasePage
 
     private async Task<bool> confirmClear()
     {
-        return await DisplayAlert("Clear mask?", "Are you sure you would like to clear the mask?", "YES", "Cancel");
+        return await DisplayAlertAsync("Clear mask?", "Are you sure you would like to clear the mask?", "YES", "Cancel");
     }
 
     private void OnCanvasActionsChanged()

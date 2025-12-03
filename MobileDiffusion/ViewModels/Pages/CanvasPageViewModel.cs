@@ -253,7 +253,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         var dispatcher = Shell.Current.CurrentPage.Dispatcher;
         await dispatcher?.DispatchAsync(async () =>
         {
-            selection = await Shell.Current.DisplayActionSheet("Save?", "Cancel", null, maskChoice, imageChoice);
+            selection = await Shell.Current.DisplayActionSheetAsync("Save?", "Cancel", null, maskChoice, imageChoice);
         });
 
         switch (selection)
@@ -382,7 +382,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             var maskCapture = await MaskCanvasView.CaptureAsync();
             var maskStream = await maskCapture.OpenReadAsync();
             var maskBitmap = SKBitmap.Decode(maskStream);
-            var sameSizeMaskBitmap = maskBitmap.Resize(SourceBitmap.Info, SKFilterQuality.High);
+            var sameSizeMaskBitmap = maskBitmap.Resize(SourceBitmap.Info, new SKSamplingOptions(SKCubicResampler.Mitchell));
 
             try
             {
@@ -458,7 +458,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             var maskCapture = await MaskCanvasView.CaptureAsync();
             var maskStream = await maskCapture.OpenReadAsync();
             var maskBitmap = SKBitmap.Decode(maskStream);
-            var sameSizeMaskBitmap = maskBitmap.Resize(SourceBitmap.Info, SKFilterQuality.High);
+            var sameSizeMaskBitmap = maskBitmap.Resize(SourceBitmap.Info, new SKSamplingOptions(SKCubicResampler.Mitchell));
 
             try
             {
@@ -526,16 +526,17 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     [RelayCommand]
     private async Task ShowMediaPicker()
     {
-        var fileResult = await MediaPicker.PickPhotoAsync();
+        var fileResult = await MediaPicker.PickPhotosAsync(new MediaPickerOptions { SelectionLimit = 1 });
+        var photo = fileResult?.FirstOrDefault();
 
-        if (fileResult == null)
+        if (photo == null)
         {
             return;
         }
 
-        using var fileStream = await fileResult.OpenReadAsync();
+        using var fileStream = await photo.OpenReadAsync();
 
-        await LoadSourceBitmapUsingStream(fileStream, fileResult.FileName);
+        await LoadSourceBitmapUsingStream(fileStream, photo.FileName);
     }
 
     [RelayCommand]
@@ -550,7 +551,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
         if (SourceBitmap == null)
         {
-            await Shell.Current.DisplayAlert("No image", "There is no image on the canvas. Add an image and try again.", "OK");
+            await Shell.Current.DisplayAlertAsync("No image", "There is no image on the canvas. Add an image and try again.", "OK");
 
             return;
         }
@@ -559,11 +560,11 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         {
             if (SettingSegmentationImage)
             {
-                await Shell.Current.DisplayAlert("Processing...", "The current image is still processing. Please try again.", "OK");
+                await Shell.Current.DisplayAlertAsync("Processing...", "The current image is still processing. Please try again.", "OK");
             }
             else
             {
-                await Shell.Current.DisplayAlert("Problem", "There was a problem processing the current image. Please add an image and try again.", "OK");
+                await Shell.Current.DisplayAlertAsync("Problem", "There was a problem processing the current image. Please add an image and try again.", "OK");
             }
 
             return;
@@ -934,7 +935,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             return null;
         }
 
-        var maskBitmap = (maskBitmapOrig.Width == srcBitmap.Width && maskBitmapOrig.Height == srcBitmap.Height) ? maskBitmapOrig : maskBitmapOrig.Resize(srcBitmap.Info, SKFilterQuality.High);
+        var maskBitmap = (maskBitmapOrig.Width == srcBitmap.Width && maskBitmapOrig.Height == srcBitmap.Height) ? maskBitmapOrig : maskBitmapOrig.Resize(srcBitmap.Info, new SKSamplingOptions(SKCubicResampler.Mitchell));
 
         byte* srcPtr = (byte*)srcBitmap.GetPixels().ToPointer();
         byte* mskPtr = (byte*)maskBitmap.GetPixels().ToPointer();
@@ -1081,11 +1082,11 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         {
             var paint = new SKPaint()
             {
-                FilterQuality = SKFilterQuality.None,
                 IsAntialias = false,
             };
 
-            canvas.DrawBitmap(bitmap, source, dest, paint);
+            using var image = SKImage.FromBitmap(bitmap);
+            canvas.DrawImage(image, source, dest, new SKSamplingOptions(SKFilterMode.Nearest, SKMipmapMode.None), paint);
         }
 
         return croppedBitmap;
@@ -1137,7 +1138,6 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         {
             var paint = new SKPaint
             {
-                FilterQuality = SKFilterQuality.High,
                 IsAntialias = true,
             };
 
@@ -1145,10 +1145,11 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
             // Scale it if the size doesn't match the current init image rectangle
             var toStitch = bitmapToStitchIn.Width != dest.Width || bitmapToStitchIn.Height != dest.Height ?
-                bitmapToStitchIn.Resize(adjustedRect.Size.ToSizeI(), SKFilterQuality.High) :
+                bitmapToStitchIn.Resize(adjustedRect.Size.ToSizeI(), new SKSamplingOptions(SKCubicResampler.Mitchell)) :
                 bitmapToStitchIn;
 
-            canvas.DrawBitmap(toStitch, source, dest);
+            using var image = SKImage.FromBitmap(toStitch);
+            canvas.DrawImage(image, source, dest, new SKSamplingOptions(SKCubicResampler.Mitchell), paint);
         }
 
         return resultBitmap;

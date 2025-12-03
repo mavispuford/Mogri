@@ -94,7 +94,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         }
         catch
         {
-            await Shell.Current.CurrentPage.DisplayAlert(
+            await Shell.Current.CurrentPage.DisplayAlertAsync(
                 "Connection problems",
                 "Unable to connect to the configured server URL. Please double check your app settings/connectivity and try again.",
                 "OK");
@@ -116,7 +116,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     {
         if (!Preferences.Default.ContainsKey(Constants.PreferenceKeys.ServerUrl))
         {
-            await Shell.Current.CurrentPage.DisplayAlert(
+            await Shell.Current.CurrentPage.DisplayAlertAsync(
                 "No server URL",
                 "There is no server URL configured. Please set the server URL in app settings and try again.",
                 "OK");
@@ -131,7 +131,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
         if (!await _stableDiffusionService.CheckServerAsync())
         {
-            await Shell.Current.CurrentPage.DisplayAlert(
+            await Shell.Current.CurrentPage.DisplayAlertAsync(
                 "Connection Problems",
                 "Unable to connect to the server. Please verify your connectivity and try again.",
                 "OK");
@@ -509,7 +509,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                     {
                         var modelChangeMessage = $"Would you like keep current model ({_settings.Model.DisplayName}) or CHANGE it to \"{settings.Model.DisplayName}\"?";
 
-                        modelChangeResult = await Shell.Current.DisplayAlert("Confirm Model Change", modelChangeMessage, "CHANGE", "Keep");
+                        modelChangeResult = await Shell.Current.DisplayAlertAsync("Confirm Model Change", modelChangeMessage, "CHANGE", "Keep");
                     }
 
                     if (modelChangeResult)
@@ -602,7 +602,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                 requestedHeight.Value != _settings.Height)
             {
                 var resChangeMessage = $"Would you like keep the resolution at {_settings.Width}x{_settings.Height} or CHANGE it to {requestedWidth.Value}x{requestedHeight.Value}?";
-                var resChangeResult = await Shell.Current.DisplayAlert("Confirm Resolution Change", resChangeMessage, "CHANGE", "Keep");
+                var resChangeResult = await Shell.Current.DisplayAlertAsync("Confirm Resolution Change", resChangeMessage, "CHANGE", "Keep");
 
                 if (resChangeResult)
                 {
@@ -639,7 +639,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
     private async Task LoadSharedImage(string imageUri, string contentType)
     {
-        var useAsSourceImage = !await Shell.Current.DisplayAlert(
+        var useAsSourceImage = !await Shell.Current.DisplayAlertAsync(
                 "Where to?",
                 "Would you like to use the image as a source image or put it in the canvas for masking?",
                 "Canvas",
