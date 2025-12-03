@@ -59,33 +59,45 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
         _ = Task.Run(async () =>
         {
-            // ALL FILES INCLUDING THUMBNAILS
-            var allFiles = await _fileService.GetFileListFromInternalStorageAsync();
-            
-            if (allFiles != null)
+            try
             {
-                // Non-thumbnail files only
-                _allImageFileNames = allFiles.Where(s => !Path.GetFileName(s).StartsWith(Constants.ThumbnailPrefix)).ToArray();
+                // ALL FILES INCLUDING THUMBNAILS
+                var allFiles = await _fileService.GetFileListFromInternalStorageAsync();
 
-                _allThumbnailFileNames = allFiles.Where(s => Path.GetFileName(s).StartsWith(Constants.ThumbnailPrefix)).ToArray();
+                if (allFiles != null)
+                {
+                    // Non-thumbnail files only
+                    _allImageFileNames = allFiles.Where(s => !Path.GetFileName(s).StartsWith(Constants.ThumbnailPrefix)).ToArray();
 
-                //// REMOVE ALL THUMBNAILS - REMOVE THIS AFTER TESTING
-                //foreach (var file in _allThumbnailFileNames)
-                //{
-                //    File.Delete(file);
-                //}
+                    _allThumbnailFileNames = allFiles.Where(s => Path.GetFileName(s).StartsWith(Constants.ThumbnailPrefix)).ToArray();
 
-                await Shell.Current.Dispatcher.DispatchAsync(LoadItems);
+                    //// REMOVE ALL THUMBNAILS - REMOVE THIS AFTER TESTING
+                    //foreach (var file in _allThumbnailFileNames)
+                    //{
+                    //    File.Delete(file);
+                    //}
+
+                    if (Application.Current != null)
+                    {
+                        await Shell.Current.Dispatcher.DispatchAsync(LoadItems);
+                    }
+                }
             }
-
-            IsLoading = false;
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading history: {ex}");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
         });
     }
 
     [RelayCommand]
     private async Task ClearHistory()
     {
-        var result = await Shell.Current.DisplayAlert("Confirm", "Are you sure you would like to clear all of your history?\n\n**This cannot be undone.**", "CLEAR ALL", "Cancel");
+        var result = await Shell.Current.DisplayAlertAsync("Confirm", "Are you sure you would like to clear all of your history?\n\n**This cannot be undone.**", "CLEAR ALL", "Cancel");
 
         if (!result)
         {
@@ -199,7 +211,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         var pluralityString = SelectedItems.Count != 1 ? "s" : string.Empty;
         SelectedItemsText = $"{SelectedItems.Count} item{pluralityString} selected";
 
-        var result = await Shell.Current.DisplayAlert("Confirm", $"Delete {SelectedItems.Count} item{pluralityString}?", "DELETE", "Cancel");
+        var result = await Shell.Current.DisplayAlertAsync("Confirm", $"Delete {SelectedItems.Count} item{pluralityString}?", "DELETE", "Cancel");
 
         if (!result)
         {

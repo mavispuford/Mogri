@@ -155,7 +155,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     [RelayCommand]
     private async Task ResetValues()
     {
-        var result = await Shell.Current.DisplayAlert("Confirm Reset", "Are you sure you would like to reset back to defaults?", "RESET", "Cancel");
+        var result = await Shell.Current.DisplayAlertAsync("Confirm Reset", "Are you sure you would like to reset back to defaults?", "RESET", "Cancel");
         
         if (!result)
         {

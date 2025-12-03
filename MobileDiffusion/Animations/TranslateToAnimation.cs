@@ -22,5 +22,5 @@ class TranslateToAnimation : BaseAnimation
         set => SetValue(TranslationYProperty, value);
     }
 
-    public override Task Animate(VisualElement view, CancellationToken token = default) => view.TranslateTo(TranslationX, TranslationY, Length, Easing);
+    public override Task Animate(VisualElement view, CancellationToken token = default) => view.TranslateToAsync(TranslationX, TranslationY, Length, Easing);
 }

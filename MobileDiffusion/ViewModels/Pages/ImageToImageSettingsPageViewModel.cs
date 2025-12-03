@@ -66,7 +66,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
     [RelayCommand]
     private async Task ResetValues()
     {
-        var result = await Shell.Current.DisplayAlert("Confirm Reset", "Are you sure you would like to reset back to defaults?", "RESET", "Cancel");
+        var result = await Shell.Current.DisplayAlertAsync("Confirm Reset", "Are you sure you would like to reset back to defaults?", "RESET", "Cancel");
 
         if (!result)
         {
@@ -153,9 +153,10 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
     {
         try
         {
-            var fileResult = await MediaPicker.PickPhotoAsync();
+            var fileResult = await MediaPicker.PickPhotosAsync(new MediaPickerOptions { SelectionLimit = 1 });
+            var photo = fileResult?.FirstOrDefault();
 
-            if (fileResult == null)
+            if (photo == null)
             {
                 return;
             }
@@ -169,14 +170,14 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
                 IsLoadingMaskImage = true;
             }
         
-            using var fileStream = await fileResult.OpenReadAsync();
+            using var fileStream = await photo.OpenReadAsync();
             using var memoryStream = new MemoryStream();
             await fileStream.CopyToAsync(memoryStream);
             var imageBytes = memoryStream.ToArray();
             var imageString = Convert.ToBase64String(imageBytes);
             memoryStream.Seek(0, SeekOrigin.Begin);
 
-            var formattedImageString = string.Format(Constants.ImageDataFormat, fileResult.ContentType, imageString);
+            var formattedImageString = string.Format(Constants.ImageDataFormat, photo.ContentType, imageString);
 
             if (forInitImage)
             {

@@ -27,7 +27,6 @@ public partial class MaskLineViewModel : CanvasActionViewModel
     {
         using var paint = new SKPaint
         {
-            FilterQuality = SKFilterQuality.None,
             IsAntialias = false,
             Style = SKPaintStyle.Stroke,
             StrokeWidth = BrushSize,

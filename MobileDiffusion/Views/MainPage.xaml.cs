@@ -11,11 +11,11 @@ public partial class MainPage : BasePage
         ImageLayout.ChildAdded += ImageLayout_ChildAdded;
     }
 
-    private void ImageLayout_ChildAdded(object sender, ElementEventArgs e)
+    private async void ImageLayout_ChildAdded(object sender, ElementEventArgs e)
     {
         if (e.Element is VisualElement visualElement)
         {
-            visualElement.ScaleTo(1, 250u, Easing.CubicInOut);
+            await visualElement.ScaleToAsync(1, 250u, Easing.CubicInOut);
 
             var imageLayoutWidth = MainGrid.Width - MainGrid.Padding.HorizontalThickness;
 
