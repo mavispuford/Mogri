@@ -3,7 +3,7 @@ using MobileDiffusion.Models;
 
 namespace MobileDiffusion.Interfaces.Services;
 
-public interface IStableDiffusionService
+public interface IImageGenerationService
 {
     public Task<bool> CheckServerAsync();
 

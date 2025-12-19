@@ -12,7 +12,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
 {
     private readonly IFileService _fileService;
     private readonly IImageService _imageService;
-    private readonly IStableDiffusionService _stableDiffusionService;
+    private readonly IImageGenerationService _stableDiffusionService;
 
     [ObservableProperty]
     private IHistoryItemViewModel _historyItem;
@@ -24,7 +24,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
         IPopupService popupService,
         IFileService fileService,
         IImageService imageService,
-        IStableDiffusionService stableDiffusionService) : base(popupService)
+        IImageGenerationService stableDiffusionService) : base(popupService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));

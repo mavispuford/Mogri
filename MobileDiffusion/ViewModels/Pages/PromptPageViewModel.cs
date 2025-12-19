@@ -10,7 +10,7 @@ namespace MobileDiffusion.ViewModels;
 
 public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
 {
-    private readonly IStableDiffusionService _stableDiffusionService;
+    private readonly IImageGenerationService _stableDiffusionService;
 
     private PromptSettings _settings;
 
@@ -36,7 +36,7 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
     private ObservableCollection<IPromptStyleViewModel> _selectedPromptStyles = new();
 
     public PromptPageViewModel(
-        IStableDiffusionService stableDiffusionService,
+        IImageGenerationService stableDiffusionService,
         ILoadingService loadingService) : base(loadingService)
     {
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));

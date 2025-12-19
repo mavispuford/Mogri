@@ -9,7 +9,7 @@ namespace MobileDiffusion.ViewModels;
 
 public partial class LoraSelectionPageViewModel : PageViewModel, ILoraSelectionPageViewModel
 {
-    private readonly IStableDiffusionService _stableDiffusionService;
+    private readonly IImageGenerationService _stableDiffusionService;
 
     private List<ILoraViewModel> _allLoras;
     private PromptSettings _settings;
@@ -24,7 +24,7 @@ public partial class LoraSelectionPageViewModel : PageViewModel, ILoraSelectionP
     ILoraViewModel _loraToAdd;
 
     public LoraSelectionPageViewModel(
-        IStableDiffusionService stableDiffusionService,
+        IImageGenerationService stableDiffusionService,
         ILoadingService loadingService) : base(loadingService)
     {
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));

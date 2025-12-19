@@ -9,7 +9,7 @@ namespace MobileDiffusion.ViewModels;
 
 internal partial class PromptStyleSelectionPageViewModel : PageViewModel, IPromptStyleSelectionPageViewModel
 {
-    private readonly IStableDiffusionService _stableDiffusionService;
+    private readonly IImageGenerationService _stableDiffusionService;
     private readonly IPopupService _popupService;
     private List<IPromptStyleViewModel> _allPromptStyles = new();
     private PromptSettings _settings;
@@ -21,7 +21,7 @@ internal partial class PromptStyleSelectionPageViewModel : PageViewModel, IPromp
     private ObservableCollection<object> _selectedPromptStyles = new();
 
     public PromptStyleSelectionPageViewModel(
-        IStableDiffusionService stableDiffusionService,
+        IImageGenerationService stableDiffusionService,
         IPopupService popupService,
         ILoadingService loadingService) : base(loadingService)
     {

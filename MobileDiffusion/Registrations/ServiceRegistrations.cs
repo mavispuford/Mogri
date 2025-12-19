@@ -25,7 +25,7 @@ public static class ServiceRegistrations
         //    Proxy = new WebProxy() { Address = new Uri("192.168.68.72:8888") }
         //});
 
-        builder.Services.AddSingleton<IStableDiffusionService, Automatic1111Service>();
+        builder.Services.AddSingleton<IImageGenerationService, Automatic1111Service>();
         //builder.Services.AddSingleton<IStableDiffusionService, LSteinStableDiffusionService>();
         builder.Services.AddSingleton<IPopupService, PopupService>();
         builder.Services.AddSingleton<IImageService, ImageService>();
