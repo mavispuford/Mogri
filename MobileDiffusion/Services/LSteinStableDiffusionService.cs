@@ -8,7 +8,7 @@ using MobileDiffusion.Interfaces.ViewModels;
 
 namespace MobileDiffusion.Services
 {
-    public class LSteinStableDiffusionService : IStableDiffusionService
+    public class LSteinStableDiffusionService : IImageGenerationService
     {
         private readonly IHttpClientFactory _httpClientFactory;
 

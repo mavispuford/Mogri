@@ -18,7 +18,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     const string _defaultPrompt = "An astronaut floating in space, detailed digital drawing, octane render, trending on artstation";
 
     private readonly IFileService _fileService;
-    private readonly IStableDiffusionService _stableDiffusionService;
+    private readonly IImageGenerationService _stableDiffusionService;
     private readonly IServiceProvider _serviceProvider;
     private readonly IImageService _imageService;
 
@@ -48,7 +48,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
     public MainPageViewModel(
         IFileService fileService,
-        IStableDiffusionService stableDiffusionService,
+        IImageGenerationService stableDiffusionService,
         IServiceProvider serviceProvider,
         IImageService imageService,
         ILoadingService loadingService) : base(loadingService)

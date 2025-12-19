@@ -9,7 +9,7 @@ namespace MobileDiffusion.ViewModels;
 
 public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSettingsPageViewModel
 {
-    private readonly IStableDiffusionService _stableDiffusionService;
+    private readonly IImageGenerationService _stableDiffusionService;
     private readonly IPopupService _popupService;
 
     private PromptSettings _settings;
@@ -90,7 +90,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     private bool _makeSeamless;
 
     public PromptSettingsPageViewModel(
-        IStableDiffusionService stableDiffusionService,
+        IImageGenerationService stableDiffusionService,
         IPopupService popupService,
         ILoadingService loadingService) : base(loadingService)
     {

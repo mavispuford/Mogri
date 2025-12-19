@@ -6,6 +6,7 @@ public class BasePage : ContentPage
 {
     public BasePage()
     {
+        this.SafeAreaEdges = SafeAreaEdges.None;
     }
 
     protected override async void OnAppearing()

@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 
 namespace MobileDiffusion.Services
 {
-    internal class Automatic1111Service : IStableDiffusionService
+    internal class Automatic1111Service : IImageGenerationService
     {
         private static class PngInfoProperties
         {
