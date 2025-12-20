@@ -8,20 +8,20 @@ namespace MobileDiffusion.ViewModels;
 public partial class PaintingToolViewModel : BaseViewModel, IPaintingToolViewModel
 {
     [ObservableProperty]
-    private string _name;
+    public partial string Name { get; set; }
 
     [ObservableProperty]
-    private string _iconCode;
+    public partial string IconCode { get; set; }
 
     [ObservableProperty]
-    private MaskEffect _effect;
+    public partial MaskEffect Effect { get; set; }
 
     [ObservableProperty]
-    private ToolType _type;
+    public partial ToolType Type { get; set; }
 
     [ObservableProperty]
-    private bool _isLoading;
+    public partial bool IsLoading { get; set; }
 
     [ObservableProperty]
-    List<CanvasContextButtonViewModel> _contextButtons;
+    public partial List<CanvasContextButtonViewModel> ContextButtons { get; set; }
 }

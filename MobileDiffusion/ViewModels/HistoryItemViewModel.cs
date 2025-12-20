@@ -8,16 +8,16 @@ namespace MobileDiffusion.ViewModels;
 public partial class HistoryItemViewModel : BaseViewModel, IHistoryItemViewModel
 {
     [ObservableProperty]
-    private string _fileName;
+    public partial string FileName { get; set; }
 
     [ObservableProperty]
-    private string _thumbnailFileName;
+    public partial string ThumbnailFileName { get; set; }
 
     [ObservableProperty]
-    private ImageSource _thumbnailImageSource;
+    public partial ImageSource ThumbnailImageSource { get; set; }
 
     [ObservableProperty]
-    private PromptSettings _settings;
+    public partial PromptSettings Settings { get; set; }
 
     public async Task InitWith(string fileName, IFileService fileService, IImageService imageService)
     {

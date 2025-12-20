@@ -11,25 +11,25 @@ public partial class ResultItemViewModel : BaseViewModel, IResultItemViewModel
     private readonly IPopupService _popupService;
 
     [ObservableProperty]
-    private ImageSource imageSource;
+    public partial ImageSource ImageSource { get; set; }
 
     [ObservableProperty]
-    private PromptSettings settings;
+    public partial PromptSettings Settings { get; set; }
 
     [ObservableProperty]
-    private ApiResponse apiResponse;
+    public partial ApiResponse ApiResponse { get; set; }
 
     [ObservableProperty]
-    private string internalUri;
+    public partial string InternalUri { get; set; }
 
     [ObservableProperty]
-    private IRelayCommand applyQueryParamsFromResultItemCommand;
+    public partial IRelayCommand ApplyQueryParamsFromResultItemCommand { get; set; }
 
     [ObservableProperty]
-    private bool isLoading = true;
+    public partial bool IsLoading { get; set; } = true;
 
     [ObservableProperty]
-    private bool failed;
+    public partial bool Failed { get; set; }
 
     public ResultItemViewModel(IPopupService popupService)
     {
