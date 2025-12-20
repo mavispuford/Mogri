@@ -4,6 +4,7 @@ using MobileDiffusion.Registrations;
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
 using Mopups.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace MobileDiffusion;
 
@@ -33,6 +34,12 @@ public static class MauiProgram
             .RegisterPopups();
 
         builder.Services.AddSingleton(DeviceDisplay.Current);
+
+#if DEBUG
+
+        builder.Logging.AddDebug();
+
+#endif
 
 #if ANDROID
         EntryHandler.Mapper.AppendToMapping("NoUnderline", (h, v) => 
