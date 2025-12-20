@@ -6,10 +6,10 @@ namespace MobileDiffusion.ViewModels;
 public partial class ModelViewModel : BaseViewModel, IModelViewModel
 {
     [ObservableProperty]
-    private string _displayName;
+    public partial string DisplayName { get; set; }
 
     [ObservableProperty]
-    private string _key;
+    public partial string Key { get; set; }
 
     public override string ToString()
     {

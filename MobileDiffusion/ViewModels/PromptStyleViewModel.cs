@@ -7,11 +7,11 @@ namespace MobileDiffusion.Models;
 public partial class PromptStyleViewModel : BaseViewModel, IPromptStyleViewModel
 {
     [ObservableProperty]
-    private string _name;
+    public partial string Name { get; set; }
 
     [ObservableProperty]
-    private string _prompt;
+    public partial string Prompt { get; set; }
 
     [ObservableProperty]
-    private string _negativePrompt;
+    public partial string NegativePrompt { get; set; }
 }

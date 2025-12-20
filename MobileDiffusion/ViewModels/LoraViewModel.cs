@@ -6,11 +6,11 @@ namespace MobileDiffusion.ViewModels;
 public partial class LoraViewModel : BaseViewModel, ILoraViewModel
 {
     [ObservableProperty]
-    private string _alias;
+    public partial string Alias { get; set; }
 
     [ObservableProperty]
-    private string _name;
+    public partial string Name { get; set; }
 
     [ObservableProperty]
-    private float _strength = 1;
+    public partial float Strength { get; set; } = 1;
 }
