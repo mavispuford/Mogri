@@ -10,10 +10,10 @@ public partial class SegmentationMaskViewModel : CanvasActionViewModel
     private SKShader _bitmapOutlineShader;
 
     [ObservableProperty]
-    private SKBitmap _bitmap;
+    public partial SKBitmap Bitmap { get; set; }
 
     [ObservableProperty]
-    private Color _color;
+    public partial Color Color { get; set; }
 
     public override void Execute(SKCanvas canvas, SKImageInfo imageInfo, bool isSaving)
     {
