@@ -8,13 +8,13 @@ namespace MobileDiffusion.ViewModels;
 internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPageViewModel
 {
     [ObservableProperty]
-    private string serverUrl;
+    public partial string ServerUrl { get; set; }
 
     [ObservableProperty]
-    private string _defaultWidth;
+    public partial string DefaultWidth { get; set; }
     
     [ObservableProperty]
-    private string _defaultHeight;
+    public partial string DefaultHeight { get; set; }
 
     public AppSettingsPageViewModel(ILoadingService loadingService) : base(loadingService)
     {

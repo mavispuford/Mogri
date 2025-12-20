@@ -19,28 +19,28 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
     private CancellationTokenSource _maskCancellationTokenSource;
 
     [ObservableProperty]
-    private bool fitImageServerSide;
+    public partial bool FitImageServerSide { get; set; }
 
     [ObservableProperty]
-    private bool fitImageClientSide;
+    public partial bool FitImageClientSide { get; set; }
 
     [ObservableProperty]
-    private bool isLoadingInitImage;
+    public partial bool IsLoadingInitImage { get; set; }
 
     [ObservableProperty]
-    private bool isLoadingMaskImage;
+    public partial bool IsLoadingMaskImage { get; set; }
 
     [ObservableProperty]
-    private string strength;
+    public partial string Strength { get; set; }
 
     [ObservableProperty]
-    private string strengthPlaceholder;
+    public partial string StrengthPlaceholder { get; set; }
 
     [ObservableProperty]
-    private ImageSource initImageSource;
+    public partial ImageSource InitImageSource { get; set; }
 
     [ObservableProperty]
-    private ImageSource maskImageSource;
+    public partial ImageSource MaskImageSource { get; set; }
 
     public ImageToImageSettingsPageViewModel(
         IImageService imageService,
