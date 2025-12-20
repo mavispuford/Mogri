@@ -23,19 +23,19 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     private const int itemTakeCount = 12;
 
     [ObservableProperty]
-    private ObservableCollection<IHistoryItemViewModel> _historyItems = new();
+    public partial ObservableCollection<IHistoryItemViewModel> HistoryItems { get; set; } = new();
 
     [ObservableProperty]
-    private IList<Object> _selectedItems;
+    public partial IList<Object> SelectedItems { get; set; }
 
     [ObservableProperty]
-    private bool _selectionModeEnabled;
+    public partial bool SelectionModeEnabled { get; set; }
 
     [ObservableProperty]
-    private string _selectedItemsText;
+    public partial string SelectedItemsText { get; set; }
 
     [ObservableProperty]
-    private bool _isLoading = true;
+    public partial bool IsLoading { get; set; } = true;
 
     public ICommand HideBottomPanelCommand { get; set; }
 

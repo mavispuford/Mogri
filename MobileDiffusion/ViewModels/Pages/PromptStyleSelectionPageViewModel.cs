@@ -15,10 +15,10 @@ internal partial class PromptStyleSelectionPageViewModel : PageViewModel, IPromp
     private PromptSettings _settings;
 
     [ObservableProperty]
-    private List<IPromptStyleViewModel> _availablePromptStyles = new();
+    public partial List<IPromptStyleViewModel> AvailablePromptStyles { get; set; } = new();
 
     [ObservableProperty]
-    private ObservableCollection<object> _selectedPromptStyles = new();
+    public partial ObservableCollection<object> SelectedPromptStyles { get; set; } = new();
 
     public PromptStyleSelectionPageViewModel(
         IImageGenerationService stableDiffusionService,

@@ -36,67 +36,67 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private int _setSegmentationImageRequestCount = 0;
 
     [ObservableProperty]
-    private List<IPaintingToolViewModel> _availableTools = new();
+    public partial List<IPaintingToolViewModel> AvailableTools { get; set; } = new();
 
     [ObservableProperty]
-    private IPaintingToolViewModel _currentTool;
+    public partial IPaintingToolViewModel CurrentTool { get; set; }
 
     [ObservableProperty]
-    private double _currentAlpha = .5f;
+    public partial double CurrentAlpha { get; set; } = .5f;
 
     [ObservableProperty]
-    private double _currentBrushSize = 10d;
+    public partial double CurrentBrushSize { get; set; } = 10d;
 
     [ObservableProperty]
-    private Color _currentColor = Colors.Black;
+    public partial Color CurrentColor { get; set; } = Colors.Black;
 
     [ObservableProperty]
-    private Color _paletteIconColor = Colors.White;
+    public partial Color PaletteIconColor { get; set; } = Colors.White;
 
     [ObservableProperty]
-    private double _boundingBoxScale;
+    public partial double BoundingBoxScale { get; set; }
 
     [ObservableProperty]
-    private float _boundingBoxSize;
+    public partial float BoundingBoxSize { get; set; }
 
     [ObservableProperty]
-    private bool _isBusy;
+    public partial bool IsBusy { get; set; }
 
     [ObservableProperty]
-    private ObservableCollection<CanvasActionViewModel> _canvasActions = new();
+    public partial ObservableCollection<CanvasActionViewModel> CanvasActions { get; set; } = new();
 
     [ObservableProperty]
-    private SKBitmap _sourceBitmap;
+    public partial SKBitmap SourceBitmap { get; set; }
 
     [ObservableProperty]
-    private SKBitmap _segmentationBitmap;
+    public partial SKBitmap SegmentationBitmap { get; set; }
 
     [ObservableProperty]
-    private SKCanvasView _sourceCanvasView;
+    public partial SKCanvasView SourceCanvasView { get; set; }
 
     [ObservableProperty]
-    private SKCanvasView _maskCanvasView;
+    public partial SKCanvasView MaskCanvasView { get; set; }
 
     [ObservableProperty]
-    private ImageSource _savedImageSource;
+    public partial ImageSource SavedImageSource { get; set; }
 
     [ObservableProperty]
-    private SKRect _boundingBox;
+    public partial SKRect BoundingBox { get; set; }
 
     [ObservableProperty]
-    private bool _showMaskLayer = true;
+    public partial bool ShowMaskLayer { get; set; } = true;
 
     [ObservableProperty]
-    private bool _settingSegmentationImage = false;
+    public partial bool SettingSegmentationImage { get; set; } = false;
 
     [ObservableProperty]
-    private bool _hasSegmentationImage = false;
+    public partial bool HasSegmentationImage { get; set; } = false;
 
     [ObservableProperty]
-    private bool _showContextMenu = false;
+    public partial bool ShowContextMenu { get; set; } = false;
 
     [ObservableProperty]
-    private bool _gettingColorPalette = false;
+    public partial bool GettingColorPalette { get; set; } = false;
 
     [ObservableProperty]
     private SegmentationMode _segmentationMode = SegmentationMode.AddArea;
