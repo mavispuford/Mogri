@@ -12,55 +12,57 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
     private string _initImgString;
 
     [ObservableProperty]
-    private double _aspectRatioDouble;
+    public partial double AspectRatioDouble { get; set; }
 
     [ObservableProperty]
-    private string _aspectRatioString;
+    public partial string AspectRatioString { get; set; }
 
     [ObservableProperty]
-    private string _aspectRatioEntryValue;
+    public partial string AspectRatioEntryValue { get; set; }
 
     [ObservableProperty]
-    private double _width;
+    public partial double Width { get; set; }
 
     [ObservableProperty]
-    private double _height;
+    public partial double Height { get; set; }
 
     [ObservableProperty]
-    private double _widthSliderValue;
+    public partial double WidthSliderValue { get; set; }
 
     [ObservableProperty]
-    private double _heightSliderValue;
+    public partial double HeightSliderValue { get; set; }
 
     [ObservableProperty]
-    private string _widthEntryValue;
+    public partial string WidthEntryValue { get; set; }
 
     [ObservableProperty]
-    private string _heightEntryValue;
+    public partial string HeightEntryValue { get; set; }
 
     [ObservableProperty]
-    private bool _preserveAspectRatio = true;
+    public partial bool PreserveAspectRatio { get; set; } = true;
 
     [ObservableProperty]
-    private ImageSource _initImageSource;
+    public partial ImageSource InitImageSource { get; set; }
 
     [ObservableProperty]
-    private double _exampleRectangleContainerWidth;
+    public partial double ExampleRectangleContainerWidth { get; set; }
 
     [ObservableProperty]
-    private double _exampleRectangleContainerHeight;
+    public partial double ExampleRectangleContainerHeight { get; set; }
 
     [ObservableProperty]
-    private double _exampleRectangleWidth;
+    public partial double ExampleRectangleWidth { get; set; }
 
     [ObservableProperty]
-    private double _exampleRectangleHeight;
+    public partial double ExampleRectangleHeight { get; set; }
 
     [ObservableProperty]
-    private double _minimumWidthHeight = Constants.MinimumWidthHeight;
+    public partial double MinimumWidthHeight { get; set; } = Constants.MinimumWidthHeight;
 
     [ObservableProperty]
-    private double _maximumWidthHeight = Constants.MaximumWidthHeight;
+    public partial double MaximumWidthHeight { get; set; } = Constants.MaximumWidthHeight;
+
+    private bool _isUpdating;
 
     public ResolutionSelectPopupViewModel(IPopupService popupService,
         IImageService imageService) : base(popupService)
@@ -162,6 +164,8 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
 
     partial void OnAspectRatioEntryValueChanged(string value)
     {
+        if (_isUpdating) return;
+
         if (string.IsNullOrEmpty(value) || value == AspectRatioString)
         {
             return;
@@ -194,16 +198,19 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
 
     partial void OnWidthSliderValueChanged(double value)
     {
+        if (_isUpdating) return;
         updateWidth(value);
     }
 
     partial void OnHeightSliderValueChanged(double value)
     {
+        if (_isUpdating) return;
         updateHeight(value);
     }
 
     partial void OnWidthEntryValueChanged(string value)
     {
+        if (_isUpdating) return;
         if (double.TryParse(value, out double width))
         {
             updateWidth(width, excludeFromUpdate: nameof(WidthEntryValue));
@@ -212,6 +219,7 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
 
     partial void OnHeightEntryValueChanged(string value)
     {
+        if (_isUpdating) return;
         if (double.TryParse(value, out double height))
         {
             updateHeight(height, excludeFromUpdate: nameof(HeightEntryValue));
@@ -303,38 +311,38 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
     [RelayCommand]
     private void UpdateAllValues(params string[] excludeFromUpdate)
     {
-#pragma warning disable MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
-
-        if (excludeFromUpdate == null || !excludeFromUpdate.Contains(nameof(AspectRatioEntryValue)))
+        _isUpdating = true;
+        try
         {
-            _aspectRatioEntryValue = AspectRatioString;
-            OnPropertyChanged(nameof(AspectRatioEntryValue));
-        }
+            if (excludeFromUpdate == null || !excludeFromUpdate.Contains(nameof(AspectRatioEntryValue)))
+            {
+                AspectRatioEntryValue = AspectRatioString;
+            }
 
-        if (excludeFromUpdate == null || !excludeFromUpdate.Contains(nameof(WidthSliderValue)))
-        {
-            _widthSliderValue = Width;
-            OnPropertyChanged(nameof(WidthSliderValue));
-        }
+            if (excludeFromUpdate == null || !excludeFromUpdate.Contains(nameof(WidthSliderValue)))
+            {
+                WidthSliderValue = Width;
+            }
 
-        if (excludeFromUpdate == null || !excludeFromUpdate.Contains(nameof(WidthEntryValue)))
-        {
-            _widthEntryValue = Width.ToString();
-            OnPropertyChanged(nameof(WidthEntryValue));
-        }
+            if (excludeFromUpdate == null || !excludeFromUpdate.Contains(nameof(WidthEntryValue)))
+            {
+                WidthEntryValue = Width.ToString();
+            }
 
-        if (excludeFromUpdate == null || !excludeFromUpdate.Contains(nameof(HeightSliderValue)))
-        {
-            _heightSliderValue = Height;
-            OnPropertyChanged(nameof(HeightSliderValue));
-        }
+            if (excludeFromUpdate == null || !excludeFromUpdate.Contains(nameof(HeightSliderValue)))
+            {
+                HeightSliderValue = Height;
+            }
 
-        if (excludeFromUpdate == null || !excludeFromUpdate.Contains(nameof(HeightEntryValue)))
-        {
-            _heightEntryValue = Height.ToString();
-            OnPropertyChanged(nameof(HeightEntryValue));
+            if (excludeFromUpdate == null || !excludeFromUpdate.Contains(nameof(HeightEntryValue)))
+            {
+                HeightEntryValue = Height.ToString();
+            }
         }
-#pragma warning restore MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
+        finally
+        {
+            _isUpdating = false;
+        }
     }
 
     private void updateExampleRectangle()

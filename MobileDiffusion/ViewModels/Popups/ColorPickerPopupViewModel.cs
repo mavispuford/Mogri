@@ -8,16 +8,16 @@ namespace MobileDiffusion.ViewModels;
 public partial class ColorPickerPopupViewModel : PopupBaseViewModel, IColorPickerPopupViewModel
 {
     [ObservableProperty]
-    private Color _currentColor;
+    public partial Color CurrentColor { get; set; }
 
     [ObservableProperty]
-    private string _currentColorHexString;
+    public partial string CurrentColorHexString { get; set; }
 
     [ObservableProperty]
-    private List<Color> _swatches = new();
+    public partial List<Color> Swatches { get; set; } = new();
 
     [ObservableProperty]
-    private List<Color> _swatchesFromImage = new();
+    public partial List<Color> SwatchesFromImage { get; set; } = new();
 
     public ColorPickerPopupViewModel(IPopupService popupService) : base(popupService)
     {

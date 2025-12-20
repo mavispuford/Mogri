@@ -15,10 +15,10 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
     private readonly IImageGenerationService _stableDiffusionService;
 
     [ObservableProperty]
-    private IHistoryItemViewModel _historyItem;
+    public partial IHistoryItemViewModel HistoryItem { get; set; }
 
     [ObservableProperty]
-    private ImageSource _fullImageSource;
+    public partial ImageSource FullImageSource { get; set; }
 
     public HistoryItemPopupViewModel(
         IPopupService popupService,
