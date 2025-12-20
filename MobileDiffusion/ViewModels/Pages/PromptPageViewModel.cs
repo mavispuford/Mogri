@@ -15,25 +15,25 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
     private PromptSettings _settings;
 
     [ObservableProperty]
-    private string _prompt;
+    public partial string Prompt { get; set; }
 
     [ObservableProperty]
-    private string _promptPlaceholder;
+    public partial string PromptPlaceholder { get; set; }
 
     [ObservableProperty]
-    private string _negativePrompt;
+    public partial string NegativePrompt { get; set; }
 
     [ObservableProperty]
-    private List<IPromptStyleViewModel> _availablePromptStyles = new();
+    public partial List<IPromptStyleViewModel> AvailablePromptStyles { get; set; } = new();
 
     [ObservableProperty]
-    private List<ILoraViewModel> _availableLoras = new();
+    public partial List<ILoraViewModel> AvailableLoras { get; set; } = new();
 
     [ObservableProperty]
-    private ObservableCollection<ILoraViewModel> _selectedLoras = new();
+    public partial ObservableCollection<ILoraViewModel> SelectedLoras { get; set; } = new();
 
     [ObservableProperty]
-    private ObservableCollection<IPromptStyleViewModel> _selectedPromptStyles = new();
+    public partial ObservableCollection<IPromptStyleViewModel> SelectedPromptStyles { get; set; } = new();
 
     public PromptPageViewModel(
         IImageGenerationService stableDiffusionService,

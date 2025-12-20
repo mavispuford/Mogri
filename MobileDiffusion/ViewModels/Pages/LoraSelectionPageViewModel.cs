@@ -15,13 +15,13 @@ public partial class LoraSelectionPageViewModel : PageViewModel, ILoraSelectionP
     private PromptSettings _settings;
 
     [ObservableProperty]
-    List<ILoraViewModel> _availableLoras = new();
+    public partial List<ILoraViewModel> AvailableLoras { get; set; } = new();
 
     [ObservableProperty]
-    ObservableCollection<ILoraViewModel> _selectedLoras = new();
+    public partial ObservableCollection<ILoraViewModel> SelectedLoras { get; set; } = new();
 
     [ObservableProperty]
-    ILoraViewModel _loraToAdd;
+    public partial ILoraViewModel LoraToAdd { get; set; }
 
     public LoraSelectionPageViewModel(
         IImageGenerationService stableDiffusionService,
