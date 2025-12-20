@@ -49,7 +49,7 @@ public partial class PillControl : ContentView
         {
             await Task.Delay(300);
 
-            await this.ScaleTo(1, 250u, Easing.CubicInOut);
+            await this.ScaleToAsync(1, 250u, Easing.CubicInOut);
         });
     }
 }
