@@ -15,79 +15,79 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     private PromptSettings _settings;
     
     [ObservableProperty]
-    private List<IModelViewModel> _availableModelValues = new();
+    public partial List<IModelViewModel> AvailableModelValues { get; set; } = new();
 
     [ObservableProperty]
-    private List<string> _availableSamplerValues = new();
+    public partial List<string> AvailableSamplerValues { get; set; } = new();
 
     [ObservableProperty]
-    private List<string> _availableUpscaleLevelValues = new();
+    public partial List<string> AvailableUpscaleLevelValues { get; set; } = new();
 
     [ObservableProperty]
-    private List<string> _availableUpscalerValues = new();
+    public partial List<string> AvailableUpscalerValues { get; set; } = new();
 
     [ObservableProperty]
-    private string _batchCount;
+    public partial string BatchCount { get; set; }
 
     [ObservableProperty]
-    private string _batchSize;
+    public partial string BatchSize { get; set; }
 
     [ObservableProperty]
-    private string _steps;
+    public partial string Steps { get; set; }
 
     [ObservableProperty]
-    private string _stepsPlaceholder;
+    public partial string StepsPlaceholder { get; set; }
 
     [ObservableProperty]
-    private string _cfgScale;
+    public partial string CfgScale { get; set; }
 
     [ObservableProperty]
-    private string _cfgScalePlaceholder;
+    public partial string CfgScalePlaceholder { get; set; }
 
     [ObservableProperty]
-    private IModelViewModel _model;
+    public partial IModelViewModel Model { get; set; }
 
     [ObservableProperty]
-    private string _sampler;
+    public partial string Sampler { get; set; }
 
     [ObservableProperty]
-    private string _width;
+    public partial string Width { get; set; }
 
     [ObservableProperty]
-    private string _height;
+    public partial string Height { get; set; }
 
     [ObservableProperty]
-    private string _seed;
+    public partial string Seed { get; set; }
 
     [ObservableProperty]
-    private string _seedPlaceholder;
+    public partial string SeedPlaceholder { get; set; }
 
     [ObservableProperty]
-    private bool _enableGfpgan;
+    public partial bool EnableGfpgan { get; set; }
 
     [ObservableProperty]
-    private string _gfpganStrength;
+    public partial string GfpganStrength { get; set; }
 
     [ObservableProperty]
-    private string _gfpganStrengthPlaceholder;
+    public partial string GfpganStrengthPlaceholder { get; set; }
 
     [ObservableProperty]
-    private bool _enableUpscaling;
+    public partial bool EnableUpscaling { get; set; }
 
     [ObservableProperty]
-    private string _upscaler; 
+    public partial string Upscaler { get; set; } 
     
     [ObservableProperty]
-    private string _upscaleLevel;
+    public partial string UpscaleLevel { get; set; }
 
     [ObservableProperty]
-    private string _upscaleSteps;
+    public partial string UpscaleSteps { get; set; }
 
     [ObservableProperty]
-    private string _upscaleStepsPlaceholder;
+    public partial string UpscaleStepsPlaceholder { get; set; }
 
     [ObservableProperty]
-    private bool _makeSeamless;
+    public partial bool MakeSeamless { get; set; }
 
     public PromptSettingsPageViewModel(
         IImageGenerationService stableDiffusionService,

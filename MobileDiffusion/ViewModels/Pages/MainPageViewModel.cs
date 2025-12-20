@@ -29,22 +29,22 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     private float _targetProgress = 0;
 
     [ObservableProperty]
-    private bool _hasInitImage;
+    public partial bool HasInitImage { get; set; }
 
     [ObservableProperty]
-    private string _prompt = _defaultPrompt;
+    public partial string Prompt { get; set; } = _defaultPrompt;
 
     [ObservableProperty]
-    private string _negativePrompt;
+    public partial string NegativePrompt { get; set; }
 
     [ObservableProperty]
-    private float _progress;
+    public partial float Progress { get; set; }
 
     [ObservableProperty]
-    private bool _serverConnected;
+    public partial bool ServerConnected { get; set; }
 
     [ObservableProperty]
-    private ObservableCollection<IResultItemViewModel> _results = new();
+    public partial ObservableCollection<IResultItemViewModel> Results { get; set; } = new();
 
     public MainPageViewModel(
         IFileService fileService,
