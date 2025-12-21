@@ -61,7 +61,7 @@
                          VerticalItemSpacing="0"/>
             </CollectionView.ItemsLayout>
             <CollectionView.EmptyView>
-                <Grid VerticalOptions="FillAndExpand" RowDefinitions="*,auto,auto,*">
+                <Grid VerticalOptions="Fill" RowDefinitions="*,auto,auto,*">
                     <ActivityIndicator Grid.Row="1" 
                                        HorizontalOptions="Center"
                                        VerticalOptions="Center"
@@ -161,8 +161,8 @@
                     <ContentView.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding DeleteSelectedItemsCommand}"/>
                     </ContentView.GestureRecognizers>
-                    <Image HorizontalOptions="CenterAndExpand"
-                           VerticalOptions="CenterAndExpand"
+                    <Image HorizontalOptions="Center"
+                           VerticalOptions="Center"
                            InputTransparent="True">
                         <Image.Source>
                             <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Size="64" Color="{StaticResource Primary}" />
