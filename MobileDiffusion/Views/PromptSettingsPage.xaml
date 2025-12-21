@@ -31,7 +31,7 @@
                   RowSpacing="10"
                   ColumnSpacing="16"
                   ColumnDefinitions="32,auto,*"
-                  HorizontalOptions="FillAndExpand">
+                  HorizontalOptions="Fill">
 
                 <Image Grid.Row="0" WidthRequest="32" HeightRequest="32">
                     <Image.Source>
