@@ -50,7 +50,7 @@
                 BackgroundColor="White"
                 StrokeShape="RoundRectangle 10">
             <Entry x:Name="FilterBar" 
-                   HorizontalOptions="FillAndExpand"
+                   HorizontalOptions="Fill"
                    Margin="10,0">
                 <Entry.Background>
                     <SolidColorBrush Color="Transparent"/>
@@ -71,7 +71,7 @@
                         SelectionMode="Multiple"
                         ItemsSource="{Binding AvailablePromptStyles}"
                         SelectedItems="{Binding SelectedPromptStyles}"
-                        VerticalOptions="StartAndExpand">
+                        VerticalOptions="Fill">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="viewModels:IPromptStyleViewModel">
                     <Grid ColumnDefinitions="*,auto"
@@ -84,7 +84,7 @@
                         <ImageButton Grid.Column="1"
                                      ToolTipProperties.Text="Info"
                                      HorizontalOptions="End"
-                                     VerticalOptions="FillAndExpand"
+                                     VerticalOptions="Fill"
                                      Command="{Binding ShowPromptStyleInfoCommand, Source={RelativeSource AncestorType={x:Type viewModels:IPromptStyleSelectionPageViewModel}}}"
                                      CommandParameter="{Binding .}">
                             <ImageButton.Source>
