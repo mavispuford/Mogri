@@ -1,7 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Maui.MainTheme.NoActionBar" parent="Maui.MainTheme.Base">
-        <!-- Opt out of edge to edge since it's currently broken in .NET MAUI 10.0.20 when using Shell -->
+<!-- This entire style is used to opt out of edge to edge since it's currently broken in .NET MAUI 10.0.20 when using Shell
+     The extra properties exist to match the .NET MAUI MainTheme.Base
+ -->
+<style name="MobileDiffusion.MainTheme.Base" parent="Theme.MaterialComponents.DayNight">
+        <item name="maui_edgetoedge_optout">true</item>
+        <item name="maui_splash">false</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:actionMenuTextColor">@color/colorActionMenuTextColor</item>
+        <item name="appBarLayoutStyle">@style/MauiAppBarLayout</item>
+        <item name="bottomNavigationViewStyle">@style/Widget.Design.BottomNavigationView</item>
+        <item name="materialButtonStyle">@style/MauiMaterialButton</item>
+        <item name="checkboxStyle">@style/MauiCheckBox</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="alertDialogTheme">@style/MauiAlertDialogTheme</item>
+        <item name="materialAlertDialogTheme">@style/MauiAlertDialogTheme</item>
         <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
-    </style>
+   </style>
 </resources>
