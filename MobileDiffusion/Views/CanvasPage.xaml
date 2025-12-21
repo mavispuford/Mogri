@@ -30,11 +30,11 @@
     <Shell.TitleView>
         <HorizontalStackLayout x:Name="TitleViewLayout"
                                Spacing="30"
-                               HorizontalOptions="CenterAndExpand"
+                               HorizontalOptions="Center"
                                TranslationX="{OnPlatform Default=0, Android=-9}">
 
             <ImageButton ToolTipProperties.Text="Add Image"
-                         VerticalOptions="FillAndExpand"
+                         VerticalOptions="Fill"
                          Command="{Binding ShowMediaPickerCommand}">
                 <ImageButton.Source>
                     <FontImageSource Glyph="&#xe43e;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
@@ -42,7 +42,7 @@
             </ImageButton>
 
             <ImageButton ToolTipProperties.Text="Undo"
-                         VerticalOptions="FillAndExpand"
+                         VerticalOptions="Fill"
                          Clicked="Undo_Button_Clicked">
                 <ImageButton.Source>
                     <FontImageSource Glyph="&#xe166;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
@@ -50,7 +50,7 @@
             </ImageButton>
 
             <ImageButton ToolTipProperties.Text="Clear Paint"
-                         VerticalOptions="FillAndExpand"
+                         VerticalOptions="Fill"
                          Clicked="Clear_Button_Clicked">
                 <ImageButton.Source>
                     <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
@@ -58,7 +58,7 @@
             </ImageButton>
 
             <ImageButton ToolTipProperties.Text="Save Mask"
-                         VerticalOptions="FillAndExpand"
+                         VerticalOptions="Fill"
                          Command="{Binding SaveCommand}">
                 <ImageButton.Source>
                     <FontImageSource Glyph="&#xe161;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
@@ -66,7 +66,7 @@
             </ImageButton>
 
             <ImageButton ToolTipProperties.Text="Use as source image"
-                         VerticalOptions="FillAndExpand"
+                         VerticalOptions="Fill"
                          Command="{Binding SendToImageToImageCommand}"
                          HeightRequest="32"
                          WidthRequest="32">
@@ -79,7 +79,7 @@
             </ImageButton>
 
             <ImageButton ToolTipProperties.Text="{Binding ShowMaskLayer, Converter={StaticResource BoolToShowMaskTextConverter}}"
-                         VerticalOptions="FillAndExpand"
+                         VerticalOptions="Fill"
                          Command="{Binding ToggleMaskLayerVisibilityCommand}"
                          HeightRequest="32"
                          WidthRequest="32"
@@ -93,8 +93,8 @@
           RowDefinitions="auto,*">
         <Grid x:Name="MaskGrid"
               Grid.Row="1"
-              HorizontalOptions="FillAndExpand"
-              VerticalOptions="FillAndExpand"
+              HorizontalOptions="Fill"
+              VerticalOptions="Fill"
               SizeChanged="MaskGrid_SizeChanged"
               Margin="0,0,0,80">
             <skia:SKCanvasView x:Name="SourceImageCanvasView" 
@@ -205,7 +205,7 @@
         </HorizontalStackLayout>
 
         <VerticalStackLayout Grid.Row="1"
-                             HorizontalOptions="FillAndExpand"
+                             HorizontalOptions="Fill"
                              VerticalOptions="End"
                              Spacing="15">
             
@@ -259,7 +259,7 @@
             </Grid>
 
             <HorizontalStackLayout x:Name="BottomButtonsLayout"
-                                   HorizontalOptions="CenterAndExpand"
+                                   HorizontalOptions="Center"
                                    Spacing="30">
 
                 <Border x:Name="BrushSizeButton" 
