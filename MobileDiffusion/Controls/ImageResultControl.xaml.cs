@@ -58,6 +58,11 @@ public partial class ImageResultControl : ContentView
         if (Source != null)
         {
             ImageControl.Source = Source;
+
+            if (ImageControl.Scale == 0)
+            {
+                _ = ImageControl.ScaleToAsync(1, 250u, Easing.CubicInOut);
+            }
         }
     }
 }
