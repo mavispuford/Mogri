@@ -43,6 +43,7 @@ namespace MobileDiffusion.Services
         private SdForgeNeoClient _client;
         private string _baseUrl;
         private CancellationTokenSource _mainRequestCancellationSource;
+        private Task _initializeTask;
 
         private List<SamplerItem> _samplers;
         private List<PromptStyleItem> _promptStyles;
@@ -78,6 +79,17 @@ namespace MobileDiffusion.Services
             var adapter = new HttpClientRequestAdapter(authProvider, httpClient: httpClient);
             adapter.BaseUrl = _baseUrl;
             _client = new SdForgeNeoClient(adapter);
+
+            if (_initializeTask == null || _initializeTask.Status != TaskStatus.Running)
+            {
+                _initializeTask = Task.Run(async () =>
+                {
+                    await RefreshResourcesAsync();
+                });
+            }
+
+            await _initializeTask;
+            _initializeTask = null;
 
             Initialized = true;
         }
