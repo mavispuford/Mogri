@@ -253,14 +253,14 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                 {
                     reportProgress((float)response.Progress);
 
-                    if (response.ResponseObject is TextToImageResponse textToImageResponse)
+                    if (response.ResponseObject is GenerationResponse generationResponse)
                     {
-                        var autoResponseInfo = JsonConvert.DeserializeObject<IDictionary<string, object>>(textToImageResponse.Info, new JsonSerializerSettings
+                        var autoResponseInfo = JsonConvert.DeserializeObject<IDictionary<string, object>>(generationResponse.Info, new JsonSerializerSettings
                         {
                             ContractResolver = CustomContractResolver.Instance
                         });
 
-                        foreach (var image in textToImageResponse.Images)
+                        foreach (var image in generationResponse.Images)
                         {
                             var seeds = autoResponseInfo["all_seeds"] as List<long>;
                             var seedString = seeds?.ElementAt(imageNumber) ?? settings.Seed + imageNumber;
@@ -279,34 +279,23 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                             }
                         }
                     }
-                    else if (response.ResponseObject is ImageToImageResponse imageToImageResponse)
+                    else if (response.ResponseObject is ProgressResponse progressResponse)
                     {
-                        reportProgress((float)response.Progress);
+                        // if (!string.IsNullOrEmpty(progressResponse.CurrentImage))
+                        // {
+                        //     var result = Results.FirstOrDefault(r => r.ApiResponse == null);
 
-                        var autoResponseInfo = JsonConvert.DeserializeObject<IDictionary<string, object>>(imageToImageResponse.Info, new JsonSerializerSettings
-                        {
-                            ContractResolver = CustomContractResolver.Instance
-                        });
+                        //     if (result != null)
+                        //     {
+                        //         using var stream = await _imageService.GetStreamFromContentTypeStringAsync(progressResponse.CurrentImage, CancellationToken.None);
+                        //         var bitmap = _imageService.GetSkBitmapFromStream(stream);
 
-                        foreach (var image in imageToImageResponse.Images)
-                        {
-                            var seeds = autoResponseInfo["all_seeds"] as List<long>;
-                            var seedString = seeds?.ElementAt(imageNumber) ?? settings.Seed + imageNumber;
-
-                            var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{seedString}-{DateTime.Now.Ticks}";
-
-                            var result = Results.FirstOrDefault(r => r.ApiResponse == null);
-
-                            result.ApiResponse = response;
-                            result.Settings = settings.Clone();
-                            result.Settings.Seed = seedString;
-
-                            await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
-                        }
-                    }
-                    else if (response.ResponseObject is Modules__api__models__ProgressResponse progressResponse)
-                    {
-                        // TODO - Display "current image"
+                        //         if (bitmap != null)
+                        //         {
+                        //             result.ImageSource = new SKBitmapImageSource { Bitmap = bitmap };
+                        //         }
+                        //     }
+                        // }
                     }              
                 }
             }
@@ -407,13 +396,9 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         }
         else if (result.ApiResponse.StableDiffusionApi == Enums.StableDiffusionApi.Automatic1111)
         {
-            if (result.ApiResponse.ResponseObject is TextToImageResponse textToImageResponse)
+            if (result.ApiResponse.ResponseObject is GenerationResponse generationResponse)
             {
-                imageBytes = Convert.FromBase64String(textToImageResponse.Images.ElementAt(number));
-            }
-            else if (result.ApiResponse.ResponseObject is ImageToImageResponse imageToImageResponse)
-            {
-                imageBytes = Convert.FromBase64String(imageToImageResponse.Images.ElementAt(number));
+                imageBytes = Convert.FromBase64String(generationResponse.Images.ElementAt(number));
             }
         }
 

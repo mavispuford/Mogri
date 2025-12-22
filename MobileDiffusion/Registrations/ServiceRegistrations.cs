@@ -19,13 +19,14 @@ public static class ServiceRegistrations
         }).AddTransientHttpErrorPolicy(p => p.WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(500), (message, timeSpan) =>
         {
 
-        }));
-        //.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
-        //{
-        //    Proxy = new WebProxy() { Address = new Uri("192.168.68.72:8888") }
-        //});
+        }))
+        .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+        {
+           Proxy = new WebProxy() { Address = new Uri("http://192.168.68.52:9000") }
+        });
 
-        builder.Services.AddSingleton<IImageGenerationService, Automatic1111Service>();
+        builder.Services.AddSingleton<IImageGenerationService, SdForgeNeoService>();
+        //builder.Services.AddSingleton<IImageGenerationService, Automatic1111Service>();
         //builder.Services.AddSingleton<IStableDiffusionService, LSteinStableDiffusionService>();
         builder.Services.AddSingleton<IPopupService, PopupService>();
         builder.Services.AddSingleton<IImageService, ImageService>();

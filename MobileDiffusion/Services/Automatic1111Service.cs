@@ -476,10 +476,17 @@ namespace MobileDiffusion.Services
                 catch (OperationCanceledException)
                 {
                     // Set the final response
+                    var generationResponse = new GenerationResponse
+                    {
+                        Images = txt2ImgResponse.Images.ToList(),
+                        Info = txt2ImgResponse.Info,
+                        Parameters = txt2ImgResponse.Parameters
+                    };
+
                     apiResponse = new ApiResponse
                     {
                         StableDiffusionApi = Enums.StableDiffusionApi.Automatic1111,
-                        ResponseObject = txt2ImgResponse,
+                        ResponseObject = generationResponse,
                         Progress = 1f
                     };
 
@@ -537,10 +544,17 @@ namespace MobileDiffusion.Services
                 catch (OperationCanceledException)
                 {
                     // Set the final response
+                    var generationResponse = new GenerationResponse
+                    {
+                        Images = img2ImgResponse.Images.ToList(),
+                        Info = img2ImgResponse.Info,
+                        Parameters = img2ImgResponse.Parameters
+                    };
+
                     apiResponse = new ApiResponse
                     {
                         StableDiffusionApi = Enums.StableDiffusionApi.Automatic1111,
-                        ResponseObject = img2ImgResponse,
+                        ResponseObject = generationResponse,
                         Progress = 1f
                     };
 
@@ -567,10 +581,17 @@ namespace MobileDiffusion.Services
 
                 var progress = progressGetResponse.Eta_relative > 0 ? progressGetResponse.Progress : 1d;
 
+                var progressResponse = new ProgressResponse
+                {
+                    Progress = progressGetResponse.Progress,
+                    EtaRelative = progressGetResponse.Eta_relative,
+                    CurrentImage = progressGetResponse.Current_image
+                };
+
                 var progressApiResponse = new ApiResponse
                 {
                     StableDiffusionApi = Enums.StableDiffusionApi.Automatic1111,
-                    ResponseObject = progressGetResponse,
+                    ResponseObject = progressResponse,
                     Progress = progress
                 };
 
