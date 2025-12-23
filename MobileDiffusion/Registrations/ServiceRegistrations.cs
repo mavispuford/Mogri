@@ -20,9 +20,17 @@ public static class ServiceRegistrations
         {
 
         }))
-        .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+        .ConfigurePrimaryHttpMessageHandler(() => 
         {
-           Proxy = new WebProxy() { Address = new Uri("http://192.168.68.52:9000") }
+#if ANDROID
+            return new SocketsHttpHandler
+            {
+                PooledConnectionLifetime = TimeSpan.FromMinutes(20),
+                PooledConnectionIdleTimeout = TimeSpan.FromMinutes(20)
+            };
+#else
+            return new HttpClientHandler();
+#endif
         });
 
         builder.Services.AddSingleton<IImageGenerationService, SdForgeNeoService>();
