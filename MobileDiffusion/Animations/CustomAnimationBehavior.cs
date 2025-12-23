@@ -38,6 +38,33 @@ public class CustomAnimationBehavior : EventToCommandBehavior
         set => SetValue(AnimationTypeProperty, value);
     }
 
+    protected override void OnAttachedTo(BindableObject bindable)
+    {
+        base.OnAttachedTo(bindable);
+
+        // Binding context isn't currently inherited from the parent, so we are manually setting/tracking it here.
+        BindingContext = bindable.BindingContext;
+        
+        bindable.BindingContextChanged += OnBindableBindingContextChanged;
+    }
+
+    protected override void OnDetachingFrom(BindableObject bindable)
+    {
+        base.OnDetachingFrom(bindable);
+
+        bindable.BindingContextChanged -= OnBindableBindingContextChanged;
+
+        BindingContext = null;
+    }
+
+    void OnBindableBindingContextChanged(object? sender, EventArgs e)
+    {
+        if (sender is BindableObject bindable)
+        {
+            BindingContext = bindable.BindingContext;
+        }
+    }
+
     /// <inheritdoc/>
     protected override async void OnTriggerHandled(object? sender = null, object? eventArgs = null)
     {

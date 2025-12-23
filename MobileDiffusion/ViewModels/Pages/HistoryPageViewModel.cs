@@ -190,11 +190,11 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         }
 
 
-        SelectionChanged();
+        SelectionChanged(null);
     }
 
     [RelayCommand]
-    private void SelectionChanged()
+    private void SelectionChanged(SelectionChangedEventArgs args)
     {
         var pluralityString = SelectedItems.Count != 1 ? "s" : string.Empty;
         SelectedItemsText = $"{SelectedItems.Count} item{pluralityString} selected";
