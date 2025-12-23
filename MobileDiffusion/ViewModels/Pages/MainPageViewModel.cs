@@ -302,21 +302,15 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         }
         catch (System.Net.Sockets.SocketException socketException)
         {
-            // TODO - Handle timeouts
-
-            //return;
+            await Shell.Current.CurrentPage.DisplayAlertAsync("Connection Error", $"A network error occurred: {socketException.Message}", "OK");
         }
         catch (System.Net.WebException webException)
         {
-            // TODO - Handle this
-
-            //return;
+            await Shell.Current.CurrentPage.DisplayAlertAsync("Web Error", $"A web error occurred: {webException.Message}", "OK");
         }
         catch (Exception e)
         {
-            // TODO - Handle this
-
-            //return;
+            await Shell.Current.CurrentPage.DisplayAlertAsync("Error", $"An unexpected error occurred: {e.Message}", "OK");
         }
 
         // Any remaining results that weren't set have failed

@@ -437,6 +437,9 @@ namespace MobileDiffusion.Services
             var httpClient = getHttpClient(TimeSpan.FromMinutes(RequestTimeoutMinutes));
             var auto1111Client = getAuto1111Client(httpClient);
 
+            var progressHttpClient = getHttpClient(TimeSpan.FromSeconds(10));
+            var progressClient = getAuto1111Client(progressHttpClient);
+
             var request = txt2ImageRequestFromSettings(settings);
 
             if (!_mainRequestCancellationSource?.IsCancellationRequested ?? false)
@@ -471,10 +474,12 @@ namespace MobileDiffusion.Services
             {
                 try
                 {
-                    apiResponse = await getCurrentProgress(auto1111Client, progressToken, skipCurrentImage);
+                    apiResponse = await getCurrentProgress(progressClient, progressToken, skipCurrentImage);
                 }
                 catch (OperationCanceledException)
                 {
+                    await textToImageTask;
+
                     // Set the final response
                     var generationResponse = new GenerationResponse
                     {
@@ -504,6 +509,9 @@ namespace MobileDiffusion.Services
         {
             var httpClient = getHttpClient(TimeSpan.FromMinutes(RequestTimeoutMinutes));
             var auto1111Client = getAuto1111Client(httpClient);
+
+            var progressHttpClient = getHttpClient(TimeSpan.FromSeconds(10));
+            var progressClient = getAuto1111Client(progressHttpClient);
 
             var request = image2ImageRequestFromSettings(settings);
 
@@ -539,10 +547,12 @@ namespace MobileDiffusion.Services
             {
                 try
                 {
-                    apiResponse = await getCurrentProgress(auto1111Client, progressToken, skipCurrentImage);
+                    apiResponse = await getCurrentProgress(progressClient, progressToken, skipCurrentImage);
                 }
                 catch (OperationCanceledException)
                 {
+                    await textToImageTask;
+
                     // Set the final response
                     var generationResponse = new GenerationResponse
                     {
