@@ -41,6 +41,7 @@ namespace MobileDiffusion.Services
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IServiceProvider _serviceProvider;
         private SdForgeNeoClient _client;
+        private SdForgeNeoClient _progressClient;
         private string _baseUrl;
         private CancellationTokenSource _mainRequestCancellationSource;
         private Task _initializeTask;
@@ -73,12 +74,22 @@ namespace MobileDiffusion.Services
             // Initialize client
             var httpClient = _httpClientFactory.CreateClient();
             httpClient.BaseAddress = new Uri(_baseUrl);
+            httpClient.Timeout = TimeSpan.FromMinutes(15);
             
             // Kiota setup
             var authProvider = new AnonymousAuthenticationProvider();
             var adapter = new HttpClientRequestAdapter(authProvider, httpClient: httpClient);
             adapter.BaseUrl = _baseUrl;
             _client = new SdForgeNeoClient(adapter);
+
+            // Initialize progress client
+            var progressHttpClient = _httpClientFactory.CreateClient();
+            progressHttpClient.BaseAddress = new Uri(_baseUrl);
+            progressHttpClient.Timeout = TimeSpan.FromSeconds(10);
+
+            var progressAdapter = new HttpClientRequestAdapter(authProvider, httpClient: progressHttpClient);
+            progressAdapter.BaseUrl = _baseUrl;
+            _progressClient = new SdForgeNeoClient(progressAdapter);
 
             if (_initializeTask == null || _initializeTask.Status != TaskStatus.Running)
             {
@@ -178,6 +189,8 @@ namespace MobileDiffusion.Services
                 }
                 catch (OperationCanceledException)
                 {
+                    await textToImageTask;
+
                     // Set the final response
                     var generationResponse = new GenerationResponse
                     {
@@ -243,6 +256,8 @@ namespace MobileDiffusion.Services
                 }
                 catch (OperationCanceledException)
                 {
+                    await imgToImageTask;
+
                     // Set the final response
                     var generationResponse = new GenerationResponse
                     {
@@ -280,7 +295,7 @@ namespace MobileDiffusion.Services
                 // The generated method is: GetAsync(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
                 // We need to set skip_current_image query param.
                 
-                var progressGetResponse = await _client.Sdapi.V1.Progress.GetAsync((config) => {
+                var progressGetResponse = await _progressClient.Sdapi.V1.Progress.GetAsync((config) => {
                     config.QueryParameters.SkipCurrentImage = skipCurrentImage;
                 }, token);
 
