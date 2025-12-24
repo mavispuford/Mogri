@@ -748,6 +748,11 @@ namespace MobileDiffusion.Services
             return Task.FromResult(result);
         }
 
+        public Task<List<string>> GetSchedulersAsync()
+        {
+            return Task.FromResult(new List<string>());
+        }
+
         public async Task SaveSettingsAsync(PromptSettings settings)
         {
             var httpClient = getHttpClient(TimeSpan.FromMinutes(RequestTimeoutMinutes));
