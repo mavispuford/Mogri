@@ -89,13 +89,57 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     [ObservableProperty]
     public partial bool MakeSeamless { get; set; }
 
+    [ObservableProperty]
+    public partial ModelType SelectedModelType { get; set; }
+
+    [ObservableProperty]
+    public partial List<ModelType> AvailableModelTypes { get; set; } = Enum.GetValues(typeof(ModelType)).Cast<ModelType>().ToList();
+
+    [ObservableProperty]
+    public partial List<string> AvailableSchedulers { get; set; } = new();
+
+    [ObservableProperty]
+    public partial string Scheduler { get; set; }
+
+    [ObservableProperty]
+    public partial List<string> AvailablePresets { get; set; } = new();
+
+    private readonly IPresetService _presetService;
+
+    private bool _isInitializing;
+
+    partial void OnSelectedModelTypeChanged(ModelType value)
+    {
+        if (_isInitializing) return;
+
+        var profile = GenerationProfile.GetDefault(value);
+        
+        Steps = profile.DefaultSteps.ToString();
+        CfgScale = profile.DefaultCfg.ToString();
+        Width = profile.DefaultWidth.ToString();
+        Height = profile.DefaultHeight.ToString();
+        Sampler = profile.DefaultSampler;
+        Scheduler = profile.DefaultScheduler;
+
+        if (value == ModelType.ZImage)
+        {
+            AvailableSchedulers = new List<string> { "Beta", "Linear Quadratic", "Simple" };
+        }
+        else
+        {
+            AvailableSchedulers = new List<string>();
+        }
+    }
+
     public PromptSettingsPageViewModel(
         IImageGenerationService stableDiffusionService,
         IPopupService popupService,
-        ILoadingService loadingService) : base(loadingService)
+        ILoadingService loadingService,
+        IPresetService presetService) : base(loadingService)
     {
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
+        _presetService = presetService ?? throw new ArgumentNullException(nameof(presetService));
 
         var upscaleLevelValues = new List<string>
         {
@@ -143,6 +187,8 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             var models = await _stableDiffusionService.GetModelsAsync();
 
             AvailableModelValues = models;
+
+            AvailablePresets = await _presetService.GetPresetsAsync();
         }
         catch
         {
@@ -271,22 +317,74 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
 
     private void mapSettingsToProperties()
     {
-        CfgScale = _settings.GuidanceScale.ToString();
-        EnableGfpgan = _settings.EnableGfpgan;
-        EnableUpscaling = _settings.EnableUpscaling;
-        GfpganStrength = _settings.GfpganStrength.ToString();
-        Height = _settings.Height.ToString();
-        BatchCount = _settings.BatchCount.ToString();
-        BatchSize = _settings.BatchSize.ToString();
-        MakeSeamless = _settings.Seamless == OnOff.on;
-        Model = AvailableModelValues?.FirstOrDefault(m => m.Key == _settings.Model.Key);
-        Sampler = _settings.Sampler;
-        Seed = _settings.Seed.ToString();
-        Steps = _settings.Steps.ToString();
-        Upscaler = _settings.Upscaler;
-        UpscaleLevel = _settings.UpscaleLevel == 0 ? "2" : _settings.UpscaleLevel.ToString();
-        UpscaleSteps= _settings.UpscaleSteps.ToString();
-        Width = _settings.Width.ToString();
+        _isInitializing = true;
+        try
+        {
+            CfgScale = _settings.GuidanceScale.ToString();
+            EnableGfpgan = _settings.EnableGfpgan;
+            EnableUpscaling = _settings.EnableUpscaling;
+            GfpganStrength = _settings.GfpganStrength.ToString();
+            Height = _settings.Height.ToString();
+            BatchCount = _settings.BatchCount.ToString();
+            BatchSize = _settings.BatchSize.ToString();
+            MakeSeamless = _settings.Seamless == OnOff.on;
+            Model = AvailableModelValues?.FirstOrDefault(m => m.Key == _settings.Model.Key);
+            Sampler = _settings.Sampler;
+            Seed = _settings.Seed.ToString();
+            Steps = _settings.Steps.ToString();
+            Upscaler = _settings.Upscaler;
+            UpscaleLevel = _settings.UpscaleLevel == 0 ? "2" : _settings.UpscaleLevel.ToString();
+            UpscaleSteps= _settings.UpscaleSteps.ToString();
+            Width = _settings.Width.ToString();
+            
+            SelectedModelType = _settings.ModelType;
+            Scheduler = _settings.Scheduler;
+            
+            if (SelectedModelType == ModelType.ZImage)
+            {
+                AvailableSchedulers = new List<string> { "Beta", "Linear Quadratic", "Simple" };
+            }
+            else
+            {
+                AvailableSchedulers = new List<string>();
+            }
+        }
+        finally
+        {
+            _isInitializing = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task SavePreset()
+    {
+        var name = await _popupService.DisplayPromptAsync("Save Preset", "Enter a name for this preset:");
+        if (string.IsNullOrWhiteSpace(name)) return;
+
+        mapPropertiesToSettings();
+        await _presetService.SavePresetAsync(name, _settings);
+        AvailablePresets = await _presetService.GetPresetsAsync();
+        await _popupService.DisplayAlertAsync("Success", "Preset saved successfully.", "OK");
+    }
+
+    [RelayCommand]
+    private async Task LoadPreset()
+    {
+        if (AvailablePresets == null || !AvailablePresets.Any())
+        {
+            await _popupService.DisplayAlertAsync("No Presets", "No presets available to load.", "OK");
+            return;
+        }
+
+        var name = await _popupService.DisplayActionSheetAsync("Load Preset", "Cancel", null, AvailablePresets.ToArray());
+        if (string.IsNullOrEmpty(name) || name == "Cancel") return;
+
+        var settings = await _presetService.LoadPresetAsync(name);
+        if (settings != null)
+        {
+            _settings = settings;
+            mapSettingsToProperties();
+        }
     }
 
     private void mapPropertiesToSettings()
@@ -358,5 +456,8 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         {
             _settings.Width = pWidth;
         }
+
+        _settings.ModelType = SelectedModelType;
+        _settings.Scheduler = Scheduler;
     }
 }
