@@ -20,7 +20,7 @@ public class GenerationProfile
             {
                 DefaultSteps = 8,
                 DefaultCfg = 1.0,
-                DefaultDistilledCfg = 3.5,
+                DefaultDistilledCfg = 9,
                 DefaultSampler = "Euler",
                 DefaultScheduler = "Beta",
                 DefaultWidth = 1024,
@@ -38,13 +38,13 @@ public class GenerationProfile
             },
             _ => new GenerationProfile // Stable Diffusion
             {
-                DefaultSteps = 20,
+                DefaultSteps = 30,
                 DefaultCfg = 7.0,
                 DefaultDistilledCfg = null,
-                DefaultSampler = "DPM++ 2M Karras",
+                DefaultSampler = "DPM++ 2M",
                 DefaultScheduler = null,
-                DefaultWidth = 512,
-                DefaultHeight = 512
+                DefaultWidth = 1024,
+                DefaultHeight = 1024
             }
         };
     }

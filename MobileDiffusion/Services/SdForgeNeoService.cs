@@ -34,6 +34,11 @@ namespace MobileDiffusion.Services
             public const string HiresUpscaler = "Hires upscaler";
             public const string HiresUpscale = "Hires upscale";
             public const string HiresSteps = "Hires steps";
+            public const string Scheduler = nameof(Scheduler);
+            public const string ScheduleType = "Schedule type";
+            public const string DistilledCfgScale = "Distilled CFG Scale";
+            public const string DistilledCfgScaleKey = "distilled_cfg_scale";
+            public const string Shift = "Shift";
         }
 
         private Regex _loraRegex = new Regex("<lora:([^:]*):([^>]*)>", RegexOptions.Compiled);
@@ -541,6 +546,16 @@ namespace MobileDiffusion.Services
                             break;
                         case PngInfoProperties.HiresSteps:
                             settings.UpscaleSteps = int.Parse(property.Value);
+                            break;
+                        case PngInfoProperties.Scheduler:
+                        case PngInfoProperties.ScheduleType:
+                            settings.Scheduler = property.Value;
+                            settings.ModelType = Enums.ModelType.ZImage;
+                            break;
+                        case PngInfoProperties.DistilledCfgScale:
+                        case PngInfoProperties.DistilledCfgScaleKey:
+                        case PngInfoProperties.Shift:
+                            settings.DistilledCfgScale = double.Parse(property.Value);
                             break;
                         case PngInfoProperties.Model:
                             if (settings.Model == null)

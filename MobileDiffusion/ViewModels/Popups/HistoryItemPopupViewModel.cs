@@ -157,7 +157,17 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
             $"Seed: {HistoryItem.Settings.Seed}\n" + 
             $"Size: {HistoryItem.Settings.Width}x{HistoryItem.Settings.Height}\n" +
             $"Denoising Strength: {HistoryItem.Settings.DenoisingStrength}\n" +
-            $"Model: {HistoryItem.Settings.Model.DisplayName}";
+            $"Model: {HistoryItem.Settings.Model?.DisplayName ?? "Unknown"}";
+
+        if (!string.IsNullOrEmpty(HistoryItem.Settings.Scheduler))
+        {
+            message += $"\nScheduler: {HistoryItem.Settings.Scheduler}";
+        }
+
+        if (HistoryItem.Settings.DistilledCfgScale.HasValue)
+        {
+            message += $"\nDistilled CFG Scale: {HistoryItem.Settings.DistilledCfgScale}";
+        }
 
         if (HistoryItem.Settings.EnableUpscaling &&
             !string.IsNullOrEmpty(HistoryItem.Settings.Upscaler) &&
