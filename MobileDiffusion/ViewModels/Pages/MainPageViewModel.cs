@@ -88,7 +88,20 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
             var samplers = await _stableDiffusionService.GetSamplersAsync();
 
-            _settings.Sampler = samplers?.FirstOrDefault().Key ?? "Euler";
+            var profile = GenerationProfile.GetDefault(Enums.ModelType.StableDiffusion);
+            _settings.Steps = profile.DefaultSteps;
+            _settings.GuidanceScale = profile.DefaultCfg;
+            _settings.Width = profile.DefaultWidth;
+            _settings.Height = profile.DefaultHeight;
+            
+            if (samplers != null && !samplers.ContainsKey(profile.DefaultSampler))
+            {
+                _settings.Sampler = samplers.FirstOrDefault().Key ?? "Euler";
+            }
+            else
+            {
+                _settings.Sampler = profile.DefaultSampler;
+            }
 
             _settings.Model = (ModelViewModel)await _stableDiffusionService.GetSelectedModelAsync();
         }

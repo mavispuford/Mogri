@@ -1,9 +1,18 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using MobileDiffusion.Enums;
 
 namespace MobileDiffusion.Interfaces.ViewModels;
 
 public interface IPromptSettingsPageViewModel : IPageViewModel
 {
+    ModelType SelectedModelType { get; set; }
+
+    List<ModelType> AvailableModelTypes { get; set; }
+
+    List<string> AvailableSchedulers { get; set; }
+
+    string Scheduler { get; set; }
+
     List<IModelViewModel> AvailableModelValues { get; set; }
 
     List<string> AvailableSamplerValues { get; set; }
@@ -61,4 +70,10 @@ public interface IPromptSettingsPageViewModel : IPageViewModel
     IAsyncRelayCommand ConfirmSettingsCommand { get; }
 
     IAsyncRelayCommand ShowResolutionSelectCommand { get; }
+
+    IAsyncRelayCommand SavePresetCommand { get; }
+
+    IAsyncRelayCommand LoadPresetCommand { get; }
+
+    List<string> AvailablePresets { get; set; }
 }

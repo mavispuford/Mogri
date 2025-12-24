@@ -349,6 +349,23 @@ namespace MobileDiffusion.Services
 
             request.SamplerName = settings.Sampler;
 
+            System.Diagnostics.Debug.WriteLine($"[SdForgeNeoService] Generating image with ModelType: {settings.ModelType}");
+            System.Diagnostics.Debug.WriteLine($"[SdForgeNeoService] Model: {settings.Model?.DisplayName}");
+            System.Diagnostics.Debug.WriteLine($"[SdForgeNeoService] Steps: {settings.Steps}, CFG: {settings.GuidanceScale}, Sampler: {settings.Sampler}");
+
+            if (settings.ModelType == Enums.ModelType.ZImage)
+            {
+                request.Scheduler = settings.Scheduler;
+                System.Diagnostics.Debug.WriteLine($"[SdForgeNeoService] ZImage Scheduler: {settings.Scheduler}");
+                
+                if (settings.DistilledCfgScale.HasValue)
+                {
+                    request.OverrideSettings = new StableDiffusionProcessingTxt2Img_override_settings();
+                    request.OverrideSettings.AdditionalData.Add("distilled_cfg_scale", settings.DistilledCfgScale.Value);
+                    System.Diagnostics.Debug.WriteLine($"[SdForgeNeoService] ZImage DistilledCfgScale: {settings.DistilledCfgScale.Value}");
+                }
+            }
+
             foreach (var lora in settings.Loras)
             {
                 request.Prompt += $" <lora:{lora.Name}:{lora.Strength:F1}>";
@@ -392,6 +409,17 @@ namespace MobileDiffusion.Services
             request.MaskBlurX = 0;
             request.MaskBlurY = 0;
             request.MaskRound = false;
+
+            if (settings.ModelType == Enums.ModelType.ZImage)
+            {
+                request.Scheduler = settings.Scheduler;
+
+                if (settings.DistilledCfgScale.HasValue)
+                {
+                    request.OverrideSettings = new StableDiffusionProcessingImg2Img_override_settings();
+                    request.OverrideSettings.AdditionalData.Add("distilled_cfg_scale", settings.DistilledCfgScale.Value);
+                }
+            }
 
             foreach (var lora in settings.Loras)
             {
