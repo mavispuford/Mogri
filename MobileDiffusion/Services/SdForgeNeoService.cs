@@ -705,8 +705,8 @@ namespace MobileDiffusion.Services
 
             if (_options == null || _models == null) return Task.FromResult(result);
 
-            var checkpoint = GetOptionValue(_options.SdModelCheckpoint);
-            var selectedModel = _models.FirstOrDefault(m => m.Title == checkpoint);
+            var checkpointHash = GetOptionValue(_options.SdCheckpointHash);
+            var selectedModel = _models.FirstOrDefault(m => m.Sha256 == checkpointHash);
 
             if (selectedModel != null)
             {
@@ -721,20 +721,17 @@ namespace MobileDiffusion.Services
         {
             if (_client == null) return;
 
-            if (_options == null)
-            {
-                _options = await _client.Sdapi.V1.OptionsPath.GetAsync();
-            }
+            _options = await _client.Sdapi.V1.OptionsPath.GetAsync();
 
             var requestBody = new OptionsPostRequestBody();
 
             if (settings.Model != null)
             {
                 var selectedModel = _models?.FirstOrDefault(m => m.Title == settings.Model.Key);
-                var currentCheckpoint = GetOptionValue(_options.SdModelCheckpoint);
+                var currentCheckpointHash = GetOptionValue(_options.SdCheckpointHash);
 
                 if (selectedModel != null &&
-                    currentCheckpoint != selectedModel.Title)
+                    currentCheckpointHash != selectedModel.Sha256)
                 {
                     requestBody.AdditionalData.Add("sd_model_checkpoint", selectedModel.Title);
                 }
