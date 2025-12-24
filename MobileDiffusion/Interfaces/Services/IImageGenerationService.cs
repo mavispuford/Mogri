@@ -27,6 +27,8 @@ public interface IImageGenerationService
 
     Task<List<IUpscalerViewModel>> GetUpscalersAsync();
 
+    Task<List<string>> GetSchedulersAsync();
+
     Task<IModelViewModel> GetSelectedModelAsync();
     
     Task SaveSettingsAsync(PromptSettings settings);

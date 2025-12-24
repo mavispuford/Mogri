@@ -47,6 +47,7 @@ namespace MobileDiffusion.Services
         private Task _initializeTask;
 
         private List<SamplerItem> _samplers;
+        private List<SchedulerItem> _schedulers;
         private List<PromptStyleItem> _promptStyles;
         private List<SDModelItem> _models;
         private List<LoraItem> _loras;
@@ -585,6 +586,7 @@ namespace MobileDiffusion.Services
 
             await Task.WhenAll(
                 Task.Run(async () => _samplers = await _client.Sdapi.V1.Samplers.GetAsync()),
+                Task.Run(async () => _schedulers = await _client.Sdapi.V1.Schedulers.GetAsync()),
                 Task.Run(async () => _promptStyles = await _client.Sdapi.V1.PromptStyles.GetAsync()),
                 Task.Run(async () => _models = await _client.Sdapi.V1.SdModels.GetAsync()),
                 Task.Run(async () => 
@@ -638,6 +640,23 @@ namespace MobileDiffusion.Services
             foreach (var sampler in _samplers)
             {
                 result.TryAdd(sampler.Name, sampler.Aliases?.FirstOrDefault() ?? sampler.Name);
+            }
+
+            return Task.FromResult(result);
+        }
+
+        public Task<List<string>> GetSchedulersAsync()
+        {
+            var result = new List<string>();
+
+            if (_schedulers == null)
+            {
+                return Task.FromResult(result);
+            }
+
+            foreach (var scheduler in _schedulers)
+            {
+                result.Add(scheduler.Name);
             }
 
             return Task.FromResult(result);

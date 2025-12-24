@@ -11,6 +11,8 @@ public interface IPromptSettingsPageViewModel : IPageViewModel
 
     List<string> AvailableSchedulers { get; set; }
 
+    bool IsSchedulerVisible { get; set; }
+
     string Scheduler { get; set; }
 
     List<IModelViewModel> AvailableModelValues { get; set; }

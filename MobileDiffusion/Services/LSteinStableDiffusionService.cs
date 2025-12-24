@@ -194,5 +194,10 @@ namespace MobileDiffusion.Services
         {
             throw new NotImplementedException();
         }
+
+        public Task<List<string>> GetSchedulersAsync()
+        {
+            return Task.FromResult(new List<string>());
+        }
     }
 }

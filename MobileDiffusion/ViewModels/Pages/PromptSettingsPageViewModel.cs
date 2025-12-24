@@ -99,6 +99,9 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     public partial List<string> AvailableSchedulers { get; set; } = new();
 
     [ObservableProperty]
+    public partial bool IsSchedulerVisible { get; set; }
+
+    [ObservableProperty]
     public partial string Scheduler { get; set; }
 
     [ObservableProperty]
@@ -107,6 +110,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     private readonly IPresetService _presetService;
 
     private bool _isInitializing;
+    private List<string> _allSchedulers = new();
 
     partial void OnSelectedModelTypeChanged(ModelType value)
     {
@@ -121,9 +125,11 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         Sampler = profile.DefaultSampler;
         Scheduler = profile.DefaultScheduler;
 
+        IsSchedulerVisible = value == ModelType.ZImage;
+
         if (value == ModelType.ZImage)
         {
-            AvailableSchedulers = new List<string> { "Beta", "Linear Quadratic", "Simple" };
+            AvailableSchedulers = _allSchedulers.Any() ? _allSchedulers : new List<string> { "Beta", "Linear Quadratic", "Simple" };
         }
         else
         {
@@ -187,6 +193,8 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             var models = await _stableDiffusionService.GetModelsAsync();
 
             AvailableModelValues = models;
+
+            _allSchedulers = await _stableDiffusionService.GetSchedulersAsync();
 
             AvailablePresets = await _presetService.GetPresetsAsync();
         }
@@ -340,9 +348,11 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             SelectedModelType = _settings.ModelType;
             Scheduler = _settings.Scheduler;
             
+            IsSchedulerVisible = SelectedModelType == ModelType.ZImage;
+
             if (SelectedModelType == ModelType.ZImage)
             {
-                AvailableSchedulers = new List<string> { "Beta", "Linear Quadratic", "Simple" };
+                AvailableSchedulers = _allSchedulers.Any() ? _allSchedulers : new List<string> { "Beta", "Linear Quadratic", "Simple" };
             }
             else
             {
