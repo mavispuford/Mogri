@@ -9,7 +9,8 @@
                 xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels" 
                 xmlns:views="clr-namespace:MobileDiffusion.Views;assembly=MobileDiffusion" 
                 x:Class="MobileDiffusion.Views.CanvasPage"
-                x:DataType="viewModels:ICanvasPageViewModel">
+                x:DataType="viewModels:ICanvasPageViewModel"
+                x:Name="ThisPage">
     <views:BasePage.Resources>
         <ResourceDictionary>
             <toolkit:BoolToObjectConverter x:Key="BoolToShowMaskTextConverter" TrueObject="Hide Mask Layer" FalseObject="Show Mask Layer" />
@@ -29,11 +30,11 @@
     <Shell.TitleView>
         <HorizontalStackLayout x:Name="TitleViewLayout"
                                Spacing="30"
-                               HorizontalOptions="CenterAndExpand"
+                               HorizontalOptions="Center"
                                TranslationX="{OnPlatform Default=0, Android=-9}">
 
             <ImageButton ToolTipProperties.Text="Add Image"
-                         VerticalOptions="FillAndExpand"
+                         VerticalOptions="Fill"
                          Command="{Binding ShowMediaPickerCommand}">
                 <ImageButton.Source>
                     <FontImageSource Glyph="&#xe43e;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
@@ -41,7 +42,7 @@
             </ImageButton>
 
             <ImageButton ToolTipProperties.Text="Undo"
-                         VerticalOptions="FillAndExpand"
+                         VerticalOptions="Fill"
                          Clicked="Undo_Button_Clicked">
                 <ImageButton.Source>
                     <FontImageSource Glyph="&#xe166;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
@@ -49,7 +50,7 @@
             </ImageButton>
 
             <ImageButton ToolTipProperties.Text="Clear Paint"
-                         VerticalOptions="FillAndExpand"
+                         VerticalOptions="Fill"
                          Clicked="Clear_Button_Clicked">
                 <ImageButton.Source>
                     <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
@@ -57,7 +58,7 @@
             </ImageButton>
 
             <ImageButton ToolTipProperties.Text="Save Mask"
-                         VerticalOptions="FillAndExpand"
+                         VerticalOptions="Fill"
                          Command="{Binding SaveCommand}">
                 <ImageButton.Source>
                     <FontImageSource Glyph="&#xe161;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
@@ -65,7 +66,7 @@
             </ImageButton>
 
             <ImageButton ToolTipProperties.Text="Use as source image"
-                         VerticalOptions="FillAndExpand"
+                         VerticalOptions="Fill"
                          Command="{Binding SendToImageToImageCommand}"
                          HeightRequest="32"
                          WidthRequest="32">
@@ -78,7 +79,7 @@
             </ImageButton>
 
             <ImageButton ToolTipProperties.Text="{Binding ShowMaskLayer, Converter={StaticResource BoolToShowMaskTextConverter}}"
-                         VerticalOptions="FillAndExpand"
+                         VerticalOptions="Fill"
                          Command="{Binding ToggleMaskLayerVisibilityCommand}"
                          HeightRequest="32"
                          WidthRequest="32"
@@ -92,8 +93,8 @@
           RowDefinitions="auto,*">
         <Grid x:Name="MaskGrid"
               Grid.Row="1"
-              HorizontalOptions="FillAndExpand"
-              VerticalOptions="FillAndExpand"
+              HorizontalOptions="Fill"
+              VerticalOptions="Fill"
               SizeChanged="MaskGrid_SizeChanged"
               Margin="0,0,0,80">
             <skia:SKCanvasView x:Name="SourceImageCanvasView" 
@@ -204,7 +205,7 @@
         </HorizontalStackLayout>
 
         <VerticalStackLayout Grid.Row="1"
-                             HorizontalOptions="FillAndExpand"
+                             HorizontalOptions="Fill"
                              VerticalOptions="End"
                              Spacing="15">
             
@@ -218,7 +219,7 @@
                         StrokeShape="RoundRectangle 10">
                     <VerticalStackLayout Spacing="0" Padding="20">
 
-                        <Label Text="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}, StringFormat='Size: {0:F0}'}"
+                        <Label Text="{Binding CurrentBrushSize, StringFormat='Size: {0:F0}'}"
                                TextColor="White"
                                FontAttributes="Bold"
                                HorizontalOptions="Center"/>
@@ -227,7 +228,7 @@
                                 HeightRequest="40"
                                 Minimum="1"
                                 Maximum="50"
-                                Value="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}" />
+                                Value="{Binding CurrentBrushSize}" />
 
                     </VerticalStackLayout>
                 </Border>
@@ -248,7 +249,7 @@
 
                         <Slider WidthRequest="200"
                                 HeightRequest="40"
-                                Minimum="0"
+                                Minimum="0.01"
                                 Maximum="1.0"
                                 Value="{Binding CurrentAlpha}" />
 
@@ -258,7 +259,7 @@
             </Grid>
 
             <HorizontalStackLayout x:Name="BottomButtonsLayout"
-                                   HorizontalOptions="CenterAndExpand"
+                                   HorizontalOptions="Center"
                                    Spacing="30">
 
                 <Border x:Name="BrushSizeButton" 
@@ -275,14 +276,14 @@
                         <Grid HorizontalOptions="Center"
                           VerticalOptions="Center">
 
-                            <Ellipse HeightRequest="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
-                                 WidthRequest="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
-                                 Opacity="{Binding CurrentAlpha, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
+                            <Ellipse HeightRequest="{Binding CurrentBrushSize}"
+                                 WidthRequest="{Binding CurrentBrushSize}"
+                                 Opacity="{Binding CurrentAlpha}"
                                  Fill="{Binding CurrentColor}"
                                  StrokeThickness="0"/>
 
-                            <Ellipse HeightRequest="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
-                                 WidthRequest="{Binding CurrentBrushSize, Source={RelativeSource AncestorType={x:Type views:CanvasPage}}}"
+                            <Ellipse HeightRequest="{Binding CurrentBrushSize}"
+                                 WidthRequest="{Binding CurrentBrushSize}"
                                  Fill="Transparent"
                                  Stroke="{StaticResource Gray200TwentySixPercent}"
                                  StrokeThickness="1"/>

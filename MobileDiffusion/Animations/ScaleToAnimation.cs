@@ -6,5 +6,5 @@ class ScaleToAnimation : BaseAnimation
 {
     public double Scale { get; set; }
 
-    public override Task Animate(VisualElement view, CancellationToken token = default) => view.ScaleTo(Scale, Length, Easing);
+    public override Task Animate(VisualElement view, CancellationToken token = default) => view.ScaleToAsync(Scale, Length, Easing);
 }

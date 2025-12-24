@@ -22,6 +22,7 @@ public class PromptSettings
     public string Prompt { get; set; }
     public string NegativePrompt { get; set; }
     public double DenoisingStrength { get; set; } = .5;
+    public ModelViewModel Model { get; set; }
     public string Sampler { get; set; }
     public OnOff Seamless { get; set; }
     public long Seed { get; set; } = -1;

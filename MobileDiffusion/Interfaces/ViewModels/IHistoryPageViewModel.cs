@@ -27,7 +27,7 @@ public interface IHistoryPageViewModel : IPageViewModel
 
     IRelayCommand ToggleSelectionModeCommand { get; }
 
-    IRelayCommand SelectionChangedCommand { get; }
+    IRelayCommand<SelectionChangedEventArgs> SelectionChangedCommand { get; }
 
     ICommand HideBottomPanelCommand { get; set; }
 

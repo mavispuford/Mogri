@@ -6,11 +6,12 @@ using MobileDiffusion.Models;
 using MobileDiffusion.Models.Automatic1111;
 using MobileDiffusion.ViewModels;
 using Newtonsoft.Json;
+using System.Dynamic;
 using System.Text.RegularExpressions;
 
 namespace MobileDiffusion.Services
 {
-    internal class Automatic1111Service : IStableDiffusionService
+    internal class Automatic1111Service : IImageGenerationService
     {
         private static class PngInfoProperties
         {
@@ -38,33 +39,44 @@ namespace MobileDiffusion.Services
         private const int RequestTimeoutMinutes = 15;
 
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IServiceProvider _serviceProvider;
 
         private ICollection<SamplerItem> _samplers;
         private ICollection<PromptStyleItem> _promptStyles;
         private ICollection<SDModelItem> _models;
         private ICollection<LoraItem> _loras;
         private ICollection<UpscalerItem> _upscalers;
+        private Options _options;
 
         private Task _initializeTask;
         private CancellationTokenSource _mainRequestCancellationSource;
 
         public bool Initialized { get; private set; }
 
-        public Automatic1111Service(IHttpClientFactory httpClientFactory)
+        public Automatic1111Service(IHttpClientFactory httpClientFactory,
+            IServiceProvider serviceProvider)
         {
             _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
         public async Task InitializeAsync()
         {
+            var baseUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
+
+            if (string.IsNullOrEmpty(baseUrl) || !baseUrl.Contains("http"))
+            {
+                Initialized = false;
+                return;
+            }
+
             if (_initializeTask == null || _initializeTask.Status != TaskStatus.Running)
-            { 
+            {
                 _initializeTask = await Task.Run(async () =>
                 {
                     // For some reason in .NET 8 (not .NET 7), if we don't manually get an HttpClient and make any GET call before the Automatic1111 client uses it,
                     // We'll get the following exception: {System.ObjectDisposedException: Cannot access a disposed object. Object name: 'AndroidMessageHandler'.
                     var httpClient = getHttpClient(TimeSpan.FromSeconds(5));
-                    var baseUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
                     var response = await httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, baseUrl)).ConfigureAwait(false);
                 }).ContinueWith(async task =>
                 {
@@ -171,7 +183,7 @@ namespace MobileDiffusion.Services
             var loraMatches = _loraRegex.Matches(prompt);
             var loras = new List<LoraViewModel>();
 
-            foreach(var match in loraMatches.Where(m => m.Success))
+            foreach (var match in loraMatches.Where(m => m.Success))
             {
                 var name = match.Groups[1].Value;
 
@@ -200,7 +212,7 @@ namespace MobileDiffusion.Services
                 Loras = loras
             };
 
-            foreach(var property in properties)
+            foreach (var property in properties)
             {
                 try
                 {
@@ -242,6 +254,26 @@ namespace MobileDiffusion.Services
                         case PngInfoProperties.HiresSteps:
                             settings.UpscaleSteps = int.Parse(property.Value);
                             break;
+                        case PngInfoProperties.Model:
+                            if (settings.Model == null)
+                            {
+                                var matchingModel = _models.FirstOrDefault(m => m.Model_name == property.Value);
+                                if (matchingModel != null)
+                                {
+                                    settings.Model = (ModelViewModel)convertModelToViewModel(matchingModel);
+                                }
+                            }
+                            break;
+                        case PngInfoProperties.ModelHash:
+                            if (settings.Model == null)
+                            {
+                                var matchingModel = _models.FirstOrDefault(m => m.Hash == property.Value);
+                                if (matchingModel != null)
+                                {
+                                    settings.Model = (ModelViewModel)convertModelToViewModel(matchingModel);
+                                }
+                            }
+                            break;
                         default:
                             break;
                     }
@@ -252,6 +284,11 @@ namespace MobileDiffusion.Services
                 }
             }
 
+            if (settings.Model == null)
+            {
+                settings.Model = (ModelViewModel)await GetSelectedModelAsync();
+            }
+
             return settings;
         }
 
@@ -259,7 +296,7 @@ namespace MobileDiffusion.Services
         {
             var httpClient = getHttpClient(TimeSpan.FromSeconds(10));
             var auto1111Client = getAuto1111Client(httpClient);
-            
+
             await Task.WhenAll(Task.Run(async () =>
             {
                 _samplers = await auto1111Client.Get_samplers_sdapi_v1_samplers_getAsync();
@@ -283,6 +320,10 @@ namespace MobileDiffusion.Services
             Task.Run(async () =>
             {
                 _upscalers = await auto1111Client.Get_upscalers_sdapi_v1_upscalers_getAsync();
+            }),
+            Task.Run(async () =>
+            {
+                _options = await auto1111Client.Get_config_sdapi_v1_options_getAsync();
             }));
         }
 
@@ -381,8 +422,9 @@ namespace MobileDiffusion.Services
             request.Mask_blur = 0;
             request.Mask_blur_x = 0;
             request.Mask_blur_y = 0;
+            request.Mask_round = false;
 
-            foreach(var lora in settings.Loras)
+            foreach (var lora in settings.Loras)
             {
                 request.Prompt += $" <lora:{lora.Name}:{lora.Strength:F1}>";
             }
@@ -394,6 +436,9 @@ namespace MobileDiffusion.Services
         {
             var httpClient = getHttpClient(TimeSpan.FromMinutes(RequestTimeoutMinutes));
             var auto1111Client = getAuto1111Client(httpClient);
+
+            var progressHttpClient = getHttpClient(TimeSpan.FromSeconds(10));
+            var progressClient = getAuto1111Client(progressHttpClient);
 
             var request = txt2ImageRequestFromSettings(settings);
 
@@ -429,15 +474,24 @@ namespace MobileDiffusion.Services
             {
                 try
                 {
-                    apiResponse = await getCurrentProgress(auto1111Client, progressToken, skipCurrentImage);
+                    apiResponse = await getCurrentProgress(progressClient, progressToken, skipCurrentImage);
                 }
                 catch (OperationCanceledException)
                 {
+                    await textToImageTask;
+
                     // Set the final response
+                    var generationResponse = new GenerationResponse
+                    {
+                        Images = txt2ImgResponse.Images.ToList(),
+                        Info = txt2ImgResponse.Info,
+                        Parameters = txt2ImgResponse.Parameters
+                    };
+
                     apiResponse = new ApiResponse
                     {
                         StableDiffusionApi = Enums.StableDiffusionApi.Automatic1111,
-                        ResponseObject = txt2ImgResponse,
+                        ResponseObject = generationResponse,
                         Progress = 1f
                     };
 
@@ -455,6 +509,9 @@ namespace MobileDiffusion.Services
         {
             var httpClient = getHttpClient(TimeSpan.FromMinutes(RequestTimeoutMinutes));
             var auto1111Client = getAuto1111Client(httpClient);
+
+            var progressHttpClient = getHttpClient(TimeSpan.FromSeconds(10));
+            var progressClient = getAuto1111Client(progressHttpClient);
 
             var request = image2ImageRequestFromSettings(settings);
 
@@ -490,15 +547,24 @@ namespace MobileDiffusion.Services
             {
                 try
                 {
-                    apiResponse = await getCurrentProgress(auto1111Client, progressToken, skipCurrentImage);
+                    apiResponse = await getCurrentProgress(progressClient, progressToken, skipCurrentImage);
                 }
                 catch (OperationCanceledException)
                 {
+                    await textToImageTask;
+
                     // Set the final response
+                    var generationResponse = new GenerationResponse
+                    {
+                        Images = img2ImgResponse.Images.ToList(),
+                        Info = img2ImgResponse.Info,
+                        Parameters = img2ImgResponse.Parameters
+                    };
+
                     apiResponse = new ApiResponse
                     {
                         StableDiffusionApi = Enums.StableDiffusionApi.Automatic1111,
-                        ResponseObject = img2ImgResponse,
+                        ResponseObject = generationResponse,
                         Progress = 1f
                     };
 
@@ -525,15 +591,30 @@ namespace MobileDiffusion.Services
 
                 var progress = progressGetResponse.Eta_relative > 0 ? progressGetResponse.Progress : 1d;
 
+                var progressResponse = new ProgressResponse
+                {
+                    Progress = progressGetResponse.Progress,
+                    EtaRelative = progressGetResponse.Eta_relative,
+                    CurrentImage = progressGetResponse.Current_image
+                };
+
                 var progressApiResponse = new ApiResponse
                 {
                     StableDiffusionApi = Enums.StableDiffusionApi.Automatic1111,
-                    ResponseObject = progressGetResponse,
+                    ResponseObject = progressResponse,
                     Progress = progress
                 };
 
                 return progressApiResponse;
             });
+        }
+
+        private async Task retrieveOptionsAsync()
+        {
+            var httpClient = getHttpClient(TimeSpan.FromMinutes(RequestTimeoutMinutes));
+            var auto1111Client = getAuto1111Client(httpClient);
+
+            _options = await auto1111Client.Get_config_sdapi_v1_options_getAsync();
         }
 
         public Task<Dictionary<string, string>> GetSamplersAsync()
@@ -575,9 +656,9 @@ namespace MobileDiffusion.Services
             return Task.FromResult(result);
         }
 
-        public Task<Dictionary<string, string>> GetModelsAsync()
+        public Task<List<IModelViewModel>> GetModelsAsync()
         {
-            var result = new Dictionary<string, string>();
+            var result = new List<IModelViewModel>();
 
             if (_models == null)
             {
@@ -586,10 +667,27 @@ namespace MobileDiffusion.Services
 
             foreach (var model in _models)
             {
-                result.TryAdd(model.Title, model.Model_name);
+                var viewModel = convertModelToViewModel(model);
+
+                result.Add(viewModel);
             }
 
             return Task.FromResult(result);
+        }
+
+        private IModelViewModel convertModelToViewModel(SDModelItem model)
+        {
+            if (model == null)
+            {
+                return null;
+            }
+
+            var viewModel = _serviceProvider.GetService<IModelViewModel>();
+
+            viewModel.DisplayName = model.Model_name;
+            viewModel.Key = model.Title;
+
+            return viewModel;
         }
 
         public Task<List<ILoraViewModel>> GetLorasAsync()
@@ -608,6 +706,21 @@ namespace MobileDiffusion.Services
                     Alias = lora.Alias,
                     Name = lora.Name
                 });
+            }
+
+            return Task.FromResult(result);
+        }
+
+        public Task<IModelViewModel> GetSelectedModelAsync()
+        {
+            var result = _serviceProvider.GetService<IModelViewModel>();
+
+            var selectedModel = _models.FirstOrDefault(m => m.Title == _options.Sd_model_checkpoint);
+
+            if (selectedModel != null)
+            {
+                result.DisplayName = selectedModel.Model_name;
+                result.Key = selectedModel.Title;
             }
 
             return Task.FromResult(result);
@@ -633,6 +746,41 @@ namespace MobileDiffusion.Services
             }
 
             return Task.FromResult(result);
+        }
+
+        public async Task SaveSettingsAsync(PromptSettings settings)
+        {
+            var httpClient = getHttpClient(TimeSpan.FromMinutes(RequestTimeoutMinutes));
+            var auto1111Client = getAuto1111Client(httpClient);
+
+            if (_options == null)
+            {
+                _options = await auto1111Client.Get_config_sdapi_v1_options_getAsync();
+            }
+
+            var request = new ExpandoObject();
+
+            if (settings.Model != null)
+            {
+                var selectedModel = _models.FirstOrDefault(m => m.Title == settings.Model.Key);
+
+                if (selectedModel != null ||
+                    _options.Sd_model_checkpoint != selectedModel.Title)
+                {
+                    request.TryAdd(nameof(_options.Sd_model_checkpoint).ToLower(), selectedModel.Title);
+                }
+            }
+
+            var requestObjects = (IDictionary<string, object>)request;
+            
+            if (!requestObjects.Any())
+            {
+                return;
+            }
+
+            var response = await auto1111Client.Set_config_sdapi_v1_options_postAsync(request);
+
+            await RefreshResourcesAsync();
         }
     }
 }

@@ -9,18 +9,21 @@ namespace MobileDiffusion.ViewModels;
 
 internal partial class PromptStyleSelectionPageViewModel : PageViewModel, IPromptStyleSelectionPageViewModel
 {
-    private readonly IStableDiffusionService _stableDiffusionService;
+    private readonly IImageGenerationService _stableDiffusionService;
     private readonly IPopupService _popupService;
     private List<IPromptStyleViewModel> _allPromptStyles = new();
     private PromptSettings _settings;
 
     [ObservableProperty]
-    private List<IPromptStyleViewModel> _availablePromptStyles = new();
+    public partial List<IPromptStyleViewModel> AvailablePromptStyles { get; set; } = new();
 
     [ObservableProperty]
-    private ObservableCollection<object> _selectedPromptStyles = new();
+    public partial ObservableCollection<object> SelectedPromptStyles { get; set; } = new();
 
-    public PromptStyleSelectionPageViewModel(IStableDiffusionService stableDiffusionService, IPopupService popupService)
+    public PromptStyleSelectionPageViewModel(
+        IImageGenerationService stableDiffusionService,
+        IPopupService popupService,
+        ILoadingService loadingService) : base(loadingService)
     {
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
@@ -127,7 +130,7 @@ internal partial class PromptStyleSelectionPageViewModel : PageViewModel, IPromp
         if (promptStyleViewModel == null || 
             (string.IsNullOrEmpty(promptStyleViewModel.Prompt) && string.IsNullOrEmpty(promptStyleViewModel.NegativePrompt)))
         {
-            await Shell.Current.DisplayAlert("No Style Info", "This style has no prompts.", "OK");
+            await Shell.Current.DisplayAlertAsync("No Style Info", "This style has no prompts.", "OK");
 
             return;
         }
@@ -137,7 +140,7 @@ internal partial class PromptStyleSelectionPageViewModel : PageViewModel, IPromp
             { NavigationParams.PromptStyle, promptStyleViewModel }
         };
 
-        await _popupService.ShowPopupAsync("PromptStyleInfoPopup", parameters);
+        await _popupService.ShowPopupForResultAsync("PromptStyleInfoPopup", parameters);
     }
 
     public override bool OnBackButtonPressed()

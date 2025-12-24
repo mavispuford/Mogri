@@ -23,19 +23,19 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     private const int itemTakeCount = 12;
 
     [ObservableProperty]
-    private ObservableCollection<IHistoryItemViewModel> _historyItems = new();
+    public partial ObservableCollection<IHistoryItemViewModel> HistoryItems { get; set; } = new();
 
     [ObservableProperty]
-    private IList<Object> _selectedItems;
+    public partial IList<Object> SelectedItems { get; set; }
 
     [ObservableProperty]
-    private bool _selectionModeEnabled;
+    public partial bool SelectionModeEnabled { get; set; }
 
     [ObservableProperty]
-    private string _selectedItemsText;
+    public partial string SelectedItemsText { get; set; }
 
     [ObservableProperty]
-    private bool _isLoading = true;
+    public partial bool IsLoading { get; set; } = true;
 
     public ICommand HideBottomPanelCommand { get; set; }
 
@@ -44,7 +44,8 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     public HistoryPageViewModel(IFileService fileService,
         IImageService imageService,
         IServiceProvider serviceProvider,
-        IPopupService popupService)
+        IPopupService popupService,
+        ILoadingService loadingService) : base(loadingService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
@@ -58,33 +59,45 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
         _ = Task.Run(async () =>
         {
-            // ALL FILES INCLUDING THUMBNAILS
-            var allFiles = await _fileService.GetFileListFromInternalStorageAsync();
-            
-            if (allFiles != null)
+            try
             {
-                // Non-thumbnail files only
-                _allImageFileNames = allFiles.Where(s => !Path.GetFileName(s).StartsWith(Constants.ThumbnailPrefix)).ToArray();
+                // ALL FILES INCLUDING THUMBNAILS
+                var allFiles = await _fileService.GetFileListFromInternalStorageAsync();
 
-                _allThumbnailFileNames = allFiles.Where(s => Path.GetFileName(s).StartsWith(Constants.ThumbnailPrefix)).ToArray();
+                if (allFiles != null)
+                {
+                    // Non-thumbnail files only
+                    _allImageFileNames = allFiles.Where(s => !Path.GetFileName(s).StartsWith(Constants.ThumbnailPrefix)).ToArray();
 
-                //// REMOVE ALL THUMBNAILS - REMOVE THIS AFTER TESTING
-                //foreach (var file in _allThumbnailFileNames)
-                //{
-                //    File.Delete(file);
-                //}
+                    _allThumbnailFileNames = allFiles.Where(s => Path.GetFileName(s).StartsWith(Constants.ThumbnailPrefix)).ToArray();
 
-                await Shell.Current.Dispatcher.DispatchAsync(LoadItems);
+                    //// REMOVE ALL THUMBNAILS - REMOVE THIS AFTER TESTING
+                    //foreach (var file in _allThumbnailFileNames)
+                    //{
+                    //    File.Delete(file);
+                    //}
+
+                    if (Application.Current != null)
+                    {
+                        await Shell.Current.Dispatcher.DispatchAsync(LoadItems);
+                    }
+                }
             }
-
-            IsLoading = false;
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading history: {ex}");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
         });
     }
 
     [RelayCommand]
     private async Task ClearHistory()
     {
-        var result = await Shell.Current.DisplayAlert("Confirm", "Are you sure you would like to clear all of your history?\n\n**This cannot be undone.**", "CLEAR ALL", "Cancel");
+        var result = await Shell.Current.DisplayAlertAsync("Confirm", "Are you sure you would like to clear all of your history?\n\n**This cannot be undone.**", "CLEAR ALL", "Cancel");
 
         if (!result)
         {
@@ -112,7 +125,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
             { NavigationParams.HistoryItem, item }
         };
 
-        var result = (await _popupService.ShowPopupAsync("HistoryItemPopup", popupParameters)) as Dictionary<string, object>;
+        var result = (await _popupService.ShowPopupForResultAsync("HistoryItemPopup", popupParameters)) as Dictionary<string, object>;
 
         if (result == null)
         {
@@ -177,11 +190,11 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         }
 
 
-        SelectionChanged();
+        SelectionChanged(null);
     }
 
     [RelayCommand]
-    private void SelectionChanged()
+    private void SelectionChanged(SelectionChangedEventArgs args)
     {
         var pluralityString = SelectedItems.Count != 1 ? "s" : string.Empty;
         SelectedItemsText = $"{SelectedItems.Count} item{pluralityString} selected";
@@ -198,7 +211,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         var pluralityString = SelectedItems.Count != 1 ? "s" : string.Empty;
         SelectedItemsText = $"{SelectedItems.Count} item{pluralityString} selected";
 
-        var result = await Shell.Current.DisplayAlert("Confirm", $"Delete {SelectedItems.Count} item{pluralityString}?", "DELETE", "Cancel");
+        var result = await Shell.Current.DisplayAlertAsync("Confirm", $"Delete {SelectedItems.Count} item{pluralityString}?", "DELETE", "Cancel");
 
         if (!result)
         {

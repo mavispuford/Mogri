@@ -6,13 +6,13 @@ namespace MobileDiffusion.ViewModels.CanvasContextButtons;
 public partial class CanvasContextButtonViewModel : BaseViewModel
 {
     [ObservableProperty]
-    private bool _isVisible;
+    public partial bool IsVisible { get; set; }
 
     [ObservableProperty]
-    private string _name;
+    public partial string Name { get; set; }
 
     [ObservableProperty]
-    private ICanvasPageViewModel _parentPage;
+    public partial ICanvasPageViewModel ParentPage { get; set; }
 
     public CanvasContextButtonViewModel(ICanvasPageViewModel parentPage)
     {

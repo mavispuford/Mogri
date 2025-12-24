@@ -98,7 +98,7 @@ public class GestureContainer : ContentView
                     cancelTranslationAnimations();
 
                     canZoom = false;
-                    Content.TranslateTo(0, 0, 250u, Easing.CubicInOut);
+                    _ = Content.TranslateToAsync(0, 0, 250u, Easing.CubicInOut);
                 }
                 else
                 {

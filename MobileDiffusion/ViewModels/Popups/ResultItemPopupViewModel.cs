@@ -11,7 +11,7 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
     private readonly IFileService _fileService;
 
     [ObservableProperty]
-    private IResultItemViewModel resultItem;
+    public partial IResultItemViewModel ResultItem { get; set; }
 
     public ResultItemPopupViewModel(
         IPopupService popupService,

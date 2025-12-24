@@ -25,7 +25,18 @@ public class MainActivity : MauiAppCompatActivity
         }
     }
 
-    protected override async void OnCreate(Bundle savedInstanceState)
+    protected override void OnDestroy()
+    {
+        try
+        {
+            base.OnDestroy();
+        }
+        catch (Exception)
+        {
+        }
+    }
+
+    protected override void OnCreate(Bundle savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
 
@@ -70,7 +81,7 @@ public class MainActivity : MauiAppCompatActivity
                         Console.WriteLine($"{param.Key}\t\t : {param.Value}");
                     }
 
-                    var dispatcher = Dispatcher.GetForCurrentThread() ?? Microsoft.Maui.Controls.Application.Current.MainPage.Dispatcher;
+                    var dispatcher = Dispatcher.GetForCurrentThread() ?? Microsoft.Maui.Controls.Application.Current.Windows[0].Page.Dispatcher;
 
                     await dispatcher.DispatchAsync(async () =>
                     {

@@ -12,13 +12,13 @@ public partial class MaskLineViewModel : CanvasActionViewModel
     private SKColor _paintColor;
 
     [ObservableProperty]
-    private float _alpha;
+    public partial float Alpha { get; set; }
 
     [ObservableProperty]
-    private float _brushSize;
+    public partial float BrushSize { get; set; }
     
     [ObservableProperty]
-    private Color _color;
+    public partial Color Color { get; set; }
 
     public List<SKPoint> Path { get; set; } = new();
     public MaskEffect MaskEffect { get; set; }
@@ -27,7 +27,6 @@ public partial class MaskLineViewModel : CanvasActionViewModel
     {
         using var paint = new SKPaint
         {
-            FilterQuality = SKFilterQuality.None,
             IsAntialias = false,
             Style = SKPaintStyle.Stroke,
             StrokeWidth = BrushSize,

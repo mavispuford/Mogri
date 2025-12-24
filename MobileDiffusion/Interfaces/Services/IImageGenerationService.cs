@@ -3,7 +3,7 @@ using MobileDiffusion.Models;
 
 namespace MobileDiffusion.Interfaces.Services;
 
-public interface IStableDiffusionService
+public interface IImageGenerationService
 {
     public Task<bool> CheckServerAsync();
 
@@ -21,11 +21,15 @@ public interface IStableDiffusionService
 
     Task<List<IPromptStyleViewModel>> GetPromptStylesAsync();
 
-    Task<Dictionary<string, string>> GetModelsAsync();
+    Task<List<IModelViewModel>> GetModelsAsync();
 
     Task<List<ILoraViewModel>> GetLorasAsync();
 
     Task<List<IUpscalerViewModel>> GetUpscalersAsync();
+
+    Task<IModelViewModel> GetSelectedModelAsync();
+    
+    Task SaveSettingsAsync(PromptSettings settings);
 
     bool Initialized { get; }
 }

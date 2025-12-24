@@ -8,7 +8,7 @@ namespace MobileDiffusion.ViewModels;
 public partial class PromptStyleInfoPopupViewModel : PopupBaseViewModel, IPromptStyleInfoPopupViewModel
 {
     [ObservableProperty]
-    private IPromptStyleViewModel _promptStyle;
+    public partial IPromptStyleViewModel PromptStyle { get; set; }
 
     public PromptStyleInfoPopupViewModel(IPopupService popupService) : base(popupService)
     {}

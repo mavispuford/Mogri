@@ -4,6 +4,8 @@ namespace MobileDiffusion.Interfaces.ViewModels;
 
 public interface IPromptSettingsPageViewModel : IPageViewModel
 {
+    List<IModelViewModel> AvailableModelValues { get; set; }
+
     List<string> AvailableSamplerValues { get; set; }
 
     List<string> AvailableUpscaleLevelValues { get; set; }
@@ -21,6 +23,8 @@ public interface IPromptSettingsPageViewModel : IPageViewModel
     string CfgScale { get; set; }
 
     string CfgScalePlaceholder { get; set; }
+
+    IModelViewModel Model { get; set; }
 
     string Sampler { get; set; }
 

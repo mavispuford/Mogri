@@ -282,13 +282,28 @@ public class FileService : IFileService
 
     private async Task checkForReadPermission()
     {
-        if (await Permissions.CheckStatusAsync<Permissions.StorageRead>() != PermissionStatus.Granted)
+        if (OperatingSystem.IsAndroidVersionAtLeast(33))
         {
-            var status = await Permissions.RequestAsync<Permissions.StorageRead>();
-
-            if (status != PermissionStatus.Granted)
+            if (await Permissions.CheckStatusAsync<Permissions.Photos>() != PermissionStatus.Granted)
             {
-                throw new PermissionException("The read storage permission has not been granted");
+                var status = await Permissions.RequestAsync<Permissions.Photos>();
+
+                if (status != PermissionStatus.Granted)
+                {
+                    throw new PermissionException("The photos permission has not been granted");
+                }
+            }
+        }
+        else
+        {
+            if (await Permissions.CheckStatusAsync<Permissions.StorageRead>() != PermissionStatus.Granted)
+            {
+                var status = await Permissions.RequestAsync<Permissions.StorageRead>();
+
+                if (status != PermissionStatus.Granted)
+                {
+                    throw new PermissionException("The read storage permission has not been granted");
+                }
             }
         }
     }
