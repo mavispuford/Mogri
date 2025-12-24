@@ -196,6 +196,32 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         {
             mapPropertiesToSettings();
 
+            var currentModel = await _stableDiffusionService.GetSelectedModelAsync();
+
+            var modelChangeResult = currentModel?.Key == null;
+
+            if (currentModel != null &&
+                _settings.Model != null &&
+                _settings.Model.Key != currentModel.Key)
+            {
+                var modelChangeMessage = $"Would you like keep current model ({currentModel.DisplayName}) or CHANGE it to \"{_settings.Model.DisplayName}\"?";
+
+                modelChangeResult = await Shell.Current.DisplayAlertAsync("Confirm Model Change", modelChangeMessage, "CHANGE", "Keep");
+            }
+            else if (currentModel != null && _settings.Model != null && _settings.Model.Key == currentModel.Key)
+            {
+                modelChangeResult = true;
+            }
+
+            if (!modelChangeResult)
+            {
+                // Keep currently selected model
+                if (currentModel is ModelViewModel modelViewModel)
+                {
+                    _settings.Model = modelViewModel;
+                }
+            }
+
             await _stableDiffusionService.SaveSettingsAsync(_settings);
 
             var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings } };

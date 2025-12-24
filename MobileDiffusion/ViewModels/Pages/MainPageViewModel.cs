@@ -473,42 +473,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         if (query.TryGetValue(NavigationParams.PromptSettings, out var promptSettings) &&
             promptSettings is PromptSettings settings)
         {
-            if (settings.Model != null)
-            {
-                try
-                {
-                    await LoadingService.ShowAsync("Refreshing...");
 
-                    _settings.Model = (ModelViewModel)await _stableDiffusionService.GetSelectedModelAsync();
-
-                    var modelChangeResult = _settings.Model?.Key == null;
-
-                    if (_settings.Model != null &&
-                        settings.Model.Key != _settings.Model.Key)
-                    {
-                        var modelChangeMessage = $"Would you like keep current model ({_settings.Model.DisplayName}) or CHANGE it to \"{settings.Model.DisplayName}\"?";
-
-                        modelChangeResult = await Shell.Current.DisplayAlertAsync("Confirm Model Change", modelChangeMessage, "CHANGE", "Keep");
-                    }
-
-                    if (modelChangeResult)
-                    {
-                        await LoadingService.ShowAsync("Saving...");
-
-                        // Commit model change
-                        await _stableDiffusionService.SaveSettingsAsync(settings);
-                    }
-                    else
-                    {
-                        // Keep currently selected model
-                        settings.Model = _settings.Model;
-                    }
-                }
-                finally
-                {
-                    await LoadingService.HideAsync();
-                }
-            }
 
             _settings = settings;
 
