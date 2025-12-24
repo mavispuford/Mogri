@@ -12,8 +12,8 @@
           RowSpacing="10"
           ColumnSpacing="16"
           ColumnDefinitions="*, *, *"
-          HorizontalOptions="FillAndExpand"
-          VerticalOptions="FillAndExpand"
+          HorizontalOptions="Fill"
+          VerticalOptions="Fill"
           IsClippedToBounds="False"
           Padding="15">
         <Grid.Resources>

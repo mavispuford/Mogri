@@ -20,4 +20,5 @@ public static class NavigationParams
     public const string Seed = nameof(Seed);
     public const string Width = nameof(Width);
     public const string Height = nameof(Height);
+    public const string LoadingMessage = nameof(LoadingMessage);
 }

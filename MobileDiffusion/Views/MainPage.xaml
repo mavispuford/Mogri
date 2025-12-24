@@ -75,7 +75,7 @@
             <Grid Grid.Row="1"
                   ColumnDefinitions="52*,16*,16*,16*"
                   ColumnSpacing="10"
-                  HorizontalOptions="FillAndExpand">
+                  HorizontalOptions="Fill">
                 
                 <Button Grid.Column="0"
                         Text="Create!"
@@ -115,7 +115,7 @@
                 </ImageButton>
             </Grid>
 
-            <ScrollView Grid.Row="2" VerticalOptions="FillAndExpand" VerticalScrollBarVisibility="Never" HorizontalScrollBarVisibility="Never">
+            <ScrollView Grid.Row="2" VerticalOptions="Fill" VerticalScrollBarVisibility="Never" HorizontalScrollBarVisibility="Never">
                 <FlexLayout x:Name="ImageLayout"
                             BindableLayout.ItemsSource="{Binding Results}" 
                             HorizontalOptions="Fill"

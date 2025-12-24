@@ -30,7 +30,7 @@
                   RowSpacing="10"
                   ColumnSpacing="16"
                   ColumnDefinitions="32,*,auto"
-                  HorizontalOptions="FillAndExpand">
+                  HorizontalOptions="Fill">
 
                 <Image Grid.Row="0" Grid.Column="0" WidthRequest="32">
                     <Image.Source>
@@ -52,7 +52,7 @@
                         StrokeShape="RoundRectangle 10"
                         Stroke="Transparent"
                         StrokeThickness="0"
-                        HorizontalOptions="CenterAndExpand">
+                        HorizontalOptions="Center">
                     <Grid Grid.Row="2" Grid.ColumnSpan="3"
                       HeightRequest="140" WidthRequest="140"
                       BackgroundColor="{StaticResource Gray300}">
@@ -91,7 +91,7 @@
                         StrokeShape="RoundRectangle 10"
                         Stroke="Transparent"
                         StrokeThickness="0"
-                        HorizontalOptions="CenterAndExpand">
+                        HorizontalOptions="Center">
                     <Grid HeightRequest="140" WidthRequest="140">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ShowMediaPickerCommand}">

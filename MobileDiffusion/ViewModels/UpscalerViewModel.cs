@@ -6,11 +6,11 @@ namespace MobileDiffusion.ViewModels;
 public partial class UpscalerViewModel : BaseViewModel, IUpscalerViewModel
 {
     [ObservableProperty]
-    private string _name;
+    public partial string Name { get; set; }
 
     [ObservableProperty]
-    private string _modelName;
+    public partial string ModelName { get; set; }
 
     [ObservableProperty]
-    private double _scale;
+    public partial double Scale { get; set; }
 }

@@ -1,7 +1,15 @@
+using System.Windows.Input;
+
 namespace MobileDiffusion.Controls;
 
 public partial class ToolControl : ContentView
 {
+	public ICommand SelectCommand
+	{
+        get => (ICommand)GetValue(SelectCommandProperty);
+        set => SetValue(SelectCommandProperty, value);
+    }
+
 	public Color IconColor
 	{
 		get => (Color)GetValue(IconColorProperty);
@@ -13,7 +21,9 @@ public partial class ToolControl : ContentView
 		((ToolControl)bindable).OnIconColorChanged();
     });
 
-	public ToolControl()
+    public static readonly BindableProperty SelectCommandProperty = BindableProperty.Create(nameof(SelectCommand), typeof(ICommand), typeof(ToolControl), default);
+
+    public ToolControl()
 	{
 		InitializeComponent();
 	}

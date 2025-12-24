@@ -18,7 +18,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     const string _defaultPrompt = "An astronaut floating in space, detailed digital drawing, octane render, trending on artstation";
 
     private readonly IFileService _fileService;
-    private readonly IStableDiffusionService _stableDiffusionService;
+    private readonly IImageGenerationService _stableDiffusionService;
     private readonly IServiceProvider _serviceProvider;
     private readonly IImageService _imageService;
 
@@ -29,28 +29,29 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     private float _targetProgress = 0;
 
     [ObservableProperty]
-    private bool _hasInitImage;
+    public partial bool HasInitImage { get; set; }
 
     [ObservableProperty]
-    private string _prompt = _defaultPrompt;
+    public partial string Prompt { get; set; } = _defaultPrompt;
 
     [ObservableProperty]
-    private string _negativePrompt;
+    public partial string NegativePrompt { get; set; }
 
     [ObservableProperty]
-    private float _progress;
+    public partial float Progress { get; set; }
 
     [ObservableProperty]
-    private bool _serverConnected;
+    public partial bool ServerConnected { get; set; }
 
     [ObservableProperty]
-    private ObservableCollection<IResultItemViewModel> _results = new();
+    public partial ObservableCollection<IResultItemViewModel> Results { get; set; } = new();
 
     public MainPageViewModel(
         IFileService fileService,
-        IStableDiffusionService stableDiffusionService,
+        IImageGenerationService stableDiffusionService,
         IServiceProvider serviceProvider,
-        IImageService imageService)
+        IImageService imageService,
+        ILoadingService loadingService) : base(loadingService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
@@ -75,21 +76,35 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
         try
         {
+            await LoadingService.ShowAsync("Initializing...");
+
             await _stableDiffusionService.InitializeAsync();
+
+            if (!_stableDiffusionService.Initialized)
+            {
+                ServerConnected = false;
+                return false;
+            }
 
             var samplers = await _stableDiffusionService.GetSamplersAsync();
 
             _settings.Sampler = samplers?.FirstOrDefault().Key ?? "Euler";
+
+            _settings.Model = (ModelViewModel)await _stableDiffusionService.GetSelectedModelAsync();
         }
         catch
         {
-            await Shell.Current.CurrentPage.DisplayAlert(
+            await Shell.Current.CurrentPage.DisplayAlertAsync(
                 "Connection problems",
                 "Unable to connect to the configured server URL. Please double check your app settings/connectivity and try again.",
                 "OK");
 
             ServerConnected = false;
             return false;
+        }
+        finally
+        {
+            await LoadingService.HideAsync();
         }
 
         ServerConnected = true;
@@ -101,7 +116,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     {
         if (!Preferences.Default.ContainsKey(Constants.PreferenceKeys.ServerUrl))
         {
-            await Shell.Current.CurrentPage.DisplayAlert(
+            await Shell.Current.CurrentPage.DisplayAlertAsync(
                 "No server URL",
                 "There is no server URL configured. Please set the server URL in app settings and try again.",
                 "OK");
@@ -116,7 +131,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
         if (!await _stableDiffusionService.CheckServerAsync())
         {
-            await Shell.Current.CurrentPage.DisplayAlert(
+            await Shell.Current.CurrentPage.DisplayAlertAsync(
                 "Connection Problems",
                 "Unable to connect to the server. Please verify your connectivity and try again.",
                 "OK");
@@ -238,14 +253,14 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                 {
                     reportProgress((float)response.Progress);
 
-                    if (response.ResponseObject is TextToImageResponse textToImageResponse)
+                    if (response.ResponseObject is GenerationResponse generationResponse)
                     {
-                        var autoResponseInfo = JsonConvert.DeserializeObject<IDictionary<string, object>>(textToImageResponse.Info, new JsonSerializerSettings
+                        var autoResponseInfo = JsonConvert.DeserializeObject<IDictionary<string, object>>(generationResponse.Info, new JsonSerializerSettings
                         {
                             ContractResolver = CustomContractResolver.Instance
                         });
 
-                        foreach (var image in textToImageResponse.Images)
+                        foreach (var image in generationResponse.Images)
                         {
                             var seeds = autoResponseInfo["all_seeds"] as List<long>;
                             var seedString = seeds?.ElementAt(imageNumber) ?? settings.Seed + imageNumber;
@@ -264,55 +279,38 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                             }
                         }
                     }
-                    else if (response.ResponseObject is ImageToImageResponse imageToImageResponse)
+                    else if (response.ResponseObject is ProgressResponse progressResponse)
                     {
-                        reportProgress((float)response.Progress);
+                        // if (!string.IsNullOrEmpty(progressResponse.CurrentImage))
+                        // {
+                        //     var result = Results.FirstOrDefault(r => r.ApiResponse == null);
 
-                        var autoResponseInfo = JsonConvert.DeserializeObject<IDictionary<string, object>>(imageToImageResponse.Info, new JsonSerializerSettings
-                        {
-                            ContractResolver = CustomContractResolver.Instance
-                        });
+                        //     if (result != null)
+                        //     {
+                        //         using var stream = await _imageService.GetStreamFromContentTypeStringAsync(progressResponse.CurrentImage, CancellationToken.None);
+                        //         var bitmap = _imageService.GetSkBitmapFromStream(stream);
 
-                        foreach (var image in imageToImageResponse.Images)
-                        {
-                            var seeds = autoResponseInfo["all_seeds"] as List<long>;
-                            var seedString = seeds?.ElementAt(imageNumber) ?? settings.Seed + imageNumber;
-
-                            var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{seedString}-{DateTime.Now.Ticks}";
-
-                            var result = Results.FirstOrDefault(r => r.ApiResponse == null);
-
-                            result.ApiResponse = response;
-                            result.Settings = settings.Clone();
-                            result.Settings.Seed = seedString;
-
-                            await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
-                        }
-                    }
-                    else if (response.ResponseObject is Modules__api__models__ProgressResponse progressResponse)
-                    {
-                        // TODO - Display "current image"
+                        //         if (bitmap != null)
+                        //         {
+                        //             result.ImageSource = new SKBitmapImageSource { Bitmap = bitmap };
+                        //         }
+                        //     }
+                        // }
                     }              
                 }
             }
         }
         catch (System.Net.Sockets.SocketException socketException)
         {
-            // TODO - Handle timeouts
-
-            //return;
+            await Shell.Current.CurrentPage.DisplayAlertAsync("Connection Error", $"A network error occurred: {socketException.Message}", "OK");
         }
         catch (System.Net.WebException webException)
         {
-            // TODO - Handle this
-
-            //return;
+            await Shell.Current.CurrentPage.DisplayAlertAsync("Web Error", $"A web error occurred: {webException.Message}", "OK");
         }
         catch (Exception e)
         {
-            // TODO - Handle this
-
-            //return;
+            await Shell.Current.CurrentPage.DisplayAlertAsync("Error", $"An unexpected error occurred: {e.Message}", "OK");
         }
 
         // Any remaining results that weren't set have failed
@@ -392,13 +390,9 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         }
         else if (result.ApiResponse.StableDiffusionApi == Enums.StableDiffusionApi.Automatic1111)
         {
-            if (result.ApiResponse.ResponseObject is TextToImageResponse textToImageResponse)
+            if (result.ApiResponse.ResponseObject is GenerationResponse generationResponse)
             {
-                imageBytes = Convert.FromBase64String(textToImageResponse.Images.ElementAt(number));
-            }
-            else if (result.ApiResponse.ResponseObject is ImageToImageResponse imageToImageResponse)
-            {
-                imageBytes = Convert.FromBase64String(imageToImageResponse.Images.ElementAt(number));
+                imageBytes = Convert.FromBase64String(generationResponse.Images.ElementAt(number));
             }
         }
 
@@ -479,6 +473,8 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         if (query.TryGetValue(NavigationParams.PromptSettings, out var promptSettings) &&
             promptSettings is PromptSettings settings)
         {
+
+
             _settings = settings;
 
             Prompt = string.IsNullOrEmpty(settings.Prompt) ? _defaultPrompt : settings.Prompt;
@@ -550,7 +546,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                 requestedHeight.Value != _settings.Height)
             {
                 var resChangeMessage = $"Would you like keep the resolution at {_settings.Width}x{_settings.Height} or CHANGE it to {requestedWidth.Value}x{requestedHeight.Value}?";
-                var resChangeResult = await Shell.Current.DisplayAlert("Confirm Resolution Change", resChangeMessage, "CHANGE", "Keep");
+                var resChangeResult = await Shell.Current.DisplayAlertAsync("Confirm Resolution Change", resChangeMessage, "CHANGE", "Keep");
 
                 if (resChangeResult)
                 {
@@ -587,7 +583,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
     private async Task LoadSharedImage(string imageUri, string contentType)
     {
-        var useAsSourceImage = !await Shell.Current.DisplayAlert(
+        var useAsSourceImage = !await Shell.Current.DisplayAlertAsync(
                 "Where to?",
                 "Would you like to use the image as a source image or put it in the canvas for masking?",
                 "Canvas",

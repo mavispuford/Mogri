@@ -19,30 +19,32 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
     private CancellationTokenSource _maskCancellationTokenSource;
 
     [ObservableProperty]
-    private bool fitImageServerSide;
+    public partial bool FitImageServerSide { get; set; }
 
     [ObservableProperty]
-    private bool fitImageClientSide;
+    public partial bool FitImageClientSide { get; set; }
 
     [ObservableProperty]
-    private bool isLoadingInitImage;
+    public partial bool IsLoadingInitImage { get; set; }
 
     [ObservableProperty]
-    private bool isLoadingMaskImage;
+    public partial bool IsLoadingMaskImage { get; set; }
 
     [ObservableProperty]
-    private string strength;
+    public partial string Strength { get; set; }
 
     [ObservableProperty]
-    private string strengthPlaceholder;
+    public partial string StrengthPlaceholder { get; set; }
 
     [ObservableProperty]
-    private ImageSource initImageSource;
+    public partial ImageSource InitImageSource { get; set; }
 
     [ObservableProperty]
-    private ImageSource maskImageSource;
+    public partial ImageSource MaskImageSource { get; set; }
 
-    public ImageToImageSettingsPageViewModel(IImageService imageService)
+    public ImageToImageSettingsPageViewModel(
+        IImageService imageService,
+        ILoadingService loadingService) : base(loadingService)
     {
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
     }
@@ -64,7 +66,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
     [RelayCommand]
     private async Task ResetValues()
     {
-        var result = await Shell.Current.DisplayAlert("Confirm Reset", "Are you sure you would like to reset back to defaults?", "RESET", "Cancel");
+        var result = await Shell.Current.DisplayAlertAsync("Confirm Reset", "Are you sure you would like to reset back to defaults?", "RESET", "Cancel");
 
         if (!result)
         {
@@ -151,9 +153,10 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
     {
         try
         {
-            var fileResult = await MediaPicker.PickPhotoAsync();
+            var fileResult = await MediaPicker.PickPhotosAsync(new MediaPickerOptions { SelectionLimit = 1 });
+            var photo = fileResult?.FirstOrDefault();
 
-            if (fileResult == null)
+            if (photo == null)
             {
                 return;
             }
@@ -167,14 +170,14 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
                 IsLoadingMaskImage = true;
             }
         
-            using var fileStream = await fileResult.OpenReadAsync();
+            using var fileStream = await photo.OpenReadAsync();
             using var memoryStream = new MemoryStream();
             await fileStream.CopyToAsync(memoryStream);
             var imageBytes = memoryStream.ToArray();
             var imageString = Convert.ToBase64String(imageBytes);
             memoryStream.Seek(0, SeekOrigin.Begin);
 
-            var formattedImageString = string.Format(Constants.ImageDataFormat, fileResult.ContentType, imageString);
+            var formattedImageString = string.Format(Constants.ImageDataFormat, photo.ContentType, imageString);
 
             if (forInitImage)
             {

@@ -12,19 +12,19 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
 {
     private readonly IFileService _fileService;
     private readonly IImageService _imageService;
-    private readonly IStableDiffusionService _stableDiffusionService;
+    private readonly IImageGenerationService _stableDiffusionService;
 
     [ObservableProperty]
-    private IHistoryItemViewModel _historyItem;
+    public partial IHistoryItemViewModel HistoryItem { get; set; }
 
     [ObservableProperty]
-    private ImageSource _fullImageSource;
+    public partial ImageSource FullImageSource { get; set; }
 
     public HistoryItemPopupViewModel(
         IPopupService popupService,
         IFileService fileService,
         IImageService imageService,
-        IStableDiffusionService stableDiffusionService) : base(popupService)
+        IImageGenerationService stableDiffusionService) : base(popupService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
@@ -96,7 +96,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
     [RelayCommand]
     private async Task Delete()
     {
-        var result = await Shell.Current.DisplayAlert("Confirm", "Are you sure you would like to delete this image?", "DELETE", "Cancel");
+        var result = await Shell.Current.DisplayAlertAsync("Confirm", "Are you sure you would like to delete this image?", "DELETE", "Cancel");
 
         if (!result)
         {
@@ -145,7 +145,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
     {
         if (HistoryItem.Settings == null)
         {
-            await Shell.Current.DisplayAlert("No Image Info", "Unable to retrieve image info. Please try again later.", "Close");
+            await Shell.Current.DisplayAlertAsync("No Image Info", "Unable to retrieve image info. Please try again later.", "Close");
 
             return;
         }
@@ -156,7 +156,8 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
             $"Guidance Scale (Cfg): {HistoryItem.Settings.GuidanceScale}\n" + 
             $"Seed: {HistoryItem.Settings.Seed}\n" + 
             $"Size: {HistoryItem.Settings.Width}x{HistoryItem.Settings.Height}\n" +
-            $"Denoising Strength: {HistoryItem.Settings.DenoisingStrength}";
+            $"Denoising Strength: {HistoryItem.Settings.DenoisingStrength}\n" +
+            $"Model: {HistoryItem.Settings.Model.DisplayName}";
 
         if (HistoryItem.Settings.EnableUpscaling &&
             !string.IsNullOrEmpty(HistoryItem.Settings.Upscaler) &&
@@ -168,7 +169,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
                 $"Upscale Steps: {HistoryItem.Settings.UpscaleSteps}\n";
         }
 
-        var result = await Shell.Current.DisplayAlert("Image Info", message, "Copy to clipboard", "Close");
+        var result = await Shell.Current.DisplayAlertAsync("Image Info", message, "Copy to clipboard", "Close");
 
         if (result)
         {

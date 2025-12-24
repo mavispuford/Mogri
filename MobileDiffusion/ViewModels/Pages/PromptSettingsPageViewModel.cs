@@ -9,82 +9,90 @@ namespace MobileDiffusion.ViewModels;
 
 public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSettingsPageViewModel
 {
-    private readonly IStableDiffusionService _stableDiffusionService;
+    private readonly IImageGenerationService _stableDiffusionService;
     private readonly IPopupService _popupService;
 
     private PromptSettings _settings;
-
-    [ObservableProperty]
-    private List<string> _availableSamplerValues = new();
-
-    [ObservableProperty]
-    private List<string> _availableUpscaleLevelValues = new();
-
-    [ObservableProperty]
-    private List<string> _availableUpscalerValues = new();
-
-    [ObservableProperty]
-    private string _batchCount;
-
-    [ObservableProperty]
-    private string _batchSize;
-
-    [ObservableProperty]
-    private string _steps;
-
-    [ObservableProperty]
-    private string _stepsPlaceholder;
-
-    [ObservableProperty]
-    private string _cfgScale;
-
-    [ObservableProperty]
-    private string _cfgScalePlaceholder;
     
     [ObservableProperty]
-    private string _sampler;
+    public partial List<IModelViewModel> AvailableModelValues { get; set; } = new();
 
     [ObservableProperty]
-    private string _width;
+    public partial List<string> AvailableSamplerValues { get; set; } = new();
 
     [ObservableProperty]
-    private string _height;
+    public partial List<string> AvailableUpscaleLevelValues { get; set; } = new();
 
     [ObservableProperty]
-    private string _seed;
+    public partial List<string> AvailableUpscalerValues { get; set; } = new();
 
     [ObservableProperty]
-    private string _seedPlaceholder;
+    public partial string BatchCount { get; set; }
 
     [ObservableProperty]
-    private bool _enableGfpgan;
+    public partial string BatchSize { get; set; }
 
     [ObservableProperty]
-    private string _gfpganStrength;
+    public partial string Steps { get; set; }
 
     [ObservableProperty]
-    private string _gfpganStrengthPlaceholder;
+    public partial string StepsPlaceholder { get; set; }
 
     [ObservableProperty]
-    private bool _enableUpscaling;
+    public partial string CfgScale { get; set; }
 
     [ObservableProperty]
-    private string _upscaler; 
+    public partial string CfgScalePlaceholder { get; set; }
+
+    [ObservableProperty]
+    public partial IModelViewModel Model { get; set; }
+
+    [ObservableProperty]
+    public partial string Sampler { get; set; }
+
+    [ObservableProperty]
+    public partial string Width { get; set; }
+
+    [ObservableProperty]
+    public partial string Height { get; set; }
+
+    [ObservableProperty]
+    public partial string Seed { get; set; }
+
+    [ObservableProperty]
+    public partial string SeedPlaceholder { get; set; }
+
+    [ObservableProperty]
+    public partial bool EnableGfpgan { get; set; }
+
+    [ObservableProperty]
+    public partial string GfpganStrength { get; set; }
+
+    [ObservableProperty]
+    public partial string GfpganStrengthPlaceholder { get; set; }
+
+    [ObservableProperty]
+    public partial bool EnableUpscaling { get; set; }
+
+    [ObservableProperty]
+    public partial string Upscaler { get; set; } 
     
     [ObservableProperty]
-    private string _upscaleLevel;
+    public partial string UpscaleLevel { get; set; }
 
     [ObservableProperty]
-    private string _upscaleSteps;
+    public partial string UpscaleSteps { get; set; }
 
     [ObservableProperty]
-    private string _upscaleStepsPlaceholder;
+    public partial string UpscaleStepsPlaceholder { get; set; }
 
     [ObservableProperty]
-    private bool _makeSeamless;
+    public partial bool MakeSeamless { get; set; }
 
-    public PromptSettingsPageViewModel(IStableDiffusionService stableDiffusionService,
-        IPopupService popupService)
+    public PromptSettingsPageViewModel(
+        IImageGenerationService stableDiffusionService,
+        IPopupService popupService,
+        ILoadingService loadingService) : base(loadingService)
     {
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
@@ -131,6 +139,10 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             var upscalers = await _stableDiffusionService.GetUpscalersAsync();
 
             AvailableUpscalerValues = upscalers.Select(u => u.Name).ToList();
+
+            var models = await _stableDiffusionService.GetModelsAsync();
+
+            AvailableModelValues = models;
         }
         catch
         {
@@ -143,7 +155,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     [RelayCommand]
     private async Task ResetValues()
     {
-        var result = await Shell.Current.DisplayAlert("Confirm Reset", "Are you sure you would like to reset back to defaults?", "RESET", "Cancel");
+        var result = await Shell.Current.DisplayAlertAsync("Confirm Reset", "Are you sure you would like to reset back to defaults?", "RESET", "Cancel");
         
         if (!result)
         {
@@ -159,6 +171,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         BatchCount = defaultSettings.BatchCount.ToString();
         BatchSize = defaultSettings.BatchSize.ToString();
         MakeSeamless = defaultSettings.Seamless == OnOff.on;
+        Model = defaultSettings.Model;
         Sampler = defaultSettings.Sampler;
         Seed = defaultSettings.Seed.ToString();
         Steps = defaultSettings.Steps.ToString();
@@ -177,11 +190,49 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     [RelayCommand]
     private async Task ConfirmSettings()
     {
-        mapPropertiesToSettings();
+        await LoadingService.ShowAsync("Saving...");
 
-        var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings } };
+        try
+        {
+            mapPropertiesToSettings();
 
-        await Shell.Current.GoToAsync("..", parameters);
+            var currentModel = await _stableDiffusionService.GetSelectedModelAsync();
+
+            var modelChangeResult = currentModel?.Key == null;
+
+            if (currentModel != null &&
+                _settings.Model != null &&
+                _settings.Model.Key != currentModel.Key)
+            {
+                var modelChangeMessage = $"Would you like keep current model ({currentModel.DisplayName}) or CHANGE it to \"{_settings.Model.DisplayName}\"?";
+
+                modelChangeResult = await Shell.Current.DisplayAlertAsync("Confirm Model Change", modelChangeMessage, "CHANGE", "Keep");
+            }
+            else if (currentModel != null && _settings.Model != null && _settings.Model.Key == currentModel.Key)
+            {
+                modelChangeResult = true;
+            }
+
+            if (!modelChangeResult)
+            {
+                // Keep currently selected model
+                if (currentModel is ModelViewModel modelViewModel)
+                {
+                    _settings.Model = modelViewModel;
+                }
+            }
+
+            await _stableDiffusionService.SaveSettingsAsync(_settings);
+
+            var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings } };
+
+            await Shell.Current.GoToAsync("..", parameters);
+        }
+        finally
+        {
+            await LoadingService.HideAsync();
+        }
+        
     }
 
     [RelayCommand]
@@ -193,7 +244,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             { NavigationParams.InitImgString, _settings.InitImage }
         };
 
-        var result = await _popupService.ShowPopupAsync("ResolutionSelectPopup", parameters) as IDictionary<string, object>;
+        var result = await _popupService.ShowPopupForResultAsync("ResolutionSelectPopup", parameters) as IDictionary<string, object>;
 
         if (result != null)
         {
@@ -228,6 +279,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         BatchCount = _settings.BatchCount.ToString();
         BatchSize = _settings.BatchSize.ToString();
         MakeSeamless = _settings.Seamless == OnOff.on;
+        Model = AvailableModelValues?.FirstOrDefault(m => m.Key == _settings.Model.Key);
         Sampler = _settings.Sampler;
         Seed = _settings.Seed.ToString();
         Steps = _settings.Steps.ToString();
@@ -270,6 +322,11 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         }
 
         _settings.Seamless = MakeSeamless ? OnOff.on : OnOff.Default;
+
+        if (Model != null)
+        {
+            _settings.Model = (ModelViewModel)Model;
+        }
 
         _settings.Sampler = Sampler;
 

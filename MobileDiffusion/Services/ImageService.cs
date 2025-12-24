@@ -178,7 +178,7 @@ public class ImageService : IImageService
 
     private SKBitmap resizeBitmap(SKBitmap bitmap, int width, int height, bool filterImage = false)
     {
-        return bitmap.Resize(new SKSizeI(width, height), filterImage ? SKFilterQuality.High : SKFilterQuality.None);
+        return bitmap.Resize(new SKSizeI(width, height), filterImage ? new SKSamplingOptions(SKCubicResampler.Mitchell) : new SKSamplingOptions(SKFilterMode.Nearest, SKMipmapMode.None));
     }
 
     private List<Rgb> filterColors(List<Rgb> sourceList, double minDeltaE, IColorSpaceComparison colorSpaceComparison)

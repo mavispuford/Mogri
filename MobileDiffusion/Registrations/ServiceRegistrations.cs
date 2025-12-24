@@ -1,6 +1,7 @@
 ﻿using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Services;
 using Polly;
+using System.Net;
 
 #if ANDROID
 using MobileDiffusion.Platforms.Android.Services;
@@ -18,17 +19,28 @@ public static class ServiceRegistrations
         }).AddTransientHttpErrorPolicy(p => p.WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(500), (message, timeSpan) =>
         {
 
-        }));
+        }))
+        .ConfigurePrimaryHttpMessageHandler(() => 
+        {
+#if ANDROID
+            return new SocketsHttpHandler
+            {
+                PooledConnectionLifetime = TimeSpan.FromMinutes(20),
+                PooledConnectionIdleTimeout = TimeSpan.FromMinutes(20),
+                Proxy = new WebProxy() { Address = new Uri("http://192.168.68.52:9000") }
+            };
+#else
+            return new HttpClientHandler();
+#endif
+        });
 
-        /*.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
-                  Proxy = new WebProxy() { Address = new Uri("192.168.86.42:8888") }
-        });*/
-
-        builder.Services.AddSingleton<IStableDiffusionService, Automatic1111Service>();
+        builder.Services.AddSingleton<IImageGenerationService, SdForgeNeoService>();
+        //builder.Services.AddSingleton<IImageGenerationService, Automatic1111Service>();
         //builder.Services.AddSingleton<IStableDiffusionService, LSteinStableDiffusionService>();
         builder.Services.AddSingleton<IPopupService, PopupService>();
         builder.Services.AddSingleton<IImageService, ImageService>();
         builder.Services.AddSingleton<ISegmentationService, SegmentationService>();
+        builder.Services.AddSingleton<ILoadingService, LoadingService>();
 
 #if ANDROID
         builder.Services.AddSingleton<IFileService, FileService>();

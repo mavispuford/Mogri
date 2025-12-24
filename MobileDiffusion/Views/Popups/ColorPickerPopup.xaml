@@ -63,14 +63,14 @@
                         AlignContent="Center"
                         Margin="14,0">
                 <BindableLayout.ItemTemplate>
-                    <DataTemplate>
-                        <BoxView Color="{Binding}"
+                    <DataTemplate x:DataType="Color">
+                        <BoxView Color="{Binding .}"
                                  WidthRequest="30"
                                  HeightRequest="30">
                             <BoxView.GestureRecognizers>
                                 <TapGestureRecognizer 
                                     Command="{Binding SwatchTappedCommand, Source={x:RelativeSource AncestorType={x:Type viewModels:IColorPickerPopupViewModel}}}" 
-                                    CommandParameter="{Binding}"/>
+                                    CommandParameter="{Binding .}"/>
                             </BoxView.GestureRecognizers>
                         </BoxView>
                     </DataTemplate>
@@ -89,14 +89,14 @@
                         Margin="14,0"
                         IsVisible="{Binding SwatchesFromImage, Converter={StaticResource ListNotNullOrEmpty}}">
                 <BindableLayout.ItemTemplate>
-                    <DataTemplate>
-                        <BoxView Color="{Binding}"
+                    <DataTemplate x:DataType="Color">
+                        <BoxView Color="{Binding .}"
                                  WidthRequest="30"
                                  HeightRequest="30">
                             <BoxView.GestureRecognizers>
                                 <TapGestureRecognizer 
                                     Command="{Binding SwatchTappedCommand, Source={x:RelativeSource AncestorType={x:Type viewModels:IColorPickerPopupViewModel}}}" 
-                                    CommandParameter="{Binding}"/>
+                                    CommandParameter="{Binding .}"/>
                             </BoxView.GestureRecognizers>
                         </BoxView>
                     </DataTemplate>

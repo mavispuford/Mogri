@@ -4637,10 +4637,7 @@ namespace MobileDiffusion.Clients.Automatic1111
                         if (status_ == 200)
                         {
                             var objectResponse_ = await ReadObjectResponseAsync<object>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
+                            
                             return objectResponse_.Object;
                         }
                         else
@@ -11987,13 +11984,13 @@ namespace MobileDiffusion.Clients.Automatic1111
         /// For inpainting, save a copy of the greyscale mask
         /// </summary>
         [Newtonsoft.Json.JsonProperty("save_mask", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Save_mask Save_mask { get; set; }
+        public bool Save_mask { get; set; }
 
         /// <summary>
         /// For inpainting, save a masked composite
         /// </summary>
         [Newtonsoft.Json.JsonProperty("save_mask_composite", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Save_mask_composite Save_mask_composite { get; set; }
+        public bool Save_mask_composite { get; set; }
 
         /// <summary>
         /// Quality for saved jpeg images
@@ -12053,7 +12050,7 @@ namespace MobileDiffusion.Clients.Automatic1111
         /// Save init images when using img2img
         /// </summary>
         [Newtonsoft.Json.JsonProperty("save_init_img", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Save_init_img Save_init_img { get; set; }
+        public bool Save_init_img { get; set; }
 
         /// <summary>
         /// Directory for temporary images; leave empty for default
@@ -12119,7 +12116,7 @@ namespace MobileDiffusion.Clients.Automatic1111
         /// Directory for saving init images when using img2img
         /// </summary>
         [Newtonsoft.Json.JsonProperty("outdir_init_images", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Outdir_init_images Outdir_init_images { get; set; }
+        public string Outdir_init_images { get; set; }
 
         /// <summary>
         /// Save images to a subdirectory
@@ -12227,7 +12224,7 @@ namespace MobileDiffusion.Clients.Automatic1111
         /// Load models/files in hidden directories
         /// </summary>
         [Newtonsoft.Json.JsonProperty("list_hidden_files", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public List_hidden_files List_hidden_files { get; set; }
+        public bool List_hidden_files { get; set; }
 
         /// <summary>
         /// Move VAE and CLIP to RAM when training if possible. Saves VRAM.
@@ -12335,7 +12332,7 @@ namespace MobileDiffusion.Clients.Automatic1111
         /// SD Unet
         /// </summary>
         [Newtonsoft.Json.JsonProperty("sd_unet", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Sd_unet Sd_unet { get; set; }
+        public string Sd_unet { get; set; }
 
         /// <summary>
         /// Inpainting conditioning mask strength
@@ -12407,49 +12404,49 @@ namespace MobileDiffusion.Clients.Automatic1111
         /// Random number generator source.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("randn_source", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Randn_source Randn_source { get; set; }
+        public string Randn_source { get; set; }
 
         /// <summary>
         /// Cross attention optimization
         /// </summary>
         [Newtonsoft.Json.JsonProperty("cross_attention_optimization", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Cross_attention_optimization Cross_attention_optimization { get; set; }
+        public string Cross_attention_optimization { get; set; }
 
         /// <summary>
         /// Negative Guidance minimum sigma
         /// </summary>
         [Newtonsoft.Json.JsonProperty("s_min_uncond", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public S_min_uncond S_min_uncond { get; set; }
+        public int S_min_uncond { get; set; }
 
         /// <summary>
         /// Token merging ratio
         /// </summary>
         [Newtonsoft.Json.JsonProperty("token_merging_ratio", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Token_merging_ratio Token_merging_ratio { get; set; }
+        public int Token_merging_ratio { get; set; }
 
         /// <summary>
         /// Token merging ratio for img2img
         /// </summary>
         [Newtonsoft.Json.JsonProperty("token_merging_ratio_img2img", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Token_merging_ratio_img2img Token_merging_ratio_img2img { get; set; }
+        public int Token_merging_ratio_img2img { get; set; }
 
         /// <summary>
         /// Token merging ratio for high-res pass
         /// </summary>
         [Newtonsoft.Json.JsonProperty("token_merging_ratio_hr", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Token_merging_ratio_hr Token_merging_ratio_hr { get; set; }
+        public int Token_merging_ratio_hr { get; set; }
 
         /// <summary>
         /// Pad prompt/negative prompt to be same length
         /// </summary>
         [Newtonsoft.Json.JsonProperty("pad_cond_uncond", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Pad_cond_uncond Pad_cond_uncond { get; set; }
+        public bool Pad_cond_uncond { get; set; }
 
         /// <summary>
         /// persistent cond cache
         /// </summary>
         [Newtonsoft.Json.JsonProperty("experimental_persistent_cond_cache", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Experimental_persistent_cond_cache Experimental_persistent_cond_cache { get; set; }
+        public bool Experimental_persistent_cond_cache { get; set; }
 
         /// <summary>
         /// Use old emphasis implementation. Can be useful to reproduce old seeds.
@@ -12479,13 +12476,13 @@ namespace MobileDiffusion.Clients.Automatic1111
         /// Do not fix prompt schedule for second order samplers.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("dont_fix_second_order_samplers_schedule", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Dont_fix_second_order_samplers_schedule Dont_fix_second_order_samplers_schedule { get; set; }
+        public bool Dont_fix_second_order_samplers_schedule { get; set; }
 
         /// <summary>
         /// For hires fix, calculate conds of second pass using extra networks of first pass.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("hires_fix_use_firstpass_conds", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Hires_fix_use_firstpass_conds Hires_fix_use_firstpass_conds { get; set; }
+        public bool Hires_fix_use_firstpass_conds { get; set; }
 
         /// <summary>
         /// Keep models in VRAM
@@ -12563,13 +12560,13 @@ namespace MobileDiffusion.Clients.Automatic1111
         /// Show hidden directories
         /// </summary>
         [Newtonsoft.Json.JsonProperty("extra_networks_show_hidden_directories", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Extra_networks_show_hidden_directories Extra_networks_show_hidden_directories { get; set; }
+        public bool Extra_networks_show_hidden_directories { get; set; }
 
         /// <summary>
         /// Show cards for models in hidden directories
         /// </summary>
         [Newtonsoft.Json.JsonProperty("extra_networks_hidden_models", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Extra_networks_hidden_models Extra_networks_hidden_models { get; set; }
+        public string Extra_networks_hidden_models { get; set; }
 
         /// <summary>
         /// Default view for Extra Networks
@@ -12623,7 +12620,7 @@ namespace MobileDiffusion.Clients.Automatic1111
         /// Gradio theme
         /// </summary>
         [Newtonsoft.Json.JsonProperty("gradio_theme", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Gradio_theme Gradio_theme { get; set; }
+        public string Gradio_theme { get; set; }
 
         /// <summary>
         /// img2img: height of image editor
@@ -12641,13 +12638,13 @@ namespace MobileDiffusion.Clients.Automatic1111
         /// For inpainting, include the greyscale mask in results for web
         /// </summary>
         [Newtonsoft.Json.JsonProperty("return_mask", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Return_mask Return_mask { get; set; }
+        public bool Return_mask { get; set; }
 
         /// <summary>
         /// For inpainting, include masked composite in results for web
         /// </summary>
         [Newtonsoft.Json.JsonProperty("return_mask_composite", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Return_mask_composite Return_mask_composite { get; set; }
+        public bool Return_mask_composite { get; set; }
 
         /// <summary>
         /// Do not show any images in results for web
@@ -12689,7 +12686,7 @@ namespace MobileDiffusion.Clients.Automatic1111
         /// Navigate image viewer with gamepad
         /// </summary>
         [Newtonsoft.Json.JsonProperty("js_modal_lightbox_gamepad", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Js_modal_lightbox_gamepad Js_modal_lightbox_gamepad { get; set; }
+        public bool Js_modal_lightbox_gamepad { get; set; }
 
         /// <summary>
         /// Gamepad repeat period, in milliseconds
@@ -12731,7 +12728,7 @@ namespace MobileDiffusion.Clients.Automatic1111
         /// Ctrl+up/down word delimiters
         /// </summary>
         [Newtonsoft.Json.JsonProperty("keyedit_delimiters", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Keyedit_delimiters Keyedit_delimiters { get; set; }
+        public string Keyedit_delimiters { get; set; }
 
         /// <summary>
         /// Quicksettings list
@@ -12743,7 +12740,7 @@ namespace MobileDiffusion.Clients.Automatic1111
         /// UI tab order
         /// </summary>
         [Newtonsoft.Json.JsonProperty("ui_tab_order", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Ui_tab_order Ui_tab_order { get; set; }
+        public int[] Ui_tab_order { get; set; }
 
         /// <summary>
         /// Hidden UI tabs
@@ -12761,19 +12758,19 @@ namespace MobileDiffusion.Clients.Automatic1111
         /// Hires fix: show hires sampler selection
         /// </summary>
         [Newtonsoft.Json.JsonProperty("hires_fix_show_sampler", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Hires_fix_show_sampler Hires_fix_show_sampler { get; set; }
+        public bool Hires_fix_show_sampler { get; set; }
 
         /// <summary>
         /// Hires fix: show hires prompt and negative prompt
         /// </summary>
         [Newtonsoft.Json.JsonProperty("hires_fix_show_prompts", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Hires_fix_show_prompts Hires_fix_show_prompts { get; set; }
+        public bool Hires_fix_show_prompts { get; set; }
 
         /// <summary>
         /// Disable prompt token counters
         /// </summary>
         [Newtonsoft.Json.JsonProperty("disable_token_counters", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Disable_token_counters Disable_token_counters { get; set; }
+        public bool Disable_token_counters { get; set; }
 
         /// <summary>
         /// Add model hash to generation information
@@ -12791,7 +12788,7 @@ namespace MobileDiffusion.Clients.Automatic1111
         /// Add program version to generation information
         /// </summary>
         [Newtonsoft.Json.JsonProperty("add_version_to_infotext", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Add_version_to_infotext Add_version_to_infotext { get; set; }
+        public bool Add_version_to_infotext { get; set; }
 
         /// <summary>
         /// Disregard checkpoint information from pasted infotext
@@ -12803,7 +12800,7 @@ namespace MobileDiffusion.Clients.Automatic1111
         /// Infer styles from prompts of pasted infotext
         /// </summary>
         [Newtonsoft.Json.JsonProperty("infotext_styles", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Infotext_styles Infotext_styles { get; set; }
+        public string Infotext_styles { get; set; }
 
         /// <summary>
         /// Show progressbar
@@ -12821,7 +12818,7 @@ namespace MobileDiffusion.Clients.Automatic1111
         /// Live preview file format
         /// </summary>
         [Newtonsoft.Json.JsonProperty("live_previews_image_format", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Live_previews_image_format Live_previews_image_format { get; set; }
+        public string Live_previews_image_format { get; set; }
 
         /// <summary>
         /// Show previews of all images generated in a batch as a grid
@@ -12899,25 +12896,25 @@ namespace MobileDiffusion.Clients.Automatic1111
         /// scheduler type
         /// </summary>
         [Newtonsoft.Json.JsonProperty("k_sched_type", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public K_sched_type K_sched_type { get; set; }
+        public string K_sched_type { get; set; }
 
         /// <summary>
         /// sigma min
         /// </summary>
         [Newtonsoft.Json.JsonProperty("sigma_min", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Sigma_min Sigma_min { get; set; }
+        public double Sigma_min { get; set; }
 
         /// <summary>
         /// sigma max
         /// </summary>
         [Newtonsoft.Json.JsonProperty("sigma_max", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Sigma_max Sigma_max { get; set; }
+        public double Sigma_max { get; set; }
 
         /// <summary>
         /// rho
         /// </summary>
         [Newtonsoft.Json.JsonProperty("rho", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Rho Rho { get; set; }
+        public string Rho { get; set; }
 
         /// <summary>
         /// Eta noise seed delta
@@ -13449,6 +13446,9 @@ namespace MobileDiffusion.Clients.Automatic1111
 
         [Newtonsoft.Json.JsonProperty("mask", Required = Newtonsoft.Json.Required.AllowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Mask { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("mask_round", Required = Newtonsoft.Json.Required.AllowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? Mask_round { get; set; }
 
         [Newtonsoft.Json.JsonProperty("mask_blur", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public int? Mask_blur { get; set; }

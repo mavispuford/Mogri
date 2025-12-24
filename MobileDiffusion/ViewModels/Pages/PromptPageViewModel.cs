@@ -10,32 +10,34 @@ namespace MobileDiffusion.ViewModels;
 
 public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
 {
-    private readonly IStableDiffusionService _stableDiffusionService;
+    private readonly IImageGenerationService _stableDiffusionService;
 
     private PromptSettings _settings;
 
     [ObservableProperty]
-    private string _prompt;
+    public partial string Prompt { get; set; }
 
     [ObservableProperty]
-    private string _promptPlaceholder;
+    public partial string PromptPlaceholder { get; set; }
 
     [ObservableProperty]
-    private string _negativePrompt;
+    public partial string NegativePrompt { get; set; }
 
     [ObservableProperty]
-    private List<IPromptStyleViewModel> _availablePromptStyles = new();
+    public partial List<IPromptStyleViewModel> AvailablePromptStyles { get; set; } = new();
 
     [ObservableProperty]
-    private List<ILoraViewModel> _availableLoras = new();
+    public partial List<ILoraViewModel> AvailableLoras { get; set; } = new();
 
     [ObservableProperty]
-    private ObservableCollection<ILoraViewModel> _selectedLoras = new();
+    public partial ObservableCollection<ILoraViewModel> SelectedLoras { get; set; } = new();
 
     [ObservableProperty]
-    private ObservableCollection<IPromptStyleViewModel> _selectedPromptStyles = new();
+    public partial ObservableCollection<IPromptStyleViewModel> SelectedPromptStyles { get; set; } = new();
 
-    public PromptPageViewModel(IStableDiffusionService stableDiffusionService)
+    public PromptPageViewModel(
+        IImageGenerationService stableDiffusionService,
+        ILoadingService loadingService) : base(loadingService)
     {
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
     }
@@ -146,7 +148,7 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
     [RelayCommand]
     private async Task ShowPromptStyleCreationPrompt()
     {
-        var accepted = await Shell.Current.DisplayAlert("Create Style?", "Would you like to create a style using the existing prompts?", "OK", "Cancel");
+        var accepted = await Shell.Current.DisplayAlertAsync("Create Style?", "Would you like to create a style using the existing prompts?", "OK", "Cancel");
 
         if (accepted)
         {
@@ -159,7 +161,7 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
     [RelayCommand]
     private async Task ShowPromptStyleExtractionPrompt()
     {
-        var accepted = await Shell.Current.DisplayAlert("Extract Style?", "Would you like to extract the prompts from the selected styles?", "OK", "Cancel");
+        var accepted = await Shell.Current.DisplayAlertAsync("Extract Style?", "Would you like to extract the prompts from the selected styles?", "OK", "Cancel");
 
         if (accepted && SelectedPromptStyles.Any())
         {

@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 
 namespace MobileDiffusion.ViewModels;
@@ -7,15 +8,15 @@ namespace MobileDiffusion.ViewModels;
 internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPageViewModel
 {
     [ObservableProperty]
-    private string serverUrl;
+    public partial string ServerUrl { get; set; }
 
     [ObservableProperty]
-    private string _defaultWidth;
+    public partial string DefaultWidth { get; set; }
     
     [ObservableProperty]
-    private string _defaultHeight;
+    public partial string DefaultHeight { get; set; }
 
-    public AppSettingsPageViewModel()
+    public AppSettingsPageViewModel(ILoadingService loadingService) : base(loadingService)
     {
         ServerUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
         DefaultWidth = Preferences.Default.Get<double>(Constants.PreferenceKeys.DefaultWidth, 512).ToString();
@@ -52,7 +53,7 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
     [RelayCommand]
     private async Task ResetValues()
     {
-        var result = await Shell.Current.DisplayAlert("Confirm Reset", "Are you sure you would like to reset back to defaults?", "RESET", "Cancel");
+        var result = await Shell.Current.DisplayAlertAsync("Confirm Reset", "Are you sure you would like to reset back to defaults?", "RESET", "Cancel");
 
         if (!result)
         {
