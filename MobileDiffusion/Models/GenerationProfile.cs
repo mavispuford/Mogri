@@ -22,7 +22,7 @@ public class GenerationProfile
                 DefaultCfg = 1.0,
                 DefaultDistilledCfg = 9,
                 DefaultSampler = "Euler",
-                DefaultScheduler = "Beta",
+                DefaultScheduler = "beta",
                 DefaultWidth = 1024,
                 DefaultHeight = 1024
             },
@@ -32,7 +32,7 @@ public class GenerationProfile
                 DefaultCfg = 1.0,
                 DefaultDistilledCfg = 3.5,
                 DefaultSampler = "Euler",
-                DefaultScheduler = "Beta",
+                DefaultScheduler = "beta",
                 DefaultWidth = 1024,
                 DefaultHeight = 1024
             },

@@ -39,6 +39,8 @@ public class LoadingService : ILoadingService
             // Already showing...
             if (MopupService.Instance.PopupStack.FirstOrDefault(p => p is LoadingPopup) is LoadingPopup loadingPopup)
             {
+                loadingPopup.SetLoadingMessage(loadingMessage);
+                
                 return;
             }
 
