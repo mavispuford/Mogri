@@ -315,7 +315,7 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
                 { "scheduler", n => { Scheduler = n.GetStringValue(); } },
                 { "script_args", n => { ScriptArgs = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "script_name", n => { ScriptName = n.GetStringValue(); } },
-                { "seed", n => { Seed = n.GetIntValue(); } },
+                { "seed", n => { Seed = n.GetLongValue(); } },
                 { "seed_resize_from_h", n => { SeedResizeFromH = n.GetIntValue(); } },
                 { "seed_resize_from_w", n => { SeedResizeFromW = n.GetIntValue(); } },
                 { "send_images", n => { SendImages = n.GetBoolValue(); } },

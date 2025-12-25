@@ -4,21 +4,19 @@ This directory contains the OpenAPI specification for the SD Forge Neo API.
 
 ## Updating the Client
 
-To update the generated client code after modifying `openapi.json`, run the following command from the root of the repository:
+To update the generated client code (e.g. after downloading a new `openapi.json`), you must first patch the specification to fix type issues, and then regenerate.
 
-```bash
-kiota update --output MobileDiffusion/Clients/SdForgeNeo
-```
+1. **Patch the OpenAPI spec** (Fixes `Seed` type to `long`):
+   ```bash
+   python3 OpenApiSpecs/SdForgeNeo/patch_openapi.py
+   ```
 
-This command uses the configuration stored in `MobileDiffusion/Clients/SdForgeNeo/kiota-lock.json`.
+2. **Generate the Client**:
+   ```bash
+   kiota generate -l CSharp -c SdForgeNeoClient -n MobileDiffusion.Clients.SdForgeNeo -d OpenApiSpecs/SdForgeNeo/openapi-patched.json -o MobileDiffusion/Clients/SdForgeNeo
+   ```
 
-## Regenerating from Scratch
-
-If you need to regenerate the client from scratch or change configuration options, use the full generate command:
-
-```bash
-kiota generate -l CSharp -c SdForgeNeoClient -n MobileDiffusion.Clients.SdForgeNeo -d OpenApiSpecs/SdForgeNeo/openapi.json -o MobileDiffusion/Clients/SdForgeNeo
-```
+   *Note: We use `kiota generate` instead of `kiota update` to ensure the lock file points to the patched JSON file.*
 
 ## Prerequisites
 

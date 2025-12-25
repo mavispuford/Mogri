@@ -534,23 +534,23 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
         public Flags()
         {
             AdditionalData = new Dictionary<string, object>();
-            Ckpt = @"D:\StableDiffusion\sd-webui-forge-classic\model.ckpt";
-            CodeformerModelsPath = @"D:\StableDiffusion\sd-webui-forge-classic\models\Codeformer";
-            Config = @"D:\StableDiffusion\sd-webui-forge-classic\configs\v1-inference.yaml";
+            Ckpt = "D:\\StableDiffusion\\sd-webui-forge-classic\\model.ckpt";
+            CodeformerModelsPath = "D:\\StableDiffusion\\sd-webui-forge-classic\\models\\Codeformer";
+            Config = "D:\\StableDiffusion\\sd-webui-forge-classic\\configs\\v1-inference.yaml";
             ControlnetLoglevel = "INFO";
-            DataDir = @"D:\StableDiffusion\sd-webui-forge-classic";
-            EmbeddingsDir = @"D:\StableDiffusion\sd-webui-forge-classic\models\embeddings";
-            EsrganModelsPath = @"D:\StableDiffusion\sd-webui-forge-classic\models\ESRGAN";
+            DataDir = "D:\\StableDiffusion\\sd-webui-forge-classic";
+            EmbeddingsDir = "D:\\StableDiffusion\\sd-webui-forge-classic\\models\\embeddings";
+            EsrganModelsPath = "D:\\StableDiffusion\\sd-webui-forge-classic\\models\\ESRGAN";
             GfpganDir = "./GFPGAN";
-            GfpganModelsPath = @"D:\StableDiffusion\sd-webui-forge-classic\models\GFPGAN";
-            LocalizationsDir = @"D:\StableDiffusion\sd-webui-forge-classic\localizations";
-            LoraDir = @"D:\StableDiffusion\sd-webui-forge-classic\models\Lora";
+            GfpganModelsPath = "D:\\StableDiffusion\\sd-webui-forge-classic\\models\\GFPGAN";
+            LocalizationsDir = "D:\\StableDiffusion\\sd-webui-forge-classic\\localizations";
+            LoraDir = "D:\\StableDiffusion\\sd-webui-forge-classic\\models\\Lora";
             Sage2Function = global::MobileDiffusion.Clients.SdForgeNeo.Models.SageAttentionFuncs.Auto;
             SageAccumDtype = global::MobileDiffusion.Clients.SdForgeNeo.Models.Sage_pv_accum_dtype.Fp32;
             SageQuantGran = global::MobileDiffusion.Clients.SdForgeNeo.Models.Sage_qk_quant_gran.Per_thread;
             SageQuantizationBackend = global::MobileDiffusion.Clients.SdForgeNeo.Models.Sage_quantization_backend.Triton;
-            UiConfigFile = @"D:\StableDiffusion\sd-webui-forge-classic\ui-config.json";
-            UiSettingsFile = @"D:\StableDiffusion\sd-webui-forge-classic\config.json";
+            UiConfigFile = "D:\\StableDiffusion\\sd-webui-forge-classic\\ui-config.json";
+            UiSettingsFile = "D:\\StableDiffusion\\sd-webui-forge-classic\\config.json";
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
