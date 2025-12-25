@@ -251,7 +251,7 @@ namespace MobileDiffusion.Services
             });
 
             ApiResponse apiResponse = null;
-            var skipCurrentImage = false;
+            var skipCurrentImage = true;
             var finished = false;
 
             while (!finished)
@@ -285,7 +285,7 @@ namespace MobileDiffusion.Services
                 yield return apiResponse;
 
                 // Skip current image every other time
-                skipCurrentImage = !skipCurrentImage;
+                // skipCurrentImage = !skipCurrentImage;
             }
         }
 

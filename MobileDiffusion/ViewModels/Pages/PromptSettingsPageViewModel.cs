@@ -110,7 +110,6 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     private readonly IPresetService _presetService;
 
     private bool _isInitializing;
-    private List<string> _allSchedulers = new();
 
     partial void OnSelectedModelTypeChanged(ModelType value)
     {
@@ -126,15 +125,6 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         Scheduler = profile.DefaultScheduler;
 
         IsSchedulerVisible = value == ModelType.ZImage;
-
-        if (value == ModelType.ZImage)
-        {
-            AvailableSchedulers = _allSchedulers.Any() ? _allSchedulers : new List<string> { "Beta", "Linear Quadratic", "Simple" };
-        }
-        else
-        {
-            AvailableSchedulers = new List<string>();
-        }
     }
 
     public PromptSettingsPageViewModel(
@@ -194,7 +184,9 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
 
             AvailableModelValues = models;
 
-            _allSchedulers = await _stableDiffusionService.GetSchedulersAsync();
+            var schedulers = await _stableDiffusionService.GetSchedulersAsync();
+
+            AvailableSchedulers = schedulers;
 
             AvailablePresets = await _presetService.GetPresetsAsync();
         }
@@ -227,6 +219,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         MakeSeamless = defaultSettings.Seamless == OnOff.on;
         Model = defaultSettings.Model;
         Sampler = defaultSettings.Sampler;
+        Scheduler = defaultSettings.Scheduler;
         Seed = defaultSettings.Seed.ToString();
         Steps = defaultSettings.Steps.ToString();
         Upscaler = defaultSettings.Upscaler.ToString();
@@ -260,7 +253,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             {
                 var modelChangeMessage = $"Would you like keep current model ({currentModel.DisplayName}) or CHANGE it to \"{_settings.Model.DisplayName}\"?";
 
-                modelChangeResult = await Shell.Current.DisplayAlertAsync("Confirm Model Change", modelChangeMessage, "CHANGE", "Keep");
+                modelChangeResult = await _popupService.DisplayAlertAsync("Confirm Model Change", modelChangeMessage, "CHANGE", "Keep");
             }
             else if (currentModel != null && _settings.Model != null && _settings.Model.Key == currentModel.Key)
             {
@@ -338,26 +331,16 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             MakeSeamless = _settings.Seamless == OnOff.on;
             Model = AvailableModelValues?.FirstOrDefault(m => m.Key == _settings.Model.Key);
             Sampler = _settings.Sampler;
+            Scheduler = _settings.Scheduler;
             Seed = _settings.Seed.ToString();
+            SelectedModelType = _settings.ModelType;
             Steps = _settings.Steps.ToString();
             Upscaler = _settings.Upscaler;
             UpscaleLevel = _settings.UpscaleLevel == 0 ? "2" : _settings.UpscaleLevel.ToString();
             UpscaleSteps= _settings.UpscaleSteps.ToString();
             Width = _settings.Width.ToString();
-            
-            SelectedModelType = _settings.ModelType;
-            Scheduler = _settings.Scheduler;
-            
-            IsSchedulerVisible = SelectedModelType == ModelType.ZImage;
 
-            if (SelectedModelType == ModelType.ZImage)
-            {
-                AvailableSchedulers = _allSchedulers.Any() ? _allSchedulers : new List<string> { "Beta", "Linear Quadratic", "Simple" };
-            }
-            else
-            {
-                AvailableSchedulers = new List<string>();
-            }
+            IsSchedulerVisible = SelectedModelType == ModelType.ZImage;
         }
         finally
         {

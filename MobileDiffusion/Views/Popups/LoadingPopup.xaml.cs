@@ -19,7 +19,7 @@ public partial class LoadingPopup : BasePopup, IQueryAttributable
 
         if (query.TryGetValue(NavigationParams.LoadingMessage, out var message))
         {
-            MessageLabel.Text = (string)message;
+            SetLoadingMessage((string)message);
         }
 
         query.Clear();
@@ -29,5 +29,10 @@ public partial class LoadingPopup : BasePopup, IQueryAttributable
     {
         // Don't allow back button for loading page...
         return true;
+    }
+
+    public void SetLoadingMessage(string message)
+    {
+        MessageLabel.Text = message;
     }
 }
