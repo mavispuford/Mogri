@@ -20,25 +20,25 @@ namespace MobileDiffusion.Services
     {
         private static class PngInfoProperties
         {
-            public const string Steps = nameof(Steps);
-            public const string Sampler = nameof(Sampler);
-            public const string CfgScale = "CFG Scale";
-            public const string Seed = nameof(Seed);
-            public const string Size = nameof(Size);
-            public const string ModelHash = "Model hash";
-            public const string Model = nameof(Model);
-            public const string LoraHashes = "Lora hashes";
-            public const string DenoisingStrength = "Denoising strength";
-            public const string Eta = nameof(Eta);
-            public const string Version = nameof(Version);
-            public const string HiresUpscaler = "Hires upscaler";
-            public const string HiresUpscale = "Hires upscale";
-            public const string HiresSteps = "Hires steps";
-            public const string Scheduler = nameof(Scheduler);
-            public const string ScheduleType = "Schedule type";
-            public const string DistilledCfgScale = "Distilled CFG Scale";
+            public const string Steps = "steps";
+            public const string Sampler = "sampler";
+            public const string CfgScale = "cfg scale";
+            public const string Seed = "seed";
+            public const string Size = "size";
+            public const string ModelHash = "model hash";
+            public const string Model = "model";
+            public const string LoraHashes = "lora hashes";
+            public const string DenoisingStrength = "denoising strength";
+            public const string Eta = "eta";
+            public const string Version = "version";
+            public const string HiresUpscaler = "hires upscaler";
+            public const string HiresUpscale = "hires upscale";
+            public const string HiresSteps = "hires steps";
+            public const string Scheduler = "scheduler";
+            public const string ScheduleType = "schedule type";
+            public const string DistilledCfgScale = "distilled cfg scale";
             public const string DistilledCfgScaleKey = "distilled_cfg_scale";
-            public const string Shift = "Shift";
+            public const string Shift = "shift";
         }
 
         private Regex _loraRegex = new Regex("<lora:([^:]*):([^>]*)>", RegexOptions.Compiled);
@@ -337,7 +337,7 @@ namespace MobileDiffusion.Services
             request.Height = (int)settings.Height;
             request.DenoisingStrength = settings.DenoisingStrength;
             request.Steps = settings.Steps;
-            request.Seed = (int)settings.Seed;
+            request.Seed = settings.Seed;
             request.Tiling = settings.Seamless == Enums.OnOff.on;
 
             // Hires Fix
@@ -366,8 +366,7 @@ namespace MobileDiffusion.Services
                 
                 if (settings.DistilledCfgScale.HasValue)
                 {
-                    request.OverrideSettings = new StableDiffusionProcessingTxt2Img_override_settings();
-                    request.OverrideSettings.AdditionalData.Add("distilled_cfg_scale", settings.DistilledCfgScale.Value);
+                    request.AdditionalData.Add("distilled_cfg_scale", settings.DistilledCfgScale.Value);
                     System.Diagnostics.Debug.WriteLine($"[SdForgeNeoService] ZImage DistilledCfgScale: {settings.DistilledCfgScale.Value}");
                 }
             }
@@ -392,7 +391,7 @@ namespace MobileDiffusion.Services
             request.Height = (int)settings.Height;
             request.DenoisingStrength = settings.DenoisingStrength;
             request.Steps = settings.Steps;
-            request.Seed = (int)settings.Seed;
+            request.Seed = settings.Seed;
             request.Tiling = settings.Seamless == Enums.OnOff.on;
 
             var combinedPromptAndStyles = settings.GetCombinedPromptAndPromptStyles();
@@ -509,7 +508,7 @@ namespace MobileDiffusion.Services
             {
                 try
                 {
-                    switch (property.Key)
+                    switch (property.Key.ToLower())
                     {
                         case PngInfoProperties.Steps:
                             settings.Steps = int.Parse(property.Value);
@@ -549,7 +548,7 @@ namespace MobileDiffusion.Services
                             break;
                         case PngInfoProperties.Scheduler:
                         case PngInfoProperties.ScheduleType:
-                            settings.Scheduler = property.Value;
+                            settings.Scheduler = property.Value.ToLower();
                             settings.ModelType = Enums.ModelType.ZImage;
                             break;
                         case PngInfoProperties.DistilledCfgScale:

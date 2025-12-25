@@ -203,7 +203,7 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
         public string ScriptName { get; set; }
 #endif
         /// <summary>The seed property</summary>
-        public int? Seed { get; set; }
+        public long? Seed { get; set; }
         /// <summary>The seed_resize_from_h property</summary>
         public int? SeedResizeFromH { get; set; }
         /// <summary>The seed_resize_from_w property</summary>
@@ -380,7 +380,7 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
             writer.WriteDoubleValue("s_churn", SChurn);
             writer.WriteObjectValue<UntypedNode>("script_args", ScriptArgs);
             writer.WriteStringValue("script_name", ScriptName);
-            writer.WriteIntValue("seed", Seed);
+            writer.WriteLongValue("seed", Seed);
             writer.WriteIntValue("seed_resize_from_h", SeedResizeFromH);
             writer.WriteIntValue("seed_resize_from_w", SeedResizeFromW);
             writer.WriteBoolValue("send_images", SendImages);
