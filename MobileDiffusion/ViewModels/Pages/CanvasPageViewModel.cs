@@ -98,6 +98,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     [ObservableProperty]
     public partial bool GettingColorPalette { get; set; } = false;
 
+    public bool IsZoomMode => CurrentTool?.Type == ToolType.Zoom;
+
     [ObservableProperty]
     private SegmentationMode _segmentationMode = SegmentationMode.AddArea;
 
@@ -175,6 +177,14 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 new BoundingBoxSizeContextButtonViewModel(this),
                 new SnipContextButtonViewModel(this),
             }
+        });
+
+        AvailableTools.Add(new PaintingToolViewModel
+        {
+            Name = "Zoom",
+            IconCode = "\ue8ff",
+            Effect = MaskEffect.None,
+            Type = ToolType.Zoom
         });
 
         // Placeholder for gesture paint bucket - Might just be added into the base control
@@ -1163,5 +1173,6 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         }
 
         ShowContextMenu = value.Type == ToolType.PaintBucket;
+        OnPropertyChanged(nameof(IsZoomMode));
     }
 }

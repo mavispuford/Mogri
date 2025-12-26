@@ -639,6 +639,8 @@ public partial class CanvasPage : BasePage
         SegmentationBitmap = null;
 
         UpdateCanvasSizes();
+
+        ZoomContainer.Reset();
     }
 
     private void UpdateCanvasSizes()
