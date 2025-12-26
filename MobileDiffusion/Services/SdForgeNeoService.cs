@@ -421,8 +421,7 @@ namespace MobileDiffusion.Services
 
                 if (settings.DistilledCfgScale.HasValue)
                 {
-                    request.OverrideSettings = new StableDiffusionProcessingImg2Img_override_settings();
-                    request.OverrideSettings.AdditionalData.Add("distilled_cfg_scale", settings.DistilledCfgScale.Value);
+                    request.AdditionalData.Add("distilled_cfg_scale", settings.DistilledCfgScale.Value);
                 }
             }
 
