@@ -184,7 +184,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             Name = "Zoom",
             IconCode = "\ue8ff",
             Effect = MaskEffect.None,
-            Type = ToolType.Zoom
+            Type = ToolType.Zoom,
+            ContextButtons = []
         });
 
         // Placeholder for gesture paint bucket - Might just be added into the base control
