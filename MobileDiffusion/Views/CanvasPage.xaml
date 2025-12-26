@@ -13,6 +13,11 @@
                 x:Name="ThisPage">
     <views:BasePage.Resources>
         <ResourceDictionary>
+            <Style x:Key="TitleBarButtonStyle" TargetType="ImageButton">
+                <Setter Property="WidthRequest" Value="50" />
+                <Setter Property="HorizontalOptions" Value="Center" />
+                <Setter Property="VerticalOptions" Value="Center" />
+            </Style>
             <toolkit:BoolToObjectConverter x:Key="BoolToShowMaskTextConverter" TrueObject="Hide Mask Layer" FalseObject="Show Mask Layer" />
             <toolkit:BoolToObjectConverter x:Key="BoolToEyeConverter">
                 <toolkit:BoolToObjectConverter.TrueObject>
@@ -29,12 +34,12 @@
 
     <Shell.TitleView>
         <HorizontalStackLayout x:Name="TitleViewLayout"
-                               Spacing="30"
+                               Spacing="8"
                                HorizontalOptions="Center"
-                               TranslationX="{OnPlatform Default=0, Android=-9}">
+                               TranslationX="{OnPlatform Default=0, Android=-8}">
 
             <ImageButton ToolTipProperties.Text="Add Image"
-                         VerticalOptions="Fill"
+                         Style="{StaticResource TitleBarButtonStyle}"
                          Command="{Binding ShowMediaPickerCommand}">
                 <ImageButton.Source>
                     <FontImageSource Glyph="&#xe43e;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
@@ -42,7 +47,7 @@
             </ImageButton>
 
             <ImageButton ToolTipProperties.Text="Undo"
-                         VerticalOptions="Fill"
+                         Style="{StaticResource TitleBarButtonStyle}"
                          Clicked="Undo_Button_Clicked">
                 <ImageButton.Source>
                     <FontImageSource Glyph="&#xe166;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
@@ -50,7 +55,7 @@
             </ImageButton>
 
             <ImageButton ToolTipProperties.Text="Clear Paint"
-                         VerticalOptions="Fill"
+                         Style="{StaticResource TitleBarButtonStyle}"
                          Clicked="Clear_Button_Clicked">
                 <ImageButton.Source>
                     <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
@@ -58,7 +63,7 @@
             </ImageButton>
 
             <ImageButton ToolTipProperties.Text="Save Mask"
-                         VerticalOptions="Fill"
+                         Style="{StaticResource TitleBarButtonStyle}"
                          Command="{Binding SaveCommand}">
                 <ImageButton.Source>
                     <FontImageSource Glyph="&#xe161;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
@@ -66,10 +71,9 @@
             </ImageButton>
 
             <ImageButton ToolTipProperties.Text="Use as source image"
-                         VerticalOptions="Fill"
+                         Style="{StaticResource TitleBarButtonStyle}"
                          Command="{Binding SendToImageToImageCommand}"
-                         HeightRequest="32"
-                         WidthRequest="32">
+                         HeightRequest="32">
                 <ImageButton.Source>
                     <FontImageSource Glyph="&#xf824;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
                 </ImageButton.Source>
@@ -79,10 +83,9 @@
             </ImageButton>
 
             <ImageButton ToolTipProperties.Text="{Binding ShowMaskLayer, Converter={StaticResource BoolToShowMaskTextConverter}}"
-                         VerticalOptions="Fill"
+                         Style="{StaticResource TitleBarButtonStyle}"
                          Command="{Binding ToggleMaskLayerVisibilityCommand}"
                          HeightRequest="32"
-                         WidthRequest="32"
                          Source="{Binding ShowMaskLayer, Converter={StaticResource BoolToEyeConverter}}"/>
 
         </HorizontalStackLayout>
@@ -143,53 +146,58 @@
         <Grid Grid.Row="0"
               HorizontalOptions="Center"
               VerticalOptions="Start">
-            <CollectionView SelectedItem="{Binding CurrentTool}"
-                            ItemsSource="{Binding AvailableTools}"
-                            HorizontalOptions="Center"
-                            VerticalOptions="Center"
-                            HeightRequest="58"
-                            SelectionChanged="ToolCollectionView_SelectedItemChanged"
-                            SelectionMode="Single"
-                            HorizontalScrollBarVisibility="Never"
-                            VerticalScrollBarVisibility="Never">
-                <CollectionView.ItemsLayout>
-                    <LinearItemsLayout Orientation="Horizontal"
-                                       SnapPointsAlignment="Center"
-                                       SnapPointsType="MandatorySingle"
-                                       ItemSpacing="0"/>
-                </CollectionView.ItemsLayout>
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="viewModels:IPaintingToolViewModel">
-                        <controls:ToolControl>
-                            <VisualStateManager.VisualStateGroups>
-                                <VisualStateGroupList>
-                                    <VisualStateGroup x:Name="CommonStates">
-                                        <VisualState x:Name="Normal">
-                                            <VisualState.Setters>
-                                                <Setter Property="BackgroundColor" Value="Transparent" />
-                                                <Setter Property="IconColor" Value="{StaticResource IndependenceAccentSixtyPercent}" />
-                                                <Setter Property="animations:AnimationProperties.Animations">
-                                                    <animations:ScaleToAnimation Scale=".75" Easing="{x:Static Easing.CubicInOut}" Length="200" />
-                                                </Setter>
-                                            </VisualState.Setters>
-                                        </VisualState>
+              <Border BackgroundColor="#20000000"
+                      Stroke="Transparent"
+                      StrokeShape="RoundRectangle 10">
+                <CollectionView SelectedItem="{Binding CurrentTool}"
+                                ItemsSource="{Binding AvailableTools}"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"
+                                HeightRequest="58"
+                                SelectionChanged="ToolCollectionView_SelectedItemChanged"
+                                SelectionMode="Single"
+                                HorizontalScrollBarVisibility="Never"
+                                VerticalScrollBarVisibility="Never">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Horizontal"
+                                        SnapPointsAlignment="Center"
+                                        SnapPointsType="MandatorySingle"
+                                        ItemSpacing="0"/>
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="viewModels:IPaintingToolViewModel">
+                            <controls:ToolControl>
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroupList>
+                                        <VisualStateGroup x:Name="CommonStates">
+                                            <VisualState x:Name="Normal">
+                                                <VisualState.Setters>
+                                                    <Setter Property="BackgroundColor" Value="Transparent" />
+                                                    <Setter Property="IconColor" Value="{StaticResource IndependenceAccentSixtyPercent}" />
+                                                    <Setter Property="animations:AnimationProperties.Animations">
+                                                        <animations:ScaleToAnimation Scale=".75" Easing="{x:Static Easing.CubicInOut}" Length="200" />
+                                                    </Setter>
+                                                </VisualState.Setters>
+                                            </VisualState>
 
-                                        <VisualState x:Name="Selected">
-                                            <VisualState.Setters>
-                                                <Setter Property="BackgroundColor" Value="Transparent" />
-                                                <Setter Property="IconColor" Value="{StaticResource Primary}" />
-                                                <Setter Property="animations:AnimationProperties.Animations">
-                                                    <animations:ScaleToAnimation Scale="1" Easing="{x:Static Easing.CubicInOut}" Length="200" />
-                                                </Setter>
-                                            </VisualState.Setters>
-                                        </VisualState>
-                                    </VisualStateGroup>
-                                </VisualStateGroupList>
-                            </VisualStateManager.VisualStateGroups>
-                        </controls:ToolControl>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+                                            <VisualState x:Name="Selected">
+                                                <VisualState.Setters>
+                                                    <Setter Property="BackgroundColor" Value="Transparent" />
+                                                    <Setter Property="IconColor" Value="{StaticResource Primary}" />
+                                                    <Setter Property="animations:AnimationProperties.Animations">
+                                                        <animations:ScaleToAnimation Scale="1" Easing="{x:Static Easing.CubicInOut}" Length="200" />
+                                                    </Setter>
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                    </VisualStateGroupList>
+                                </VisualStateManager.VisualStateGroups>
+                            </controls:ToolControl>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Border>
+            
         </Grid>
 
         <HorizontalStackLayout x:Name="ContextButtonsLayout"
