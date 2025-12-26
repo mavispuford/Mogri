@@ -91,12 +91,18 @@
     <Grid Padding="30,10,30,10"
           RowSpacing="10"
           RowDefinitions="auto,*">
-        <Grid x:Name="MaskGrid"
-              Grid.Row="1"
-              HorizontalOptions="Fill"
-              VerticalOptions="Fill"
-              SizeChanged="MaskGrid_SizeChanged"
-              Margin="0,0,0,80">
+        <controls:GestureContainer x:Name="ZoomContainer"
+                                   Grid.Row="1"
+                                   HorizontalOptions="Fill"
+                                   VerticalOptions="Fill"
+                                   Margin="0,0,0,80"
+                                   EnablePanning="{Binding IsZoomMode}"
+                                   EnableZooming="{Binding IsZoomMode}">
+            <Grid x:Name="MaskGrid"
+                  HorizontalOptions="Fill"
+                  VerticalOptions="Fill"
+                  SizeChanged="MaskGrid_SizeChanged"
+                  InputTransparent="{Binding IsZoomMode}">
             <skia:SKCanvasView x:Name="SourceImageCanvasView" 
                    PaintSurface="OnPaintSourceImageSurface"
                    IgnorePixelScaling="True"
@@ -131,7 +137,8 @@
                    IsRunning="{Binding IsBusy}"
                    InputTransparent="True"/>
 
-        </Grid>
+            </Grid>
+        </controls:GestureContainer>
 
         <Grid Grid.Row="0"
               HorizontalOptions="Center"

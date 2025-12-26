@@ -38,6 +38,19 @@ public class GestureContainer : ContentView
 
     public static readonly BindableProperty EnableZoomingProperty = BindableProperty.Create(nameof(EnableZooming), typeof(bool), typeof(GestureContainer), true);
 
+    public void Reset()
+    {
+        currentScale = 1;
+        startScale = 1;
+        if (Content != null)
+        {
+            Content.Scale = 1;
+            Content.TranslationX = 0;
+            Content.TranslationY = 0;
+            cancelTranslationAnimations();
+        }
+    }
+
     public GestureContainer()
     {
         var panGesture = new PanGestureRecognizer();
