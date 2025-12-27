@@ -111,20 +111,41 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
 
     private bool _isInitializing;
 
-    partial void OnSelectedModelTypeChanged(ModelType value)
+    async partial void OnSelectedModelTypeChanged(ModelType value)
     {
         if (_isInitializing) return;
 
-        var profile = GenerationProfile.GetDefault(value);
-        
-        Steps = profile.DefaultSteps.ToString();
-        CfgScale = profile.DefaultCfg.ToString();
-        Width = profile.DefaultWidth.ToString();
-        Height = profile.DefaultHeight.ToString();
-        Sampler = profile.DefaultSampler;
-        Scheduler = profile.DefaultScheduler;
+        try
+        {
+            var profile = GenerationProfile.GetDefault(value);
+            
+            Steps = profile.DefaultSteps.ToString();
+            CfgScale = profile.DefaultCfg.ToString();
 
-        IsSchedulerVisible = value == ModelType.ZImage;
+            var defaultWidth = profile.DefaultWidth.ToString();
+            var defaultHeight = profile.DefaultHeight.ToString();
+
+            if (Width != defaultWidth || Height != defaultHeight)
+            {
+                var resChangeMessage = $"Would you like keep the resolution at {Width}x{Height} or CHANGE it to {defaultWidth}x{defaultHeight}?";
+                var resChangeResult = await _popupService.DisplayAlertAsync("Confirm Resolution Change", resChangeMessage, "CHANGE", "Keep");
+
+                if (resChangeResult)
+                {
+                    Width = defaultWidth;
+                    Height = defaultHeight;
+                }
+            }
+            
+            Sampler = profile.DefaultSampler;
+            Scheduler = profile.DefaultScheduler;
+
+            IsSchedulerVisible = value == ModelType.ZImage;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error in OnSelectedModelTypeChanged: {ex}");
+        }
     }
 
     public PromptSettingsPageViewModel(
