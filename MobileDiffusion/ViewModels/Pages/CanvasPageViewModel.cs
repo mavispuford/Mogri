@@ -657,6 +657,12 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     {
         SegmentationBitmap?.Dispose();
         SegmentationBitmap = null;
+        _segmentationService.Reset();
+    }
+
+    partial void OnSegmentationModeChanged(SegmentationMode value)
+    {
+        _segmentationService.Reset();
     }
 
     private async Task LoadSourceBitmapUsingStream(Stream stream, string fileName)
