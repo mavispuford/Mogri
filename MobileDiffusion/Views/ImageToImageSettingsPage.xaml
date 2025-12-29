@@ -11,9 +11,6 @@
                 Shell.NavBarIsVisible="True"
                 Shell.TabBarIsVisible="False"
                 Title="Image to Image Settings">
-    <Shell.BackButtonBehavior>
-        <BackButtonBehavior Command="{Binding ConfirmSettingsCommand}" />
-    </Shell.BackButtonBehavior>
     <views:BasePage.Resources>
         <ResourceDictionary>
             <toolkit:VariableMultiValueConverter x:Key="AnyTrueConverter" ConditionType="Any" />

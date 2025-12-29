@@ -9,9 +9,6 @@
                 Shell.TabBarIsVisible="False"
                 Title="LoRAs"
                 x:DataType="viewModels:ILoraSelectionPageViewModel">
-    <Shell.BackButtonBehavior>
-        <BackButtonBehavior Command="{Binding ConfirmCommand}" />
-    </Shell.BackButtonBehavior>
     <Grid RowDefinitions="*, auto, auto">
         <Grid RowDefinitions="auto, *" 
               ColumnDefinitions="auto,*"

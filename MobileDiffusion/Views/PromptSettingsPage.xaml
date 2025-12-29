@@ -10,9 +10,6 @@
                 Shell.NavBarIsVisible="True"
                 Shell.TabBarIsVisible="False"
                 Title="Prompt Settings">
-    <Shell.BackButtonBehavior>
-        <BackButtonBehavior Command="{Binding ConfirmSettingsCommand}" />
-    </Shell.BackButtonBehavior>
     <views:BasePage.Resources>
         <ResourceDictionary>
             <Style TargetType="Label" x:Key="SettingLabel">

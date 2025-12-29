@@ -9,9 +9,6 @@
                 Title="Prompt Editor"
                 Shell.TabBarIsVisible="False"
                 x:DataType="viewModels:IPromptPageViewModel">
-    <Shell.BackButtonBehavior>
-        <BackButtonBehavior Command="{Binding ConfirmCommand}" />
-    </Shell.BackButtonBehavior>
     <Grid RowDefinitions="auto,*,auto,*,auto,*,auto,*"
           Padding="30">
         <Label Grid.Row="0"

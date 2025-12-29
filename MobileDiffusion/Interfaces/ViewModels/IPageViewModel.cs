@@ -1,7 +1,11 @@
-﻿namespace MobileDiffusion.Interfaces.ViewModels;
+﻿using CommunityToolkit.Mvvm.Input;
+
+namespace MobileDiffusion.Interfaces.ViewModels;
 
 public interface IPageViewModel : IQueryAttributable, IBaseViewModel
 {
+    IAsyncRelayCommand BackButtonCommand {get;}
+
     Task OnAppearingAsync();
 
     Task OnDisappearingAsync();
