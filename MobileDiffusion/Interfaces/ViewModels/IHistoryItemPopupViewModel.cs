@@ -21,4 +21,8 @@ public interface IHistoryItemPopupViewModel : IPopupBaseViewModel
     IAsyncRelayCommand ImageInfoCommand { get; }
 
     IAsyncRelayCommand SendToCanvasCommand { get; }
+
+    IRelayCommand NextItemCommand { get; }
+
+    IRelayCommand PreviousItemCommand { get; }
 }

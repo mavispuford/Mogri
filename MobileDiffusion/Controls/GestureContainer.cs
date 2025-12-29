@@ -1,4 +1,5 @@
-﻿using MauiControls = Microsoft.Maui.Controls;
+﻿using System.Windows.Input;
+using MauiControls = Microsoft.Maui.Controls;
 
 namespace MobileDiffusion.Controls;
 
@@ -37,6 +38,30 @@ public class GestureContainer : ContentView
     public static readonly BindableProperty EnablePanningProperty = BindableProperty.Create(nameof(EnablePanning), typeof(bool), typeof(GestureContainer), true);
 
     public static readonly BindableProperty EnableZoomingProperty = BindableProperty.Create(nameof(EnableZooming), typeof(bool), typeof(GestureContainer), true);
+
+    public static readonly BindableProperty EnableSwipeCommandsWhenScaleIsOneProperty = BindableProperty.Create(nameof(EnableSwipeCommandsWhenScaleIsOne), typeof(bool), typeof(GestureContainer), false);
+
+    public static readonly BindableProperty SwipeLeftCommandProperty = BindableProperty.Create(nameof(SwipeLeftCommand), typeof(ICommand), typeof(GestureContainer));
+
+    public static readonly BindableProperty SwipeRightCommandProperty = BindableProperty.Create(nameof(SwipeRightCommand), typeof(ICommand), typeof(GestureContainer));
+
+    public bool EnableSwipeCommandsWhenScaleIsOne
+    {
+        get => (bool)GetValue(EnableSwipeCommandsWhenScaleIsOneProperty);
+        set => SetValue(EnableSwipeCommandsWhenScaleIsOneProperty, value);
+    }
+
+    public ICommand SwipeLeftCommand
+    {
+        get => (ICommand)GetValue(SwipeLeftCommandProperty);
+        set => SetValue(SwipeLeftCommandProperty, value);
+    }
+
+    public ICommand SwipeRightCommand
+    {
+        get => (ICommand)GetValue(SwipeRightCommandProperty);
+        set => SetValue(SwipeRightCommandProperty, value);
+    }
 
     public void Reset()
     {
@@ -150,7 +175,12 @@ public class GestureContainer : ContentView
 
     private void PanGesture_PanUpdated(object sender, PanUpdatedEventArgs e)
     {
-        if (!EnablePanning || !canPan || currentScale == 1)
+        if (!EnablePanning || !canPan)
+        {
+            return;
+        }
+
+        if (currentScale == 1 && !EnableSwipeCommandsWhenScaleIsOne)
         {
             return;
         }
@@ -186,7 +216,11 @@ public class GestureContainer : ContentView
                 }
 
                 Content.TranslationX += totalXDelta;
-                Content.TranslationY += totalYDelta;
+
+                if (currentScale > 1)
+                {
+                    Content.TranslationY += totalYDelta;
+                }
 
                 clampTranslation();
 
@@ -196,6 +230,23 @@ public class GestureContainer : ContentView
                 break;
 
             case GestureStatus.Completed:
+                if (currentScale == 1)
+                {
+                    const int swipeThreshold = 50;
+                    if (prevTotalX < -swipeThreshold && SwipeLeftCommand?.CanExecute(null) == true)
+                    {
+                        SwipeLeftCommand.Execute(null);
+                    }
+                    else if (prevTotalX > swipeThreshold && SwipeRightCommand?.CanExecute(null) == true)
+                    {
+                        SwipeRightCommand.Execute(null);
+                    }
+
+                    Content.TranslateTo(0, 0, 250, Easing.SpringOut);
+                    isPanning = false;
+                    return;
+                }
+
                 var dragX = getDrag(totalXDelta);
 
                 Content.AnimateKinetic("TranslationAnimationX", (distance, _) =>
