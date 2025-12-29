@@ -71,7 +71,7 @@
                                         </FormattedString>
                                     </Label.FormattedText>
                                 </Label>
-                                <Slider Minimum=".1" Maximum="2.0" Value="{Binding Strength}" />
+                                <Slider Minimum=".1" Maximum="2.0" Value="{Binding Strength, Mode=TwoWay}" />
                             </VerticalStackLayout>
                         </DataTemplate>
                     </BindableLayout.ItemTemplate>

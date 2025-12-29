@@ -6,5 +6,5 @@ public interface ILoraViewModel : IBaseViewModel
 
     string Alias { get; }
 
-    float Strength { get; }
+    double Strength { get; set; }
 }

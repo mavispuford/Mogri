@@ -12,5 +12,5 @@ public partial class LoraViewModel : BaseViewModel, ILoraViewModel
     public partial string Name { get; set; }
 
     [ObservableProperty]
-    public partial float Strength { get; set; } = 1;
+    public partial double Strength { get; set; } = 1d;
 }
