@@ -122,7 +122,8 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     {
         var popupParameters = new Dictionary<string, object>
         {
-            { NavigationParams.HistoryItem, item }
+            { NavigationParams.HistoryItem, item },
+            { NavigationParams.HistoryItems, HistoryItems }
         };
 
         var result = (await _popupService.ShowPopupForResultAsync("HistoryItemPopup", popupParameters)) as Dictionary<string, object>;
