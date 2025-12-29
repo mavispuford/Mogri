@@ -45,6 +45,15 @@ public partial class PageViewModel : BaseViewModel, IPageViewModel
 
     public virtual bool OnBackButtonPressed()
     {
+        // Executing the command to avoid using async void
+        NavigateBackCommand.Execute(null);
+
         return false;
+    }
+
+    [RelayCommand]
+    protected async Task NavigateBack()
+    {
+        await Shell.Current.GoToAsync("..");
     }
 }
