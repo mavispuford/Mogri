@@ -152,191 +152,200 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             return;
         }
 
-        Progress = 0;
-
-        Results = new();
-
-        var settings = _settings.Clone();
-
-        for (var i = 0; i < settings.BatchCount * settings.BatchSize; i++)
-        {
-            var resultItem = _serviceProvider.GetService<IResultItemViewModel>();
-
-            resultItem.ApplyQueryParamsFromResultItemCommand = new RelayCommand<IDictionary<string,object>>(ApplyQueryAttributes);
-
-            Results.Add(resultItem);
-        }
-
-        if (HasInitImage && settings.FitClientSide)
-        {
-            if (_initImageNeedsResize)
-            {
-                var initImageResult = await GetResizedImageStringFromSettingsAsync(settings, settings.InitImage, filterImage: true);
-
-                if (!string.IsNullOrEmpty(initImageResult.ImageString))
-                {
-                    settings.InitImage = initImageResult.ImageString;
-
-                    _resizedInitImage = initImageResult.ImageString;
-                    _initImageNeedsResize = false;
-                }
-
-                if (!string.IsNullOrEmpty(settings.Mask))
-                {
-                    var maskImageResult = await GetResizedImageStringFromWidthAndHeightAsync(initImageResult.ActualWidth, initImageResult.ActualHeight, settings.Mask, true, true);
-
-                    if (!string.IsNullOrEmpty(maskImageResult.ImageString))
-                    {
-                        settings.Mask = maskImageResult.ImageString;
-
-                        _resizedMaskImage = maskImageResult.ImageString;
-                    }
-                }
-            }
-            else
-            {
-                settings.InitImage = _resizedInitImage;
-                settings.Mask = _resizedMaskImage;
-            }
-        }
-
-        settings.Prompt = string.IsNullOrEmpty(settings.Prompt) ? _defaultPrompt : settings.Prompt;
-
-        var sanitizedPrompt = settings.Prompt.Replace(" ", "_").ToLower();
-        var length = Math.Min(sanitizedPrompt.Length, 90);
-
-        var imageNumber = 0;
+        DeviceDisplay.Current.KeepScreenOn = true;
 
         try
         {
-            await foreach (var response in _stableDiffusionService.SubmitImageRequestAsync(settings))
+            Progress = 0;
+
+            Results = new();
+
+            var settings = _settings.Clone();
+
+            for (var i = 0; i < settings.BatchCount * settings.BatchSize; i++)
             {
-                if (response.StableDiffusionApi == Enums.StableDiffusionApi.InvokeAI)
+                var resultItem = _serviceProvider.GetService<IResultItemViewModel>();
+
+                resultItem.ApplyQueryParamsFromResultItemCommand = new RelayCommand<IDictionary<string,object>>(ApplyQueryAttributes);
+
+                Results.Add(resultItem);
+            }
+
+            if (HasInitImage && settings.FitClientSide)
+            {
+                if (_initImageNeedsResize)
                 {
-                    var item = response.ResponseObject as LSteinResponseItem;
+                    var initImageResult = await GetResizedImageStringFromSettingsAsync(settings, settings.InitImage, filterImage: true);
 
-                    if (item.Event.Equals("step", StringComparison.OrdinalIgnoreCase))
+                    if (!string.IsNullOrEmpty(initImageResult.ImageString))
                     {
-                        float progress = 0f;
+                        settings.InitImage = initImageResult.ImageString;
 
-                        if (string.IsNullOrEmpty(settings.InitImage))
-                        {
-                            progress = item.Step / (float)(settings.Steps);
-                        }
-                        else
-                        {
-                            progress = item.Step / (float)(settings.Steps * settings.DenoisingStrength);
-                        }
-
-                        reportProgress(progress);
-
-                        continue;
+                        _resizedInitImage = initImageResult.ImageString;
+                        _initImageNeedsResize = false;
                     }
 
-                    var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{item.Seed}-{DateTime.Now.Ticks}";
-
-                    if (item.Event.Equals("result", StringComparison.OrdinalIgnoreCase))
+                    if (!string.IsNullOrEmpty(settings.Mask))
                     {
-                        var result = Results.FirstOrDefault(r => r.ApiResponse == null);
+                        var maskImageResult = await GetResizedImageStringFromWidthAndHeightAsync(initImageResult.ActualWidth, initImageResult.ActualHeight, settings.Mask, true, true);
 
-                        result.ApiResponse = response;
-                        result.Settings = settings.Clone();
-
-                        await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
-                    }
-                    else if (item.Event.Equals("upscaling-started", StringComparison.OrdinalIgnoreCase))
-                    {
-                        foreach (var result in Results)
+                        if (!string.IsNullOrEmpty(maskImageResult.ImageString))
                         {
-                            result.IsLoading = true;
-                        }
-                    }
-                    else if (item.Event.Equals("upscaling-done", StringComparison.OrdinalIgnoreCase))
-                    {
-                        foreach (var result in Results)
-                        {
-                            if (result != null)
-                            {
-                                await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
-                            }
+                            settings.Mask = maskImageResult.ImageString;
+
+                            _resizedMaskImage = maskImageResult.ImageString;
                         }
                     }
                 }
-                else if (response.StableDiffusionApi == Enums.StableDiffusionApi.Automatic1111)
+                else
                 {
-                    reportProgress((float)response.Progress);
+                    settings.InitImage = _resizedInitImage;
+                    settings.Mask = _resizedMaskImage;
+                }
+            }
 
-                    if (response.ResponseObject is GenerationResponse generationResponse)
+            settings.Prompt = string.IsNullOrEmpty(settings.Prompt) ? _defaultPrompt : settings.Prompt;
+
+            var sanitizedPrompt = settings.Prompt.Replace(" ", "_").ToLower();
+            var length = Math.Min(sanitizedPrompt.Length, 90);
+
+            var imageNumber = 0;
+
+            try
+            {
+                await foreach (var response in _stableDiffusionService.SubmitImageRequestAsync(settings))
+                {
+                    if (response.StableDiffusionApi == Enums.StableDiffusionApi.InvokeAI)
                     {
-                        var autoResponseInfo = JsonConvert.DeserializeObject<IDictionary<string, object>>(generationResponse.Info, new JsonSerializerSettings
+                        var item = response.ResponseObject as LSteinResponseItem;
+
+                        if (item.Event.Equals("step", StringComparison.OrdinalIgnoreCase))
                         {
-                            ContractResolver = CustomContractResolver.Instance
-                        });
+                            float progress = 0f;
 
-                        foreach (var image in generationResponse.Images)
+                            if (string.IsNullOrEmpty(settings.InitImage))
+                            {
+                                progress = item.Step / (float)(settings.Steps);
+                            }
+                            else
+                            {
+                                progress = item.Step / (float)(settings.Steps * settings.DenoisingStrength);
+                            }
+
+                            reportProgress(progress);
+
+                            continue;
+                        }
+
+                        var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{item.Seed}-{DateTime.Now.Ticks}";
+
+                        if (item.Event.Equals("result", StringComparison.OrdinalIgnoreCase))
                         {
-                            var seeds = autoResponseInfo["all_seeds"] as List<long>;
-                            var seedString = seeds?.ElementAt(imageNumber) ?? settings.Seed + imageNumber;
-
-                            var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{seedString}-{DateTime.Now.Ticks}";
-
                             var result = Results.FirstOrDefault(r => r.ApiResponse == null);
 
-                            if (result != null)
-                            {
-                                result.ApiResponse = response;
-                                result.Settings = settings.Clone();
-                                result.Settings.Seed = seedString;
+                            result.ApiResponse = response;
+                            result.Settings = settings.Clone();
 
-                                await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
+                            await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
+                        }
+                        else if (item.Event.Equals("upscaling-started", StringComparison.OrdinalIgnoreCase))
+                        {
+                            foreach (var result in Results)
+                            {
+                                result.IsLoading = true;
+                            }
+                        }
+                        else if (item.Event.Equals("upscaling-done", StringComparison.OrdinalIgnoreCase))
+                        {
+                            foreach (var result in Results)
+                            {
+                                if (result != null)
+                                {
+                                    await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
+                                }
                             }
                         }
                     }
-                    else if (response.ResponseObject is ProgressResponse progressResponse)
+                    else if (response.StableDiffusionApi == Enums.StableDiffusionApi.Automatic1111)
                     {
-                        // if (!string.IsNullOrEmpty(progressResponse.CurrentImage))
-                        // {
-                        //     var result = Results.FirstOrDefault(r => r.ApiResponse == null);
+                        reportProgress((float)response.Progress);
 
-                        //     if (result != null)
-                        //     {
-                        //         using var stream = await _imageService.GetStreamFromContentTypeStringAsync(progressResponse.CurrentImage, CancellationToken.None);
-                        //         var bitmap = _imageService.GetSkBitmapFromStream(stream);
+                        if (response.ResponseObject is GenerationResponse generationResponse)
+                        {
+                            var autoResponseInfo = JsonConvert.DeserializeObject<IDictionary<string, object>>(generationResponse.Info, new JsonSerializerSettings
+                            {
+                                ContractResolver = CustomContractResolver.Instance
+                            });
 
-                        //         if (bitmap != null)
-                        //         {
-                        //             result.ImageSource = new SKBitmapImageSource { Bitmap = bitmap };
-                        //         }
-                        //     }
-                        // }
-                    }              
+                            foreach (var image in generationResponse.Images)
+                            {
+                                var seeds = autoResponseInfo["all_seeds"] as List<long>;
+                                var seedString = seeds?.ElementAt(imageNumber) ?? settings.Seed + imageNumber;
+
+                                var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{seedString}-{DateTime.Now.Ticks}";
+
+                                var result = Results.FirstOrDefault(r => r.ApiResponse == null);
+
+                                if (result != null)
+                                {
+                                    result.ApiResponse = response;
+                                    result.Settings = settings.Clone();
+                                    result.Settings.Seed = seedString;
+
+                                    await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
+                                }
+                            }
+                        }
+                        else if (response.ResponseObject is ProgressResponse progressResponse)
+                        {
+                            // if (!string.IsNullOrEmpty(progressResponse.CurrentImage))
+                            // {
+                            //     var result = Results.FirstOrDefault(r => r.ApiResponse == null);
+
+                            //     if (result != null)
+                            //     {
+                            //         using var stream = await _imageService.GetStreamFromContentTypeStringAsync(progressResponse.CurrentImage, CancellationToken.None);
+                            //         var bitmap = _imageService.GetSkBitmapFromStream(stream);
+
+                            //         if (bitmap != null)
+                            //         {
+                            //             result.ImageSource = new SKBitmapImageSource { Bitmap = bitmap };
+                            //         }
+                            //     }
+                            // }
+                        }              
+                    }
                 }
             }
-        }
-        catch (System.Net.Sockets.SocketException socketException)
-        {
-            await Shell.Current.CurrentPage.DisplayAlertAsync("Connection Error", $"A network error occurred: {socketException.Message}", "OK");
-        }
-        catch (System.Net.WebException webException)
-        {
-            await Shell.Current.CurrentPage.DisplayAlertAsync("Web Error", $"A web error occurred: {webException.Message}", "OK");
-        }
-        catch (Exception e)
-        {
-            await Shell.Current.CurrentPage.DisplayAlertAsync("Error", $"An unexpected error occurred: {e.Message}", "OK");
-        }
-
-        // Any remaining results that weren't set have failed
-        foreach (var result in Results)
-        {
-            if (result.IsLoading)
+            catch (System.Net.Sockets.SocketException socketException)
             {
-                result.IsLoading = false;
-                result.Failed = true;
+                await Shell.Current.CurrentPage.DisplayAlertAsync("Connection Error", $"A network error occurred: {socketException.Message}", "OK");
             }
-        }
+            catch (System.Net.WebException webException)
+            {
+                await Shell.Current.CurrentPage.DisplayAlertAsync("Web Error", $"A web error occurred: {webException.Message}", "OK");
+            }
+            catch (Exception e)
+            {
+                await Shell.Current.CurrentPage.DisplayAlertAsync("Error", $"An unexpected error occurred: {e.Message}", "OK");
+            }
 
-        vibrate(HapticFeedbackType.LongPress);
+            // Any remaining results that weren't set have failed
+            foreach (var result in Results)
+            {
+                if (result.IsLoading)
+                {
+                    result.IsLoading = false;
+                    result.Failed = true;
+                }
+            }
+
+            vibrate(HapticFeedbackType.LongPress);
+        }
+        finally
+        {
+            DeviceDisplay.Current.KeepScreenOn = false;
+        }
     }
 
     private void reportProgress(float progress)
