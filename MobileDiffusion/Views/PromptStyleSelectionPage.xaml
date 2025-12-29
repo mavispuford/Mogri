@@ -11,9 +11,6 @@
                 Shell.NavBarIsVisible="True"
                 Shell.TabBarIsVisible="False"
                 Title="Prompt Styles">
-    <Shell.BackButtonBehavior>
-        <BackButtonBehavior Command="{Binding ConfirmCommand}" />
-    </Shell.BackButtonBehavior>
     <views:BasePage.Resources>
         <Style TargetType="Grid">
             <Setter Property="VisualStateManager.VisualStateGroups">
