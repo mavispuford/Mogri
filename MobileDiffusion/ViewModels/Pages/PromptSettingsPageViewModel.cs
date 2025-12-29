@@ -396,7 +396,36 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         var settings = await _presetService.LoadPresetAsync(name);
         if (settings != null)
         {
+
+            // Store Prompt Page property values
+            var currentPrompt = _settings.Prompt;
+            var currentNegativePrompt = _settings.NegativePrompt;
+            var currentPromptStyles = _settings.PromptStyles;
+            var currentLoras = _settings.Loras;
+
             _settings = settings;
+            
+            // Set the Prompt Page properties back if they were previously set
+            if (!string.IsNullOrEmpty(currentPrompt))
+            {
+                _settings.Prompt = currentPrompt;
+            }
+
+            if (!string.IsNullOrEmpty(currentNegativePrompt))
+            {
+                _settings.NegativePrompt = currentNegativePrompt;
+            }
+
+            if (currentPromptStyles.Any())
+            {
+                _settings.PromptStyles = currentPromptStyles;
+            }
+
+            if (currentLoras.Any())
+            {
+                _settings.Loras = currentLoras;
+            }
+            
             mapSettingsToProperties();
         }
     }
