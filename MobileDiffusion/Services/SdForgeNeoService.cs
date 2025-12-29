@@ -790,10 +790,37 @@ namespace MobileDiffusion.Services
                 var selectedModel = _models?.FirstOrDefault(m => m.Title == settings.Model.Key);
                 var currentCheckpointHash = GetOptionValue(_options.SdCheckpointHash);
 
-                if (selectedModel != null &&
-                    currentCheckpointHash != selectedModel.Sha256)
+                if (selectedModel != null)
                 {
-                    requestBody.AdditionalData.Add("sd_model_checkpoint", selectedModel.Title);
+                    if (currentCheckpointHash != selectedModel.Sha256)
+                    {
+                        requestBody.AdditionalData.Add("sd_model_checkpoint", selectedModel.Title);
+                    }
+
+                    // Handle Z-Image Turbo setting
+                    string desiredUnetStorage = "Automatic";
+                    if (settings.ModelType == MobileDiffusion.Enums.ModelType.ZImage && settings.Loras?.Any() == true)
+                    {
+                        desiredUnetStorage = "Automatic (fp16 LoRA)";
+                    }
+
+                    string currentUnetStorage = null;
+                    if (_options.AdditionalData.TryGetValue("forge_unet_storage_dtype", out var unetStorageObj))
+                    {
+                        if (unetStorageObj is UntypedString unetStorageStr)
+                        {
+                            currentUnetStorage = unetStorageStr.GetValue();
+                        }
+                        else if (unetStorageObj is string str)
+                        {
+                            currentUnetStorage = str;
+                        }
+                    }
+
+                    if (currentUnetStorage != desiredUnetStorage)
+                    {
+                        requestBody.AdditionalData.Add("forge_unet_storage_dtype", desiredUnetStorage);
+                    }
                 }
             }
             
