@@ -45,6 +45,15 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     public partial string CfgScalePlaceholder { get; set; }
 
     [ObservableProperty]
+    public partial string DistilledCfgScale { get; set; }
+
+    [ObservableProperty]
+    public partial string DistilledCfgScalePlaceholder { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsDistilledCfgScaleVisible { get; set; }
+
+    [ObservableProperty]
     public partial IModelViewModel Model { get; set; }
 
     [ObservableProperty]
@@ -121,6 +130,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             
             Steps = profile.DefaultSteps.ToString();
             CfgScale = profile.DefaultCfg.ToString();
+            DistilledCfgScale = profile.DefaultDistilledCfg?.ToString();
 
             var defaultWidth = profile.DefaultWidth.ToString();
             var defaultHeight = profile.DefaultHeight.ToString();
@@ -141,6 +151,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             Scheduler = profile.DefaultScheduler;
 
             IsSchedulerVisible = value == ModelType.ZImage;
+            IsDistilledCfgScaleVisible = value == ModelType.ZImage || value == ModelType.Flux;
         }
         catch (Exception ex)
         {
@@ -168,6 +179,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         var defaultSettings = new PromptSettings();
         StepsPlaceholder = defaultSettings.Steps.ToString();
         CfgScalePlaceholder = defaultSettings.GuidanceScale.ToString();
+        DistilledCfgScalePlaceholder = defaultSettings.DistilledCfgScale?.ToString();
         SeedPlaceholder = defaultSettings.Seed.ToString();
         GfpganStrengthPlaceholder = defaultSettings.GfpganStrength.ToString();
         UpscaleStepsPlaceholder = defaultSettings.UpscaleSteps.ToString();
@@ -343,6 +355,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         try
         {
             CfgScale = _settings.GuidanceScale.ToString();
+            DistilledCfgScale = _settings.DistilledCfgScale?.ToString();
             EnableGfpgan = _settings.EnableGfpgan;
             EnableUpscaling = _settings.EnableUpscaling;
             GfpganStrength = _settings.GfpganStrength.ToString();
@@ -362,6 +375,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             Width = _settings.Width.ToString();
 
             IsSchedulerVisible = SelectedModelType == ModelType.ZImage;
+            IsDistilledCfgScaleVisible = SelectedModelType == ModelType.ZImage || SelectedModelType == ModelType.Flux;
         }
         finally
         {
@@ -436,6 +450,12 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             double.TryParse(CfgScalePlaceholder, out pCfgScale))
         {
             _settings.GuidanceScale = pCfgScale;
+        }
+
+        if (double.TryParse(DistilledCfgScale, out var pDistilledCfgScale) ||
+            double.TryParse(DistilledCfgScalePlaceholder, out pDistilledCfgScale))
+        {
+            _settings.DistilledCfgScale = pDistilledCfgScale;
         }
 
         _settings.EnableGfpgan = EnableGfpgan;
