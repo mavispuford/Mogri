@@ -12,7 +12,7 @@ public class PromptSettings
     public bool FitClientSide { get; set; } = true;
     public double GfpganStrength { get; set; } = .75;
     public double GuidanceScale { get; set; } = 7.5;
-    public double? DistilledCfgScale { get; set; }
+    public double? DistilledCfgScale { get; set; } = 3;
     public double Height { get; set; } = Preferences.Default.Get<double>(Constants.PreferenceKeys.DefaultWidth, 512);
     public string InitImage { get; set; }
     public OnOff InvertMask { get; set; }
