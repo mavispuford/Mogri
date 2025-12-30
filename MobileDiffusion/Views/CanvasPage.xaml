@@ -264,7 +264,7 @@
 
                         <Slider WidthRequest="200"
                                 HeightRequest="40"
-                                Minimum="0.01"
+                                Minimum="0.0"
                                 Maximum="1.0"
                                 Value="{Binding CurrentAlpha}" />
 
