@@ -181,6 +181,18 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
         AvailableTools.Add(new PaintingToolViewModel
         {
+            Name = "Eyedropper",
+            IconCode = "\ue3b8",
+            Effect = MaskEffect.None,
+            Type = ToolType.Eyedropper,
+            ContextButtons = 
+            [
+                new ColorPickerContextButtonViewModel(this),
+            ]
+        });
+
+        AvailableTools.Add(new PaintingToolViewModel
+        {
             Name = "Zoom",
             IconCode = "\ue8ff",
             Effect = MaskEffect.None,
