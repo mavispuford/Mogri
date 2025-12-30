@@ -20,7 +20,7 @@ public class GenerationProfile
             {
                 DefaultSteps = 8,
                 DefaultCfg = 1.0,
-                DefaultDistilledCfg = 9,
+                DefaultDistilledCfg = 3.5,
                 DefaultSampler = "Euler",
                 DefaultScheduler = "beta",
                 DefaultWidth = 1024,
