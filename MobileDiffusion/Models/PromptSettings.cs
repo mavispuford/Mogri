@@ -17,6 +17,7 @@ public class PromptSettings
     public string InitImage { get; set; }
     public OnOff InvertMask { get; set; }
     public string Mask { get; set; }
+    public int MaskBlur { get; set; } = 0;
     public ModelType ModelType { get; set; } = ModelType.StableDiffusion;
     public int Steps { get; set; } = 30;
     public int BatchCount { get; set; } = 1;

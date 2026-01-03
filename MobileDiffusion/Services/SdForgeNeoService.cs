@@ -410,9 +410,10 @@ namespace MobileDiffusion.Services
             request.InpaintingFill = 1;
 
             // Because we colorize the image, blurring the mask would cause some of the colorized pixels to stay
-            request.MaskBlur = 0;
-            request.MaskBlurX = 0;
-            request.MaskBlurY = 0;
+            // However, if the user has explicitly set a mask blur, we should honor it.
+            request.MaskBlur = settings.MaskBlur;
+            request.MaskBlurX = settings.MaskBlur;
+            request.MaskBlurY = settings.MaskBlur;
             request.MaskRound = false;
 
             if (settings.ModelType == Enums.ModelType.ZImage)
