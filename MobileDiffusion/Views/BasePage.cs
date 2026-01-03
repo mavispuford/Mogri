@@ -6,6 +6,24 @@ public class BasePage : ContentPage
 {
     public BasePage()
     {
+        // For some reason, the back button behavior occasionally breaks when setting it from the XAML.  
+        // https://github.com/dotnet/maui/issues/33139
+        // Handling it here instead...
+        var backButtonBehavior = new BackButtonBehavior();
+        backButtonBehavior.SetBinding(BackButtonBehavior.CommandProperty, nameof(IPageViewModel.BackButtonCommand));
+        Shell.SetBackButtonBehavior(this, backButtonBehavior);
+    }
+
+    protected override void OnBindingContextChanged()
+    {
+        var backButtonBehavior = Shell.GetBackButtonBehavior(this);
+
+        if (backButtonBehavior != null)
+        {
+            backButtonBehavior.BindingContext = BindingContext;
+        }
+
+        base.OnBindingContextChanged();
     }
 
     protected override async void OnAppearing()

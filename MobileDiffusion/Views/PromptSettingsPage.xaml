@@ -10,9 +10,6 @@
                 Shell.NavBarIsVisible="True"
                 Shell.TabBarIsVisible="False"
                 Title="Prompt Settings">
-    <Shell.BackButtonBehavior>
-        <BackButtonBehavior Command="{Binding ConfirmSettingsCommand}" />
-    </Shell.BackButtonBehavior>
     <views:BasePage.Resources>
         <ResourceDictionary>
             <Style TargetType="Label" x:Key="SettingLabel">
@@ -26,14 +23,19 @@
           Padding="0"
           Margin="0">
         <ScrollView Grid.Row="0" Orientation="Vertical">
-            <Grid Padding="30"
-                  RowDefinitions="auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto"
-                  RowSpacing="10"
-                  ColumnSpacing="16"
-                  ColumnDefinitions="32,auto,*"
-                  HorizontalOptions="Fill">
+            <VerticalStackLayout>
+                <Grid Padding="30, 20, 30, 0" ColumnDefinitions="*, *" ColumnSpacing="10">
+                    <Button Text="Load Preset" Command="{Binding LoadPresetCommand}" />
+                    <Button Grid.Column="1" Text="Save Preset" Command="{Binding SavePresetCommand}" />
+                </Grid>
+                <Grid Padding="30"
+                      RowDefinitions="auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto"
+                      RowSpacing="10"
+                      ColumnSpacing="16"
+                      ColumnDefinitions="32,auto,*"
+                      HorizontalOptions="Fill">
 
-                <Image Grid.Row="0" WidthRequest="32" HeightRequest="32">
+                    <Image Grid.Row="0" WidthRequest="32" HeightRequest="32">
                     <Image.Source>
                         <FontImageSource Glyph="&#xf609;" FontFamily="MaterialIconsRound300" Size="30" Color="{StaticResource Tertiary}" />
                     </Image.Source>
@@ -69,14 +71,30 @@
                 <Label Grid.Row="5" Grid.Column="1" Text="Cfg Scale:" Style="{StaticResource SettingLabel}"/>
                 <Entry Grid.Row="5" Grid.Column="2" Placeholder="{Binding CfgScalePlaceholder}" Text="{Binding CfgScale}" Keyboard="Numeric" FontSize="16" MaxLength="6" HorizontalTextAlignment="End" />
 
-                <Image Grid.Row="6" WidthRequest="32">
+                <Image Grid.Row="6" WidthRequest="32" IsVisible="{Binding IsDistilledCfgScaleVisible}">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xeb5f;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                    </Image.Source>
+                </Image>
+                <Label Grid.Row="6" Grid.Column="1" Text="Shift:" Style="{StaticResource SettingLabel}" IsVisible="{Binding IsDistilledCfgScaleVisible}"/>
+                <Entry Grid.Row="6" Grid.Column="2" Placeholder="{Binding DistilledCfgScalePlaceholder}" Text="{Binding DistilledCfgScale}" Keyboard="Numeric" FontSize="16" MaxLength="6" HorizontalTextAlignment="End" IsVisible="{Binding IsDistilledCfgScaleVisible}"/>
+
+                <Image Grid.Row="7" WidthRequest="32">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xe8e5;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                    </Image.Source>
+                </Image>
+                <Label Grid.Row="7" Grid.Column="1" Text="Type:" Style="{StaticResource SettingLabel}"/>
+                <Picker Grid.Row="7" Grid.Column="2" Title="Type" ItemsSource="{Binding AvailableModelTypes}" SelectedItem="{Binding SelectedModelType}" FontSize="16" HorizontalTextAlignment="End" />
+
+                <Image Grid.Row="8" WidthRequest="32">
                     <Image.Source>
                         <FontImageSource Glyph="&#xf720;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="6" Grid.Column="1" Text="Model:" Style="{StaticResource SettingLabel}"/>
+                <Label Grid.Row="8" Grid.Column="1" Text="Model:" Style="{StaticResource SettingLabel}"/>
                 <ScrollView 
-                    Grid.Row="6" Grid.Column="2"
+                    Grid.Row="8" Grid.Column="2"
                     Orientation="Horizontal"
                     HorizontalOptions="End">
                     <Picker Title="Model" 
@@ -87,25 +105,33 @@
                             HorizontalOptions="End"/>
                 </ScrollView>
 
-                <Image Grid.Row="7" WidthRequest="32">
+                <Image Grid.Row="9" WidthRequest="32">
                     <Image.Source>
                         <FontImageSource Glyph="&#xe8f4;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="7" Grid.Column="1" Text="Sampler:" Style="{StaticResource SettingLabel}"/>
-                <Picker Grid.Row="7" Grid.Column="2" Title="Sampler" ItemsSource="{Binding AvailableSamplerValues}" SelectedItem="{Binding Sampler}" FontSize="16" HorizontalTextAlignment="End" />
+                <Label Grid.Row="9" Grid.Column="1" Text="Sampler:" Style="{StaticResource SettingLabel}"/>
+                <Picker Grid.Row="9" Grid.Column="2" Title="Sampler" ItemsSource="{Binding AvailableSamplerValues}" SelectedItem="{Binding Sampler}" FontSize="16" HorizontalTextAlignment="End" />
 
-                <Image Grid.Row="8" WidthRequest="32">
+                <Image Grid.Row="10" WidthRequest="32" IsVisible="{Binding IsSchedulerVisible}">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xe924;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                    </Image.Source>
+                </Image>
+                <Label Grid.Row="10" Grid.Column="1" Text="Scheduler:" Style="{StaticResource SettingLabel}" IsVisible="{Binding IsSchedulerVisible}"/>
+                <Picker Grid.Row="10" Grid.Column="2" Title="Scheduler" ItemsSource="{Binding AvailableSchedulers}" SelectedItem="{Binding Scheduler}" FontSize="16" HorizontalTextAlignment="End" IsVisible="{Binding IsSchedulerVisible}"/>
+
+                <Image Grid.Row="11" WidthRequest="32">
                     <Image.Source>
                         <FontImageSource Glyph="&#xe85b;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="8" Grid.Column="1" Text="Width/Height" Style="{StaticResource SettingLabel}">
+                <Label Grid.Row="11" Grid.Column="1" Text="Width/Height" Style="{StaticResource SettingLabel}">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding ShowResolutionSelectCommand}"/>
                     </Label.GestureRecognizers>
                 </Label>
-                <Label Grid.Row="8" Grid.Column="2" VerticalTextAlignment="Center" HorizontalTextAlignment="End" FontAttributes="Bold" FontSize="16">
+                <Label Grid.Row="11" Grid.Column="2" VerticalTextAlignment="Center" HorizontalTextAlignment="End" FontAttributes="Bold" FontSize="16">
                     <Label.FormattedText>
                         <FormattedString>
                             <Span Text="{Binding Width}" />
@@ -118,48 +144,49 @@
                     </Label.GestureRecognizers>
                 </Label>
                 
-                <Image Grid.Row="9" WidthRequest="32">
+                <Image Grid.Row="12" WidthRequest="32">
                     <Image.Source>
                         <FontImageSource Glyph="&#xe3a5;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="9" Grid.Column="1" Text="Seed:" Style="{StaticResource SettingLabel}"/>
-                <Entry Grid.Row="9" Grid.Column="2" Placeholder="{Binding SeedPlaceholder}" Text="{Binding Seed}" Keyboard="Numeric" FontSize="16" HorizontalTextAlignment="End" />
+                <Label Grid.Row="12" Grid.Column="1" Text="Seed:" Style="{StaticResource SettingLabel}"/>
+                <Entry Grid.Row="12" Grid.Column="2" Placeholder="{Binding SeedPlaceholder}" Text="{Binding Seed}" Keyboard="Numeric" FontSize="16" HorizontalTextAlignment="End" />
 
-                <Image Grid.Row="10" WidthRequest="32">
+                <Image Grid.Row="13" WidthRequest="32">
                     <Image.Source>
                         <FontImageSource Glyph="&#xe87c;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="10" Grid.Column="1" Text="Face-correct:" Style="{StaticResource SettingLabel}"/>
-                <Switch Grid.Row="10" Grid.Column="2" IsToggled="{Binding EnableGfpgan}" />
-                <Label Grid.Row="11" Grid.Column="1" Text="Strength:" Style="{StaticResource SettingLabel}"/>
-                <Entry Grid.Row="11" Grid.Column="2" Placeholder="{Binding GfpganStrengthPlaceholder}" Text="{Binding GfpganStrength}" Keyboard="Numeric" FontSize="16" HorizontalTextAlignment="End" />
+                <Label Grid.Row="13" Grid.Column="1" Text="Face-correct:" Style="{StaticResource SettingLabel}"/>
+                <Switch Grid.Row="13" Grid.Column="2" IsToggled="{Binding EnableGfpgan}" />
+                <Label Grid.Row="14" Grid.Column="1" Text="Strength:" Style="{StaticResource SettingLabel}"/>
+                <Entry Grid.Row="14" Grid.Column="2" Placeholder="{Binding GfpganStrengthPlaceholder}" Text="{Binding GfpganStrength}" Keyboard="Numeric" FontSize="16" HorizontalTextAlignment="End" />
 
-                <Image Grid.Row="12" WidthRequest="32">
+                <Image Grid.Row="15" WidthRequest="32">
                     <Image.Source>
                         <FontImageSource Glyph="&#xe8c4;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="12" Grid.Column="1" Text="Upscaling:" Style="{StaticResource SettingLabel}"/>
-                <Switch Grid.Row="12" Grid.Column="2" IsToggled="{Binding EnableUpscaling}" />
-                <Label Grid.Row="13" Grid.Column="1" Text="Upscaler:" Style="{StaticResource SettingLabel}"/>
-                <Picker Grid.Row="13" Grid.Column="2" Title="Upscaler" ItemsSource="{Binding AvailableUpscalerValues}" SelectedItem="{Binding Upscaler}" FontSize="16" HorizontalTextAlignment="End" />
-                <Label Grid.Row="14" Grid.Column="1" Text="Upscale Lvl:" Style="{StaticResource SettingLabel}"/>
-                <Picker Grid.Row="14" Grid.Column="2" Title="Level" ItemsSource="{Binding AvailableUpscaleLevelValues}" SelectedItem="{Binding UpscaleLevel}" FontSize="16" HorizontalTextAlignment="End" />
+                <Label Grid.Row="15" Grid.Column="1" Text="Upscaling:" Style="{StaticResource SettingLabel}"/>
+                <Switch Grid.Row="15" Grid.Column="2" IsToggled="{Binding EnableUpscaling}" />
+                <Label Grid.Row="16" Grid.Column="1" Text="Upscaler:" Style="{StaticResource SettingLabel}"/>
+                <Picker Grid.Row="16" Grid.Column="2" Title="Upscaler" ItemsSource="{Binding AvailableUpscalerValues}" SelectedItem="{Binding Upscaler}" FontSize="16" HorizontalTextAlignment="End" />
+                <Label Grid.Row="17" Grid.Column="1" Text="Upscale Lvl:" Style="{StaticResource SettingLabel}"/>
+                <Picker Grid.Row="17" Grid.Column="2" Title="Level" ItemsSource="{Binding AvailableUpscaleLevelValues}" SelectedItem="{Binding UpscaleLevel}" FontSize="16" HorizontalTextAlignment="End" />
 
-                <Label Grid.Row="15" Grid.Column="1" Text="Steps:" Style="{StaticResource SettingLabel}"/>
-                <Entry Grid.Row="15" Grid.Column="2" Placeholder="{Binding UpscaleStepsPlaceholder}" Text="{Binding UpscaleSteps}" Keyboard="Numeric" FontSize="16" HorizontalTextAlignment="End" />
+                <Label Grid.Row="18" Grid.Column="1" Text="Steps:" Style="{StaticResource SettingLabel}"/>
+                <Entry Grid.Row="18" Grid.Column="2" Placeholder="{Binding UpscaleStepsPlaceholder}" Text="{Binding UpscaleSteps}" Keyboard="Numeric" FontSize="16" HorizontalTextAlignment="End" />
 
-                <Image Grid.Row="16" Grid.Column="0" WidthRequest="32">
+                <Image Grid.Row="19" Grid.Column="0" WidthRequest="32">
                     <Image.Source>
                         <FontImageSource Glyph="&#xe421;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="16" Grid.Column="1" Text="Make Seamless:" Style="{StaticResource SettingLabel}"/>
-                <Switch Grid.Row="16" Grid.Column="2" IsToggled="{Binding MakeSeamless}" />
+                <Label Grid.Row="19" Grid.Column="1" Text="Make Seamless:" Style="{StaticResource SettingLabel}"/>
+                <Switch Grid.Row="19" Grid.Column="2" IsToggled="{Binding MakeSeamless}" />
 
             </Grid>
+            </VerticalStackLayout>
         </ScrollView>
 
         <HorizontalStackLayout Grid.Row="1" Spacing="10" HorizontalOptions="End" Padding="10">

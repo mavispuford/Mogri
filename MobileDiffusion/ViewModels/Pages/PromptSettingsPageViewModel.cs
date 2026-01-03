@@ -45,6 +45,15 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     public partial string CfgScalePlaceholder { get; set; }
 
     [ObservableProperty]
+    public partial string DistilledCfgScale { get; set; }
+
+    [ObservableProperty]
+    public partial string DistilledCfgScalePlaceholder { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsDistilledCfgScaleVisible { get; set; }
+
+    [ObservableProperty]
     public partial IModelViewModel Model { get; set; }
 
     [ObservableProperty]
@@ -89,13 +98,76 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     [ObservableProperty]
     public partial bool MakeSeamless { get; set; }
 
+    [ObservableProperty]
+    public partial ModelType SelectedModelType { get; set; }
+
+    [ObservableProperty]
+    public partial List<ModelType> AvailableModelTypes { get; set; } = Enum.GetValues(typeof(ModelType)).Cast<ModelType>().ToList();
+
+    [ObservableProperty]
+    public partial List<string> AvailableSchedulers { get; set; } = new();
+
+    [ObservableProperty]
+    public partial bool IsSchedulerVisible { get; set; }
+
+    [ObservableProperty]
+    public partial string Scheduler { get; set; }
+
+    [ObservableProperty]
+    public partial List<string> AvailablePresets { get; set; } = new();
+
+    private readonly IPresetService _presetService;
+
+    private bool _isInitializing;
+
+    async partial void OnSelectedModelTypeChanged(ModelType value)
+    {
+        if (_isInitializing) return;
+
+        try
+        {
+            var profile = GenerationProfile.GetDefault(value);
+            
+            Steps = profile.DefaultSteps.ToString();
+            CfgScale = profile.DefaultCfg.ToString();
+            DistilledCfgScale = profile.DefaultDistilledCfg?.ToString();
+
+            var defaultWidth = profile.DefaultWidth.ToString();
+            var defaultHeight = profile.DefaultHeight.ToString();
+
+            if (Width != defaultWidth || Height != defaultHeight)
+            {
+                var resChangeMessage = $"Would you like keep the resolution at {Width}x{Height} or CHANGE it to {defaultWidth}x{defaultHeight}?";
+                var resChangeResult = await _popupService.DisplayAlertAsync("Confirm Resolution Change", resChangeMessage, "CHANGE", "Keep");
+
+                if (resChangeResult)
+                {
+                    Width = defaultWidth;
+                    Height = defaultHeight;
+                }
+            }
+            
+            Sampler = profile.DefaultSampler;
+            Scheduler = profile.DefaultScheduler;
+
+            IsSchedulerVisible = value == ModelType.ZImage;
+            IsDistilledCfgScaleVisible = value == ModelType.ZImage || value == ModelType.Flux;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error in OnSelectedModelTypeChanged: {ex}");
+        }
+    }
+
     public PromptSettingsPageViewModel(
         IImageGenerationService stableDiffusionService,
         IPopupService popupService,
-        ILoadingService loadingService) : base(loadingService)
+        ILoadingService loadingService,
+        IPresetService presetService) : base(loadingService)
     {
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
+        _presetService = presetService ?? throw new ArgumentNullException(nameof(presetService));
 
         var upscaleLevelValues = new List<string>
         {
@@ -107,6 +179,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         var defaultSettings = new PromptSettings();
         StepsPlaceholder = defaultSettings.Steps.ToString();
         CfgScalePlaceholder = defaultSettings.GuidanceScale.ToString();
+        DistilledCfgScalePlaceholder = defaultSettings.DistilledCfgScale?.ToString();
         SeedPlaceholder = defaultSettings.Seed.ToString();
         GfpganStrengthPlaceholder = defaultSettings.GfpganStrength.ToString();
         UpscaleStepsPlaceholder = defaultSettings.UpscaleSteps.ToString();
@@ -143,6 +216,12 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             var models = await _stableDiffusionService.GetModelsAsync();
 
             AvailableModelValues = models;
+
+            var schedulers = await _stableDiffusionService.GetSchedulersAsync();
+
+            AvailableSchedulers = schedulers;
+
+            AvailablePresets = await _presetService.GetPresetsAsync();
         }
         catch
         {
@@ -173,6 +252,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         MakeSeamless = defaultSettings.Seamless == OnOff.on;
         Model = defaultSettings.Model;
         Sampler = defaultSettings.Sampler;
+        Scheduler = defaultSettings.Scheduler;
         Seed = defaultSettings.Seed.ToString();
         Steps = defaultSettings.Steps.ToString();
         Upscaler = defaultSettings.Upscaler.ToString();
@@ -206,7 +286,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             {
                 var modelChangeMessage = $"Would you like keep current model ({currentModel.DisplayName}) or CHANGE it to \"{_settings.Model.DisplayName}\"?";
 
-                modelChangeResult = await Shell.Current.DisplayAlertAsync("Confirm Model Change", modelChangeMessage, "CHANGE", "Keep");
+                modelChangeResult = await _popupService.DisplayAlertAsync("Confirm Model Change", modelChangeMessage, "CHANGE", "Keep");
             }
             else if (currentModel != null && _settings.Model != null && _settings.Model.Key == currentModel.Key)
             {
@@ -271,22 +351,97 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
 
     private void mapSettingsToProperties()
     {
-        CfgScale = _settings.GuidanceScale.ToString();
-        EnableGfpgan = _settings.EnableGfpgan;
-        EnableUpscaling = _settings.EnableUpscaling;
-        GfpganStrength = _settings.GfpganStrength.ToString();
-        Height = _settings.Height.ToString();
-        BatchCount = _settings.BatchCount.ToString();
-        BatchSize = _settings.BatchSize.ToString();
-        MakeSeamless = _settings.Seamless == OnOff.on;
-        Model = AvailableModelValues?.FirstOrDefault(m => m.Key == _settings.Model.Key);
-        Sampler = _settings.Sampler;
-        Seed = _settings.Seed.ToString();
-        Steps = _settings.Steps.ToString();
-        Upscaler = _settings.Upscaler;
-        UpscaleLevel = _settings.UpscaleLevel == 0 ? "2" : _settings.UpscaleLevel.ToString();
-        UpscaleSteps= _settings.UpscaleSteps.ToString();
-        Width = _settings.Width.ToString();
+        _isInitializing = true;
+        try
+        {
+            CfgScale = _settings.GuidanceScale.ToString();
+            DistilledCfgScale = _settings.DistilledCfgScale?.ToString();
+            EnableGfpgan = _settings.EnableGfpgan;
+            EnableUpscaling = _settings.EnableUpscaling;
+            GfpganStrength = _settings.GfpganStrength.ToString();
+            Height = _settings.Height.ToString();
+            BatchCount = _settings.BatchCount.ToString();
+            BatchSize = _settings.BatchSize.ToString();
+            MakeSeamless = _settings.Seamless == OnOff.on;
+            Model = AvailableModelValues?.FirstOrDefault(m => m.Key == _settings.Model.Key);
+            Sampler = _settings.Sampler;
+            Scheduler = _settings.Scheduler;
+            Seed = _settings.Seed.ToString();
+            SelectedModelType = _settings.ModelType;
+            Steps = _settings.Steps.ToString();
+            Upscaler = _settings.Upscaler;
+            UpscaleLevel = _settings.UpscaleLevel == 0 ? "2" : _settings.UpscaleLevel.ToString();
+            UpscaleSteps= _settings.UpscaleSteps.ToString();
+            Width = _settings.Width.ToString();
+
+            IsSchedulerVisible = SelectedModelType == ModelType.ZImage;
+            IsDistilledCfgScaleVisible = SelectedModelType == ModelType.ZImage || SelectedModelType == ModelType.Flux;
+        }
+        finally
+        {
+            _isInitializing = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task SavePreset()
+    {
+        var name = await _popupService.DisplayPromptAsync("Save Preset", "Enter a name for this preset:");
+        if (string.IsNullOrWhiteSpace(name)) return;
+
+        mapPropertiesToSettings();
+        await _presetService.SavePresetAsync(name, _settings);
+        AvailablePresets = await _presetService.GetPresetsAsync();
+        await _popupService.DisplayAlertAsync("Success", "Preset saved successfully.", "OK");
+    }
+
+    [RelayCommand]
+    private async Task LoadPreset()
+    {
+        if (AvailablePresets == null || !AvailablePresets.Any())
+        {
+            await _popupService.DisplayAlertAsync("No Presets", "No presets available to load.", "OK");
+            return;
+        }
+
+        var name = await _popupService.DisplayActionSheetAsync("Load Preset", "Cancel", null, AvailablePresets.ToArray());
+        if (string.IsNullOrEmpty(name) || name == "Cancel") return;
+
+        var settings = await _presetService.LoadPresetAsync(name);
+        if (settings != null)
+        {
+
+            // Store Prompt Page property values
+            var currentPrompt = _settings.Prompt;
+            var currentNegativePrompt = _settings.NegativePrompt;
+            var currentPromptStyles = _settings.PromptStyles;
+            var currentLoras = _settings.Loras;
+
+            _settings = settings;
+            
+            // Set the Prompt Page properties back if they were previously set
+            if (!string.IsNullOrEmpty(currentPrompt))
+            {
+                _settings.Prompt = currentPrompt;
+            }
+
+            if (!string.IsNullOrEmpty(currentNegativePrompt))
+            {
+                _settings.NegativePrompt = currentNegativePrompt;
+            }
+
+            if (currentPromptStyles.Any())
+            {
+                _settings.PromptStyles = currentPromptStyles;
+            }
+
+            if (currentLoras.Any())
+            {
+                _settings.Loras = currentLoras;
+            }
+            
+            mapSettingsToProperties();
+        }
     }
 
     private void mapPropertiesToSettings()
@@ -295,6 +450,12 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             double.TryParse(CfgScalePlaceholder, out pCfgScale))
         {
             _settings.GuidanceScale = pCfgScale;
+        }
+
+        if (double.TryParse(DistilledCfgScale, out var pDistilledCfgScale) ||
+            double.TryParse(DistilledCfgScalePlaceholder, out pDistilledCfgScale))
+        {
+            _settings.DistilledCfgScale = pDistilledCfgScale;
         }
 
         _settings.EnableGfpgan = EnableGfpgan;
@@ -358,5 +519,8 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         {
             _settings.Width = pWidth;
         }
+
+        _settings.ModelType = SelectedModelType;
+        _settings.Scheduler = Scheduler;
     }
 }

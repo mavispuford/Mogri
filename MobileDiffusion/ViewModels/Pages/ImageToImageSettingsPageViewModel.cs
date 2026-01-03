@@ -37,6 +37,12 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
     public partial string StrengthPlaceholder { get; set; }
 
     [ObservableProperty]
+    public partial string MaskBlur { get; set; }
+
+    [ObservableProperty]
+    public partial string MaskBlurPlaceholder { get; set; }
+
+    [ObservableProperty]
     public partial ImageSource InitImageSource { get; set; }
 
     [ObservableProperty]
@@ -78,6 +84,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
 
         var defaultSettings = new PromptSettings();
         Strength = defaultSettings.DenoisingStrength.ToString();
+        MaskBlur = defaultSettings.MaskBlur.ToString();
         _settings.InitImage = null;
         _settings.Mask = null;
         InitImageSource = null;
@@ -113,6 +120,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
     private async Task mapSettingsToProperties()
     {
         Strength = _settings.DenoisingStrength.ToString();
+        MaskBlur = _settings.MaskBlur.ToString();
 
         FitImageServerSide = _settings.Fit == Enums.OnOff.on;
         FitImageClientSide = _settings.FitClientSide;
@@ -142,6 +150,12 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
             double.TryParse(StrengthPlaceholder, out strength))
         {
             _settings.DenoisingStrength = strength;
+        }
+
+        if (int.TryParse(MaskBlur, out var maskBlur) ||
+            int.TryParse(MaskBlurPlaceholder, out maskBlur))
+        {
+            _settings.MaskBlur = maskBlur;
         }
 
         _settings.Fit = FitImageServerSide ? Enums.OnOff.on : Enums.OnOff.Default;

@@ -44,25 +44,30 @@ public partial class ImageResultControl : ContentView
 
     private async void OnIsLoadingChanged()
     {
-        if (!IsLoading && ImageControl.Scale == 0)
+        if (!IsLoading)
         {
-            // Avoid possible animation hitches caused by image loading
-            await Task.Delay(300);
-
-            _ = ImageControl.ScaleToAsync(1, 250u, Easing.CubicInOut);
+            await animateImageInAsync();
         }
     }
 
-    private void OnImageSourceChanged()
+    private async void OnImageSourceChanged()
     {
         if (Source != null)
         {
             ImageControl.Source = Source;
 
-            if (ImageControl.Scale == 0)
-            {
-                _ = ImageControl.ScaleToAsync(1, 250u, Easing.CubicInOut);
-            }
+            await animateImageInAsync();
+        }
+    }
+
+    private async Task animateImageInAsync()
+    {
+        if (ImageControl.Scale == 0)
+        {
+            // Avoid possible animation hitches caused by image loading
+            await Task.Delay(300);
+
+            _ = ImageControl.ScaleToAsync(1, 250u, Easing.CubicInOut);
         }
     }
 }

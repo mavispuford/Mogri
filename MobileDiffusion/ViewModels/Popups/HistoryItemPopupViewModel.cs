@@ -14,6 +14,8 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
     private readonly IImageService _imageService;
     private readonly IImageGenerationService _stableDiffusionService;
 
+    private IList<IHistoryItemViewModel> _historyItems;
+
     [ObservableProperty]
     public partial IHistoryItemViewModel HistoryItem { get; set; }
 
@@ -34,6 +36,12 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
     public override async void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         base.ApplyQueryAttributes(query);
+
+        if (query.TryGetValue(NavigationParams.HistoryItems, out var historyItemsParam) &&
+            historyItemsParam is IList<IHistoryItemViewModel> historyItems)
+        {
+            _historyItems = historyItems;
+        }
 
         if (query.TryGetValue(NavigationParams.HistoryItem, out var historyItemParam) &&
             historyItemParam is IHistoryItemViewModel historyItem)
@@ -62,6 +70,21 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
 
     public override async Task OnAppearingAsync()
     {
+        await LoadImageAsync();
+    }
+
+    partial void OnHistoryItemChanged(IHistoryItemViewModel value)
+    {
+        _ = LoadImageAsync();
+    }
+
+    private async Task LoadImageAsync()
+    {
+        if (HistoryItem == null)
+        {
+            return;
+        }
+
         if (!string.IsNullOrEmpty(HistoryItem.FileName))
         {
             using var fileStream = await _fileService.GetFileStreamFromInternalStorageAsync(HistoryItem.FileName);
@@ -90,6 +113,36 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
 
                 HistoryItem.Settings = imageInfoSettings;
             });
+        }
+    }
+
+    [RelayCommand]
+    private void NextItem()
+    {
+        if (_historyItems == null || HistoryItem == null)
+        {
+            return;
+        }
+
+        var index = _historyItems.IndexOf(HistoryItem);
+        if (index < _historyItems.Count - 1)
+        {
+            HistoryItem = _historyItems[index + 1];
+        }
+    }
+
+    [RelayCommand]
+    private void PreviousItem()
+    {
+        if (_historyItems == null || HistoryItem == null)
+        {
+            return;
+        }
+
+        var index = _historyItems.IndexOf(HistoryItem);
+        if (index > 0)
+        {
+            HistoryItem = _historyItems[index - 1];
         }
     }
 
@@ -157,7 +210,17 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
             $"Seed: {HistoryItem.Settings.Seed}\n" + 
             $"Size: {HistoryItem.Settings.Width}x{HistoryItem.Settings.Height}\n" +
             $"Denoising Strength: {HistoryItem.Settings.DenoisingStrength}\n" +
-            $"Model: {HistoryItem.Settings.Model.DisplayName}";
+            $"Model: {HistoryItem.Settings.Model?.DisplayName ?? "Unknown"}";
+
+        if (!string.IsNullOrEmpty(HistoryItem.Settings.Scheduler))
+        {
+            message += $"\nScheduler: {HistoryItem.Settings.Scheduler}";
+        }
+
+        if (HistoryItem.Settings.DistilledCfgScale.HasValue)
+        {
+            message += $"\nDistilled CFG Scale: {HistoryItem.Settings.DistilledCfgScale}";
+        }
 
         if (HistoryItem.Settings.EnableUpscaling &&
             !string.IsNullOrEmpty(HistoryItem.Settings.Upscaler) &&

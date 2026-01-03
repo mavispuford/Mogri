@@ -67,11 +67,11 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
                 if (allFiles != null)
                 {
                     // Non-thumbnail files only
-                    _allImageFileNames = allFiles.Where(s => !Path.GetFileName(s).StartsWith(Constants.ThumbnailPrefix)).ToArray();
-
-                    _allThumbnailFileNames = allFiles.Where(s => Path.GetFileName(s).StartsWith(Constants.ThumbnailPrefix)).ToArray();
+                    _allImageFileNames = allFiles.Where(s => !Path.GetFileName(s).StartsWith(Constants.ThumbnailPrefix) && s.EndsWith(".png", StringComparison.OrdinalIgnoreCase)).ToArray();
 
                     //// REMOVE ALL THUMBNAILS - REMOVE THIS AFTER TESTING
+                    // _allThumbnailFileNames = allFiles.Where(s => Path.GetFileName(s).StartsWith(Constants.ThumbnailPrefix) && s.EndsWith(".png", StringComparison.OrdinalIgnoreCase)).ToArray();
+                    //
                     //foreach (var file in _allThumbnailFileNames)
                     //{
                     //    File.Delete(file);
@@ -122,7 +122,8 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     {
         var popupParameters = new Dictionary<string, object>
         {
-            { NavigationParams.HistoryItem, item }
+            { NavigationParams.HistoryItem, item },
+            { NavigationParams.HistoryItems, HistoryItems }
         };
 
         var result = (await _popupService.ShowPopupForResultAsync("HistoryItemPopup", popupParameters)) as Dictionary<string, object>;

@@ -11,9 +11,6 @@
                 Shell.NavBarIsVisible="True"
                 Shell.TabBarIsVisible="False"
                 Title="Image to Image Settings">
-    <Shell.BackButtonBehavior>
-        <BackButtonBehavior Command="{Binding ConfirmSettingsCommand}" />
-    </Shell.BackButtonBehavior>
     <views:BasePage.Resources>
         <ResourceDictionary>
             <toolkit:VariableMultiValueConverter x:Key="AnyTrueConverter" ConditionType="Any" />
@@ -26,7 +23,7 @@
           Margin="0">
         <ScrollView Grid.Row="0" Orientation="Vertical">
             <Grid Padding="30"
-                  RowDefinitions="auto, auto, auto, auto, auto, auto, auto"
+                  RowDefinitions="auto, auto, auto, auto, auto, auto, auto, auto"
                   RowSpacing="10"
                   ColumnSpacing="16"
                   ColumnDefinitions="32,*,auto"
@@ -131,6 +128,14 @@
                 </Image>
                 <Label Grid.Row="6" Grid.Column="1" Text="Fit Image (before sending):" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
                 <Switch Grid.Row="6" Grid.Column="2" HorizontalOptions="End" IsToggled="{Binding FitImageClientSide}" />
+
+                <Image Grid.Row="7" Grid.Column="0" WidthRequest="32">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xe3e9;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                    </Image.Source>
+                </Image>
+                <Label Grid.Row="7" Grid.Column="1" Text="Mask Blur:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+                <Entry Grid.Row="7" Grid.Column="2" Placeholder="{Binding MaskBlurPlaceholder}" Text="{Binding MaskBlur}" Keyboard="Numeric" FontSize="16" MaxLength="3" HorizontalTextAlignment="End" />
             </Grid>
         </ScrollView>
 

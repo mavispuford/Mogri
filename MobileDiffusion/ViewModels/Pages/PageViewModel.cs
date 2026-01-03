@@ -1,9 +1,10 @@
-﻿using MobileDiffusion.Interfaces.Services;
+﻿using CommunityToolkit.Mvvm.Input;
+using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 
 namespace MobileDiffusion.ViewModels;
 
-public class PageViewModel : BaseViewModel, IPageViewModel
+public partial class PageViewModel : BaseViewModel, IPageViewModel
 {
     protected ILoadingService LoadingService { get; set; }
 
@@ -36,8 +37,23 @@ public class PageViewModel : BaseViewModel, IPageViewModel
         return Task.CompletedTask;
     }
 
+    [RelayCommand]
+    public async Task BackButton()  
+    {
+        OnBackButtonPressed();
+    }
+
     public virtual bool OnBackButtonPressed()
     {
+        // Executing the command to avoid using async void
+        NavigateBackCommand.Execute(null);
+
         return false;
+    }
+
+    [RelayCommand]
+    protected async Task NavigateBack()
+    {
+        await Shell.Current.GoToAsync("..");
     }
 }

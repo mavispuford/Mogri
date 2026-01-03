@@ -98,6 +98,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     [ObservableProperty]
     public partial bool GettingColorPalette { get; set; } = false;
 
+    public bool IsZoomMode => CurrentTool?.Type == ToolType.Zoom;
+
     [ObservableProperty]
     private SegmentationMode _segmentationMode = SegmentationMode.AddArea;
 
@@ -175,6 +177,27 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 new BoundingBoxSizeContextButtonViewModel(this),
                 new SnipContextButtonViewModel(this),
             }
+        });
+
+        AvailableTools.Add(new PaintingToolViewModel
+        {
+            Name = "Eyedropper",
+            IconCode = "\ue3b8",
+            Effect = MaskEffect.None,
+            Type = ToolType.Eyedropper,
+            ContextButtons = 
+            [
+                new ColorPickerContextButtonViewModel(this),
+            ]
+        });
+
+        AvailableTools.Add(new PaintingToolViewModel
+        {
+            Name = "Zoom",
+            IconCode = "\ue8ff",
+            Effect = MaskEffect.None,
+            Type = ToolType.Zoom,
+            ContextButtons = []
         });
 
         // Placeholder for gesture paint bucket - Might just be added into the base control
@@ -646,6 +669,12 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     {
         SegmentationBitmap?.Dispose();
         SegmentationBitmap = null;
+        _segmentationService.Reset();
+    }
+
+    partial void OnSegmentationModeChanged(SegmentationMode value)
+    {
+        _segmentationService.Reset();
     }
 
     private async Task LoadSourceBitmapUsingStream(Stream stream, string fileName)
@@ -686,10 +715,14 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             {
                 if (mask?.Lines != null)
                 {
+                    var canvasActions = new ObservableCollection<CanvasActionViewModel>();
+
                     foreach(var line in mask.Lines)
                     {
-                        CanvasActions.Add(line);
+                        canvasActions.Add(line);
                     }
+
+                    CanvasActions = canvasActions;
                 }
             });
         }
@@ -1163,5 +1196,6 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         }
 
         ShowContextMenu = value.Type == ToolType.PaintBucket;
+        OnPropertyChanged(nameof(IsZoomMode));
     }
 }
