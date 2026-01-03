@@ -86,6 +86,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
         Strength = defaultSettings.DenoisingStrength.ToString();
         MaskBlur = defaultSettings.MaskBlur.ToString();
         _settings.InitImage = null;
+        _settings.InitImageThumbnail = null;
         _settings.Mask = null;
         InitImageSource = null;
         MaskImageSource = null;
@@ -132,7 +133,8 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
             Task.Run(async () =>
             {
                 IsLoadingInitImage = true;
-                InitImageSource = await _imageService.GetImageSourceFromContentTypeStringAsync(_settings.InitImage, _initCancellationTokenSource.Token);
+                var imageToLoad = !string.IsNullOrEmpty(_settings.InitImageThumbnail) ? _settings.InitImageThumbnail : _settings.InitImage;
+                InitImageSource = await _imageService.GetImageSourceFromContentTypeStringAsync(imageToLoad, _initCancellationTokenSource.Token);
                 IsLoadingInitImage = false;
             }, _initCancellationTokenSource.Token),
             Task.Run(async () =>
@@ -199,8 +201,15 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
 
                 _settings.InitImage = formattedImageString;
 
-                // Attempt to match the aspect ratio of the image within the resolution constraints
+                memoryStream.Seek(0, SeekOrigin.Begin);
                 var bitmap = _imageService.GetSkBitmapFromStream(memoryStream);
+
+                if (bitmap != null)
+                {
+                    _settings.InitImageThumbnail = _imageService.GetThumbnailString(bitmap, photo.ContentType);
+                }
+
+                // Attempt to match the aspect ratio of the image within the resolution constraints
                 var constrainedDimensions = MathHelper.GetAspectCorrectConstrainedDimensions(bitmap.Width, bitmap.Height, 0, 0, MathHelper.DimensionConstraint.ClosestMatch);
 
                 _settings.Width = constrainedDimensions.Width;

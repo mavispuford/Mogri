@@ -7,7 +7,6 @@ using System.Collections.ObjectModel;
 using SkiaSharp.Views.Maui.Controls;
 using CommunityToolkit.Maui.Alerts;
 using MobileDiffusion.Models.LStein;
-using MobileDiffusion.Clients.Automatic1111;
 using Newtonsoft.Json;
 using MobileDiffusion.Json;
 
@@ -512,6 +511,15 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             _settings.Mask = null;
             _resizedMaskImage = null;
 
+            if (query.TryGetValue(NavigationParams.InitImgThumbnail, out var initImageThumbnailParam))
+            {
+                _settings.InitImageThumbnail = initImageThumbnailParam as string;
+            }
+            else
+            {
+                _settings.InitImageThumbnail = null;
+            }
+
             updateHasInitImage();
         }
 
@@ -648,6 +656,14 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             var formattedImageString = string.Format(Constants.ImageDataFormat, contentType ?? "image/png", imageString);
 
             _settings.InitImage = formattedImageString;
+
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            var bitmap = _imageService.GetSkBitmapFromStream(memoryStream);
+
+            if (bitmap != null)
+            {
+                _settings.InitImageThumbnail = _imageService.GetThumbnailString(bitmap, contentType ?? "image/png");
+            }
         }
         catch
         {

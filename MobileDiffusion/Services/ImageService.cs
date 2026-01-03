@@ -176,6 +176,49 @@ public class ImageService : IImageService
         return (null, 0, 0);
     }
 
+    public string GetThumbnailString(Stream stream, string contentType, int width = 256, int height = 256)
+    {
+        try
+        {
+            stream.Seek(0, SeekOrigin.Begin);
+            var bitmap = GetSkBitmapFromStream(stream);
+            return GetThumbnailString(bitmap, contentType, width, height);
+        }
+        catch
+        {
+            // TODO - Handle exceptions
+        }
+
+        return null;
+    }
+
+    public string GetThumbnailString(SKBitmap bitmap, string contentType, int width = 256, int height = 256)
+    {
+        try
+        {
+            if (bitmap != null)
+            {
+                var thumbnailBitmap = GetResizedSKBitmap(bitmap, width, height, false, false, true);
+                if (thumbnailBitmap != null)
+                {
+                    using var thumbStream = new MemoryStream();
+                    using var skiaStream = new SKManagedWStream(thumbStream);
+                    thumbnailBitmap.Encode(skiaStream, SKEncodedImageFormat.Png, 100);
+                    thumbStream.Seek(0, SeekOrigin.Begin);
+                    var thumbBytes = thumbStream.ToArray();
+                    var thumbString = Convert.ToBase64String(thumbBytes);
+                    return string.Format(Constants.ImageDataFormat, contentType ?? "image/png", thumbString);
+                }
+            }
+        }
+        catch
+        {
+            // TODO - Handle exceptions
+        }
+
+        return null;
+    }
+
     private SKBitmap resizeBitmap(SKBitmap bitmap, int width, int height, bool filterImage = false)
     {
         return bitmap.Resize(new SKSizeI(width, height), filterImage ? new SKSamplingOptions(SKCubicResampler.Mitchell) : new SKSamplingOptions(SKFilterMode.Nearest, SKMipmapMode.None));

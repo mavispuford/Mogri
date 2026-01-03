@@ -318,10 +318,12 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     [RelayCommand]
     private async Task ShowResolutionSelect()
     {
+        var initImgString = !string.IsNullOrEmpty(_settings.InitImageThumbnail) ? _settings.InitImageThumbnail : _settings.InitImage;
+
         var parameters = new Dictionary<string, object> {
             { NavigationParams.Width, Width },
             { NavigationParams.Height, Height },
-            { NavigationParams.InitImgString, _settings.InitImage }
+            { NavigationParams.InitImgString, initImgString }
         };
 
         var result = await _popupService.ShowPopupForResultAsync("ResolutionSelectPopup", parameters) as IDictionary<string, object>;
