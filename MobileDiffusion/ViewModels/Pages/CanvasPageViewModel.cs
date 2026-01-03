@@ -715,10 +715,14 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             {
                 if (mask?.Lines != null)
                 {
+                    var canvasActions = new ObservableCollection<CanvasActionViewModel>();
+
                     foreach(var line in mask.Lines)
                     {
-                        CanvasActions.Add(line);
+                        canvasActions.Add(line);
                     }
+
+                    CanvasActions = canvasActions;
                 }
             });
         }
