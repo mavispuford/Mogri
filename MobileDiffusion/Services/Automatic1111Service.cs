@@ -419,9 +419,10 @@ namespace MobileDiffusion.Services
             request.Inpainting_fill = 1;
 
             // Because we colorize the image, blurring the mask would cause some of the colorized pixels to stay
-            request.Mask_blur = 0;
-            request.Mask_blur_x = 0;
-            request.Mask_blur_y = 0;
+            // However, if the user has explicitly set a mask blur, we should honor it.
+            request.Mask_blur = settings.MaskBlur;
+            request.Mask_blur_x = settings.MaskBlur;
+            request.Mask_blur_y = settings.MaskBlur;
             request.Mask_round = false;
 
             foreach (var lora in settings.Loras)
