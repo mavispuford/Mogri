@@ -6,20 +6,12 @@ using System.Diagnostics;
 
 namespace MobileDiffusion.Services;
 
-public class SegmentationService : ISegmentationService
+public class SegmentationService : ISegmentationService, IDisposable
 {
     private readonly IImageService _imageService;
 
-    private static readonly float[] meanArray = new float[] { 123.675f, 116.28f, 103.53f };
-    private static readonly float[] stdArray = new float[] { 58.395f, 57.12f, 57.375f };
-    private readonly DenseTensor<float> meanTensor = new(meanArray, new int[] { 1, 3, 1, 1 });
-    private readonly DenseTensor<float> stdTensor = new(stdArray, new int[] { 1, 3, 1, 1 });
-    private const int imgSize = 224;
-
     private Stopwatch _stopwatch = new();
     private Task _initTask;
-    private byte[] _encoderModel;
-    private byte[] _decoderModel;
     private InferenceSession _encoderSession;
     private InferenceSession _decoderSession;
 
@@ -28,6 +20,7 @@ public class SegmentationService : ISegmentationService
     private float _scaleX;
     private float _scaleY;
     private Tensor<float> _imageEmbeddings;
+    private Tensor<float> _lowResMasks;
 
     public SKColor MaskColor => SKColors.Red;
 
@@ -36,6 +29,17 @@ public class SegmentationService : ISegmentationService
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
 
         _ = InitAsync();
+    }
+
+    public void Dispose()
+    {
+        _encoderSession?.Dispose();
+        _decoderSession?.Dispose();
+    }
+
+    public void Reset()
+    {
+        _lowResMasks = null;
     }
 
     Task InitAsync()
@@ -48,33 +52,39 @@ public class SegmentationService : ISegmentationService
 
     async Task InitTask()
     {
-        var sessionOptions = new SessionOptions();
+        try
+        {
+            var sessionOptions = new SessionOptions();
 
-#if RELEASE
 #if ANDROID
-        sessionOptions.AppendExecutionProvider_Nnapi();
+            sessionOptions.AppendExecutionProvider_Nnapi();
 #elif IOS
-        sessionOptions.AppendExecutionProvider_CoreML();
+            sessionOptions.AppendExecutionProvider_CoreML();
 #endif
-#endif 
 
-        // Set up encoder...
+            // Set up encoder...
 
-        using var encoderFileStream = await FileSystem.OpenAppPackageFileAsync("mobile_sam.encoder.onnx");
-        using var encoderMemoryStream = new MemoryStream();
-        await encoderFileStream.CopyToAsync(encoderMemoryStream);
+            using var encoderFileStream = await FileSystem.OpenAppPackageFileAsync("mobile_sam.encoder.onnx");
+            using var encoderMemoryStream = new MemoryStream();
+            await encoderFileStream.CopyToAsync(encoderMemoryStream);
 
-        _encoderModel = encoderMemoryStream.ToArray();
-        _encoderSession = new InferenceSession(_encoderModel, sessionOptions);
+            var encoderModel = encoderMemoryStream.ToArray();
+            _encoderSession = new InferenceSession(encoderModel, sessionOptions);
 
-        // Set up decoder...
+            // Set up decoder...
 
-        using var decoderFileStream = await FileSystem.OpenAppPackageFileAsync("mobile_sam.decoder.onnx");
-        using var decoderMemoryStream = new MemoryStream();
-        await decoderFileStream.CopyToAsync(decoderMemoryStream);
+            using var decoderFileStream = await FileSystem.OpenAppPackageFileAsync("mobile_sam.decoder.onnx");
+            using var decoderMemoryStream = new MemoryStream();
+            await decoderFileStream.CopyToAsync(decoderMemoryStream);
 
-        _decoderModel = decoderMemoryStream.ToArray();
-        _decoderSession = new InferenceSession(_decoderModel, sessionOptions);
+            var decoderModel = decoderMemoryStream.ToArray();
+            _decoderSession = new InferenceSession(decoderModel, sessionOptions);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error initializing SegmentationService: {ex}");
+            // Consider rethrowing or handling appropriately depending on app requirements
+        }
     }
 
     public async Task<bool> SetImage(SKBitmap bitmap, CancellationToken token)
@@ -127,6 +137,7 @@ public class SegmentationService : ISegmentationService
                 _imageEmbeddings = encoderResult.First().AsTensor<float>();
                 _imageWidth = bitmap.Width;
                 _imageHeight = bitmap.Height;
+                _lowResMasks = null; // Reset mask state for new image
             }
         }
         catch (Exception ex)
@@ -134,6 +145,7 @@ public class SegmentationService : ISegmentationService
             _imageEmbeddings = null;
             _imageWidth = 0;
             _imageHeight = 0;
+            _lowResMasks = null;
             return false;
         }
         finally
@@ -144,7 +156,7 @@ public class SegmentationService : ISegmentationService
         return true;
     }
 
-    public async Task<SKBitmap> DoSegmentation(SKPoint[] points)
+    public async Task<SKBitmap> DoSegmentation(SKPoint[] points, bool reset = false)
     {
         if (_imageEmbeddings == null ||
             _imageWidth == 0 ||
@@ -185,8 +197,22 @@ public class SegmentationService : ISegmentationService
 
                 var pointCoords = new DenseTensor<float>(pointCoordsScaled.ToArray(), new int[] { 1, pointCoordsScaled.Count / 2, 2 });
                 var pointLabels = new DenseTensor<float>(labels.ToArray(), new int[] { 1, labels.Count });
-                var maskInput = new DenseTensor<float>(new float[256 * 256], new int[] { 1, 1, 256, 256 });
-                var hasMask = new DenseTensor<float>(new float[] { 0 }, new int[] { 1 });
+                
+                // Determine mask input
+                Tensor<float> maskInput;
+                Tensor<float> hasMask;
+
+                if (!reset && _lowResMasks != null)
+                {
+                    maskInput = _lowResMasks;
+                    hasMask = new DenseTensor<float>(new float[] { 1.0f }, new int[] { 1 });
+                }
+                else
+                {
+                    maskInput = new DenseTensor<float>(new float[256 * 256], new int[] { 1, 1, 256, 256 });
+                    hasMask = new DenseTensor<float>(new float[] { 0.0f }, new int[] { 1 });
+                }
+
                 var originalImageSize = new DenseTensor<float>(new float[] { _imageHeight, _imageWidth }, new int[] { 2 });
 
                 var decoderInputs = new NamedOnnxValue[]
@@ -211,7 +237,10 @@ public class SegmentationService : ISegmentationService
                     // Retrieve the output tensor(s)
                     var maskTensor = results.First(r => r.Name == "masks").AsTensor<float>();
                     var iouPredictionsTensor = results.First(r => r.Name == "iou_predictions").AsTensor<float>();
+                    
+                    // Cache low res masks for next iteration
                     var lowResMasksTensor = results.First(r => r.Name == "low_res_masks").AsTensor<float>();
+                    _lowResMasks = new DenseTensor<float>(lowResMasksTensor.ToArray(), lowResMasksTensor.Dimensions);
 
                     return GetImageFromMaskTensorPointer(maskTensor);
                 }
@@ -237,65 +266,6 @@ public class SegmentationService : ISegmentationService
 
         return resized;
     }
-
-    public DenseTensor<float> NormalizeAndPadImageTensor(DenseTensor<float> inputTensor)
-    {
-        _stopwatch.Restart();
-
-        // Perform element-wise subtraction for color normalization
-        var x = new DenseTensor<float>(inputTensor.Dimensions);
-
-        for (int i = 0; i < inputTensor.Length; i++)
-        {
-            var inputValue = inputTensor.GetValue(i);
-            var meanValue = meanTensor.GetValue(i % 3); // Use modulo to cycle through mean and std values
-            var stdValue = stdTensor.GetValue(i % 3);
-
-            x.SetValue(i, (inputValue - meanValue) / stdValue);
-        }
-
-        // Skip padding for now
-
-        /*
-        // Get the current height and width
-        var w = x.Dimensions[^1];
-        var h = x.Dimensions[^2];
-
-        // Calculate padding
-        var padh = imgSize - h;
-        var padw = imgSize - w;
-
-        // Pad the tensor manually
-        x = PadTensor(x, padw, padh);*/
-
-        _stopwatch.Stop();
-        Console.WriteLine($"NormalizeAndPadImageTensor: {_stopwatch.Elapsed.TotalMilliseconds}ms");
-
-        return x;
-    }
-
-    private DenseTensor<float> PadTensor(DenseTensor<float> tensor, int padWidth, int padHeight)
-    {
-        var paddedDimensions = new int[tensor.Dimensions.Length];
-        for (int i = 0; i < tensor.Dimensions.Length; i++)
-        {
-            paddedDimensions[i] = tensor.Dimensions[i];
-        }
-
-        paddedDimensions[^1] += padWidth;
-        paddedDimensions[^2] += padHeight;
-
-        var paddedTensor = new DenseTensor<float>(paddedDimensions);
-
-        for (int i = 0; i < tensor.Length; i++)
-        {
-            var value = tensor.GetValue(i);
-            paddedTensor.SetValue(i, value);
-        }
-
-        return paddedTensor;
-    }
-
 
     private SKBitmap ConvertColorFormat(SKBitmap image)
     {

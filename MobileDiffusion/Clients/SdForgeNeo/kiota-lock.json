@@ -1,6 +1,6 @@
 {
-  "descriptionHash": "A46B9C463A533870E6031CD78EDD893FFF7DFE775862796955298A8488C6A6BCF1B51D4BA2010BE11D29890285AE170AA4ADA17DFA2B3421379A32D0EC881908",
-  "descriptionLocation": "../../../OpenApiSpecs/SdForgeNeo/openapi.json",
+  "descriptionHash": "81944E4DC783F86679B2845E08BA3637D2A20EF6555A444C61CEE751D1E6A342D42D3CA919D86E73DC2A60F505E171581BBF1BDE249AED9D6A23F10CC9621A43",
+  "descriptionLocation": "../../../OpenApiSpecs/SdForgeNeo/openapi-patched.json",
   "lockFileVersion": "1.0.0",
   "kiotaVersion": "1.29.0",
   "clientClassName": "SdForgeNeoClient",

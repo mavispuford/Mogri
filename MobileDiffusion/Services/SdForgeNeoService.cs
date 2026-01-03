@@ -20,20 +20,25 @@ namespace MobileDiffusion.Services
     {
         private static class PngInfoProperties
         {
-            public const string Steps = nameof(Steps);
-            public const string Sampler = nameof(Sampler);
-            public const string CfgScale = "CFG Scale";
-            public const string Seed = nameof(Seed);
-            public const string Size = nameof(Size);
-            public const string ModelHash = "Model hash";
-            public const string Model = nameof(Model);
-            public const string LoraHashes = "Lora hashes";
-            public const string DenoisingStrength = "Denoising strength";
-            public const string Eta = nameof(Eta);
-            public const string Version = nameof(Version);
-            public const string HiresUpscaler = "Hires upscaler";
-            public const string HiresUpscale = "Hires upscale";
-            public const string HiresSteps = "Hires steps";
+            public const string Steps = "steps";
+            public const string Sampler = "sampler";
+            public const string CfgScale = "cfg scale";
+            public const string Seed = "seed";
+            public const string Size = "size";
+            public const string ModelHash = "model hash";
+            public const string Model = "model";
+            public const string LoraHashes = "lora hashes";
+            public const string DenoisingStrength = "denoising strength";
+            public const string Eta = "eta";
+            public const string Version = "version";
+            public const string HiresUpscaler = "hires upscaler";
+            public const string HiresUpscale = "hires upscale";
+            public const string HiresSteps = "hires steps";
+            public const string Scheduler = "scheduler";
+            public const string ScheduleType = "schedule type";
+            public const string DistilledCfgScale = "distilled cfg scale";
+            public const string DistilledCfgScaleKey = "distilled_cfg_scale";
+            public const string Shift = "shift";
         }
 
         private Regex _loraRegex = new Regex("<lora:([^:]*):([^>]*)>", RegexOptions.Compiled);
@@ -47,6 +52,7 @@ namespace MobileDiffusion.Services
         private Task _initializeTask;
 
         private List<SamplerItem> _samplers;
+        private List<SchedulerItem> _schedulers;
         private List<PromptStyleItem> _promptStyles;
         private List<SDModelItem> _models;
         private List<LoraItem> _loras;
@@ -245,7 +251,7 @@ namespace MobileDiffusion.Services
             });
 
             ApiResponse apiResponse = null;
-            var skipCurrentImage = false;
+            var skipCurrentImage = true;
             var finished = false;
 
             while (!finished)
@@ -279,7 +285,7 @@ namespace MobileDiffusion.Services
                 yield return apiResponse;
 
                 // Skip current image every other time
-                skipCurrentImage = !skipCurrentImage;
+                // skipCurrentImage = !skipCurrentImage;
             }
         }
 
@@ -331,7 +337,7 @@ namespace MobileDiffusion.Services
             request.Height = (int)settings.Height;
             request.DenoisingStrength = settings.DenoisingStrength;
             request.Steps = settings.Steps;
-            request.Seed = (int)settings.Seed;
+            request.Seed = settings.Seed;
             request.Tiling = settings.Seamless == Enums.OnOff.on;
 
             // Hires Fix
@@ -348,6 +354,22 @@ namespace MobileDiffusion.Services
             request.NegativePrompt = combinedPromptAndStyles.NegativePrompt;
 
             request.SamplerName = settings.Sampler;
+
+            System.Diagnostics.Debug.WriteLine($"[SdForgeNeoService] Generating image with ModelType: {settings.ModelType}");
+            System.Diagnostics.Debug.WriteLine($"[SdForgeNeoService] Model: {settings.Model?.DisplayName}");
+            System.Diagnostics.Debug.WriteLine($"[SdForgeNeoService] Steps: {settings.Steps}, CFG: {settings.GuidanceScale}, Sampler: {settings.Sampler}");
+
+            if (settings.ModelType == Enums.ModelType.ZImage)
+            {
+                request.Scheduler = settings.Scheduler;
+                System.Diagnostics.Debug.WriteLine($"[SdForgeNeoService] ZImage Scheduler: {settings.Scheduler}");
+                
+                if (settings.DistilledCfgScale.HasValue)
+                {
+                    request.AdditionalData.Add("distilled_cfg_scale", settings.DistilledCfgScale.Value);
+                    System.Diagnostics.Debug.WriteLine($"[SdForgeNeoService] ZImage DistilledCfgScale: {settings.DistilledCfgScale.Value}");
+                }
+            }
 
             foreach (var lora in settings.Loras)
             {
@@ -369,7 +391,7 @@ namespace MobileDiffusion.Services
             request.Height = (int)settings.Height;
             request.DenoisingStrength = settings.DenoisingStrength;
             request.Steps = settings.Steps;
-            request.Seed = (int)settings.Seed;
+            request.Seed = settings.Seed;
             request.Tiling = settings.Seamless == Enums.OnOff.on;
 
             var combinedPromptAndStyles = settings.GetCombinedPromptAndPromptStyles();
@@ -388,10 +410,21 @@ namespace MobileDiffusion.Services
             request.InpaintingFill = 1;
 
             // Because we colorize the image, blurring the mask would cause some of the colorized pixels to stay
-            request.MaskBlur = 0;
-            request.MaskBlurX = 0;
-            request.MaskBlurY = 0;
+            // However, if the user has explicitly set a mask blur, we should honor it.
+            request.MaskBlur = settings.MaskBlur;
+            request.MaskBlurX = settings.MaskBlur;
+            request.MaskBlurY = settings.MaskBlur;
             request.MaskRound = false;
+
+            if (settings.ModelType == Enums.ModelType.ZImage)
+            {
+                request.Scheduler = settings.Scheduler;
+
+                if (settings.DistilledCfgScale.HasValue)
+                {
+                    request.AdditionalData.Add("distilled_cfg_scale", settings.DistilledCfgScale.Value);
+                }
+            }
 
             foreach (var lora in settings.Loras)
             {
@@ -475,7 +508,7 @@ namespace MobileDiffusion.Services
             {
                 try
                 {
-                    switch (property.Key)
+                    switch (property.Key.ToLower())
                     {
                         case PngInfoProperties.Steps:
                             settings.Steps = int.Parse(property.Value);
@@ -512,6 +545,16 @@ namespace MobileDiffusion.Services
                             break;
                         case PngInfoProperties.HiresSteps:
                             settings.UpscaleSteps = int.Parse(property.Value);
+                            break;
+                        case PngInfoProperties.Scheduler:
+                        case PngInfoProperties.ScheduleType:
+                            settings.Scheduler = property.Value.ToLower();
+                            settings.ModelType = Enums.ModelType.ZImage;
+                            break;
+                        case PngInfoProperties.DistilledCfgScale:
+                        case PngInfoProperties.DistilledCfgScaleKey:
+                        case PngInfoProperties.Shift:
+                            settings.DistilledCfgScale = double.Parse(property.Value);
                             break;
                         case PngInfoProperties.Model:
                             if (settings.Model == null)
@@ -557,6 +600,7 @@ namespace MobileDiffusion.Services
 
             await Task.WhenAll(
                 Task.Run(async () => _samplers = await _client.Sdapi.V1.Samplers.GetAsync()),
+                Task.Run(async () => _schedulers = await _client.Sdapi.V1.Schedulers.GetAsync()),
                 Task.Run(async () => _promptStyles = await _client.Sdapi.V1.PromptStyles.GetAsync()),
                 Task.Run(async () => _models = await _client.Sdapi.V1.SdModels.GetAsync()),
                 Task.Run(async () => 
@@ -610,6 +654,23 @@ namespace MobileDiffusion.Services
             foreach (var sampler in _samplers)
             {
                 result.TryAdd(sampler.Name, sampler.Aliases?.FirstOrDefault() ?? sampler.Name);
+            }
+
+            return Task.FromResult(result);
+        }
+
+        public Task<List<string>> GetSchedulersAsync()
+        {
+            var result = new List<string>();
+
+            if (_schedulers == null)
+            {
+                return Task.FromResult(result);
+            }
+
+            foreach (var scheduler in _schedulers)
+            {
+                result.Add(scheduler.Name);
             }
 
             return Task.FromResult(result);
@@ -730,10 +791,37 @@ namespace MobileDiffusion.Services
                 var selectedModel = _models?.FirstOrDefault(m => m.Title == settings.Model.Key);
                 var currentCheckpointHash = GetOptionValue(_options.SdCheckpointHash);
 
-                if (selectedModel != null &&
-                    currentCheckpointHash != selectedModel.Sha256)
+                if (selectedModel != null)
                 {
-                    requestBody.AdditionalData.Add("sd_model_checkpoint", selectedModel.Title);
+                    if (currentCheckpointHash != selectedModel.Sha256)
+                    {
+                        requestBody.AdditionalData.Add("sd_model_checkpoint", selectedModel.Title);
+                    }
+
+                    // Handle Z-Image Turbo setting
+                    string desiredUnetStorage = "Automatic";
+                    if (settings.ModelType == MobileDiffusion.Enums.ModelType.ZImage && settings.Loras?.Any() == true)
+                    {
+                        desiredUnetStorage = "Automatic (fp16 LoRA)";
+                    }
+
+                    string currentUnetStorage = null;
+                    if (_options.AdditionalData.TryGetValue("forge_unet_storage_dtype", out var unetStorageObj))
+                    {
+                        if (unetStorageObj is UntypedString unetStorageStr)
+                        {
+                            currentUnetStorage = unetStorageStr.GetValue();
+                        }
+                        else if (unetStorageObj is string str)
+                        {
+                            currentUnetStorage = str;
+                        }
+                    }
+
+                    if (currentUnetStorage != desiredUnetStorage)
+                    {
+                        requestBody.AdditionalData.Add("forge_unet_storage_dtype", desiredUnetStorage);
+                    }
                 }
             }
             

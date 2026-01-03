@@ -31,7 +31,10 @@
                                    Grid.ColumnSpan="3"
                                    HorizontalOptions="Fill"
                                    VerticalOptions="Fill"
-                                   IsClippedToBounds="False">
+                                   IsClippedToBounds="False"
+                                   EnableSwipeCommandsWhenScaleIsOne="True"
+                                   SwipeLeftCommand="{Binding NextItemCommand}"
+                                   SwipeRightCommand="{Binding PreviousItemCommand}">
             
             <Image x:Name="ImageControl" 
                    Aspect="AspectFit" 

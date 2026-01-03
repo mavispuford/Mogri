@@ -274,6 +274,23 @@ public partial class CanvasPage : BasePage
                         }
 
                         break;
+                    case ToolType.Eyedropper:
+                        if (Bitmap != null)
+                        {
+                            var x = (int)((location.X / TemporaryCanvasView.Width) * Bitmap.Width);
+                            var y = (int)((location.Y / TemporaryCanvasView.Height) * Bitmap.Height);
+
+                            if (x >= 0 && x < Bitmap.Width && y >= 0 && y < Bitmap.Height)
+                            {
+                                var pixelColor = Bitmap.GetPixel(x, y);
+                                CurrentColor = pixelColor.ToMauiColor();
+                                if (BindingContext is ICanvasPageViewModel vm)
+                                {
+                                    vm.CurrentColor = CurrentColor;
+                                }
+                            }
+                        }
+                        break;
                     case ToolType.PaintBrush:
                     case ToolType.Eraser:
                         if (_currentLine == null)
@@ -639,6 +656,8 @@ public partial class CanvasPage : BasePage
         SegmentationBitmap = null;
 
         UpdateCanvasSizes();
+
+        ZoomContainer.Reset();
     }
 
     private void UpdateCanvasSizes()

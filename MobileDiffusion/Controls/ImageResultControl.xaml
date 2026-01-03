@@ -24,9 +24,13 @@
                VerticalOptions="Fill"
                Scale="0"/>
 
-            <ActivityIndicator HorizontalOptions="Center"
-                               VerticalOptions="Center"
-                               IsRunning="{Binding Source={x:Reference MainControl}, Path=IsLoading}"/>
+            <ActivityIndicator HorizontalOptions="Fill"
+                               VerticalOptions="Fill"
+                               WidthRequest="50"
+                               HeightRequest="50"
+                               BackgroundColor="Transparent"
+                               IsVisible="{Binding IsLoading}"
+                               IsRunning="{Binding IsLoading}"/>
         </Grid>
     </Border>
     

@@ -12,10 +12,13 @@ public class PromptSettings
     public bool FitClientSide { get; set; } = true;
     public double GfpganStrength { get; set; } = .75;
     public double GuidanceScale { get; set; } = 7.5;
+    public double? DistilledCfgScale { get; set; } = 3;
     public double Height { get; set; } = Preferences.Default.Get<double>(Constants.PreferenceKeys.DefaultWidth, 512);
     public string InitImage { get; set; }
     public OnOff InvertMask { get; set; }
     public string Mask { get; set; }
+    public int MaskBlur { get; set; } = 0;
+    public ModelType ModelType { get; set; } = ModelType.StableDiffusion;
     public int Steps { get; set; } = 30;
     public int BatchCount { get; set; } = 1;
     public int BatchSize { get; set; } = 1;
@@ -24,6 +27,7 @@ public class PromptSettings
     public double DenoisingStrength { get; set; } = .5;
     public ModelViewModel Model { get; set; }
     public string Sampler { get; set; }
+    public string Scheduler { get; set; }
     public OnOff Seamless { get; set; }
     public long Seed { get; set; } = -1;
     public string Upscaler { get; set; }
