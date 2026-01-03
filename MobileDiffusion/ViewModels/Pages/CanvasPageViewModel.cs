@@ -423,11 +423,14 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 // Attempt to match the aspect ratio of the image within the resolution constraints
                 var constrainedDimensions = MathHelper.GetAspectCorrectConstrainedDimensions(colorizedBitmap.Width, colorizedBitmap.Height, 0, 0, MathHelper.DimensionConstraint.ClosestMatch);
 
+                var thumbnailString = _imageService.GetThumbnailString(colorizedBitmap, "image/png");
+
                 var parameters = new Dictionary<string, object>
                 {
                     { NavigationParams.ImageWidth, constrainedDimensions.Width },
                     { NavigationParams.ImageHeight, constrainedDimensions.Height },
-                    { NavigationParams.InitImgString, colorizedImgContentTypeString }
+                    { NavigationParams.InitImgString, colorizedImgContentTypeString },
+                    { NavigationParams.InitImgThumbnail, thumbnailString }
                 };
 
                 var maskImgContentTypeString = string.Empty;
@@ -498,11 +501,14 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 var croppedBitmapImageString = Convert.ToBase64String(croppedBitmapImageBytes);
                 var croppedBitmapContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", croppedBitmapImageString);
 
+                var thumbnailString = _imageService.GetThumbnailString(croppedBitmap, "image/png");
+
                 var parameters = new Dictionary<string, object>
                 {
                     { NavigationParams.ImageWidth, BoundingBoxSize },
                     { NavigationParams.ImageHeight, BoundingBoxSize },
-                    { NavigationParams.InitImgString, croppedBitmapContentTypeString }
+                    { NavigationParams.InitImgString, croppedBitmapContentTypeString },
+                    { NavigationParams.InitImgThumbnail, thumbnailString }
                 };
 
                 var croppedMaskContentTypeString = string.Empty;

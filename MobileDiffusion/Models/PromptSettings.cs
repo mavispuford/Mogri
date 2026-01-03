@@ -15,6 +15,7 @@ public class PromptSettings
     public double? DistilledCfgScale { get; set; } = 3;
     public double Height { get; set; } = Preferences.Default.Get<double>(Constants.PreferenceKeys.DefaultWidth, 512);
     public string InitImage { get; set; }
+    public string InitImageThumbnail { get; set; }
     public OnOff InvertMask { get; set; }
     public string Mask { get; set; }
     public int MaskBlur { get; set; } = 0;

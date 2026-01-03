@@ -207,8 +207,8 @@
                                HorizontalOptions="Center"
                                VerticalOptions="Start"
                                IsVisible="{Binding CurrentTool.Type, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:ToolType.PaintBucket}}"
-                               Spacing="8"
-                               Margin="0,-12,0,0"
+                               Spacing="10"
+                               Margin="0"
                                RadioButtonGroup.GroupName="SegmentationMode"
                                RadioButtonGroup.SelectedValue="{Binding SegmentationMode}">
             <HorizontalStackLayout.GestureRecognizers>
@@ -216,8 +216,8 @@
             </HorizontalStackLayout.GestureRecognizers>
             <RadioButton Content="Add" Value="{x:Static enums:SegmentationMode.AddArea}" HorizontalOptions="Start" IsChecked="True"/>
             <RadioButton Content="Remove" Value="{x:Static enums:SegmentationMode.RemoveArea}" HorizontalOptions="Start"/>
-            <Button Text="Apply" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" BorderColor="{StaticResource IndependenceAccentSixtyPercent}" BorderWidth="1" Command="{Binding ApplySegmentationMaskCommand}" />
-            <Button Text="Clear" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" BorderColor="{StaticResource IndependenceAccentSixtyPercent}" BorderWidth="1" Command="{Binding ClearSegmentationMaskCommand}"/>
+            <Button Text="Apply" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" BorderColor="{StaticResource IndependenceAccentFortyPercent}" BorderWidth="1" Command="{Binding ApplySegmentationMaskCommand}" />
+            <Button Text="Clear" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" BorderColor="{StaticResource IndependenceAccentFortyPercent}" BorderWidth="1" Command="{Binding ClearSegmentationMaskCommand}"/>
         </HorizontalStackLayout>
 
         <VerticalStackLayout Grid.Row="1"

@@ -56,6 +56,11 @@ namespace MobileDiffusion.Services
             // Clone to avoid reference issues
             var settingsClone = settings.Clone();
             
+            // Clear out properties that we don't want to save
+            settingsClone.InitImage = string.Empty;
+            settingsClone.InitImageThumbnail = string.Empty;
+            settingsClone.Mask = string.Empty;
+
             if (_presets.ContainsKey(name))
             {
                 _presets[name] = settingsClone;
