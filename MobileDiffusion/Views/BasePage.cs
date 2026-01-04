@@ -1,3 +1,5 @@
+using CommunityToolkit.Maui.Behaviors;
+using CommunityToolkit.Maui.Core;
 using MobileDiffusion.Interfaces.ViewModels;
 
 namespace MobileDiffusion.Views;
@@ -12,6 +14,19 @@ public class BasePage : ContentPage
         var backButtonBehavior = new BackButtonBehavior();
         backButtonBehavior.SetBinding(BackButtonBehavior.CommandProperty, nameof(IPageViewModel.BackButtonCommand));
         Shell.SetBackButtonBehavior(this, backButtonBehavior);
+
+        if (Application.Current.Resources.TryGetValue("Primary", out var lightStatusBarColor) &&
+            Application.Current.Resources.TryGetValue("Black", out var darkStatusBarColor))
+        {
+            var statusBarBehavior = new StatusBarBehavior()
+            {
+                StatusBarStyle = StatusBarStyle.LightContent
+            };
+
+            statusBarBehavior.SetAppThemeColor(StatusBarBehavior.StatusBarColorProperty, (Color)lightStatusBarColor, (Color)darkStatusBarColor);
+            
+            Behaviors.Add(statusBarBehavior);
+        }
     }
 
     protected override void OnBindingContextChanged()

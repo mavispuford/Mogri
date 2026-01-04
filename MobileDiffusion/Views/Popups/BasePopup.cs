@@ -1,4 +1,6 @@
-﻿using MobileDiffusion.Interfaces.ViewModels;
+﻿using CommunityToolkit.Maui.Behaviors;
+using CommunityToolkit.Maui.Core;
+using MobileDiffusion.Interfaces.ViewModels;
 using Mopups.Pages;
 
 namespace MobileDiffusion.Views.Popups;
@@ -17,6 +19,15 @@ public class BasePopup : PopupPage
         BackgroundColor = (Color)bgColor;
 
         CloseWhenBackgroundIsClicked = false;
+
+        if (Application.Current.Resources.TryGetValue("Gray950", out var statusBarColor))
+        {
+            Behaviors.Add(new StatusBarBehavior()
+            {
+                StatusBarColor = (Color)statusBarColor,
+                StatusBarStyle = StatusBarStyle.LightContent
+            });
+        }
     }
 
     protected override async void OnAppearing()
