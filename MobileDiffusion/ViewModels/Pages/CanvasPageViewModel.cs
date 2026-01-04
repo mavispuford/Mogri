@@ -651,7 +651,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
         var maskBitmap = await Task.Run(() =>
         {
-            return CreateMaskBitmapFromSegmentationMask(SegmentationBitmap, CurrentColor.WithAlpha((float)CurrentAlpha));
+            return CreateMaskBitmapFromSegmentationMask(SegmentationBitmap);
         });
 
         var segmentationMask = new SegmentationMaskViewModel
@@ -918,48 +918,23 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         return resultBitmap;
     }
 
-    private unsafe SKBitmap CreateMaskBitmapFromSegmentationMask(SKBitmap segmentationBitmap, Color maskColor)
+    private SKBitmap CreateMaskBitmapFromSegmentationMask(SKBitmap segmentationBitmap)
     {
-        if (segmentationBitmap == null || maskColor == null)
+        if (segmentationBitmap == null)
         {
             return null;
         }
 
-        byte* srcPtr = (byte*)segmentationBitmap.GetPixels().ToPointer();
-
-        var width = segmentationBitmap.Width;
-        var height = segmentationBitmap.Height;
-
-        SKColorType colorType = segmentationBitmap.ColorType;
-
         var resultBitmap = new SKBitmap(segmentationBitmap.Info.Width, segmentationBitmap.Info.Height, SKColorType.Rgba8888, SKAlphaType.Unpremul);
 
-        byte* resultPtr = (byte*)resultBitmap.GetPixels().ToPointer();
-
-        for (int row = 0; row < height; row++)
+        using (var canvas = new SKCanvas(resultBitmap))
         {
-            for (int col = 0; col < width; col++)
-            {
-                // Get color from source bitmap
-                byte srcByte1 = *srcPtr++;         // red or blue
-                byte srcByte2 = *srcPtr++;         // green
-                byte srcByte3 = *srcPtr++;         // blue or red
-                byte srcByte4 = *srcPtr++;         // alpha
+            canvas.Clear(SKColors.Transparent);
 
-                if (srcByte4 != 0)
-                {
-                    *resultPtr++ = colorType == SKColorType.Rgba8888 ? maskColor.GetByteRed() : maskColor.GetByteBlue();
-                    *resultPtr++ = maskColor.GetByteGreen();
-                    *resultPtr++ = colorType == SKColorType.Rgba8888 ? maskColor.GetByteBlue() : maskColor.GetByteRed();
-                    *resultPtr++ = byte.Max(1, maskColor.GetByteAlpha());
-                }
-                else
-                {
-                    *resultPtr++ = srcByte1;
-                    *resultPtr++ = srcByte2;
-                    *resultPtr++ = srcByte3;
-                    *resultPtr++ = srcByte4;
-                }
+            using (var paint = new SKPaint())
+            {
+                paint.ColorFilter = SKColorFilter.CreateBlendMode(SKColors.White, SKBlendMode.SrcIn);
+                canvas.DrawBitmap(segmentationBitmap, 0, 0, paint);
             }
         }
 
