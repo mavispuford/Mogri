@@ -33,5 +33,7 @@ public interface IImageGenerationService
     
     Task SaveSettingsAsync(PromptSettings settings);
 
+    Task<bool> CancelAsync();
+
     bool Initialized { get; }
 }

@@ -199,5 +199,10 @@ namespace MobileDiffusion.Services
         {
             return Task.FromResult(new List<string>());
         }
+
+        public Task<bool> CancelAsync()
+        {
+            return Task.FromResult(false);
+        }
     }
 }

@@ -43,6 +43,9 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     public partial bool ServerConnected { get; set; }
 
     [ObservableProperty]
+    public partial bool IsGenerating { get; set; }
+
+    [ObservableProperty]
     public partial ObservableCollection<IResultItemViewModel> Results { get; set; } = new();
 
     public MainPageViewModel(
@@ -155,6 +158,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
         try
         {
+            IsGenerating = true;
             Progress = 0;
 
             Results = new();
@@ -343,6 +347,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         }
         finally
         {
+            IsGenerating = false;
             DeviceDisplay.Current.KeepScreenOn = false;
         }
     }
@@ -450,6 +455,12 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     private async Task ShowHistory()
     {
         await Shell.Current.GoToAsync("HistoryPage");
+    }
+
+    [RelayCommand]
+    private async Task Cancel()
+    {
+        await _stableDiffusionService.CancelAsync();
     }
 
     [RelayCommand]
