@@ -192,6 +192,34 @@ namespace MobileDiffusion.Services
                 try
                 {
                     apiResponse = await getCurrentProgress(progressToken, skipCurrentImage);
+
+                    if (apiResponse.ResponseObject is ProgressResponse pr && pr.IsInterrupted)
+                    {
+                        try
+                        {
+                            await textToImageTask;
+                        }
+                        catch
+                        {
+                            // Ignore
+                        }
+
+                        var generationResponse = new GenerationResponse
+                        {
+                            Images = txt2ImgResponse?.Images,
+                            Info = txt2ImgResponse?.Info,
+                            Parameters = txt2ImgResponse?.Parameters
+                        };
+
+                        apiResponse = new ApiResponse
+                        {
+                            StableDiffusionApi = Enums.StableDiffusionApi.Automatic1111,
+                            ResponseObject = generationResponse,
+                            Progress = 1f
+                        };
+
+                        finished = true;
+                    }
                 }
                 catch (OperationCanceledException)
                 {
@@ -200,9 +228,9 @@ namespace MobileDiffusion.Services
                     // Set the final response
                     var generationResponse = new GenerationResponse
                     {
-                        Images = txt2ImgResponse.Images,
-                        Info = txt2ImgResponse.Info,
-                        Parameters = txt2ImgResponse.Parameters
+                        Images = txt2ImgResponse?.Images,
+                        Info = txt2ImgResponse?.Info,
+                        Parameters = txt2ImgResponse?.Parameters
                     };
 
                     apiResponse = new ApiResponse
@@ -259,6 +287,34 @@ namespace MobileDiffusion.Services
                 try
                 {
                     apiResponse = await getCurrentProgress(progressToken, skipCurrentImage);
+
+                    if (apiResponse.ResponseObject is ProgressResponse pr && pr.IsInterrupted)
+                    {
+                        try
+                        {
+                            await imgToImageTask;
+                        }
+                        catch
+                        {
+                            // Ignore
+                        }
+
+                        var generationResponse = new GenerationResponse
+                        {
+                            Images = img2ImgResponse?.Images,
+                            Info = img2ImgResponse?.Info,
+                            Parameters = img2ImgResponse?.Parameters
+                        };
+
+                        apiResponse = new ApiResponse
+                        {
+                            StableDiffusionApi = Enums.StableDiffusionApi.Automatic1111,
+                            ResponseObject = generationResponse,
+                            Progress = 1f
+                        };
+
+                        finished = true;
+                    }
                 }
                 catch (OperationCanceledException)
                 {
@@ -267,9 +323,9 @@ namespace MobileDiffusion.Services
                     // Set the final response
                     var generationResponse = new GenerationResponse
                     {
-                        Images = img2ImgResponse.Images,
-                        Info = img2ImgResponse.Info,
-                        Parameters = img2ImgResponse.Parameters
+                        Images = img2ImgResponse?.Images,
+                        Info = img2ImgResponse?.Info,
+                        Parameters = img2ImgResponse?.Parameters
                     };
 
                     apiResponse = new ApiResponse
@@ -307,11 +363,26 @@ namespace MobileDiffusion.Services
 
                 var progress = progressGetResponse.EtaRelative > 0 ? progressGetResponse.Progress : 1d;
 
+                var isInterrupted = false;
+                if (progressGetResponse.State?.AdditionalData != null && 
+                    progressGetResponse.State.AdditionalData.TryGetValue("interrupted", out var interruptedObj))
+                {
+                    if (interruptedObj is UntypedBoolean interruptedBool)
+                    {
+                        isInterrupted = interruptedBool.GetValue();
+                    }
+                    else if (interruptedObj is bool b)
+                    {
+                        isInterrupted = b;
+                    }
+                }
+
                 var progressResponse = new ProgressResponse
                 {
                     Progress = progressGetResponse.Progress ?? 0,
                     EtaRelative = progressGetResponse.EtaRelative ?? 0,
-                    CurrentImage = progressGetResponse.CurrentImage
+                    CurrentImage = progressGetResponse.CurrentImage,
+                    IsInterrupted = isInterrupted
                 };
 
                 var progressApiResponse = new ApiResponse
@@ -833,6 +904,19 @@ namespace MobileDiffusion.Services
             await _client.Sdapi.V1.OptionsPath.PostAsync(requestBody);
 
             await RefreshResourcesAsync();
+        }
+
+        public async Task<bool> CancelAsync()
+        {
+            try
+            {
+                await _client.Sdapi.V1.Interrupt.PostAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         private IModelViewModel convertModelToViewModel(SDModelItem model)

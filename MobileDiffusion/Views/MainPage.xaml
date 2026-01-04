@@ -13,6 +13,7 @@
     <views:BasePage.Resources>
         <ResourceDictionary>
             <toolkit:IsListNotNullOrEmptyConverter x:Key="IsListNotNullOrEmptyConverter" />
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
             <toolkit:BoolToObjectConverter x:Key="BoolToColorConverter" TrueObject="{StaticResource Tertiary}" FalseObject="{StaticResource IndependenceAccent}" />
             <toolkit:BoolToObjectConverter x:Key="BoolToOpacityConverter" TrueObject="1" FalseObject="0" />
             <toolkit:BoolToObjectConverter x:Key="ConnectivityBoolToImageSourceConverter">
@@ -79,7 +80,13 @@
                 
                 <Button Grid.Column="0"
                         Text="Create!"
-                        Command="{Binding CreateCommand}"/>
+                        Command="{Binding CreateCommand}"
+                        IsVisible="{Binding IsGenerating, Converter={StaticResource InvertedBoolConverter}}"/>
+
+                <Button Grid.Column="0"
+                        Text="Cancel"
+                        Command="{Binding CancelCommand}"
+                        IsVisible="{Binding IsGenerating}"/>
 
                 <ImageButton Grid.Column="1"
                              HorizontalOptions="Fill"

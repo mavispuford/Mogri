@@ -10,8 +10,10 @@ public interface IMainPageViewModel : IPageViewModel
     string NegativePrompt { get; set; }
     float Progress { get; set; }
     bool ServerConnected { get; set; }
+    bool IsGenerating { get; }
     ObservableCollection<IResultItemViewModel> Results { get; set; }
     IAsyncRelayCommand CreateCommand { get; }
+    IAsyncRelayCommand CancelCommand { get; }
     IAsyncRelayCommand ShowImageToImageSettingsCommand { get; }
     IAsyncRelayCommand ShowPromptSettingsCommand { get; }
     IAsyncRelayCommand ShowAppSettingsCommand { get; }

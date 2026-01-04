@@ -788,5 +788,10 @@ namespace MobileDiffusion.Services
 
             await RefreshResourcesAsync();
         }
+
+        public Task<bool> CancelAsync()
+        {
+            return Task.FromResult(false);
+        }
     }
 }
