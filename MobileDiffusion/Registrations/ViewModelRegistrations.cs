@@ -26,6 +26,8 @@ public static class ViewModelRegistrations
         builder.Services.AddTransient<ILoraSelectionPageViewModel, LoraSelectionPageViewModel>();
         builder.Services.AddTransient<ILoraViewModel, LoraViewModel>();
         builder.Services.AddTransient<IModelViewModel, ModelViewModel>();
+        builder.Services.AddTransient<IUpscalerViewModel, UpscalerViewModel>();
+        builder.Services.AddTransient<IPromptStyleViewModel, PromptStyleViewModel>();
 
         return builder;
     }
