@@ -2,8 +2,8 @@
 using MobileDiffusion.Enums;
 using MobileDiffusion.ViewModels;
 using SkiaSharp;
-using SkiaSharp.Views.Maui.Controls;
 using System.Collections.ObjectModel;
+using MobileDiffusion.Models;
 
 namespace MobileDiffusion.Interfaces.ViewModels;
 
@@ -29,8 +29,6 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     ObservableCollection<CanvasActionViewModel> CanvasActions { get; set; }
 
-    SKCanvasView MaskCanvasView { get; set; }
-
     Color PaletteIconColor { get; set; }
 
     ImageSource SavedImageSource { get; set; }
@@ -40,8 +38,6 @@ public interface ICanvasPageViewModel : IPageViewModel
     SKBitmap SourceBitmap { get; set; }
 
     SKBitmap SegmentationBitmap { get; set; }
-
-    SKCanvasView SourceCanvasView { get; set; }
 
     bool SettingSegmentationImage { get; set; }
     
@@ -63,11 +59,11 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     IAsyncRelayCommand PrepareForSavingCommand { get; set; }
 
-    IAsyncRelayCommand FinishSavingCommand { get; }
+    IAsyncRelayCommand<CanvasCaptureResult> FinishSavingCommand { get; }
 
-    IAsyncRelayCommand FinishSendingToImageToImageCommand { get; }
+    IAsyncRelayCommand<CanvasCaptureResult> FinishSendingToImageToImageCommand { get; }
 
-    IAsyncRelayCommand FinishCroppingWithBoundingBoxCommand { get; }
+    IAsyncRelayCommand<CanvasCaptureResult> FinishCroppingWithBoundingBoxCommand { get; }
 
     IAsyncRelayCommand ShowColorPickerCommand { get; }
 
