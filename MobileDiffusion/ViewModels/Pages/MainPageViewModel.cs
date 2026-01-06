@@ -220,52 +220,23 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                 {
                     if (response.StableDiffusionApi == Enums.StableDiffusionApi.InvokeAI)
                     {
-                        var item = response.ResponseObject as LSteinResponseItem;
-
-                        if (item.Event.Equals("step", StringComparison.OrdinalIgnoreCase))
+                        if (response.ResponseObject is ProgressResponse progressResponse)
                         {
-                            float progress = 0f;
-
-                            if (string.IsNullOrEmpty(settings.InitImage))
-                            {
-                                progress = item.Step / (float)(settings.Steps);
-                            }
-                            else
-                            {
-                                progress = item.Step / (float)(settings.Steps * settings.DenoisingStrength);
-                            }
-
-                            reportProgress(progress);
-
-                            continue;
+                            reportProgress((float)progressResponse.Progress);
                         }
-
-                        var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{item.Seed}-{DateTime.Now.Ticks}";
-
-                        if (item.Event.Equals("result", StringComparison.OrdinalIgnoreCase))
+                        else if (response.ResponseObject is GenerationResponse generationResponse)
                         {
+                            var seed = generationResponse.Info;
+                            var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{seed}-{DateTime.Now.Ticks}";
+
                             var result = Results.FirstOrDefault(r => r.ApiResponse == null);
 
-                            result.ApiResponse = response;
-                            result.Settings = settings.Clone();
+                            if (result != null)
+                            {
+                                result.ApiResponse = response;
+                                result.Settings = settings.Clone();
 
-                            await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
-                        }
-                        else if (item.Event.Equals("upscaling-started", StringComparison.OrdinalIgnoreCase))
-                        {
-                            foreach (var result in Results)
-                            {
-                                result.IsLoading = true;
-                            }
-                        }
-                        else if (item.Event.Equals("upscaling-done", StringComparison.OrdinalIgnoreCase))
-                        {
-                            foreach (var result in Results)
-                            {
-                                if (result != null)
-                                {
-                                    await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
-                                }
+                                await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
                             }
                         }
                     }
@@ -408,18 +379,9 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     {
         byte[] imageBytes = null;
 
-        if (result.ApiResponse.StableDiffusionApi == Enums.StableDiffusionApi.InvokeAI)
+        if (result.ApiResponse.ResponseObject is GenerationResponse generationResponse)
         {
-            var invokeAiResponse = result.ApiResponse.ResponseObject as LSteinResponseItem;
-
-            imageBytes = await _stableDiffusionService.GetImageBytesAsync(invokeAiResponse.Url);
-        }
-        else if (result.ApiResponse.StableDiffusionApi == Enums.StableDiffusionApi.Automatic1111)
-        {
-            if (result.ApiResponse.ResponseObject is GenerationResponse generationResponse)
-            {
-                imageBytes = Convert.FromBase64String(generationResponse.Images.ElementAt(number));
-            }
+            imageBytes = Convert.FromBase64String(generationResponse.Images.ElementAt(number));
         }
 
         var uri = await _fileService.WriteFileToInternalStorageAsync($"{fileName}-{number++}.png", imageBytes);
