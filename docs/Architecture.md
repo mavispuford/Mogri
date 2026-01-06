@@ -10,6 +10,7 @@ This .NET MAUI application follows the MVVM pattern. It consists mainly of these
 - There is some codebehind code, focused only on view-specific logic (animations, canvas drawing, etc.)
 - `Views` should never contain business logic
 - `Views` should avoid using `Event Handlers` if possible (bind to `Commands` instead)
+- `Views` should always use `x:DataType` (compiled bindings)
 
 ### View Models 
 - Exposed via interfaces (ie. `IMainPageViewModel`) and registered in a dependency container in `ViewModelRegistrations.cs`
