@@ -606,46 +606,6 @@ public partial class CanvasPage : BasePage
         BrushSizeSliderContainer.IsVisible = false;
     }
 
-    private void Undo_Button_Clicked(object sender, EventArgs e)
-    {
-        HideSliders();
-
-        if (CanvasActions == null || !CanvasActions.Any())
-        {
-            return;
-        }
-
-        CanvasActions.Remove(CanvasActions.Last());
-
-        MaskCanvasView.InvalidateSurface();
-    }
-
-    private async void Clear_Button_Clicked(object sender, EventArgs e)
-    {
-        var result = await confirmClear();
-
-        if (!result)
-        {
-            return;
-        }
-
-        HideSliders();
-
-        if (CanvasActions == null || !CanvasActions.Any())
-        {
-            return;
-        }
-
-        CanvasActions.Clear();
-
-        MaskCanvasView.InvalidateSurface();
-    }
-
-    private async Task<bool> confirmClear()
-    {
-        return await DisplayAlertAsync("Clear mask?", "Are you sure you would like to clear the mask?", "YES", "Cancel");
-    }
-
     private void OnCanvasActionsChanged()
     {
         MaskCanvasView.InvalidateSurface();
@@ -682,9 +642,6 @@ public partial class CanvasPage : BasePage
 
         TemporaryCanvasView.WidthRequest = width;
         TemporaryCanvasView.HeightRequest = height;
-
-        // Clear lines
-        //Clear_Button_Clicked(this, new EventArgs());
 
         // Force a measure on both canvas views because setting width/height request doesn't seem to be enough
         SourceImageCanvasView.Measure(width, height);
