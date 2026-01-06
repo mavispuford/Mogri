@@ -460,7 +460,14 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     [RelayCommand]
     private async Task Cancel()
     {
-        await _stableDiffusionService.CancelAsync();
+        try
+        {
+            await _stableDiffusionService.CancelAsync();
+        }
+        catch(Exception)
+        {
+            // Ignore
+        }
     }
 
     [RelayCommand]
