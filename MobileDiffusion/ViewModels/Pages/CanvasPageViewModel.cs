@@ -220,6 +220,39 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         }
     }
 
+    [RelayCommand]
+    private void Undo()
+    {
+        if (CanvasActions == null || !CanvasActions.Any())
+        {
+            return;
+        }
+
+        CanvasActions.Remove(CanvasActions.Last());
+
+        MaskCanvasView?.InvalidateSurface();
+    }
+
+    [RelayCommand]
+    private async Task Clear()
+    {
+        var result = await Shell.Current.DisplayAlertAsync("Clear mask?", "Are you sure you would like to clear the mask?", "YES", "Cancel");
+
+        if (!result)
+        {
+            return;
+        }
+
+        if (CanvasActions == null || !CanvasActions.Any())
+        {
+            return;
+        }
+
+        CanvasActions.Clear();
+
+        MaskCanvasView?.InvalidateSurface();
+    }
+
     partial void OnSourceBitmapChanged(SKBitmap value)
     {
         if (value != null)

@@ -47,6 +47,10 @@ public interface ICanvasPageViewModel : IPageViewModel
     
     bool HasSegmentationImage { get; set; }
 
+    IRelayCommand UndoCommand { get; }
+
+    IAsyncRelayCommand ClearCommand { get; }
+
     bool ShowContextMenu { get; set; }
 
     bool GettingColorPalette { get; set; }

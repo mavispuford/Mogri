@@ -48,7 +48,7 @@
 
             <ImageButton ToolTipProperties.Text="Undo"
                          Style="{StaticResource TitleBarButtonStyle}"
-                         Clicked="Undo_Button_Clicked">
+                         Command="{Binding UndoCommand}">
                 <ImageButton.Source>
                     <FontImageSource Glyph="&#xe166;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
                 </ImageButton.Source>
@@ -56,7 +56,7 @@
 
             <ImageButton ToolTipProperties.Text="Clear Paint"
                          Style="{StaticResource TitleBarButtonStyle}"
-                         Clicked="Clear_Button_Clicked">
+                         Command="{Binding ClearCommand}">
                 <ImageButton.Source>
                     <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
                 </ImageButton.Source>
