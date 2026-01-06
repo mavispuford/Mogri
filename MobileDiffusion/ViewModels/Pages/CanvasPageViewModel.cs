@@ -7,9 +7,9 @@ using MobileDiffusion.Helpers;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 using SkiaSharp;
-using SkiaSharp.Views.Maui.Controls;
 using System.Collections.ObjectModel;
 using MobileDiffusion.ViewModels.CanvasContextButtons;
+using MobileDiffusion.Models;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -70,12 +70,6 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
     [ObservableProperty]
     public partial SKBitmap SegmentationBitmap { get; set; }
-
-    [ObservableProperty]
-    public partial SKCanvasView SourceCanvasView { get; set; }
-
-    [ObservableProperty]
-    public partial SKCanvasView MaskCanvasView { get; set; }
 
     [ObservableProperty]
     public partial ImageSource SavedImageSource { get; set; }
@@ -229,8 +223,6 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         }
 
         CanvasActions.Remove(CanvasActions.Last());
-
-        MaskCanvasView?.InvalidateSurface();
     }
 
     [RelayCommand]
@@ -249,8 +241,6 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         }
 
         CanvasActions.Clear();
-
-        MaskCanvasView?.InvalidateSurface();
     }
 
     partial void OnSourceBitmapChanged(SKBitmap value)
@@ -349,9 +339,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
     private async Task saveImage()
     {
-        if (SourceCanvasView == null ||
-            MaskCanvasView == null ||
-            SourceBitmap == null)
+        if (SourceBitmap == null)
         {
             await Toast.Make("There is no image to save.").Show();
 
@@ -364,9 +352,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     [RelayCommand]
     private async Task SendToImageToImage()
     {
-        if (SourceCanvasView == null ||
-            MaskCanvasView == null ||
-            SourceBitmap == null)
+        if (SourceBitmap == null)
         {
             await Toast.Make("There is no image to send.").Show();
 
@@ -379,9 +365,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     [RelayCommand]
     private async Task BeginCropImageRect()
     {
-        if (SourceCanvasView == null ||
-            MaskCanvasView == null ||
-            SourceBitmap == null)
+        if (SourceBitmap == null)
         {
             await Toast.Make("There is no image data to crop.").Show();
 
@@ -392,7 +376,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     }
 
     [RelayCommand]
-    private async Task FinishSaving()
+    private async Task FinishSaving(CanvasCaptureResult result)
     {
         IsBusy = true;
 
@@ -429,15 +413,13 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     }
 
     [RelayCommand]
-    private async Task FinishSendingToImageToImage()
+    private async Task FinishSendingToImageToImage(CanvasCaptureResult result)
     {
         IsBusy = true;
 
         await Task.Run(async () =>
         {
-            var maskCapture = await MaskCanvasView.CaptureAsync();
-            var maskStream = await maskCapture.OpenReadAsync();
-            var maskBitmap = SKBitmap.Decode(maskStream);
+            var maskBitmap = result.MaskBitmap;
             var sameSizeMaskBitmap = maskBitmap.Resize(SourceBitmap.Info, new SKSamplingOptions(SKCubicResampler.Mitchell));
 
             try
@@ -508,15 +490,13 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     }
 
     [RelayCommand]
-    private async Task FinishCroppingWithBoundingBox()
+    private async Task FinishCroppingWithBoundingBox(CanvasCaptureResult result)
     {
         IsBusy = true;
 
         await Task.Run(async () =>
         {
-            var maskCapture = await MaskCanvasView.CaptureAsync();
-            var maskStream = await maskCapture.OpenReadAsync();
-            var maskBitmap = SKBitmap.Decode(maskStream);
+            var maskBitmap = result.MaskBitmap;
             var sameSizeMaskBitmap = maskBitmap.Resize(SourceBitmap.Info, new SKSamplingOptions(SKCubicResampler.Mitchell));
 
             try
@@ -695,8 +675,6 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         };
 
         CanvasActions.Add(segmentationMask);
-
-        MaskCanvasView?.InvalidateSurface();
 
         ClearSegmentationMask();
 
