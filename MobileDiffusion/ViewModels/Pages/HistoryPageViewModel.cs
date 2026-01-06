@@ -4,6 +4,8 @@ using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Core;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -219,17 +221,25 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
             return;
         }
 
-        foreach (var item in SelectedItems)
+        try
         {
-            if (item is IHistoryItemViewModel viewModel)
+            // Create a copy to avoid modification during enumeration
+            var itemsToDelete = SelectedItems.OfType<IHistoryItemViewModel>().ToList();
+
+            foreach (var viewModel in itemsToDelete)
             {
                 await _fileService.DeleteFileFromInternalStorage(viewModel.ThumbnailFileName);
                 await _fileService.DeleteFileFromInternalStorage(viewModel.FileName);
 
                 HistoryItems.Remove(viewModel);
             }
-        }
 
-        SelectedItems.Clear();
+             SelectedItems.Clear();
+        }
+        catch (Exception ex)
+        {
+             // Log error
+             await Toast.Make("Failed to delete some items.").Show();
+        }
     }
 }
