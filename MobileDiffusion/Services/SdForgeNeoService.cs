@@ -207,8 +207,7 @@ namespace MobileDiffusion.Services
                         var generationResponse = new GenerationResponse
                         {
                             Images = txt2ImgResponse?.Images,
-                            Info = txt2ImgResponse?.Info,
-                            Parameters = txt2ImgResponse?.Parameters
+                            Info = txt2ImgResponse?.Info
                         };
 
                         apiResponse = new ApiResponse
@@ -229,8 +228,7 @@ namespace MobileDiffusion.Services
                     var generationResponse = new GenerationResponse
                     {
                         Images = txt2ImgResponse?.Images,
-                        Info = txt2ImgResponse?.Info,
-                        Parameters = txt2ImgResponse?.Parameters
+                        Info = txt2ImgResponse?.Info
                     };
 
                     apiResponse = new ApiResponse
@@ -302,8 +300,7 @@ namespace MobileDiffusion.Services
                         var generationResponse = new GenerationResponse
                         {
                             Images = img2ImgResponse?.Images,
-                            Info = img2ImgResponse?.Info,
-                            Parameters = img2ImgResponse?.Parameters
+                            Info = img2ImgResponse?.Info
                         };
 
                         apiResponse = new ApiResponse
@@ -324,8 +321,7 @@ namespace MobileDiffusion.Services
                     var generationResponse = new GenerationResponse
                     {
                         Images = img2ImgResponse?.Images,
-                        Info = img2ImgResponse?.Info,
-                        Parameters = img2ImgResponse?.Parameters
+                        Info = img2ImgResponse?.Info
                     };
 
                     apiResponse = new ApiResponse
