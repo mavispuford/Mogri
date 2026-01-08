@@ -1,4 +1,5 @@
 ﻿using MobileDiffusion.Models;
+using MobileDiffusion.ViewModels;
 using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
@@ -83,9 +84,42 @@ namespace MobileDiffusion.Services
 
             await foreach (var item in submitTextToImageRequestToInvokeAi(requestMessage))
             {
-                apiResponse.ResponseObject = item;
+                if (string.Equals(item.Event, "step", StringComparison.OrdinalIgnoreCase))
+                {
+                    float progress = 0f;
 
-                yield return apiResponse;
+                    if (string.IsNullOrEmpty(settings.InitImage))
+                    {
+                        progress = item.Step / (float)(settings.Steps);
+                    }
+                    else
+                    {
+                        progress = item.Step / (float)(settings.Steps * settings.DenoisingStrength);
+                    }
+
+                    apiResponse.ResponseObject = new ProgressResponse
+                    {
+                        Progress = progress
+                    };
+                    apiResponse.Progress = progress;
+
+                    yield return apiResponse;
+                }
+                else if (string.Equals(item.Event, "result", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(item.Event, "upscaling-done", StringComparison.OrdinalIgnoreCase))
+                {
+                    byte[] imageBytes = await GetImageBytesAsync(item.Url);
+                    string base64 = Convert.ToBase64String(imageBytes);
+
+                    apiResponse.ResponseObject = new GenerationResponse
+                    {
+                        Images = new List<string> { base64 },
+                        Info = $"{item.Seed}"
+                    };
+                    apiResponse.Progress = 1.0;
+
+                    yield return apiResponse;
+                }
             }
         }
 

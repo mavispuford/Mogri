@@ -8,9 +8,7 @@ using MobileDiffusion.ViewModels;
 using MobileDiffusion.Helpers;
 using Microsoft.Kiota.Http.HttpClientLibrary;
 using Microsoft.Kiota.Abstractions.Authentication;
-using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Serialization;
-using System.Dynamic;
 using MobileDiffusion.Models.Automatic1111;
 using System.Text.RegularExpressions;
 
@@ -121,7 +119,8 @@ namespace MobileDiffusion.Services
 
             try
             {
-                await _client.Sdapi.V1.OptionsPath.GetAsync();
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                await _client.Sdapi.V1.OptionsPath.GetAsync(cancellationToken: cts.Token);
                 return true;
             }
             catch (Exception)
@@ -207,8 +206,7 @@ namespace MobileDiffusion.Services
                         var generationResponse = new GenerationResponse
                         {
                             Images = txt2ImgResponse?.Images,
-                            Info = txt2ImgResponse?.Info,
-                            Parameters = txt2ImgResponse?.Parameters
+                            Info = txt2ImgResponse?.Info
                         };
 
                         apiResponse = new ApiResponse
@@ -229,8 +227,7 @@ namespace MobileDiffusion.Services
                     var generationResponse = new GenerationResponse
                     {
                         Images = txt2ImgResponse?.Images,
-                        Info = txt2ImgResponse?.Info,
-                        Parameters = txt2ImgResponse?.Parameters
+                        Info = txt2ImgResponse?.Info
                     };
 
                     apiResponse = new ApiResponse
@@ -302,8 +299,7 @@ namespace MobileDiffusion.Services
                         var generationResponse = new GenerationResponse
                         {
                             Images = img2ImgResponse?.Images,
-                            Info = img2ImgResponse?.Info,
-                            Parameters = img2ImgResponse?.Parameters
+                            Info = img2ImgResponse?.Info
                         };
 
                         apiResponse = new ApiResponse
@@ -324,8 +320,7 @@ namespace MobileDiffusion.Services
                     var generationResponse = new GenerationResponse
                     {
                         Images = img2ImgResponse?.Images,
-                        Info = img2ImgResponse?.Info,
-                        Parameters = img2ImgResponse?.Parameters
+                        Info = img2ImgResponse?.Info
                     };
 
                     apiResponse = new ApiResponse
@@ -669,19 +664,67 @@ namespace MobileDiffusion.Services
         {
             if (_client == null) return;
 
-            await Task.WhenAll(
-                Task.Run(async () => _samplers = await _client.Sdapi.V1.Samplers.GetAsync()),
-                Task.Run(async () => _schedulers = await _client.Sdapi.V1.Schedulers.GetAsync()),
-                Task.Run(async () => _promptStyles = await _client.Sdapi.V1.PromptStyles.GetAsync()),
-                Task.Run(async () => _models = await _client.Sdapi.V1.SdModels.GetAsync()),
+            // 1. Connectivity Probe
+            // We use a dedicated, short-lived HttpClient to perform a strict connectivity check.
+            // This bypasses any potential middleware/retries in the main client pipeline and enforces a hard timeout.
+            using (var probeClient = _httpClientFactory.CreateClient())
+            {
+                probeClient.BaseAddress = new Uri(_baseUrl);
+                probeClient.Timeout = TimeSpan.FromSeconds(4); // Hard cap on the probe
+                try
+                {
+                    using var probeCts = new CancellationTokenSource(TimeSpan.FromSeconds(4));
+                    // Just fetch headers to be fast
+                    using var response = await probeClient.GetAsync("sdapi/v1/options", HttpCompletionOption.ResponseHeadersRead, probeCts.Token);
+                    response.EnsureSuccessStatusCode();
+                }
+                catch
+                {
+                    // If the probe fails (timeout, connection refused, 404, etc.), abort immediately.
+                    throw;
+                }
+            }
+
+            // 2. If connected, proceed with parallel resource fetching.
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+
+            var tasks = new List<Task>
+            {
+                // Options is strictly required and fetched first/parallel
+                Task.Run(async () => _options = await _client.Sdapi.V1.OptionsPath.GetAsync(cancellationToken: cts.Token)),
+                Task.Run(async () => _samplers = await _client.Sdapi.V1.Samplers.GetAsync(cancellationToken: cts.Token)),
+                Task.Run(async () => _schedulers = await _client.Sdapi.V1.Schedulers.GetAsync(cancellationToken: cts.Token)),
+                Task.Run(async () => _promptStyles = await _client.Sdapi.V1.PromptStyles.GetAsync(cancellationToken: cts.Token)),
+                Task.Run(async () => _models = await _client.Sdapi.V1.SdModels.GetAsync(cancellationToken: cts.Token)),
                 Task.Run(async () => 
                 {
-                    var lorasNode = await _client.Sdapi.V1.Loras.GetAsync();
+                    var lorasNode = await _client.Sdapi.V1.Loras.GetAsync(cancellationToken: cts.Token);
                     _loras = ParseLoras(lorasNode);
                 }),
-                Task.Run(async () => _upscalers = await _client.Sdapi.V1.Upscalers.GetAsync()),
-                Task.Run(async () => _options = await _client.Sdapi.V1.OptionsPath.GetAsync())
-            );
+                Task.Run(async () => _upscalers = await _client.Sdapi.V1.Upscalers.GetAsync(cancellationToken: cts.Token))
+            };
+
+            try
+            {
+                var remainingTasks = tasks.ToList();
+                while (remainingTasks.Count > 0)
+                {
+                    var finishedTask = await Task.WhenAny(remainingTasks);
+                    
+                    if (finishedTask.IsFaulted || finishedTask.IsCanceled)
+                    {
+                        cts.Cancel(); 
+                        await finishedTask; 
+                    }
+                    
+                    remainingTasks.Remove(finishedTask);
+                }
+            }
+            catch
+            {
+                cts.Cancel();
+                throw;
+            }
         }
 
         private List<LoraItem> ParseLoras(UntypedNode node)

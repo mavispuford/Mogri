@@ -2,7 +2,7 @@
 using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.ViewModels;
 
-namespace MobileDiffusion.Models;
+namespace MobileDiffusion.ViewModels;
 
 public partial class PromptStyleViewModel : BaseViewModel, IPromptStyleViewModel
 {

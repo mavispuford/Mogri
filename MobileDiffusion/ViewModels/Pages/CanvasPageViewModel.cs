@@ -7,9 +7,9 @@ using MobileDiffusion.Helpers;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 using SkiaSharp;
-using SkiaSharp.Views.Maui.Controls;
 using System.Collections.ObjectModel;
 using MobileDiffusion.ViewModels.CanvasContextButtons;
+using MobileDiffusion.Models;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -70,12 +70,6 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
     [ObservableProperty]
     public partial SKBitmap SegmentationBitmap { get; set; }
-
-    [ObservableProperty]
-    public partial SKCanvasView SourceCanvasView { get; set; }
-
-    [ObservableProperty]
-    public partial SKCanvasView MaskCanvasView { get; set; }
 
     [ObservableProperty]
     public partial ImageSource SavedImageSource { get; set; }
@@ -220,6 +214,35 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         }
     }
 
+    [RelayCommand]
+    private void Undo()
+    {
+        if (CanvasActions == null || !CanvasActions.Any())
+        {
+            return;
+        }
+
+        CanvasActions.Remove(CanvasActions.Last());
+    }
+
+    [RelayCommand]
+    private async Task Clear()
+    {
+        var result = await Shell.Current.DisplayAlertAsync("Clear mask?", "Are you sure you would like to clear the mask?", "YES", "Cancel");
+
+        if (!result)
+        {
+            return;
+        }
+
+        if (CanvasActions == null || !CanvasActions.Any())
+        {
+            return;
+        }
+
+        CanvasActions.Clear();
+    }
+
     partial void OnSourceBitmapChanged(SKBitmap value)
     {
         if (value != null)
@@ -316,9 +339,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
     private async Task saveImage()
     {
-        if (SourceCanvasView == null ||
-            MaskCanvasView == null ||
-            SourceBitmap == null)
+        if (SourceBitmap == null)
         {
             await Toast.Make("There is no image to save.").Show();
 
@@ -331,9 +352,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     [RelayCommand]
     private async Task SendToImageToImage()
     {
-        if (SourceCanvasView == null ||
-            MaskCanvasView == null ||
-            SourceBitmap == null)
+        if (SourceBitmap == null)
         {
             await Toast.Make("There is no image to send.").Show();
 
@@ -346,9 +365,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     [RelayCommand]
     private async Task BeginCropImageRect()
     {
-        if (SourceCanvasView == null ||
-            MaskCanvasView == null ||
-            SourceBitmap == null)
+        if (SourceBitmap == null)
         {
             await Toast.Make("There is no image data to crop.").Show();
 
@@ -359,7 +376,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     }
 
     [RelayCommand]
-    private async Task FinishSaving()
+    private async Task FinishSaving(CanvasCaptureResult result)
     {
         IsBusy = true;
 
@@ -396,15 +413,13 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     }
 
     [RelayCommand]
-    private async Task FinishSendingToImageToImage()
+    private async Task FinishSendingToImageToImage(CanvasCaptureResult result)
     {
         IsBusy = true;
 
         await Task.Run(async () =>
         {
-            var maskCapture = await MaskCanvasView.CaptureAsync();
-            var maskStream = await maskCapture.OpenReadAsync();
-            var maskBitmap = SKBitmap.Decode(maskStream);
+            var maskBitmap = result.MaskBitmap;
             var sameSizeMaskBitmap = maskBitmap.Resize(SourceBitmap.Info, new SKSamplingOptions(SKCubicResampler.Mitchell));
 
             try
@@ -475,15 +490,13 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     }
 
     [RelayCommand]
-    private async Task FinishCroppingWithBoundingBox()
+    private async Task FinishCroppingWithBoundingBox(CanvasCaptureResult result)
     {
         IsBusy = true;
 
         await Task.Run(async () =>
         {
-            var maskCapture = await MaskCanvasView.CaptureAsync();
-            var maskStream = await maskCapture.OpenReadAsync();
-            var maskBitmap = SKBitmap.Decode(maskStream);
+            var maskBitmap = result.MaskBitmap;
             var sameSizeMaskBitmap = maskBitmap.Resize(SourceBitmap.Info, new SKSamplingOptions(SKCubicResampler.Mitchell));
 
             try
@@ -555,17 +568,24 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     [RelayCommand]
     private async Task ShowMediaPicker()
     {
-        var fileResult = await MediaPicker.PickPhotosAsync(new MediaPickerOptions { SelectionLimit = 1 });
-        var photo = fileResult?.FirstOrDefault();
-
-        if (photo == null)
+        try
         {
-            return;
+            var fileResult = await MediaPicker.PickPhotosAsync(new MediaPickerOptions { SelectionLimit = 1 });
+            var photo = fileResult?.FirstOrDefault();
+
+            if (photo == null)
+            {
+                return;
+            }
+
+            using var fileStream = await photo.OpenReadAsync();
+
+            await LoadSourceBitmapUsingStream(fileStream, photo.FileName);
         }
-
-        using var fileStream = await photo.OpenReadAsync();
-
-        await LoadSourceBitmapUsingStream(fileStream, photo.FileName);
+        catch (Exception)
+        {
+            await Toast.Make("Unable to load image. Please check permissions and try again.").Show();
+        }
     }
 
     [RelayCommand]
@@ -599,44 +619,54 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             return;
         }
 
-        _doingSegmentation = true;
-        IsBusy = true;
-
-        var maskBitmap = await _segmentationService.DoSegmentation(points);
-        
-        if (maskBitmap != null)
+        try
         {
-            if (SegmentationBitmap == null)
-            {
-                SegmentationBitmap = maskBitmap;
-            }
-            else
-            {
-                var newBitmap = new SKBitmap(SegmentationBitmap.Info);
+            _doingSegmentation = true;
+            IsBusy = true;
 
-                using (var combineCanvas = new SKCanvas(newBitmap))
+            var maskBitmap = await _segmentationService.DoSegmentation(points);
+            
+            if (maskBitmap != null)
+            {
+                if (SegmentationBitmap == null)
                 {
-                    var paint = new SKPaint
-                    {
-                        BlendMode = SKBlendMode.SrcOver
-                    };
-
-                    combineCanvas.DrawBitmap(SegmentationBitmap, 0, 0, paint);
-
-                    paint.BlendMode = SegmentationMode == SegmentationMode.AddArea ? SKBlendMode.SrcOver : SKBlendMode.DstOut;
-
-                    combineCanvas.DrawBitmap(maskBitmap, 0, 0, paint);
+                    SegmentationBitmap = maskBitmap;
                 }
+                else
+                {
+                    var newBitmap = new SKBitmap(SegmentationBitmap.Info);
 
-                SegmentationBitmap?.Dispose();
-                SegmentationBitmap = null;
+                    using (var combineCanvas = new SKCanvas(newBitmap))
+                    {
+                        var paint = new SKPaint
+                        {
+                            BlendMode = SKBlendMode.SrcOver
+                        };
 
-                SegmentationBitmap = newBitmap;
+                        combineCanvas.DrawBitmap(SegmentationBitmap, 0, 0, paint);
+
+                        paint.BlendMode = SegmentationMode == SegmentationMode.AddArea ? SKBlendMode.SrcOver : SKBlendMode.DstOut;
+
+                        combineCanvas.DrawBitmap(maskBitmap, 0, 0, paint);
+                    }
+
+                    SegmentationBitmap?.Dispose();
+                    SegmentationBitmap = null;
+
+                    SegmentationBitmap = newBitmap;
+                }
             }
         }
-        
-        IsBusy = false;
-        _doingSegmentation = false;
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            await Toast.Make("Failed to perform segmentation.").Show();
+        }
+        finally
+        {
+            IsBusy = false;
+            _doingSegmentation = false;
+        }
     }
 
     [RelayCommand]
@@ -647,27 +677,35 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             return;
         }
 
-        IsBusy = true;
-
-        var maskBitmap = await Task.Run(() =>
+        try
         {
-            return CreateMaskBitmapFromSegmentationMask(SegmentationBitmap);
-        });
+            IsBusy = true;
 
-        var segmentationMask = new SegmentationMaskViewModel
+            var maskBitmap = await Task.Run(() =>
+            {
+                return CreateMaskBitmapFromSegmentationMask(SegmentationBitmap);
+            });
+
+            var segmentationMask = new SegmentationMaskViewModel
+            {
+                CanvasActionType = CanvasActionType.Mask,
+                Color = CurrentColor.WithAlpha((float)CurrentAlpha),
+                Bitmap = maskBitmap
+            };
+
+            CanvasActions.Add(segmentationMask);
+
+            ClearSegmentationMask();
+        }
+        catch (Exception ex)
         {
-            CanvasActionType = CanvasActionType.Mask,
-            Color = CurrentColor.WithAlpha((float)CurrentAlpha),
-            Bitmap = maskBitmap
-        };
-
-        CanvasActions.Add(segmentationMask);
-
-        MaskCanvasView?.InvalidateSurface();
-
-        ClearSegmentationMask();
-
-        IsBusy = false;
+             Console.WriteLine(ex.Message);
+             await Toast.Make("Failed to apply mask.").Show();
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     [RelayCommand]
@@ -748,21 +786,28 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     [RelayCommand]
     private async Task ShowColorPicker()
     {
-        if (HapticFeedback.Default.IsSupported)
+        try
         {
-            HapticFeedback.Default.Perform(HapticFeedbackType.Click);
+            if (HapticFeedback.Default.IsSupported)
+            {
+                HapticFeedback.Default.Perform(HapticFeedbackType.Click);
+            }
+
+            var parameters = new Dictionary<string, object> {
+                { NavigationParams.Color, CurrentColor },
+                { NavigationParams.ColorPalette, _colorPalette },
+            };
+
+            var color = await _popupService.ShowPopupForResultAsync("ColorPickerPopup", parameters) as Color;
+
+            if (color != null)
+            {
+                CurrentColor = color;
+            }
         }
-
-        var parameters = new Dictionary<string, object> {
-            { NavigationParams.Color, CurrentColor },
-            { NavigationParams.ColorPalette, _colorPalette },
-        };
-
-        var color = await _popupService.ShowPopupForResultAsync("ColorPickerPopup", parameters) as Color;
-
-        if (color != null)
+        catch (Exception)
         {
-            CurrentColor = color;
+            await Toast.Make("Unable to show color picker.").Show();
         }
     }
 

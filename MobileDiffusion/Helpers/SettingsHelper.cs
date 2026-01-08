@@ -1,4 +1,5 @@
 ﻿using MobileDiffusion.Models;
+using MobileDiffusion.ViewModels;
 
 namespace MobileDiffusion.Helpers;
 
