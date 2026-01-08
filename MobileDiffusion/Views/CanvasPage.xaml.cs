@@ -1,4 +1,3 @@
-using CommunityToolkit.Maui.Core.Extensions;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Enums;
 using MobileDiffusion.Interfaces.ViewModels;
@@ -7,6 +6,8 @@ using MobileDiffusion.ViewModels.CanvasContextButtons;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using MobileDiffusion.Models;
 
 namespace MobileDiffusion.Views;
 
@@ -151,7 +152,7 @@ public partial class CanvasPage : BasePage
 
     public static BindableProperty CanvasActionsProperty = BindableProperty.Create(nameof(CanvasActions), typeof(ObservableCollection<CanvasActionViewModel>), typeof(CanvasPage), default(ObservableCollection<CanvasActionViewModel>), propertyChanged: (bindable, oldValue, newValue) =>
     {
-        ((CanvasPage)bindable).OnCanvasActionsChanged();
+        ((CanvasPage)bindable).OnCanvasActionsChanged(oldValue as ObservableCollection<CanvasActionViewModel>, newValue as ObservableCollection<CanvasActionViewModel>);
     });
 
     public static BindableProperty PrepareForSavingCommandProperty = BindableProperty.Create(nameof(PrepareForSavingCommand), typeof(IAsyncRelayCommand), typeof(CanvasPage), default(IAsyncRelayCommand));
@@ -219,16 +220,6 @@ public partial class CanvasPage : BasePage
         UpdateCanvasSizes();
     }
 
-    protected override void OnBindingContextChanged()
-    {
-        base.OnBindingContextChanged();
-
-        if (BindingContext is ICanvasPageViewModel pageViewModel)
-        {
-            pageViewModel.SourceCanvasView = SourceImageCanvasView;
-            pageViewModel.MaskCanvasView = MaskCanvasView;
-        }
-    }
 
     private void OnTouchTemporarySurface(object sender, SKTouchEventArgs e)
     {
@@ -606,47 +597,22 @@ public partial class CanvasPage : BasePage
         BrushSizeSliderContainer.IsVisible = false;
     }
 
-    private void Undo_Button_Clicked(object sender, EventArgs e)
+    private void OnCanvasActionsChanged(ObservableCollection<CanvasActionViewModel> oldValue, ObservableCollection<CanvasActionViewModel> newValue)
     {
-        HideSliders();
-
-        if (CanvasActions == null || !CanvasActions.Any())
+        if (oldValue != null)
         {
-            return;
+            oldValue.CollectionChanged -= CanvasActions_CollectionChanged;
         }
 
-        CanvasActions.Remove(CanvasActions.Last());
+        if (newValue != null)
+        {
+            newValue.CollectionChanged += CanvasActions_CollectionChanged;
+        }
 
         MaskCanvasView.InvalidateSurface();
     }
 
-    private async void Clear_Button_Clicked(object sender, EventArgs e)
-    {
-        var result = await confirmClear();
-
-        if (!result)
-        {
-            return;
-        }
-
-        HideSliders();
-
-        if (CanvasActions == null || !CanvasActions.Any())
-        {
-            return;
-        }
-
-        CanvasActions.Clear();
-
-        MaskCanvasView.InvalidateSurface();
-    }
-
-    private async Task<bool> confirmClear()
-    {
-        return await DisplayAlertAsync("Clear mask?", "Are you sure you would like to clear the mask?", "YES", "Cancel");
-    }
-
-    private void OnCanvasActionsChanged()
+    private void CanvasActions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
         MaskCanvasView.InvalidateSurface();
     }
@@ -683,9 +649,6 @@ public partial class CanvasPage : BasePage
         TemporaryCanvasView.WidthRequest = width;
         TemporaryCanvasView.HeightRequest = height;
 
-        // Clear lines
-        //Clear_Button_Clicked(this, new EventArgs());
-
         // Force a measure on both canvas views because setting width/height request doesn't seem to be enough
         SourceImageCanvasView.Measure(width, height);
         SourceImageCanvasView.InvalidateSurface();
@@ -713,7 +676,16 @@ public partial class CanvasPage : BasePage
         // Wait for canvas to redraw - hack - find a better solution (maybe the PaintSurface event?)
         await Task.Delay(300);
 
-        await callbackCommand.ExecuteAsync(this);
+        var maskCapture = await MaskCanvasView.CaptureAsync();
+        var result = new CanvasCaptureResult();
+
+        if (maskCapture != null)
+        {
+            using var maskStream = await maskCapture.OpenReadAsync();
+            result.MaskBitmap = SKBitmap.Decode(maskStream);
+        }
+
+        await callbackCommand.ExecuteAsync(result);
 
         _isSaving = false;
 
