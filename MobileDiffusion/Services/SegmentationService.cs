@@ -84,22 +84,26 @@ public class SegmentationService : ISegmentationService, IDisposable
 #endif
 
             // Set up encoder...
-
-            using var encoderFileStream = await FileSystem.OpenAppPackageFileAsync("mobile_sam.encoder.onnx");
-            using var encoderMemoryStream = new MemoryStream();
-            await encoderFileStream.CopyToAsync(encoderMemoryStream);
-
-            var encoderModel = encoderMemoryStream.ToArray();
-            _encoderSession = new InferenceSession(encoderModel, sessionOptions);
+            var encoderPath = Path.Combine(FileSystem.CacheDirectory, "mobile_sam.encoder.onnx");
+            if (!File.Exists(encoderPath))
+            {
+                Console.WriteLine("[SegmentationService] Extracting encoder to cache...");
+                using var stream = await FileSystem.OpenAppPackageFileAsync("mobile_sam.encoder.onnx");
+                using var fileStream = File.Create(encoderPath);
+                await stream.CopyToAsync(fileStream);
+            }
+            _encoderSession = new InferenceSession(encoderPath, sessionOptions);
 
             // Set up decoder...
-
-            using var decoderFileStream = await FileSystem.OpenAppPackageFileAsync("mobile_sam.decoder.onnx");
-            using var decoderMemoryStream = new MemoryStream();
-            await decoderFileStream.CopyToAsync(decoderMemoryStream);
-
-            var decoderModel = decoderMemoryStream.ToArray();
-            _decoderSession = new InferenceSession(decoderModel, sessionOptions);
+            var decoderPath = Path.Combine(FileSystem.CacheDirectory, "mobile_sam.decoder.onnx");
+            if (!File.Exists(decoderPath))
+            {
+                Console.WriteLine("[SegmentationService] Extracting decoder to cache...");
+                using var stream = await FileSystem.OpenAppPackageFileAsync("mobile_sam.decoder.onnx");
+                using var fileStream = File.Create(decoderPath);
+                await stream.CopyToAsync(fileStream);
+            }
+            _decoderSession = new InferenceSession(decoderPath, sessionOptions);
         }
         catch (Exception ex)
         {
