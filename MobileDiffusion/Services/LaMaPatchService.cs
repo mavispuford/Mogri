@@ -13,7 +13,7 @@ namespace MobileDiffusion.Services
 
         public LaMaPatchService()
         {
-            _ = InitializeModelAsync();
+            // Deliberately not initializing here so it doesn't happen at page load
         }
 
         private async Task InitializeModelAsync()
@@ -34,6 +34,10 @@ namespace MobileDiffusion.Services
                 // Explicitly define CPU usage to avoid potential NNAPI stability issues on Android
                 options.AppendExecutionProvider_CPU(useArena: 1); // True (1), False (0)
                 options.LogSeverityLevel = OrtLoggingLevel.ORT_LOGGING_LEVEL_VERBOSE;
+
+                // Limit threads to prevent overheating
+                options.InterOpNumThreads = 2;
+                options.IntraOpNumThreads = 2;
 
                 _session = new InferenceSession(memoryStream.ToArray(), options);
                 Console.WriteLine("[LaMaPatchService] InferenceSession created successfully.");
@@ -176,6 +180,12 @@ namespace MobileDiffusion.Services
                     // Draw mask with DstIn to keep only the inpainted parts where mask exists
                     using var maskPaint = new SKPaint();
                     maskPaint.BlendMode = SKBlendMode.DstIn;
+                    
+                    // IMPORTANT: The mask is White (Inpaint) and Black (Keep). 
+                    // Since it has no Alpha transparency in the Black areas, we must use LumaColor
+                    // to convert Black (Luma 0) to Transparent (Alpha 0) and White (Luma 1) to Opaque (Alpha 1).
+                    maskPaint.ColorFilter = SKColorFilter.CreateLumaColor();
+                    
                     resultCanvas.DrawBitmap(mask, 0, 0, maskPaint);
                     
                     resultCanvas.Restore();
