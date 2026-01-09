@@ -1,20 +1,13 @@
-# Implementation Checklist - LaMa Inpainting
+# Implementation Checklist - LaMa Refinement
 
-- [x] **Phase 1: Service Infrastructure & Scaffolding**
-    - [x] Create `IPatchService.cs` interface.
-    - [x] Create `LaMaPatchService.cs` class shell.
-    - [x] Register `LaMaPatchService` in `ServiceRegistrations.cs`.
+- [x] **Phase 1: Color Space Correction**
+    - [x] Update Input Tensor mapping (BGR -> RGB)
+    - [x] Update Output Tensor reading (BGR -> RGB)
+    - [x] Verify fix by running application
 
-- [x] **Phase 2: LaMa Inference Implementation**
-    - [x] Implement `PreProcess` logic (Resize 512x512, Normalize).
-    - [x] Implement `PatchImageAsync` using `OnnxRuntime`.
-    - [x] Implement `PostProcess` logic (Resize back, Clamp).
-
-- [x] **Phase 3: ViewModel Logic & Mask Generation**
-    - [x] Inject `IPatchService` into `CanvasPageViewModel`.
-    - [x] Implement `GenerateMask` helper method (off-screen rendering).
-    - [x] Implement `PatchCommand` with User Choice (Last vs All).
-    - [x] Update `SourceBitmap` with result.
-
-- [x] **Phase 4: UI Integration**
-    - [x] Add "Bandage" (Patch) button to `CanvasPage.xaml` TitleView.
+- [x] **Phase 2: High-Resolution ROI Pipeline**
+    - [x] Implement Bounding Box calculation
+    - [x] Implement Square Crop with Padding logic
+    - [x] Resize crops to 512x512
+    - [x] Resize output back to crop size
+    - [x] Composite patch into original image
