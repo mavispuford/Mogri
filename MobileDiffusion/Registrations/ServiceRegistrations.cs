@@ -42,6 +42,7 @@ public static class ServiceRegistrations
         builder.Services.AddSingleton<ISegmentationService, SegmentationService>();
         builder.Services.AddSingleton<ILoadingService, LoadingService>();
         builder.Services.AddSingleton<IPresetService, PresetService>();
+        builder.Services.AddSingleton<IPatchService, LaMaPatchService>();
 
 #if ANDROID
         builder.Services.AddSingleton<IFileService, FileService>();
