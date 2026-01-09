@@ -227,6 +227,14 @@ public partial class CanvasPage : BasePage
 
         if (e.Location is SKPoint location && CurrentTool != null)
         {
+            float scale = 1f;
+            if (Bitmap != null && TemporaryCanvasView.CanvasSize.Width > 0)
+            {
+                scale = (float)Bitmap.Width / TemporaryCanvasView.CanvasSize.Width;
+            }
+
+            var imageLocation = new SKPoint(location.X * scale, location.Y * scale);
+
             // InContact == Finger currently touching down
             if (e.InContact)
             {
@@ -290,13 +298,13 @@ public partial class CanvasPage : BasePage
                             {
                                 CanvasActionType = CanvasActionType.Mask,
                                 Alpha = (float)CurrentAlpha,
-                                BrushSize = (float)CurrentBrushSize,
+                                BrushSize = (float)CurrentBrushSize * scale,
                                 Color = CurrentColor,
                                 MaskEffect = CurrentTool?.Effect ?? MaskEffect.Paint
                             };
                         }
 
-                        _currentLine.Path.Add(location);
+                        _currentLine.Path.Add(imageLocation);
 
                         if (_currentLine.MaskEffect == MaskEffect.Erase)
                         {
@@ -309,12 +317,12 @@ public partial class CanvasPage : BasePage
                         {
                             CanvasActionType = CanvasActionType.Mask,
                             Alpha = .75f,
-                            BrushSize = 10f,
+                            BrushSize = 10f * scale,
                             Color = Colors.White,
                             MaskEffect = MaskEffect.Paint
                         };
 
-                        _segmentationLine.Path.Add(location);
+                        _segmentationLine.Path.Add(imageLocation);
 
                         break;
 
@@ -344,26 +352,22 @@ public partial class CanvasPage : BasePage
 
                         var bounds = new SKRect(left, top, right, bottom);
 
-                        if (bounds.Size.Width < 10 &&
-                            bounds.Size.Height < 10)
+                        if (bounds.Size.Width < (10 * scale) &&
+                            bounds.Size.Height < (10 * scale))
                         {
-                            var pixelPoint = getPixelPoint(location);
-
-                            DoSegmentationCommand?.Execute([pixelPoint]);
+                            DoSegmentationCommand?.Execute([imageLocation]);
                         }
                         else
                         {
-                            var topLeft = getPixelPoint(new SKPoint(left, top));
-                            var bottomRight = getPixelPoint(new SKPoint(right, bottom));
+                            var topLeft = new SKPoint(left, top);
+                            var bottomRight = new SKPoint(right, bottom);
 
                             DoSegmentationCommand?.Execute([topLeft, bottomRight]);
                         }
                     }
                     else
                     {
-                        var pixelPoint = getPixelPoint(location);
-
-                        DoSegmentationCommand?.Execute([pixelPoint]);
+                        DoSegmentationCommand?.Execute([imageLocation]);
                     }
 
                     _segmentationLine = null;
@@ -402,18 +406,44 @@ public partial class CanvasPage : BasePage
     {
         var canvas = e.Surface.Canvas;
         canvas.Clear(SKColors.Transparent);
+        
+        // Calculate scale to transform Image Coords -> View Coords
+        float scale = 1f;
+        if (Bitmap != null) 
+        {
+            // e.Info.Width is ViewPixels. Bitmap.Width is ImagePixels.
+            // Scale = View / Image.
+            scale = (float)e.Info.Width / Bitmap.Width;
+        }
 
         if (CanvasActions != null)
         {
             foreach (var canvasAction in CanvasActions.Where(ca => ca.CanvasActionType == CanvasActionType.Mask))
             {
-                canvasAction.Execute(canvas, e.Info, _isSaving);
+                if (canvasAction is MaskLineViewModel)
+                {
+                    canvas.Save();
+                    canvas.Scale(scale);
+                    canvasAction.Execute(canvas, e.Info, _isSaving);
+                    canvas.Restore();
+                }
+                else
+                {
+                    // SegmentationMaskViewModel uses Destination Rect logic internally or assumed View Space?
+                    // SegmentationMaskViewModel.Execute draws to imageInfo.Rect (View Space).
+                    // If the Bitmap is Image Size, it gets scaled down by DrawBitmap implicit scaling.
+                    // So we DON't scale canvas for it.
+                    canvasAction.Execute(canvas, e.Info, _isSaving);
+                }
             }
         }
 
         if (_currentLine != null && _currentLine.MaskEffect == MaskEffect.Erase)
         {
+            canvas.Save();
+            canvas.Scale(scale);
             _currentLine.Execute(canvas, e.Info, _isSaving);
+            canvas.Restore();
         }
     }
 
@@ -421,15 +451,27 @@ public partial class CanvasPage : BasePage
     {
         var canvas = e.Surface.Canvas;
         canvas.Clear(SKColors.Transparent);
+        
+        float scale = 1f;
+        if (Bitmap != null) 
+        {
+            scale = (float)e.Info.Width / Bitmap.Width;
+        }
 
         if (_currentLine != null && _currentLine.MaskEffect == MaskEffect.Paint)
         {
+            canvas.Save();
+            canvas.Scale(scale);
             _currentLine.Execute(canvas, e.Info, _isSaving);
+            canvas.Restore();
         }
 
         if (_segmentationLine != null)
         {
+            canvas.Save();
+            canvas.Scale(scale);
             _segmentationLine.Execute(canvas, e.Info, _isSaving);
+            canvas.Restore();
         }
 
         if (ShowBoundingBox)
