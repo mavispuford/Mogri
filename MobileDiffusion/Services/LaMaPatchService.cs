@@ -24,23 +24,45 @@ namespace MobileDiffusion.Services
 
             try
             {
-                Console.WriteLine("[LaMaPatchService] Loading model file...");
-                using var stream = await FileSystem.OpenAppPackageFileAsync("lama_int8.onnx");
-                using var memoryStream = new MemoryStream();
-                await stream.CopyToAsync(memoryStream);
-                Console.WriteLine($"[LaMaPatchService] Model loaded into memory. Size: {memoryStream.Length}");
+                // To save memory, we extract the model to a temp file and load from path 
+                // instead of loading a huge byte[] into managed memory.
+                var modelPath = Path.Combine(FileSystem.CacheDirectory, "lama_int8.onnx");
+                
+                if (!File.Exists(modelPath))
+                {
+                    Console.WriteLine("[LaMaPatchService] Extracting model to cache...");
+                    using var stream = await FileSystem.OpenAppPackageFileAsync("lama_int8.onnx");
+                    using var fileStream = File.Create(modelPath);
+                    await stream.CopyToAsync(fileStream);
+                    Console.WriteLine($"[LaMaPatchService] Model extracted to: {modelPath}");
+                }
+                else
+                {
+                    Console.WriteLine($"[LaMaPatchService] Model already exists at: {modelPath}");
+                }
                 
                 var options = new SessionOptions();
                 // Explicitly define CPU usage to avoid potential NNAPI stability issues on Android
-                options.AppendExecutionProvider_CPU(useArena: 1); // True (1), False (0)
+                // useArena: 0 (False) prevents pre-allocating large memory chunks, reducing peak RAM usage (at cost of speed)
+                options.AppendExecutionProvider_CPU(useArena: 0); 
                 options.LogSeverityLevel = OrtLoggingLevel.ORT_LOGGING_LEVEL_VERBOSE;
 
                 // Limit threads to prevent overheating
                 options.InterOpNumThreads = 2;
                 options.IntraOpNumThreads = 2;
+                
+                // Disable all graph optimizations to prevent memory spikes during graph rewriting
+                options.GraphOptimizationLevel = GraphOptimizationLevel.ORT_DISABLE_ALL;
 
-                _session = new InferenceSession(memoryStream.ToArray(), options);
+                // Load from file path (Native C++ loads it, avoiding Managed Heap allocation)
+                _session = new InferenceSession(modelPath, options);
                 Console.WriteLine("[LaMaPatchService] InferenceSession created successfully.");
+                
+                // Log input metadata for debugging
+                foreach (var input in _session.InputMetadata)
+                {
+                    Console.WriteLine($"[LaMaPatchService] Input: {input.Key}, Type: {input.Value.ElementType}, dimensions: {string.Join(",", input.Value.Dimensions)}");
+                }
             }
             catch (Exception ex)
             {
@@ -128,6 +150,12 @@ namespace MobileDiffusion.Services
 
                 // 3. Run Inference
                 Console.WriteLine("[LaMaPatchService] Creating Onnx inputs...");
+
+                // Force a GC before allocating input wrappers and running inference
+                // to clear out the large bitmaps from the resize step (resizing creates copies).
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+
                 var inputs = new List<NamedOnnxValue>
                 {
                     NamedOnnxValue.CreateFromTensor("image", imageTensor),
@@ -137,7 +165,15 @@ namespace MobileDiffusion.Services
                 // Run on a background thread to avoid blocking UI
                 // InferenceSession.Run is blocking
                 Console.WriteLine("[LaMaPatchService] Running inference (background thread)...");
-                using var results = await Task.Run(() => _session.Run(inputs));
+                
+                using var results = await Task.Run(() => 
+                {
+                    // Double check Inputs before running (Native crash prevention)
+                    if (inputs == null || inputs.Count != 2) throw new InvalidOperationException("Inputs invalid");
+                    
+                    return _session.Run(inputs);
+                });
+                
                 Console.WriteLine("[LaMaPatchService] Inference returned results");
                 
                 var outputTensor = results.First().AsTensor<float>();
