@@ -8,4 +8,5 @@ public interface ISegmentationService
     Task<bool> SetImage(SKBitmap bitmap, CancellationToken token);
     Task<SKBitmap> DoSegmentation(SKPoint[] points, bool reset = false);
     void Reset();
+    void UnloadModel();
 }

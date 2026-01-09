@@ -20,6 +20,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private readonly IImageService _imageService;
     private readonly IPopupService _popupService;
     private readonly ISegmentationService _segmentationService;
+    private readonly IPatchService _patchService;
 
     private int _imgRectIndex = 0;
     private List<int> _supportedImgRectSizes = new()
@@ -105,12 +106,14 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         IPopupService popupService,
         IImageService imageService,
         ISegmentationService segmentationService,
+        IPatchService patchService,
         ILoadingService loadingService) : base(loadingService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
         _segmentationService = segmentationService ?? throw new ArgumentNullException(nameof(segmentationService));
+        _patchService = patchService ?? throw new ArgumentNullException(nameof(patchService));
 
         Application.Current.Resources.TryGetValue("IndependenceAccent", out var independenceColor);
 
@@ -1223,5 +1226,115 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
         ShowContextMenu = value.Type == ToolType.PaintBucket;
         OnPropertyChanged(nameof(IsZoomMode));
+    }
+
+    [RelayCommand]
+    private async Task PatchAsync()
+    {
+        if (SourceBitmap == null || CanvasActions.Count == 0)
+        {
+            await _popupService.DisplayAlertAsync("Info", "Nothing to patch!", "OK");
+            return;
+        }
+
+        var action = await _popupService.DisplayActionSheetAsync("Inpaint / Patch", "Cancel", null, "Use Last Mask Only", "Use All Masks");
+        
+        if (action == "Cancel" || string.IsNullOrEmpty(action))
+            return;
+
+        bool useLastOnly = action == "Use Last Mask Only";
+
+        try
+        {
+            IsBusy = true;
+            await Task.Delay(100);
+
+            // Unload Segmentation Service to free resource
+            _segmentationService.UnloadModel();
+
+            using var mask = await Task.Run(() => GenerateMask(useLastOnly));
+
+            var result = await _patchService.PatchImageAsync(SourceBitmap, mask);
+            
+            // Unload Patch Service after use
+            _patchService.UnloadModel();
+
+            if (result != null)
+            {
+                SourceBitmap = result;
+            }
+        }
+        catch (Exception ex)
+        {
+            await _popupService.DisplayAlertAsync("Error", $"Inpainting failed: {ex.Message}", "OK");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private SKBitmap GenerateMask(bool useLastOnly)
+    {
+        if (SourceBitmap == null) return null;
+
+        var mask = new SKBitmap(SourceBitmap.Width, SourceBitmap.Height, SKColorType.Rgba8888, SKAlphaType.Premul);
+        using var canvas = new SKCanvas(mask);
+        
+        // Background is black (keep original)
+        canvas.Clear(SKColors.Black);
+
+        // Filter actions
+        var actionsToRender = useLastOnly 
+            ? CanvasActions.Where(x => x == CanvasActions.LastOrDefault()).ToList() 
+            : CanvasActions.ToList();
+
+        // Draw masks (White = Inpaint)
+        foreach (var action in actionsToRender)
+        {
+            if (action is MaskLineViewModel line)
+            {
+                using var paint = new SKPaint
+                {
+                    Style = SKPaintStyle.Stroke,
+                    StrokeWidth = line.BrushSize,
+                    StrokeCap = SKStrokeCap.Round,
+                    StrokeJoin = SKStrokeJoin.Round,
+                    IsAntialias = true
+                };
+
+                if (line.MaskEffect == MaskEffect.Paint)
+                {
+                    paint.BlendMode = SKBlendMode.SrcOver; 
+                    paint.Color = SKColors.White;
+                }
+                else // Erase
+                {
+                    paint.BlendMode = SKBlendMode.Src;
+                    paint.Color = SKColors.Black;
+                }
+
+                if (line.Path != null && line.Path.Count > 0)
+                {
+                    using var path = new SKPath();
+                    path.MoveTo(line.Path[0]);
+                    for (var i = 1; i < line.Path.Count; i++)
+                    {
+                        path.ConicTo(line.Path[i - 1], line.Path[i], .5f);
+                    }
+                    canvas.DrawPath(path, paint);
+                }
+            }
+            else if (action is SegmentationMaskViewModel seg && seg.Bitmap != null)
+            {
+                 using var paint = new SKPaint();
+                 // Create filter to make non-transparent pixels white
+                 paint.ColorFilter = SKColorFilter.CreateBlendMode(SKColors.White, SKBlendMode.SrcIn); 
+                 
+                 canvas.DrawBitmap(seg.Bitmap, new SKRect(0, 0, mask.Width, mask.Height), paint);
+            }
+        }
+        
+        return mask;
     }
 }

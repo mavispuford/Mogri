@@ -42,6 +42,27 @@ public class SegmentationService : ISegmentationService, IDisposable
         _lowResMasks = null;
     }
 
+    public void UnloadModel()
+    {
+        Console.WriteLine("[SegmentationService] Unloading models to free memory...");
+        try
+        {
+            _encoderSession?.Dispose();
+            _decoderSession?.Dispose();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[SegmentationService] Error disposing sessions: {ex}");
+        }
+        finally
+        {
+            _encoderSession = null;
+            _decoderSession = null;
+            _initTask = null;
+            GC.Collect();
+        }
+    }
+
     Task InitAsync()
     {
         if (_initTask == null || _initTask.IsFaulted)
@@ -94,7 +115,7 @@ public class SegmentationService : ISegmentationService, IDisposable
             return false;
         }
 
-        await _initTask.ConfigureAwait(false);
+        await InitAsync().ConfigureAwait(false);
 
         try
         {
@@ -166,7 +187,7 @@ public class SegmentationService : ISegmentationService, IDisposable
             return null;
         }
 
-        await _initTask.ConfigureAwait(false);
+        await InitAsync().ConfigureAwait(false);
 
         return await Task.Run(() =>
         {

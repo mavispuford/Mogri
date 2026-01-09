@@ -62,6 +62,14 @@
                 </ImageButton.Source>
             </ImageButton>
 
+            <ImageButton ToolTipProperties.Text="Patch / Inpaint"
+                         Style="{StaticResource TitleBarButtonStyle}"
+                         Command="{Binding PatchCommand}">
+                <ImageButton.Source>
+                    <FontImageSource Glyph="&#xe3f3;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
+                </ImageButton.Source>
+            </ImageButton>
+
             <ImageButton ToolTipProperties.Text="Save Mask"
                          Style="{StaticResource TitleBarButtonStyle}"
                          Command="{Binding SaveCommand}">
