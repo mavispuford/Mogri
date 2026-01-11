@@ -144,13 +144,14 @@
                     HorizontalOptions="Center"
                     VerticalOptions="Center"/>
 
-                <ActivityIndicator HorizontalOptions="Center" 
-                    VerticalOptions="Center"
-                    IsRunning="{Binding IsBusy}"
-                    InputTransparent="True"/>
-
             </Grid>
         </controls:GestureContainer>
+
+        <ActivityIndicator Grid.RowSpan="2"
+                           HorizontalOptions="Center" 
+                           VerticalOptions="Center"
+                           IsRunning="{Binding IsBusy}"
+                           InputTransparent="True"/>
 
         <Grid Grid.Row="0"
               HorizontalOptions="Center"

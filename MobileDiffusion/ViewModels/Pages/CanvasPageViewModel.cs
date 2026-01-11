@@ -1337,4 +1337,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         
         return mask;
     }
+
+    public override bool OnBackButtonPressed()
+    {
+        return true;
+    }
 }
