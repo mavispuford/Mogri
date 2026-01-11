@@ -49,14 +49,31 @@ namespace MobileDiffusion.Services
                 
                 var options = new SessionOptions();
                 
-                // CRITICAL: Strict memory conservation for mobile devices
-                options.EnableCpuMemArena = false;
-                options.ExecutionMode = ExecutionMode.ORT_SEQUENTIAL;
-                options.InterOpNumThreads = 2;
-                options.IntraOpNumThreads = 2;
-                options.GraphOptimizationLevel = GraphOptimizationLevel.ORT_ENABLE_BASIC;
-                
-                options.LogSeverityLevel = OrtLoggingLevel.ORT_LOGGING_LEVEL_VERBOSE;
+                if (DeviceInfo.Current.DeviceType == DeviceType.Virtual)
+                {
+                    Console.WriteLine("[AotGanPatchService] Emulator detected: Using CPU settings");
+                    // CRITICAL: Strict memory conservation for mobile devices
+                    options.EnableCpuMemArena = false;
+                    options.ExecutionMode = ExecutionMode.ORT_SEQUENTIAL;
+                    options.InterOpNumThreads = 2;
+                    options.IntraOpNumThreads = 2;
+                    options.GraphOptimizationLevel = GraphOptimizationLevel.ORT_ENABLE_BASIC;
+                    
+                    options.LogSeverityLevel = OrtLoggingLevel.ORT_LOGGING_LEVEL_VERBOSE;
+                }
+                else
+                {
+                    Console.WriteLine("[AotGanPatchService] Physical device detected: Using NNAPI");
+                    try
+                    {
+                        // Use NNAPI for physical devices
+                        options.AppendExecutionProvider_Nnapi();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[AotGanPatchService] Warning: Failed to append NNAPI provider: {ex.Message}");
+                    }
+                }
 
                 _session = new InferenceSession(modelPath, options);
                 Console.WriteLine("[AotGanPatchService] InferenceSession created successfully.");
