@@ -34,7 +34,7 @@
 
     <Shell.TitleView>
         <HorizontalStackLayout x:Name="TitleViewLayout"
-                               Spacing="8"
+                               Spacing="6"
                                HorizontalOptions="Center"
                                TranslationX="{OnPlatform Default=0, Android=-8}">
 
@@ -62,14 +62,6 @@
                 </ImageButton.Source>
             </ImageButton>
 
-            <ImageButton ToolTipProperties.Text="Patch / Inpaint"
-                         Style="{StaticResource TitleBarButtonStyle}"
-                         Command="{Binding PatchCommand}">
-                <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe3f3;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
-                </ImageButton.Source>
-            </ImageButton>
-
             <ImageButton ToolTipProperties.Text="Save Mask"
                          Style="{StaticResource TitleBarButtonStyle}"
                          Command="{Binding SaveCommand}">
@@ -88,6 +80,14 @@
                 <ImageButton.Behaviors>
                     <toolkit:IconTintColorBehavior TintColor="White" />
                 </ImageButton.Behaviors>
+            </ImageButton>
+
+            <ImageButton ToolTipProperties.Text="Patch / Inpaint"
+                         Style="{StaticResource TitleBarButtonStyle}"
+                         Command="{Binding PatchCommand}">
+                <ImageButton.Source>
+                    <FontImageSource Glyph="&#xe3f3;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
+                </ImageButton.Source>
             </ImageButton>
 
             <ImageButton ToolTipProperties.Text="{Binding ShowMaskLayer, Converter={StaticResource BoolToShowMaskTextConverter}}"
