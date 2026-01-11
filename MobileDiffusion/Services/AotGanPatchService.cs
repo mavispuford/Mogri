@@ -444,7 +444,7 @@ namespace MobileDiffusion.Services
 
             // AOT-GAN works best with significant context. 1.25x is often too tight, causing "blob" artifacts.
             // 3x provides a good balance of context vs resolution.
-            int targetSize = requiredSize * 3;
+            int targetSize = requiredSize * 2;
             
             // 2. Constrain size - but NEVER smaller than the required bbox
             // (Original logic clamped to Min(W,H) which caused cutoffs for large masks)
@@ -480,7 +480,9 @@ namespace MobileDiffusion.Services
                 if (top + size > imageHeight) top = imageHeight - size;
             }
             
-            return new SKRectI(left, top, left + size, top + size);
+            var rect = new SKRectI(left, top, left + size, top + size);
+            rect.Intersect(new SKRectI(0, 0, imageWidth, imageHeight));
+            return rect;
         }
 
         private unsafe void EnsureMaskTransparency(SKBitmap mask)
