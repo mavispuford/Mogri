@@ -204,7 +204,7 @@ namespace MobileDiffusion.Services
             }
         }
 
-        private SKBitmap RunAotGanModel(SKBitmap resizedImage, SKBitmap resizedMask)
+        private unsafe SKBitmap RunAotGanModel(SKBitmap resizedImage, SKBitmap resizedMask)
         {
             if (resizedImage.Width != ModelInputSize || resizedImage.Height != ModelInputSize)
                 throw new ArgumentException($"RunAotGanModel expects {ModelInputSize}x{ModelInputSize} image");
@@ -222,55 +222,51 @@ namespace MobileDiffusion.Services
             int gOffset = inputPixelCount;
             int rOffset = inputPixelCount * 2;
 
-            for (int y = 0; y < ModelInputSize; y++)
+            byte* imgPtr = (byte*)resizedImage.GetPixels().ToPointer();
+            byte* maskPtr = (byte*)resizedMask.GetPixels().ToPointer();
+
+            for (int i = 0; i < inputPixelCount; i++)
             {
-                for (int x = 0; x < ModelInputSize; x++)
+                int ptrOffset = i * 4;
+                
+                // 1. Process Mask
+                // AOT-GAN: 1 for invalid (masked) regions, 0 for valid.
+                // FIX: Ensure we don't treat opaque black background as mask
+                // Lower alpha threshold to 0 to catch faint mask strokes, but rely on Color check to exclude black background.
+                // Rgba8888: R, G, B, A
+                byte mr = maskPtr[ptrOffset];
+                byte mg = maskPtr[ptrOffset + 1];
+                byte mb = maskPtr[ptrOffset + 2];
+                byte ma = maskPtr[ptrOffset + 3];
+
+                bool isMask = ma > 0 && (mr > 10 || mg > 10 || mb > 10);
+                var maskVal = isMask ? 1.0f : 0.0f;
+                maskArray[i] = maskVal;
+
+                // 2. Process Image
+                byte r = imgPtr[ptrOffset];
+                byte g = imgPtr[ptrOffset + 1];
+                byte b = imgPtr[ptrOffset + 2];
+
+                // Normalize to [0, 1]
+                float rNorm = r / 255.0f;
+                float gNorm = g / 255.0f;
+                float bNorm = b / 255.0f;
+                
+                // 3. Apply Mask Logic
+                if (maskVal > 0.5f)
                 {
-                    var pixel = resizedImage.GetPixel(x, y);
-                    var maskPixel = resizedMask.GetPixel(x, y);
-                    
-                    var index = y * ModelInputSize + x;
-
-                    // 1. Process Mask
-                    // AOT-GAN: 1 for invalid (masked) regions, 0 for valid.
-                    // FIX: Ensure we don't treat opaque black background as mask
-                    // Lower alpha threshold to 0 to catch faint mask strokes, but rely on Color check to exclude black background.
-                    bool isMask = maskPixel.Alpha > 0 && (maskPixel.Red > 10 || maskPixel.Green > 10 || maskPixel.Blue > 10);
-                    var maskVal = isMask ? 1.0f : 0.0f;
-                    maskArray[index] = maskVal;
-
-                    // 2. Process Image
-                    // Based on empirical testing (variation 3_BGR_0_1_Fill1.png),
-                    // the model performs best with:
-                    // - BGR Input
-                    // - [0, 1] Normalization (NOT [-1, 1])
-                    // - White (1.0) Hole Filling
-
-                    // Normalize to [0, 1]
-                    float rNorm = pixel.Red / 255.0f;
-                    float gNorm = pixel.Green / 255.0f;
-                    float bNorm = pixel.Blue / 255.0f;
-                    
-                    // 3. Apply Mask Logic
-                    // image_masked = (image * (1 - mask)) + mask
-                    // Hole -> 1.0
-                    
-                    if (maskVal > 0.5f)
-                    {
-                        // Hole -> White (1.0)
-                        imageArray[rOffset + index] = 1.0f;
-                        imageArray[gOffset + index] = 1.0f;
-                        imageArray[bOffset + index] = 1.0f;
-                    }
-                    else
-                    {
-                        // Valid -> Normalized [0, 1] BGR pixel
-                        // Note: rOffset/gOffset/bOffset logic is already set for BGR layout above
-                        
-                        imageArray[rOffset + index] = rNorm;
-                        imageArray[gOffset + index] = gNorm;
-                        imageArray[bOffset + index] = bNorm;
-                    }
+                    // Hole -> White (1.0)
+                    imageArray[rOffset + i] = 1.0f;
+                    imageArray[gOffset + i] = 1.0f;
+                    imageArray[bOffset + i] = 1.0f;
+                }
+                else
+                {
+                    // Valid -> Normalized [0, 1] BGR pixel
+                    imageArray[rOffset + i] = rNorm;
+                    imageArray[gOffset + i] = gNorm;
+                    imageArray[bOffset + i] = bNorm;
                 }
             }
             
@@ -303,6 +299,9 @@ namespace MobileDiffusion.Services
 
             // Post-process
             var outputBitmap = new SKBitmap(ModelInputSize, ModelInputSize, SKColorType.Rgba8888, SKAlphaType.Premul);
+            byte* outPtr = (byte*)outputBitmap.GetPixels().ToPointer();
+            
+            bool isZeroOne = minVal >= 0 && maxVal <= 1.0f;
             
             for (int y = 0; y < ModelInputSize; y++)
             {
@@ -316,12 +315,9 @@ namespace MobileDiffusion.Services
                     float rRaw = outputTensor[0, 2, y, x];
                     
                     // Denormalize
-                    // If range is approx [-1, 1]: (val + 1) / 2 * 255
-                    // If range is approx [0, 1]: val * 255
-                    
                     float rNorm, gNorm, bNorm;
                     
-                    if (minVal >= 0 && maxVal <= 1.0f)
+                    if (isZeroOne)
                     {
                          // Likely [0, 1] range
                          rNorm = rRaw;
@@ -340,14 +336,18 @@ namespace MobileDiffusion.Services
                     int g = (int)(gNorm * 255.0f);
                     int b = (int)(bNorm * 255.0f);
                     
-                    outputBitmap.SetPixel(x, y, new SKColor((byte)Math.Clamp(r, 0, 255), (byte)Math.Clamp(g, 0, 255), (byte)Math.Clamp(b, 0, 255)));
+                    int outIdx = (y * ModelInputSize + x) * 4;
+                    outPtr[outIdx] = (byte)Math.Clamp(r, 0, 255);
+                    outPtr[outIdx + 1] = (byte)Math.Clamp(g, 0, 255);
+                    outPtr[outIdx + 2] = (byte)Math.Clamp(b, 0, 255);
+                    outPtr[outIdx + 3] = 255; // Alpha
                 }
             }
             
             return outputBitmap;
         }
 
-        private SKRectI GetBoundingBox(SKBitmap mask)
+        private unsafe SKRectI GetBoundingBox(SKBitmap mask)
         {
             int minX = mask.Width;
             int minY = mask.Height;
@@ -355,19 +355,61 @@ namespace MobileDiffusion.Services
             int maxY = 0;
             bool found = false;
 
-            for (int y = 0; y < mask.Height; y++)
+            int width = mask.Width;
+            int height = mask.Height;
+            byte* ptr = (byte*)mask.GetPixels().ToPointer();
+            int rowBytes = mask.RowBytes;
+            int bpp = mask.BytesPerPixel;
+
+            // Optimization for standard 32-bit bitmaps (RGBA/BGRA)
+            if (bpp == 4)
             {
-                for (int x = 0; x < mask.Width; x++)
+                for (int y = 0; y < height; y++)
                 {
-                    var color = mask.GetPixel(x, y);
-                    // FIX: Ensure we don't treat opaque black background as mask
-                    if (color.Alpha > 0 && (color.Red > 10 || color.Green > 10 || color.Blue > 10)) 
+                    byte* row = ptr + y * rowBytes;
+                    for (int x = 0; x < width; x++)
                     {
-                        if (x < minX) minX = x;
-                        if (x > maxX) maxX = x;
-                        if (y < minY) minY = y;
-                        if (y > maxY) maxY = y;
-                        found = true;
+                        // Assume Alpha is at index 3 (Standard for Rgba8888 and Bgra8888)
+                        // Even if Argb8888 (Alpha at 0), this heuristic is decent if we check all channels.
+                        // But explicitly: Skia standard is byte order R,G,B,A or B,G,R,A in memory.
+                        // If we check b3 > 0 (Alpha) and any of b0,b1,b2 > 10 (Color)
+                        
+                        // Note: If A is 0, then b3 is Blue or Red.
+                        // However, standard Skia surfaces on mobile are Rgba8888 or Bgra8888.
+                        
+                        byte b0 = row[x * 4];
+                        byte b1 = row[x * 4 + 1];
+                        byte b2 = row[x * 4 + 2];
+                        byte b3 = row[x * 4 + 3];
+
+                        if (b3 > 0 && (b0 > 10 || b1 > 10 || b2 > 10))
+                        {
+                            if (x < minX) minX = x;
+                            if (x > maxX) maxX = x;
+                            if (y < minY) minY = y;
+                            if (y > maxY) maxY = y;
+                            found = true;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // Fallback for other formats
+                for (int y = 0; y < mask.Height; y++)
+                {
+                    for (int x = 0; x < mask.Width; x++)
+                    {
+                        var color = mask.GetPixel(x, y);
+                        // FIX: Ensure we don't treat opaque black background as mask
+                        if (color.Alpha > 0 && (color.Red > 10 || color.Green > 10 || color.Blue > 10)) 
+                        {
+                            if (x < minX) minX = x;
+                            if (x > maxX) maxX = x;
+                            if (y < minY) minY = y;
+                            if (y > maxY) maxY = y;
+                            found = true;
+                        }
                     }
                 }
             }
@@ -424,27 +466,61 @@ namespace MobileDiffusion.Services
             return new SKRectI(left, top, left + size, top + size);
         }
 
-        private void EnsureMaskTransparency(SKBitmap mask)
+        private unsafe void EnsureMaskTransparency(SKBitmap mask)
         {
             // Fixes the issue where a black background is treated as "masked" by DstIn blending.
             // We force pixels that are visually black (background) to be fully transparent.
             
-            var pixels = mask.Pixels;
-            bool modified = false;
-
-            for (int i = 0; i < pixels.Length; i++)
+            // Optimization: Direct pointer access avoids copying to/from SKBitmap.Pixels array
+            if (mask.BytesPerPixel == 4)
             {
-                // If it has alpha but no color content, treated as transparent background
-                if (pixels[i].Alpha > 0 && pixels[i].Red < 10 && pixels[i].Green < 10 && pixels[i].Blue < 10)
+                byte* ptr = (byte*)mask.GetPixels().ToPointer();
+                int width = mask.Width;
+                int height = mask.Height;
+                int rowBytes = mask.RowBytes;
+
+                for (int y = 0; y < height; y++)
                 {
-                    pixels[i] = SKColors.Transparent;
-                    modified = true;
+                    byte* row = ptr + y * rowBytes;
+                    for (int x = 0; x < width; x++)
+                    {
+                        // Check if black but has alpha
+                        // Assume Alpha at index 3 for 32-bit SKBitmap
+                        int offset = x * 4;
+                        byte b0 = row[offset];
+                        byte b1 = row[offset + 1];
+                        byte b2 = row[offset + 2];
+                        byte b3 = row[offset + 3];
+
+                        if (b3 > 0 && b0 < 10 && b1 < 10 && b2 < 10)
+                        {
+                            // Set to transparent (all 0)
+                            // Casting to int* to write 4 bytes at once
+                            *(int*)(row + offset) = 0;
+                        }
+                    }
                 }
             }
-
-            if (modified)
+            else
             {
-                mask.Pixels = pixels;
+                // Fallback for non-standard formats
+                var pixels = mask.Pixels;
+                bool modified = false;
+
+                for (int i = 0; i < pixels.Length; i++)
+                {
+                    // If it has alpha but no color content, treated as transparent background
+                    if (pixels[i].Alpha > 0 && pixels[i].Red < 10 && pixels[i].Green < 10 && pixels[i].Blue < 10)
+                    {
+                        pixels[i] = SKColors.Transparent;
+                        modified = true;
+                    }
+                }
+
+                if (modified)
+                {
+                    mask.Pixels = pixels;
+                }
             }
         }
     }
