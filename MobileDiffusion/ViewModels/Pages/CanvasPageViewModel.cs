@@ -91,6 +91,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     public partial bool HasSegmentationImage { get; set; } = false;
 
     [ObservableProperty]
+    public partial bool ShowActions {get; set;}
+
+    [ObservableProperty]
     public partial bool ShowContextMenu { get; set; } = false;
 
     [ObservableProperty]
@@ -1340,6 +1343,12 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         }
         
         return mask;
+    }
+
+    [RelayCommand]
+    private void ToggleActionsVisibility()
+    {
+        ShowActions = !ShowActions;
     }
 
     public override bool OnBackButtonPressed()

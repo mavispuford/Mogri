@@ -53,6 +53,8 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     bool GettingColorPalette { get; set; }
 
+    bool ShowActions {get; set; }
+
     IAsyncRelayCommand BeginCropImageRectCommand { get; }
 
     IRelayCommand ChangeBoundingBoxSizeCommand { get; }
@@ -84,4 +86,6 @@ public interface ICanvasPageViewModel : IPageViewModel
     IRelayCommand ClearSegmentationMaskCommand { get; }
 
     IRelayCommand ToggleSegmentationAddCommand { get; }
+
+    IRelayCommand ToggleActionsVisibilityCommand { get; }
 }

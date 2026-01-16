@@ -5,24 +5,34 @@ namespace MobileDiffusion.Animations;
 
 public class ColorToAnimation : BaseAnimation
 {
-    public Color ToColor { get; set; }
+    public static readonly BindableProperty ToColorProperty = BindableProperty.Create(nameof(ToColor), typeof(Color), typeof(ColorToAnimation), Colors.Transparent);
+    public Color ToColor 
+    { 
+        get => (Color)GetValue(ToColorProperty);
+        set => SetValue(ToColorProperty, value);
+    }
 
-    public BindableProperty BindableProperty { get; set; }
+    public static readonly BindableProperty TargetPropertyProperty = BindableProperty.Create(nameof(TargetProperty), typeof(BindableProperty), typeof(ColorToAnimation), null);
+    public BindableProperty TargetProperty 
+    { 
+        get => (BindableProperty)GetValue(TargetPropertyProperty);
+        set => SetValue(TargetPropertyProperty, value);
+    }
 
     public override Task Animate(VisualElement view, CancellationToken token = default)
     {
-        if (view == null || BindableProperty == null)
+        if (view == null || TargetProperty == null)
         {
             return Task.CompletedTask;
         }
 
-        string animationName = $"ColorTo_{BindableProperty.PropertyName}";
+        string animationName = $"ColorTo_{TargetProperty.PropertyName}";
         
         // Abort any existing animation on this property first
         view.AbortAnimation(animationName);
 
-        var fromColor = (Color)view.GetValue(BindableProperty) ?? Colors.Transparent;
+        var fromColor = (Color)view.GetValue(TargetProperty) ?? Colors.Transparent;
 
-        return view.ColorTo(fromColor, ToColor, color => view.SetValue(BindableProperty, color), (uint)Length, Easing, animationName);
+        return view.ColorTo(fromColor, ToColor, color => view.SetValue(TargetProperty, color), (uint)Length, Easing, animationName);
     }
 }

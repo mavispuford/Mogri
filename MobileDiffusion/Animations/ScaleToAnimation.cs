@@ -2,9 +2,15 @@
 
 namespace MobileDiffusion.Animations;
 
-class ScaleToAnimation : BaseAnimation
+public class ScaleToAnimation : BaseAnimation
 {
-    public double Scale { get; set; }
+    public static readonly BindableProperty ScaleProperty = BindableProperty.Create(nameof(Scale), typeof(double), typeof(ScaleToAnimation), 1.0);
+
+    public double Scale 
+    { 
+        get => (double)GetValue(ScaleProperty);
+        set => SetValue(ScaleProperty, value);
+    }
 
     public override Task Animate(VisualElement view, CancellationToken token = default) => view.ScaleToAsync(Scale, Length, Easing);
 }

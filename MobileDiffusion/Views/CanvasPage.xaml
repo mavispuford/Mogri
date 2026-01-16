@@ -37,77 +37,24 @@
             </toolkit:BoolToObjectConverter>
             <toolkit:EnumToBoolConverter x:Key="EnumToBool" />
             <toolkit:InvertedBoolConverter x:Key="InvertedBool" />
+            <toolkit:BoolToObjectConverter x:Key="BoolToScaleInDoubleConverter">
+                <toolkit:BoolToObjectConverter.TrueObject>
+                    <x:Double>1</x:Double>
+                </toolkit:BoolToObjectConverter.TrueObject>
+                <toolkit:BoolToObjectConverter.FalseObject>
+                    <x:Double>0</x:Double>
+                </toolkit:BoolToObjectConverter.FalseObject>
+            </toolkit:BoolToObjectConverter>
+            <toolkit:BoolToObjectConverter x:Key="BoolToScaleOutDoubleConverter">
+                <toolkit:BoolToObjectConverter.TrueObject>
+                    <x:Double>0</x:Double>
+                </toolkit:BoolToObjectConverter.TrueObject>
+                <toolkit:BoolToObjectConverter.FalseObject>
+                    <x:Double>1</x:Double>
+                </toolkit:BoolToObjectConverter.FalseObject>
+            </toolkit:BoolToObjectConverter>
         </ResourceDictionary>
     </views:BasePage.Resources>
-
-    <!--<Shell.TitleView>
-        <FlexLayout x:Name="TitleViewLayout"
-                    AlignContent="Center"
-                    AlignItems="Center"
-                    JustifyContent="SpaceBetween"
-                    HorizontalOptions="Fill"
-                    Wrap="NoWrap"
-                    TranslationX="{OnPlatform Default=0, Android=-8}">
-
-            <ImageButton ToolTipProperties.Text="Add Image"
-                         Style="{StaticResource TitleBarButtonStyle}"
-                         Command="{Binding ShowMediaPickerCommand}">
-                <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe43e;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
-                </ImageButton.Source>
-            </ImageButton>
-
-            <ImageButton ToolTipProperties.Text="Undo"
-                         Style="{StaticResource TitleBarButtonStyle}"
-                         Command="{Binding UndoCommand}">
-                <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe166;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
-                </ImageButton.Source>
-            </ImageButton>
-
-            <ImageButton ToolTipProperties.Text="Clear Paint"
-                         Style="{StaticResource TitleBarButtonStyle}"
-                         Command="{Binding ClearCommand}">
-                <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
-                </ImageButton.Source>
-            </ImageButton>
-
-            <ImageButton ToolTipProperties.Text="Save"
-                         Style="{StaticResource TitleBarButtonStyle}"
-                         Command="{Binding SaveCommand}">
-                <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe161;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
-                </ImageButton.Source>
-            </ImageButton>
-
-            <ImageButton ToolTipProperties.Text="Use as source image"
-                         Style="{StaticResource TitleBarButtonStyle}"
-                         Command="{Binding SendToImageToImageCommand}"
-                         HeightRequest="34">
-                <ImageButton.Source>
-                    <FontImageSource Glyph="&#xf824;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
-                </ImageButton.Source>
-                <ImageButton.Behaviors>
-                    <toolkit:IconTintColorBehavior TintColor="White" />
-                </ImageButton.Behaviors>
-            </ImageButton>
-
-            <ImageButton ToolTipProperties.Text="Patch / Inpaint"
-                         Style="{StaticResource TitleBarButtonStyle}"
-                         Command="{Binding PatchCommand}">
-                <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe3f3;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
-                </ImageButton.Source>
-            </ImageButton>
-
-            <ImageButton ToolTipProperties.Text="{Binding ShowMaskLayer, Converter={StaticResource BoolToShowMaskTextConverter}}"
-                         Style="{StaticResource TitleBarButtonStyle}"
-                         Command="{Binding ToggleMaskLayerVisibilityCommand}"
-                         Source="{Binding ShowMaskLayer, Converter={StaticResource BoolToEyeConverter}}"/>
-
-        </FlexLayout>
-    </Shell.TitleView>-->
 
     <views:BasePage.ToolbarItems>
         <ToolbarItem Text="Undo" Command="{Binding UndoCommand}" Order="Primary">
@@ -120,36 +67,31 @@
                 <FontImageSource Glyph="&#xe161;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
-        <ToolbarItem Text="Patch" Command="{Binding PatchCommand}" Order="Primary">
-            <ToolbarItem.IconImageSource>
-                <FontImageSource Glyph="&#xe3f3;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
-            </ToolbarItem.IconImageSource>
-        </ToolbarItem>
+        <ToolbarItem Text="{Binding ShowMaskLayer, Converter={StaticResource BoolToShowMaskTextConverter}}" 
+                     IconImageSource="{Binding ShowMaskLayer, Converter={StaticResource BoolToEyeConverter}}"
+                     Command="{Binding ToggleMaskLayerVisibilityCommand}" 
+                     Order="Primary" />
         <ToolbarItem Text="Clear Paint" Command="{Binding ClearCommand}" Order="Secondary">
             <ToolbarItem.IconImageSource>
                 <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
-        <ToolbarItem Text="Add Image" Command="{Binding ShowMediaPickerCommand}" Order="Secondary">
+        <ToolbarItem Text="Set Image" Command="{Binding ShowMediaPickerCommand}" Order="Secondary">
             <ToolbarItem.IconImageSource>
                 <FontImageSource Glyph="&#xe43e;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
-        <ToolbarItem Text="{Binding ShowMaskLayer, Converter={StaticResource BoolToShowMaskTextConverter}}" 
-                     IconImageSource="{Binding ShowMaskLayer, Converter={StaticResource BoolToEyeConverter}}"
-                     Command="{Binding ToggleMaskLayerVisibilityCommand}" 
-                     Order="Secondary" />
     </views:BasePage.ToolbarItems>
 
-    <Grid Padding="30,10,30,10"
-          RowSpacing="10"
-          RowDefinitions="auto,*,64">
+    <Grid Padding="16,10,16,16"
+          RowSpacing="8"
+          RowDefinitions="auto,*,60">
         <controls:GestureContainer x:Name="ZoomContainer"
                                    Grid.Row="1"
                                    Grid.RowSpan="2"
                                    HorizontalOptions="Fill"
                                    VerticalOptions="Fill"
-                                   Margin="0,56,0,40"
+                                   Margin="14,56,14,40"
                                    EnablePanning="{Binding IsZoomMode}"
                                    EnableZooming="{Binding IsZoomMode}">
             <Grid x:Name="MaskGrid"
@@ -454,14 +396,77 @@
 
         </VerticalStackLayout>
 
+        <VerticalStackLayout Grid.Row="1"
+                             HorizontalOptions="End"
+                             VerticalOptions="End"
+                             IsVisible="{Binding ShowActions}"
+                             Spacing="4">
+            <VerticalStackLayout.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="BackgroundColor" Value="{StaticResource Secondary}"/>
+                    <Setter Property="HeightRequest" Value="56"/>
+                    <Setter Property="StrokeShape" Value="RoundRectangle 28"/>
+                    <Setter Property="Stroke" Value="Transparent"/>
+                    <Setter Property="Padding" Value="24,0"/>
+                    <Setter Property="HorizontalOptions" Value="End"/>
+                </Style>
+
+                <Style TargetType="Label">
+                    <Setter Property="FontSize" Value="16"/>
+                    <Setter Property="TextColor" Value="{StaticResource Tertiary}"/>
+                    <Setter Property="VerticalTextAlignment" Value="Center"/>
+                </Style>
+
+                <Style TargetType="Image">
+                    <Style.Behaviors>
+                        <toolkit:IconTintColorBehavior TintColor="{StaticResource Primary}" />
+                    </Style.Behaviors>
+                </Style>
+
+                <Style TargetType="HorizontalStackLayout">
+                    <Setter Property="Spacing" Value="8"/>
+                </Style>
+            </VerticalStackLayout.Resources>
+
+            <Border>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding PatchCommand}" />
+                </Border.GestureRecognizers>
+                <HorizontalStackLayout>
+                    <Image>
+                        <Image.Source>
+                            <FontImageSource Glyph="&#xe3f3;" FontFamily="MaterialIconsRound300" Size="24" />
+                        </Image.Source>
+                    </Image>
+
+                    <Label Text="Patch" />
+                </HorizontalStackLayout>
+            </Border>
+
+            <Border>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding SendToImageToImageCommand}" />
+                </Border.GestureRecognizers>
+                <HorizontalStackLayout>
+                    <Image>
+                        <Image.Source>
+                            <FontImageSource Glyph="&#xf824;" FontFamily="MaterialIconsRound300" Size="24" />
+                        </Image.Source>
+                    </Image>
+
+                    <Label Text="Use Image" />
+                </HorizontalStackLayout>
+            </Border>
+
+            
+
+        </VerticalStackLayout>
+
         <Grid x:Name="ContextButtonsLayout"
               Grid.Row="2"
               ColumnDefinitions="*,auto"
               ColumnSpacing="10"
               Margin="0">
-            <Grid.GestureRecognizers>
-                <TapGestureRecognizer />
-            </Grid.GestureRecognizers>
             <FlexLayout Grid.Column="0"
                         AlignContent="Center"
                         AlignItems="Center"
@@ -471,21 +476,52 @@
                 <Button Text="Clear Paint" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" BorderColor="{StaticResource IndependenceAccentFortyPercent}" BorderWidth="1" Command="{Binding ClearSegmentationMaskCommand}"/>
             </FlexLayout>
 
-            <Border Grid.Column="1"
-                    BackgroundColor="{StaticResource Primary}"
+            <Border x:Name="ShowActionsButton"
+                    Grid.Column="1"
+                    BackgroundColor="{StaticResource Secondary}"
                     Stroke="Transparent"
                     HorizontalOptions="End"
                     VerticalOptions="Center"
                     WidthRequest="56"
                     HeightRequest="56"
                     StrokeShape="RoundRectangle 15">
-                <ImageButton ToolTipProperties.Text="Use as source image"
-                        Command="{Binding SendToImageToImageCommand}"
+                    <animations:AnimationProperties.Animations>
+                        <animations:ScaleToAnimation Scale="{Binding ShowActions, Converter={StaticResource BoolToScaleOutDoubleConverter}}" Easing="{x:Static Easing.CubicInOut}" Length="200" />
+                    </animations:AnimationProperties.Animations>   
+                <ImageButton ToolTipProperties.Text="Actions"
+                        Command="{Binding ToggleActionsVisibilityCommand}"
                         HorizontalOptions="Fill"
                         VerticalOptions="Fill"
                         Padding="10">
                     <ImageButton.Source>
                         <FontImageSource Glyph="&#xf824;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
+                    </ImageButton.Source>
+                    <ImageButton.Behaviors>
+                        <toolkit:IconTintColorBehavior TintColor="{StaticResource Tertiary}" />
+                    </ImageButton.Behaviors>
+                </ImageButton>
+            </Border>
+
+            <Border x:Name="CloseActionsButton"
+                    Grid.Column="1"
+                    BackgroundColor="#FFFA9A8C"
+                    Stroke="Transparent"
+                    HorizontalOptions="End"
+                    VerticalOptions="Center"
+                    WidthRequest="56"
+                    HeightRequest="56"
+                    Scale="0"
+                    StrokeShape="RoundRectangle 28">
+                    <animations:AnimationProperties.Animations>
+                        <animations:ScaleToAnimation Scale="{Binding ShowActions, Converter={StaticResource BoolToScaleInDoubleConverter}}" Easing="{x:Static Easing.CubicInOut}" Length="200" />
+                    </animations:AnimationProperties.Animations>                
+                    <ImageButton ToolTipProperties.Text="Actions"
+                        Command="{Binding ToggleActionsVisibilityCommand}"
+                        HorizontalOptions="Fill"
+                        VerticalOptions="Fill"
+                        Padding="10">
+                    <ImageButton.Source>
+                        <FontImageSource Glyph="&#xe5cd;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
                     </ImageButton.Source>
                     <ImageButton.Behaviors>
                         <toolkit:IconTintColorBehavior TintColor="White" />
@@ -494,8 +530,6 @@
             </Border>
 
         </Grid>
-
-        
 
     </Grid>
 </views:BasePage>
