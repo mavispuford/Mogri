@@ -2,9 +2,9 @@
 
 namespace MobileDiffusion.Animations;
 
-class TranslateToAnimation : BaseAnimation
+public class TranslateToAnimation : BaseAnimation
 {
-    public static BindableProperty TranslationXProperty = BindableProperty.Create(nameof(TranslationX),
+    public static readonly BindableProperty TranslationXProperty = BindableProperty.Create(nameof(TranslationX),
         typeof(double), typeof(TranslateToAnimation), 0d);
 
     public double TranslationX
@@ -13,7 +13,7 @@ class TranslateToAnimation : BaseAnimation
         set => SetValue(TranslationXProperty, value);
     }
 
-    public static BindableProperty TranslationYProperty = BindableProperty.Create(nameof(TranslationY),
+    public static readonly BindableProperty TranslationYProperty = BindableProperty.Create(nameof(TranslationY),
         typeof(double), typeof(TranslateToAnimation), 0d);
 
     public double TranslationY
