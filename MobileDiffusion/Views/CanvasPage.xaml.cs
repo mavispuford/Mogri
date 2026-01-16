@@ -784,6 +784,7 @@ public partial class CanvasPage : BasePage
         ColorPaletteButton.IsVisible = false;
         SnipButton.IsVisible = false;
         BoundingBoxSizeButton.IsVisible = false;
+        AddRemoveButton.IsVisible = false;
 
         foreach (var contextButton in CurrentTool.ContextButtons)
         {
@@ -803,6 +804,9 @@ public partial class CanvasPage : BasePage
                     break;
                 case BoundingBoxSizeContextButtonViewModel:
                     BoundingBoxSizeButton.IsVisible = true;
+                    break;
+                case AddRemoveButtonViewModel:
+                    AddRemoveButton.IsVisible = true;
                     break;
                 default:
                     break;

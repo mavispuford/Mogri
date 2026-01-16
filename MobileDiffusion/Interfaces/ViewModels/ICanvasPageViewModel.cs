@@ -37,6 +37,8 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     SKBitmap SourceBitmap { get; set; }
 
+    bool SegmentationAdd { get; }
+
     SKBitmap SegmentationBitmap { get; set; }
 
     bool SettingSegmentationImage { get; set; }
@@ -50,8 +52,6 @@ public interface ICanvasPageViewModel : IPageViewModel
     bool ShowContextMenu { get; set; }
 
     bool GettingColorPalette { get; set; }
-
-    SegmentationMode SegmentationMode { get; set; }
 
     IAsyncRelayCommand BeginCropImageRectCommand { get; }
 
@@ -82,4 +82,6 @@ public interface ICanvasPageViewModel : IPageViewModel
     IAsyncRelayCommand ApplySegmentationMaskCommand { get; }
 
     IRelayCommand ClearSegmentationMaskCommand { get; }
+
+    IRelayCommand ToggleSegmentationAddCommand { get; }
 }

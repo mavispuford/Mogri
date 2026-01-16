@@ -5,15 +5,24 @@ namespace MobileDiffusion.Animations;
 
 public class ColorToAnimation : BaseAnimation
 {
-    public Color FromColor { get; set; }
-
     public Color ToColor { get; set; }
-
-    public static readonly BindableProperty FromColorProperty = BindableProperty.Create(nameof(FromColor), typeof(Color), typeof(ColorToAnimation), Colors.Black);
 
     public BindableProperty BindableProperty { get; set; }
 
+    public override Task Animate(VisualElement view, CancellationToken token = default)
+    {
+        if (view == null || BindableProperty == null)
+        {
+            return Task.CompletedTask;
+        }
 
-    public override Task Animate(VisualElement view, CancellationToken token = default) => 
-        view.ColorTo(FromColor, ToColor, color => view.SetValue(BindableProperty, color));
+        string animationName = $"ColorTo_{BindableProperty.PropertyName}";
+        
+        // Abort any existing animation on this property first
+        view.AbortAnimation(animationName);
+
+        var fromColor = (Color)view.GetValue(BindableProperty) ?? Colors.Transparent;
+
+        return view.ColorTo(fromColor, ToColor, color => view.SetValue(BindableProperty, color), (uint)Length, Easing, animationName);
+    }
 }
