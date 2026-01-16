@@ -27,16 +27,27 @@
                     <FontImageSource Glyph="&#xe8f4;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
                 </toolkit:BoolToObjectConverter.FalseObject>
             </toolkit:BoolToObjectConverter>
+            <toolkit:BoolToObjectConverter x:Key="BoolToPlusMinusConverter">
+                <toolkit:BoolToObjectConverter.TrueObject>
+                    <FontImageSource Glyph="&#xe145;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
+                </toolkit:BoolToObjectConverter.TrueObject>
+                <toolkit:BoolToObjectConverter.FalseObject>
+                    <FontImageSource Glyph="&#xe15b;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
+                </toolkit:BoolToObjectConverter.FalseObject>
+            </toolkit:BoolToObjectConverter>
             <toolkit:EnumToBoolConverter x:Key="EnumToBool" />
             <toolkit:InvertedBoolConverter x:Key="InvertedBool" />
         </ResourceDictionary>
     </views:BasePage.Resources>
 
-    <Shell.TitleView>
-        <HorizontalStackLayout x:Name="TitleViewLayout"
-                               Spacing="6"
-                               HorizontalOptions="Center"
-                               TranslationX="{OnPlatform Default=0, Android=-8}">
+    <!--<Shell.TitleView>
+        <FlexLayout x:Name="TitleViewLayout"
+                    AlignContent="Center"
+                    AlignItems="Center"
+                    JustifyContent="SpaceBetween"
+                    HorizontalOptions="Fill"
+                    Wrap="NoWrap"
+                    TranslationX="{OnPlatform Default=0, Android=-8}">
 
             <ImageButton ToolTipProperties.Text="Add Image"
                          Style="{StaticResource TitleBarButtonStyle}"
@@ -62,7 +73,7 @@
                 </ImageButton.Source>
             </ImageButton>
 
-            <ImageButton ToolTipProperties.Text="Save Mask"
+            <ImageButton ToolTipProperties.Text="Save"
                          Style="{StaticResource TitleBarButtonStyle}"
                          Command="{Binding SaveCommand}">
                 <ImageButton.Source>
@@ -73,7 +84,7 @@
             <ImageButton ToolTipProperties.Text="Use as source image"
                          Style="{StaticResource TitleBarButtonStyle}"
                          Command="{Binding SendToImageToImageCommand}"
-                         HeightRequest="32">
+                         HeightRequest="34">
                 <ImageButton.Source>
                     <FontImageSource Glyph="&#xf824;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
                 </ImageButton.Source>
@@ -93,20 +104,52 @@
             <ImageButton ToolTipProperties.Text="{Binding ShowMaskLayer, Converter={StaticResource BoolToShowMaskTextConverter}}"
                          Style="{StaticResource TitleBarButtonStyle}"
                          Command="{Binding ToggleMaskLayerVisibilityCommand}"
-                         HeightRequest="32"
                          Source="{Binding ShowMaskLayer, Converter={StaticResource BoolToEyeConverter}}"/>
 
-        </HorizontalStackLayout>
-    </Shell.TitleView>
+        </FlexLayout>
+    </Shell.TitleView>-->
+
+    <views:BasePage.ToolbarItems>
+        <ToolbarItem Text="Undo" Command="{Binding UndoCommand}" Order="Primary">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource Glyph="&#xe166;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+        <ToolbarItem Text="Save" Command="{Binding SaveCommand}" Order="Primary">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource Glyph="&#xe161;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+        <ToolbarItem Text="Patch" Command="{Binding PatchCommand}" Order="Primary">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource Glyph="&#xe3f3;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+        <ToolbarItem Text="Clear Paint" Command="{Binding ClearCommand}" Order="Secondary">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+        <ToolbarItem Text="Add Image" Command="{Binding ShowMediaPickerCommand}" Order="Secondary">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource Glyph="&#xe43e;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+        <ToolbarItem Text="{Binding ShowMaskLayer, Converter={StaticResource BoolToShowMaskTextConverter}}" 
+                     IconImageSource="{Binding ShowMaskLayer, Converter={StaticResource BoolToEyeConverter}}"
+                     Command="{Binding ToggleMaskLayerVisibilityCommand}" 
+                     Order="Secondary" />
+    </views:BasePage.ToolbarItems>
 
     <Grid Padding="30,10,30,10"
           RowSpacing="10"
-          RowDefinitions="auto,*">
+          RowDefinitions="auto,*,64">
         <controls:GestureContainer x:Name="ZoomContainer"
                                    Grid.Row="1"
+                                   Grid.RowSpan="2"
                                    HorizontalOptions="Fill"
                                    VerticalOptions="Fill"
-                                   Margin="0,0,0,80"
+                                   Margin="0,56,0,40"
                                    EnablePanning="{Binding IsZoomMode}"
                                    EnableZooming="{Binding IsZoomMode}">
             <Grid x:Name="MaskGrid"
@@ -147,152 +190,86 @@
             </Grid>
         </controls:GestureContainer>
 
-        <ActivityIndicator Grid.RowSpan="2"
+        <ActivityIndicator Grid.RowSpan="3"
                            HorizontalOptions="Center" 
                            VerticalOptions="Center"
                            IsRunning="{Binding IsBusy}"
                            InputTransparent="True"/>
 
-        <Grid Grid.Row="0"
-              HorizontalOptions="Center"
-              VerticalOptions="Start">
-              <Border BackgroundColor="#20000000"
-                      Stroke="Transparent"
-                      StrokeShape="RoundRectangle 10">
-                <CollectionView SelectedItem="{Binding CurrentTool}"
-                                ItemsSource="{Binding AvailableTools}"
-                                HorizontalOptions="Center"
-                                VerticalOptions="Center"
-                                HeightRequest="58"
-                                SelectionChanged="ToolCollectionView_SelectedItemChanged"
-                                SelectionMode="Single"
-                                HorizontalScrollBarVisibility="Never"
-                                VerticalScrollBarVisibility="Never">
-                    <CollectionView.ItemsLayout>
-                        <LinearItemsLayout Orientation="Horizontal"
-                                        SnapPointsAlignment="Center"
-                                        SnapPointsType="MandatorySingle"
-                                        ItemSpacing="0"/>
-                    </CollectionView.ItemsLayout>
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="viewModels:IPaintingToolViewModel">
-                            <controls:ToolControl>
-                                <VisualStateManager.VisualStateGroups>
-                                    <VisualStateGroupList>
-                                        <VisualStateGroup x:Name="CommonStates">
-                                            <VisualState x:Name="Normal">
-                                                <VisualState.Setters>
-                                                    <Setter Property="BackgroundColor" Value="Transparent" />
-                                                    <Setter Property="IconColor" Value="{StaticResource IndependenceAccentSixtyPercent}" />
-                                                    <Setter Property="animations:AnimationProperties.Animations">
-                                                        <animations:ScaleToAnimation Scale=".75" Easing="{x:Static Easing.CubicInOut}" Length="200" />
-                                                    </Setter>
-                                                </VisualState.Setters>
-                                            </VisualState>
+        <Border Grid.Row="0"
+                BackgroundColor="{StaticResource IndependenceAccentSixtyPercent}"
+                HorizontalOptions="Center"
+                VerticalOptions="Start"
+                Stroke="Transparent"
+                StrokeShape="RoundRectangle 25">
+                <!-- <Border.Shadow>
+                <Shadow Radius="5" Offset="5,5" Opacity=".2"></Shadow>
+                </Border.Shadow> -->
+        <CollectionView SelectedItem="{Binding CurrentTool}"
+                        ItemsSource="{Binding AvailableTools}"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center"
+                        HeightRequest="50"
+                        SelectionChanged="ToolCollectionView_SelectedItemChanged"
+                        SelectionMode="Single"
+                        HorizontalScrollBarVisibility="Never"
+                        VerticalScrollBarVisibility="Never">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Horizontal"
+                                SnapPointsAlignment="Center"
+                                SnapPointsType="MandatorySingle"
+                                ItemSpacing="4"/>
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="viewModels:IPaintingToolViewModel">
+                    <controls:ToolControl>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroupList>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="Transparent" />
+                                            <Setter Property="IconColor" Value="{StaticResource White}" />
+                                            <Setter Property="animations:AnimationProperties.Animations">
+                                                <animations:ScaleToAnimation Scale=".75" Easing="{x:Static Easing.CubicInOut}" Length="200" />
+                                            </Setter>
+                                        </VisualState.Setters>
+                                    </VisualState>
 
-                                            <VisualState x:Name="Selected">
-                                                <VisualState.Setters>
-                                                    <Setter Property="BackgroundColor" Value="Transparent" />
-                                                    <Setter Property="IconColor" Value="{StaticResource Primary}" />
-                                                    <Setter Property="animations:AnimationProperties.Animations">
-                                                        <animations:ScaleToAnimation Scale="1" Easing="{x:Static Easing.CubicInOut}" Length="200" />
-                                                    </Setter>
-                                                </VisualState.Setters>
-                                            </VisualState>
-                                        </VisualStateGroup>
-                                    </VisualStateGroupList>
-                                </VisualStateManager.VisualStateGroups>
-                            </controls:ToolControl>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </Border>
-            
-        </Grid>
-
-        <HorizontalStackLayout x:Name="ContextButtonsLayout"
-                               Grid.Row="1"
-                               BackgroundColor="Transparent"
-                               HorizontalOptions="Center"
-                               VerticalOptions="Start"
-                               IsVisible="{Binding CurrentTool.Type, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:ToolType.PaintBucket}}"
-                               Spacing="10"
-                               Margin="0"
-                               RadioButtonGroup.GroupName="SegmentationMode"
-                               RadioButtonGroup.SelectedValue="{Binding SegmentationMode}">
-            <HorizontalStackLayout.GestureRecognizers>
-                <TapGestureRecognizer />
-            </HorizontalStackLayout.GestureRecognizers>
-            <RadioButton Content="Add" Value="{x:Static enums:SegmentationMode.AddArea}" HorizontalOptions="Start" IsChecked="True"/>
-            <RadioButton Content="Remove" Value="{x:Static enums:SegmentationMode.RemoveArea}" HorizontalOptions="Start"/>
-            <Button Text="Apply" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" BorderColor="{StaticResource IndependenceAccentFortyPercent}" BorderWidth="1" Command="{Binding ApplySegmentationMaskCommand}" />
-            <Button Text="Clear" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" BorderColor="{StaticResource IndependenceAccentFortyPercent}" BorderWidth="1" Command="{Binding ClearSegmentationMaskCommand}"/>
-        </HorizontalStackLayout>
+                                    <VisualState x:Name="Selected">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="{StaticResource IndependenceAccentFortyPercent}" />
+                                            <Setter Property="IconColor" Value="{StaticResource White}" />
+                                            <Setter Property="animations:AnimationProperties.Animations">
+                                                <animations:ScaleToAnimation Scale="1" Easing="{x:Static Easing.CubicInOut}" Length="200" />
+                                            </Setter>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateGroupList>
+                        </VisualStateManager.VisualStateGroups>
+                    </controls:ToolControl>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Border>
 
         <VerticalStackLayout Grid.Row="1"
+                             Grid.RowSpan="2"
                              HorizontalOptions="Fill"
-                             VerticalOptions="End"
-                             Spacing="15">
+                             VerticalOptions="Start"
+                             Spacing="10">
             
-            <Grid x:Name="SecondaryButtonsLayout">
-                <Border x:Name="BrushSizeSliderContainer"
-                        BackgroundColor="{StaticResource IndependenceAccent}"
-                        Stroke="Transparent"
-                        IsVisible="False"
-                        HorizontalOptions="Start"
-                        VerticalOptions="End"
-                        StrokeShape="RoundRectangle 10">
-                    <VerticalStackLayout Spacing="0" Padding="20">
-
-                        <Label Text="{Binding CurrentBrushSize, StringFormat='Size: {0:F0}'}"
-                               TextColor="White"
-                               FontAttributes="Bold"
-                               HorizontalOptions="Center"/>
-
-                        <Slider WidthRequest="200"
-                                HeightRequest="40"
-                                Minimum="1"
-                                Maximum="50"
-                                Value="{Binding CurrentBrushSize}" />
-
-                    </VerticalStackLayout>
-                </Border>
-
-                <Border x:Name="AlphaSliderContainer"
-                        BackgroundColor="{StaticResource IndependenceAccent}"
-                        Stroke="Transparent"
-                        IsVisible="False"
-                        HorizontalOptions="Center"
-                        VerticalOptions="End"
-                        StrokeShape="RoundRectangle 10">
-                    <VerticalStackLayout Spacing="0" Padding="20">
-
-                        <Label Text="{Binding CurrentAlpha, StringFormat='Alpha: {0:F2}'}"
-                               TextColor="White"
-                               FontAttributes="Bold"
-                               HorizontalOptions="Center"/>
-
-                        <Slider WidthRequest="200"
-                                HeightRequest="40"
-                                Minimum="0.01"
-                                Maximum="1.0"
-                                Value="{Binding CurrentAlpha}" />
-
-                    </VerticalStackLayout>
-                </Border>
-
-            </Grid>
-
             <HorizontalStackLayout x:Name="BottomButtonsLayout"
                                    HorizontalOptions="Center"
-                                   Spacing="30">
+                                   Spacing="20">
 
                 <Border x:Name="BrushSizeButton" 
-                        BackgroundColor="{StaticResource IndependenceAccent}"
-                        HeightRequest="60"
-                        WidthRequest="60"
+                        BackgroundColor="{StaticResource IndependenceAccentFortyPercent}"
+                        HeightRequest="50"
+                        WidthRequest="50"
                         StrokeThickness="0"
-                        StrokeShape="RoundRectangle 10">
+                        StrokeShape="RoundRectangle 25">
                     <ContentView>
                         <ContentView.GestureRecognizers>
                             <TapGestureRecognizer Tapped="Brush_Size_Button_Clicked" />
@@ -320,11 +297,11 @@
                 </Border>
 
                 <Border x:Name="AlphaButton"
-                        BackgroundColor="{StaticResource IndependenceAccent}"
+                        BackgroundColor="{StaticResource IndependenceAccentFortyPercent}"
                         StrokeThickness="0"
-                        WidthRequest="60"
-                        HeightRequest="60"
-                        StrokeShape="RoundRectangle 10">
+                        WidthRequest="50"
+                        HeightRequest="50"
+                        StrokeShape="RoundRectangle 25">
                     <ContentView>
                         <ContentView.GestureRecognizers>
                             <TapGestureRecognizer Tapped="Alpha_Button_Clicked" />
@@ -339,12 +316,13 @@
                 </Border>
 
                 <Border x:Name="ColorPaletteButton"
-                        BackgroundColor="{StaticResource IndependenceAccent}"
-                        StrokeThickness="0"
+                        BackgroundColor="{StaticResource IndependenceAccentFortyPercent}"
+                        StrokeThickness="1"
+                        Stroke="{StaticResource IndependenceAccentSixtyPercent}"
                         IsEnabled="{Binding GettingColorPalette, Converter={StaticResource InvertedBool}}"
-                        WidthRequest="60"
-                        HeightRequest="60"
-                        StrokeShape="RoundRectangle 10">
+                        WidthRequest="50"
+                        HeightRequest="50"
+                        StrokeShape="RoundRectangle 25">
                     <Grid BackgroundColor="{Binding CurrentColor}">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ShowColorPickerCommand}" />
@@ -366,11 +344,11 @@
                 </Border>
 
                 <Border x:Name="BoundingBoxSizeButton"
-                        BackgroundColor="{StaticResource IndependenceAccent}"
+                        BackgroundColor="{StaticResource IndependenceAccentFortyPercent}"
                         StrokeThickness="0"
-                        WidthRequest="60"
-                        HeightRequest="60"
-                        StrokeShape="RoundRectangle 10">
+                        WidthRequest="50"
+                        HeightRequest="50"
+                        StrokeShape="RoundRectangle 25">
                     <Grid>
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ChangeBoundingBoxSizeCommand}" Tapped="Vibrate_Button_Tapped" />
@@ -389,11 +367,11 @@
                 </Border>
 
                 <Border x:Name="SnipButton"
-                        BackgroundColor="{StaticResource IndependenceAccent}"
+                        BackgroundColor="{StaticResource IndependenceAccentFortyPercent}"
                         StrokeThickness="0"
-                        WidthRequest="60"
-                        HeightRequest="60"
-                        StrokeShape="RoundRectangle 10">
+                        WidthRequest="50"
+                        HeightRequest="50"
+                        StrokeShape="RoundRectangle 25">
                     <ContentView>
                         <ContentView.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding BeginCropImageRectCommand}" Tapped="Vibrate_Button_Tapped" />
@@ -407,9 +385,117 @@
                     </ContentView>
                 </Border>
 
+                <Border x:Name="AddRemoveButton"
+                        BackgroundColor="{StaticResource IndependenceAccentFortyPercent}"
+                        StrokeThickness="0"
+                        WidthRequest="50"
+                        HeightRequest="50"
+                        StrokeShape="RoundRectangle 25">
+                    <ContentView>
+                        <ContentView.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleSegmentationAddCommand}" Tapped="Vibrate_Button_Tapped" />
+                        </ContentView.GestureRecognizers>
+                        <Image HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               Source="{Binding SegmentationAdd, Converter={StaticResource BoolToPlusMinusConverter}}"/>
+                    </ContentView>
+                </Border>
+
             </HorizontalStackLayout>
 
+            <Grid x:Name="SecondaryButtonsLayout">
+                <Border x:Name="BrushSizeSliderContainer"
+                        BackgroundColor="{StaticResource IndependenceAccentEightyPercent}"
+                        Stroke="Transparent"
+                        IsVisible="False"
+                        HorizontalOptions="Start"
+                        VerticalOptions="End"
+                        StrokeShape="RoundRectangle 15">
+                    <VerticalStackLayout Spacing="0" Padding="15">
+
+                        <Label Text="{Binding CurrentBrushSize, StringFormat='Size: {0:F0}'}"
+                               TextColor="White"
+                               FontAttributes="Bold"
+                               HorizontalOptions="Center"/>
+
+                        <Slider WidthRequest="200"
+                                HeightRequest="40"
+                                Minimum="1"
+                                Maximum="50"
+                                Value="{Binding CurrentBrushSize}" />
+
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border x:Name="AlphaSliderContainer"
+                        BackgroundColor="{StaticResource IndependenceAccentEightyPercent}"
+                        Stroke="Transparent"
+                        IsVisible="False"
+                        HorizontalOptions="Center"
+                        VerticalOptions="End"
+                        StrokeShape="RoundRectangle 15">
+                    <VerticalStackLayout Spacing="0" Padding="15">
+
+                        <Label Text="{Binding CurrentAlpha, StringFormat='Alpha: {0:F2}'}"
+                               TextColor="White"
+                               FontAttributes="Bold"
+                               HorizontalOptions="Center"/>
+
+                        <Slider WidthRequest="200"
+                                HeightRequest="40"
+                                Minimum="0.01"
+                                Maximum="1.0"
+                                Value="{Binding CurrentAlpha}" />
+
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+
         </VerticalStackLayout>
+
+        <Grid x:Name="ContextButtonsLayout"
+              Grid.Row="2"
+              ColumnDefinitions="*,auto"
+              ColumnSpacing="10"
+              Margin="0">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer />
+            </Grid.GestureRecognizers>
+            <FlexLayout Grid.Column="0"
+                        AlignContent="Center"
+                        AlignItems="Center"
+                        JustifyContent="SpaceEvenly"
+                        IsVisible="{Binding CurrentTool.Type, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:ToolType.PaintBucket}}">
+                <Button Text="Apply Paint" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" BorderColor="{StaticResource IndependenceAccentFortyPercent}" BorderWidth="1" Command="{Binding ApplySegmentationMaskCommand}"/>
+                <Button Text="Clear Paint" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" BorderColor="{StaticResource IndependenceAccentFortyPercent}" BorderWidth="1" Command="{Binding ClearSegmentationMaskCommand}"/>
+            </FlexLayout>
+
+            <Border Grid.Column="1"
+                    BackgroundColor="{StaticResource Primary}"
+                    Stroke="Transparent"
+                    HorizontalOptions="End"
+                    VerticalOptions="Center"
+                    WidthRequest="56"
+                    HeightRequest="56"
+                    StrokeShape="RoundRectangle 15">
+                <ImageButton ToolTipProperties.Text="Use as source image"
+                        Command="{Binding SendToImageToImageCommand}"
+                        HorizontalOptions="Fill"
+                        VerticalOptions="Fill"
+                        Padding="10">
+                    <ImageButton.Source>
+                        <FontImageSource Glyph="&#xf824;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
+                    </ImageButton.Source>
+                    <ImageButton.Behaviors>
+                        <toolkit:IconTintColorBehavior TintColor="White" />
+                    </ImageButton.Behaviors>
+                </ImageButton>
+            </Border>
+
+        </Grid>
+
         
+
     </Grid>
 </views:BasePage>

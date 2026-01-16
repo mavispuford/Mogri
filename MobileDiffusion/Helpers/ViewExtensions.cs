@@ -2,7 +2,7 @@
 
 public static class ViewExtensions
 {
-    public static Task<bool> ColorTo(this VisualElement self, Color fromColor, Color toColor, Action<Color> callback, uint length = 250, Easing easing = null)
+    public static Task<bool> ColorTo(this VisualElement self, Color fromColor, Color toColor, Action<Color> callback, uint length = 250, Easing easing = null, string name = null)
     {
         Func<double, Color> transform = (t) =>
             Color.FromRgba(fromColor.Red + t * (toColor.Red - fromColor.Red),
@@ -10,10 +10,10 @@ public static class ViewExtensions
                            fromColor.Blue + t * (toColor.Blue - fromColor.Blue),
                            fromColor.Alpha + t * (toColor.Alpha - fromColor.Alpha));
 
-        return ColorAnimation(self, nameof(ColorTo), transform, callback, length, easing);
+        return ColorAnimation(self, name ?? nameof(ColorTo), transform, callback, length, easing);
     }
 
-    public static void CancelAnimation(this VisualElement self)
+    public static void CancelAnimations(this VisualElement self)
     {
         self.AbortAnimation(nameof(ColorTo));
     }

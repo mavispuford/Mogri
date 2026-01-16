@@ -70,6 +70,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     public partial SKBitmap SourceBitmap { get; set; }
 
     [ObservableProperty]
+    public partial bool SegmentationAdd { get; set; } = true;
+
+    [ObservableProperty]
     public partial SKBitmap SegmentationBitmap { get; set; }
 
     [ObservableProperty]
@@ -94,9 +97,6 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     public partial bool GettingColorPalette { get; set; } = false;
 
     public bool IsZoomMode => CurrentTool?.Type == ToolType.Zoom;
-
-    [ObservableProperty]
-    private SegmentationMode _segmentationMode = SegmentationMode.AddArea;
 
     [ObservableProperty]
     private IAsyncRelayCommand _prepareForSavingCommand;
@@ -160,6 +160,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             {
                 new AlphaContextButtonViewModel(this),
                 new ColorPickerContextButtonViewModel(this),
+                new AddRemoveButtonViewModel(this),
             }
         });
 
@@ -648,7 +649,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
                         combineCanvas.DrawBitmap(SegmentationBitmap, 0, 0, paint);
 
-                        paint.BlendMode = SegmentationMode == SegmentationMode.AddArea ? SKBlendMode.SrcOver : SKBlendMode.DstOut;
+                        paint.BlendMode = SegmentationAdd ? SKBlendMode.SrcOver : SKBlendMode.DstOut;
 
                         combineCanvas.DrawBitmap(maskBitmap, 0, 0, paint);
                     }
@@ -716,11 +717,6 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     {
         SegmentationBitmap?.Dispose();
         SegmentationBitmap = null;
-        _segmentationService.Reset();
-    }
-
-    partial void OnSegmentationModeChanged(SegmentationMode value)
-    {
         _segmentationService.Reset();
     }
 
@@ -1272,6 +1268,14 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         {
             IsBusy = false;
         }
+    }
+
+    [RelayCommand]
+    private void ToggleSegmentationAdd()
+    {
+        SegmentationAdd = !SegmentationAdd;
+
+        _segmentationService.Reset();
     }
 
     private SKBitmap GenerateMask(bool useLastOnly)
