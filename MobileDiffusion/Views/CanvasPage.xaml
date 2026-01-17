@@ -495,8 +495,8 @@
                         AlignItems="Center"
                         JustifyContent="SpaceEvenly"
                         IsVisible="{Binding CurrentTool.Type, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:ToolType.PaintBucket}}">
-                <Button Text="Apply Paint" BackgroundColor="{StaticResource IndependenceAccentTwentyPercent}" TextColor="{StaticResource Primary}" BorderColor="{StaticResource IndependenceAccentFortyPercent}" BorderWidth="1" Command="{Binding ApplySegmentationMaskCommand}"/>
-                <Button Text="Clear Selection" BackgroundColor="{StaticResource IndependenceAccentTwentyPercent}" TextColor="{StaticResource Primary}" BorderColor="{StaticResource IndependenceAccentFortyPercent}" BorderWidth="1" Command="{Binding ClearSegmentationMaskCommand}"/>
+                <Button Text="Apply Paint" BackgroundColor="{StaticResource IndependenceAccentTwentyPercent}" TextColor="{StaticResource Primary}" BorderColor="{StaticResource IndependenceAccentFortyPercent}" BorderWidth="1" Command="{Binding ApplySegmentationMaskCommand}" FontAttributes="Bold"/>
+                <Button Text="Clear Selection" BackgroundColor="{StaticResource IndependenceAccentTwentyPercent}" TextColor="{StaticResource Primary}" BorderColor="{StaticResource IndependenceAccentFortyPercent}" BorderWidth="1" Command="{Binding ClearSegmentationMaskCommand}" FontAttributes="Bold"/>
             </FlexLayout>
 
             <Border x:Name="ShowActionsButton"
