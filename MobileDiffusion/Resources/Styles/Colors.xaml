@@ -48,6 +48,7 @@
     <Color x:Key="Blue300Accent">#A7CBF6</Color>
 
     <Color x:Key="IndependenceAccent">#545775</Color>
+    <Color x:Key="IndependenceAccentTwentyPercent">#33545775</Color>
     <Color x:Key="IndependenceAccentFortyPercent">#66545775</Color>
     <Color x:Key="IndependenceAccentSixtyPercent">#99545775</Color>
     <Color x:Key="IndependenceAccentEightyPercent">#CC545775</Color>
