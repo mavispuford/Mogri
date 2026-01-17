@@ -37,6 +37,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private int _setSegmentationImageRequestCount = 0;
 
     [ObservableProperty]
+    public partial IRelayCommand ResetZoomCommand { get; set; }
+
+    [ObservableProperty]
     public partial List<IPaintingToolViewModel> AvailableTools { get; set; } = new();
 
     [ObservableProperty]
@@ -1357,6 +1360,12 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
     public override bool OnBackButtonPressed()
     {
-        return true;
+        if (CurrentTool is { Type: ToolType.Zoom })
+        {
+            ResetZoomCommand?.Execute(null);
+            return true;
+        }
+
+        return base.OnBackButtonPressed();
     }
 }

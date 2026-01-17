@@ -63,16 +63,25 @@ public class GestureContainer : ContentView
         set => SetValue(SwipeRightCommandProperty, value);
     }
 
-    public void Reset()
+    public void Reset(bool animate = false)
     {
         currentScale = 1;
         startScale = 1;
         if (Content != null)
         {
-            Content.Scale = 1;
-            Content.TranslationX = 0;
-            Content.TranslationY = 0;
             cancelTranslationAnimations();
+
+            if (animate)
+            {
+                Content.ScaleTo(1, 250, Easing.CubicInOut);
+                Content.TranslateTo(0, 0, 250, Easing.CubicInOut);
+            }
+            else
+            {
+                Content.Scale = 1;
+                Content.TranslationX = 0;
+                Content.TranslationY = 0;
+            }
         }
     }
 
