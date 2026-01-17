@@ -8,8 +8,7 @@
                 xmlns:converters="clr-namespace:MobileDiffusion.Converters;assembly=MobileDiffusion"
                 xmlns:views="clr-namespace:MobileDiffusion.Views;assembly=MobileDiffusion"
                 x:Class="MobileDiffusion.Views.MainPage"
-                x:DataType="viewModels:IMainPageViewModel"
-                Title="Mobile Diffusion">
+                x:DataType="viewModels:IMainPageViewModel">
     <views:BasePage.Resources>
         <ResourceDictionary>
             <toolkit:IsListNotNullOrEmptyConverter x:Key="IsListNotNullOrEmptyConverter" />

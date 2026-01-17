@@ -71,7 +71,7 @@
                      IconImageSource="{Binding ShowMaskLayer, Converter={StaticResource BoolToEyeConverter}}"
                      Command="{Binding ToggleMaskLayerVisibilityCommand}" 
                      Order="Primary" />
-        <ToolbarItem Text="Clear Paint" Command="{Binding ClearCommand}" Order="Secondary">
+        <ToolbarItem Text="Clear Masks" Command="{Binding ClearCommand}" Order="Secondary">
             <ToolbarItem.IconImageSource>
                 <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
             </ToolbarItem.IconImageSource>
@@ -478,7 +478,7 @@
                         JustifyContent="SpaceEvenly"
                         IsVisible="{Binding CurrentTool.Type, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:ToolType.PaintBucket}}">
                 <Button Text="Apply Paint" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" BorderColor="{StaticResource IndependenceAccentFortyPercent}" BorderWidth="1" Command="{Binding ApplySegmentationMaskCommand}"/>
-                <Button Text="Clear Paint" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" BorderColor="{StaticResource IndependenceAccentFortyPercent}" BorderWidth="1" Command="{Binding ClearSegmentationMaskCommand}"/>
+                <Button Text="Clear Selection" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" BorderColor="{StaticResource IndependenceAccentFortyPercent}" BorderWidth="1" Command="{Binding ClearSegmentationMaskCommand}"/>
             </FlexLayout>
 
             <Border x:Name="ShowActionsButton"
@@ -490,16 +490,20 @@
                     WidthRequest="56"
                     HeightRequest="56"
                     StrokeShape="RoundRectangle 15">
-                    <animations:AnimationProperties.Animations>
-                        <animations:ScaleToAnimation Scale="{Binding ShowActions, Converter={StaticResource BoolToScaleOutDoubleConverter}}" Easing="{x:Static Easing.CubicInOut}" Length="200" />
-                    </animations:AnimationProperties.Animations>   
+                <Border.Shadow>
+                    <Shadow Radius="5" Opacity=".2" />
+                </Border.Shadow>
+                <animations:AnimationProperties.Animations>
+                    <animations:ScaleToAnimation Scale="{Binding ShowActions, Converter={StaticResource BoolToScaleOutDoubleConverter}}" Easing="{x:Static Easing.CubicInOut}" Length="200" />
+                </animations:AnimationProperties.Animations>
+
                 <ImageButton ToolTipProperties.Text="Actions"
                         Command="{Binding ToggleActionsVisibilityCommand}"
                         HorizontalOptions="Fill"
                         VerticalOptions="Fill"
                         Padding="10">
                     <ImageButton.Source>
-                        <FontImageSource Glyph="&#xf824;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
+                        <FontImageSource Glyph="&#xf10a;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
                     </ImageButton.Source>
                     <ImageButton.Behaviors>
                         <toolkit:IconTintColorBehavior TintColor="{StaticResource Tertiary}" />
@@ -509,7 +513,7 @@
 
             <Border x:Name="CloseActionsButton"
                     Grid.Column="1"
-                    BackgroundColor="#FFFA9A8C"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Secondary}}"
                     Stroke="Transparent"
                     HorizontalOptions="End"
                     VerticalOptions="Center"
@@ -517,14 +521,18 @@
                     HeightRequest="56"
                     Scale="0"
                     StrokeShape="RoundRectangle 28">
-                    <animations:AnimationProperties.Animations>
-                        <animations:ScaleToAnimation Scale="{Binding ShowActions, Converter={StaticResource BoolToScaleInDoubleConverter}}" Easing="{x:Static Easing.CubicInOut}" Length="200" />
-                    </animations:AnimationProperties.Animations>                
-                    <ImageButton ToolTipProperties.Text="Actions"
-                        Command="{Binding ToggleActionsVisibilityCommand}"
-                        HorizontalOptions="Fill"
-                        VerticalOptions="Fill"
-                        Padding="10">
+                <!-- <Border.Shadow>
+                    <Shadow Radius="5" Opacity=".2" />
+                </Border.Shadow> -->
+                <animations:AnimationProperties.Animations>
+                    <animations:ScaleToAnimation Scale="{Binding ShowActions, Converter={StaticResource BoolToScaleInDoubleConverter}}" Easing="{x:Static Easing.CubicInOut}" Length="200" />
+                </animations:AnimationProperties.Animations> 
+
+                <ImageButton ToolTipProperties.Text="Actions"
+                    Command="{Binding ToggleActionsVisibilityCommand}"
+                    HorizontalOptions="Fill"
+                    VerticalOptions="Fill"
+                    Padding="10">
                     <ImageButton.Source>
                         <FontImageSource Glyph="&#xe5cd;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
                     </ImageButton.Source>
