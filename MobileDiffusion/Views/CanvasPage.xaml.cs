@@ -171,6 +171,17 @@ public partial class CanvasPage : BasePage
         ((CanvasPage)bindable).UpdateMaskLayer();
     });
 
+    public static BindableProperty ShowActionsProperty = BindableProperty.Create(nameof(ShowActions), typeof(bool), typeof(CanvasPage), false, propertyChanged: (bindable, oldValue, newValue) =>
+    {
+        ((CanvasPage)bindable).AnimateActionsContainer((bool)newValue);
+    });
+
+    public bool ShowActions
+    {
+        get => (bool)GetValue(ShowActionsProperty);
+        set => SetValue(ShowActionsProperty, value);
+    }
+
     public CanvasPage()
     {
         InitializeComponent();
@@ -188,6 +199,7 @@ public partial class CanvasPage : BasePage
         this.SetBinding(ShowMaskLayerProperty, nameof(ICanvasPageViewModel.ShowMaskLayer), BindingMode.OneWay);
         this.SetBinding(DoSegmentationCommandProperty, nameof(ICanvasPageViewModel.DoSegmentationCommand), BindingMode.OneWay);
         this.SetBinding(SegmentationBitmapProperty, nameof(ICanvasPageViewModel.SegmentationBitmap), BindingMode.TwoWay);
+        this.SetBinding(ShowActionsProperty, nameof(ICanvasPageViewModel.ShowActions), BindingMode.OneWay);
 
         PrepareForSavingCommand = new AsyncRelayCommand<IAsyncRelayCommand>(PrepareForSaving);
 
@@ -200,6 +212,22 @@ public partial class CanvasPage : BasePage
             TemporaryCanvasView.Height != -1)
         {
             UpdateBoundingBox(true, true);
+        }
+    }
+
+    private async void AnimateActionsContainer(bool show)
+    {
+        if (show)
+        {
+            await ActionsContainer.TranslateTo(0, 0, 200, Easing.CubicInOut);
+        }
+        else
+        {
+            // Calculate height dynamically
+            double translation = ActionsContainer.Height / 4;
+            if (translation <= 0) translation = 200; // fallback if not measured
+            
+            await ActionsContainer.TranslateTo(0, translation, 200, Easing.CubicInOut);
         }
     }
 

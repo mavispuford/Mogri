@@ -359,6 +359,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     [RelayCommand]
     private async Task SendToImageToImage()
     {
+        ShowActions = false;
+
         if (SourceBitmap == null)
         {
             await Toast.Make("There is no image to send.").Show();
@@ -1230,6 +1232,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     [RelayCommand]
     private async Task PatchAsync()
     {
+        ShowActions = false;
+
         if (SourceBitmap == null || CanvasActions.Count == 0)
         {
             await _popupService.DisplayAlertAsync("Info", "Nothing to patch!", "OK");

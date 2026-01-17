@@ -396,10 +396,12 @@
 
         </VerticalStackLayout>
 
-        <VerticalStackLayout Grid.Row="1"
+        <VerticalStackLayout x:Name="ActionsContainer"
+                             Grid.Row="1"
                              HorizontalOptions="End"
                              VerticalOptions="End"
-                             IsVisible="{Binding ShowActions}"
+                             InputTransparent="{Binding ShowActions, Converter={StaticResource InvertedBool}}"
+                             CascadeInputTransparent="True"
                              Spacing="4">
             <VerticalStackLayout.Resources>
                 <Style TargetType="Border">
@@ -417,16 +419,13 @@
                     <Setter Property="VerticalTextAlignment" Value="Center"/>
                 </Style>
 
-                <Style TargetType="Image">
-                    <Style.Behaviors>
-                        <toolkit:IconTintColorBehavior TintColor="{StaticResource Primary}" />
-                    </Style.Behaviors>
-                </Style>
-
                 <Style TargetType="HorizontalStackLayout">
                     <Setter Property="Spacing" Value="8"/>
                 </Style>
             </VerticalStackLayout.Resources>
+            <animations:AnimationProperties.Animations>
+                <animations:FadeToAnimation Opacity="{Binding ShowActions, Converter={StaticResource BoolToScaleInDoubleConverter}}" Easing="{x:Static Easing.CubicInOut}" Length="200" />
+            </animations:AnimationProperties.Animations>
 
             <Border>
                 <Border.GestureRecognizers>
@@ -437,6 +436,9 @@
                         <Image.Source>
                             <FontImageSource Glyph="&#xe3f3;" FontFamily="MaterialIconsRound300" Size="24" />
                         </Image.Source>
+                        <Image.Behaviors>
+                            <toolkit:IconTintColorBehavior TintColor="{StaticResource Primary}" />
+                        </Image.Behaviors>
                     </Image>
 
                     <Label Text="Patch" />
@@ -452,9 +454,12 @@
                         <Image.Source>
                             <FontImageSource Glyph="&#xf824;" FontFamily="MaterialIconsRound300" Size="24" />
                         </Image.Source>
+                        <Image.Behaviors>
+                            <toolkit:IconTintColorBehavior TintColor="{StaticResource Primary}" />
+                        </Image.Behaviors>
                     </Image>
 
-                    <Label Text="Use Image" />
+                    <Label Text="Use Canvas" />
                 </HorizontalStackLayout>
             </Border>
 
