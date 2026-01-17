@@ -328,9 +328,17 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
         try
         {
+            var maskActions = CanvasActions.Where(ca => ca.CanvasActionType == CanvasActionType.Mask).ToList();
+
+            for (var i = 0; i < maskActions.Count; i++)
+            {
+                maskActions[i].Order = i;
+            }
+
             var maskUri = await _fileService.WriteMaskFileToAppDataAsync(_sourceFileName, 
                 new MaskViewModel { 
-                    Lines = CanvasActions.Where(ca => ca is MaskLineViewModel).Select(ml => (MaskLineViewModel)ml).ToList() 
+                    Lines = maskActions.OfType<MaskLineViewModel>().ToList(),
+                    SegmentationMasks = maskActions.OfType<SegmentationMaskViewModel>().ToList()
                 });
 
             await Toast.Make("Mask saved.").Show();
@@ -696,6 +704,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             {
                 CanvasActionType = CanvasActionType.Mask,
                 Color = CurrentColor.WithAlpha((float)CurrentAlpha),
+                Alpha = (float)CurrentAlpha,
                 Bitmap = maskBitmap
             };
 
@@ -758,16 +767,21 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
             await dispatcher.DispatchAsync(() =>
             {
-                if (mask?.Lines != null)
+                if (mask != null)
                 {
-                    var canvasActions = new ObservableCollection<CanvasActionViewModel>();
+                    var allActions = new List<CanvasActionViewModel>();
 
-                    foreach(var line in mask.Lines)
+                    if (mask.Lines != null)
                     {
-                        canvasActions.Add(line);
+                        allActions.AddRange(mask.Lines);
                     }
 
-                    CanvasActions = canvasActions;
+                    if (mask.SegmentationMasks != null)
+                    {
+                        allActions.AddRange(mask.SegmentationMasks);
+                    }
+
+                    CanvasActions = new ObservableCollection<CanvasActionViewModel>(allActions.OrderBy(a => a.Order));
                 }
             });
         }
