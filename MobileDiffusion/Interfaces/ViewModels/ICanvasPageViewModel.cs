@@ -88,4 +88,6 @@ public interface ICanvasPageViewModel : IPageViewModel
     IRelayCommand ToggleSegmentationAddCommand { get; }
 
     IRelayCommand ToggleActionsVisibilityCommand { get; }
+
+    IRelayCommand ResetZoomCommand { get; set; }
 }

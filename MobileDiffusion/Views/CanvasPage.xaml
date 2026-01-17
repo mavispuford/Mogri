@@ -521,9 +521,10 @@
                     HeightRequest="56"
                     Scale="0"
                     StrokeShape="RoundRectangle 28">
-                <Border.Shadow>
+                    <!-- The shadow on this one currently has rendering issues and causes this button to disappear -->
+                <!-- <Border.Shadow>
                     <Shadow Radius="5" Opacity=".2" />
-                </Border.Shadow>
+                </Border.Shadow> -->
                 <animations:AnimationProperties.Animations>
                     <animations:ScaleToAnimation Scale="{Binding ShowActions, Converter={StaticResource BoolToScaleInDoubleConverter}}" Easing="{x:Static Easing.CubicInOut}" Length="200" />
                 </animations:AnimationProperties.Animations> 

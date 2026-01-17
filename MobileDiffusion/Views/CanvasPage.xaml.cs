@@ -99,6 +99,12 @@ public partial class CanvasPage : BasePage
         set => SetValue(DoSegmentationCommandProperty, value);
     }
 
+    public IRelayCommand ResetZoomCommand
+    {
+        get => (IRelayCommand)GetValue(ResetZoomCommandProperty);
+        set => SetValue(ResetZoomCommandProperty, value);
+    }
+
     public float BoundingBoxSize
     {
         get => (float)GetValue(BoundingBoxSizeProperty);
@@ -161,6 +167,8 @@ public partial class CanvasPage : BasePage
 
     public static BindableProperty DoSegmentationCommandProperty = BindableProperty.Create(nameof(DoSegmentationCommand), typeof(IAsyncRelayCommand<SKPoint[]>), typeof(CanvasPage), default(IAsyncRelayCommand<SKPoint[]>));
 
+    public static BindableProperty ResetZoomCommandProperty = BindableProperty.Create(nameof(ResetZoomCommand), typeof(IRelayCommand), typeof(CanvasPage), default(IRelayCommand));
+
     public static BindableProperty ShowBoundingBoxProperty = BindableProperty.Create(nameof(ShowBoundingBox), typeof(bool), typeof(CanvasPage), false, propertyChanged: (bindable, oldValue, newValue) =>
     {
         ((CanvasPage)bindable).UpdateBoundingBox(false);
@@ -200,8 +208,10 @@ public partial class CanvasPage : BasePage
         this.SetBinding(DoSegmentationCommandProperty, nameof(ICanvasPageViewModel.DoSegmentationCommand), BindingMode.OneWay);
         this.SetBinding(SegmentationBitmapProperty, nameof(ICanvasPageViewModel.SegmentationBitmap), BindingMode.TwoWay);
         this.SetBinding(ShowActionsProperty, nameof(ICanvasPageViewModel.ShowActions), BindingMode.OneWay);
+        this.SetBinding(ResetZoomCommandProperty, nameof(ICanvasPageViewModel.ResetZoomCommand), BindingMode.OneWayToSource);
 
         PrepareForSavingCommand = new AsyncRelayCommand<IAsyncRelayCommand>(PrepareForSaving);
+        ResetZoomCommand = new RelayCommand(() => ZoomContainer.Reset(true));
 
         TemporaryCanvasView.SizeChanged += TemporaryCanvasView_SizeChanged;
     }
