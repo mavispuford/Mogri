@@ -136,12 +136,12 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             IconCode = "\ue3ae",
             Effect = MaskEffect.Paint,
             Type = ToolType.PaintBrush,
-            ContextButtons = new List<CanvasContextButtonViewModel>
-            {
+            ContextButtons =
+            [
                 new BrushSizeContextButtonViewModel(this),
                 new AlphaContextButtonViewModel(this),
                 new ColorPickerContextButtonViewModel(this)
-            }
+            ]
         });
 
         AvailableTools.Add(new PaintingToolViewModel
@@ -150,10 +150,10 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             IconCode = "\ue6d0",
             Effect = MaskEffect.Erase,
             Type = ToolType.Eraser,
-            ContextButtons = new List<CanvasContextButtonViewModel>
-            {
+            ContextButtons =
+            [
                 new BrushSizeContextButtonViewModel(this)
-            }
+            ]
         });
 
         AvailableTools.Add(new PaintingToolViewModel
@@ -162,12 +162,12 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             IconCode = "\ue997",
             Effect = MaskEffect.Paint,
             Type = ToolType.PaintBucket,
-            ContextButtons = new List<CanvasContextButtonViewModel>
-            {
+            ContextButtons =
+            [
                 new AlphaContextButtonViewModel(this),
                 new ColorPickerContextButtonViewModel(this),
                 new AddRemoveButtonViewModel(this)
-            }
+            ]
         });
 
         AvailableTools.Add(new PaintingToolViewModel
@@ -176,11 +176,10 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             IconCode = "\ue3c6",
             Effect = MaskEffect.None,
             Type = ToolType.BoundingBox,
-            ContextButtons = new List<CanvasContextButtonViewModel>
-            {
-                new BoundingBoxSizeContextButtonViewModel(this),
-                new SnipContextButtonViewModel(this)
-            }
+            ContextButtons =
+            [
+                new BoundingBoxSizeContextButtonViewModel(this)
+            ]
         });
 
         AvailableTools.Add(new PaintingToolViewModel
@@ -379,6 +378,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     [RelayCommand]
     private async Task BeginCropImageRect()
     {
+        ShowActions = false;
+
         if (SourceBitmap == null)
         {
             await Toast.Make("There is no image data to crop.").Show();

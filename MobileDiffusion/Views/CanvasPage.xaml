@@ -203,7 +203,7 @@
                              VerticalOptions="Start"
                              Spacing="10">
             
-            <HorizontalStackLayout x:Name="BottomButtonsLayout"
+            <HorizontalStackLayout x:Name="ContextButtonsLayout"
                                    HorizontalOptions="Center"
                                    Spacing="20">
 
@@ -307,25 +307,6 @@
                                TextColor="White"
                                Margin="0,0,0,6"/>
                     </Grid>
-                </Border>
-
-                <Border x:Name="SnipButton"
-                        BackgroundColor="{StaticResource IndependenceAccentFortyPercent}"
-                        StrokeThickness="0"
-                        WidthRequest="50"
-                        HeightRequest="50"
-                        StrokeShape="RoundRectangle 25">
-                    <ContentView>
-                        <ContentView.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding BeginCropImageRectCommand}" Tapped="Vibrate_Button_Tapped" />
-                        </ContentView.GestureRecognizers>
-                        <Image HorizontalOptions="Center" VerticalOptions="Center">
-                            <Image.Source>
-                                <FontImageSource Glyph="&#xf08b;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
-                            </Image.Source>
-                        </Image>
-
-                    </ContentView>
                 </Border>
 
                 <Border x:Name="AddRemoveButton"
@@ -464,6 +445,24 @@
                 </HorizontalStackLayout>
             </Border>
 
+            <Border IsVisible="{Binding CurrentTool.Type, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:ToolType.BoundingBox}}">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding BeginCropImageRectCommand}" />
+                </Border.GestureRecognizers>
+                <HorizontalStackLayout>
+                    <Image>
+                        <Image.Source>
+                            <FontImageSource Glyph="&#xf08b;" FontFamily="MaterialIconsRound300" Size="24" />
+                        </Image.Source>
+                        <Image.Behaviors>
+                            <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Primary}" />
+                        </Image.Behaviors>
+                    </Image>
+
+                    <Label Text="Snip Selection" />
+                </HorizontalStackLayout>
+            </Border>
+
             <Border>
                 <Border.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding SendToImageToImageCommand}" />
@@ -486,7 +485,7 @@
 
         </VerticalStackLayout>
 
-        <Grid x:Name="ContextButtonsLayout"
+        <Grid x:Name="SecondaryContextButtonsLayout"
               Grid.Row="2"
               ColumnDefinitions="*,auto"
               ColumnSpacing="10"
