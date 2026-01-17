@@ -1055,21 +1055,15 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
                     var maskColor = new Color();
 
-                    // This adds randomness to each pixel to add texture to masked portions,
+                    // This adds noise to each pixel to add texture to masked portions,
                     // resulting in a better image overall when processed.
                     if (randomizeMaskPixels)
                     {
-                        // This controls how far away each pixel can travel from the original value
-                        const int rngAmount = 50;
-
-                        var pos = _random.Next(0, 2) == 1;
-                        mskByte1 = (byte)int.Clamp(((int)mskByte1) + (_random.Next(0, rngAmount) * (pos ? 1 : -1)), 0, 255);
-
-                        pos = _random.Next(0, 2) == 1;
-                        mskByte2 = (byte)int.Clamp(((int)mskByte2) + (_random.Next(0, rngAmount) * (pos ? 1 : -1)), 0, 255);
+                        const double stdDev = 30.0;
                         
-                        pos = _random.Next(0, 2) == 1;
-                        mskByte3 = (byte)int.Clamp(((int)mskByte3) + (_random.Next(0, rngAmount) * (pos ? 1 : -1)), 0, 255);
+                        mskByte1 = (byte)int.Clamp(((int)mskByte1) + (int)NoiseHelper.NextGaussian(_random, 0, stdDev), 0, 255);
+                        mskByte2 = (byte)int.Clamp(((int)mskByte2) + (int)NoiseHelper.NextGaussian(_random, 0, stdDev), 0, 255);
+                        mskByte3 = (byte)int.Clamp(((int)mskByte3) + (int)NoiseHelper.NextGaussian(_random, 0, stdDev), 0, 255);
                     }
 
                     if (typeMsk == SKColorType.Rgba8888)
