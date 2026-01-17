@@ -2,6 +2,7 @@
 <views:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                 xmlns:animations="clr-namespace:MobileDiffusion.Animations;assembly=MobileDiffusion"
+                xmlns:behaviors="clr-namespace:MobileDiffusion.Behaviors"
                 xmlns:controls="clr-namespace:MobileDiffusion.Controls" 
                 xmlns:enums="clr-namespace:MobileDiffusion.Enums" 
                 xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
@@ -455,7 +456,7 @@
                             <FontImageSource Glyph="&#xe3f3;" FontFamily="MaterialIconsRound300" Size="24" />
                         </Image.Source>
                         <Image.Behaviors>
-                            <toolkit:IconTintColorBehavior TintColor="{StaticResource Primary}" />
+                            <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Primary}" />
                         </Image.Behaviors>
                     </Image>
 
@@ -473,7 +474,7 @@
                             <FontImageSource Glyph="&#xf824;" FontFamily="MaterialIconsRound300" Size="24" />
                         </Image.Source>
                         <Image.Behaviors>
-                            <toolkit:IconTintColorBehavior TintColor="{StaticResource Primary}" />
+                            <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Primary}" />
                         </Image.Behaviors>
                     </Image>
 
@@ -524,7 +525,7 @@
                         <FontImageSource Glyph="&#xf10a;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
                     </ImageButton.Source>
                     <ImageButton.Behaviors>
-                        <toolkit:IconTintColorBehavior TintColor="{StaticResource Tertiary}" />
+                        <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Tertiary}" />
                     </ImageButton.Behaviors>
                 </ImageButton>
             </Border>
@@ -556,7 +557,7 @@
                         <FontImageSource Glyph="&#xe5cd;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
                     </ImageButton.Source>
                     <ImageButton.Behaviors>
-                        <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource Primary}}" />
+                        <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Secondary}" Dark="{StaticResource Primary}" />
                     </ImageButton.Behaviors>
                 </ImageButton>
             </Border>
