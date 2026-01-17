@@ -97,8 +97,8 @@
 
 	<ItemGroup>
 	  <PackageReference Include="ColorMinePortable" Version="2.0.4" />
-	  <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.20" />
-	  <PackageReference Include="Microsoft.Maui.Essentials" Version="10.0.20" />
+	  <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.30" />
+	  <PackageReference Include="Microsoft.Maui.Essentials" Version="10.0.30" />
 	  <PackageReference Include="CommunityToolkit.Maui" Version="13.0.0" />
 	  <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 	  <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
