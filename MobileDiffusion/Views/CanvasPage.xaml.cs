@@ -823,6 +823,7 @@ public partial class CanvasPage : BasePage
         SnipButton.IsVisible = false;
         BoundingBoxSizeButton.IsVisible = false;
         AddRemoveButton.IsVisible = false;
+        ResetZoomButton.IsVisible = false;
 
         foreach (var contextButton in CurrentTool.ContextButtons)
         {
@@ -845,6 +846,9 @@ public partial class CanvasPage : BasePage
                     break;
                 case AddRemoveButtonViewModel:
                     AddRemoveButton.IsVisible = true;
+                    break;
+                case ResetZoomContextButtonViewModel:
+                    ResetZoomButton.IsVisible = true;
                     break;
                 default:
                     break;

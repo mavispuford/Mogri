@@ -140,7 +140,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             {
                 new BrushSizeContextButtonViewModel(this),
                 new AlphaContextButtonViewModel(this),
-                new ColorPickerContextButtonViewModel(this),
+                new ColorPickerContextButtonViewModel(this)
             }
         });
 
@@ -166,7 +166,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             {
                 new AlphaContextButtonViewModel(this),
                 new ColorPickerContextButtonViewModel(this),
-                new AddRemoveButtonViewModel(this),
+                new AddRemoveButtonViewModel(this)
             }
         });
 
@@ -179,7 +179,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             ContextButtons = new List<CanvasContextButtonViewModel>
             {
                 new BoundingBoxSizeContextButtonViewModel(this),
-                new SnipContextButtonViewModel(this),
+                new SnipContextButtonViewModel(this)
             }
         });
 
@@ -191,7 +191,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             Type = ToolType.Eyedropper,
             ContextButtons = 
             [
-                new ColorPickerContextButtonViewModel(this),
+                new ColorPickerContextButtonViewModel(this)
             ]
         });
 
@@ -201,17 +201,11 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             IconCode = "\ue8ff",
             Effect = MaskEffect.None,
             Type = ToolType.Zoom,
-            ContextButtons = []
+            ContextButtons = 
+            [
+                new ResetZoomContextButtonViewModel(this)
+            ]
         });
-
-        // Placeholder for gesture paint bucket - Might just be added into the base control
-        //AvailableTools.Add(new PaintingToolViewModel
-        //{
-        //    Name = "Paint Bucket",
-        //    IconCode = "\ue155",
-        //    Effect = MaskEffect.Paint,
-        //    Type = ToolType.PaintBucket
-        //});
 
         CurrentTool = AvailableTools.FirstOrDefault();
     }
