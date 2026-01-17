@@ -817,10 +817,18 @@ public partial class CanvasPage : BasePage
 
         ShowBoundingBox = CurrentTool.Type == ToolType.BoundingBox;
 
+        if (ShowBoundingBox && !ShowActions)
+        {
+            Dispatcher.Dispatch(async () =>
+            {
+                await ShowActionsButton.ScaleTo(1.25, 200, Easing.CubicOut);
+                await ShowActionsButton.ScaleTo(1.0, 200, Easing.CubicIn);
+            });
+        }
+
         BrushSizeButton.IsVisible = false;
         AlphaButton.IsVisible = false;
         ColorPaletteButton.IsVisible = false;
-        SnipButton.IsVisible = false;
         BoundingBoxSizeButton.IsVisible = false;
         AddRemoveButton.IsVisible = false;
         ResetZoomButton.IsVisible = false;
@@ -837,9 +845,6 @@ public partial class CanvasPage : BasePage
                     break;
                 case ColorPickerContextButtonViewModel:
                     ColorPaletteButton.IsVisible = true;
-                    break;
-                case SnipContextButtonViewModel:
-                    SnipButton.IsVisible = true;
                     break;
                 case BoundingBoxSizeContextButtonViewModel:
                     BoundingBoxSizeButton.IsVisible = true;
