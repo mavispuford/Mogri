@@ -197,7 +197,7 @@ public partial class CanvasPage : BasePage
         this.SetBinding(BitmapProperty, nameof(ICanvasPageViewModel.SourceBitmap));
         this.SetBinding(CurrentAlphaProperty, nameof(ICanvasPageViewModel.CurrentAlpha));
         this.SetBinding(CurrentBrushSizeProperty, nameof(ICanvasPageViewModel.CurrentBrushSize));
-        this.SetBinding(CurrentColorProperty, nameof(ICanvasPageViewModel.CurrentColor));
+        this.SetBinding(CurrentColorProperty, nameof(ICanvasPageViewModel.CurrentColor), BindingMode.TwoWay);
         this.SetBinding(CurrentToolProperty, nameof(ICanvasPageViewModel.CurrentTool));
         this.SetBinding(CanvasActionsProperty, nameof(ICanvasPageViewModel.CanvasActions), BindingMode.TwoWay);
         this.SetBinding(BoundingBoxProperty, nameof(ICanvasPageViewModel.BoundingBox), BindingMode.OneWayToSource);
@@ -321,10 +321,6 @@ public partial class CanvasPage : BasePage
                             {
                                 var pixelColor = Bitmap.GetPixel(x, y);
                                 CurrentColor = pixelColor.ToMauiColor();
-                                if (BindingContext is ICanvasPageViewModel vm)
-                                {
-                                    vm.CurrentColor = CurrentColor;
-                                }
                             }
                         }
                         break;
