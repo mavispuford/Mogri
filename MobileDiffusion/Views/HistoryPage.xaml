@@ -6,6 +6,7 @@
                 xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
                 xmlns:views="clr-namespace:MobileDiffusion.Views;assembly=MobileDiffusion"
                 x:Class="MobileDiffusion.Views.HistoryPage"
+                x:Name="HistoryPageRoot"
                 x:DataType="viewModels:IHistoryPageViewModel"
                 Shell.PresentationMode="Animated"
                 Shell.NavBarIsVisible="True"
@@ -13,10 +14,19 @@
                 Title="History">
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,auto,auto" 
-              ColumnSpacing="20"
-              Padding="10,0,10,0">
-            <Label Grid.Column="0" Text="History" VerticalOptions="Center" FontSize="Medium" FontAttributes="Bold" 
-                   TextColor="White"/>
+              ColumnSpacing="10"
+              Padding="0,0,10,0">
+            
+            <Border Grid.Column="0" StrokeShape="RoundRectangle 23" StrokeThickness="0" BackgroundColor="{AppThemeBinding Light=#F0F0F0, Dark=#303030}" Padding="10,0" HeightRequest="46" VerticalOptions="Center">
+                <Grid ColumnDefinitions="Auto, *">
+                    <Image Grid.Column="0" VerticalOptions="Center" Margin="0,0,5,0">
+                        <Image.Source>
+                            <FontImageSource Glyph="&#xe8b6;" FontFamily="MaterialIconsRound400" Size="20" Color="{AppThemeBinding Light=Gray, Dark=Gray}" />
+                        </Image.Source>
+                    </Image>
+                    <Entry Grid.Column="1" HeightRequest="46" Placeholder="Search history..." VerticalTextAlignment="Center" Text="{Binding SearchText}" VerticalOptions="Fill" BackgroundColor="Transparent" FontSize="14" ClearButtonVisibility="WhileEditing" ReturnType="Search" />
+                </Grid>
+            </Border>
 
             <ImageButton Grid.Column="1" ToolTipProperties.Text="Select" Command="{Binding ToggleSelectionModeCommand}">
                 <ImageButton.Source>
@@ -26,7 +36,13 @@
 
             <ImageButton Grid.Column="2" ToolTipProperties.Text="Clear History" Command="{Binding ClearHistoryCommand}" IsVisible="{Binding SelectionModeEnabled, Converter={StaticResource InvertedBool}}">
                 <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
+                    <FontImageSource Glyph="&#xe16c;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
+                </ImageButton.Source>
+            </ImageButton>
+
+            <ImageButton Grid.Column="2" ToolTipProperties.Text="Select All" Command="{Binding SelectAllResultsCommand}" IsVisible="{Binding SelectionModeEnabled}">
+                <ImageButton.Source>
+                    <FontImageSource Glyph="&#xe162;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
                 </ImageButton.Source>
             </ImageButton>
         </Grid>
@@ -102,13 +118,20 @@
                                 </VisualStateGroup>
                             </VisualStateGroupList>
                         </VisualStateManager.VisualStateGroups>
-                        <ImageButton Source="{Binding ThumbnailImageSource}"
+                        <ImageButton x:Name="ItemImageButton"
+                                     Source="{Binding ThumbnailImageSource}"
                                      Aspect="AspectFill"
                                      WidthRequest="200"
                                      HeightRequest="200"
                                      Command="{Binding ItemTappedCommand, Source={RelativeSource AncestorType={x:Type viewModels:IHistoryPageViewModel}}}"
                                      CommandParameter="{Binding .}"
                                      InputTransparent="{Binding SelectionModeEnabled, Source={RelativeSource AncestorType={x:Type viewModels:IHistoryPageViewModel}}}">
+
+                            <ImageButton.Behaviors>
+                                <toolkit:TouchBehavior LongPressCommand="{Binding BindingContext.ItemLongPressedCommand, Source={x:Reference HistoryPageRoot}}"
+                                                       LongPressCommandParameter="{Binding BindingContext, Source={x:Reference ItemImageButton}}"
+                                                       LongPressDuration="500" />
+                            </ImageButton.Behaviors>
 
                         </ImageButton>
                     </Border>

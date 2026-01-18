@@ -15,11 +15,9 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
     private readonly IFileService _fileService;
     private readonly IImageService _imageService;
+    private readonly IHistoryService _historyService;
     private readonly IServiceProvider _serviceProvider;
     private readonly IPopupService _popupService;
-
-    private string[] _allImageFileNames;
-    private string[] _allThumbnailFileNames;
 
     private int itemIndex = 0;
     private const int itemTakeCount = 12;
@@ -39,18 +37,47 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     [ObservableProperty]
     public partial bool IsLoading { get; set; } = true;
 
+    [ObservableProperty]
+    public partial string SearchText { get; set; }
+
+    private CancellationTokenSource _searchDebounceCts;
+
+    partial void OnSearchTextChanged(string value)
+    {
+        _searchDebounceCts?.Cancel();
+        _searchDebounceCts = new CancellationTokenSource();
+        var token = _searchDebounceCts.Token;
+
+        Task.Delay(500, token).ContinueWith(async t =>
+        {
+            if (t.IsCanceled) return;
+
+            if (Application.Current != null)
+            {
+                await Shell.Current.Dispatcher.DispatchAsync(async () =>
+                {
+                    itemIndex = 0;
+                    HistoryItems.Clear();
+                    await LoadItemsCommand.ExecuteAsync(null);
+                });
+            }
+        });
+    }
+
     public ICommand HideBottomPanelCommand { get; set; }
 
     public ICommand ShowBottomPanelCommand { get; set; }
 
     public HistoryPageViewModel(IFileService fileService,
         IImageService imageService,
+        IHistoryService historyService,
         IServiceProvider serviceProvider,
         IPopupService popupService,
         ILoadingService loadingService) : base(loadingService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
+        _historyService = historyService ?? throw new ArgumentNullException(nameof(historyService));
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
     }
@@ -63,26 +90,11 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         {
             try
             {
-                // ALL FILES INCLUDING THUMBNAILS
-                var allFiles = await _fileService.GetFileListFromInternalStorageAsync();
+                await _historyService.InitializeAsync();
 
-                if (allFiles != null)
+                if (Application.Current != null)
                 {
-                    // Non-thumbnail files only
-                    _allImageFileNames = allFiles.Where(s => !Path.GetFileName(s).StartsWith(Constants.ThumbnailPrefix) && s.EndsWith(".png", StringComparison.OrdinalIgnoreCase)).ToArray();
-
-                    //// REMOVE ALL THUMBNAILS - REMOVE THIS AFTER TESTING
-                    // _allThumbnailFileNames = allFiles.Where(s => Path.GetFileName(s).StartsWith(Constants.ThumbnailPrefix) && s.EndsWith(".png", StringComparison.OrdinalIgnoreCase)).ToArray();
-                    //
-                    //foreach (var file in _allThumbnailFileNames)
-                    //{
-                    //    File.Delete(file);
-                    //}
-
-                    if (Application.Current != null)
-                    {
-                        await Shell.Current.Dispatcher.DispatchAsync(LoadItems);
-                    }
+                    await Shell.Current.Dispatcher.DispatchAsync(LoadItems);
                 }
             }
             catch (Exception ex)
@@ -106,15 +118,9 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
             return;
         }
 
-        foreach (var filePath in _allImageFileNames)
-        {
-            await _fileService.DeleteFileFromInternalStorage(filePath);
-        }
+        var allItems = await _historyService.SearchAsync(string.Empty, 0, int.MaxValue);
 
-        foreach (var filePath in _allThumbnailFileNames)
-        {
-            await _fileService.DeleteFileFromInternalStorage(filePath);
-        }
+        await _historyService.DeleteItemsAsync(allItems);
 
         HistoryItems.Clear();
     }
@@ -149,27 +155,45 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     }
 
     [RelayCommand]
+    private void ItemLongPressed(IHistoryItemViewModel item)
+    {
+        if (SelectionModeEnabled) return;
+
+        SelectionModeEnabled = true;
+        ShowBottomPanelCommand?.Execute(null);
+        
+        // Select the item that was long pressed
+        if (!SelectedItems.Contains(item))
+        {
+            SelectedItems.Add(item);
+        }
+        
+        SelectionChanged(null);
+    }
+
+    [RelayCommand]
     private async Task LoadItems()
     {
-        if (_allImageFileNames == null || itemIndex >= _allImageFileNames.Length)
-        {
-            return;
-        }
-
         await _semaphore.WaitAsync();
 
         try
         {
-            foreach (var filename in _allImageFileNames.Take(new Range(itemIndex, itemIndex + itemTakeCount)))
+            var results = await _historyService.SearchAsync(SearchText ?? string.Empty, itemIndex, itemTakeCount);
+            
+            foreach (var entity in results)
             {
                 var historyItem = _serviceProvider.GetService<IHistoryItemViewModel>();
-
                 HistoryItems.Add(historyItem);
-
-                _ = Task.Run(() => historyItem.InitWith(filename, _fileService, _imageService));
+                
+                // Fire and forget initialization to keep UI responsive
+                _ = Task.Run(() => historyItem.InitWith(entity, _fileService, _imageService));
             }
 
-            itemIndex += itemTakeCount;
+            // Only increment if we actually got results
+            if (results.Any())
+            {
+                itemIndex += itemTakeCount;
+            }
         }
         finally
         {
@@ -204,6 +228,21 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     }
 
     [RelayCommand]
+    private void SelectAllResults()
+    {
+        if (HistoryItems == null) return;
+
+        foreach (var item in HistoryItems)
+        {
+            if (!SelectedItems.Contains(item))
+            {
+                SelectedItems.Add(item);
+            }
+        }
+        SelectionChanged(null);
+    }
+
+    [RelayCommand]
     private async Task DeleteSelectedItems()
     {
         if (SelectedItems.Count == 0)
@@ -223,23 +262,26 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
         try
         {
-            // Create a copy to avoid modification during enumeration
             var itemsToDelete = SelectedItems.OfType<IHistoryItemViewModel>().ToList();
+            
+            // Get entities
+            var entities = itemsToDelete.Select(x => x.Entity).Where(x => x != null).ToList();
+            
+            // Delete from Service (DB + Files)
+            await _historyService.DeleteItemsAsync(entities);
 
-            foreach (var viewModel in itemsToDelete)
+            // Update UI
+            foreach (var item in itemsToDelete)
             {
-                await _fileService.DeleteFileFromInternalStorage(viewModel.ThumbnailFileName);
-                await _fileService.DeleteFileFromInternalStorage(viewModel.FileName);
-
-                HistoryItems.Remove(viewModel);
+                HistoryItems.Remove(item);
             }
-
-             SelectedItems.Clear();
+            
+            SelectedItems.Clear();
+            SelectionChanged(null);
         }
         catch (Exception ex)
         {
-             // Log error
-             await Toast.Make("Failed to delete some items.").Show();
+             await Toast.Make($"Failed to delete items: {ex.Message}").Show();
         }
     }
 }

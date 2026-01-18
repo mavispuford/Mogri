@@ -43,6 +43,7 @@ public static class ServiceRegistrations
         builder.Services.AddSingleton<ILoadingService, LoadingService>();
         builder.Services.AddSingleton<IPresetService, PresetService>();
         builder.Services.AddSingleton<IPatchService, AotGanPatchService>();
+        builder.Services.AddSingleton<IHistoryService, HistoryService>();
 
 #if ANDROID
         builder.Services.AddSingleton<IFileService, FileService>();
