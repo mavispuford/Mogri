@@ -24,7 +24,7 @@ namespace MobileDiffusion.Helpers
                     }
                     else
                     {
-                        maskTiledBitmap.SetPixel(x, y, paintColor.WithAlpha(100));
+                        maskTiledBitmap.SetPixel(x, y, paintColor.WithAlpha(80));
                     }
                 }
             }

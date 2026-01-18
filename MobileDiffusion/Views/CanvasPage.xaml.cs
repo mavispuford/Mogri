@@ -99,6 +99,12 @@ public partial class CanvasPage : BasePage
         set => SetValue(DoSegmentationCommandProperty, value);
     }
 
+    public IRelayCommand ResetZoomCommand
+    {
+        get => (IRelayCommand)GetValue(ResetZoomCommandProperty);
+        set => SetValue(ResetZoomCommandProperty, value);
+    }
+
     public float BoundingBoxSize
     {
         get => (float)GetValue(BoundingBoxSizeProperty);
@@ -161,6 +167,8 @@ public partial class CanvasPage : BasePage
 
     public static BindableProperty DoSegmentationCommandProperty = BindableProperty.Create(nameof(DoSegmentationCommand), typeof(IAsyncRelayCommand<SKPoint[]>), typeof(CanvasPage), default(IAsyncRelayCommand<SKPoint[]>));
 
+    public static BindableProperty ResetZoomCommandProperty = BindableProperty.Create(nameof(ResetZoomCommand), typeof(IRelayCommand), typeof(CanvasPage), default(IRelayCommand));
+
     public static BindableProperty ShowBoundingBoxProperty = BindableProperty.Create(nameof(ShowBoundingBox), typeof(bool), typeof(CanvasPage), false, propertyChanged: (bindable, oldValue, newValue) =>
     {
         ((CanvasPage)bindable).UpdateBoundingBox(false);
@@ -171,6 +179,17 @@ public partial class CanvasPage : BasePage
         ((CanvasPage)bindable).UpdateMaskLayer();
     });
 
+    public static BindableProperty ShowActionsProperty = BindableProperty.Create(nameof(ShowActions), typeof(bool), typeof(CanvasPage), false, propertyChanged: (bindable, oldValue, newValue) =>
+    {
+        ((CanvasPage)bindable).AnimateActionsContainer((bool)newValue);
+    });
+
+    public bool ShowActions
+    {
+        get => (bool)GetValue(ShowActionsProperty);
+        set => SetValue(ShowActionsProperty, value);
+    }
+
     public CanvasPage()
     {
         InitializeComponent();
@@ -178,7 +197,7 @@ public partial class CanvasPage : BasePage
         this.SetBinding(BitmapProperty, nameof(ICanvasPageViewModel.SourceBitmap));
         this.SetBinding(CurrentAlphaProperty, nameof(ICanvasPageViewModel.CurrentAlpha));
         this.SetBinding(CurrentBrushSizeProperty, nameof(ICanvasPageViewModel.CurrentBrushSize));
-        this.SetBinding(CurrentColorProperty, nameof(ICanvasPageViewModel.CurrentColor));
+        this.SetBinding(CurrentColorProperty, nameof(ICanvasPageViewModel.CurrentColor), BindingMode.TwoWay);
         this.SetBinding(CurrentToolProperty, nameof(ICanvasPageViewModel.CurrentTool));
         this.SetBinding(CanvasActionsProperty, nameof(ICanvasPageViewModel.CanvasActions), BindingMode.TwoWay);
         this.SetBinding(BoundingBoxProperty, nameof(ICanvasPageViewModel.BoundingBox), BindingMode.OneWayToSource);
@@ -188,8 +207,11 @@ public partial class CanvasPage : BasePage
         this.SetBinding(ShowMaskLayerProperty, nameof(ICanvasPageViewModel.ShowMaskLayer), BindingMode.OneWay);
         this.SetBinding(DoSegmentationCommandProperty, nameof(ICanvasPageViewModel.DoSegmentationCommand), BindingMode.OneWay);
         this.SetBinding(SegmentationBitmapProperty, nameof(ICanvasPageViewModel.SegmentationBitmap), BindingMode.TwoWay);
+        this.SetBinding(ShowActionsProperty, nameof(ICanvasPageViewModel.ShowActions), BindingMode.OneWay);
+        this.SetBinding(ResetZoomCommandProperty, nameof(ICanvasPageViewModel.ResetZoomCommand), BindingMode.OneWayToSource);
 
         PrepareForSavingCommand = new AsyncRelayCommand<IAsyncRelayCommand>(PrepareForSaving);
+        ResetZoomCommand = new RelayCommand(() => ZoomContainer.Reset(true));
 
         TemporaryCanvasView.SizeChanged += TemporaryCanvasView_SizeChanged;
     }
@@ -200,6 +222,22 @@ public partial class CanvasPage : BasePage
             TemporaryCanvasView.Height != -1)
         {
             UpdateBoundingBox(true, true);
+        }
+    }
+
+    private async void AnimateActionsContainer(bool show)
+    {
+        if (show)
+        {
+            await ActionsContainer.TranslateTo(0, 0, 200, Easing.CubicInOut);
+        }
+        else
+        {
+            // Calculate height dynamically
+            double translation = ActionsContainer.Height / 4;
+            if (translation <= 0) translation = 200; // fallback if not measured
+            
+            await ActionsContainer.TranslateTo(0, translation, 200, Easing.CubicInOut);
         }
     }
 
@@ -227,6 +265,14 @@ public partial class CanvasPage : BasePage
 
         if (e.Location is SKPoint location && CurrentTool != null)
         {
+            float scale = 1f;
+            if (Bitmap != null && TemporaryCanvasView.CanvasSize.Width > 0)
+            {
+                scale = (float)Bitmap.Width / TemporaryCanvasView.CanvasSize.Width;
+            }
+
+            var imageLocation = new SKPoint(location.X * scale, location.Y * scale);
+
             // InContact == Finger currently touching down
             if (e.InContact)
             {
@@ -275,10 +321,6 @@ public partial class CanvasPage : BasePage
                             {
                                 var pixelColor = Bitmap.GetPixel(x, y);
                                 CurrentColor = pixelColor.ToMauiColor();
-                                if (BindingContext is ICanvasPageViewModel vm)
-                                {
-                                    vm.CurrentColor = CurrentColor;
-                                }
                             }
                         }
                         break;
@@ -290,13 +332,13 @@ public partial class CanvasPage : BasePage
                             {
                                 CanvasActionType = CanvasActionType.Mask,
                                 Alpha = (float)CurrentAlpha,
-                                BrushSize = (float)CurrentBrushSize,
+                                BrushSize = (float)CurrentBrushSize * scale,
                                 Color = CurrentColor,
                                 MaskEffect = CurrentTool?.Effect ?? MaskEffect.Paint
                             };
                         }
 
-                        _currentLine.Path.Add(location);
+                        _currentLine.Path.Add(imageLocation);
 
                         if (_currentLine.MaskEffect == MaskEffect.Erase)
                         {
@@ -309,12 +351,12 @@ public partial class CanvasPage : BasePage
                         {
                             CanvasActionType = CanvasActionType.Mask,
                             Alpha = .75f,
-                            BrushSize = 10f,
+                            BrushSize = 10f * scale,
                             Color = Colors.White,
                             MaskEffect = MaskEffect.Paint
                         };
 
-                        _segmentationLine.Path.Add(location);
+                        _segmentationLine.Path.Add(imageLocation);
 
                         break;
 
@@ -344,26 +386,22 @@ public partial class CanvasPage : BasePage
 
                         var bounds = new SKRect(left, top, right, bottom);
 
-                        if (bounds.Size.Width < 10 &&
-                            bounds.Size.Height < 10)
+                        if (bounds.Size.Width < (10 * scale) &&
+                            bounds.Size.Height < (10 * scale))
                         {
-                            var pixelPoint = getPixelPoint(location);
-
-                            DoSegmentationCommand?.Execute([pixelPoint]);
+                            DoSegmentationCommand?.Execute([imageLocation]);
                         }
                         else
                         {
-                            var topLeft = getPixelPoint(new SKPoint(left, top));
-                            var bottomRight = getPixelPoint(new SKPoint(right, bottom));
+                            var topLeft = new SKPoint(left, top);
+                            var bottomRight = new SKPoint(right, bottom);
 
                             DoSegmentationCommand?.Execute([topLeft, bottomRight]);
                         }
                     }
                     else
                     {
-                        var pixelPoint = getPixelPoint(location);
-
-                        DoSegmentationCommand?.Execute([pixelPoint]);
+                        DoSegmentationCommand?.Execute([imageLocation]);
                     }
 
                     _segmentationLine = null;
@@ -402,18 +440,44 @@ public partial class CanvasPage : BasePage
     {
         var canvas = e.Surface.Canvas;
         canvas.Clear(SKColors.Transparent);
+        
+        // Calculate scale to transform Image Coords -> View Coords
+        float scale = 1f;
+        if (Bitmap != null) 
+        {
+            // e.Info.Width is ViewPixels. Bitmap.Width is ImagePixels.
+            // Scale = View / Image.
+            scale = (float)e.Info.Width / Bitmap.Width;
+        }
 
         if (CanvasActions != null)
         {
             foreach (var canvasAction in CanvasActions.Where(ca => ca.CanvasActionType == CanvasActionType.Mask))
             {
-                canvasAction.Execute(canvas, e.Info, _isSaving);
+                if (canvasAction is MaskLineViewModel)
+                {
+                    canvas.Save();
+                    canvas.Scale(scale);
+                    canvasAction.Execute(canvas, e.Info, _isSaving);
+                    canvas.Restore();
+                }
+                else
+                {
+                    // SegmentationMaskViewModel uses Destination Rect logic internally or assumed View Space?
+                    // SegmentationMaskViewModel.Execute draws to imageInfo.Rect (View Space).
+                    // If the Bitmap is Image Size, it gets scaled down by DrawBitmap implicit scaling.
+                    // So we DON't scale canvas for it.
+                    canvasAction.Execute(canvas, e.Info, _isSaving);
+                }
             }
         }
 
         if (_currentLine != null && _currentLine.MaskEffect == MaskEffect.Erase)
         {
+            canvas.Save();
+            canvas.Scale(scale);
             _currentLine.Execute(canvas, e.Info, _isSaving);
+            canvas.Restore();
         }
     }
 
@@ -421,15 +485,27 @@ public partial class CanvasPage : BasePage
     {
         var canvas = e.Surface.Canvas;
         canvas.Clear(SKColors.Transparent);
+        
+        float scale = 1f;
+        if (Bitmap != null) 
+        {
+            scale = (float)e.Info.Width / Bitmap.Width;
+        }
 
         if (_currentLine != null && _currentLine.MaskEffect == MaskEffect.Paint)
         {
+            canvas.Save();
+            canvas.Scale(scale);
             _currentLine.Execute(canvas, e.Info, _isSaving);
+            canvas.Restore();
         }
 
         if (_segmentationLine != null)
         {
+            canvas.Save();
+            canvas.Scale(scale);
             _segmentationLine.Execute(canvas, e.Info, _isSaving);
+            canvas.Restore();
         }
 
         if (ShowBoundingBox)
@@ -737,11 +813,21 @@ public partial class CanvasPage : BasePage
 
         ShowBoundingBox = CurrentTool.Type == ToolType.BoundingBox;
 
+        if (ShowBoundingBox && !ShowActions)
+        {
+            Dispatcher.Dispatch(async () =>
+            {
+                await ShowActionsButton.ScaleTo(1.25, 200, Easing.CubicOut);
+                await ShowActionsButton.ScaleTo(1.0, 200, Easing.CubicIn);
+            });
+        }
+
         BrushSizeButton.IsVisible = false;
         AlphaButton.IsVisible = false;
         ColorPaletteButton.IsVisible = false;
-        SnipButton.IsVisible = false;
         BoundingBoxSizeButton.IsVisible = false;
+        AddRemoveButton.IsVisible = false;
+        ResetZoomButton.IsVisible = false;
 
         foreach (var contextButton in CurrentTool.ContextButtons)
         {
@@ -756,11 +842,14 @@ public partial class CanvasPage : BasePage
                 case ColorPickerContextButtonViewModel:
                     ColorPaletteButton.IsVisible = true;
                     break;
-                case SnipContextButtonViewModel:
-                    SnipButton.IsVisible = true;
-                    break;
                 case BoundingBoxSizeContextButtonViewModel:
                     BoundingBoxSizeButton.IsVisible = true;
+                    break;
+                case AddRemoveButtonViewModel:
+                    AddRemoveButton.IsVisible = true;
+                    break;
+                case ResetZoomContextButtonViewModel:
+                    ResetZoomButton.IsVisible = true;
                     break;
                 default:
                     break;

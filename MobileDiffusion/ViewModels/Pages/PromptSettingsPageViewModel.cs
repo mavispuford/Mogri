@@ -419,9 +419,16 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             var currentPromptStyles = _settings.PromptStyles;
             var currentLoras = _settings.Loras;
 
+            // Store Image to Image Settings Page property values
+            var currentInitImage = _settings.InitImage;
+            var currentMask = _settings.Mask;
+
             _settings = settings;
-            
+
+#region Prompt Page
+
             // Set the Prompt Page properties back if they were previously set
+
             if (!string.IsNullOrEmpty(currentPrompt))
             {
                 _settings.Prompt = currentPrompt;
@@ -441,6 +448,24 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             {
                 _settings.Loras = currentLoras;
             }
+
+#endregion
+
+#region Image to Image Settings
+
+            // Set the init image and mask if it was already set
+
+            if (!string.IsNullOrEmpty(currentInitImage))
+            {
+                _settings.InitImage = currentInitImage;
+            }
+
+            if (!string.IsNullOrEmpty(currentMask))
+            {
+                _settings.Mask = currentMask;
+            }
+
+#endregion
             
             mapSettingsToProperties();
         }
