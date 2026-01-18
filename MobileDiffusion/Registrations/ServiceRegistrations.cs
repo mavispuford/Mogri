@@ -24,7 +24,7 @@ public static class ServiceRegistrations
         {
 #if ANDROID
             return new SocketsHttpHandler
-            {
+            {   
                 PooledConnectionLifetime = TimeSpan.FromMinutes(20),
                 PooledConnectionIdleTimeout = TimeSpan.FromMinutes(20),
                 Proxy = new WebProxy() { Address = new Uri("http://192.168.68.52:9000") }
@@ -32,7 +32,7 @@ public static class ServiceRegistrations
 #else
             return new HttpClientHandler();
 #endif
-        });
+        }); 
 
         builder.Services.AddSingleton<IImageGenerationService, SdForgeNeoService>();
         //builder.Services.AddSingleton<IImageGenerationService, Automatic1111Service>();
@@ -42,6 +42,7 @@ public static class ServiceRegistrations
         builder.Services.AddSingleton<ISegmentationService, SegmentationService>();
         builder.Services.AddSingleton<ILoadingService, LoadingService>();
         builder.Services.AddSingleton<IPresetService, PresetService>();
+        builder.Services.AddSingleton<IPatchService, AotGanPatchService>();
 
 #if ANDROID
         builder.Services.AddSingleton<IFileService, FileService>();

@@ -20,6 +20,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private readonly IImageService _imageService;
     private readonly IPopupService _popupService;
     private readonly ISegmentationService _segmentationService;
+    private readonly IPatchService _patchService;
 
     private int _imgRectIndex = 0;
     private List<int> _supportedImgRectSizes = new()
@@ -34,6 +35,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private bool _doingSegmentation = false;
     private CancellationTokenSource _setSegmentationImageCancellationTokenSource;
     private int _setSegmentationImageRequestCount = 0;
+
+    [ObservableProperty]
+    public partial IRelayCommand ResetZoomCommand { get; set; }
 
     [ObservableProperty]
     public partial List<IPaintingToolViewModel> AvailableTools { get; set; } = new();
@@ -69,6 +73,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     public partial SKBitmap SourceBitmap { get; set; }
 
     [ObservableProperty]
+    public partial bool SegmentationAdd { get; set; } = true;
+
+    [ObservableProperty]
     public partial SKBitmap SegmentationBitmap { get; set; }
 
     [ObservableProperty]
@@ -87,15 +94,15 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     public partial bool HasSegmentationImage { get; set; } = false;
 
     [ObservableProperty]
+    public partial bool ShowActions {get; set;}
+
+    [ObservableProperty]
     public partial bool ShowContextMenu { get; set; } = false;
 
     [ObservableProperty]
     public partial bool GettingColorPalette { get; set; } = false;
 
     public bool IsZoomMode => CurrentTool?.Type == ToolType.Zoom;
-
-    [ObservableProperty]
-    private SegmentationMode _segmentationMode = SegmentationMode.AddArea;
 
     [ObservableProperty]
     private IAsyncRelayCommand _prepareForSavingCommand;
@@ -105,12 +112,14 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         IPopupService popupService,
         IImageService imageService,
         ISegmentationService segmentationService,
+        IPatchService patchService,
         ILoadingService loadingService) : base(loadingService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
         _segmentationService = segmentationService ?? throw new ArgumentNullException(nameof(segmentationService));
+        _patchService = patchService ?? throw new ArgumentNullException(nameof(patchService));
 
         Application.Current.Resources.TryGetValue("IndependenceAccent", out var independenceColor);
 
@@ -127,12 +136,12 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             IconCode = "\ue3ae",
             Effect = MaskEffect.Paint,
             Type = ToolType.PaintBrush,
-            ContextButtons = new List<CanvasContextButtonViewModel>
-            {
+            ContextButtons =
+            [
                 new BrushSizeContextButtonViewModel(this),
                 new AlphaContextButtonViewModel(this),
-                new ColorPickerContextButtonViewModel(this),
-            }
+                new ColorPickerContextButtonViewModel(this)
+            ]
         });
 
         AvailableTools.Add(new PaintingToolViewModel
@@ -141,10 +150,10 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             IconCode = "\ue6d0",
             Effect = MaskEffect.Erase,
             Type = ToolType.Eraser,
-            ContextButtons = new List<CanvasContextButtonViewModel>
-            {
+            ContextButtons =
+            [
                 new BrushSizeContextButtonViewModel(this)
-            }
+            ]
         });
 
         AvailableTools.Add(new PaintingToolViewModel
@@ -153,11 +162,12 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             IconCode = "\ue997",
             Effect = MaskEffect.Paint,
             Type = ToolType.PaintBucket,
-            ContextButtons = new List<CanvasContextButtonViewModel>
-            {
+            ContextButtons =
+            [
                 new AlphaContextButtonViewModel(this),
                 new ColorPickerContextButtonViewModel(this),
-            }
+                new AddRemoveButtonViewModel(this)
+            ]
         });
 
         AvailableTools.Add(new PaintingToolViewModel
@@ -166,11 +176,10 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             IconCode = "\ue3c6",
             Effect = MaskEffect.None,
             Type = ToolType.BoundingBox,
-            ContextButtons = new List<CanvasContextButtonViewModel>
-            {
-                new BoundingBoxSizeContextButtonViewModel(this),
-                new SnipContextButtonViewModel(this),
-            }
+            ContextButtons =
+            [
+                new BoundingBoxSizeContextButtonViewModel(this)
+            ]
         });
 
         AvailableTools.Add(new PaintingToolViewModel
@@ -181,7 +190,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             Type = ToolType.Eyedropper,
             ContextButtons = 
             [
-                new ColorPickerContextButtonViewModel(this),
+                new ColorPickerContextButtonViewModel(this)
             ]
         });
 
@@ -191,17 +200,11 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             IconCode = "\ue8ff",
             Effect = MaskEffect.None,
             Type = ToolType.Zoom,
-            ContextButtons = []
+            ContextButtons = 
+            [
+                new ResetZoomContextButtonViewModel(this)
+            ]
         });
-
-        // Placeholder for gesture paint bucket - Might just be added into the base control
-        //AvailableTools.Add(new PaintingToolViewModel
-        //{
-        //    Name = "Paint Bucket",
-        //    IconCode = "\ue155",
-        //    Effect = MaskEffect.Paint,
-        //    Type = ToolType.PaintBucket
-        //});
 
         CurrentTool = AvailableTools.FirstOrDefault();
     }
@@ -324,9 +327,17 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
         try
         {
+            var maskActions = CanvasActions.Where(ca => ca.CanvasActionType == CanvasActionType.Mask).ToList();
+
+            for (var i = 0; i < maskActions.Count; i++)
+            {
+                maskActions[i].Order = i;
+            }
+
             var maskUri = await _fileService.WriteMaskFileToAppDataAsync(_sourceFileName, 
                 new MaskViewModel { 
-                    Lines = CanvasActions.Where(ca => ca is MaskLineViewModel).Select(ml => (MaskLineViewModel)ml).ToList() 
+                    Lines = maskActions.OfType<MaskLineViewModel>().ToList(),
+                    SegmentationMasks = maskActions.OfType<SegmentationMaskViewModel>().ToList()
                 });
 
             await Toast.Make("Mask saved.").Show();
@@ -352,6 +363,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     [RelayCommand]
     private async Task SendToImageToImage()
     {
+        ShowActions = false;
+
         if (SourceBitmap == null)
         {
             await Toast.Make("There is no image to send.").Show();
@@ -365,6 +378,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     [RelayCommand]
     private async Task BeginCropImageRect()
     {
+        ShowActions = false;
+
         if (SourceBitmap == null)
         {
             await Toast.Make("There is no image data to crop.").Show();
@@ -645,7 +660,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
                         combineCanvas.DrawBitmap(SegmentationBitmap, 0, 0, paint);
 
-                        paint.BlendMode = SegmentationMode == SegmentationMode.AddArea ? SKBlendMode.SrcOver : SKBlendMode.DstOut;
+                        paint.BlendMode = SegmentationAdd ? SKBlendMode.SrcOver : SKBlendMode.DstOut;
 
                         combineCanvas.DrawBitmap(maskBitmap, 0, 0, paint);
                     }
@@ -690,6 +705,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             {
                 CanvasActionType = CanvasActionType.Mask,
                 Color = CurrentColor.WithAlpha((float)CurrentAlpha),
+                Alpha = (float)CurrentAlpha,
                 Bitmap = maskBitmap
             };
 
@@ -713,11 +729,6 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     {
         SegmentationBitmap?.Dispose();
         SegmentationBitmap = null;
-        _segmentationService.Reset();
-    }
-
-    partial void OnSegmentationModeChanged(SegmentationMode value)
-    {
         _segmentationService.Reset();
     }
 
@@ -757,16 +768,21 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
             await dispatcher.DispatchAsync(() =>
             {
-                if (mask?.Lines != null)
+                if (mask != null)
                 {
-                    var canvasActions = new ObservableCollection<CanvasActionViewModel>();
+                    var allActions = new List<CanvasActionViewModel>();
 
-                    foreach(var line in mask.Lines)
+                    if (mask.Lines != null)
                     {
-                        canvasActions.Add(line);
+                        allActions.AddRange(mask.Lines);
                     }
 
-                    CanvasActions = canvasActions;
+                    if (mask.SegmentationMasks != null)
+                    {
+                        allActions.AddRange(mask.SegmentationMasks);
+                    }
+
+                    CanvasActions = new ObservableCollection<CanvasActionViewModel>(allActions.OrderBy(a => a.Order));
                 }
             });
         }
@@ -1040,21 +1056,15 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
                     var maskColor = new Color();
 
-                    // This adds randomness to each pixel to add texture to masked portions,
+                    // This adds noise to each pixel to add texture to masked portions,
                     // resulting in a better image overall when processed.
                     if (randomizeMaskPixels)
                     {
-                        // This controls how far away each pixel can travel from the original value
-                        const int rngAmount = 50;
-
-                        var pos = _random.Next(0, 2) == 1;
-                        mskByte1 = (byte)int.Clamp(((int)mskByte1) + (_random.Next(0, rngAmount) * (pos ? 1 : -1)), 0, 255);
-
-                        pos = _random.Next(0, 2) == 1;
-                        mskByte2 = (byte)int.Clamp(((int)mskByte2) + (_random.Next(0, rngAmount) * (pos ? 1 : -1)), 0, 255);
+                        const double stdDev = 30.0;
                         
-                        pos = _random.Next(0, 2) == 1;
-                        mskByte3 = (byte)int.Clamp(((int)mskByte3) + (_random.Next(0, rngAmount) * (pos ? 1 : -1)), 0, 255);
+                        mskByte1 = (byte)int.Clamp(((int)mskByte1) + (int)NoiseHelper.NextGaussian(_random, 0, stdDev), 0, 255);
+                        mskByte2 = (byte)int.Clamp(((int)mskByte2) + (int)NoiseHelper.NextGaussian(_random, 0, stdDev), 0, 255);
+                        mskByte3 = (byte)int.Clamp(((int)mskByte3) + (int)NoiseHelper.NextGaussian(_random, 0, stdDev), 0, 255);
                     }
 
                     if (typeMsk == SKColorType.Rgba8888)
@@ -1223,5 +1233,142 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
         ShowContextMenu = value.Type == ToolType.PaintBucket;
         OnPropertyChanged(nameof(IsZoomMode));
+    }
+
+    [RelayCommand]
+    private async Task PatchAsync()
+    {
+        ShowActions = false;
+
+        if (SourceBitmap == null || CanvasActions.Count == 0)
+        {
+            await _popupService.DisplayAlertAsync("Info", "Nothing to patch!", "OK");
+            return;
+        }
+
+        var action = await _popupService.DisplayActionSheetAsync("Inpaint / Patch", "Cancel", null, "Use Last Mask Only", "Use All Masks");
+        
+        if (action == "Cancel" || string.IsNullOrEmpty(action))
+            return;
+
+        bool useLastOnly = action == "Use Last Mask Only";
+
+        try
+        {
+            IsBusy = true;
+            await Task.Delay(100);
+
+            // Unload Segmentation Service to free resource
+            _segmentationService.UnloadModel();
+
+            using var mask = await Task.Run(() => GenerateMask(useLastOnly));
+
+            var result = await _patchService.PatchImageAsync(SourceBitmap, mask);
+            
+            // Unload Patch Service after use
+            _patchService.UnloadModel();
+
+            if (result != null)
+            {
+                SourceBitmap = result;
+            }
+        }
+        catch (Exception ex)
+        {
+            await _popupService.DisplayAlertAsync("Error", $"Inpainting failed: {ex.Message}", "OK");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private void ToggleSegmentationAdd()
+    {
+        SegmentationAdd = !SegmentationAdd;
+
+        _segmentationService.Reset();
+    }
+
+    private SKBitmap GenerateMask(bool useLastOnly)
+    {
+        if (SourceBitmap == null) return null;
+
+        var mask = new SKBitmap(SourceBitmap.Width, SourceBitmap.Height, SKColorType.Rgba8888, SKAlphaType.Premul);
+        using var canvas = new SKCanvas(mask);
+        
+        // Background is black (keep original)
+        canvas.Clear(SKColors.Black);
+
+        // Filter actions
+        var actionsToRender = useLastOnly 
+            ? CanvasActions.Where(x => x == CanvasActions.LastOrDefault()).ToList() 
+            : CanvasActions.ToList();
+
+        // Draw masks (White = Inpaint)
+        foreach (var action in actionsToRender)
+        {
+            if (action is MaskLineViewModel line)
+            {
+                using var paint = new SKPaint
+                {
+                    Style = SKPaintStyle.Stroke,
+                    StrokeWidth = line.BrushSize,
+                    StrokeCap = SKStrokeCap.Round,
+                    StrokeJoin = SKStrokeJoin.Round,
+                    IsAntialias = true
+                };
+
+                if (line.MaskEffect == MaskEffect.Paint)
+                {
+                    paint.BlendMode = SKBlendMode.SrcOver; 
+                    paint.Color = SKColors.White;
+                }
+                else // Erase
+                {
+                    paint.BlendMode = SKBlendMode.Src;
+                    paint.Color = SKColors.Black;
+                }
+
+                if (line.Path != null && line.Path.Count > 0)
+                {
+                    using var path = new SKPath();
+                    path.MoveTo(line.Path[0]);
+                    for (var i = 1; i < line.Path.Count; i++)
+                    {
+                        path.ConicTo(line.Path[i - 1], line.Path[i], .5f);
+                    }
+                    canvas.DrawPath(path, paint);
+                }
+            }
+            else if (action is SegmentationMaskViewModel seg && seg.Bitmap != null)
+            {
+                 using var paint = new SKPaint();
+                 // Create filter to make non-transparent pixels white
+                 paint.ColorFilter = SKColorFilter.CreateBlendMode(SKColors.White, SKBlendMode.SrcIn); 
+                 
+                 canvas.DrawBitmap(seg.Bitmap, new SKRect(0, 0, mask.Width, mask.Height), paint);
+            }
+        }
+        
+        return mask;
+    }
+
+    [RelayCommand]
+    private void ToggleActionsVisibility()
+    {
+        ShowActions = !ShowActions;
+    }
+
+    public override bool OnBackButtonPressed()
+    {
+        if (CurrentTool is { Type: ToolType.Zoom })
+        {
+            ResetZoomCommand?.Execute(null);
+            return true;
+        }
+
+        return base.OnBackButtonPressed();
     }
 }

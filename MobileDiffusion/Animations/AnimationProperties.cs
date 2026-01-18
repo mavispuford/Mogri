@@ -29,20 +29,62 @@ public static class AnimationProperties
         {
             if (bindable is VisualElement element)
             {
-                if (newValue is BaseAnimation[] animations)
-                {
-                    foreach (var animation in animations)
-                    {
-                        animation.Animate(element);
-                    }
-                }
-                else if (newValue is BaseAnimation animation)
-                {
-                    animation.Animate(element);
-                }
+                element.BindingContextChanged -= OnBindingContextChanged;
+                element.BindingContextChanged += OnBindingContextChanged;
+
+                ApplyAnimations(element, newValue);
             }
-            
         });
+
+    private static void OnBindingContextChanged(object sender, EventArgs e)
+    {
+        var element = (VisualElement)sender;
+        var animations = GetAnimations(element);
+
+        if (animations is BaseAnimation[] animationArray)
+        {
+            foreach (var animation in animationArray)
+            {
+                animation.BindingContext = element.BindingContext;
+            }
+        }
+        else if (animations is BaseAnimation animation)
+        {
+            animation.BindingContext = element.BindingContext;
+        }
+    }
+
+    private static void ApplyAnimations(VisualElement element, object newValue)
+    {
+        if (newValue is BaseAnimation[] animations)
+        {
+            foreach (var animation in animations)
+            {
+                animation.BindingContext = element.BindingContext;
+                animation.PropertyChanged -= (s, e) => OnAnimationPropertyChanged(s, e, element);
+                animation.PropertyChanged += (s, e) => OnAnimationPropertyChanged(s, e, element);
+                animation.Animate(element);
+            }
+        }
+        else if (newValue is BaseAnimation animation)
+        {
+            animation.BindingContext = element.BindingContext;
+            animation.PropertyChanged -= (s, e) => OnAnimationPropertyChanged(s, e, element);
+            animation.PropertyChanged += (s, e) => OnAnimationPropertyChanged(s, e, element);
+            animation.Animate(element);
+        }
+    }
+
+    private static void OnAnimationPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e, VisualElement element)
+    {
+        if (e.PropertyName != nameof(BaseAnimation.BindingContext))
+        {
+            if (sender is BaseAnimation animation)
+            {
+                animation.Animate(element);
+            }
+        }
+    }
 
     public static object GetAnimations(BindableObject view)
     {

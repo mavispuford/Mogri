@@ -16,32 +16,24 @@
         </ResourceDictionary>
     </ContentView.Resources>
     
-    <Grid>
+        <Grid>
 
-        <ImageButton WidthRequest="50" 
-                     HeightRequest="50" 
-                     Command="{Binding SelectToolCommand, Source={RelativeSource AncestorType={x:Type viewModels:ICanvasPageViewModel}}}"
-                     CommandParameter="{Binding .}"
-                     Opacity="{Binding IsLoading, Converter={StaticResource BoolToHalfOpacityConverter}}"
-                     ToolTipProperties.Text="{Binding Name}">
+            <ImageButton WidthRequest="50" 
+                         HeightRequest="50" 
+                         HorizontalOptions="Center"
+                         VerticalOptions="Center"
+                         Command="{Binding SelectToolCommand, Source={RelativeSource AncestorType={x:Type viewModels:ICanvasPageViewModel}}}"
+                         CommandParameter="{Binding .}"
+                         Opacity="{Binding IsLoading, Converter={StaticResource BoolToHalfOpacityConverter}}"
+                         ToolTipProperties.Text="{Binding Name}"
+                         Padding="4">
 
-            <ImageButton.Source>
-                <FontImageSource x:Name="FontImageSource" Glyph="{Binding IconCode}" FontFamily="MaterialIconsRound400" Size="50" />
-            </ImageButton.Source>
-        </ImageButton>
+                <ImageButton.Source>
+                    <FontImageSource x:Name="FontImageSource"   Glyph="{Binding IconCode}" FontFamily="MaterialIconsRound400" Size="50" />
+                </ImageButton.Source>
+            </ImageButton>
 
-        <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center" IsRunning="{Binding IsLoading}" InputTransparent="True"/>
+            <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center" IsRunning="{Binding IsLoading}" InputTransparent="True"/>
+        </Grid>
 
-        <Border WidthRequest="58"
-                HeightRequest="58"
-                VerticalOptions="Center"
-                HorizontalOptions="Center"
-                Stroke="{StaticResource IndependenceAccent}"
-                StrokeThickness="4"
-                StrokeShape="RoundRectangle 10"
-                BackgroundColor="Transparent"
-                Opacity="0"
-                InputTransparent="True">
-        </Border>
-    </Grid>
 </ContentView>
