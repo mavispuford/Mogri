@@ -284,4 +284,16 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
              await Toast.Make($"Failed to delete items: {ex.Message}").Show();
         }
     }
+
+    public override bool OnBackButtonPressed()
+    {
+        if (SelectionModeEnabled)
+        {
+            ToggleSelectionMode();
+
+            return true;
+        }
+
+        return base.OnBackButtonPressed();
+    }
 }
