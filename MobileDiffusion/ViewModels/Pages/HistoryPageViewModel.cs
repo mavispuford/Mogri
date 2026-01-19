@@ -22,6 +22,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     private int itemIndex = 0;
     private const int itemTakeCount = 12;
     private bool _isInitialized = false;
+    private int _lastSelectionCount = 0;
 
     [ObservableProperty]
     public partial ObservableCollection<IHistoryItemViewModel> HistoryItems { get; set; } = new();
@@ -194,6 +195,11 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
         await _semaphore.WaitAsync();
 
+        if (SelectionModeEnabled)
+        {
+            ToggleSelectionMode();
+        }
+
         try
         {
             var results = await _historyService.SearchAsync(SearchText ?? string.Empty, itemIndex, itemTakeCount);
@@ -234,13 +240,20 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
             ShowBottomPanelCommand?.Execute(null);
         }
 
-
+        _lastSelectionCount = 0;
         SelectionChanged(null);
     }
 
     [RelayCommand]
     private void SelectionChanged(SelectionChangedEventArgs args)
     {
+        if (_lastSelectionCount != 0 && SelectedItems.Count == 0 && SelectionModeEnabled)
+        {
+            ToggleSelectionMode();
+        }
+
+        _lastSelectionCount = SelectedItems.Count;
+
         var pluralityString = SelectedItems.Count != 1 ? "s" : string.Empty;
         SelectedItemsText = $"{SelectedItems.Count} item{pluralityString} selected";
     }

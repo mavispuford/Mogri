@@ -52,6 +52,7 @@
             <toolkit:InvertedBoolConverter x:Key="InvertedBool" />
             <toolkit:BoolToObjectConverter x:Key="BoolToSelectionModeGlyph" TrueObject="&#xe5cd;" FalseObject="&#xe86c;" />
             <toolkit:BoolToObjectConverter x:Key="BoolToLoadingText" TrueObject="Loading history..." FalseObject="No items found." />
+            <toolkit:BoolToObjectConverter x:Key="BoolToSelectionMode" TrueObject="{x:Static SelectionMode.Multiple}" FalseObject="{x:Static SelectionMode.None}" />
         </ResourceDictionary>
     </views:BasePage.Resources>
     
@@ -63,7 +64,7 @@
                         VerticalOptions="Fill"
                         RemainingItemsThreshold="3"
                         RemainingItemsThresholdReachedCommand="{Binding LoadItemsCommand}"
-                        SelectionMode="Multiple"
+                        SelectionMode="{Binding SelectionModeEnabled, Converter={StaticResource BoolToSelectionMode}}"
                         SelectedItems="{Binding SelectedItems, Mode=TwoWay}"
                         SelectionChangedCommand="{Binding SelectionChangedCommand}">
             <CollectionView.ItemsLayout>
