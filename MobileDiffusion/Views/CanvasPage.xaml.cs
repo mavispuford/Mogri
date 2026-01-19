@@ -229,7 +229,7 @@ public partial class CanvasPage : BasePage
     {
         if (show)
         {
-            await ActionsContainer.TranslateTo(0, 0, 200, Easing.CubicInOut);
+            await ActionsContainer.TranslateToAsync(0, 0, 200, Easing.CubicInOut);
         }
         else
         {
@@ -237,7 +237,7 @@ public partial class CanvasPage : BasePage
             double translation = ActionsContainer.Height / 4;
             if (translation <= 0) translation = 200; // fallback if not measured
             
-            await ActionsContainer.TranslateTo(0, translation, 200, Easing.CubicInOut);
+            await ActionsContainer.TranslateToAsync(0, translation, 200, Easing.CubicInOut);
         }
     }
 

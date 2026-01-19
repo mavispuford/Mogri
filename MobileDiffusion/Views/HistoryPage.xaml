@@ -51,7 +51,7 @@
         <ResourceDictionary>
             <toolkit:InvertedBoolConverter x:Key="InvertedBool" />
             <toolkit:BoolToObjectConverter x:Key="BoolToSelectionModeGlyph" TrueObject="&#xe5cd;" FalseObject="&#xe86c;" />
-            <toolkit:BoolToObjectConverter x:Key="BoolToLoadingText" TrueObject="Loading history..." FalseObject="There are no items in your history" />
+            <toolkit:BoolToObjectConverter x:Key="BoolToLoadingText" TrueObject="Loading history..." FalseObject="No items found." />
         </ResourceDictionary>
     </views:BasePage.Resources>
     
