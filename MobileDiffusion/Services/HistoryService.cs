@@ -28,12 +28,13 @@ public class HistoryService : IHistoryService
         return new LiteDatabase(_dbPath);
     }
 
-    public async Task InitializeAsync()
+    public async Task<bool> InitializeAsync()
     {
-        await Task.Run(async () =>
+        return await Task.Run(async () =>
         {
             using var db = GetDatabase();
             var col = db.GetCollection<HistoryEntity>(CollectionName);
+            bool hasChanges = false;
 
             // Ensure indexes
             col.EnsureIndex(x => x.UserPrompt);
@@ -43,43 +44,103 @@ public class HistoryService : IHistoryService
             // Get all files from cache directory (source of truth)
             var cacheDir = FileSystem.CacheDirectory;
             if (!Directory.Exists(cacheDir))
-                return;
+                return false;
 
-            var imageFiles = Directory.GetFiles(cacheDir, "*.png")
-                .Where(f => !Path.GetFileName(f).StartsWith(Constants.ThumbnailPrefix))
-                .Select(f => new FileInfo(f))
-                .ToList();
+            // Optimization: Use EnumerateFiles for lower memory footprint, though we still need to realize a list for comparison
+            // But projection helps.
+            var imageFiles = Directory.GetFiles(cacheDir, "*.png");
+            
+            // Files on disk map
+            var diskFilesMap = new Dictionary<string, FileInfo>();
+            foreach (var f in imageFiles)
+            {
+                if (!Path.GetFileName(f).StartsWith(Constants.ThumbnailPrefix))
+                {
+                    diskFilesMap[f] = new FileInfo(f);
+                }
+            }
 
-            var dbEntries = col.FindAll().ToDictionary(x => x.ImageFileName);
+            // Optimization: Projection - read only ImageFileName from DB to avoid loading full prompts/history into memory
+            // We map ImageFileName -> Id
+            var dbEntries = col.Query()
+                .Select(x => new { x.ImageFileName, x.Id })
+                .ToEnumerable()
+                .ToDictionary(x => x.ImageFileName, x => x.Id);
 
             // 1. Prune: Remove DB entries that don't exist on disk
-            var filesSet = new HashSet<string>(imageFiles.Select(x => x.FullName));
-            var toRemove = dbEntries.Values.Where(e => !filesSet.Contains(e.ImageFileName)).ToList();
-
-            foreach (var item in toRemove)
+            var toRemove = new List<ObjectId>();
+            foreach (var kvp in dbEntries)
             {
-                col.Delete(item.Id);
+                if (!diskFilesMap.ContainsKey(kvp.Key))
+                {
+                    toRemove.Add(kvp.Value);
+                }
+            }
+            
+            if (toRemove.Count > 0)
+            {
+                hasChanges = true;
+                foreach (var id in toRemove)
+                {
+                    col.Delete(id);
+                }
             }
 
             // 2. Insert: Add new files to DB
-            foreach (var fileInfo in imageFiles)
+            foreach (var kvp in diskFilesMap)
             {
-                if (!dbEntries.ContainsKey(fileInfo.FullName))
+                var filePath = kvp.Key;
+                if (!dbEntries.ContainsKey(filePath))
                 {
-                    var (positive, negative, raw) = await PngMetadataHelper.ReadParametersAsync(fileInfo.FullName);
-
-                    var entity = new HistoryEntity
+                    try
                     {
-                        ImageFileName = fileInfo.FullName,
-                        ThumbnailFileName = Path.Combine(cacheDir, Constants.ThumbnailPrefix + fileInfo.Name), // Approximate, standard naming convention
-                        UserPrompt = positive ?? "",
-                        NegativePrompt = negative ?? "",
-                        CreatedAt = fileInfo.CreationTime
-                    };
-
-                    col.Insert(entity);
+                        var fileInfo = kvp.Value;
+                        // Avoid holding DB lock during IO
+                    }
+                    catch
+                    {
+                        continue;
+                    }
                 }
             }
+            
+            // Process insertions in batch to minimize DB lock time and ensure transaction safety
+            var newEntities = new List<HistoryEntity>();
+            
+            foreach (var kvp in diskFilesMap)
+            {
+                var filePath = kvp.Key;
+                if (!dbEntries.ContainsKey(filePath))
+                {
+                     try
+                     {
+                        var fileInfo = kvp.Value;
+                        var (positive, negative, raw) = await PngMetadataHelper.ReadParametersAsync(filePath);
+
+                        var entity = new HistoryEntity
+                        {
+                            ImageFileName = filePath,
+                            ThumbnailFileName = Path.Combine(cacheDir, Constants.ThumbnailPrefix + fileInfo.Name), // Approximate, standard naming convention
+                            UserPrompt = positive ?? "",
+                            NegativePrompt = negative ?? "",
+                            CreatedAt = fileInfo.CreationTime
+                        };
+                        newEntities.Add(entity);
+                     }
+                     catch(Exception ex)
+                     {
+                         System.Diagnostics.Debug.WriteLine($"Failed to process history file {filePath}: {ex}");
+                     }
+                }
+            }
+            
+            if(newEntities.Count > 0)
+            {
+                hasChanges = true;
+                col.InsertBulk(newEntities);
+            }
+            
+            return hasChanges;
         });
     }
 
@@ -101,17 +162,40 @@ public class HistoryService : IHistoryService
             }
             else
             {
-                // LiteDB simple text search or contains
-                // Using Lower() for case insensitive search if not using FreeText search
-                // For simple "contains", we can use LINQ expression
                 var lowerQuery = query.ToLower();
-                result = col.Query()
-                    .Where(x => (x.UserPrompt != null && x.UserPrompt.ToLower().Contains(lowerQuery)) ||
-                                (x.NegativePrompt != null && x.NegativePrompt.ToLower().Contains(lowerQuery)))
-                    .OrderByDescending(x => x.CreatedAt)
-                    .Skip(skip)
-                    .Limit(take)
+                bool isExact = false;
+                var cleanQuery = lowerQuery;
+
+                if (lowerQuery.Length > 2 && ((lowerQuery.StartsWith("\"") && lowerQuery.EndsWith("\"")) || (lowerQuery.StartsWith("'") && lowerQuery.EndsWith("'"))))
+                {
+                    isExact = true;
+                    cleanQuery = lowerQuery.Substring(1, lowerQuery.Length - 2);
+                }
+                
+                // Fetch all matching records to sort them by relevance in memory
+                var candidates = col.Query()
+                    .Where(x => (x.UserPrompt != null && x.UserPrompt.ToLower().Contains(cleanQuery)) ||
+                                (x.NegativePrompt != null && x.NegativePrompt.ToLower().Contains(cleanQuery)))
                     .ToEnumerable();
+
+                if (isExact)
+                {
+                    candidates = candidates.Where(x => IsWholeWordMatch(x.UserPrompt, cleanQuery) || IsWholeWordMatch(x.NegativePrompt, cleanQuery));
+                }
+
+                result = candidates
+                    .Select(x => 
+                    {
+                        var score1 = GetStringScore(x.UserPrompt, cleanQuery);
+                        var score2 = GetStringScore(x.NegativePrompt, cleanQuery);
+                        var finalScore = Math.Min(score1, score2);
+                        return new { Item = x, Score = finalScore };
+                    })
+                    .OrderBy(x => x.Score)
+                    .ThenByDescending(x => x.Item.CreatedAt)
+                    .Skip(skip)
+                    .Take(take) // Using Take instead of Limit for IEnumerable
+                    .Select(x => x.Item);
             }
             
             // Materialize list before disposing DB
@@ -142,5 +226,47 @@ public class HistoryService : IHistoryService
                 col.Delete(item.Id);
             }
         });
+    }
+
+    private bool IsWholeWordMatch(string text, string lowerQuery)
+    {
+        if (string.IsNullOrEmpty(text)) return false;
+        
+        var lowerText = text.ToLower();
+        int index = lowerText.IndexOf(lowerQuery, StringComparison.Ordinal);
+        
+        while (index != -1)
+        {
+            bool startOk = index == 0 || !char.IsLetterOrDigit(lowerText[index - 1]);
+            bool endOk = (index + lowerQuery.Length == lowerText.Length) || !char.IsLetterOrDigit(lowerText[index + lowerQuery.Length]);
+
+            if (startOk && endOk) return true;
+
+            index = lowerText.IndexOf(lowerQuery, index + 1, StringComparison.Ordinal);
+        }
+        return false;
+    }
+
+    private int GetStringScore(string text, string lowerQuery)
+    {
+        if (string.IsNullOrEmpty(text)) return 3;
+
+        if (text.StartsWith(lowerQuery, StringComparison.OrdinalIgnoreCase)) return 0;
+        
+        var lowerText = text.ToLower();
+        int index = lowerText.IndexOf(lowerQuery, StringComparison.Ordinal);
+        
+        if (index == -1) return 3;
+
+        while (index != -1)
+        {
+            if (index > 0 && !char.IsLetterOrDigit(lowerText[index - 1]))
+            {
+                return 1;
+            }
+            index = lowerText.IndexOf(lowerQuery, index + 1, StringComparison.Ordinal);
+        }
+        
+        return 2;
     }
 }

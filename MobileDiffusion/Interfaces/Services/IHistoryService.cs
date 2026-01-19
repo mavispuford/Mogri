@@ -6,7 +6,7 @@ namespace MobileDiffusion.Interfaces.Services;
 
 public interface IHistoryService
 {
-    Task InitializeAsync();
+    Task<bool> InitializeAsync();
     Task<IEnumerable<HistoryEntity>> SearchAsync(string query, int skip, int take);
     Task DeleteItemsAsync(IEnumerable<HistoryEntity> items);
 }

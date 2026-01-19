@@ -21,6 +21,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
     private int itemIndex = 0;
     private const int itemTakeCount = 12;
+    private bool _isInitialized = false;
 
     [ObservableProperty]
     public partial ObservableCollection<IHistoryItemViewModel> HistoryItems { get; set; } = new();
@@ -85,16 +86,31 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     public override async Task OnNavigatedToAsync()
     {
         await base.OnNavigatedToAsync();
+        
+        _isInitialized = false;
 
         _ = Task.Run(async () =>
         {
             try
             {
-                await _historyService.InitializeAsync();
+                var hasChanges = await _historyService.InitializeAsync();
 
                 if (Application.Current != null)
                 {
-                    await Shell.Current.Dispatcher.DispatchAsync(LoadItems);
+                    await Shell.Current.Dispatcher.DispatchAsync(async () =>
+                    {
+                        if (hasChanges || HistoryItems.Count == 0 || !string.IsNullOrWhiteSpace(SearchText))
+                        {
+                            itemIndex = 0;
+                            HistoryItems.Clear();
+                            _isInitialized = true; // Set to true before calling LoadItems
+                            await LoadItems();
+                        }
+                        else
+                        {
+                             _isInitialized = true;
+                        }
+                    });
                 }
             }
             catch (Exception ex)
@@ -174,6 +190,8 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     [RelayCommand]
     private async Task LoadItems()
     {
+        if (!_isInitialized) return;
+
         await _semaphore.WaitAsync();
 
         try
