@@ -19,9 +19,13 @@ public partial class HistoryItemViewModel : BaseViewModel, IHistoryItemViewModel
     [ObservableProperty]
     public partial PromptSettings Settings { get; set; }
 
-    public async Task InitWith(string fileName, IFileService fileService, IImageService imageService)
+    [ObservableProperty]
+    public partial HistoryEntity Entity { get; set; }
+
+    public async Task InitWith(HistoryEntity entity, IFileService fileService, IImageService imageService)
     {
-        FileName = fileName;
+        Entity = entity;
+        FileName = entity.ImageFileName;
 
         var filenameNoPath = Path.GetFileName(FileName);
         var directoryOnly = FileName.Replace(filenameNoPath, string.Empty);

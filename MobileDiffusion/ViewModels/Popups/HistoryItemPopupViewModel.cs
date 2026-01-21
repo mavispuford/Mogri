@@ -5,6 +5,7 @@ using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 using SkiaSharp;
 using SkiaSharp.Views.Maui.Controls;
+using Microsoft.Maui.ApplicationModel;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -70,7 +71,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
 
     public override async Task OnAppearingAsync()
     {
-        await LoadImageAsync();
+        _ = LoadImageAsync();
     }
 
     partial void OnHistoryItemChanged(IHistoryItemViewModel value)
@@ -80,30 +81,46 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
 
     private async Task LoadImageAsync()
     {
-        if (HistoryItem == null)
+        var currentItem = HistoryItem;
+        if (currentItem == null)
         {
             return;
         }
 
-        if (!string.IsNullOrEmpty(HistoryItem.FileName))
+        // Delay to allow the UI to settle (e.g. keyboard hiding, popup animation)
+        await Task.Delay(100);
+
+        if (!string.IsNullOrEmpty(currentItem.FileName))
         {
-            using var fileStream = await _fileService.GetFileStreamFromInternalStorageAsync(HistoryItem.FileName);
-            var bitmap = _imageService.GetSkBitmapFromStream(fileStream);
-            bitmap = _imageService.GetResizedSKBitmap(bitmap, (int)Constants.MaximumDisplayWidthHeight, (int)Constants.MaximumDisplayWidthHeight, filterImage: true, onlyIfLarger: true);
+            SKBitmapImageSource imageSource = null;
 
-            var imageSource = new SKBitmapImageSource
+            await Task.Run(async () =>
             {
-                Bitmap = bitmap
-            };
+                using var fileStream = await _fileService.GetFileStreamFromInternalStorageAsync(currentItem.FileName);
+             
+                var originalBitmap = _imageService.GetSkBitmapFromStream(fileStream);
+                var resizedBitmap = _imageService.GetResizedSKBitmap(originalBitmap, (int)Constants.MaximumDisplayWidthHeight, (int)Constants.MaximumDisplayWidthHeight, filterImage: true, onlyIfLarger: true);
+                
+                imageSource = new SKBitmapImageSource
+                {
+                    Bitmap = resizedBitmap
+                };
+            });
 
-            FullImageSource = imageSource;
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                if (HistoryItem == currentItem && imageSource != null)
+                {
+                    FullImageSource = imageSource;
+                }
+            });
         }
 
-        if (HistoryItem.Settings == null)
+        if (currentItem.Settings == null)
         {
             _ = Task.Run(async () =>
             {
-                using var imageFileStream = await _fileService.GetFileStreamFromInternalStorageAsync(HistoryItem.FileName);
+                using var imageFileStream = await _fileService.GetFileStreamFromInternalStorageAsync(currentItem.FileName);
                 using var memoryStream = new MemoryStream();
                 await imageFileStream.CopyToAsync(memoryStream);
                 var imageString = Convert.ToBase64String(memoryStream.ToArray());
@@ -111,7 +128,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
 
                 var imageInfoSettings = await _stableDiffusionService.GetImageInfoAsync(formattedImageString);
 
-                HistoryItem.Settings = imageInfoSettings;
+                currentItem.Settings = imageInfoSettings;
             });
         }
     }

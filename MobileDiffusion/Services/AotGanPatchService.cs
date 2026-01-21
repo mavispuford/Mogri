@@ -490,7 +490,7 @@ namespace MobileDiffusion.Services
             // Fixes the issue where a black background is treated as "masked" by DstIn blending.
             // We force pixels that are visually black (background) to be fully transparent.
             
-            // Optimization: Direct pointer access avoids copying to/from SKBitmap.Pixels array
+            // Direct pointer access avoids copying to/from SKBitmap.Pixels array
             if (mask.BytesPerPixel == 4)
             {
                 byte* ptr = (byte*)mask.GetPixels().ToPointer();
