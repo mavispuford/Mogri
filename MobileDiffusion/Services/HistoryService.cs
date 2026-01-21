@@ -46,7 +46,7 @@ public class HistoryService : IHistoryService
             if (!Directory.Exists(cacheDir))
                 return false;
 
-            // Optimization: Use EnumerateFiles for lower memory footprint, though we still need to realize a list for comparison
+            // Use EnumerateFiles for lower memory footprint, though we still need to realize a list for comparison
             // But projection helps.
             var imageFiles = Directory.GetFiles(cacheDir, "*.png");
             
@@ -60,7 +60,7 @@ public class HistoryService : IHistoryService
                 }
             }
 
-            // Optimization: Projection - read only ImageFileName from DB to avoid loading full prompts/history into memory
+            // Projection - read only ImageFileName from DB to avoid loading full prompts/history into memory
             // We map ImageFileName -> Id
             var dbEntries = col.Query()
                 .Select(x => new { x.ImageFileName, x.Id })
