@@ -13,5 +13,7 @@ public interface IHistoryItemViewModel : IBaseViewModel
 
     PromptSettings Settings { get; set; }
 
-    Task InitWith(string fileName, IFileService fileService, IImageService imageService);
+    HistoryEntity Entity { get; set; }
+
+    Task InitWith(HistoryEntity entity, IFileService fileService, IImageService imageService);
 }

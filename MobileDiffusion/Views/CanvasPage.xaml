@@ -402,7 +402,8 @@
                              VerticalOptions="End"
                              InputTransparent="{Binding ShowActions, Converter={StaticResource InvertedBool}}"
                              CascadeInputTransparent="True"
-                             Spacing="4">
+                             Spacing="4"
+                             Opacity="0">
             <VerticalStackLayout.Resources>
                 <Style TargetType="Border">
                     <Setter Property="BackgroundColor" Value="{StaticResource Secondary}"/>
@@ -539,7 +540,7 @@
                     HeightRequest="56"
                     Scale="0"
                     StrokeShape="RoundRectangle 28">
-                    <!-- The shadow on this one currently has rendering issues and causes this button to disappear -->
+                <!-- The shadow on this one currently has rendering issues and causes this button to disappear -->
                 <!-- <Border.Shadow>
                     <Shadow Radius="5" Opacity=".2" />
                 </Border.Shadow> -->

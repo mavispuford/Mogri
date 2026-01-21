@@ -23,6 +23,10 @@ public interface IHistoryPageViewModel : IPageViewModel
 
     IAsyncRelayCommand DeleteSelectedItemsCommand { get; }
 
+    IRelayCommand<IHistoryItemViewModel> ItemLongPressedCommand { get; }
+
+    IRelayCommand SelectAllResultsCommand { get; }
+
     IAsyncRelayCommand LoadItemsCommand { get; }
 
     IRelayCommand ToggleSelectionModeCommand { get; }
@@ -32,4 +36,6 @@ public interface IHistoryPageViewModel : IPageViewModel
     ICommand HideBottomPanelCommand { get; set; }
 
     ICommand ShowBottomPanelCommand { get; set; }
+
+    string SearchText { get; set; }
 }
