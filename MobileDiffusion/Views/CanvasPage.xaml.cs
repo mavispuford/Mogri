@@ -2,7 +2,6 @@ using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Enums;
 using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.ViewModels;
-using MobileDiffusion.ViewModels.CanvasContextButtons;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using System.Collections.ObjectModel;
@@ -833,22 +832,22 @@ public partial class CanvasPage : BasePage
         {
             switch (contextButton)
             {
-                case BrushSizeContextButtonViewModel:
+                case ContextButtonType.BrushSize:
                     BrushSizeButton.IsVisible = true;
                     break;
-                case AlphaContextButtonViewModel:
+                case ContextButtonType.Alpha:
                     AlphaButton.IsVisible = true;
                     break;
-                case ColorPickerContextButtonViewModel:
+                case ContextButtonType.ColorPicker:
                     ColorPaletteButton.IsVisible = true;
                     break;
-                case BoundingBoxSizeContextButtonViewModel:
+                case ContextButtonType.BoundingBoxSize:
                     BoundingBoxSizeButton.IsVisible = true;
                     break;
-                case AddRemoveButtonViewModel:
+                case ContextButtonType.AddRemove:
                     AddRemoveButton.IsVisible = true;
                     break;
-                case ResetZoomContextButtonViewModel:
+                case ContextButtonType.ResetZoom:
                     ResetZoomButton.IsVisible = true;
                     break;
                 default:

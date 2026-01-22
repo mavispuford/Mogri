@@ -8,7 +8,6 @@ using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 using SkiaSharp;
 using System.Collections.ObjectModel;
-using MobileDiffusion.ViewModels.CanvasContextButtons;
 using MobileDiffusion.Models;
 
 namespace MobileDiffusion.ViewModels;
@@ -138,9 +137,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             Type = ToolType.PaintBrush,
             ContextButtons =
             [
-                new BrushSizeContextButtonViewModel(this),
-                new AlphaContextButtonViewModel(this),
-                new ColorPickerContextButtonViewModel(this)
+                ContextButtonType.BrushSize,
+                ContextButtonType.Alpha,
+                ContextButtonType.ColorPicker
             ]
         });
 
@@ -152,7 +151,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             Type = ToolType.Eraser,
             ContextButtons =
             [
-                new BrushSizeContextButtonViewModel(this)
+                ContextButtonType.BrushSize
             ]
         });
 
@@ -164,9 +163,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             Type = ToolType.PaintBucket,
             ContextButtons =
             [
-                new AlphaContextButtonViewModel(this),
-                new ColorPickerContextButtonViewModel(this),
-                new AddRemoveButtonViewModel(this)
+                ContextButtonType.Alpha,
+                ContextButtonType.ColorPicker,
+                ContextButtonType.AddRemove
             ]
         });
 
@@ -178,7 +177,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             Type = ToolType.BoundingBox,
             ContextButtons =
             [
-                new BoundingBoxSizeContextButtonViewModel(this)
+                ContextButtonType.BoundingBoxSize
             ]
         });
 
@@ -190,7 +189,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             Type = ToolType.Eyedropper,
             ContextButtons = 
             [
-                new ColorPickerContextButtonViewModel(this)
+                ContextButtonType.ColorPicker
             ]
         });
 
@@ -202,7 +201,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             Type = ToolType.Zoom,
             ContextButtons = 
             [
-                new ResetZoomContextButtonViewModel(this)
+                ContextButtonType.ResetZoom
             ]
         });
 
