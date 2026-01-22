@@ -1,5 +1,4 @@
 ﻿using MobileDiffusion.Enums;
-using MobileDiffusion.ViewModels.CanvasContextButtons;
 
 namespace MobileDiffusion.Interfaces.ViewModels;
 
@@ -15,5 +14,5 @@ public interface IPaintingToolViewModel : IBaseViewModel
 
     bool IsLoading { get; set; }
 
-    List<CanvasContextButtonViewModel> ContextButtons { get; set; }
+    List<ContextButtonType> ContextButtons { get; set; }
 }

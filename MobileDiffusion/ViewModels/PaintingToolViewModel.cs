@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using MobileDiffusion.Enums;
 using MobileDiffusion.Interfaces.ViewModels;
-using MobileDiffusion.ViewModels.CanvasContextButtons;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -23,5 +22,5 @@ public partial class PaintingToolViewModel : BaseViewModel, IPaintingToolViewMod
     public partial bool IsLoading { get; set; }
 
     [ObservableProperty]
-    public partial List<CanvasContextButtonViewModel> ContextButtons { get; set; }
+    public partial List<ContextButtonType> ContextButtons { get; set; }
 }
