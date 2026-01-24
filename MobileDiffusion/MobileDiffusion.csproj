@@ -112,7 +112,7 @@
 	  <PackageReference Include="Microsoft.Kiota.Serialization.Multipart" Version="1.16.0" />
 	  <PackageReference Include="Microsoft.Kiota.Serialization.Text" Version="1.16.0" />
 	  <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.23.2" />
-	  <PackageReference Include="Microsoft.ML.OnnxRuntime.Managed" Version="1.23.2" />
+	  <!-- <PackageReference Include="Microsoft.ML.OnnxRuntime.Managed" Version="1.23.2" /> -->
 	  <PackageReference Include="Mopups" Version="1.3.4" />
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 	  <PackageReference Include="SkiaSharp" Version="3.119.0" />
