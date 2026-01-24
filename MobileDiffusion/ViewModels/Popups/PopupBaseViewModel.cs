@@ -6,7 +6,7 @@ using MobileDiffusion.ViewModels;
 
 public partial class PopupBaseViewModel : BaseViewModel, IPopupBaseViewModel
 {
-    private readonly IPopupService _popupService;
+    protected readonly IPopupService _popupService;
 
     public PopupBaseViewModel(IPopupService popupService)
     {

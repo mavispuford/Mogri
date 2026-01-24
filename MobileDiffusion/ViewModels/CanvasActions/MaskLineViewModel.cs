@@ -20,6 +20,8 @@ public partial class MaskLineViewModel : CanvasActionViewModel
     [ObservableProperty]
     public partial Color Color { get; set; }
 
+    public float TouchScale { get; set; } = 1f;
+
     public List<SKPoint> Path { get; set; } = new();
     public MaskEffect MaskEffect { get; set; }
 
@@ -83,6 +85,7 @@ public partial class MaskLineViewModel : CanvasActionViewModel
             BrushSize = BrushSize,
             Color = Color,
             MaskEffect = MaskEffect,
+            TouchScale = TouchScale,
             Path = new List<SKPoint>(Path)
         };
     }

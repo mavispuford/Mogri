@@ -10,8 +10,9 @@ public interface IEditMaskItemViewModel
     Color DisplayColor { get; set; }
     Color ColorWithAlpha { get; set; }
     double Alpha { get; set; }
+    string Description { get; set; }
     CanvasActionViewModel CanvasAction { get; set; }
-    IAsyncRelayCommand ChangeColorCommand { get; }
+    IAsyncRelayCommand EditCommand { get; }
     IRelayCommand DeleteCommand { get; }
     IRelayCommand DuplicateCommand { get; }
     void InitWith(CanvasActionViewModel canvasAction, Action<IEditMaskItemViewModel> deleteAction, Action<IEditMaskItemViewModel> duplicateAction);

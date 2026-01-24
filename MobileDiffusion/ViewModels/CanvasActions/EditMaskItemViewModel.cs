@@ -29,6 +29,9 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
     [ObservableProperty]
     private Color _colorWithAlpha;
 
+    [ObservableProperty]
+    private string _description;
+
     public EditMaskItemViewModel(IPopupService popupService)
     {
         _popupService = popupService;
@@ -40,10 +43,10 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
         _duplicateAction = duplicateAction;
         CanvasAction = canvasAction;
 
-        Initialize();
+        initialize();
     }
 
-    private void Initialize()
+    private void initialize()
     {
         if (CanvasAction is MaskLineViewModel maskLine)
         {
@@ -58,34 +61,26 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
             Alpha = segMask.Alpha;
         }
 
-        UpdateColorWithAlpha();
+        updateDescription();
+        updateColorWithAlpha();
 
         if (CanvasAction != null)
         {
-            CanvasAction.PropertyChanged += Action_PropertyChanged;
+            CanvasAction.PropertyChanged += action_PropertyChanged;
         }
     }
 
     partial void OnAlphaChanged(double value)
     {
-        UpdateColorWithAlpha();
-        
-        if (CanvasAction is MaskLineViewModel maskLine)
-        {
-            maskLine.Alpha = (float)value;
-        }
-        else if (CanvasAction is SegmentationMaskViewModel segMask)
-        {
-            segMask.Alpha = (float)value;
-        }
+        updateColorWithAlpha();
     }
 
     partial void OnDisplayColorChanged(Color value)
     {
-        UpdateColorWithAlpha();
+        updateColorWithAlpha();
     }
 
-    private void UpdateColorWithAlpha()
+    private void updateColorWithAlpha()
     {
         if (DisplayColor != null)
         {
@@ -93,7 +88,7 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
         }
     }
 
-    private void Action_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void action_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (e.PropertyName == "Color")
         {
@@ -106,27 +101,34 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
                 DisplayColor = segMask.Color;
             }
         }
+        else if (e.PropertyName == "Alpha")
+        {
+             if (CanvasAction is MaskLineViewModel maskLine)
+            {
+                Alpha = maskLine.Alpha;
+            }
+            else if (CanvasAction is SegmentationMaskViewModel segMask)
+            {
+                Alpha = segMask.Alpha;  
+            }
+
+            updateDescription();
+        }
+        else if (e.PropertyName == "BrushSize")
+        {
+            updateDescription();
+        }
     }
 
     [RelayCommand]
-    private async Task ChangeColor()
+    private async Task EditAsync()
     {
-        if (_popupService == null) return;
-        
-        var current = DisplayColor;
         var parameters = new Dictionary<string, object>
         {
-            { NavigationParams.Color, current }
+            { "Action", CanvasAction }
         };
 
-        var result = await _popupService.ShowPopupForResultAsync("ColorPickerPopup", parameters);
-
-        if (result is Color newColor)
-        {
-            DisplayColor = newColor;
-            if (CanvasAction is MaskLineViewModel m) m.Color = newColor;
-            else if (CanvasAction is SegmentationMaskViewModel s) s.Color = newColor;
-        }
+        await _popupService.ShowPopupAsync("EditMaskItemPopup", parameters);
     }
 
     [RelayCommand]
@@ -139,5 +141,17 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
     private void Duplicate()
     {
         _duplicateAction?.Invoke(this);
+    }
+
+    private void updateDescription() 
+    {
+        if (CanvasAction is MaskLineViewModel maskLine)
+        {
+            Description = $"{maskLine.Alpha:P0}, Size {maskLine.BrushSize / (maskLine.TouchScale == 0 ? 1 : maskLine.TouchScale):F0}";
+        }
+        else if (CanvasAction is SegmentationMaskViewModel segMask)
+        {
+            Description = $"{segMask.Alpha:P0}";
+        }
     }
 }

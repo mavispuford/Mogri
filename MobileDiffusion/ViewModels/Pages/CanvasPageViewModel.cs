@@ -703,7 +703,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             var segmentationMask = new SegmentationMaskViewModel
             {
                 CanvasActionType = CanvasActionType.Mask,
-                Color = CurrentColor.WithAlpha((float)CurrentAlpha),
+                Color = CurrentColor,
                 Alpha = (float)CurrentAlpha,
                 Bitmap = maskBitmap
             };

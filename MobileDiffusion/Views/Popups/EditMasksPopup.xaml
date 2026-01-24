@@ -30,7 +30,7 @@
                         <ImageButton.Source>
                             <FontImageSource Glyph="&#xe16c;" 
                                              FontFamily="MaterialIconsRound300"
-                                             Size="30"
+                                             Size="40"
                                              Color="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
                         </ImageButton.Source>
                     </ImageButton>
@@ -43,48 +43,56 @@
                     </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="viewModels:IEditMaskItemViewModel">
-                            <Grid ColumnDefinitions="Auto, Auto, *, Auto, Auto, Auto, Auto" 
+                            <Grid ColumnDefinitions="Auto, Auto, *, Auto, Auto, Auto" 
                                   Padding="0,5" 
-                                  ColumnSpacing="5">
+                                  ColumnSpacing="10">
                                 
-                                <Label Text="{Binding Icon}" 
+                                <Label Grid.Column="0"
+                                       Text="{Binding Icon}" 
                                        FontFamily="MaterialIconsRound400" 
                                        FontSize="24" 
                                        VerticalOptions="Center"
                                        TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"/>
                                 
                                 <Border Grid.Column="1"
-                                        StrokeShape="RoundRectangle 15"
-                                        StrokeThickness=".5"
-                                        Stroke="{StaticResource IndependenceAccentSixtyPercent}"
-                                        HeightRequest="30"
-                                        WidthRequest="30"
-                                        VerticalOptions="Center">
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding ChangeColorCommand}" />
-                                    </Border.GestureRecognizers>
-                                    <BoxView Color="{Binding DisplayColor}" />
+                                       WidthRequest="40"
+                                       HeightRequest="40" 
+                                       VerticalOptions="Center"
+                                       BackgroundColor="White"
+                                       StrokeShape="RoundRectangle 10"
+                                       Stroke="Transparent">
+                                    <Image WidthRequest="32" 
+                                           Opacity="{Binding Alpha}"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center">
+                                        <Image.Source>
+                                            <FontImageSource Glyph="&#xe91c;" FontFamily="MaterialIconsRound400" Size="32" Color="{Binding DisplayColor}" />
+                                        </Image.Source>
+                                    </Image>
                                 </Border>
 
-                                <Slider Grid.Column="2" 
-                                        Minimum="0.01" 
-                                        Maximum="1.0" 
-                                        Value="{Binding Alpha}" 
-                                        VerticalOptions="Center" />
+                                <Label Grid.Column="2" 
+                                       Text="{Binding Description}"
+                                       VerticalOptions="Center"
+                                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+                                       FontSize="14" />
 
-                                <Image Grid.Column="3" WidthRequest="32" Opacity="{Binding Alpha}">
-                                    <Image.Source>
-                                        <FontImageSource Glyph="&#xe91c;" FontFamily="MaterialIconsRound400" Size="32" Color="{Binding DisplayColor}" />
-                                    </Image.Source>
-                                </Image>
+                                <ImageButton Grid.Column="3"
+                                             Command="{Binding EditCommand}"
+                                             VerticalOptions="Center"
+                                             HorizontalOptions="End"
+                                             BackgroundColor="Transparent"
+                                             HeightRequest="40"
+                                             WidthRequest="40">
+                                    <ImageButton.Source>
+                                        <FontImageSource Glyph="&#xe3c9;"
+                                                         FontFamily="MaterialIconsRound400"
+                                                         Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary075}}"
+                                                         Size="24"/>
+                                    </ImageButton.Source>
+                                </ImageButton>
 
-                                <Label Grid.Column="4"
-                                    FontSize="12"
-                                    FontAttributes="Bold"
-                                       Text="{Binding Alpha, StringFormat='{0:F2}'}"
-                                       VerticalTextAlignment="Center" />
-
-                                <ImageButton Grid.Column="5"
+                                <ImageButton Grid.Column="4"
                                              Command="{Binding DuplicateCommand}"
                                              VerticalOptions="Center"
                                              HorizontalOptions="End"
@@ -99,7 +107,7 @@
                                     </ImageButton.Source>
                                 </ImageButton>
 
-                                <ImageButton Grid.Column="6"
+                                <ImageButton Grid.Column="5"
                                              Command="{Binding DeleteCommand}"
                                              VerticalOptions="Center"
                                              HorizontalOptions="End"
@@ -109,7 +117,7 @@
                                     <ImageButton.Source>
                                         <FontImageSource Glyph="&#xe872;"
                                                          FontFamily="MaterialIconsRound400"
-                                                         Color="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+                                                         Color="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Secondary}}"
                                                          Size="24"/>
                                     </ImageButton.Source>
                                 </ImageButton>
@@ -120,8 +128,7 @@
 
                 <Button Grid.Row="2"
                         Text="Close"
-                        Clicked="OnCloseClicked"
-                        Style="{StaticResource PrimaryActionButton}" />
+                        Clicked="OnCloseClicked" />
             </Grid>
         </Border>
     
