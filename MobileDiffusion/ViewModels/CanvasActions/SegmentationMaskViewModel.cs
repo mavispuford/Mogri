@@ -59,6 +59,18 @@ public partial class SegmentationMaskViewModel : CanvasActionViewModel
         }
     }
 
+    public override CanvasActionViewModel Clone()
+    {
+        return new SegmentationMaskViewModel
+        {
+            CanvasActionType = CanvasActionType,
+            Order = Order,
+            Color = Color,
+            Alpha = Alpha,
+            Bitmap = Bitmap?.Copy()
+        };
+    }
+
     partial void OnColorChanged(Color value)
     {
         if (value != null)

@@ -43,7 +43,7 @@
                     </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="viewModels:IEditMaskItemViewModel">
-                            <Grid ColumnDefinitions="Auto, Auto, *, Auto, Auto, Auto" 
+                            <Grid ColumnDefinitions="Auto, Auto, *, Auto, Auto, Auto, Auto" 
                                   Padding="0,5" 
                                   ColumnSpacing="5">
                                 
@@ -79,10 +79,27 @@
                                 </Image>
 
                                 <Label Grid.Column="4"
+                                    FontSize="12"
+                                    FontAttributes="Bold"
                                        Text="{Binding Alpha, StringFormat='{0:F2}'}"
                                        VerticalTextAlignment="Center" />
 
                                 <ImageButton Grid.Column="5"
+                                             Command="{Binding DuplicateCommand}"
+                                             VerticalOptions="Center"
+                                             HorizontalOptions="End"
+                                             BackgroundColor="Transparent"
+                                             HeightRequest="40"
+                                             WidthRequest="40">
+                                    <ImageButton.Source>
+                                        <FontImageSource Glyph="&#xe14d;"
+                                                         FontFamily="MaterialIconsRound400"
+                                                         Color="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+                                                         Size="24"/>
+                                    </ImageButton.Source>
+                                </ImageButton>
+
+                                <ImageButton Grid.Column="6"
                                              Command="{Binding DeleteCommand}"
                                              VerticalOptions="Center"
                                              HorizontalOptions="End"

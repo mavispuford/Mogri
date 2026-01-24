@@ -73,6 +73,20 @@ public partial class MaskLineViewModel : CanvasActionViewModel
         canvas.DrawPath(path, paint);
     }
 
+    public override CanvasActionViewModel Clone()
+    {
+        return new MaskLineViewModel
+        {
+            CanvasActionType = CanvasActionType,
+            Order = Order,
+            Alpha = Alpha,
+            BrushSize = BrushSize,
+            Color = Color,
+            MaskEffect = MaskEffect,
+            Path = new List<SKPoint>(Path)
+        };
+    }
+
     partial void OnAlphaChanged(float value)
     {
         updateShader();

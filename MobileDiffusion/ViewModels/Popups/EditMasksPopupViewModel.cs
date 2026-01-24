@@ -45,8 +45,29 @@ public partial class EditMasksPopupViewModel : PopupBaseViewModel, IEditMasksPop
         foreach (var action in filtered)
         {
             var item = _serviceProvider.GetRequiredService<IEditMaskItemViewModel>();
-            item.InitWith(action, OnDeleteItem);
+            item.InitWith(action, OnDeleteItem, OnDuplicateItem);
             Items.Add(item);
+        }
+    }
+
+    private void OnDuplicateItem(IEditMaskItemViewModel item)
+    {
+        if (item.CanvasAction == null || _sourceActions == null) return;
+
+        var index = _sourceActions.IndexOf(item.CanvasAction);
+        if (index >= 0)
+        {
+            var result = item.CanvasAction.Clone();
+            _sourceActions.Insert(index + 1, result);
+
+            var newItem = _serviceProvider.GetRequiredService<IEditMaskItemViewModel>();
+            newItem.InitWith(result, OnDeleteItem, OnDuplicateItem);
+
+            var itemIndex = Items.IndexOf(item);
+            if (itemIndex >= 0)
+            {
+                Items.Insert(itemIndex, newItem);
+            }
         }
     }
 

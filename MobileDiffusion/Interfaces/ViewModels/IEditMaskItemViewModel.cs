@@ -13,5 +13,6 @@ public interface IEditMaskItemViewModel
     CanvasActionViewModel CanvasAction { get; set; }
     IAsyncRelayCommand ChangeColorCommand { get; }
     IRelayCommand DeleteCommand { get; }
-    void InitWith(CanvasActionViewModel canvasAction, Action<IEditMaskItemViewModel> deleteAction);
+    IRelayCommand DuplicateCommand { get; }
+    void InitWith(CanvasActionViewModel canvasAction, Action<IEditMaskItemViewModel> deleteAction, Action<IEditMaskItemViewModel> duplicateAction);
 }

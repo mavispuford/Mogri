@@ -12,6 +12,7 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
 {
     private readonly IPopupService _popupService;
     private Action<IEditMaskItemViewModel> _deleteAction;
+    private Action<IEditMaskItemViewModel> _duplicateAction;
 
     [ObservableProperty]
     private CanvasActionViewModel _canvasAction;
@@ -33,9 +34,10 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
         _popupService = popupService;
     }
 
-    public void InitWith(CanvasActionViewModel canvasAction, Action<IEditMaskItemViewModel> deleteAction)
+    public void InitWith(CanvasActionViewModel canvasAction, Action<IEditMaskItemViewModel> deleteAction, Action<IEditMaskItemViewModel> duplicateAction)
     {
         _deleteAction = deleteAction;
+        _duplicateAction = duplicateAction;
         CanvasAction = canvasAction;
 
         Initialize();
@@ -131,5 +133,11 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
     private void Delete()
     {
         _deleteAction?.Invoke(this);
+    }
+
+    [RelayCommand]
+    private void Duplicate()
+    {
+        _duplicateAction?.Invoke(this);
     }
 }
