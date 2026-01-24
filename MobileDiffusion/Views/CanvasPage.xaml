@@ -65,7 +65,7 @@
         </ToolbarItem>
         <ToolbarItem Text="Edit Masks" Order="Primary" Command="{Binding EditMasksCommand}">
             <ToolbarItem.IconImageSource>
-                <FontImageSource Glyph="&#xf7f8;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
+                <FontImageSource Glyph="&#xe155;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
         <ToolbarItem Text="{Binding ShowMaskLayer, Converter={StaticResource BoolToShowMaskTextConverter}}" 

@@ -44,7 +44,7 @@
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="viewModels:IEditMaskItemViewModel">
                             <Grid ColumnDefinitions="Auto, Auto, *, Auto, Auto, Auto" 
-                                  Padding="10,5" 
+                                  Padding="0,5" 
                                   ColumnSpacing="5">
                                 
                                 <Label Text="{Binding Icon}" 
