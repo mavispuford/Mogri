@@ -10,7 +10,7 @@ This .NET MAUI application follows the MVVM pattern. It consists mainly of these
 - There is some codebehind code, focused only on view-specific logic (animations, canvas drawing, etc.)
 - `Views` should never contain business logic
 - `Views` should avoid using `Event Handlers` if possible (bind to `Commands` instead)
-- `Views` should always use `x:DataType` (compiled bindings)
+- `Views` should always use `x:DataType` (compiled bindings) that point to the `Interface` of the view model, not the implementation
 - **Controls**: Reusable UI components (like `ToolControl`) live in the `Controls` namespace. They inherit from `ContentView`, use `BindableProperty` for data input, and generally do not have their own ViewModels.
 - **Behaviors**: Complex view interactions (especially animations) are handled via Behaviors (e.g., `CustomAnimationBehavior`) to keep view logic declarative and reusable.
 
@@ -20,7 +20,9 @@ This .NET MAUI application follows the MVVM pattern. It consists mainly of these
 - The aim is not to contain business logic, but to bind Commands and other properties to the view, and to call the `Services` that actually perform the business logic
 - The View Model is also supposed to handle `Exceptions` thrown from the `Services`, and display them in a user friendly way
 - For example, the user taps a `Save` button, which executes a `SaveCommand`, which calls a `Save()` medthod on the `View Model`, which calls a `SaveAsync()` method on some `Service`.  The `Service` either succeeds (and returns relevant data to the `ViewModel` class) or throws an exception, which the `View Model` handles in some way (calling a service to display an alert to the user, show/hide a loading spinner, etc.)
-- ViewModels inherit from `BaseViewModel` and `ObservableObject`, leveraging CommunityToolkit source generators (e.g., `[ObservableProperty]`, `[RelayCommand]`) to reduce boilerplate.
+- All ViewModels inherit from `BaseViewModel` and `ObservableObject`, leveraging CommunityToolkit source generators (e.g., `[ObservableProperty]`, `[RelayCommand]`) to reduce boilerplate. More specific view models extend other classes as a base. For example,
+  - Page view models always extend `PageViewModel`
+  - Popup view models always extend `PopupBaseViewModel`
 - `View Models` handle navigation between pages and showing/hiding alerts, action sheets, popups, etc.
 - `ViewModel` classes should never contain view/business logic
 
@@ -45,8 +47,37 @@ This .NET MAUI application follows the MVVM pattern. It consists mainly of these
 
 ### Registrations
 - The `Registrations` folder contains registration classes for Popups, Services, View Models, and Views
+- The registrations tie the `Interfaces` to their `Implementations`
 - The application currently uses Microsoft's dependency container
 - Registrations are implemented as extension methods on `MauiAppBuilder` (e.g., `.RegisterServices()`) to keep `MauiProgram.cs` clean and organized.
+
+### Dependency Injection
+- Classes that require things from the dependency container should inject them in their constructor.
+- In cases where several instances of a class are required (building up a list, etc.), get them out of the service provider (followed by the `InitWith` pattern) like this:
+
+```csharp
+foreach (var item in items) 
+{
+    // Always pull the interface out of the container
+    var viewModel = _serviceProvider.GetService<IExampleViewModel>();
+
+    viewModel.InitWith(item);
+}
+```
+
+- Example of async variant:
+
+```csharp
+foreach (var item in items) 
+{
+    // Always pull the interface out of the container
+    var viewModel = _serviceProvider.GetService<IExampleViewModel>();
+
+    await viewModel.InitWithAsync(item);
+}
+```
+
+- The above pattern allows async work to happen if necessary, since it is bad practice to do it in the constructor.
 
 ### OpenAPI Specs
 - The `OpenApiSpecs` folder contains OpenAPI specifications for the APIs that the app targets (for example, the `SdForgeNeo` folder has the openapi specs for SD Forge Neo)

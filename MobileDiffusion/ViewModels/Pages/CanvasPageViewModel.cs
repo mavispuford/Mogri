@@ -799,6 +799,23 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     }
 
     [RelayCommand]
+    private async Task EditMasks()
+    {
+        try
+        {
+             var parameters = new Dictionary<string, object> {
+                { "Actions", CanvasActions }
+            };
+
+            await _popupService.ShowPopupAsync("EditMasksPopup", parameters);
+        }
+        catch (Exception ex)
+        {
+             await _popupService.DisplayAlertAsync("Error", $"Unable to open edit masks popup: {ex.Message}", "OK");
+        }
+    }
+
+    [RelayCommand]
     private async Task ShowColorPicker()
     {
         try
