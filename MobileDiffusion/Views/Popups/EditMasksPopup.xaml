@@ -43,9 +43,9 @@
                     </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="viewModels:IEditMaskItemViewModel">
-                            <Grid ColumnDefinitions="Auto, Auto, *, Auto" 
+                            <Grid ColumnDefinitions="Auto, Auto, *, Auto, Auto, Auto" 
                                   Padding="10,5" 
-                                  ColumnSpacing="15">
+                                  ColumnSpacing="5">
                                 
                                 <Label Text="{Binding Icon}" 
                                        FontFamily="MaterialIconsRound400" 
@@ -55,8 +55,8 @@
                                 
                                 <Border Grid.Column="1"
                                         StrokeShape="RoundRectangle 15"
-                                        StrokeThickness="1"
-                                        Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}"
+                                        StrokeThickness=".5"
+                                        Stroke="{StaticResource IndependenceAccentSixtyPercent}"
                                         HeightRequest="30"
                                         WidthRequest="30"
                                         VerticalOptions="Center">
@@ -66,9 +66,23 @@
                                     <BoxView Color="{Binding DisplayColor}" />
                                 </Border>
 
-                                <!-- Insert Entry here that represents the color's opacity value. -->
+                                <Slider Grid.Column="2" 
+                                        Minimum="0.01" 
+                                        Maximum="1.0" 
+                                        Value="{Binding Alpha}" 
+                                        VerticalOptions="Center" />
 
-                                <ImageButton Grid.Column="3"
+                                <Image Grid.Column="3" WidthRequest="32" Opacity="{Binding Alpha}">
+                                    <Image.Source>
+                                        <FontImageSource Glyph="&#xe91c;" FontFamily="MaterialIconsRound400" Size="32" Color="{Binding DisplayColor}" />
+                                    </Image.Source>
+                                </Image>
+
+                                <Label Grid.Column="4"
+                                       Text="{Binding Alpha, StringFormat='{0:F2}'}"
+                                       VerticalTextAlignment="Center" />
+
+                                <ImageButton Grid.Column="5"
                                              Command="{Binding DeleteCommand}"
                                              VerticalOptions="Center"
                                              HorizontalOptions="End"

@@ -69,6 +69,8 @@ public partial class EditMasksPopupViewModel : PopupBaseViewModel, IEditMasksPop
 
             _sourceActions.Clear();
             Items.Clear();
+
+            await ClosePopupAsync();
         }
     }
 }

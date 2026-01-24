@@ -73,17 +73,29 @@ public partial class MaskLineViewModel : CanvasActionViewModel
         canvas.DrawPath(path, paint);
     }
 
+    partial void OnAlphaChanged(float value)
+    {
+        updateShader();
+    }
+
     partial void OnColorChanged(Color value)
     {
-        if (value != null)
+        updateShader();
+    }
+
+    private void updateShader()
+    {
+        if (Color == null || Alpha < 0 || Alpha > 1)
         {
-            _paintColor = new SKColor(
-                value.GetByteRed(),
-                value.GetByteGreen(),
-                value.GetByteBlue(),
+            return;
+        }
+
+        _paintColor = new SKColor(
+                Color.GetByteRed(),
+                Color.GetByteGreen(),
+                Color.GetByteBlue(),
                 Convert.ToByte((int)Math.Max(1, Alpha * 255)));
 
-            _bitmapShader = MaskHelper.CreateMaskBitmapShaderLines(_paintColor);
-        }
+        _bitmapShader = MaskHelper.CreateMaskBitmapShaderLines(_paintColor);
     }
 }

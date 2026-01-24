@@ -22,6 +22,12 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
     [ObservableProperty]
     private Color _displayColor;
 
+    [ObservableProperty]
+    private double _alpha;
+
+    [ObservableProperty]
+    private Color _colorWithAlpha;
+
     public EditMaskItemViewModel(IPopupService popupService)
     {
         _popupService = popupService;
@@ -41,16 +47,47 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
         {
             Icon = "\ue3ae"; // Brush
             DisplayColor = maskLine.Color;
+            Alpha = maskLine.Alpha;
         }
         else if (CanvasAction is SegmentationMaskViewModel segMask)
         {
             Icon = "\ue997"; // Paint Bucket
             DisplayColor = segMask.Color;
+            Alpha = segMask.Alpha;
         }
+
+        UpdateColorWithAlpha();
 
         if (CanvasAction != null)
         {
             CanvasAction.PropertyChanged += Action_PropertyChanged;
+        }
+    }
+
+    partial void OnAlphaChanged(double value)
+    {
+        UpdateColorWithAlpha();
+        
+        if (CanvasAction is MaskLineViewModel maskLine)
+        {
+            maskLine.Alpha = (float)value;
+        }
+        else if (CanvasAction is SegmentationMaskViewModel segMask)
+        {
+            segMask.Alpha = (float)value;
+        }
+    }
+
+    partial void OnDisplayColorChanged(Color value)
+    {
+        UpdateColorWithAlpha();
+    }
+
+    private void UpdateColorWithAlpha()
+    {
+        if (DisplayColor != null)
+        {
+            ColorWithAlpha = DisplayColor.WithAlpha((float)Alpha);
         }
     }
 
