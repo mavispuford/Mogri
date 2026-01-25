@@ -19,13 +19,13 @@
                 <Setter Property="HorizontalOptions" Value="Center" />
                 <Setter Property="VerticalOptions" Value="Center" />
             </Style>
-            <toolkit:BoolToObjectConverter x:Key="BoolToShowMaskTextConverter" TrueObject="Hide Mask Layer" FalseObject="Show Mask Layer" />
+            <toolkit:BoolToObjectConverter x:Key="BoolToShowMaskTextConverter" TrueObject="Hide Masks" FalseObject="Show Masks" />
             <toolkit:BoolToObjectConverter x:Key="BoolToEyeConverter">
                 <toolkit:BoolToObjectConverter.TrueObject>
-                    <FontImageSource Glyph="&#xe8f5;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
+                    <FontImageSource Glyph="&#xe8f4;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
                 </toolkit:BoolToObjectConverter.TrueObject>
                 <toolkit:BoolToObjectConverter.FalseObject>
-                    <FontImageSource Glyph="&#xe8f4;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
+                    <FontImageSource Glyph="&#xe8f5;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
                 </toolkit:BoolToObjectConverter.FalseObject>
             </toolkit:BoolToObjectConverter>
             <toolkit:BoolToObjectConverter x:Key="BoolToPlusMinusConverter">
@@ -63,18 +63,18 @@
                 <FontImageSource Glyph="&#xe166;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
-        <ToolbarItem Text="Save" Command="{Binding SaveCommand}" Order="Primary">
+        <ToolbarItem Text="Edit Masks" Order="Primary" Command="{Binding EditMasksCommand}">
             <ToolbarItem.IconImageSource>
-                <FontImageSource Glyph="&#xe161;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
+                <FontImageSource Glyph="&#xe155;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
         <ToolbarItem Text="{Binding ShowMaskLayer, Converter={StaticResource BoolToShowMaskTextConverter}}" 
                      IconImageSource="{Binding ShowMaskLayer, Converter={StaticResource BoolToEyeConverter}}"
                      Command="{Binding ToggleMaskLayerVisibilityCommand}" 
                      Order="Primary" />
-        <ToolbarItem Text="Clear Masks" Command="{Binding ClearCommand}" Order="Secondary">
+        <ToolbarItem Text="Save" Command="{Binding SaveCommand}" Order="Secondary">
             <ToolbarItem.IconImageSource>
-                <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
+                <FontImageSource Glyph="&#xe161;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
         <ToolbarItem Text="Set Image" Command="{Binding ShowMediaPickerCommand}" Order="Secondary">
@@ -496,8 +496,8 @@
                         AlignItems="Center"
                         JustifyContent="SpaceEvenly"
                         IsVisible="{Binding CurrentTool.Type, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:ToolType.PaintBucket}}">
-                <Button Text="Apply Paint" BackgroundColor="{StaticResource IndependenceAccentTwentyPercent}" TextColor="{StaticResource Primary}" BorderColor="Transparent" BorderWidth="1" Command="{Binding ApplySegmentationMaskCommand}" FontAttributes="Bold"/>
-                <Button Text="Clear Selection" BackgroundColor="{StaticResource IndependenceAccentTwentyPercent}" TextColor="{StaticResource Primary}" BorderColor="Transparent" BorderWidth="1" Command="{Binding ClearSegmentationMaskCommand}" FontAttributes="Bold"/>
+                <Button Text="Apply Paint" Command="{Binding ApplySegmentationMaskCommand}" FontAttributes="Bold"/>
+                <Button Text="Clear Selection" BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark=Transparent}" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark=White}" BorderColor="{AppThemeBinding Light=Transparent, Dark={StaticResource IndependenceAccentFortyPercent}}" BorderWidth="1" Command="{Binding ClearSegmentationMaskCommand}" FontAttributes="Bold"/>
             </FlexLayout>
 
             <Border x:Name="ShowActionsButton"

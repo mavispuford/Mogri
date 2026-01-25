@@ -11,4 +11,8 @@ public interface IPopupBaseViewModel : IQueryAttributable, IBaseViewModel
     Task OnNavigatedToAsync();
 
     void OnBackButtonPressed();
+
+    double ContentOpacity { get; }
+
+    Color PopupBackgroundColor { get; }
 }

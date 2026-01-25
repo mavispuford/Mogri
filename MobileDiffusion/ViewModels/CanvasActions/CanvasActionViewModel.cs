@@ -10,4 +10,6 @@ public abstract class CanvasActionViewModel : BaseViewModel
     public int Order { get; set; }
 
     public abstract void Execute(SKCanvas canvas, SKImageInfo imageInfo, bool isSaving);
+
+    public abstract CanvasActionViewModel Clone();
 }

@@ -703,7 +703,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             var segmentationMask = new SegmentationMaskViewModel
             {
                 CanvasActionType = CanvasActionType.Mask,
-                Color = CurrentColor.WithAlpha((float)CurrentAlpha),
+                Color = CurrentColor,
                 Alpha = (float)CurrentAlpha,
                 Bitmap = maskBitmap
             };
@@ -795,6 +795,23 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             await stream.DisposeAsync();
 
             IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task EditMasks()
+    {
+        try
+        {
+             var parameters = new Dictionary<string, object> {
+                { "Actions", CanvasActions }
+            };
+
+            await _popupService.ShowPopupAsync("EditMasksPopup", parameters);
+        }
+        catch (Exception ex)
+        {
+             await _popupService.DisplayAlertAsync("Error", $"Unable to open edit masks popup: {ex.Message}", "OK");
         }
     }
 
