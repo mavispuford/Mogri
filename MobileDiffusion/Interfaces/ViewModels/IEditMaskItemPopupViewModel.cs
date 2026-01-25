@@ -11,6 +11,7 @@ public interface IEditMaskItemPopupViewModel : IPopupBaseViewModel
     float Alpha { get; set; }
     Color DisplayColor { get; set; }
     bool IsBrush { get; set; }
+    bool IsColorVisible { get; }
 
     IRelayCommand DragStartedCommand { get; }
     IRelayCommand DragCompletedCommand { get; }

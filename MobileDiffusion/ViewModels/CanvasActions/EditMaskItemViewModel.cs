@@ -21,6 +21,9 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
     private string _icon;
 
     [ObservableProperty]
+    private bool _isColorVisible;
+
+    [ObservableProperty]
     private Color _displayColor;
 
     [ObservableProperty]
@@ -50,13 +53,25 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
     {
         if (CanvasAction is MaskLineViewModel maskLine)
         {
-            Icon = "\ue3ae"; // Brush
-            DisplayColor = maskLine.Color;
-            Alpha = maskLine.Alpha;
+            if (maskLine.MaskEffect == MaskEffect.Erase)
+            {
+                Icon = "\ue6d0"; // Erase
+                IsColorVisible = false;
+                DisplayColor = Colors.Transparent; // Or generic color since not visible
+                Alpha = 1.0; 
+            }
+            else
+            {
+                Icon = "\ue3ae"; // Brush
+                IsColorVisible = true;
+                DisplayColor = maskLine.Color;
+                Alpha = maskLine.Alpha;
+            }
         }
         else if (CanvasAction is SegmentationMaskViewModel segMask)
         {
             Icon = "\ue997"; // Paint Bucket
+            IsColorVisible = true;
             DisplayColor = segMask.Color;
             Alpha = segMask.Alpha;
         }
@@ -147,7 +162,14 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
     {
         if (CanvasAction is MaskLineViewModel maskLine)
         {
-            Description = $"{maskLine.Alpha:P0}, Size {maskLine.BrushSize / (maskLine.TouchScale == 0 ? 1 : maskLine.TouchScale):F0}";
+            if (maskLine.MaskEffect == MaskEffect.Erase)
+            {
+                Description = $"Size {maskLine.BrushSize / (maskLine.TouchScale == 0 ? 1 : maskLine.TouchScale):F0}";
+            }
+            else
+            {
+                Description = $"{maskLine.Alpha:P0}, Size {maskLine.BrushSize / (maskLine.TouchScale == 0 ? 1 : maskLine.TouchScale):F0}";
+            }
         }
         else if (CanvasAction is SegmentationMaskViewModel segMask)
         {

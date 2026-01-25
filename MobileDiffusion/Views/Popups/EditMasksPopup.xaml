@@ -44,7 +44,7 @@
                     </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="viewModels:IEditMaskItemViewModel">
-                            <Grid ColumnDefinitions="Auto, Auto, *, Auto, Auto, Auto" 
+                            <Grid ColumnDefinitions="Auto, 40, *, Auto, Auto, Auto" 
                                   Padding="0,5" 
                                   ColumnSpacing="10">
                                 
@@ -61,7 +61,8 @@
                                        VerticalOptions="Center"
                                        BackgroundColor="White"
                                        StrokeShape="RoundRectangle 10"
-                                       Stroke="Transparent">
+                                       Stroke="Transparent"
+                                       IsVisible="{Binding IsColorVisible}">
                                     <Image WidthRequest="32" 
                                            Opacity="{Binding Alpha}"
                                            HorizontalOptions="Center"

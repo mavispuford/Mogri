@@ -15,6 +15,9 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
     private bool _isBrush;
 
     [ObservableProperty]
+    private bool _isColorVisible;
+
+    [ObservableProperty]
     private double _brushSize;
 
     [ObservableProperty]
@@ -73,10 +76,11 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
     {
         _action = action;
         
-        IsBrush = _action is MaskLineViewModel;
-
         if (_action is MaskLineViewModel line)
         {
+            IsBrush = true;
+            IsColorVisible = line.MaskEffect != Enums.MaskEffect.Erase;
+
             var scale = (line.TouchScale <= 0) ? 1 : line.TouchScale;
             BrushSize = line.BrushSize / scale;
             Alpha = line.Alpha;
@@ -84,6 +88,8 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
         }
         else if (_action is SegmentationMaskViewModel seg)
         {
+            IsBrush = false;
+            IsColorVisible = true;
             Alpha = seg.Alpha;
             DisplayColor = seg.Color;
             BrushSize = 0; 
