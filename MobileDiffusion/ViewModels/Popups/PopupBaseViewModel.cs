@@ -1,16 +1,34 @@
 ﻿#nullable enable
 
+using CommunityToolkit.Mvvm.ComponentModel;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.ViewModels;
 
+namespace MobileDiffusion.ViewModels;
+
 public partial class PopupBaseViewModel : BaseViewModel, IPopupBaseViewModel
 {
-    private readonly IPopupService _popupService;
+    protected readonly IPopupService _popupService;
+
+    [ObservableProperty]
+    private double _contentOpacity = 1.0;
+
+    [ObservableProperty]
+    private Color _popupBackgroundColor;
 
     public PopupBaseViewModel(IPopupService popupService)
     {
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
+
+        if (Application.Current?.Resources != null && Application.Current.Resources.TryGetValue("BlackSeventyThreePercent", out var bgColor))
+        {
+            PopupBackgroundColor = (Color)bgColor;
+        }
+        else
+        {
+            PopupBackgroundColor = Color.FromArgb("BB000000");
+        }
     }
 
     public virtual void ApplyQueryAttributes(IDictionary<string, object> query)

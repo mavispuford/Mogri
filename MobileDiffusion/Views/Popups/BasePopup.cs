@@ -28,6 +28,8 @@ public class BasePopup : PopupPage
                 StatusBarStyle = StatusBarStyle.LightContent
             });
         }
+
+        this.SetBinding(BackgroundColorProperty, nameof(IPopupBaseViewModel.PopupBackgroundColor));
     }
 
     protected override async void OnAppearing()

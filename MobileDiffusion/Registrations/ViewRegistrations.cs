@@ -7,40 +7,31 @@ public static class ViewRegistrations
 {
     public static MauiAppBuilder RegisterViews(this MauiAppBuilder builder)
     {
-        registerPage<IMainPageViewModel, MainPage>(builder.Services);
-        registerPage<IPromptSettingsPageViewModel, PromptSettingsPage>(builder.Services);
-        registerPage<IImageToImageSettingsPageViewModel, ImageToImageSettingsPage>(builder.Services);
-        registerPage<ICanvasPageViewModel, CanvasPage>(builder.Services);
-        registerPage<IAppSettingsPageViewModel, AppSettingsPage>(builder.Services);
-        registerPage<IPromptPageViewModel, PromptPage>(builder.Services);
-        registerPage<IPromptStyleSelectionPageViewModel, PromptStyleSelectionPage>(builder.Services);
-        registerPage<IHistoryPageViewModel, HistoryPage>(builder.Services);
-        registerPage<ILoraSelectionPageViewModel, LoraSelectionPage>(builder.Services);
+        registerPage<IMainPageViewModel, MainPage>(builder.Services, () => new MainPage());
+        registerPage<IPromptSettingsPageViewModel, PromptSettingsPage>(builder.Services, () => new PromptSettingsPage());
+        registerPage<IImageToImageSettingsPageViewModel, ImageToImageSettingsPage>(builder.Services, () => new ImageToImageSettingsPage());
+        registerPage<ICanvasPageViewModel, CanvasPage>(builder.Services, () => new CanvasPage());
+        registerPage<IAppSettingsPageViewModel, AppSettingsPage>(builder.Services, () => new AppSettingsPage());
+        registerPage<IPromptPageViewModel, PromptPage>(builder.Services, () => new PromptPage());
+        registerPage<IPromptStyleSelectionPageViewModel, PromptStyleSelectionPage>(builder.Services, () => new PromptStyleSelectionPage());
+        registerPage<IHistoryPageViewModel, HistoryPage>(builder.Services, () => new HistoryPage());
+        registerPage<ILoraSelectionPageViewModel, LoraSelectionPage>(builder.Services, () => new LoraSelectionPage());
 
         return builder;
     }
 
-    private static void registerPage<TViewModel, TPage>(IServiceCollection serviceCollection)
+    private static void registerPage<TViewModel, TPage>(IServiceCollection serviceCollection, Func<TPage> factory)
         where TViewModel : IPageViewModel
         where TPage : BasePage
     {
         Routing.RegisterRoute(typeof(TPage).Name, typeof(TPage));
 
-        serviceCollection.AddTransient(provider =>
+        serviceCollection.AddTransient<TPage>(provider =>
         {
-            var page = Activator.CreateInstance(typeof(TPage)) as TPage;
+            var page = factory();
 
-            if (page == null)
-            {
-                throw new InvalidOperationException($"Unable to create a page of type {typeof(TPage)}");
-            }
-
-            var viewModel = provider.GetService<TViewModel>();
-
-            if (viewModel == null)
-            {
-                throw new InvalidOperationException($"Unable to create a viewmodel of type {typeof(TViewModel)}");
-            }
+            var viewModel = provider.GetService<TViewModel>()
+                ?? throw new InvalidOperationException($"Unable to create a viewmodel of type {typeof(TViewModel)}");
 
             page.BindingContext = viewModel;
 

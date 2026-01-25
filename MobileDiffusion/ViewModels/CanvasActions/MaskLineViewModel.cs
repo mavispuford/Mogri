@@ -20,6 +20,8 @@ public partial class MaskLineViewModel : CanvasActionViewModel
     [ObservableProperty]
     public partial Color Color { get; set; }
 
+    public float TouchScale { get; set; } = 1f;
+
     public List<SKPoint> Path { get; set; } = new();
     public MaskEffect MaskEffect { get; set; }
 
@@ -73,17 +75,44 @@ public partial class MaskLineViewModel : CanvasActionViewModel
         canvas.DrawPath(path, paint);
     }
 
+    public override CanvasActionViewModel Clone()
+    {
+        return new MaskLineViewModel
+        {
+            CanvasActionType = CanvasActionType,
+            Order = Order,
+            Alpha = Alpha,
+            BrushSize = BrushSize,
+            Color = Color,
+            MaskEffect = MaskEffect,
+            TouchScale = TouchScale,
+            Path = new List<SKPoint>(Path)
+        };
+    }
+
+    partial void OnAlphaChanged(float value)
+    {
+        updateShader();
+    }
+
     partial void OnColorChanged(Color value)
     {
-        if (value != null)
+        updateShader();
+    }
+
+    private void updateShader()
+    {
+        if (Color == null || Alpha < 0 || Alpha > 1)
         {
-            _paintColor = new SKColor(
-                value.GetByteRed(),
-                value.GetByteGreen(),
-                value.GetByteBlue(),
+            return;
+        }
+
+        _paintColor = new SKColor(
+                Color.GetByteRed(),
+                Color.GetByteGreen(),
+                Color.GetByteBlue(),
                 Convert.ToByte((int)Math.Max(1, Alpha * 255)));
 
-            _bitmapShader = MaskHelper.CreateMaskBitmapShaderLines(_paintColor);
-        }
+        _bitmapShader = MaskHelper.CreateMaskBitmapShaderLines(_paintColor);
     }
 }

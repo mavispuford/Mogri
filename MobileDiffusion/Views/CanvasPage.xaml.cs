@@ -265,9 +265,11 @@ public partial class CanvasPage : BasePage
         if (e.Location is SKPoint location && CurrentTool != null)
         {
             float scale = 1f;
-            if (Bitmap != null && TemporaryCanvasView.CanvasSize.Width > 0)
+            var viewWidth = TemporaryCanvasView.CanvasSize.Width > 0 ? TemporaryCanvasView.CanvasSize.Width : MaskCanvasView.CanvasSize.Width;
+
+            if (Bitmap != null && viewWidth > 0)
             {
-                scale = (float)Bitmap.Width / TemporaryCanvasView.CanvasSize.Width;
+                scale = (float)Bitmap.Width / viewWidth;
             }
 
             var imageLocation = new SKPoint(location.X * scale, location.Y * scale);
@@ -332,6 +334,7 @@ public partial class CanvasPage : BasePage
                                 CanvasActionType = CanvasActionType.Mask,
                                 Alpha = (float)CurrentAlpha,
                                 BrushSize = (float)CurrentBrushSize * scale,
+                                TouchScale = scale,
                                 Color = CurrentColor,
                                 MaskEffect = CurrentTool?.Effect ?? MaskEffect.Paint
                             };
@@ -351,6 +354,7 @@ public partial class CanvasPage : BasePage
                             CanvasActionType = CanvasActionType.Mask,
                             Alpha = .75f,
                             BrushSize = 10f * scale,
+                            TouchScale = scale,
                             Color = Colors.White,
                             MaskEffect = MaskEffect.Paint
                         };
@@ -677,17 +681,46 @@ public partial class CanvasPage : BasePage
         if (oldValue != null)
         {
             oldValue.CollectionChanged -= CanvasActions_CollectionChanged;
+            foreach (var item in oldValue)
+            {
+                item.PropertyChanged -= OnCanvasActionPropertyChanged;
+            }
         }
 
         if (newValue != null)
         {
             newValue.CollectionChanged += CanvasActions_CollectionChanged;
+            foreach (var item in newValue)
+            {
+                item.PropertyChanged += OnCanvasActionPropertyChanged;
+            }
         }
 
         MaskCanvasView.InvalidateSurface();
     }
 
     private void CanvasActions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.OldItems != null)
+        {
+            foreach (CanvasActionViewModel item in e.OldItems)
+            {
+                item.PropertyChanged -= OnCanvasActionPropertyChanged;
+            }
+        }
+
+        if (e.NewItems != null)
+        {
+            foreach (CanvasActionViewModel item in e.NewItems)
+            {
+                item.PropertyChanged += OnCanvasActionPropertyChanged;
+            }
+        }
+
+        MaskCanvasView.InvalidateSurface();
+    }
+
+    private void OnCanvasActionPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         MaskCanvasView.InvalidateSurface();
     }
