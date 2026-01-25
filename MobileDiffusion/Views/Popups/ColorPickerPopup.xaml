@@ -19,7 +19,7 @@
             VerticalOptions="Center"
             HorizontalOptions="Center"
             Padding="15"
-            WidthRequest="300">
+            Margin="50">
         <VerticalStackLayout x:Name="MainLayout"
                              Spacing="10"
                              HorizontalOptions="Center"

@@ -8,7 +8,7 @@
                   x:Class="MobileDiffusion.Views.Popups.LoadingPopup"
                   x:DataType="popups:LoadingPopup"
                   CloseWhenBackgroundIsClicked="False">
-    <Border Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource IndependenceAccent}}"
+    <Border Background="{AppThemeBinding Light={StaticResource IndependenceAccentTwentyPercent}, Dark={StaticResource IndependenceAccent}}"
             Stroke="Transparent"
             StrokeShape="RoundRectangle 10"
             VerticalOptions="Center"
