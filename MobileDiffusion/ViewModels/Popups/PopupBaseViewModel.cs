@@ -21,7 +21,7 @@ public partial class PopupBaseViewModel : BaseViewModel, IPopupBaseViewModel
     {
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
 
-        if (Application.Current != null && Application.Current.Resources.TryGetValue("BlackSeventyThreePercent", out var bgColor))
+        if (Application.Current?.Resources != null && Application.Current.Resources.TryGetValue("BlackSeventyThreePercent", out var bgColor))
         {
             PopupBackgroundColor = (Color)bgColor;
         }

@@ -11,57 +11,38 @@ public static class PopupRegistrations
 
     public static MauiAppBuilder RegisterPopups(this MauiAppBuilder builder)
     {
-        registerPopup<IResultItemPopupViewModel, ResultItemPopup>(builder.Services);
-        registerPopup<IColorPickerPopupViewModel, ColorPickerPopup>(builder.Services);
-        registerPopup<IEditMasksPopupViewModel, EditMasksPopup>(builder.Services);
-        registerPopup<IEditMaskItemPopupViewModel, EditMaskItemPopup>(builder.Services);
-        registerPopup<IPromptStyleInfoPopupViewModel, PromptStyleInfoPopup>(builder.Services);
-        registerPopup<IHistoryItemPopupViewModel, HistoryItemPopup>(builder.Services);
-        registerPopup<IResolutionSelectPopupViewModel, ResolutionSelectPopup>(builder.Services);
-        registerSingletonPopup<LoadingPopup>(builder.Services);
+        registerPopup<IResultItemPopupViewModel, ResultItemPopup>(builder.Services, () => new ResultItemPopup());
+        registerPopup<IColorPickerPopupViewModel, ColorPickerPopup>(builder.Services, () => new ColorPickerPopup());
+        registerPopup<IEditMasksPopupViewModel, EditMasksPopup>(builder.Services, () => new EditMasksPopup());
+        registerPopup<IEditMaskItemPopupViewModel, EditMaskItemPopup>(builder.Services, () => new EditMaskItemPopup());
+        registerPopup<IPromptStyleInfoPopupViewModel, PromptStyleInfoPopup>(builder.Services, () => new PromptStyleInfoPopup());
+        registerPopup<IHistoryItemPopupViewModel, HistoryItemPopup>(builder.Services, () => new HistoryItemPopup());
+        registerPopup<IResolutionSelectPopupViewModel, ResolutionSelectPopup>(builder.Services, () => new ResolutionSelectPopup());
+        registerSingletonPopup<LoadingPopup>(builder.Services, () => new LoadingPopup());
 
         return builder;
     }
 
-    private static void registerPopup<TPopup>(IServiceCollection serviceCollection)
-    where TPopup : PopupPage
+    private static void registerPopup<TPopup>(IServiceCollection serviceCollection, Func<TPopup> factory)
+        where TPopup : PopupPage
     {
         _registrations[typeof(TPopup).Name] = typeof(TPopup);
 
-        serviceCollection.AddTransient(provider =>
-        {
-            var popup = Activator.CreateInstance(typeof(TPopup)) as TPopup;
-
-            if (popup == null)
-            {
-                throw new InvalidOperationException($"Unable to create a popup of type {typeof(TPopup)}");
-            }
-
-            return popup;
-        });
+        serviceCollection.AddTransient<TPopup>(provider => factory());
     }
 
-    private static void registerPopup<TViewModel, TPopup>(IServiceCollection serviceCollection)
+    private static void registerPopup<TViewModel, TPopup>(IServiceCollection serviceCollection, Func<TPopup> factory)
         where TViewModel : IPopupBaseViewModel
         where TPopup : PopupPage
     {
         _registrations[typeof(TPopup).Name] = typeof(TPopup);
 
-        serviceCollection.AddTransient(provider =>
+        serviceCollection.AddTransient<TPopup>(provider =>
         {
-            var popup = Activator.CreateInstance(typeof(TPopup)) as TPopup;
+            var popup = factory();
 
-            if (popup == null)
-            {
-                throw new InvalidOperationException($"Unable to create a popup of type {typeof(TPopup)}");
-            }
-
-            var viewModel = provider.GetService<TViewModel>();
-
-            if (viewModel == null)
-            {
-                throw new InvalidOperationException($"Unable to create a viewmodel of type {typeof(TViewModel)}");
-            }
+            var viewModel = provider.GetService<TViewModel>()
+                ?? throw new InvalidOperationException($"Unable to create a viewmodel of type {typeof(TViewModel)}");
 
             popup.BindingContext = viewModel;
 
@@ -69,22 +50,12 @@ public static class PopupRegistrations
         });
     }
 
-    private static void registerSingletonPopup<TPopup>(IServiceCollection serviceCollection)
-    where TPopup : PopupPage
+    private static void registerSingletonPopup<TPopup>(IServiceCollection serviceCollection, Func<TPopup> factory)
+        where TPopup : PopupPage
     {
         _registrations[typeof(TPopup).Name] = typeof(TPopup);
 
-        serviceCollection.AddSingleton(provider =>
-        {
-            var popup = Activator.CreateInstance(typeof(TPopup)) as TPopup;
-
-            if (popup == null)
-            {
-                throw new InvalidOperationException($"Unable to create a popup of type {typeof(TPopup)}");
-            }
-
-            return popup;
-        });
+        serviceCollection.AddSingleton<TPopup>(provider => factory());
     }
 
     public static Type GetPopupTypeByName(string name)

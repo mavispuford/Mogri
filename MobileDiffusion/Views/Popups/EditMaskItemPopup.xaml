@@ -77,7 +77,6 @@
                     <Button Grid.Row="4"
                             Text="Done"
                             Command="{Binding CloseCommand}"
-                            Style="{StaticResource PrimaryButtonStyle}" 
                             Margin="0,8,0,0"/>
 
                 </Grid>
