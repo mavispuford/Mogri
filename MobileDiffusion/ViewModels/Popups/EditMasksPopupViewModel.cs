@@ -1,13 +1,15 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Enums;
+using MobileDiffusion.Messages;
 
 namespace MobileDiffusion.ViewModels;
 
-public partial class EditMasksPopupViewModel : PopupBaseViewModel, IEditMasksPopupViewModel
+public partial class EditMasksPopupViewModel : PopupBaseViewModel, IEditMasksPopupViewModel, IRecipient<MaskSliderDragMessage>
 {
     private readonly IServiceProvider _serviceProvider;
     private ObservableCollection<CanvasActionViewModel> _sourceActions;
@@ -18,6 +20,28 @@ public partial class EditMasksPopupViewModel : PopupBaseViewModel, IEditMasksPop
     public EditMasksPopupViewModel(IPopupService popupService, IServiceProvider serviceProvider) : base(popupService)
     {
         _serviceProvider = serviceProvider;
+        WeakReferenceMessenger.Default.RegisterAll(this);
+    }
+
+    public void Receive(MaskSliderDragMessage message)
+    {
+        ContentOpacity = message.Value ? 0 : 1;
+
+        if (message.Value)
+        {
+            PopupBackgroundColor = Colors.Transparent;
+        }
+        else
+        {
+            if (Application.Current != null && Application.Current.Resources.TryGetValue("BlackSeventyThreePercent", out var bgColor))
+            {
+                PopupBackgroundColor = (Color)bgColor;
+            }
+            else
+            {
+                PopupBackgroundColor = Color.FromArgb("BB000000");
+            }
+        }
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)

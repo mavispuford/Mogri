@@ -1,11 +1,13 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Interfaces.Services;
+using MobileDiffusion.Messages;
 
 namespace MobileDiffusion.ViewModels;
 
-public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskItemPopupViewModel
+public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskItemPopupViewModel, IRecipient<MaskSliderDragMessage>
 {
     private CanvasActionViewModel _action;
 
@@ -21,8 +23,50 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
     [ObservableProperty]
     private Color _displayColor;
 
+    [ObservableProperty]
+    private bool _isDragging;
+
+    [ObservableProperty]
+    private string _dragInfoText;
+
     public EditMaskItemPopupViewModel(IPopupService popupService) : base(popupService)
     {
+        WeakReferenceMessenger.Default.RegisterAll(this);
+    }
+
+    [RelayCommand]
+    private void OnDragStarted()
+    {
+        WeakReferenceMessenger.Default.Send(new MaskSliderDragMessage(true));
+    }
+
+    [RelayCommand]
+    private void OnDragCompleted()
+    {
+        WeakReferenceMessenger.Default.Send(new MaskSliderDragMessage(false));
+    }
+
+    public void Receive(MaskSliderDragMessage message)
+    {
+        // Must keep opacity slightly above 0 to maintain touch interaction with the slider
+        ContentOpacity = message.Value ? 0 : 1;
+        IsDragging = message.Value;
+        
+        if (message.Value)
+        {
+            PopupBackgroundColor = Colors.Transparent;
+        }
+        else
+        {
+            if (Application.Current != null && Application.Current.Resources.TryGetValue("BlackSeventyThreePercent", out var bgColor))
+            {
+                PopupBackgroundColor = (Color)bgColor;
+            }
+            else
+            {
+                PopupBackgroundColor = Color.FromArgb("BB000000");
+            }
+        }
     }
 
     public void InitWith(CanvasActionViewModel action)
@@ -57,6 +101,8 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
 
     partial void OnBrushSizeChanged(double value)
     {
+        DragInfoText = $"Size: {value:F0}";
+
         if (_action is MaskLineViewModel line)
         {
             var scale = (line.TouchScale <= 0) ? 1 : line.TouchScale;
@@ -66,6 +112,8 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
 
     partial void OnAlphaChanged(float value)
     {
+        DragInfoText = $"Opacity: {value:P0}";
+
         if (_action is MaskLineViewModel line)
         {
             line.Alpha = value;

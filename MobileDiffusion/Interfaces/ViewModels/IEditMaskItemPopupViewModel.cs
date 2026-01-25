@@ -1,7 +1,18 @@
 using MobileDiffusion.Interfaces.ViewModels;
+using CommunityToolkit.Mvvm.Input;
 
 namespace MobileDiffusion.Interfaces.ViewModels;
 
 public interface IEditMaskItemPopupViewModel : IPopupBaseViewModel
 {
+    bool IsDragging { get; set; }
+    string DragInfoText { get; set; }
+    double BrushSize { get; set; }
+    float Alpha { get; set; }
+    Color DisplayColor { get; set; }
+    bool IsBrush { get; set; }
+
+    IRelayCommand DragStartedCommand { get; }
+    IRelayCommand DragCompletedCommand { get; }
+    IAsyncRelayCommand ChangeColorCommand { get; }
 }

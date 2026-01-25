@@ -12,7 +12,8 @@
              BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource IndependenceAccent}}"
              Stroke="Transparent"
              Margin="15"
-             Padding="15">
+             Padding="15"
+             Opacity="{Binding ContentOpacity}">
             <Grid RowSpacing="15"
                   RowDefinitions="auto,*,auto"
                   HeightRequest="400">
