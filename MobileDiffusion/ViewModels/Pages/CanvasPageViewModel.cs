@@ -206,6 +206,12 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         });
 
         CurrentTool = AvailableTools.FirstOrDefault();
+
+        SourceBitmap = new SKBitmap(768, 1024);
+        using (var canvas = new SKCanvas(SourceBitmap))
+        {
+            canvas.Clear(SKColors.White);
+        }
     }
 
     partial void OnCurrentColorChanged(Color value)
@@ -261,12 +267,15 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             {
                 var paintBucketTool = AvailableTools.FirstOrDefault(t => t.Type == ToolType.PaintBucket);
 
-                lock (_setSegmentationImageLock)
+                if (paintBucketTool != null)
                 {
-                    _setSegmentationImageRequestCount++;
+                    lock (_setSegmentationImageLock)
+                    {
+                        _setSegmentationImageRequestCount++;
 
-                    paintBucketTool.IsLoading = true;
-                    SettingSegmentationImage = true;
+                        paintBucketTool.IsLoading = true;
+                        SettingSegmentationImage = true;
+                    }
                 }
 
                 if (!_setSegmentationImageCancellationTokenSource?.IsCancellationRequested ?? false)
@@ -278,12 +287,15 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
                 HasSegmentationImage = await _segmentationService.SetImage(value, _setSegmentationImageCancellationTokenSource?.Token ?? CancellationToken.None);
 
-                lock (_setSegmentationImageLock)
+                if (paintBucketTool != null)
                 {
-                    _setSegmentationImageRequestCount--;
+                    lock (_setSegmentationImageLock)
+                    {
+                        _setSegmentationImageRequestCount--;
 
-                    paintBucketTool.IsLoading = _setSegmentationImageRequestCount > 0;
-                    SettingSegmentationImage = _setSegmentationImageRequestCount > 0;
+                        paintBucketTool.IsLoading = _setSegmentationImageRequestCount > 0;
+                        SettingSegmentationImage = _setSegmentationImageRequestCount > 0;
+                    }
                 }
 
             }));
@@ -592,9 +604,76 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 return;
             }
 
+            var actions = new List<string> { "Create New Canvas with Image", "Scale Image to Canvas" };
+
+            if (CurrentTool?.Type == ToolType.BoundingBox)
+            {
+                actions.Add("Scale Image to Bounding Box");
+            }
+
+            var action = await Shell.Current.DisplayActionSheetAsync("Set Image", "Cancel", null, actions.ToArray());
+
+            if (action == "Cancel" || action == null)
+            {
+                return;
+            }
+
             using var fileStream = await photo.OpenReadAsync();
 
-            await LoadSourceBitmapUsingStream(fileStream, photo.FileName);
+            if (action == "Create New Canvas with Image")
+            {
+                ClearSegmentationMask();
+                await LoadSourceBitmapUsingStream(fileStream, photo.FileName);
+            }
+            else if (action == "Scale Image to Canvas")
+            {
+                try
+                {
+                    IsBusy = true;
+
+                    var loadedBitmap = LoadBitmapFromStream(fileStream);
+
+                    if (loadedBitmap != null)
+                    {
+                        var info = new SKImageInfo(SourceBitmap.Width, SourceBitmap.Height);
+                        var resizedBitmap = loadedBitmap.Resize(info, new SKSamplingOptions(SKCubicResampler.Mitchell));
+
+                        loadedBitmap.Dispose();
+
+                        SourceBitmap = resizedBitmap;
+                        _sourceFileName = null;
+
+                        ClearSegmentationMask();
+                        CanvasActions.Clear();
+                    }
+                }
+                finally
+                {
+                    IsBusy = false;
+                }
+            }
+            else if (action == "Scale Image to Bounding Box")
+            {
+                try
+                {
+                    IsBusy = true;
+
+                    var loadedBitmap = LoadBitmapFromStream(fileStream);
+
+                    if (loadedBitmap != null)
+                    {
+                        var stitchedBitmap = StitchBitmapIntoSource(SourceBitmap, loadedBitmap, BoundingBox);
+
+                        loadedBitmap.Dispose();
+
+                        SourceBitmap = stitchedBitmap;
+                    }
+                }
+                finally
+                {
+                    IsBusy = false;
+                }
+            }
         }
         catch (Exception)
         {
@@ -731,6 +810,21 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         _segmentationService.Reset();
     }
 
+    private SKBitmap LoadBitmapFromStream(Stream stream)
+    {
+        var codec = SKCodec.Create(stream);
+        var info = new SKImageInfo
+        {
+            AlphaType = SKAlphaType.Unpremul,
+            ColorSpace = codec.Info.ColorSpace,
+            ColorType = codec.Info.ColorType,
+            Height = codec.Info.Height,
+            Width = codec.Info.Width,
+        };
+
+        return SKBitmap.Decode(codec, info);
+    }
+
     private async Task LoadSourceBitmapUsingStream(Stream stream, string fileName)
     {
         try
@@ -740,17 +834,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             // Instead of a simple SKBitmap.Decode() call, we're using a codec and SKImageInfo with Unpremul for the
             // AlphaType so masked images can be reopened after being created
 
-            var codec = SKCodec.Create(stream);
-            var info = new SKImageInfo
-            {
-                AlphaType = SKAlphaType.Unpremul,
-                ColorSpace = codec.Info.ColorSpace,
-                ColorType = codec.Info.ColorType,
-                Height = codec.Info.Height,
-                Width = codec.Info.Width,
-            };
-
-            var sourceBitmap = SKBitmap.Decode(codec, info);
+            var sourceBitmap = LoadBitmapFromStream(stream);
 
             // Wrap in dispatch call because ApplyQueryAttributes can call this method and it
             // appears to be called from a non-UI thread.
@@ -1386,5 +1470,71 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         }
 
         return base.OnBackButtonPressed();
+    }
+
+    [RelayCommand]
+    private async Task SetResolution()
+    {
+        var action = await _popupService.DisplayActionSheetAsync("Set Resolution", "Cancel", null, "Create a blank canvas", "Scale Existing Canvas");
+
+        if (action == "Create a blank canvas")
+        {
+            var parameters = new Dictionary<string, object>
+            {
+                { NavigationParams.Width, (double)SourceBitmap.Width },
+                { NavigationParams.Height, (double)SourceBitmap.Height },
+                { NavigationParams.InitImgString, string.Empty }
+            };
+
+            var result = await _popupService.ShowPopupForResultAsync("ResolutionSelectPopup", parameters) as IDictionary<string, object>;
+            
+            if (result != null)
+            {
+                if (result.TryGetValue(NavigationParams.Width, out var widthParam) &&
+                    double.TryParse(widthParam.ToString(), out var width) &&
+                    result.TryGetValue(NavigationParams.Height, out var heightParam) &&
+                    double.TryParse(heightParam.ToString(), out var height))
+                {
+                    ClearSegmentationMask();
+                    CanvasActions.Clear();
+                    
+                    SourceBitmap?.Dispose();
+                    SourceBitmap = new SKBitmap((int)width, (int)height);
+                    using (var canvas = new SKCanvas(SourceBitmap))
+                    {
+                        canvas.Clear(SKColors.White);
+                    }
+                    OnPropertyChanged(nameof(SourceBitmap));
+                }
+            }
+        }
+        else if (action == "Scale Existing Canvas")
+        {
+            var parameters = new Dictionary<string, object>
+            {
+                { NavigationParams.Width, (double)SourceBitmap.Width },
+                { NavigationParams.Height, (double)SourceBitmap.Height },
+                { NavigationParams.InitImgString, string.Empty }
+            };
+
+            var result = await _popupService.ShowPopupForResultAsync("ResolutionSelectPopup", parameters) as IDictionary<string, object>;
+
+            if (result != null)
+            {
+                if (result.TryGetValue(NavigationParams.Width, out var widthParam) &&
+                    double.TryParse(widthParam.ToString(), out var width) &&
+                    result.TryGetValue(NavigationParams.Height, out var heightParam) &&
+                    double.TryParse(heightParam.ToString(), out var height))
+                {
+                    ClearSegmentationMask();
+                    CanvasActions.Clear();
+
+                    var resized = SourceBitmap.Resize(new SKImageInfo((int)width, (int)height), new SKSamplingOptions(SKCubicResampler.Mitchell));
+                    SourceBitmap?.Dispose();
+                    SourceBitmap = resized;
+                    OnPropertyChanged(nameof(SourceBitmap));
+                }
+            }
+        }
     }
 }

@@ -77,9 +77,14 @@
                 <FontImageSource Glyph="&#xe161;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
-        <ToolbarItem Text="Set Image" Command="{Binding ShowMediaPickerCommand}" Order="Secondary">
+        <ToolbarItem Text="Add Image" Command="{Binding ShowMediaPickerCommand}" Order="Secondary">
             <ToolbarItem.IconImageSource>
                 <FontImageSource Glyph="&#xe43e;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+        <ToolbarItem Text="Set Resolution" Command="{Binding SetResolutionCommand}" Order="Secondary">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource Glyph="&#xe85b;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
     </views:BasePage.ToolbarItems>
