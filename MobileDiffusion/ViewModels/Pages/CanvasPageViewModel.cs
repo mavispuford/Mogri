@@ -35,6 +35,16 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private CancellationTokenSource _setSegmentationImageCancellationTokenSource;
     private int _setSegmentationImageRequestCount = 0;
 
+    private enum CanvasUseMode
+    {
+        Inpaint,
+        PaintOnly,
+        MaskOnly,
+        ImageOnly
+    }
+
+    private CanvasUseMode _currentCanvasUseMode = CanvasUseMode.Inpaint;
+
     [ObservableProperty]
     public partial IRelayCommand ResetZoomCommand { get; set; }
 
@@ -371,6 +381,30 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         await PrepareForSavingCommand?.ExecuteAsync(FinishSavingCommand);
     }
 
+    private async Task<bool> AskUseCanvasMode()
+    {
+        if (CanvasActions == null || !CanvasActions.Any())
+        {
+            _currentCanvasUseMode = CanvasUseMode.ImageOnly;
+            return true;
+        }
+
+        const string inpaint = "Use paint and mask (inpainting)";
+        const string paintOnly = "Paint only (exclude mask)";
+        const string maskOnly = "Mask only (exclude colors)";
+        const string imageOnly = "Image only";
+
+        var selection = await Shell.Current.DisplayActionSheetAsync("Use Masks?", "Cancel", null, inpaint, paintOnly, maskOnly, imageOnly);
+
+        if (selection == inpaint) _currentCanvasUseMode = CanvasUseMode.Inpaint;
+        else if (selection == paintOnly) _currentCanvasUseMode = CanvasUseMode.PaintOnly;
+        else if (selection == maskOnly) _currentCanvasUseMode = CanvasUseMode.MaskOnly;
+        else if (selection == imageOnly) _currentCanvasUseMode = CanvasUseMode.ImageOnly;
+        else return false;
+
+        return true;
+    }
+
     [RelayCommand]
     private async Task SendToImageToImage()
     {
@@ -380,6 +414,11 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         {
             await Toast.Make("There is no image to send.").Show();
 
+            return;
+        }
+
+        if (!await AskUseCanvasMode())
+        {
             return;
         }
 
@@ -395,6 +434,11 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         {
             await Toast.Make("There is no image data to crop.").Show();
 
+            return;
+        }
+
+        if (!await AskUseCanvasMode())
+        {
             return;
         }
 
@@ -451,7 +495,17 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             try
             {
                 // Colorize the source bitmap using the mask, then create a black and white mask
-                var colorizedBitmap = CreateMaskedBitmap(SourceBitmap, sameSizeMaskBitmap);
+                SKBitmap colorizedBitmap;
+
+                if (_currentCanvasUseMode == CanvasUseMode.Inpaint || _currentCanvasUseMode == CanvasUseMode.PaintOnly)
+                {
+                    colorizedBitmap = CreateMaskedBitmap(SourceBitmap, sameSizeMaskBitmap);
+                }
+                else
+                {
+                    colorizedBitmap = SourceBitmap;
+                }
+
                 using var colorizedMemStream = new MemoryStream();
                 using var colorizedSkiaStream = new SKManagedWStream(colorizedMemStream);
                 colorizedBitmap.Encode(colorizedSkiaStream, SKEncodedImageFormat.Png, 100);
@@ -476,7 +530,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
                 var maskImgContentTypeString = string.Empty;
 
-                if (CanvasActions.Any(c => c.CanvasActionType == CanvasActionType.Mask))
+                if ((_currentCanvasUseMode == CanvasUseMode.Inpaint || _currentCanvasUseMode == CanvasUseMode.MaskOnly) &&
+                    CanvasActions.Any(c => c.CanvasActionType == CanvasActionType.Mask))
                 {
                     if (maskBitmap.Pixels.Any(p => p.Alpha > 0))
                     {
@@ -528,7 +583,17 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             try
             {
                 // Colorize the source bitmap using the mask, then create a black and white mask
-                var colorizedBitmap = CreateMaskedBitmap(SourceBitmap, sameSizeMaskBitmap);
+                SKBitmap colorizedBitmap;
+
+                if (_currentCanvasUseMode == CanvasUseMode.Inpaint || _currentCanvasUseMode == CanvasUseMode.PaintOnly)
+                {
+                    colorizedBitmap = CreateMaskedBitmap(SourceBitmap, sameSizeMaskBitmap);
+                }
+                else
+                {
+                    colorizedBitmap = SourceBitmap;
+                }
+
                 var croppedBitmap = GetCroppedBitmap(colorizedBitmap, BoundingBox);
 
                 using var croppedBitmapMemStream = new MemoryStream();
@@ -552,7 +617,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
                 var croppedMaskContentTypeString = string.Empty;
 
-                if (CanvasActions.Any(c => c.CanvasActionType == CanvasActionType.Mask))
+                if ((_currentCanvasUseMode == CanvasUseMode.Inpaint || _currentCanvasUseMode == CanvasUseMode.MaskOnly) &&
+                    CanvasActions.Any(c => c.CanvasActionType == CanvasActionType.Mask))
                 {
                     var blackAndWhiteMaskBitmap = CreateBlackAndWhiteMask(sameSizeMaskBitmap);
                     var croppedMask = GetCroppedBitmap(blackAndWhiteMaskBitmap, BoundingBox);
