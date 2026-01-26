@@ -394,7 +394,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         const string maskOnly = "Mask only (exclude colors)";
         const string imageOnly = "Image only";
 
-        var selection = await Shell.Current.DisplayActionSheetAsync("Use Masks?", "Cancel", null, inpaint, paintOnly, maskOnly, imageOnly);
+        var selection = await Shell.Current.DisplayActionSheetAsync("Image Mode", "Cancel", null, inpaint, paintOnly, maskOnly, imageOnly);
 
         if (selection == inpaint) _currentCanvasUseMode = CanvasUseMode.Inpaint;
         else if (selection == paintOnly) _currentCanvasUseMode = CanvasUseMode.PaintOnly;
