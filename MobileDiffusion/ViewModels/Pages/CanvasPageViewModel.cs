@@ -397,9 +397,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             return true;
         }
 
-        const string inpaint = "Use paint and mask (inpainting)";
-        const string paintOnly = "Paint only (exclude mask)";
-        const string maskOnly = "Mask only (exclude colors)";
+        const string inpaint = "Paint and Mask (inpainting)";
+        const string paintOnly = "Paint only (NO mask)";
+        const string maskOnly = "Mask only (NO Paint)";
         const string imageOnly = "Image only";
 
         var selection = await Shell.Current.DisplayActionSheetAsync("Image Mode", "Cancel", null, inpaint, paintOnly, maskOnly, imageOnly);
@@ -706,7 +706,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 return;
             }
 
-            var actions = new List<string> { "Create New Canvas with Image", "Scale Image to Canvas" };
+            var actions = new List<string> { "New Canvas with Image", "Scale Image to Existing Canvas" };
 
             if (CurrentTool?.Type == ToolType.BoundingBox)
             {
@@ -1441,12 +1441,15 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             return;
         }
 
-        var action = await _popupService.DisplayActionSheetAsync("Inpaint / Patch", "Cancel", null, "Use Last Mask Only", "Use All Masks");
+        const string useLastMaskOnlyOption = "Use Last Mask Only";
+        const string useAllMasksOption = "Use All Masks";
+
+        var action = await _popupService.DisplayActionSheetAsync("Patch", "Cancel", null, useLastMaskOnlyOption, useAllMasksOption);
         
         if (action == "Cancel" || string.IsNullOrEmpty(action))
             return;
 
-        bool useLastOnly = action == "Use Last Mask Only";
+        bool useLastOnly = action == useLastMaskOnlyOption;
 
         try
         {
@@ -1470,7 +1473,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         }
         catch (Exception ex)
         {
-            await _popupService.DisplayAlertAsync("Error", $"Inpainting failed: {ex.Message}", "OK");
+            await _popupService.DisplayAlertAsync("Error", $"Patching failed: {ex.Message}", "OK");
         }
         finally
         {
