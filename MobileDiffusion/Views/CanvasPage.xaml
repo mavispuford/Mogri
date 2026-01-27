@@ -77,7 +77,7 @@
                 <FontImageSource Glyph="&#xe161;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
-        <ToolbarItem Text="Add Image" Command="{Binding ShowMediaPickerCommand}" Order="Secondary">
+        <ToolbarItem Text="Pick Image" Command="{Binding ShowMediaPickerCommand}" Order="Secondary">
             <ToolbarItem.IconImageSource>
                 <FontImageSource Glyph="&#xe43e;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
             </ToolbarItem.IconImageSource>
