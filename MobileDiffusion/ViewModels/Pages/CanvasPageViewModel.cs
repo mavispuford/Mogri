@@ -61,6 +61,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     public partial double CurrentBrushSize { get; set; } = 10d;
 
     [ObservableProperty]
+    public partial double CurrentNoise { get; set; } = 1d;
+
+    [ObservableProperty]
     public partial Color CurrentColor { get; set; } = Colors.Black;
 
     [ObservableProperty]
@@ -130,6 +133,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         _segmentationService = segmentationService ?? throw new ArgumentNullException(nameof(segmentationService));
         _patchService = patchService ?? throw new ArgumentNullException(nameof(patchService));
 
+        // Precompute the noise bitmap on a background thread so the first stroke is smooth
+        NoiseShaderHelper.Initialize();
+
         Application.Current.Resources.TryGetValue("IndependenceAccent", out var independenceColor);
 
         if (independenceColor is Color paletteIconDarkColor)
@@ -149,7 +155,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             [
                 ContextButtonType.BrushSize,
                 ContextButtonType.Alpha,
-                ContextButtonType.ColorPicker
+                ContextButtonType.ColorPicker,
+                ContextButtonType.Noise
             ]
         });
 
@@ -175,7 +182,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             [
                 ContextButtonType.Alpha,
                 ContextButtonType.ColorPicker,
-                ContextButtonType.AddRemove
+                ContextButtonType.AddRemove,
+                ContextButtonType.Noise
             ]
         });
 
@@ -482,6 +490,24 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         IsBusy = false;
     }
 
+    private SKBitmap GenerateRenderedLayer(int width, int height)
+    {
+        var bmp = new SKBitmap(width, height, SKColorType.Rgba8888, SKAlphaType.Premul);
+        using (var canvas = new SKCanvas(bmp))
+        {
+            canvas.Clear(SKColors.Transparent);
+            
+            // Render all actions with isSaving=true to ensure High Fidelity (Noise/Color) 
+            // instead of UI Fallbacks (Hatch Patterns).
+            var info = new SKImageInfo(width, height);
+            foreach (var action in CanvasActions)
+            {
+                action.Execute(canvas, info, true);
+            }
+        }
+        return bmp;
+    }
+
     [RelayCommand]
     private async Task FinishSendingToImageToImage(CanvasCaptureResult result)
     {
@@ -489,8 +515,12 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
         await Task.Run(async () =>
         {
-            var maskBitmap = result.MaskBitmap;
-            var sameSizeMaskBitmap = maskBitmap.Resize(SourceBitmap.Info, new SKSamplingOptions(SKCubicResampler.Mitchell));
+            // Instead of using the Screen Capture (result.MaskBitmap) which might contain
+            // UI-only artifacts or be at the wrong resolution/aspect ratio, we re-render the
+            // layer internally using the SourceBitmap's dimensions. This ensures 1:1 alignment.
+            using var rawMaskBitmap = GenerateRenderedLayer(SourceBitmap.Width, SourceBitmap.Height);
+            
+            var sameSizeMaskBitmap = rawMaskBitmap; // Already same size, no resize needed.
 
             try
             {
@@ -499,6 +529,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
                 if (_currentCanvasUseMode == CanvasUseMode.Inpaint || _currentCanvasUseMode == CanvasUseMode.PaintOnly)
                 {
+                    // Update: Pass opaque=false because our mask layer uses alpha modulation
                     colorizedBitmap = CreateMaskedBitmap(SourceBitmap, sameSizeMaskBitmap);
                 }
                 else
@@ -533,7 +564,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 if ((_currentCanvasUseMode == CanvasUseMode.Inpaint || _currentCanvasUseMode == CanvasUseMode.MaskOnly) &&
                     CanvasActions.Any(c => c.CanvasActionType == CanvasActionType.Mask))
                 {
-                    if (maskBitmap.Pixels.Any(p => p.Alpha > 0))
+                    // Check if any visible mask exists
+                    if (rawMaskBitmap.Pixels.Any(p => p.Alpha > 0))
                     {
                         var blackAndWhiteMaskBitmap = CreateBlackAndWhiteMask(sameSizeMaskBitmap);
                         using var maskMemStream = new MemoryStream();
@@ -551,6 +583,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                         //var uri = await _fileService.WriteImageFileToExternalStorageAsync(fileName, maskMemStream, true);
                     }
                 }
+
 
                 // Add the mask if it is empty or not so it can be cleared if there is no data
                 parameters.Add(NavigationParams.MaskImgString, maskImgContentTypeString);
@@ -577,8 +610,11 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
         await Task.Run(async () =>
         {
-            var maskBitmap = result.MaskBitmap;
-            var sameSizeMaskBitmap = maskBitmap.Resize(SourceBitmap.Info, new SKSamplingOptions(SKCubicResampler.Mitchell));
+            // Re-render layer at SourceBitmap dimensions to ensure correct alignment of masks.
+            // Using result.MaskBitmap (screen capture) dimensions causes scaling mismatches.
+            using var rawMaskBitmap = GenerateRenderedLayer(SourceBitmap.Width, SourceBitmap.Height);
+            
+            var sameSizeMaskBitmap = rawMaskBitmap; // Already same size.
 
             try
             {
@@ -850,6 +886,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 CanvasActionType = CanvasActionType.Mask,
                 Color = CurrentColor,
                 Alpha = (float)CurrentAlpha,
+                Noise = CurrentNoise,
                 Bitmap = maskBitmap
             };
 
@@ -1222,16 +1259,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
                     var maskColor = new Color();
 
-                    // This adds noise to each pixel to add texture to masked portions,
-                    // resulting in a better image overall when processed.
-                    if (randomizeMaskPixels)
-                    {
-                        const double stdDev = 30.0;
-                        
-                        mskByte1 = (byte)int.Clamp(((int)mskByte1) + (int)NoiseHelper.NextGaussian(_random, 0, stdDev), 0, 255);
-                        mskByte2 = (byte)int.Clamp(((int)mskByte2) + (int)NoiseHelper.NextGaussian(_random, 0, stdDev), 0, 255);
-                        mskByte3 = (byte)int.Clamp(((int)mskByte3) + (int)NoiseHelper.NextGaussian(_random, 0, stdDev), 0, 255);
-                    }
+                    // Mask color is derived directly from the mask bitmap. Noise is now applied when drawing
+                    // so we don't add per-pixel CPU-based noise here.
 
                     if (typeMsk == SKColorType.Rgba8888)
                     {

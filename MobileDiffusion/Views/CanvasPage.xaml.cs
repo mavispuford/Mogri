@@ -16,6 +16,7 @@ public partial class CanvasPage : BasePage
     private MaskLineViewModel _segmentationLine;
     private Timer _brushSizeTimer;
     private Timer _alphaTimer;
+    private Timer _noiseTimer;
     private bool _hasCreatedBoundingBox;
     private bool _isSaving;
     private bool _hapticsEnabled = false;
@@ -136,6 +137,17 @@ public partial class CanvasPage : BasePage
         ((CanvasPage)bindable).AutoHideAlphaSlider();
     });
 
+    public double CurrentNoise
+    {
+        get => (double)GetValue(CurrentNoiseProperty);
+        set => SetValue(CurrentNoiseProperty, value);
+    }
+
+    public static BindableProperty CurrentNoiseProperty = BindableProperty.Create(nameof(CurrentNoise), typeof(double), typeof(CanvasPage), 0d, propertyChanged: (bindable, oldValue, newValue) =>
+    {
+        ((CanvasPage)bindable).AutoHideNoiseSlider();
+    });
+
     public static BindableProperty CurrentColorProperty = BindableProperty.Create(nameof(CurrentColor), typeof(Color), typeof(CanvasPage), Colors.Black);
 
     public static BindableProperty CurrentToolProperty = BindableProperty.Create(nameof(CurrentTool), typeof(IPaintingToolViewModel), typeof(CanvasPage), null, propertyChanged: (bindable, oldValue, newValue) =>
@@ -196,6 +208,7 @@ public partial class CanvasPage : BasePage
         this.SetBinding(BitmapProperty, nameof(ICanvasPageViewModel.SourceBitmap));
         this.SetBinding(CurrentAlphaProperty, nameof(ICanvasPageViewModel.CurrentAlpha));
         this.SetBinding(CurrentBrushSizeProperty, nameof(ICanvasPageViewModel.CurrentBrushSize));
+        this.SetBinding(CurrentNoiseProperty, nameof(ICanvasPageViewModel.CurrentNoise));
         this.SetBinding(CurrentColorProperty, nameof(ICanvasPageViewModel.CurrentColor), BindingMode.TwoWay);
         this.SetBinding(CurrentToolProperty, nameof(ICanvasPageViewModel.CurrentTool));
         this.SetBinding(CanvasActionsProperty, nameof(ICanvasPageViewModel.CanvasActions), BindingMode.TwoWay);
@@ -336,6 +349,7 @@ public partial class CanvasPage : BasePage
                                 BrushSize = (float)CurrentBrushSize * scale,
                                 TouchScale = scale,
                                 Color = CurrentColor,
+                                Noise = CurrentNoise,
                                 MaskEffect = CurrentTool?.Effect ?? MaskEffect.Paint
                             };
                         }
@@ -356,6 +370,7 @@ public partial class CanvasPage : BasePage
                             BrushSize = 10f * scale,
                             TouchScale = scale,
                             Color = Colors.White,
+                            Noise = CurrentNoise,
                             MaskEffect = MaskEffect.Paint
                         };
 
@@ -457,21 +472,16 @@ public partial class CanvasPage : BasePage
         {
             foreach (var canvasAction in CanvasActions.Where(ca => ca.CanvasActionType == CanvasActionType.Mask))
             {
-                if (canvasAction is MaskLineViewModel)
-                {
-                    canvas.Save();
-                    canvas.Scale(scale);
-                    canvasAction.Execute(canvas, e.Info, _isSaving);
-                    canvas.Restore();
-                }
-                else
-                {
-                    // SegmentationMaskViewModel uses Destination Rect logic internally or assumed View Space?
-                    // SegmentationMaskViewModel.Execute draws to imageInfo.Rect (View Space).
-                    // If the Bitmap is Image Size, it gets scaled down by DrawBitmap implicit scaling.
-                    // So we DON't scale canvas for it.
-                    canvasAction.Execute(canvas, e.Info, _isSaving);
-                }
+                // Scale the canvas so all mask actions render in "Image Space".
+                // We pass the Source Bitmap's Info (Virtual Image Space) to the action.
+                canvas.Save();
+                canvas.Scale(scale);
+                
+                // Construct info representing the full Source Image dimensions
+                var virtualInfo = new SKImageInfo(Bitmap.Width, Bitmap.Height, e.Info.ColorType, e.Info.AlphaType);
+                canvasAction.Execute(canvas, virtualInfo, _isSaving);
+                
+                canvas.Restore();
             }
         }
 
@@ -550,6 +560,15 @@ public partial class CanvasPage : BasePage
         ShowHideAlphaSlider(!AlphaSliderContainer.IsVisible);
     }
 
+    private void Noise_Button_Clicked(object sender, EventArgs e)
+    {
+        vibrate(HapticFeedbackType.Click);
+
+        ShowHideBrushSizeSlider(false);
+        ShowHideAlphaSlider(false);
+        ShowHideNoiseSlider(!NoiseSliderContainer.IsVisible);
+    }
+
     private void ShowHideAlphaSlider(bool show)
     {
         if (show)
@@ -606,6 +625,34 @@ public partial class CanvasPage : BasePage
         });
     }
 
+    private void ShowHideNoiseSlider(bool show)
+    {
+        if (show)
+        {
+            NoiseSliderContainer.Opacity = 0f;
+            NoiseSliderContainer.IsVisible = true;
+        }
+
+        NoiseSliderContainer.AbortAnimation("FadeInOutNoise");
+        NoiseSliderContainer.Animate("FadeInOutNoise", value =>
+        {
+            NoiseSliderContainer.Opacity = value;
+        }, NoiseSliderContainer.Opacity, show ? 1 : 0, easing: Easing.CubicInOut, finished: (value, canceled) =>
+        {
+            if (canceled)
+            {
+                return;
+            }
+
+            NoiseSliderContainer.IsVisible = show;
+
+            if (NoiseSliderContainer.IsVisible)
+            {
+                AutoHideNoiseSlider();
+            }
+        });
+    }
+
     private void AutoHideBrushSizeSlider()
     {
         if (_brushSizeTimer == null)
@@ -642,6 +689,24 @@ public partial class CanvasPage : BasePage
         }
     }
 
+    private void AutoHideNoiseSlider()
+    {
+        if (_noiseTimer == null)
+        {
+            _noiseTimer = new Timer(delegate
+            {
+                Dispatcher.Dispatch(() =>
+                {
+                    ShowHideNoiseSlider(false);
+                });
+            }, null, 3000, -1);
+        }
+        else
+        {
+            _noiseTimer.Change(3000, -1);
+        }
+    }
+
     private void UpdateBoundingBox(bool sizeChanged, bool resetPosition = false)
     {        
         var rectSize = (float)(BoundingBoxSize / BoundingBoxScale);
@@ -674,6 +739,7 @@ public partial class CanvasPage : BasePage
     {
         AlphaSliderContainer.IsVisible = false;
         BrushSizeSliderContainer.IsVisible = false;
+        NoiseSliderContainer.IsVisible = false;
     }
 
     private void OnCanvasActionsChanged(ObservableCollection<CanvasActionViewModel> oldValue, ObservableCollection<CanvasActionViewModel> newValue)
@@ -860,6 +926,7 @@ public partial class CanvasPage : BasePage
         BoundingBoxSizeButton.IsVisible = false;
         AddRemoveButton.IsVisible = false;
         ResetZoomButton.IsVisible = false;
+        NoiseButton.IsVisible = false;
 
         foreach (var contextButton in CurrentTool.ContextButtons)
         {
@@ -882,6 +949,9 @@ public partial class CanvasPage : BasePage
                     break;
                 case ContextButtonType.ResetZoom:
                     ResetZoomButton.IsVisible = true;
+                    break;
+                case ContextButtonType.Noise:
+                    NoiseButton.IsVisible = true;
                     break;
                 default:
                     break;

@@ -6,20 +6,11 @@ using SkiaSharp;
 
 namespace MobileDiffusion.ViewModels;
 
-public partial class MaskLineViewModel : CanvasActionViewModel
+public partial class MaskLineViewModel : PaintActionViewModel
 {
-    private SKShader _bitmapShader;
-    private SKColor _paintColor;
-
-    [ObservableProperty]
-    public partial float Alpha { get; set; }
-
     [ObservableProperty]
     public partial float BrushSize { get; set; }
     
-    [ObservableProperty]
-    public partial Color Color { get; set; }
-
     public float TouchScale { get; set; } = 1f;
 
     public List<SKPoint> Path { get; set; } = new();
@@ -60,12 +51,20 @@ public partial class MaskLineViewModel : CanvasActionViewModel
             path.ConicTo(points[i - 1], points[i], .5f);
         }
 
-        if (MaskEffect == MaskEffect.Paint &&
-            !isSaving && Alpha <= .1f && 
-            _bitmapShader != null)
+        // PRIORITY 1: Visual Fallback for Low Alpha (Only when NOT saving)
+        // If the alpha is very low, we show the hatch pattern so the user can see where they are drawing.
+        // But if we are saving (Exporting), we skip this validation so the actual noise/color is rendered.
+        if (!isSaving && Alpha <= 0.1f && _bitmapShader != null)
         {
             paint.Shader = _bitmapShader;
-            paint.Color = paint.Color.WithAlpha(255);
+            paint.Color = SKColors.White; // Full opacity for the hatch pattern lines
+        }
+        // PRIORITY 2: Noise Shader (If enabled)
+        // Used for saving OR if alpha is high enough to be visible.
+        else if (Noise > 0 && _noiseShader != null)
+        {
+            // Use the cached Noise shader (created in PaintActionViewModel.UpdateShaders)
+            paint.Shader = _noiseShader;
         }
         else
         {
@@ -84,35 +83,10 @@ public partial class MaskLineViewModel : CanvasActionViewModel
             Alpha = Alpha,
             BrushSize = BrushSize,
             Color = Color,
+            Noise = Noise,
             MaskEffect = MaskEffect,
             TouchScale = TouchScale,
             Path = new List<SKPoint>(Path)
         };
-    }
-
-    partial void OnAlphaChanged(float value)
-    {
-        updateShader();
-    }
-
-    partial void OnColorChanged(Color value)
-    {
-        updateShader();
-    }
-
-    private void updateShader()
-    {
-        if (Color == null || Alpha < 0 || Alpha > 1)
-        {
-            return;
-        }
-
-        _paintColor = new SKColor(
-                Color.GetByteRed(),
-                Color.GetByteGreen(),
-                Color.GetByteBlue(),
-                Convert.ToByte((int)Math.Max(1, Alpha * 255)));
-
-        _bitmapShader = MaskHelper.CreateMaskBitmapShaderLines(_paintColor);
     }
 }
