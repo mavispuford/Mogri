@@ -57,6 +57,21 @@
         </ResourceDictionary>
     </views:BasePage.Resources>
 
+    <Shell.TitleView>
+        <Grid HorizontalOptions="Start">
+            <ImageButton ToolTipProperties.Text="Pick Image"
+                         VerticalOptions="FillAndExpand"
+                         Command="{Binding ShowMediaPickerCommand}"
+                         WidthRequest="50"
+                         HeightRequest="50"
+                         Padding="10">
+                <ImageButton.Source>
+                    <FontImageSource Glyph="&#xe43e;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
+                </ImageButton.Source>
+            </ImageButton>    
+        </Grid>
+    </Shell.TitleView>
+
     <views:BasePage.ToolbarItems>
         <ToolbarItem Text="Undo" Command="{Binding UndoCommand}" Order="Primary">
             <ToolbarItem.IconImageSource>
@@ -75,11 +90,6 @@
         <ToolbarItem Text="Save" Command="{Binding SaveCommand}" Order="Secondary">
             <ToolbarItem.IconImageSource>
                 <FontImageSource Glyph="&#xe161;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
-            </ToolbarItem.IconImageSource>
-        </ToolbarItem>
-        <ToolbarItem Text="Pick Image" Command="{Binding ShowMediaPickerCommand}" Order="Secondary">
-            <ToolbarItem.IconImageSource>
-                <FontImageSource Glyph="&#xe43e;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
         <ToolbarItem Text="Set Resolution" Command="{Binding SetResolutionCommand}" Order="Secondary">

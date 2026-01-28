@@ -706,11 +706,15 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 return;
             }
 
-            var actions = new List<string> { "New Canvas with Image", "Scale Image to Existing Canvas" };
+            const string newCanvasWithImageOption = "New Canvas with Image";
+            const string scaleImageToExistingCanvasOption = "Scale Image to Existing Canvas";
+            const string scaleImageToBoundingBoxOption = "Scale Image to Bounding Box";
+
+            var actions = new List<string> { newCanvasWithImageOption, scaleImageToExistingCanvasOption };
 
             if (CurrentTool?.Type == ToolType.BoundingBox)
             {
-                actions.Add("Scale Image to Bounding Box");
+                actions.Add(scaleImageToBoundingBoxOption);
             }
 
             var action = await Shell.Current.DisplayActionSheetAsync("Set Image", "Cancel", null, actions.ToArray());
@@ -722,12 +726,12 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
             using var fileStream = await photo.OpenReadAsync();
 
-            if (action == "Create New Canvas with Image")
+            if (action == newCanvasWithImageOption)
             {
                 ClearSegmentationMask();
                 await LoadSourceBitmapUsingStream(fileStream, photo.FileName);
             }
-            else if (action == "Scale Image to Canvas")
+            else if (action == scaleImageToExistingCanvasOption)
             {
                 try
                 {
@@ -754,7 +758,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                     IsBusy = false;
                 }
             }
-            else if (action == "Scale Image to Bounding Box")
+            else if (action == scaleImageToBoundingBoxOption)
             {
                 try
                 {

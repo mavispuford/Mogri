@@ -550,6 +550,7 @@ public partial class CanvasPage : BasePage
 
         ShowHideAlphaSlider(false);
         ShowHideBrushSizeSlider(!BrushSizeSliderContainer.IsVisible);
+        ShowHideNoiseSlider(false);
     }
 
     private void Alpha_Button_Clicked(object sender, EventArgs e)
@@ -558,6 +559,7 @@ public partial class CanvasPage : BasePage
 
         ShowHideBrushSizeSlider(false);
         ShowHideAlphaSlider(!AlphaSliderContainer.IsVisible);
+        ShowHideNoiseSlider(false);
     }
 
     private void Noise_Button_Clicked(object sender, EventArgs e)
@@ -919,6 +921,10 @@ public partial class CanvasPage : BasePage
                 await ShowActionsButton.ScaleTo(1.0, 200, Easing.CubicIn);
             });
         }
+
+        ShowHideBrushSizeSlider(false);
+        ShowHideAlphaSlider(false);
+        ShowHideNoiseSlider(false);
 
         BrushSizeButton.IsVisible = false;
         AlphaButton.IsVisible = false;
