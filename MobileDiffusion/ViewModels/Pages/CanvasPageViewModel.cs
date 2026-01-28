@@ -61,7 +61,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     public partial double CurrentBrushSize { get; set; } = 10d;
 
     [ObservableProperty]
-    public partial double CurrentNoise { get; set; } = 1d;
+    public partial double CurrentNoise { get; set; } = .5d;
 
     [ObservableProperty]
     public partial Color CurrentColor { get; set; } = Colors.Black;
