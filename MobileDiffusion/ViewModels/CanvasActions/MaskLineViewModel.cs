@@ -46,11 +46,20 @@ public partial class MaskLineViewModel : PaintActionViewModel
         using var path = new SKPath();
         path.MoveTo(points[0]);
 
-        for (var i = 1; i < points.Count; i++)
+        // Create the path
+        if (points.Count > 1)
         {
-            path.ConicTo(points[i - 1], points[i], .5f);
+            for (var i = 1; i < points.Count; i++)
+            {
+                path.ConicTo(points[i - 1], points[i], .5f);
+            }
         }
-
+        else if (points.Count == 1)
+        {
+            // This will draw a single dot if there is only one point
+            path.ConicTo(points[0], points[0], .5f);
+        }
+        
         // PRIORITY 1: Visual Fallback for Low Alpha (Only when NOT saving)
         // If the alpha is very low, we show the hatch pattern so the user can see where they are drawing.
         // But if we are saving (Exporting), we skip this validation so the actual noise/color is rendered.
@@ -70,7 +79,7 @@ public partial class MaskLineViewModel : PaintActionViewModel
         {
             paint.Shader = null;
         }
-
+        
         canvas.DrawPath(path, paint);
     }
 
