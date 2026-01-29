@@ -37,18 +37,18 @@ public partial class SegmentationMaskViewModel : PaintActionViewModel
 
             paint.BlendMode = SKBlendMode.SrcIn;
 
-            // Use the noise shader if configured (even when saving/exporting)
-            if (Noise > 0 && _noiseShader != null)
-            {
-                paint.Shader = _noiseShader;
-                paint.Color = SKColors.White.WithAlpha((byte)(Alpha * 255));
-            }
-            // Fallback: Use hatch pattern for low alpha visibility (Visual only, NOT when saving)
-            else if (!isSaving && Alpha <= 0.1f && _bitmapShader != null)
+            // Use hatch pattern for low alpha visibility (Visual only, NOT when saving)
+            if (!isSaving && Alpha <= 0.1f && _bitmapShader != null)
             {
                 paint.Shader = _bitmapShader;
                 paint.Color = SKColors.White;
             }
+            else if (Noise > 0 && _noiseShader != null)
+            {
+                paint.Shader = _noiseShader;
+                paint.Color = SKColors.White.WithAlpha((byte)(Alpha * 255));
+            }
+            // Fallback: Use the noise shader if configured (even when saving/exporting)
             else
             {
                 paint.Shader = null;

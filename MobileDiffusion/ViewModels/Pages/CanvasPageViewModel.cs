@@ -228,7 +228,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         SourceBitmap = new SKBitmap(768, 1024);
         using (var canvas = new SKCanvas(SourceBitmap))
         {
-            canvas.Clear(SKColors.White);
+            canvas.Clear(SKColors.WhiteSmoke);
         }
     }
 
@@ -1604,7 +1604,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                     SourceBitmap = new SKBitmap((int)width, (int)height);
                     using (var canvas = new SKCanvas(SourceBitmap))
                     {
-                        canvas.Clear(SKColors.White);
+                        canvas.Clear(SKColors.WhiteSmoke);
                     }
                     OnPropertyChanged(nameof(SourceBitmap));
                 }

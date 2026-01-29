@@ -58,7 +58,7 @@
     </views:BasePage.Resources>
 
     <Shell.TitleView>
-        <Grid HorizontalOptions="Start">
+        <HorizontalStackLayout HorizontalOptions="Start">
             <ImageButton ToolTipProperties.Text="Pick Image"
                          VerticalOptions="FillAndExpand"
                          Command="{Binding ShowMediaPickerCommand}"
@@ -68,8 +68,8 @@
                 <ImageButton.Source>
                     <FontImageSource Glyph="&#xe43e;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
                 </ImageButton.Source>
-            </ImageButton>    
-        </Grid>
+            </ImageButton>
+        </HorizontalStackLayout>
     </Shell.TitleView>
 
     <views:BasePage.ToolbarItems>

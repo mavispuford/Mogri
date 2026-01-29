@@ -216,7 +216,7 @@ public partial class CanvasPage : BasePage
         this.SetBinding(PrepareForSavingCommandProperty, nameof(ICanvasPageViewModel.PrepareForSavingCommand), BindingMode.OneWayToSource);
         this.SetBinding(BoundingBoxScaleProperty, nameof(ICanvasPageViewModel.BoundingBoxScale), BindingMode.OneWayToSource);
         this.SetBinding(BoundingBoxSizeProperty, nameof(ICanvasPageViewModel.BoundingBoxSize), BindingMode.TwoWay);
-        this.SetBinding(ShowMaskLayerProperty, nameof(ICanvasPageViewModel.ShowMaskLayer), BindingMode.OneWay);
+        this.SetBinding(ShowMaskLayerProperty, nameof(ICanvasPageViewModel.ShowMaskLayer), BindingMode.TwoWay);
         this.SetBinding(DoSegmentationCommandProperty, nameof(ICanvasPageViewModel.DoSegmentationCommand), BindingMode.OneWay);
         this.SetBinding(SegmentationBitmapProperty, nameof(ICanvasPageViewModel.SegmentationBitmap), BindingMode.TwoWay);
         this.SetBinding(ShowActionsProperty, nameof(ICanvasPageViewModel.ShowActions), BindingMode.OneWay);
@@ -340,6 +340,8 @@ public partial class CanvasPage : BasePage
                         break;
                     case ToolType.PaintBrush:
                     case ToolType.Eraser:
+                        ShowMaskLayer = true;
+
                         if (_currentLine == null)
                         {
                             _currentLine = new()
@@ -363,6 +365,8 @@ public partial class CanvasPage : BasePage
 
                         break;
                     case ToolType.PaintBucket:
+                        ShowMaskLayer = true;
+
                         _segmentationLine ??= new()
                         {
                             CanvasActionType = CanvasActionType.Mask,
@@ -526,10 +530,19 @@ public partial class CanvasPage : BasePage
             canvas.DrawRect(BoundingBox,
             new SKPaint()
             {
+                Color = SKColors.Black.WithAlpha((byte)15),
+                Style = SKPaintStyle.Stroke,
+                StrokeWidth = 6,
+            });
+
+            var boxPaint = new SKPaint()
+            {
                 Color = SKColors.White,
                 Style = SKPaintStyle.Stroke,
                 StrokeWidth = 3,
-            });
+            };
+
+            canvas.DrawRect(BoundingBox, boxPaint);
         }
     }
 
