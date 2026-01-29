@@ -42,22 +42,41 @@ public partial class MaskLineViewModel : PaintActionViewModel
         }
 
         var points = Path;
+        if (points == null || points.Count == 0) 
+        {
+            return;
+        }
 
         using var path = new SKPath();
         path.MoveTo(points[0]);
 
-        // Create the path
-        if (points.Count > 1)
+        if (points.Count > 2)
         {
-            for (var i = 1; i < points.Count; i++)
+            // The Midpoint Algorithm
+            for (var i = 1; i < points.Count - 1; i++)
             {
-                path.ConicTo(points[i - 1], points[i], .5f);
+                var current = points[i];
+                var next = points[i + 1];
+
+                // Calculate the midpoint between the current and next point
+                var midPoint = new SKPoint((current.X + next.X) / 2, (current.Y + next.Y) / 2);
+
+                // QuadTo uses the 'current' point as the control point (the "pull")
+                // and the 'midPoint' as the actual destination.
+                path.QuadTo(current, midPoint);
             }
+
+            // Connect to the very last point to finish the line
+            path.LineTo(points[^1]);
+        }
+        else if (points.Count == 2)
+        {
+            path.LineTo(points[1]);
         }
         else if (points.Count == 1)
         {
-            // This will draw a single dot if there is only one point
-            path.ConicTo(points[0], points[0], .5f);
+            // Draw a tiny line/dot so a single tap is visible
+            path.LineTo(points[0].X, points[0].Y);
         }
         
         // PRIORITY 1: Visual Fallback for Low Alpha (Only when NOT saving)
