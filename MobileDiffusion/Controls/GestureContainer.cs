@@ -92,9 +92,28 @@ public class GestureContainer : ContentView
         
         var pinchGesture = new PinchGestureRecognizer();
         pinchGesture.PinchUpdated += OnPinchUpdated;
+
+        var doubleTapGesture = new TapGestureRecognizer { NumberOfTapsRequired = 2 };
+        doubleTapGesture.Tapped += OnDoubleTapped;
         
         GestureRecognizers.Add(panGesture);
         GestureRecognizers.Add(pinchGesture);
+        GestureRecognizers.Add(doubleTapGesture);
+    }
+
+    private void OnDoubleTapped(object? sender, EventArgs e)
+    {
+        if (currentScale > 1)
+        {
+            Reset(true);
+        }
+        else
+        {
+            // Zoom to 2x
+            currentScale = 2;
+            startScale = 2;
+            Content.ScaleTo(2, 250, Easing.CubicInOut);
+        }
     }
 
     void OnPinchUpdated(object sender, PinchGestureUpdatedEventArgs e)
@@ -312,11 +331,15 @@ public class GestureContainer : ContentView
 
     private void clampTranslation()
     {
-        var maxTranslationX = (Content.Width / 2) * currentScale;
-        var maxTranslationY = (Content.Height / 2) * currentScale;
+        // Only allow panning if the zoomed content is larger than the viewport.
+        // The max allowed translation is half the difference between scaled content size and viewport size.
+        // This ensures the edge of the content never crosses the edge of the viewport (no whitespace).
+        
+        var maxTranslationX = Math.Max(0, (Content.Width * currentScale - Content.Width) / 2);
+        var maxTranslationY = Math.Max(0, (Content.Height * currentScale - Content.Height) / 2);
 
-        Content.TranslationX = double.Clamp(Content.TranslationX, -maxTranslationX, maxTranslationX);
-        Content.TranslationY = double.Clamp(Content.TranslationY, -maxTranslationY, maxTranslationY);
+        Content.TranslationX = Math.Clamp(Content.TranslationX, -maxTranslationX, maxTranslationX);
+        Content.TranslationY = Math.Clamp(Content.TranslationY, -maxTranslationY, maxTranslationY);
     }
 
     private void cancelTranslationAnimations()
