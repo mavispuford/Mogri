@@ -229,7 +229,6 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                     }
                     else if (response.ResponseObject is GenerationResponse generationResponse)
                     {
-                        // Try to detect Automatic1111-style response (where Info is JSON containing all_seeds)
                         IDictionary<string, object> autoResponseInfo = null;
 
                         try
