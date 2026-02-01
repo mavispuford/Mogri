@@ -1292,7 +1292,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                     *resultPtr++ = typeMsk == SKColorType.Rgba8888 ? newColor.GetByteBlue() : newColor.GetByteRed();
                     *resultPtr++ = newColor.GetByteAlpha();
 
-                    // Set alpha to a near-zero value for InvokeAI
+                    // Some server implementations expect a near-zero alpha; keep example here for reference
                     //*resultPtr++ = 3;
                 }
                 else

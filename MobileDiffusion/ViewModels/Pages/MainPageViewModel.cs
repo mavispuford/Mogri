@@ -6,7 +6,6 @@ using MobileDiffusion.Models;
 using System.Collections.ObjectModel;
 using SkiaSharp.Views.Maui.Controls;
 using CommunityToolkit.Maui.Alerts;
-using MobileDiffusion.Models.LStein;
 using Newtonsoft.Json;
 using MobileDiffusion.Json;
 
@@ -218,44 +217,40 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             {
                 await foreach (var response in _stableDiffusionService.SubmitImageRequestAsync(settings))
                 {
-                    if (response.StableDiffusionApi == Enums.StableDiffusionApi.InvokeAI)
-                    {
-                        if (response.ResponseObject is ProgressResponse progressResponse)
-                        {
-                            reportProgress((float)progressResponse.Progress);
-                        }
-                        else if (response.ResponseObject is GenerationResponse generationResponse)
-                        {
-                            var seed = generationResponse.Info;
-                            var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{seed}-{DateTime.Now.Ticks}";
-
-                            var result = Results.FirstOrDefault(r => r.ApiResponse == null);
-
-                            if (result != null)
-                            {
-                                result.ApiResponse = response;
-                                result.Settings = settings.Clone();
-
-                                await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
-                            }
-                        }
-                    }
-                    else if (response.StableDiffusionApi == Enums.StableDiffusionApi.Automatic1111)
+                    // Some servers surface progress as a numeric Progress or a ProgressResponse object.
+                    if (response.Progress > 0)
                     {
                         reportProgress((float)response.Progress);
+                    }
 
-                        if (response.ResponseObject is GenerationResponse generationResponse)
+                    if (response.ResponseObject is ProgressResponse progressResponse)
+                    {
+                        reportProgress((float)progressResponse.Progress);
+                    }
+                    else if (response.ResponseObject is GenerationResponse generationResponse)
+                    {
+                        // Try to detect Automatic1111-style response (where Info is JSON containing all_seeds)
+                        IDictionary<string, object> autoResponseInfo = null;
+
+                        try
                         {
-                            var autoResponseInfo = JsonConvert.DeserializeObject<IDictionary<string, object>>(generationResponse.Info, new JsonSerializerSettings
+                            autoResponseInfo = JsonConvert.DeserializeObject<IDictionary<string, object>>(generationResponse.Info, new JsonSerializerSettings
                             {
                                 ContractResolver = CustomContractResolver.Instance
                             });
+                        }
+                        catch
+                        {
+                            // Not JSON - treat Info as a raw seed string
+                        }
+
+                        if (autoResponseInfo != null && autoResponseInfo.ContainsKey("all_seeds"))
+                        {
+                            var seeds = autoResponseInfo["all_seeds"] as List<long>;
 
                             foreach (var image in generationResponse.Images)
                             {
-                                var seeds = autoResponseInfo["all_seeds"] as List<long>;
                                 var seedString = seeds?.ElementAt(imageNumber) ?? settings.Seed + imageNumber;
-
                                 var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{seedString}-{DateTime.Now.Ticks}";
 
                                 var result = Results.FirstOrDefault(r => r.ApiResponse == null);
@@ -270,24 +265,21 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                                 }
                             }
                         }
-                        else if (response.ResponseObject is ProgressResponse progressResponse)
+                        else
                         {
-                            // if (!string.IsNullOrEmpty(progressResponse.CurrentImage))
-                            // {
-                            //     var result = Results.FirstOrDefault(r => r.ApiResponse == null);
+                            var seed = generationResponse.Info;
+                            var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{seed}-{DateTime.Now.Ticks}";
 
-                            //     if (result != null)
-                            //     {
-                            //         using var stream = await _imageService.GetStreamFromContentTypeStringAsync(progressResponse.CurrentImage, CancellationToken.None);
-                            //         var bitmap = _imageService.GetSkBitmapFromStream(stream);
+                            var result = Results.FirstOrDefault(r => r.ApiResponse == null);
 
-                            //         if (bitmap != null)
-                            //         {
-                            //             result.ImageSource = new SKBitmapImageSource { Bitmap = bitmap };
-                            //         }
-                            //     }
-                            // }
-                        }              
+                            if (result != null)
+                            {
+                                result.ApiResponse = response;
+                                result.Settings = settings.Clone();
+
+                                await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
+                            }
+                        }
                     }
                 }
             }

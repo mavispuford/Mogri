@@ -2,6 +2,5 @@
 
 public enum StableDiffusionApi
 {
-    InvokeAI,
     Automatic1111
 };
