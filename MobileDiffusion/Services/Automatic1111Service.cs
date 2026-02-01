@@ -3,7 +3,6 @@ using MobileDiffusion.Helpers;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Models;
-using MobileDiffusion.Models.Automatic1111;
 using MobileDiffusion.ViewModels;
 using Newtonsoft.Json;
 using System.Dynamic;

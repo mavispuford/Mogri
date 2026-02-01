@@ -6,10 +6,8 @@ using System.Text.Json.Serialization;
 
 namespace MobileDiffusion.ViewModels;
 
-public partial class SegmentationMaskViewModel : CanvasActionViewModel
+public partial class SegmentationMaskViewModel : PaintActionViewModel
 {
-    private SKShader _bitmapOutlineShader;
-
     [ObservableProperty]
     [property: JsonIgnore]
     public partial SKBitmap Bitmap { get; set; }
@@ -24,12 +22,6 @@ public partial class SegmentationMaskViewModel : CanvasActionViewModel
         }
     }
 
-    [ObservableProperty]
-    public partial Color Color { get; set; }
-
-    [ObservableProperty]
-    public partial float Alpha { get; set; }
-
     public override void Execute(SKCanvas canvas, SKImageInfo imageInfo, bool isSaving)
     {
         if (Bitmap != null)
@@ -38,15 +30,25 @@ public partial class SegmentationMaskViewModel : CanvasActionViewModel
 
             canvas.SaveLayer(paint);
 
-            canvas.DrawBitmap(Bitmap, Bitmap.Info.Rect, imageInfo.Rect, paint);
+            // Draw to fill the full target area (which should be the Image Bounds provided by the caller)
+            // Use Linear sampling to smooth the mask edges if scaling is involved
+            using var image = SKImage.FromBitmap(Bitmap);
+            canvas.DrawImage(image, Bitmap.Info.Rect, imageInfo.Rect, new SKSamplingOptions(SKFilterMode.Linear), paint);
 
             paint.BlendMode = SKBlendMode.SrcIn;
 
-            if (!isSaving && Alpha <= 0.1f && _bitmapOutlineShader != null)
+            // Use hatch pattern for low alpha visibility (Visual only, NOT when saving)
+            if (!isSaving && Alpha <= 0.1f && _bitmapShader != null)
             {
-                paint.Shader = _bitmapOutlineShader;
+                paint.Shader = _bitmapShader;
                 paint.Color = SKColors.White;
             }
+            else if (Noise > 0 && _noiseShader != null)
+            {
+                paint.Shader = _noiseShader;
+                paint.Color = SKColors.White.WithAlpha((byte)(Alpha * 255));
+            }
+            // Fallback: Use the noise shader if configured (even when saving/exporting)
             else
             {
                 paint.Shader = null;
@@ -67,23 +69,10 @@ public partial class SegmentationMaskViewModel : CanvasActionViewModel
             Order = Order,
             Color = Color,
             Alpha = Alpha,
+            Noise = Noise,
             Bitmap = Bitmap?.Copy()
         };
     }
 
-    partial void OnColorChanged(Color value)
-    {
-        if (value != null)
-        {
-            _bitmapOutlineShader = MaskHelper.CreateMaskBitmapShaderLines(value.ToSKColor().WithAlpha((byte)(Alpha * 255)));
-        }
-    }
 
-    partial void OnAlphaChanged(float value)
-    {
-        if (Color != null)
-        {
-            OnColorChanged(Color);
-        }
-    }
 }

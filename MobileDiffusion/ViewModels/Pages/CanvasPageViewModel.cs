@@ -35,6 +35,16 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private CancellationTokenSource _setSegmentationImageCancellationTokenSource;
     private int _setSegmentationImageRequestCount = 0;
 
+    private enum CanvasUseMode
+    {
+        Inpaint,
+        PaintOnly,
+        MaskOnly,
+        ImageOnly
+    }
+
+    private CanvasUseMode _currentCanvasUseMode = CanvasUseMode.Inpaint;
+
     [ObservableProperty]
     public partial IRelayCommand ResetZoomCommand { get; set; }
 
@@ -49,6 +59,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
     [ObservableProperty]
     public partial double CurrentBrushSize { get; set; } = 10d;
+
+    [ObservableProperty]
+    public partial double CurrentNoise { get; set; } = .5d;
 
     [ObservableProperty]
     public partial Color CurrentColor { get; set; } = Colors.Black;
@@ -120,6 +133,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         _segmentationService = segmentationService ?? throw new ArgumentNullException(nameof(segmentationService));
         _patchService = patchService ?? throw new ArgumentNullException(nameof(patchService));
 
+        // Precompute the noise bitmap on a background thread so the first stroke is smooth
+        NoiseShaderHelper.Initialize();
+
         Application.Current.Resources.TryGetValue("IndependenceAccent", out var independenceColor);
 
         if (independenceColor is Color paletteIconDarkColor)
@@ -139,7 +155,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             [
                 ContextButtonType.BrushSize,
                 ContextButtonType.Alpha,
-                ContextButtonType.ColorPicker
+                ContextButtonType.ColorPicker,
+                ContextButtonType.Noise
             ]
         });
 
@@ -165,7 +182,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             [
                 ContextButtonType.Alpha,
                 ContextButtonType.ColorPicker,
-                ContextButtonType.AddRemove
+                ContextButtonType.AddRemove,
+                ContextButtonType.Noise
             ]
         });
 
@@ -206,6 +224,12 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         });
 
         CurrentTool = AvailableTools.FirstOrDefault();
+
+        SourceBitmap = new SKBitmap(768, 1024);
+        using (var canvas = new SKCanvas(SourceBitmap))
+        {
+            canvas.Clear(SKColors.WhiteSmoke);
+        }
     }
 
     partial void OnCurrentColorChanged(Color value)
@@ -261,12 +285,15 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             {
                 var paintBucketTool = AvailableTools.FirstOrDefault(t => t.Type == ToolType.PaintBucket);
 
-                lock (_setSegmentationImageLock)
+                if (paintBucketTool != null)
                 {
-                    _setSegmentationImageRequestCount++;
+                    lock (_setSegmentationImageLock)
+                    {
+                        _setSegmentationImageRequestCount++;
 
-                    paintBucketTool.IsLoading = true;
-                    SettingSegmentationImage = true;
+                        paintBucketTool.IsLoading = true;
+                        SettingSegmentationImage = true;
+                    }
                 }
 
                 if (!_setSegmentationImageCancellationTokenSource?.IsCancellationRequested ?? false)
@@ -278,12 +305,15 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
                 HasSegmentationImage = await _segmentationService.SetImage(value, _setSegmentationImageCancellationTokenSource?.Token ?? CancellationToken.None);
 
-                lock (_setSegmentationImageLock)
+                if (paintBucketTool != null)
                 {
-                    _setSegmentationImageRequestCount--;
+                    lock (_setSegmentationImageLock)
+                    {
+                        _setSegmentationImageRequestCount--;
 
-                    paintBucketTool.IsLoading = _setSegmentationImageRequestCount > 0;
-                    SettingSegmentationImage = _setSegmentationImageRequestCount > 0;
+                        paintBucketTool.IsLoading = _setSegmentationImageRequestCount > 0;
+                        SettingSegmentationImage = _setSegmentationImageRequestCount > 0;
+                    }
                 }
 
             }));
@@ -359,6 +389,30 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         await PrepareForSavingCommand?.ExecuteAsync(FinishSavingCommand);
     }
 
+    private async Task<bool> AskUseCanvasMode()
+    {
+        if (CanvasActions == null || !CanvasActions.Any())
+        {
+            _currentCanvasUseMode = CanvasUseMode.ImageOnly;
+            return true;
+        }
+
+        const string inpaint = "Paint and Mask (inpainting)";
+        const string paintOnly = "Paint only (NO mask)";
+        const string maskOnly = "Mask only (NO Paint)";
+        const string imageOnly = "Image only";
+
+        var selection = await Shell.Current.DisplayActionSheetAsync("Image Mode", "Cancel", null, inpaint, paintOnly, maskOnly, imageOnly);
+
+        if (selection == inpaint) _currentCanvasUseMode = CanvasUseMode.Inpaint;
+        else if (selection == paintOnly) _currentCanvasUseMode = CanvasUseMode.PaintOnly;
+        else if (selection == maskOnly) _currentCanvasUseMode = CanvasUseMode.MaskOnly;
+        else if (selection == imageOnly) _currentCanvasUseMode = CanvasUseMode.ImageOnly;
+        else return false;
+
+        return true;
+    }
+
     [RelayCommand]
     private async Task SendToImageToImage()
     {
@@ -368,6 +422,11 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         {
             await Toast.Make("There is no image to send.").Show();
 
+            return;
+        }
+
+        if (!await AskUseCanvasMode())
+        {
             return;
         }
 
@@ -383,6 +442,11 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         {
             await Toast.Make("There is no image data to crop.").Show();
 
+            return;
+        }
+
+        if (!await AskUseCanvasMode())
+        {
             return;
         }
 
@@ -426,6 +490,24 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         IsBusy = false;
     }
 
+    private SKBitmap GenerateRenderedLayer(int width, int height)
+    {
+        var bmp = new SKBitmap(width, height, SKColorType.Rgba8888, SKAlphaType.Premul);
+        using (var canvas = new SKCanvas(bmp))
+        {
+            canvas.Clear(SKColors.Transparent);
+            
+            // Render all actions with isSaving=true to ensure High Fidelity (Noise/Color) 
+            // instead of UI Fallbacks (Hatch Patterns).
+            var info = new SKImageInfo(width, height);
+            foreach (var action in CanvasActions)
+            {
+                action.Execute(canvas, info, true);
+            }
+        }
+        return bmp;
+    }
+
     [RelayCommand]
     private async Task FinishSendingToImageToImage(CanvasCaptureResult result)
     {
@@ -433,13 +515,28 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
         await Task.Run(async () =>
         {
-            var maskBitmap = result.MaskBitmap;
-            var sameSizeMaskBitmap = maskBitmap.Resize(SourceBitmap.Info, new SKSamplingOptions(SKCubicResampler.Mitchell));
+            // Instead of using the Screen Capture (result.MaskBitmap) which might contain
+            // UI-only artifacts or be at the wrong resolution/aspect ratio, we re-render the
+            // layer internally using the SourceBitmap's dimensions. This ensures 1:1 alignment.
+            using var rawMaskBitmap = GenerateRenderedLayer(SourceBitmap.Width, SourceBitmap.Height);
+            
+            var sameSizeMaskBitmap = rawMaskBitmap; // Already same size, no resize needed.
 
             try
             {
                 // Colorize the source bitmap using the mask, then create a black and white mask
-                var colorizedBitmap = CreateMaskedBitmap(SourceBitmap, sameSizeMaskBitmap);
+                SKBitmap colorizedBitmap;
+
+                if (_currentCanvasUseMode == CanvasUseMode.Inpaint || _currentCanvasUseMode == CanvasUseMode.PaintOnly)
+                {
+                    // Update: Pass opaque=false because our mask layer uses alpha modulation
+                    colorizedBitmap = CreateMaskedBitmap(SourceBitmap, sameSizeMaskBitmap);
+                }
+                else
+                {
+                    colorizedBitmap = SourceBitmap;
+                }
+
                 using var colorizedMemStream = new MemoryStream();
                 using var colorizedSkiaStream = new SKManagedWStream(colorizedMemStream);
                 colorizedBitmap.Encode(colorizedSkiaStream, SKEncodedImageFormat.Png, 100);
@@ -464,9 +561,11 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
                 var maskImgContentTypeString = string.Empty;
 
-                if (CanvasActions.Any(c => c.CanvasActionType == CanvasActionType.Mask))
+                if ((_currentCanvasUseMode == CanvasUseMode.Inpaint || _currentCanvasUseMode == CanvasUseMode.MaskOnly) &&
+                    CanvasActions.Any(c => c.CanvasActionType == CanvasActionType.Mask))
                 {
-                    if (maskBitmap.Pixels.Any(p => p.Alpha > 0))
+                    // Check if any visible mask exists
+                    if (rawMaskBitmap.Pixels.Any(p => p.Alpha > 0))
                     {
                         var blackAndWhiteMaskBitmap = CreateBlackAndWhiteMask(sameSizeMaskBitmap);
                         using var maskMemStream = new MemoryStream();
@@ -484,6 +583,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                         //var uri = await _fileService.WriteImageFileToExternalStorageAsync(fileName, maskMemStream, true);
                     }
                 }
+
 
                 // Add the mask if it is empty or not so it can be cleared if there is no data
                 parameters.Add(NavigationParams.MaskImgString, maskImgContentTypeString);
@@ -510,13 +610,26 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
         await Task.Run(async () =>
         {
-            var maskBitmap = result.MaskBitmap;
-            var sameSizeMaskBitmap = maskBitmap.Resize(SourceBitmap.Info, new SKSamplingOptions(SKCubicResampler.Mitchell));
+            // Re-render layer at SourceBitmap dimensions to ensure correct alignment of masks.
+            // Using result.MaskBitmap (screen capture) dimensions causes scaling mismatches.
+            using var rawMaskBitmap = GenerateRenderedLayer(SourceBitmap.Width, SourceBitmap.Height);
+            
+            var sameSizeMaskBitmap = rawMaskBitmap; // Already same size.
 
             try
             {
                 // Colorize the source bitmap using the mask, then create a black and white mask
-                var colorizedBitmap = CreateMaskedBitmap(SourceBitmap, sameSizeMaskBitmap);
+                SKBitmap colorizedBitmap;
+
+                if (_currentCanvasUseMode == CanvasUseMode.Inpaint || _currentCanvasUseMode == CanvasUseMode.PaintOnly)
+                {
+                    colorizedBitmap = CreateMaskedBitmap(SourceBitmap, sameSizeMaskBitmap);
+                }
+                else
+                {
+                    colorizedBitmap = SourceBitmap;
+                }
+
                 var croppedBitmap = GetCroppedBitmap(colorizedBitmap, BoundingBox);
 
                 using var croppedBitmapMemStream = new MemoryStream();
@@ -540,7 +653,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
                 var croppedMaskContentTypeString = string.Empty;
 
-                if (CanvasActions.Any(c => c.CanvasActionType == CanvasActionType.Mask))
+                if ((_currentCanvasUseMode == CanvasUseMode.Inpaint || _currentCanvasUseMode == CanvasUseMode.MaskOnly) &&
+                    CanvasActions.Any(c => c.CanvasActionType == CanvasActionType.Mask))
                 {
                     var blackAndWhiteMaskBitmap = CreateBlackAndWhiteMask(sameSizeMaskBitmap);
                     var croppedMask = GetCroppedBitmap(blackAndWhiteMaskBitmap, BoundingBox);
@@ -592,9 +706,80 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 return;
             }
 
+            const string newCanvasWithImageOption = "New Canvas with Image";
+            const string scaleImageToExistingCanvasOption = "Scale Image to Existing Canvas";
+            const string scaleImageToBoundingBoxOption = "Scale Image to Bounding Box";
+
+            var actions = new List<string> { newCanvasWithImageOption, scaleImageToExistingCanvasOption };
+
+            if (CurrentTool?.Type == ToolType.BoundingBox)
+            {
+                actions.Add(scaleImageToBoundingBoxOption);
+            }
+
+            var action = await Shell.Current.DisplayActionSheetAsync("Set Image", "Cancel", null, actions.ToArray());
+
+            if (action == "Cancel" || action == null)
+            {
+                return;
+            }
+
             using var fileStream = await photo.OpenReadAsync();
 
-            await LoadSourceBitmapUsingStream(fileStream, photo.FileName);
+            if (action == newCanvasWithImageOption)
+            {
+                ClearSegmentationMask();
+                await LoadSourceBitmapUsingStream(fileStream, photo.FileName);
+            }
+            else if (action == scaleImageToExistingCanvasOption)
+            {
+                try
+                {
+                    IsBusy = true;
+
+                    var loadedBitmap = LoadBitmapFromStream(fileStream);
+
+                    if (loadedBitmap != null)
+                    {
+                        var info = new SKImageInfo(SourceBitmap.Width, SourceBitmap.Height);
+                        var resizedBitmap = loadedBitmap.Resize(info, new SKSamplingOptions(SKCubicResampler.Mitchell));
+
+                        loadedBitmap.Dispose();
+
+                        SourceBitmap = resizedBitmap;
+                        _sourceFileName = null;
+
+                        ClearSegmentationMask();
+                        CanvasActions.Clear();
+                    }
+                }
+                finally
+                {
+                    IsBusy = false;
+                }
+            }
+            else if (action == scaleImageToBoundingBoxOption)
+            {
+                try
+                {
+                    IsBusy = true;
+
+                    var loadedBitmap = LoadBitmapFromStream(fileStream);
+
+                    if (loadedBitmap != null)
+                    {
+                        var stitchedBitmap = StitchBitmapIntoSource(SourceBitmap, loadedBitmap, BoundingBox);
+
+                        loadedBitmap.Dispose();
+
+                        SourceBitmap = stitchedBitmap;
+                    }
+                }
+                finally
+                {
+                    IsBusy = false;
+                }
+            }
         }
         catch (Exception)
         {
@@ -705,6 +890,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 CanvasActionType = CanvasActionType.Mask,
                 Color = CurrentColor,
                 Alpha = (float)CurrentAlpha,
+                Noise = CurrentNoise,
                 Bitmap = maskBitmap
             };
 
@@ -731,6 +917,21 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         _segmentationService.Reset();
     }
 
+    private SKBitmap LoadBitmapFromStream(Stream stream)
+    {
+        var codec = SKCodec.Create(stream);
+        var info = new SKImageInfo
+        {
+            AlphaType = SKAlphaType.Unpremul,
+            ColorSpace = codec.Info.ColorSpace,
+            ColorType = codec.Info.ColorType,
+            Height = codec.Info.Height,
+            Width = codec.Info.Width,
+        };
+
+        return SKBitmap.Decode(codec, info);
+    }
+
     private async Task LoadSourceBitmapUsingStream(Stream stream, string fileName)
     {
         try
@@ -740,17 +941,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             // Instead of a simple SKBitmap.Decode() call, we're using a codec and SKImageInfo with Unpremul for the
             // AlphaType so masked images can be reopened after being created
 
-            var codec = SKCodec.Create(stream);
-            var info = new SKImageInfo
-            {
-                AlphaType = SKAlphaType.Unpremul,
-                ColorSpace = codec.Info.ColorSpace,
-                ColorType = codec.Info.ColorType,
-                Height = codec.Info.Height,
-                Width = codec.Info.Width,
-            };
-
-            var sourceBitmap = SKBitmap.Decode(codec, info);
+            var sourceBitmap = LoadBitmapFromStream(stream);
 
             // Wrap in dispatch call because ApplyQueryAttributes can call this method and it
             // appears to be called from a non-UI thread.
@@ -1072,16 +1263,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
                     var maskColor = new Color();
 
-                    // This adds noise to each pixel to add texture to masked portions,
-                    // resulting in a better image overall when processed.
-                    if (randomizeMaskPixels)
-                    {
-                        const double stdDev = 30.0;
-                        
-                        mskByte1 = (byte)int.Clamp(((int)mskByte1) + (int)NoiseHelper.NextGaussian(_random, 0, stdDev), 0, 255);
-                        mskByte2 = (byte)int.Clamp(((int)mskByte2) + (int)NoiseHelper.NextGaussian(_random, 0, stdDev), 0, 255);
-                        mskByte3 = (byte)int.Clamp(((int)mskByte3) + (int)NoiseHelper.NextGaussian(_random, 0, stdDev), 0, 255);
-                    }
+                    // Mask color is derived directly from the mask bitmap. Noise is now applied when drawing
+                    // so we don't add per-pixel CPU-based noise here.
 
                     if (typeMsk == SKColorType.Rgba8888)
                     {
@@ -1262,12 +1445,15 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             return;
         }
 
-        var action = await _popupService.DisplayActionSheetAsync("Inpaint / Patch", "Cancel", null, "Use Last Mask Only", "Use All Masks");
+        const string useLastMaskOnlyOption = "Use Last Mask Only";
+        const string useAllMasksOption = "Use All Masks";
+
+        var action = await _popupService.DisplayActionSheetAsync("Patch", "Cancel", null, useLastMaskOnlyOption, useAllMasksOption);
         
         if (action == "Cancel" || string.IsNullOrEmpty(action))
             return;
 
-        bool useLastOnly = action == "Use Last Mask Only";
+        bool useLastOnly = action == useLastMaskOnlyOption;
 
         try
         {
@@ -1291,7 +1477,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         }
         catch (Exception ex)
         {
-            await _popupService.DisplayAlertAsync("Error", $"Inpainting failed: {ex.Message}", "OK");
+            await _popupService.DisplayAlertAsync("Error", $"Patching failed: {ex.Message}", "OK");
         }
         finally
         {
@@ -1386,5 +1572,71 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         }
 
         return base.OnBackButtonPressed();
+    }
+
+    [RelayCommand]
+    private async Task SetResolution()
+    {
+        var action = await _popupService.DisplayActionSheetAsync("Set Resolution", "Cancel", null, "Create a blank canvas", "Scale Existing Canvas");
+
+        if (action == "Create a blank canvas")
+        {
+            var parameters = new Dictionary<string, object>
+            {
+                { NavigationParams.Width, (double)SourceBitmap.Width },
+                { NavigationParams.Height, (double)SourceBitmap.Height },
+                { NavigationParams.InitImgString, string.Empty }
+            };
+
+            var result = await _popupService.ShowPopupForResultAsync("ResolutionSelectPopup", parameters) as IDictionary<string, object>;
+            
+            if (result != null)
+            {
+                if (result.TryGetValue(NavigationParams.Width, out var widthParam) &&
+                    double.TryParse(widthParam.ToString(), out var width) &&
+                    result.TryGetValue(NavigationParams.Height, out var heightParam) &&
+                    double.TryParse(heightParam.ToString(), out var height))
+                {
+                    ClearSegmentationMask();
+                    CanvasActions.Clear();
+                    
+                    SourceBitmap?.Dispose();
+                    SourceBitmap = new SKBitmap((int)width, (int)height);
+                    using (var canvas = new SKCanvas(SourceBitmap))
+                    {
+                        canvas.Clear(SKColors.WhiteSmoke);
+                    }
+                    OnPropertyChanged(nameof(SourceBitmap));
+                }
+            }
+        }
+        else if (action == "Scale Existing Canvas")
+        {
+            var parameters = new Dictionary<string, object>
+            {
+                { NavigationParams.Width, (double)SourceBitmap.Width },
+                { NavigationParams.Height, (double)SourceBitmap.Height },
+                { NavigationParams.InitImgString, string.Empty }
+            };
+
+            var result = await _popupService.ShowPopupForResultAsync("ResolutionSelectPopup", parameters) as IDictionary<string, object>;
+
+            if (result != null)
+            {
+                if (result.TryGetValue(NavigationParams.Width, out var widthParam) &&
+                    double.TryParse(widthParam.ToString(), out var width) &&
+                    result.TryGetValue(NavigationParams.Height, out var heightParam) &&
+                    double.TryParse(heightParam.ToString(), out var height))
+                {
+                    ClearSegmentationMask();
+                    CanvasActions.Clear();
+
+                    var resized = SourceBitmap.Resize(new SKImageInfo((int)width, (int)height), new SKSamplingOptions(SKCubicResampler.Mitchell));
+                    SourceBitmap?.Dispose();
+                    SourceBitmap = resized;
+                    OnPropertyChanged(nameof(SourceBitmap));
+                }
+            }
+        }
     }
 }

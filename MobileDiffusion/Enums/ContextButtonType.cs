@@ -7,5 +7,6 @@ public enum ContextButtonType
     ColorPicker,
     BoundingBoxSize,
     AddRemove,
-    ResetZoom
+    ResetZoom,
+    Noise
 }

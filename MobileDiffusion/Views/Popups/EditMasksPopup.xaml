@@ -16,7 +16,7 @@
              Opacity="{Binding ContentOpacity}">
             <Grid RowSpacing="15"
                   RowDefinitions="auto,*,auto"
-                  HeightRequest="400">
+                  HeightRequest="500">
                 <Grid Grid.Row="0">
                     <Label Text="Edit Masks"
                            FontSize="16"

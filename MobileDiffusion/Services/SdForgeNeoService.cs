@@ -9,7 +9,6 @@ using MobileDiffusion.Helpers;
 using Microsoft.Kiota.Http.HttpClientLibrary;
 using Microsoft.Kiota.Abstractions.Authentication;
 using Microsoft.Kiota.Abstractions.Serialization;
-using MobileDiffusion.Models.Automatic1111;
 using System.Text.RegularExpressions;
 
 namespace MobileDiffusion.Services
