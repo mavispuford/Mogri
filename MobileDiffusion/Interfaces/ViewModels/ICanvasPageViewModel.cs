@@ -17,6 +17,8 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     double CurrentBrushSize { get; set; }
 
+    double CurrentNoise { get; set; }
+
     Color CurrentColor { get; set; }
 
     SKRect BoundingBox { get; set; }

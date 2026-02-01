@@ -21,10 +21,16 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
     private double _brushSize;
 
     [ObservableProperty]
+    private double _noise;
+
+    [ObservableProperty]
     private float _alpha;
 
     [ObservableProperty]
     private Color _displayColor;
+
+    [ObservableProperty]
+    private bool _isNoiseVisible;
 
     [ObservableProperty]
     private bool _isDragging;
@@ -80,17 +86,21 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
         {
             IsBrush = true;
             IsColorVisible = line.MaskEffect != Enums.MaskEffect.Erase;
+            IsNoiseVisible = line.MaskEffect != Enums.MaskEffect.Erase;
 
             var scale = (line.TouchScale <= 0) ? 1 : line.TouchScale;
             BrushSize = line.BrushSize / scale;
             Alpha = line.Alpha;
+            Noise = line.Noise;
             DisplayColor = line.Color;
         }
         else if (_action is SegmentationMaskViewModel seg)
         {
             IsBrush = false;
             IsColorVisible = true;
+            IsNoiseVisible = true;
             Alpha = seg.Alpha;
+            Noise = seg.Noise;
             DisplayColor = seg.Color;
             BrushSize = 0; 
         }
@@ -127,6 +137,20 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
         else if (_action is SegmentationMaskViewModel seg)
         {
             seg.Alpha = value;
+        }
+    }
+
+    partial void OnNoiseChanged(double value)
+    {
+        DragInfoText = $"Noise: {value:P0}";
+
+        if (_action is MaskLineViewModel line)
+        {
+            line.Noise = value;
+        }
+        else if (_action is SegmentationMaskViewModel seg)
+        {
+            seg.Noise = value;
         }
     }
 

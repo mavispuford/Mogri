@@ -17,7 +17,7 @@
                  Opacity="{Binding ContentOpacity}">
             
                 <Grid RowSpacing="24"
-                      RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+                      RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
 
                     <!-- Header -->
                     <Label Grid.Row="0"
@@ -59,8 +59,22 @@
                                 DragCompletedCommand="{Binding DragCompletedCommand}" />
                     </VerticalStackLayout>
 
+                    <!-- Noise -->
+                    <VerticalStackLayout Grid.Row="3" Spacing="8" IsVisible="{Binding IsNoiseVisible}">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <Label Text="Noise" FontAttributes="Bold" FontSize="14" />
+                            <Label Grid.Column="1" Text="{Binding Noise, StringFormat='{0:P0}'}" FontSize="14" FontAttributes="Bold"/>
+                        </Grid>
+                        <Slider Minimum="0" 
+                                Maximum="1.0" 
+                                Value="{Binding Noise}"
+                                MinimumTrackColor="{StaticResource Primary}"
+                                DragStartedCommand="{Binding DragStartedCommand}"
+                                DragCompletedCommand="{Binding DragCompletedCommand}" />
+                    </VerticalStackLayout>
+
                     <!-- Size (Conditional) -->
-                    <VerticalStackLayout Grid.Row="3" Spacing="8" IsVisible="{Binding IsBrush}">
+                    <VerticalStackLayout Grid.Row="4" Spacing="8" IsVisible="{Binding IsBrush}">
                         <Grid ColumnDefinitions="*, Auto">
                             <Label Text="Brush Size" FontAttributes="Bold" FontSize="14" />
                             <Label Grid.Column="1" Text="{Binding BrushSize, StringFormat='{0:F0}'}" FontSize="14" FontAttributes="Bold"/>
@@ -74,7 +88,7 @@
                     </VerticalStackLayout>
 
                     <!-- Done Button -->
-                    <Button Grid.Row="4"
+                    <Button Grid.Row="5"
                             Text="Done"
                             Command="{Binding CloseCommand}"
                             Margin="0,8,0,0"/>

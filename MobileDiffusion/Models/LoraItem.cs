@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace MobileDiffusion.Models.Automatic1111;
+namespace MobileDiffusion.Models;
 
 /// <summary>
 ///     The generated sdapi/v1/loras GET method returns an object so convert to this.

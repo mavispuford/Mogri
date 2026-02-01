@@ -92,9 +92,61 @@ public class GestureContainer : ContentView
         
         var pinchGesture = new PinchGestureRecognizer();
         pinchGesture.PinchUpdated += OnPinchUpdated;
+
+        var doubleTapGesture = new TapGestureRecognizer { NumberOfTapsRequired = 2 };
+        doubleTapGesture.Tapped += OnDoubleTapped;
         
         GestureRecognizers.Add(panGesture);
         GestureRecognizers.Add(pinchGesture);
+        GestureRecognizers.Add(doubleTapGesture);
+    }
+
+    private void OnDoubleTapped(object? sender, TappedEventArgs e)
+    {
+        if (Content == null) return;
+
+        if (currentScale > 1)
+        {
+            Reset(true);
+        }
+        else
+        {
+            var tapPosition = e.GetPosition(Content);
+            if (tapPosition == null) return;
+
+            // Zoom to 2x
+            currentScale = 2;
+            startScale = 2;
+
+            double contentWidth = Content.Width;
+            double contentHeight = Content.Height;
+
+            // Center of the view
+            double elementCenterX = contentWidth / 2;
+            double elementCenterY = contentHeight / 2;
+
+            // Calculate target translation to keep tap position under the finger.
+            // Formula derived from: TapPos_Viewport = (TapPos_Content - Center) * Scale + Center + Translation
+            // We want TapPos_Viewport_Start (Scale=1, Trans=0) == TapPos_Viewport_End (Scale=2, Trans=New)
+            // TapPos_V = TapPos_C
+            // TapPos_C = (TapPos_C - Center) * 2 + Center + NewTrans
+            // NewTrans = TapPos_C - ((TapPos_C - Center) * 2 + Center)
+            //          = TapPos_C - (2*TapPos_C - 2*Center + Center)
+            //          = TapPos_C - 2*TapPos_C + Center
+            //          = Center - TapPos_C
+            double targetTranslationX = elementCenterX - tapPosition.Value.X;
+            double targetTranslationY = elementCenterY - tapPosition.Value.Y;
+
+            // Clamp translation so we don't show whitespace
+            var maxTranslationX = Math.Max(0, (contentWidth * currentScale - contentWidth) / 2);
+            var maxTranslationY = Math.Max(0, (contentHeight * currentScale - contentHeight) / 2);
+
+            targetTranslationX = Math.Clamp(targetTranslationX, -maxTranslationX, maxTranslationX);
+            targetTranslationY = Math.Clamp(targetTranslationY, -maxTranslationY, maxTranslationY);
+
+            Content.ScaleTo(currentScale, 250, Easing.CubicInOut);
+            Content.TranslateTo(targetTranslationX, targetTranslationY, 250, Easing.CubicInOut);
+        }
     }
 
     void OnPinchUpdated(object sender, PinchGestureUpdatedEventArgs e)
@@ -312,11 +364,15 @@ public class GestureContainer : ContentView
 
     private void clampTranslation()
     {
-        var maxTranslationX = (Content.Width / 2) * currentScale;
-        var maxTranslationY = (Content.Height / 2) * currentScale;
+        // Only allow panning if the zoomed content is larger than the viewport.
+        // The max allowed translation is half the difference between scaled content size and viewport size.
+        // This ensures the edge of the content never crosses the edge of the viewport (no whitespace).
+        
+        var maxTranslationX = Math.Max(0, (Content.Width * currentScale - Content.Width) / 2);
+        var maxTranslationY = Math.Max(0, (Content.Height * currentScale - Content.Height) / 2);
 
-        Content.TranslationX = double.Clamp(Content.TranslationX, -maxTranslationX, maxTranslationX);
-        Content.TranslationY = double.Clamp(Content.TranslationY, -maxTranslationY, maxTranslationY);
+        Content.TranslationX = Math.Clamp(Content.TranslationX, -maxTranslationX, maxTranslationX);
+        Content.TranslationY = Math.Clamp(Content.TranslationY, -maxTranslationY, maxTranslationY);
     }
 
     private void cancelTranslationAnimations()
