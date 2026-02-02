@@ -67,7 +67,6 @@
                 </ImageButton.Source>
             </ImageButton>
 
-            <!-- Not currently supported by Automatic1111 -->
             <!--<Button Grid.Column="2"
                     Text="Create"
                     Command="{Binding ShowPromptStyleCreationPromptCommand}"
