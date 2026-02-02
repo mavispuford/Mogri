@@ -1,6 +1,7 @@
 using CommunityToolkit.Maui.Behaviors;
 using CommunityToolkit.Maui.Core;
 using MobileDiffusion.Interfaces.ViewModels;
+using MobileDiffusion.Interfaces.ViewModels.Pages;
 
 namespace MobileDiffusion.Views;
 
