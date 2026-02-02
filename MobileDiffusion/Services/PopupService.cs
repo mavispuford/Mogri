@@ -3,6 +3,7 @@
 using CommunityToolkit.Maui.Views;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
+using MobileDiffusion.Interfaces.ViewModels.Popups;
 using MobileDiffusion.Registrations;
 using Mopups.Pages;
 using Mopups.Services;

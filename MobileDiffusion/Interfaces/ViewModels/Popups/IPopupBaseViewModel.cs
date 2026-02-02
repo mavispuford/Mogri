@@ -1,4 +1,4 @@
-﻿namespace MobileDiffusion.Interfaces.ViewModels;
+﻿namespace MobileDiffusion.Interfaces.ViewModels.Popups;
 
 public interface IPopupBaseViewModel : IQueryAttributable, IBaseViewModel
 {
