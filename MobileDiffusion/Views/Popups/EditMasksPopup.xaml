@@ -2,7 +2,7 @@
 <popups:BasePopup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                   xmlns:popups="clr-namespace:MobileDiffusion.Views.Popups"
-                  xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
+                  xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels.Popups"
                   x:Class="MobileDiffusion.Views.Popups.EditMasksPopup"
                   x:DataType="viewModels:IEditMasksPopupViewModel">
 

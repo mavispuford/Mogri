@@ -1,4 +1,5 @@
 ﻿using MobileDiffusion.Interfaces.ViewModels;
+using MobileDiffusion.Interfaces.ViewModels.Popups;
 using MobileDiffusion.Models;
 using MobileDiffusion.Views.Popups;
 using Mopups.Pages;
