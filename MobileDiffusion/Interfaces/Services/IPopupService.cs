@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using MobileDiffusion.Interfaces.ViewModels;
+using MobileDiffusion.Interfaces.ViewModels.Popups;
 
 namespace MobileDiffusion.Interfaces.Services;
 
