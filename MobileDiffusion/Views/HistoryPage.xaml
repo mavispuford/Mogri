@@ -3,11 +3,12 @@
                 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                 xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                 xmlns:animations="clr-namespace:MobileDiffusion.Animations;assembly=MobileDiffusion"
+                xmlns:pages="clr-namespace:MobileDiffusion.Interfaces.ViewModels.Pages"
                 xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
                 xmlns:views="clr-namespace:MobileDiffusion.Views;assembly=MobileDiffusion"
                 x:Class="MobileDiffusion.Views.HistoryPage"
                 x:Name="HistoryPageRoot"
-                x:DataType="viewModels:IHistoryPageViewModel"
+                x:DataType="pages:IHistoryPageViewModel"
                 Shell.PresentationMode="Animated"
                 Shell.NavBarIsVisible="True"
                 Shell.TabBarIsVisible="False"
@@ -124,9 +125,9 @@
                                      Aspect="AspectFill"
                                      WidthRequest="200"
                                      HeightRequest="200"
-                                     Command="{Binding ItemTappedCommand, Source={RelativeSource AncestorType={x:Type viewModels:IHistoryPageViewModel}}}"
+                                     Command="{Binding ItemTappedCommand, Source={RelativeSource AncestorType={x:Type pages:IHistoryPageViewModel}}}"
                                      CommandParameter="{Binding .}"
-                                     InputTransparent="{Binding SelectionModeEnabled, Source={RelativeSource AncestorType={x:Type viewModels:IHistoryPageViewModel}}}">
+                                     InputTransparent="{Binding SelectionModeEnabled, Source={RelativeSource AncestorType={x:Type pages:IHistoryPageViewModel}}}">
 
                             <ImageButton.Behaviors>
                                 <toolkit:TouchBehavior LongPressCommand="{Binding BindingContext.ItemLongPressedCommand, Source={x:Reference HistoryPageRoot}}"

@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Enums;
 using MobileDiffusion.Interfaces.ViewModels;
+using MobileDiffusion.Interfaces.ViewModels.Pages;
 using MobileDiffusion.ViewModels;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
