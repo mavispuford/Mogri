@@ -35,8 +35,6 @@ public static class ServiceRegistrations
         }); 
 
         builder.Services.AddSingleton<IImageGenerationService, SdForgeNeoService>();
-        //builder.Services.AddSingleton<IImageGenerationService, Automatic1111Service>();
-        //builder.Services.AddSingleton<IImageGenerationService, LSteinStableDiffusionService>();
         builder.Services.AddSingleton<IPopupService, PopupService>();
         builder.Services.AddSingleton<IImageService, ImageService>();
         builder.Services.AddSingleton<ISegmentationService, SegmentationService>();

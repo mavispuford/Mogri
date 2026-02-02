@@ -210,7 +210,6 @@ namespace MobileDiffusion.Services
 
                         apiResponse = new ApiResponse
                         {
-                            StableDiffusionApi = Enums.StableDiffusionApi.Automatic1111,
                             ResponseObject = generationResponse,
                             Progress = 1f
                         };
@@ -231,7 +230,6 @@ namespace MobileDiffusion.Services
 
                     apiResponse = new ApiResponse
                     {
-                        StableDiffusionApi = Enums.StableDiffusionApi.Automatic1111,
                         ResponseObject = generationResponse,
                         Progress = 1f
                     };
@@ -303,7 +301,6 @@ namespace MobileDiffusion.Services
 
                         apiResponse = new ApiResponse
                         {
-                            StableDiffusionApi = Enums.StableDiffusionApi.Automatic1111,
                             ResponseObject = generationResponse,
                             Progress = 1f
                         };
@@ -324,7 +321,6 @@ namespace MobileDiffusion.Services
 
                     apiResponse = new ApiResponse
                     {
-                        StableDiffusionApi = Enums.StableDiffusionApi.Automatic1111,
                         ResponseObject = generationResponse,
                         Progress = 1f
                     };
@@ -381,7 +377,6 @@ namespace MobileDiffusion.Services
 
                 var progressApiResponse = new ApiResponse
                 {
-                    StableDiffusionApi = Enums.StableDiffusionApi.Automatic1111,
                     ResponseObject = progressResponse,
                     Progress = progress.Value
                 };

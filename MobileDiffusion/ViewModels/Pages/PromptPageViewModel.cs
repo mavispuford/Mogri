@@ -152,8 +152,6 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
 
         if (accepted)
         {
-            // TODO - Create style - Automatic1111 APIs don't currently support this
-
             //await _stableDiffusionService.CreatePromptStyleAsync();
         }
     }
