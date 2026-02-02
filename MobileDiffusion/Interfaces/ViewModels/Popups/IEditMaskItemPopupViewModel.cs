@@ -1,7 +1,7 @@
 using MobileDiffusion.Interfaces.ViewModels;
 using CommunityToolkit.Mvvm.Input;
 
-namespace MobileDiffusion.Interfaces.ViewModels;
+namespace MobileDiffusion.Interfaces.ViewModels.Popups;
 
 public interface IEditMaskItemPopupViewModel : IPopupBaseViewModel
 {

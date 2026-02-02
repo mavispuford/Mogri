@@ -4,7 +4,7 @@
                   xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                   xmlns:controls="clr-namespace:MobileDiffusion.Controls;assembly=MobileDiffusion"
                   xmlns:mopups="clr-namespace:Mopups.Pages;assembly=Mopups"
-                  xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
+                  xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels.Popups"
                   xmlns:popups="clr-namespace:MobileDiffusion.Views.Popups"
                   x:Class="MobileDiffusion.Views.Popups.ColorPickerPopup"
                   x:DataType="viewModels:IColorPickerPopupViewModel">

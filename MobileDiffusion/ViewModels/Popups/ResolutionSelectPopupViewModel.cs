@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Helpers;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
+using MobileDiffusion.Interfaces.ViewModels.Popups;
 
 namespace MobileDiffusion.ViewModels;
 
