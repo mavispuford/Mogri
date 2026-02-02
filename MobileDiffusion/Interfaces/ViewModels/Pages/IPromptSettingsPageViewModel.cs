@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Enums;
 
-namespace MobileDiffusion.Interfaces.ViewModels;
+namespace MobileDiffusion.Interfaces.ViewModels.Pages;
 
 public interface IPromptSettingsPageViewModel : IPageViewModel
 {

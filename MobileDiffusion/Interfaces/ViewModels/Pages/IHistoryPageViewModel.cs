@@ -3,7 +3,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 
-namespace MobileDiffusion.Interfaces.ViewModels;
+namespace MobileDiffusion.Interfaces.ViewModels.Pages;
 
 public interface IHistoryPageViewModel : IPageViewModel
 {

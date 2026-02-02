@@ -6,6 +6,7 @@ using MobileDiffusion.Enums;
 using MobileDiffusion.Helpers;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
+using MobileDiffusion.Interfaces.ViewModels.Pages;
 using SkiaSharp;
 using System.Collections.ObjectModel;
 using MobileDiffusion.Models;

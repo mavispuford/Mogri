@@ -3,12 +3,13 @@
                 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                 xmlns:controls="clr-namespace:MobileDiffusion.Controls;assembly=MobileDiffusion"
                 xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+                xmlns:pages="clr-namespace:MobileDiffusion.Interfaces.ViewModels.Pages"
                 xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
                 xmlns:views="clr-namespace:MobileDiffusion.Views;assembly=MobileDiffusion"
                 x:Class="MobileDiffusion.Views.PromptPage"
                 Title="Prompt Editor"
                 Shell.TabBarIsVisible="False"
-                x:DataType="viewModels:IPromptPageViewModel">
+                x:DataType="pages:IPromptPageViewModel">
     <Grid RowDefinitions="auto,*,auto,*,auto,*,auto,*"
           Padding="30">
         <Label Grid.Row="0"
@@ -98,7 +99,7 @@
                         <controls:PillControl
                             Text="{Binding Name}"
                             TooltipText="Remove Style"
-                            Command="{Binding RemovePromptStyleCommand, Source={RelativeSource AncestorType={x:Type viewModels:IPromptPageViewModel}}}"
+                            Command="{Binding RemovePromptStyleCommand, Source={RelativeSource AncestorType={x:Type pages:IPromptPageViewModel}}}"
                             CommandParameter="{Binding .}" />
                     </DataTemplate>
                 </BindableLayout.ItemTemplate>
@@ -140,7 +141,7 @@
                         <controls:PillControl
                             Text="{Binding Name}"
                             TooltipText="Remove Lora"
-                            Command="{Binding RemoveLoraCommand, Source={RelativeSource AncestorType={x:Type viewModels:IPromptPageViewModel}}}"
+                            Command="{Binding RemoveLoraCommand, Source={RelativeSource AncestorType={x:Type pages:IPromptPageViewModel}}}"
                             CommandParameter="{Binding .}" />
                     </DataTemplate>
                 </BindableLayout.ItemTemplate>

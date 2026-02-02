@@ -3,10 +3,11 @@
                 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                 xmlns:models="clr-namespace:MobileDiffusion.Models"
                 xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+                xmlns:pages="clr-namespace:MobileDiffusion.Interfaces.ViewModels.Pages"
                 xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
                 xmlns:views="clr-namespace:MobileDiffusion.Views"
                 x:Class="MobileDiffusion.Views.PromptStyleSelectionPage"
-                x:DataType="viewModels:IPromptStyleSelectionPageViewModel"
+                x:DataType="pages:IPromptStyleSelectionPageViewModel"
                 Shell.PresentationMode="Animated"
                 Shell.NavBarIsVisible="True"
                 Shell.TabBarIsVisible="False"
@@ -82,7 +83,7 @@
                                      ToolTipProperties.Text="Info"
                                      HorizontalOptions="End"
                                      VerticalOptions="Fill"
-                                     Command="{Binding ShowPromptStyleInfoCommand, Source={RelativeSource AncestorType={x:Type viewModels:IPromptStyleSelectionPageViewModel}}}"
+                                     Command="{Binding ShowPromptStyleInfoCommand, Source={RelativeSource AncestorType={x:Type pages:IPromptStyleSelectionPageViewModel}}}"
                                      CommandParameter="{Binding .}">
                             <ImageButton.Source>
                                 <FontImageSource Glyph="&#xe88e;" FontFamily="MaterialIconsRound400" Size="30" Color="{StaticResource IndependenceAccent}" />

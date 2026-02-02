@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Helpers;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
+using MobileDiffusion.Interfaces.ViewModels.Pages;
 using MobileDiffusion.Models;
 using SkiaSharp.Views.Maui.Controls;
 

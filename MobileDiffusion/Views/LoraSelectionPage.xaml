@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <views:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                xmlns:pages="clr-namespace:MobileDiffusion.Interfaces.ViewModels.Pages"
                 xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
                 xmlns:views="clr-namespace:MobileDiffusion.Views"
                 x:Class="MobileDiffusion.Views.LoraSelectionPage"
@@ -8,7 +9,7 @@
                 Shell.NavBarIsVisible="True"
                 Shell.TabBarIsVisible="False"
                 Title="LoRAs"
-                x:DataType="viewModels:ILoraSelectionPageViewModel">
+                x:DataType="pages:ILoraSelectionPageViewModel">
     <Grid RowDefinitions="*, auto, auto">
         <Grid RowDefinitions="auto, *" 
               ColumnDefinitions="auto,*"
@@ -27,11 +28,11 @@
                     Title="Tap to select"
                     Grid.Column="1"
                     x:DataType="viewModels:ILoraViewModel"
-                    ItemsSource="{Binding AvailableLoras, Source={x:RelativeSource AncestorType={x:Type viewModels:ILoraSelectionPageViewModel}}}" 
+                    ItemsSource="{Binding AvailableLoras, Source={x:RelativeSource AncestorType={x:Type pages:ILoraSelectionPageViewModel}}}" 
                     ItemDisplayBinding="{Binding Alias}"
                     FontSize="18"
                     VerticalTextAlignment="Center"
-                    SelectedItem="{Binding LoraToAdd, Source={x:RelativeSource AncestorType={x:Type viewModels:ILoraSelectionPageViewModel}}}"/>
+                    SelectedItem="{Binding LoraToAdd, Source={x:RelativeSource AncestorType={x:Type pages:ILoraSelectionPageViewModel}}}"/>
 
             <ScrollView Grid.Row="1" 
                         Grid.Column="0"
@@ -52,7 +53,7 @@
 
                                     <ImageButton Grid.Column="1"
                                                  HorizontalOptions="End" 
-                                                 Command="{Binding RemoveCommand, Source={x:RelativeSource AncestorType={x:Type viewModels:ILoraSelectionPageViewModel}}}"
+                                                 Command="{Binding RemoveCommand, Source={x:RelativeSource AncestorType={x:Type pages:ILoraSelectionPageViewModel}}}"
                                                  CommandParameter="{Binding .}">
                                         <ImageButton.Source>
                                             <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />

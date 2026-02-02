@@ -5,7 +5,7 @@ using SkiaSharp;
 using System.Collections.ObjectModel;
 using MobileDiffusion.Models;
 
-namespace MobileDiffusion.Interfaces.ViewModels;
+namespace MobileDiffusion.Interfaces.ViewModels.Pages;
 
 public interface ICanvasPageViewModel : IPageViewModel
 {
