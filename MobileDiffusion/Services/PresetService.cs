@@ -34,7 +34,7 @@ namespace MobileDiffusion.Services
                     // Keep empty dictionary
                 }
             }
-            
+
             _isInitialized = true;
         }
 
@@ -53,10 +53,10 @@ namespace MobileDiffusion.Services
         public async Task SavePresetAsync(string name, PromptSettings settings)
         {
             await InitializeAsync();
-            
+
             // Clone to avoid reference issues
             var settingsClone = settings.Clone();
-            
+
             // Clear out properties that we don't want to save
             settingsClone.InitImage = string.Empty;
             settingsClone.InitImageThumbnail = string.Empty;

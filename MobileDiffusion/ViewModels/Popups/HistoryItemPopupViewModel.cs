@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
@@ -99,7 +99,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
             await Task.Run(async () =>
             {
                 using var fileStream = await _fileService.GetFileStreamFromInternalStorageAsync(currentItem.FileName);
-                
+
                 if (fileStream == null)
                 {
                     return;
@@ -107,7 +107,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
 
                 var originalBitmap = _imageService.GetSkBitmapFromStream(fileStream);
                 var resizedBitmap = _imageService.GetResizedSKBitmap(originalBitmap, (int)Constants.MaximumDisplayWidthHeight, (int)Constants.MaximumDisplayWidthHeight, filterImage: true, onlyIfLarger: true);
-                
+
                 imageSource = new SKBitmapImageSource
                 {
                     Bitmap = resizedBitmap
@@ -129,7 +129,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
             {
                 using var imageFileStream = await _fileService.GetFileStreamFromInternalStorageAsync(currentItem.FileName);
                 if (imageFileStream == null) return;
-                
+
                 using var memoryStream = new MemoryStream();
                 await imageFileStream.CopyToAsync(memoryStream);
                 var imageString = Convert.ToBase64String(memoryStream.ToArray());
@@ -186,7 +186,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
 
         await _fileService.DeleteFileFromInternalStorage(HistoryItem.FileName);
         await _fileService.DeleteFileFromInternalStorage(HistoryItem.ThumbnailFileName);
-        
+
         var parameters = new Dictionary<string, object>
         {
             { NavigationParams.DeletedHistoryItem, true }
@@ -207,7 +207,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
         if (HistoryItem == null) return;
 
         var stream = await _fileService.GetFileStreamFromInternalStorageAsync(HistoryItem.FileName);
-        
+
         if (stream == null) return;
 
         await _fileService.WriteImageFileToExternalStorageAsync(Path.GetFileName(HistoryItem.FileName), stream);
@@ -241,8 +241,8 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
         var message = $"Prompt: {HistoryItem.Settings.Prompt}\n\n" +
             $"Negative Prompt: {HistoryItem.Settings.NegativePrompt}\n\n" +
             $"Steps: {HistoryItem.Settings.Steps}, Sampler: {HistoryItem.Settings.Sampler}\n" +
-            $"Guidance Scale (Cfg): {HistoryItem.Settings.GuidanceScale}\n" + 
-            $"Seed: {HistoryItem.Settings.Seed}\n" + 
+            $"Guidance Scale (Cfg): {HistoryItem.Settings.GuidanceScale}\n" +
+            $"Seed: {HistoryItem.Settings.Seed}\n" +
             $"Size: {HistoryItem.Settings.Width}x{HistoryItem.Settings.Height}\n" +
             $"Denoising Strength: {HistoryItem.Settings.DenoisingStrength}\n" +
             $"Model: {HistoryItem.Settings.Model?.DisplayName ?? "Unknown"}";

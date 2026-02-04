@@ -1,4 +1,4 @@
-﻿using ColorMine.ColorSpaces.Comparisons;
+using ColorMine.ColorSpaces.Comparisons;
 using ColorMine.ColorSpaces;
 using MobileDiffusion.Interfaces.Services;
 using SkiaSharp;
@@ -42,7 +42,7 @@ public class ImageService : IImageService
         {
             // TODO - Handle exceptions
         }
-        
+
         return Task.FromResult<MemoryStream?>(null);
     }
 
@@ -107,8 +107,8 @@ public class ImageService : IImageService
             {
                 return bitmap;
             }
-            
-            if (onlyIfLarger && 
+
+            if (onlyIfLarger &&
                 bitmap.Width < width &&
                 bitmap.Height < height)
             {
@@ -282,7 +282,7 @@ public class ImageService : IImageService
         const int maxSize = 128;
 
         var smallBitmap = GetResizedSKBitmap(bitmap, maxSize, maxSize, false, false, false);
-        
+
         if (smallBitmap == null)
         {
             return null;

@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
@@ -62,7 +62,7 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
         if (ResultItem == null) return;
 
         var stream = await _fileService.GetFileStreamFromInternalStorageAsync(ResultItem.InternalUri);
-        
+
         if (stream == null) return;
 
         await _fileService.WriteImageFileToExternalStorageAsync(Path.GetFileName(ResultItem.InternalUri), stream);

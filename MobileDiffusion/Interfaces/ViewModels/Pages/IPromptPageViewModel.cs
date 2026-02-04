@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 
 namespace MobileDiffusion.Interfaces.ViewModels.Pages;
@@ -24,7 +24,7 @@ public interface IPromptPageViewModel : IPageViewModel
     IRelayCommand<IPromptStyleViewModel> RemovePromptStyleCommand { get; }
 
     IRelayCommand<ILoraViewModel> RemoveLoraCommand { get; }
-    
+
     IAsyncRelayCommand ShowLoraSelectionPageCommand { get; }
 
     IAsyncRelayCommand ShowPromptStyleCreationPromptCommand { get; }

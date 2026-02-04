@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Enums;
 using MobileDiffusion.Interfaces.Services;
@@ -15,7 +15,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     private readonly IPresetService _presetService;
 
     private PromptSettings _settings = new();
-    
+
     [ObservableProperty]
     public partial List<IModelViewModel> AvailableModelValues { get; set; } = new();
 
@@ -86,8 +86,8 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     public partial bool EnableUpscaling { get; set; }
 
     [ObservableProperty]
-    public partial string? Upscaler { get; set; } 
-    
+    public partial string? Upscaler { get; set; }
+
     [ObservableProperty]
     public partial string? UpscaleLevel { get; set; }
 
@@ -127,7 +127,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         try
         {
             var profile = GenerationProfile.GetDefault(value);
-            
+
             Steps = profile.DefaultSteps.ToString();
             CfgScale = profile.DefaultCfg.ToString();
             DistilledCfgScale = profile.DefaultDistilledCfg?.ToString();
@@ -146,7 +146,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
                     Height = defaultHeight;
                 }
             }
-            
+
             Sampler = profile.DefaultSampler;
             Scheduler = profile.DefaultScheduler;
 
@@ -235,7 +235,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     private async Task ResetValues()
     {
         var result = await Shell.Current.DisplayAlertAsync("Confirm Reset", "Are you sure you would like to reset back to defaults?", "RESET", "Cancel");
-        
+
         if (!result)
         {
             return;
@@ -312,7 +312,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         {
             await LoadingService.HideAsync();
         }
-        
+
     }
 
     [RelayCommand]
@@ -365,8 +365,8 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             BatchCount = _settings.BatchCount.ToString();
             BatchSize = _settings.BatchSize.ToString();
             MakeSeamless = _settings.Seamless == OnOff.on;
-            Model = _settings.Model != null 
-                ? AvailableModelValues?.FirstOrDefault(m => m.Key == _settings.Model.Key) 
+            Model = _settings.Model != null
+                ? AvailableModelValues?.FirstOrDefault(m => m.Key == _settings.Model.Key)
                 : null;
             Sampler = _settings.Sampler;
             Scheduler = _settings.Scheduler;
@@ -375,7 +375,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             Steps = _settings.Steps.ToString();
             Upscaler = _settings.Upscaler?.ToString();
             UpscaleLevel = _settings.UpscaleLevel == 0 ? "2" : _settings.UpscaleLevel.ToString();
-            UpscaleSteps= _settings.UpscaleSteps.ToString();
+            UpscaleSteps = _settings.UpscaleSteps.ToString();
             Width = _settings.Width.ToString();
 
             IsSchedulerVisible = SelectedModelType == ModelType.ZImage;
@@ -428,7 +428,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
 
             _settings = settings;
 
-#region Prompt Page
+            #region Prompt Page
 
             // Set the Prompt Page properties back if they were previously set
 
@@ -452,9 +452,9 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
                 _settings.Loras = currentLoras;
             }
 
-#endregion
+            #endregion
 
-#region Image to Image Settings
+            #region Image to Image Settings
 
             // Set the init image and mask if it was already set
 
@@ -468,8 +468,8 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
                 _settings.Mask = currentMask;
             }
 
-#endregion
-            
+            #endregion
+
             mapSettingsToProperties();
         }
     }

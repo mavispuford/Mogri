@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
@@ -72,7 +72,7 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
 
         if (_settings == null)
         {
-             return;
+            return;
         }
 
         try
@@ -111,7 +111,7 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
                     {
                         var matchingLoras = AvailableLoras.SelectMany(a => _settings.Loras.Where(p => p.Name.Equals(a.Name, StringComparison.Ordinal)));
 
-                        foreach(var lora in SelectedLoras.Where(l => !matchingLoras.Any(ml => ml.Name == l.Name)))
+                        foreach (var lora in SelectedLoras.Where(l => !matchingLoras.Any(ml => ml.Name == l.Name)))
                         {
                             Shell.Current.Dispatcher.Dispatch(() =>
                             {
@@ -119,7 +119,7 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
                             });
                         }
 
-                        foreach(var lora in matchingLoras.Where(l => !SelectedLoras.Any(sl => sl.Name == l.Name)))
+                        foreach (var lora in matchingLoras.Where(l => !SelectedLoras.Any(sl => sl.Name == l.Name)))
                         {
                             Shell.Current.Dispatcher.Dispatch(() =>
                             {
@@ -255,7 +255,7 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
     private void mapSettingsToProperties()
     {
         if (_settings == null) return;
-        
+
         Prompt = _settings.Prompt;
         NegativePrompt = _settings.NegativePrompt;
     }

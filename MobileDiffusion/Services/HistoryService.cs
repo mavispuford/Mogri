@@ -49,7 +49,7 @@ public class HistoryService : IHistoryService
             // Use EnumerateFiles for lower memory footprint, though we still need to realize a list for comparison
             // But projection helps.
             var imageFiles = Directory.GetFiles(cacheDir, "*.png");
-            
+
             // Files on disk map
             var diskFilesMap = new Dictionary<string, FileInfo>();
             foreach (var f in imageFiles)
@@ -76,7 +76,7 @@ public class HistoryService : IHistoryService
                     toRemove.Add(kvp.Value);
                 }
             }
-            
+
             if (toRemove.Count > 0)
             {
                 hasChanges = true;
@@ -103,17 +103,17 @@ public class HistoryService : IHistoryService
                     }
                 }
             }
-            
+
             // Process insertions in batch to minimize DB lock time and ensure transaction safety
             var newEntities = new List<HistoryEntity>();
-            
+
             foreach (var kvp in diskFilesMap)
             {
                 var filePath = kvp.Key;
                 if (!dbEntries.ContainsKey(filePath))
                 {
-                     try
-                     {
+                    try
+                    {
                         var fileInfo = kvp.Value;
                         var (positive, negative, raw) = await PngMetadataHelper.ReadParametersAsync(filePath);
 
@@ -126,20 +126,20 @@ public class HistoryService : IHistoryService
                             CreatedAt = fileInfo.CreationTime
                         };
                         newEntities.Add(entity);
-                     }
-                     catch(Exception ex)
-                     {
-                         System.Diagnostics.Debug.WriteLine($"Failed to process history file {filePath}: {ex}");
-                     }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Failed to process history file {filePath}: {ex}");
+                    }
                 }
             }
-            
-            if(newEntities.Count > 0)
+
+            if (newEntities.Count > 0)
             {
                 hasChanges = true;
                 col.InsertBulk(newEntities);
             }
-            
+
             return hasChanges;
         });
     }
@@ -171,7 +171,7 @@ public class HistoryService : IHistoryService
                     isExact = true;
                     cleanQuery = lowerQuery.Substring(1, lowerQuery.Length - 2);
                 }
-                
+
                 // Fetch all matching records to sort them by relevance in memory
                 var candidates = col.Query()
                     .Where(x => (x.UserPrompt != null && x.UserPrompt.ToLower().Contains(cleanQuery)) ||
@@ -184,7 +184,7 @@ public class HistoryService : IHistoryService
                 }
 
                 result = candidates
-                    .Select(x => 
+                    .Select(x =>
                     {
                         var score1 = GetStringScore(x.UserPrompt ?? string.Empty, cleanQuery);
                         var score2 = GetStringScore(x.NegativePrompt ?? string.Empty, cleanQuery);
@@ -197,7 +197,7 @@ public class HistoryService : IHistoryService
                     .Take(take) // Using Take instead of Limit for IEnumerable
                     .Select(x => x.Item);
             }
-            
+
             // Materialize list before disposing DB
             return (IEnumerable<HistoryEntity>)result.ToList();
         });
@@ -231,10 +231,10 @@ public class HistoryService : IHistoryService
     private bool IsWholeWordMatch(string text, string lowerQuery)
     {
         if (string.IsNullOrEmpty(text)) return false;
-        
+
         var lowerText = text.ToLower();
         int index = lowerText.IndexOf(lowerQuery, StringComparison.Ordinal);
-        
+
         while (index != -1)
         {
             bool startOk = index == 0 || !char.IsLetterOrDigit(lowerText[index - 1]);
@@ -252,10 +252,10 @@ public class HistoryService : IHistoryService
         if (string.IsNullOrEmpty(text)) return 3;
 
         if (text.StartsWith(lowerQuery, StringComparison.OrdinalIgnoreCase)) return 0;
-        
+
         var lowerText = text.ToLower();
         int index = lowerText.IndexOf(lowerQuery, StringComparison.Ordinal);
-        
+
         if (index == -1) return 3;
 
         while (index != -1)
@@ -266,7 +266,7 @@ public class HistoryService : IHistoryService
             }
             index = lowerText.IndexOf(lowerQuery, index + 1, StringComparison.Ordinal);
         }
-        
+
         return 2;
     }
 }

@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
@@ -13,7 +13,7 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
 
     [ObservableProperty]
     public partial string DefaultWidth { get; set; }
-    
+
     [ObservableProperty]
     public partial string DefaultHeight { get; set; }
 

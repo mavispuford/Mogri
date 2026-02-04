@@ -1,4 +1,4 @@
-﻿using MobileDiffusion.ViewModels;
+using MobileDiffusion.ViewModels;
 
 namespace MobileDiffusion.Interfaces.Services;
 

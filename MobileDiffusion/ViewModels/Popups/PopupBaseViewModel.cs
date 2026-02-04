@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using MobileDiffusion.Interfaces.Services;
@@ -74,5 +74,5 @@ public partial class PopupBaseViewModel : BaseViewModel, IPopupBaseViewModel
         {
             // TODO - Handle this
         }
-    } 
+    }
 }

@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Maui.Animations;
+using CommunityToolkit.Maui.Animations;
 
 namespace MobileDiffusion.Animations;
 
@@ -6,8 +6,8 @@ public class FadeToAnimation : BaseAnimation
 {
     public static readonly BindableProperty OpacityProperty = BindableProperty.Create(nameof(Opacity), typeof(double), typeof(FadeToAnimation), 1.0);
 
-    public double Opacity 
-    { 
+    public double Opacity
+    {
         get => (double)GetValue(OpacityProperty);
         set => SetValue(OpacityProperty, value);
     }

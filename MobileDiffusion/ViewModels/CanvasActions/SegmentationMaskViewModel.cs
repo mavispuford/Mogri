@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using MobileDiffusion.Helpers;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;

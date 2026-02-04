@@ -6,10 +6,10 @@ namespace MobileDiffusion.Views.Popups;
 
 public partial class EditMasksPopup : BasePopup
 {
-	public EditMasksPopup()
-	{
-		InitializeComponent();
-	}
+    public EditMasksPopup()
+    {
+        InitializeComponent();
+    }
 
     private void OnCloseClicked(object? sender, EventArgs e)
     {

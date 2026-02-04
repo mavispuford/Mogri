@@ -1,4 +1,4 @@
-﻿namespace MobileDiffusion.Helpers;
+namespace MobileDiffusion.Helpers;
 
 public static class ViewExtensions
 {
@@ -25,7 +25,7 @@ public static class ViewExtensions
         var taskCompletionSource = new TaskCompletionSource<bool>();
 
         element.Animate(name, transform, callback, 16, length, easing, (v, c) => taskCompletionSource.SetResult(c));
-        
+
         return taskCompletionSource.Task;
     }
 }

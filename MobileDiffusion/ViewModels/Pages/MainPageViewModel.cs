@@ -1,4 +1,4 @@
-﻿using MobileDiffusion.Interfaces.ViewModels;
+using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Interfaces.ViewModels.Pages;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
@@ -95,7 +95,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             _settings.GuidanceScale = profile.DefaultCfg;
             _settings.Width = profile.DefaultWidth;
             _settings.Height = profile.DefaultHeight;
-            
+
             if (samplers != null && !samplers.ContainsKey(profile.DefaultSampler))
             {
                 _settings.Sampler = samplers.FirstOrDefault().Key ?? "Euler";
@@ -173,7 +173,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
                 if (resultItem == null) continue;
 
-                resultItem.ApplyQueryParamsFromResultItemCommand = new RelayCommand<IDictionary<string,object>>(ApplyQueryAttributes);
+                resultItem.ApplyQueryParamsFromResultItemCommand = new RelayCommand<IDictionary<string, object>>(ApplyQueryAttributes);
 
                 Results.Add(resultItem);
             }
@@ -517,7 +517,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         if (query.TryGetValue(NavigationParams.CanvasImageString, out var canvasImageParam))
         {
             var imageString = canvasImageParam as string;
-            
+
             if (imageString != null)
             {
                 var parameters = new Dictionary<string, object>

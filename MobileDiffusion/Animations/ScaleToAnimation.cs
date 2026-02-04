@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Maui.Animations;
+using CommunityToolkit.Maui.Animations;
 
 namespace MobileDiffusion.Animations;
 
@@ -6,8 +6,8 @@ public class ScaleToAnimation : BaseAnimation
 {
     public static readonly BindableProperty ScaleProperty = BindableProperty.Create(nameof(Scale), typeof(double), typeof(ScaleToAnimation), 1.0);
 
-    public double Scale 
-    { 
+    public double Scale
+    {
         get => (double)GetValue(ScaleProperty);
         set => SetValue(ScaleProperty, value);
     }

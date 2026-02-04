@@ -61,7 +61,7 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
         // Must keep opacity slightly above 0 to maintain touch interaction with the slider
         ContentOpacity = message.Value ? 0 : 1;
         IsDragging = message.Value;
-        
+
         if (message.Value)
         {
             PopupBackgroundColor = Colors.Transparent;
@@ -82,7 +82,7 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
     public void InitWith(CanvasActionViewModel action)
     {
         _action = action;
-        
+
         if (_action is MaskLineViewModel line)
         {
             IsBrush = true;
@@ -103,7 +103,7 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
             Alpha = seg.Alpha;
             Noise = seg.Noise;
             DisplayColor = seg.Color;
-            BrushSize = 0; 
+            BrushSize = 0;
         }
     }
 
@@ -166,7 +166,7 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
         }
 
         var result = await _popupService.ShowPopupForResultAsync("ColorPickerPopup", parameters);
-        
+
         if (result is Color color)
         {
             DisplayColor = color;

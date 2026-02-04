@@ -66,7 +66,7 @@ namespace MobileDiffusion.Services
 
         public async Task InitializeAsync()
         {
-             _baseUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
+            _baseUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
 
             if (string.IsNullOrWhiteSpace(_baseUrl) || !_baseUrl.Contains("http"))
             {
@@ -84,12 +84,12 @@ namespace MobileDiffusion.Services
                 Initialized = false;
                 return;
             }
-            
+
             // Initialize client
             var httpClient = _httpClientFactory.CreateClient();
             httpClient.BaseAddress = baseUri;
             httpClient.Timeout = TimeSpan.FromMinutes(15);
-            
+
             // Kiota setup
             var authProvider = new AnonymousAuthenticationProvider();
             var adapter = new HttpClientRequestAdapter(authProvider, httpClient: httpClient);
@@ -167,7 +167,7 @@ namespace MobileDiffusion.Services
         private async IAsyncEnumerable<ApiResponse> sendTextToImageRequest(PromptSettings settings)
         {
             var request = txt2ImageRequestFromSettings(settings);
-            
+
             if (_mainRequestCancellationSource?.IsCancellationRequested == false)
             {
                 _mainRequestCancellationSource.Cancel();
@@ -370,8 +370,9 @@ namespace MobileDiffusion.Services
                 // Note: Kiota client doesn't support query parameters easily in the generated method signature if not exposed.
                 // The generated method is: GetAsync(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
                 // We need to set skip_current_image query param.
-                
-                var progressGetResponse = await _progressClient.Sdapi.V1.Progress.GetAsync((config) => {
+
+                var progressGetResponse = await _progressClient.Sdapi.V1.Progress.GetAsync((config) =>
+                {
                     config.QueryParameters.SkipCurrentImage = skipCurrentImage;
                 }, token);
 
@@ -383,7 +384,7 @@ namespace MobileDiffusion.Services
                 var progress = progressGetResponse.EtaRelative > 0 ? progressGetResponse.Progress : 1d;
 
                 var isInterrupted = false;
-                if (progressGetResponse.State?.AdditionalData != null && 
+                if (progressGetResponse.State?.AdditionalData != null &&
                     progressGetResponse.State.AdditionalData.TryGetValue("interrupted", out var interruptedObj))
                 {
                     if (interruptedObj is UntypedBoolean interruptedBool)
@@ -452,7 +453,7 @@ namespace MobileDiffusion.Services
             {
                 request.Scheduler = settings.Scheduler;
                 System.Diagnostics.Debug.WriteLine($"[SdForgeNeoService] ZImage Scheduler: {settings.Scheduler}");
-                
+
                 if (settings.DistilledCfgScale.HasValue)
                 {
                     request.AdditionalData.Add("distilled_cfg_scale", settings.DistilledCfgScale.Value);
@@ -488,13 +489,13 @@ namespace MobileDiffusion.Services
             request.NegativePrompt = combinedPromptAndStyles.NegativePrompt;
 
             request.SamplerName = settings.Sampler;
-            
+
             var initImagesList = new List<UntypedNode>
             {
                 new UntypedString(settings.InitImage)
             };
             request.InitImages = new UntypedArray(initImagesList);
-            
+
             request.Mask = !string.IsNullOrEmpty(settings.Mask) ? settings.Mask : null;
             request.InpaintingFill = 1;
 
@@ -635,10 +636,10 @@ namespace MobileDiffusion.Services
                             settings.EnableUpscaling = !string.IsNullOrEmpty(property.Value);
                             break;
                         case PngInfoProperties.HiresUpscale:
-                             if (int.TryParse(property.Value, out var upscale)) settings.UpscaleLevel = upscale;
+                            if (int.TryParse(property.Value, out var upscale)) settings.UpscaleLevel = upscale;
                             break;
                         case PngInfoProperties.HiresSteps:
-                             if (int.TryParse(property.Value, out var hrSteps)) settings.UpscaleSteps = hrSteps;
+                            if (int.TryParse(property.Value, out var hrSteps)) settings.UpscaleSteps = hrSteps;
                             break;
                         case PngInfoProperties.Scheduler:
                         case PngInfoProperties.ScheduleType:
@@ -724,7 +725,7 @@ namespace MobileDiffusion.Services
                 Task.Run(async () => _schedulers = await _client.Sdapi.V1.Schedulers.GetAsync(cancellationToken: cts.Token)),
                 Task.Run(async () => _promptStyles = await _client.Sdapi.V1.PromptStyles.GetAsync(cancellationToken: cts.Token)),
                 Task.Run(async () => _models = await _client.Sdapi.V1.SdModels.GetAsync(cancellationToken: cts.Token)),
-                Task.Run(async () => 
+                Task.Run(async () =>
                 {
                     var lorasNode = await _client.Sdapi.V1.Loras.GetAsync(cancellationToken: cts.Token);
                     _loras = ParseLoras(lorasNode);
@@ -738,13 +739,13 @@ namespace MobileDiffusion.Services
                 while (remainingTasks.Count > 0)
                 {
                     var finishedTask = await Task.WhenAny(remainingTasks);
-                    
+
                     if (finishedTask.IsFaulted || finishedTask.IsCanceled)
                     {
-                        cts.Cancel(); 
-                        await finishedTask; 
+                        cts.Cancel();
+                        await finishedTask;
                     }
-                    
+
                     remainingTasks.Remove(finishedTask);
                 }
             }
@@ -771,17 +772,17 @@ namespace MobileDiffusion.Services
                             if (properties == null) continue;
 
                             var lora = new LoraItem();
-                            
+
                             if (properties.TryGetValue("name", out var nameNode) && nameNode is UntypedString nameStr)
                             {
                                 lora.Name = nameStr.GetValue();
                             }
-                            
+
                             if (properties.TryGetValue("alias", out var aliasNode) && aliasNode is UntypedString aliasStr)
                             {
                                 lora.Alias = aliasStr.GetValue();
                             }
-                            
+
                             loras.Add(lora);
                         }
                     }
@@ -952,7 +953,7 @@ namespace MobileDiffusion.Services
                 {
                     if (currentCheckpointHash != selectedModel.Sha256)
                     {
-                         // TryAdd to avoid exception if key exists (though new request body shouldn't have)
+                        // TryAdd to avoid exception if key exists (though new request body shouldn't have)
                         requestBody.AdditionalData.TryAdd("sd_model_checkpoint", selectedModel.Title);
                     }
 
@@ -982,7 +983,7 @@ namespace MobileDiffusion.Services
                     }
                 }
             }
-            
+
             if (!requestBody.AdditionalData.Any())
             {
                 return;

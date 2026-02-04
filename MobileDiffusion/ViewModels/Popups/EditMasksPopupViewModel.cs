@@ -62,7 +62,7 @@ public partial class EditMasksPopupViewModel : PopupBaseViewModel, IEditMasksPop
         if (_sourceActions == null) return;
 
         var filtered = _sourceActions
-            .Where(a => 
+            .Where(a =>
                 (a is MaskLineViewModel m && (m.MaskEffect == MaskEffect.Paint || m.MaskEffect == MaskEffect.Erase)) ||
                 (a is SegmentationMaskViewModel))
             .Reverse();

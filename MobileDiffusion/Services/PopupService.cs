@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 
 using CommunityToolkit.Maui.Views;
 using MobileDiffusion.Interfaces.Services;
@@ -14,7 +14,7 @@ namespace MobileDiffusion.Services
     public class PopupService : IPopupService
     {
         private static Dictionary<PopupPage, TaskCompletionSource<object?>> activePopups = new();
-        
+
         private readonly IServiceProvider _serviceProvider;
 
         public PopupService(IServiceProvider serviceProvider)
@@ -49,7 +49,7 @@ namespace MobileDiffusion.Services
             await MopupService.Instance.PushAsync(popup);
 
             // It takes a bit of time for the popup to show...
-            for(var i = 0; i < 5; i++)
+            for (var i = 0; i < 5; i++)
             {
                 if (MopupService.Instance.PopupStack.Contains(popup))
                 {
@@ -77,7 +77,7 @@ namespace MobileDiffusion.Services
             }
 
             var tcs = new TaskCompletionSource<object?>();
-            
+
             activePopups.Add(popup, tcs);
 
             await MopupService.Instance.PushAsync(popup);

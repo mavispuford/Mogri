@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Helpers;
 using MobileDiffusion.Interfaces.Services;
@@ -203,7 +203,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
             {
                 IsLoadingMaskImage = true;
             }
-        
+
             using var fileStream = await photo.OpenReadAsync();
             using var memoryStream = new MemoryStream();
             await fileStream.CopyToAsync(memoryStream);

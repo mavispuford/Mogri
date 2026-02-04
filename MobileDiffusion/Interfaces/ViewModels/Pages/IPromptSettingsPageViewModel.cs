@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Enums;
 
 namespace MobileDiffusion.Interfaces.ViewModels.Pages;
@@ -46,7 +46,7 @@ public interface IPromptSettingsPageViewModel : IPageViewModel
     string? Sampler { get; set; }
 
     string? Width { get; set; }
-    
+
     string? Height { get; set; }
 
     string? Seed { get; set; }
@@ -58,14 +58,14 @@ public interface IPromptSettingsPageViewModel : IPageViewModel
     string? GfpganStrength { get; set; }
 
     string? GfpganStrengthPlaceholder { get; set; }
-    
+
     bool EnableUpscaling { get; set; }
 
     string? Upscaler { get; set; }
 
     string? UpscaleLevel { get; set; }
 
-    string? UpscaleSteps { get; set; } 
+    string? UpscaleSteps { get; set; }
 
     string? UpscaleStepsPlaceholder { get; set; }
 

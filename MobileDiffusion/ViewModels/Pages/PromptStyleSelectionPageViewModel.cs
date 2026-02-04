@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
@@ -128,7 +128,7 @@ internal partial class PromptStyleSelectionPageViewModel : PageViewModel, IPromp
     [RelayCommand]
     private async Task ShowPromptStyleInfo(IPromptStyleViewModel promptStyleViewModel)
     {
-        if (promptStyleViewModel == null || 
+        if (promptStyleViewModel == null ||
             (string.IsNullOrEmpty(promptStyleViewModel.Prompt) && string.IsNullOrEmpty(promptStyleViewModel.NegativePrompt)))
         {
             await Shell.Current.DisplayAlertAsync("No Style Info", "This style has no prompts.", "OK");

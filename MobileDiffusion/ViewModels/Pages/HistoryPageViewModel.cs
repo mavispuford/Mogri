@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
@@ -96,7 +96,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     public override async Task OnNavigatedToAsync()
     {
         await base.OnNavigatedToAsync();
-        
+
         _isInitialized = false;
 
         _ = Task.Run(async () =>
@@ -118,7 +118,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
                         }
                         else
                         {
-                             _isInitialized = true;
+                            _isInitialized = true;
                         }
                     });
                 }
@@ -195,7 +195,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         {
             SelectedItems.Add(item);
         }
-        
+
         SelectionChanged(null);
     }
 
@@ -214,14 +214,14 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         try
         {
             var results = await _historyService.SearchAsync(SearchText ?? string.Empty, itemIndex, itemTakeCount);
-            
+
             foreach (var entity in results)
             {
                 var historyItem = _serviceProvider.GetService<IHistoryItemViewModel>();
                 if (historyItem != null)
                 {
                     HistoryItems.Add(historyItem);
-                    
+
                     // Fire and forget initialization to keep UI responsive
                     _ = Task.Run(() => historyItem.InitWith(entity, _fileService, _imageService));
                 }
@@ -243,7 +243,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     private void ToggleSelectionMode()
     {
         SelectionModeEnabled = !SelectionModeEnabled;
-        
+
         if (!SelectionModeEnabled)
         {
             HideBottomPanelCommand?.Execute(null);
@@ -310,10 +310,10 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         try
         {
             var itemsToDelete = SelectedItems.OfType<IHistoryItemViewModel>().ToList();
-            
+
             // Get entities
             var entities = itemsToDelete.Select(x => x.Entity).Where(x => x != null).ToList();
-            
+
             // Delete from Service (DB + Files)
             await _historyService.DeleteItemsAsync(entities);
 
@@ -322,13 +322,13 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
             {
                 HistoryItems.Remove(item);
             }
-            
+
             SelectedItems.Clear();
             SelectionChanged(null);
         }
         catch (Exception ex)
         {
-             await Toast.Make($"Failed to delete items: {ex.Message}").Show();
+            await Toast.Make($"Failed to delete items: {ex.Message}").Show();
         }
     }
 

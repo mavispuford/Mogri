@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Maui.Behaviors;
+using CommunityToolkit.Maui.Behaviors;
 using CommunityToolkit.Maui.Core;
 using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Interfaces.ViewModels.Popups;
@@ -112,7 +112,7 @@ public class BasePopup : PopupPage
         if (BindingContext is IPopupBaseViewModel viewModel)
         {
             viewModel.OnBackButtonPressed();
-            
+
             return true;
         }
         else

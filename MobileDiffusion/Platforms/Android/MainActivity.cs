@@ -1,4 +1,4 @@
-﻿using Android.App;
+using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.Content.Res;
@@ -6,11 +6,11 @@ using Android.OS;
 
 namespace MobileDiffusion;
 
-[Activity(Theme = "@style/Maui.SplashTheme", 
+[Activity(Theme = "@style/Maui.SplashTheme",
     MainLauncher = true,
-    LaunchMode = LaunchMode.SingleTask, 
+    LaunchMode = LaunchMode.SingleTask,
     ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
-[IntentFilter(new[] { Intent.ActionSend}, Categories = new[] { Intent.CategoryDefault }, DataMimeType = "image/*")]
+[IntentFilter(new[] { Intent.ActionSend }, Categories = new[] { Intent.CategoryDefault }, DataMimeType = "image/*")]
 public class MainActivity : MauiAppCompatActivity
 {
     public override void OnConfigurationChanged(Configuration newConfig)
@@ -82,7 +82,7 @@ public class MainActivity : MauiAppCompatActivity
                         Console.WriteLine($"{param.Key}\t\t : {param.Value}");
                     }
 
-                    var dispatcher = Dispatcher.GetForCurrentThread() ?? 
+                    var dispatcher = Dispatcher.GetForCurrentThread() ??
                         Microsoft.Maui.Controls.Application.Current?.Windows.FirstOrDefault()?.Page?.Dispatcher;
 
                     if (dispatcher != null)

@@ -1,4 +1,4 @@
-﻿using Android.Content;
+using Android.Content;
 using Android.Provider;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Models;
@@ -105,7 +105,7 @@ public class FileService : IFileService
             if (mediaCursor == null) return Task.FromResult<Stream?>(null);
 
             var columnIndexIdIndex = mediaCursor.GetColumnIndexOrThrow(MediaStore.Images.Media.InterfaceConsts.Id);
-            
+
             while (mediaCursor.MoveToNext())
             {
                 var id = mediaCursor.GetLong(columnIndexIdIndex);

@@ -174,7 +174,7 @@ public partial class CanvasPage : BasePage
     });
 
     public static BindableProperty PrepareForSavingCommandProperty = BindableProperty.Create(nameof(PrepareForSavingCommand), typeof(IAsyncRelayCommand), typeof(CanvasPage), default(IAsyncRelayCommand));
-    
+
     public static BindableProperty SegmentationCallbackCommandProperty = BindableProperty.Create(nameof(SegmentationCallbackCommand), typeof(IAsyncRelayCommand<SKBitmap>), typeof(CanvasPage), default(IAsyncRelayCommand<SKBitmap>));
 
     public static BindableProperty DoSegmentationCommandProperty = BindableProperty.Create(nameof(DoSegmentationCommand), typeof(IAsyncRelayCommand<SKPoint[]>), typeof(CanvasPage), default(IAsyncRelayCommand<SKPoint[]>));
@@ -249,7 +249,7 @@ public partial class CanvasPage : BasePage
             // Calculate height dynamically
             double translation = ActionsContainer.Height / 4;
             if (translation <= 0) translation = 200; // fallback if not measured
-            
+
             await ActionsContainer.TranslateToAsync(0, translation, 200, Easing.CubicInOut);
         }
     }
@@ -463,10 +463,10 @@ public partial class CanvasPage : BasePage
     {
         var canvas = e.Surface.Canvas;
         canvas.Clear(SKColors.Transparent);
-        
+
         // Calculate scale to transform Image Coords -> View Coords
         float scale = 1f;
-        if (Bitmap != null) 
+        if (Bitmap != null)
         {
             // e.Info.Width is ViewPixels. Bitmap.Width is ImagePixels.
             // Scale = View / Image.
@@ -481,11 +481,11 @@ public partial class CanvasPage : BasePage
                 // We pass the Source Bitmap's Info (Virtual Image Space) to the action.
                 canvas.Save();
                 canvas.Scale(scale);
-                
+
                 // Construct info representing the full Source Image dimensions
                 var virtualInfo = new SKImageInfo(Bitmap.Width, Bitmap.Height, e.Info.ColorType, e.Info.AlphaType);
                 canvasAction.Execute(canvas, virtualInfo, _isSaving);
-                
+
                 canvas.Restore();
             }
         }
@@ -503,9 +503,9 @@ public partial class CanvasPage : BasePage
     {
         var canvas = e.Surface.Canvas;
         canvas.Clear(SKColors.Transparent);
-        
+
         float scale = 1f;
-        if (Bitmap != null) 
+        if (Bitmap != null)
         {
             scale = (float)e.Info.Width / Bitmap.Width;
         }
@@ -551,7 +551,7 @@ public partial class CanvasPage : BasePage
     {
         var canvas = e.Surface.Canvas;
         canvas.Clear(SKColors.Transparent);
-        
+
         if (SegmentationBitmap != null)
         {
             canvas.DrawBitmap(SegmentationBitmap, SegmentationBitmap.Info.Rect, e.Info.Rect);
@@ -724,7 +724,7 @@ public partial class CanvasPage : BasePage
     }
 
     private void UpdateBoundingBox(bool sizeChanged, bool resetPosition = false)
-    {        
+    {
         var rectSize = (float)(BoundingBoxSize / BoundingBoxScale);
 
         if ((!_hasCreatedBoundingBox || resetPosition) &&
@@ -823,13 +823,13 @@ public partial class CanvasPage : BasePage
             return;
         }
 
-        var scale = Math.Min((float)MaskGrid.Width / Bitmap.Width,(float)MaskGrid.Height / Bitmap.Height);
+        var scale = Math.Min((float)MaskGrid.Width / Bitmap.Width, (float)MaskGrid.Height / Bitmap.Height);
         var width = scale * Bitmap.Width;
         var height = scale * Bitmap.Height;
 
         SourceImageCanvasView.WidthRequest = width;
         SourceImageCanvasView.HeightRequest = height;
-        
+
         MaskCanvasView.WidthRequest = width;
         MaskCanvasView.HeightRequest = height;
 
@@ -867,7 +867,7 @@ public partial class CanvasPage : BasePage
         await Task.Delay(300);
 
         var maskCapture = await MaskCanvasView.CaptureAsync();
-        
+
         SKBitmap? maskBitmap = null;
 
         if (maskCapture != null)

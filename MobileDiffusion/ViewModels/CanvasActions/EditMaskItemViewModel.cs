@@ -58,7 +58,7 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
                 Icon = "\ue6d0"; // Erase
                 IsColorVisible = false;
                 DisplayColor = Colors.Transparent; // Or generic color since not visible
-                Alpha = 1.0; 
+                Alpha = 1.0;
             }
             else
             {
@@ -107,7 +107,7 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
     {
         if (e.PropertyName == "Color")
         {
-             if (CanvasAction is MaskLineViewModel maskLine)
+            if (CanvasAction is MaskLineViewModel maskLine)
             {
                 DisplayColor = maskLine.Color;
             }
@@ -118,13 +118,13 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
         }
         else if (e.PropertyName == "Alpha")
         {
-             if (CanvasAction is MaskLineViewModel maskLine)
+            if (CanvasAction is MaskLineViewModel maskLine)
             {
                 Alpha = maskLine.Alpha;
             }
             else if (CanvasAction is SegmentationMaskViewModel segMask)
             {
-                Alpha = segMask.Alpha;  
+                Alpha = segMask.Alpha;
             }
 
             updateDescription();
@@ -160,7 +160,7 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
         _duplicateAction?.Invoke(this);
     }
 
-    private void updateDescription() 
+    private void updateDescription()
     {
         if (CanvasAction is MaskLineViewModel maskLine)
         {

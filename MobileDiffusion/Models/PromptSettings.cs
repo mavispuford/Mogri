@@ -1,4 +1,4 @@
-﻿using MobileDiffusion.Enums;
+using MobileDiffusion.Enums;
 using MobileDiffusion.ViewModels;
 using Newtonsoft.Json;
 
@@ -39,7 +39,7 @@ public class PromptSettings
     public OnOff WithVariations { get; set; }
     public List<LoraViewModel> Loras { get; set; } = new();
     public List<PromptStyleViewModel> PromptStyles { get; set; } = new();
-    
+
     public PromptSettings Clone()
     {
         var json = JsonConvert.SerializeObject(this);

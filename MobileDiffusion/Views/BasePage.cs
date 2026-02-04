@@ -26,7 +26,7 @@ public class BasePage : ContentPage
             };
 
             statusBarBehavior.SetAppThemeColor(StatusBarBehavior.StatusBarColorProperty, (Color)lightStatusBarColor, (Color)darkStatusBarColor);
-            
+
             Behaviors.Add(statusBarBehavior);
         }
     }

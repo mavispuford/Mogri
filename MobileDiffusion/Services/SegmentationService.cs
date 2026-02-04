@@ -1,4 +1,4 @@
-﻿using Microsoft.ML.OnnxRuntime;
+using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
 using MobileDiffusion.Interfaces.Services;
 using SkiaSharp;
@@ -147,8 +147,8 @@ public class SegmentationService : ISegmentationService, IDisposable
 
             if (_encoderSession == null)
             {
-                 Console.WriteLine("Encoder session is null.");
-                 return false;
+                Console.WriteLine("Encoder session is null.");
+                return false;
             }
 
             var encoderInputMeta = _encoderSession.InputMetadata;
@@ -201,7 +201,7 @@ public class SegmentationService : ISegmentationService, IDisposable
 
         if (_decoderSession == null)
         {
-             return null;
+            return null;
         }
 
         return await Task.Run(() =>
@@ -234,7 +234,7 @@ public class SegmentationService : ISegmentationService, IDisposable
 
                 var pointCoords = new DenseTensor<float>(pointCoordsScaled.ToArray(), new int[] { 1, pointCoordsScaled.Count / 2, 2 });
                 var pointLabels = new DenseTensor<float>(labels.ToArray(), new int[] { 1, labels.Count });
-                
+
                 // Determine mask input
                 Tensor<float> maskInput;
                 Tensor<float> hasMask;
@@ -274,7 +274,7 @@ public class SegmentationService : ISegmentationService, IDisposable
                     // Retrieve the output tensor(s)
                     var maskTensor = results.First(r => r.Name == "masks").AsTensor<float>();
                     var iouPredictionsTensor = results.First(r => r.Name == "iou_predictions").AsTensor<float>();
-                    
+
                     // Cache low res masks for next iteration
                     var lowResMasksTensor = results.First(r => r.Name == "low_res_masks").AsTensor<float>();
                     _lowResMasks = new DenseTensor<float>(lowResMasksTensor.ToArray(), lowResMasksTensor.Dimensions);
@@ -286,7 +286,7 @@ public class SegmentationService : ISegmentationService, IDisposable
             {
                 return null;
             }
-        });   
+        });
     }
 
     private SKBitmap PreprocessImage(SKBitmap bitmap)
@@ -353,7 +353,7 @@ public class SegmentationService : ISegmentationService, IDisposable
                 byte pixelG = pixels[pixelIndex++];
                 byte pixelB = pixels[pixelIndex++];
                 pixelIndex++; // Skip the alpha channel
-                
+
                 int arrayIndex = (y * width + x) * channelCount;
 
                 // Store the RGB values directly in the array

@@ -1,4 +1,4 @@
-﻿using System.Windows.Input;
+using System.Windows.Input;
 using MauiControls = Microsoft.Maui.Controls;
 
 namespace MobileDiffusion.Controls;
@@ -9,7 +9,7 @@ public class GestureContainer : ContentView
     private const double maxDelta = 50;
     private double currentScale = 1;
     private double startScale = 1;
-    private Point startOffset = new ();
+    private Point startOffset = new();
     private bool canPan = true;
     private bool canZoom = true;
     private bool isPanning;
@@ -89,13 +89,13 @@ public class GestureContainer : ContentView
     {
         var panGesture = new PanGestureRecognizer();
         panGesture.PanUpdated += PanGesture_PanUpdated;
-        
+
         var pinchGesture = new PinchGestureRecognizer();
         pinchGesture.PinchUpdated += OnPinchUpdated;
 
         var doubleTapGesture = new TapGestureRecognizer { NumberOfTapsRequired = 2 };
         doubleTapGesture.Tapped += OnDoubleTapped;
-        
+
         GestureRecognizers.Add(panGesture);
         GestureRecognizers.Add(pinchGesture);
         GestureRecognizers.Add(doubleTapGesture);
@@ -189,7 +189,7 @@ public class GestureContainer : ContentView
 
                 Content.Scale = currentScale;
 
-                if (currentScale == 1 && 
+                if (currentScale == 1 &&
                     !Content.AnimationIsRunning(nameof(MauiControls.ViewExtensions.TranslateTo)) &&
                     Content.TranslationX != 0 &&
                     Content.TranslationY != 0)
@@ -317,7 +317,7 @@ public class GestureContainer : ContentView
 
                         return false;
                     }
-                    
+
                     Content.TranslationX += distance;
 
                     clampTranslation();
@@ -367,7 +367,7 @@ public class GestureContainer : ContentView
         // Only allow panning if the zoomed content is larger than the viewport.
         // The max allowed translation is half the difference between scaled content size and viewport size.
         // This ensures the edge of the content never crosses the edge of the viewport (no whitespace).
-        
+
         var maxTranslationX = Math.Max(0, (Content.Width * currentScale - Content.Width) / 2);
         var maxTranslationY = Math.Max(0, (Content.Height * currentScale - Content.Height) / 2);
 

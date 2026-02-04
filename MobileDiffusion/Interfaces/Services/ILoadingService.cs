@@ -1,4 +1,4 @@
-﻿namespace MobileDiffusion.Interfaces.Services;
+namespace MobileDiffusion.Interfaces.Services;
 
 public interface ILoadingService
 {

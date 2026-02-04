@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Enums;
 using MobileDiffusion.ViewModels;
 using SkiaSharp;
@@ -44,7 +44,7 @@ public interface ICanvasPageViewModel : IPageViewModel
     SKBitmap? SegmentationBitmap { get; set; }
 
     bool SettingSegmentationImage { get; set; }
-    
+
     bool HasSegmentationImage { get; set; }
 
     IRelayCommand UndoCommand { get; }
@@ -55,7 +55,7 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     bool GettingColorPalette { get; set; }
 
-    bool ShowActions {get; set; }
+    bool ShowActions { get; set; }
 
     IAsyncRelayCommand BeginCropImageRectCommand { get; }
 
@@ -76,7 +76,7 @@ public interface ICanvasPageViewModel : IPageViewModel
     IAsyncRelayCommand SaveCommand { get; }
 
     IAsyncRelayCommand SendToImageToImageCommand { get; }
-    
+
     IRelayCommand ToggleMaskLayerVisibilityCommand { get; }
 
     IRelayCommand<IPaintingToolViewModel> SelectToolCommand { get; }

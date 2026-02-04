@@ -1,4 +1,4 @@
-﻿using MobileDiffusion.Interfaces.Services;
+using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Views.Popups;
 using Mopups.Services;
 
@@ -8,7 +8,7 @@ public class LoadingService : ILoadingService
 {
     private const string _loadingPopupName = "LoadingPopup";
 
-    private readonly SemaphoreSlim _semaphore = new(1,1);
+    private readonly SemaphoreSlim _semaphore = new(1, 1);
     private readonly IPopupService _popupService;
 
     public LoadingService(IPopupService popupService)
@@ -40,7 +40,7 @@ public class LoadingService : ILoadingService
             if (MopupService.Instance.PopupStack.FirstOrDefault(p => p is LoadingPopup) is LoadingPopup loadingPopup)
             {
                 loadingPopup.SetLoadingMessage(loadingMessage ?? string.Empty);
-                
+
                 return;
             }
 

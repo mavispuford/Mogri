@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Helpers;
 using MobileDiffusion.Interfaces.Services;
@@ -119,7 +119,7 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
 
         AspectRatioDouble = aspectRatioResult.AspectRatioDouble;
         AspectRatioString = aspectRatioResult.AspectRatioString;
-        
+
         UpdateAllValues();
     }
 
@@ -152,7 +152,7 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
 
         await ClosePopupAsync(parameters);
     }
-    
+
     partial void OnExampleRectangleContainerWidthChanged(double value)
     {
         updateExampleRectangle();
@@ -174,7 +174,7 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
 
         var splitValue = value.Split(":");
 
-        if (splitValue.Length != 2 || 
+        if (splitValue.Length != 2 ||
             !int.TryParse(splitValue[0], out int aspectWidth) ||
             aspectWidth <= 0 ||
             !int.TryParse(splitValue[1], out int aspectHeight) ||
@@ -354,7 +354,7 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
         }
 
         var isPortrait = Width <= Height;
-        
+
         if (isPortrait)
         {
             ExampleRectangleWidth = ExampleRectangleContainerWidth * AspectRatioDouble;

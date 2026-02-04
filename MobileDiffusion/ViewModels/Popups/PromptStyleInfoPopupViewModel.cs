@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
@@ -12,7 +12,7 @@ public partial class PromptStyleInfoPopupViewModel : PopupBaseViewModel, IPrompt
     public partial IPromptStyleViewModel PromptStyle { get; set; }
 
     public PromptStyleInfoPopupViewModel(IPopupService popupService) : base(popupService)
-    {}
+    { }
 
     public override async void ApplyQueryAttributes(IDictionary<string, object> query)
     {

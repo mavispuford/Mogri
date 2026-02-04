@@ -96,11 +96,11 @@ public static class PngMetadataHelper
             // The negative prompt section often ends with "Steps:" or other generation params
             var negativeSection = parts[1];
             var stepsIndex = negativeSection.IndexOf("\nSteps:", StringComparison.Ordinal);
-            
+
             if (stepsIndex == -1)
             {
-                 // Try searching for just "Steps:" without newline if formatting varies
-                 stepsIndex = negativeSection.IndexOf("Steps:", StringComparison.Ordinal);
+                // Try searching for just "Steps:" without newline if formatting varies
+                stepsIndex = negativeSection.IndexOf("Steps:", StringComparison.Ordinal);
             }
 
             if (stepsIndex != -1)
@@ -116,11 +116,11 @@ public static class PngMetadataHelper
         // Clean up weird trailing stuff on positive prompt if negative prompt wasn't found but steps were
         if (negative == null && positive != null)
         {
-             var stepsIndex = positive.IndexOf("\nSteps:", StringComparison.Ordinal);
-             if (stepsIndex != -1)
-             {
-                 positive = positive.Substring(0, stepsIndex).Trim();
-             }
+            var stepsIndex = positive.IndexOf("\nSteps:", StringComparison.Ordinal);
+            if (stepsIndex != -1)
+            {
+                positive = positive.Substring(0, stepsIndex).Trim();
+            }
         }
 
         return (positive, negative, parameters);
