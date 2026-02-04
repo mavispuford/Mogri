@@ -17,7 +17,7 @@ public partial class HistoryItemViewModel : BaseViewModel, IHistoryItemViewModel
     public partial ImageSource ThumbnailImageSource { get; set; }
 
     [ObservableProperty]
-    public partial PromptSettings Settings { get; set; }
+    public partial PromptSettings? Settings { get; set; }
 
     [ObservableProperty]
     public partial HistoryEntity Entity { get; set; }
@@ -37,7 +37,10 @@ public partial class HistoryItemViewModel : BaseViewModel, IHistoryItemViewModel
             using var fileStream = await fileService.GetFileStreamFromInternalStorageAsync(filenameNoPath);
             var resized = imageService.GetResizedImageStreamBytes(fileStream, 256, 256, filterImage: true);
 
-            await fileService.WriteFileToInternalStorageAsync(ThumbnailFileName, resized.Bytes);
+            if (resized.Bytes != null)
+            {
+                await fileService.WriteFileToInternalStorageAsync(ThumbnailFileName, resized.Bytes);
+            }
         }
         else
         {

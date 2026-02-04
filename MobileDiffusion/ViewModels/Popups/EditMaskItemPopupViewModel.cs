@@ -10,7 +10,7 @@ namespace MobileDiffusion.ViewModels;
 
 public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskItemPopupViewModel, IRecipient<MaskSliderDragMessage>
 {
-    private CanvasActionViewModel _action;
+    private CanvasActionViewModel? _action;
 
     [ObservableProperty]
     private bool _isBrush;
@@ -28,7 +28,7 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
     private float _alpha;
 
     [ObservableProperty]
-    private Color _displayColor;
+    private Color _displayColor = Colors.Transparent;
 
     [ObservableProperty]
     private bool _isNoiseVisible;
@@ -37,7 +37,7 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
     private bool _isDragging;
 
     [ObservableProperty]
-    private string _dragInfoText;
+    private string _dragInfoText = string.Empty;
 
     public EditMaskItemPopupViewModel(IPopupService popupService) : base(popupService)
     {

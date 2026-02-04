@@ -13,11 +13,11 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
 {
     private readonly IImageService _imageService;
 
-    private PromptSettings _settings;
+    private PromptSettings? _settings;
 
-    private CancellationTokenSource _initCancellationTokenSource;
+    private CancellationTokenSource? _initCancellationTokenSource;
 
-    private CancellationTokenSource _maskCancellationTokenSource;
+    private CancellationTokenSource? _maskCancellationTokenSource;
 
     [ObservableProperty]
     public partial bool FitImageServerSide { get; set; }
@@ -32,22 +32,22 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
     public partial bool IsLoadingMaskImage { get; set; }
 
     [ObservableProperty]
-    public partial string Strength { get; set; }
+    public partial string? Strength { get; set; }
 
     [ObservableProperty]
-    public partial string StrengthPlaceholder { get; set; }
+    public partial string? StrengthPlaceholder { get; set; }
 
     [ObservableProperty]
-    public partial string MaskBlur { get; set; }
+    public partial string? MaskBlur { get; set; }
 
     [ObservableProperty]
-    public partial string MaskBlurPlaceholder { get; set; }
+    public partial string? MaskBlurPlaceholder { get; set; }
 
     [ObservableProperty]
-    public partial ImageSource InitImageSource { get; set; }
+    public partial ImageSource? InitImageSource { get; set; }
 
     [ObservableProperty]
-    public partial ImageSource MaskImageSource { get; set; }
+    public partial ImageSource? MaskImageSource { get; set; }
 
     public ImageToImageSettingsPageViewModel(
         IImageService imageService,
@@ -73,6 +73,11 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
     [RelayCommand]
     private async Task ResetValues()
     {
+        if (_settings == null)
+        {
+            return;
+        }
+
         var result = await Shell.Current.DisplayAlertAsync("Confirm Reset", "Are you sure you would like to reset back to defaults?", "RESET", "Cancel");
 
         if (!result)
@@ -105,6 +110,11 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
     [RelayCommand]
     private async Task ConfirmSettings()
     {
+        if (_settings == null)
+        {
+            return;
+        }
+
         mapPropertiesToSettings();
 
         var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings }, };
@@ -121,6 +131,11 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
 
     private async Task mapSettingsToProperties()
     {
+        if (_settings == null)
+        {
+            return;
+        }
+
         Strength = _settings.DenoisingStrength.ToString();
         MaskBlur = _settings.MaskBlur.ToString();
 
@@ -149,6 +164,8 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
 
     private void mapPropertiesToSettings()
     {
+        if (_settings == null) return;
+
         if (double.TryParse(Strength, out var strength) ||
             double.TryParse(StrengthPlaceholder, out strength))
         {
@@ -173,7 +190,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
             var fileResult = await MediaPicker.PickPhotosAsync(new MediaPickerOptions { SelectionLimit = 1 });
             var photo = fileResult?.FirstOrDefault();
 
-            if (photo == null)
+            if (photo == null || _settings == null)
             {
                 return;
             }
@@ -208,18 +225,18 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
                 if (bitmap != null)
                 {
                     _settings.InitImageThumbnail = _imageService.GetThumbnailString(bitmap, photo.ContentType);
+
+                    // Attempt to match the aspect ratio of the image within the resolution constraints
+                    var constrainedDimensions = MathHelper.GetAspectCorrectConstrainedDimensions(bitmap.Width, bitmap.Height, 0, 0, MathHelper.DimensionConstraint.ClosestMatch);
+
+                    _settings.Width = constrainedDimensions.Width;
+                    _settings.Height = constrainedDimensions.Height;
+
+                    InitImageSource = new SKBitmapImageSource
+                    {
+                        Bitmap = bitmap
+                    };
                 }
-
-                // Attempt to match the aspect ratio of the image within the resolution constraints
-                var constrainedDimensions = MathHelper.GetAspectCorrectConstrainedDimensions(bitmap.Width, bitmap.Height, 0, 0, MathHelper.DimensionConstraint.ClosestMatch);
-
-                _settings.Width = constrainedDimensions.Width;
-                _settings.Height = constrainedDimensions.Height;
-                
-                InitImageSource = new SKBitmapImageSource
-                {
-                    Bitmap = bitmap
-                };
             }
             else
             {

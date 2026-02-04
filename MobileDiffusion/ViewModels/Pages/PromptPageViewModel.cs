@@ -13,16 +13,16 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
 {
     private readonly IImageGenerationService _stableDiffusionService;
 
-    private PromptSettings _settings;
+    private PromptSettings? _settings;
 
     [ObservableProperty]
-    public partial string Prompt { get; set; }
+    public partial string? Prompt { get; set; }
 
     [ObservableProperty]
-    public partial string PromptPlaceholder { get; set; }
+    public partial string? PromptPlaceholder { get; set; }
 
     [ObservableProperty]
-    public partial string NegativePrompt { get; set; }
+    public partial string? NegativePrompt { get; set; }
 
     [ObservableProperty]
     public partial List<IPromptStyleViewModel> AvailablePromptStyles { get; set; } = new();
@@ -69,6 +69,11 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
     public override async Task OnNavigatedToAsync()
     {
         await base.OnNavigatedToAsync();
+
+        if (_settings == null)
+        {
+             return;
+        }
 
         try
         {
@@ -135,7 +140,10 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
     {
         SelectedPromptStyles.Remove(promptStyleViewModel);
 
-        _settings.PromptStyles = SelectedPromptStyles.Distinct().Select(ps => ps as PromptStyleViewModel).ToList();
+        if (_settings != null)
+        {
+            _settings.PromptStyles = SelectedPromptStyles.OfType<PromptStyleViewModel>().Distinct().ToList();
+        }
     }
 
     [RelayCommand]
@@ -143,7 +151,10 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
     {
         SelectedLoras.Remove(loraViewModel);
 
-        _settings.Loras = SelectedLoras.Distinct().Select(l => l as LoraViewModel).ToList();
+        if (_settings != null)
+        {
+            _settings.Loras = SelectedLoras.OfType<LoraViewModel>().Distinct().ToList();
+        }
     }
 
     [RelayCommand]
@@ -169,7 +180,7 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
                 Prompt = PromptPlaceholder;
             }
 
-            var combinedPromptAndStyles = SettingsHelper.GetCombinedPromptAndPromptStyles(Prompt, NegativePrompt, SelectedPromptStyles.Distinct().Select(ps => ps as PromptStyleViewModel).ToList());
+            var combinedPromptAndStyles = SettingsHelper.GetCombinedPromptAndPromptStyles(Prompt ?? string.Empty, NegativePrompt ?? string.Empty, SelectedPromptStyles.Distinct().ToList());
 
             Prompt = combinedPromptAndStyles.Prompt;
             NegativePrompt = combinedPromptAndStyles.NegativePrompt;
@@ -187,6 +198,8 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
     {
         SetPromptsOnSettings();
 
+        if (_settings == null) return;
+
         var parameters = new Dictionary<string, object>()
         {
             {NavigationParams.PromptSettings, _settings.Clone() }
@@ -199,6 +212,8 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
     private async Task ShowPromptStyleSelectionPage()
     {
         SetPromptsOnSettings();
+
+        if (_settings == null) return;
 
         var parameters = new Dictionary<string, object>()
         {
@@ -213,6 +228,8 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
     {
         SetPromptsOnSettings();
 
+        if (_settings == null) return;
+
         var parameters = new Dictionary<string, object>()
         {
             { NavigationParams.PromptSettings, _settings }
@@ -223,8 +240,9 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
 
     private void SetPromptsOnSettings()
     {
-        _settings.Prompt = Prompt;
-        _settings.NegativePrompt = NegativePrompt;
+        if (_settings == null) return;
+        _settings.Prompt = Prompt ?? string.Empty;
+        _settings.NegativePrompt = NegativePrompt ?? string.Empty;
     }
 
     public override bool OnBackButtonPressed()
@@ -236,6 +254,8 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
 
     private void mapSettingsToProperties()
     {
+        if (_settings == null) return;
+        
         Prompt = _settings.Prompt;
         NegativePrompt = _settings.NegativePrompt;
     }

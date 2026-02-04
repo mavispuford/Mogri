@@ -11,7 +11,7 @@ public interface IHistoryItemViewModel : IBaseViewModel
 
     ImageSource ThumbnailImageSource { get; set; }
 
-    PromptSettings Settings { get; set; }
+    PromptSettings? Settings { get; set; }
 
     HistoryEntity Entity { get; set; }
 

@@ -11,7 +11,7 @@ public partial class MainPage : BasePage
         ImageLayout.ChildAdded += ImageLayout_ChildAdded;
     }
 
-    private async void ImageLayout_ChildAdded(object sender, ElementEventArgs e)
+    private async void ImageLayout_ChildAdded(object? sender, ElementEventArgs e)
     {
         if (e.Element is VisualElement visualElement)
         {

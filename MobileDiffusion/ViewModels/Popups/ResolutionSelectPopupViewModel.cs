@@ -10,16 +10,16 @@ namespace MobileDiffusion.ViewModels;
 public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResolutionSelectPopupViewModel
 {
     private readonly IImageService _imageService;
-    private string _initImgString;
+    private string? _initImgString;
 
     [ObservableProperty]
     public partial double AspectRatioDouble { get; set; }
 
     [ObservableProperty]
-    public partial string AspectRatioString { get; set; }
+    public partial string? AspectRatioString { get; set; }
 
     [ObservableProperty]
-    public partial string AspectRatioEntryValue { get; set; }
+    public partial string? AspectRatioEntryValue { get; set; }
 
     [ObservableProperty]
     public partial double Width { get; set; }
@@ -34,16 +34,16 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
     public partial double HeightSliderValue { get; set; }
 
     [ObservableProperty]
-    public partial string WidthEntryValue { get; set; }
+    public partial string? WidthEntryValue { get; set; }
 
     [ObservableProperty]
-    public partial string HeightEntryValue { get; set; }
+    public partial string? HeightEntryValue { get; set; }
 
     [ObservableProperty]
     public partial bool PreserveAspectRatio { get; set; } = true;
 
     [ObservableProperty]
-    public partial ImageSource InitImageSource { get; set; }
+    public partial ImageSource? InitImageSource { get; set; }
 
     [ObservableProperty]
     public partial double ExampleRectangleContainerWidth { get; set; }
@@ -127,7 +127,7 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
     {
         await base.OnAppearingAsync();
 
-        if (InitImageSource == null)
+        if (InitImageSource == null && !string.IsNullOrEmpty(_initImgString))
         {
             var initCancellationTokenSource = new CancellationTokenSource();
 
@@ -163,7 +163,7 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
         updateExampleRectangle();
     }
 
-    partial void OnAspectRatioEntryValueChanged(string value)
+    partial void OnAspectRatioEntryValueChanged(string? value)
     {
         if (_isUpdating) return;
 
@@ -209,7 +209,7 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
         updateHeight(value);
     }
 
-    partial void OnWidthEntryValueChanged(string value)
+    partial void OnWidthEntryValueChanged(string? value)
     {
         if (_isUpdating) return;
         if (double.TryParse(value, out double width))
@@ -218,7 +218,7 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
         }
     }
 
-    partial void OnHeightEntryValueChanged(string value)
+    partial void OnHeightEntryValueChanged(string? value)
     {
         if (_isUpdating) return;
         if (double.TryParse(value, out double height))

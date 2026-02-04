@@ -7,7 +7,7 @@ namespace MobileDiffusion.Services
 {
     public class AotGanPatchService : IPatchService
     {
-        private InferenceSession _session;
+        private InferenceSession? _session;
         private const int ModelInputSize = 512;
         private bool _isLoading = false;
 
@@ -301,6 +301,11 @@ namespace MobileDiffusion.Services
             
             // Force GC before run to clear previous large buffers
             GC.Collect();
+            
+            if (_session == null)
+            {
+                throw new InvalidOperationException("Inference session not initialized");
+            }
             
             using var results = _session.Run(inputs);
             var outputTensor = results.First().AsTensor<float>();

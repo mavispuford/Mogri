@@ -12,7 +12,7 @@ public interface IEditMaskItemViewModel
     Color ColorWithAlpha { get; set; }
     double Alpha { get; set; }
     string Description { get; set; }
-    CanvasActionViewModel CanvasAction { get; set; }
+    CanvasActionViewModel? CanvasAction { get; set; }
     IAsyncRelayCommand EditCommand { get; }
     IRelayCommand DeleteCommand { get; }
     IRelayCommand DuplicateCommand { get; }

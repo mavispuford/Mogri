@@ -7,7 +7,7 @@ public interface IPromptStyleSelectionPageViewModel : IPageViewModel
 {
     List<IPromptStyleViewModel> AvailablePromptStyles { get; set; }
 
-    ObservableCollection<object> SelectedPromptStyles { get; set; }
+    ObservableCollection<IPromptStyleViewModel> SelectedPromptStyles { get; set; }
 
     IAsyncRelayCommand CancelCommand { get; }
 

@@ -11,11 +11,11 @@ public interface IHistoryPageViewModel : IPageViewModel
 
     ObservableCollection<IHistoryItemViewModel> HistoryItems { get; set; }
 
-    IList<object> SelectedItems { get; set; }
+    IList<object>? SelectedItems { get; set; }
 
     IAsyncRelayCommand<IHistoryItemViewModel> ItemTappedCommand { get; }
 
-    string SelectedItemsText { get; set; }
+    string? SelectedItemsText { get; set; }
 
     bool SelectionModeEnabled { get; set; }
 
@@ -33,9 +33,9 @@ public interface IHistoryPageViewModel : IPageViewModel
 
     IRelayCommand<SelectionChangedEventArgs> SelectionChangedCommand { get; }
 
-    ICommand HideBottomPanelCommand { get; set; }
+    ICommand? HideBottomPanelCommand { get; set; }
 
-    ICommand ShowBottomPanelCommand { get; set; }
+    ICommand? ShowBottomPanelCommand { get; set; }
 
-    string SearchText { get; set; }
+    string? SearchText { get; set; }
 }

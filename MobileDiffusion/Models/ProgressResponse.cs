@@ -4,7 +4,7 @@ namespace MobileDiffusion.Models
     {
         public double Progress { get; set; }
         public double EtaRelative { get; set; }
-        public string CurrentImage { get; set; }
+        public string? CurrentImage { get; set; }
         public bool IsInterrupted { get; set; }
     }
 }

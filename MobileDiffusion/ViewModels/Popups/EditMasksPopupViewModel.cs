@@ -13,7 +13,7 @@ namespace MobileDiffusion.ViewModels;
 public partial class EditMasksPopupViewModel : PopupBaseViewModel, IEditMasksPopupViewModel, IRecipient<MaskSliderDragMessage>
 {
     private readonly IServiceProvider _serviceProvider;
-    private ObservableCollection<CanvasActionViewModel> _sourceActions;
+    private ObservableCollection<CanvasActionViewModel>? _sourceActions;
 
     [ObservableProperty]
     private ObservableCollection<IEditMaskItemViewModel> _items = new();

@@ -36,9 +36,13 @@ public static class AnimationProperties
             }
         });
 
-    private static void OnBindingContextChanged(object sender, EventArgs e)
+    private static void OnBindingContextChanged(object? sender, EventArgs e)
     {
-        var element = (VisualElement)sender;
+        if (sender is not VisualElement element)
+        {
+            return;
+        }
+
         var animations = GetAnimations(element);
 
         if (animations is BaseAnimation[] animationArray)

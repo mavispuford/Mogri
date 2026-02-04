@@ -12,8 +12,9 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
 {
     private readonly IImageGenerationService _stableDiffusionService;
     private readonly IPopupService _popupService;
+    private readonly IPresetService _presetService;
 
-    private PromptSettings _settings;
+    private PromptSettings _settings = new();
     
     [ObservableProperty]
     public partial List<IModelViewModel> AvailableModelValues { get; set; } = new();
@@ -28,73 +29,73 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     public partial List<string> AvailableUpscalerValues { get; set; } = new();
 
     [ObservableProperty]
-    public partial string BatchCount { get; set; }
+    public partial string? BatchCount { get; set; }
 
     [ObservableProperty]
-    public partial string BatchSize { get; set; }
+    public partial string? BatchSize { get; set; }
 
     [ObservableProperty]
-    public partial string Steps { get; set; }
+    public partial string? Steps { get; set; }
 
     [ObservableProperty]
-    public partial string StepsPlaceholder { get; set; }
+    public partial string? StepsPlaceholder { get; set; }
 
     [ObservableProperty]
-    public partial string CfgScale { get; set; }
+    public partial string? CfgScale { get; set; }
 
     [ObservableProperty]
-    public partial string CfgScalePlaceholder { get; set; }
+    public partial string? CfgScalePlaceholder { get; set; }
 
     [ObservableProperty]
-    public partial string DistilledCfgScale { get; set; }
+    public partial string? DistilledCfgScale { get; set; }
 
     [ObservableProperty]
-    public partial string DistilledCfgScalePlaceholder { get; set; }
+    public partial string? DistilledCfgScalePlaceholder { get; set; }
 
     [ObservableProperty]
     public partial bool IsDistilledCfgScaleVisible { get; set; }
 
     [ObservableProperty]
-    public partial IModelViewModel Model { get; set; }
+    public partial IModelViewModel? Model { get; set; }
 
     [ObservableProperty]
-    public partial string Sampler { get; set; }
+    public partial string? Sampler { get; set; }
 
     [ObservableProperty]
-    public partial string Width { get; set; }
+    public partial string? Width { get; set; }
 
     [ObservableProperty]
-    public partial string Height { get; set; }
+    public partial string? Height { get; set; }
 
     [ObservableProperty]
-    public partial string Seed { get; set; }
+    public partial string? Seed { get; set; }
 
     [ObservableProperty]
-    public partial string SeedPlaceholder { get; set; }
+    public partial string? SeedPlaceholder { get; set; }
 
     [ObservableProperty]
     public partial bool EnableGfpgan { get; set; }
 
     [ObservableProperty]
-    public partial string GfpganStrength { get; set; }
+    public partial string? GfpganStrength { get; set; }
 
     [ObservableProperty]
-    public partial string GfpganStrengthPlaceholder { get; set; }
+    public partial string? GfpganStrengthPlaceholder { get; set; }
 
     [ObservableProperty]
     public partial bool EnableUpscaling { get; set; }
 
     [ObservableProperty]
-    public partial string Upscaler { get; set; } 
+    public partial string? Upscaler { get; set; } 
     
     [ObservableProperty]
-    public partial string UpscaleLevel { get; set; }
+    public partial string? UpscaleLevel { get; set; }
 
     [ObservableProperty]
-    public partial string UpscaleSteps { get; set; }
+    public partial string? UpscaleSteps { get; set; }
 
     [ObservableProperty]
-    public partial string UpscaleStepsPlaceholder { get; set; }
+    public partial string? UpscaleStepsPlaceholder { get; set; }
 
     [ObservableProperty]
     public partial bool MakeSeamless { get; set; }
@@ -112,12 +113,10 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     public partial bool IsSchedulerVisible { get; set; }
 
     [ObservableProperty]
-    public partial string Scheduler { get; set; }
+    public partial string? Scheduler { get; set; }
 
     [ObservableProperty]
     public partial List<string> AvailablePresets { get; set; } = new();
-
-    private readonly IPresetService _presetService;
 
     private bool _isInitializing;
 
@@ -256,7 +255,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         Scheduler = defaultSettings.Scheduler;
         Seed = defaultSettings.Seed.ToString();
         Steps = defaultSettings.Steps.ToString();
-        Upscaler = defaultSettings.Upscaler.ToString();
+        Upscaler = defaultSettings.Upscaler?.ToString();
         UpscaleLevel = defaultSettings.UpscaleLevel.ToString();
         UpscaleSteps = defaultSettings.UpscaleSteps.ToString();
         Width = defaultSettings.Width.ToString();
@@ -322,9 +321,9 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         var initImgString = !string.IsNullOrEmpty(_settings.InitImageThumbnail) ? _settings.InitImageThumbnail : _settings.InitImage;
 
         var parameters = new Dictionary<string, object> {
-            { NavigationParams.Width, Width },
-            { NavigationParams.Height, Height },
-            { NavigationParams.InitImgString, initImgString }
+            { NavigationParams.Width, Width ?? "512" },
+            { NavigationParams.Height, Height ?? "512" },
+            { NavigationParams.InitImgString, initImgString ?? string.Empty }
         };
 
         var result = await _popupService.ShowPopupForResultAsync("ResolutionSelectPopup", parameters) as IDictionary<string, object>;
@@ -366,13 +365,15 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             BatchCount = _settings.BatchCount.ToString();
             BatchSize = _settings.BatchSize.ToString();
             MakeSeamless = _settings.Seamless == OnOff.on;
-            Model = AvailableModelValues?.FirstOrDefault(m => m.Key == _settings.Model.Key);
+            Model = _settings.Model != null 
+                ? AvailableModelValues?.FirstOrDefault(m => m.Key == _settings.Model.Key) 
+                : null;
             Sampler = _settings.Sampler;
             Scheduler = _settings.Scheduler;
             Seed = _settings.Seed.ToString();
             SelectedModelType = _settings.ModelType;
             Steps = _settings.Steps.ToString();
-            Upscaler = _settings.Upscaler;
+            Upscaler = _settings.Upscaler?.ToString();
             UpscaleLevel = _settings.UpscaleLevel == 0 ? "2" : _settings.UpscaleLevel.ToString();
             UpscaleSteps= _settings.UpscaleSteps.ToString();
             Width = _settings.Width.ToString();
@@ -407,11 +408,12 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             return;
         }
 
-        var name = await _popupService.DisplayActionSheetAsync("Load Preset", "Cancel", null, AvailablePresets.ToArray());
+        var presets = AvailablePresets.ToArray();
+        var name = await _popupService.DisplayActionSheetAsync("Load Preset", "Cancel", null, presets);
         if (string.IsNullOrEmpty(name) || name == "Cancel") return;
 
         var settings = await _presetService.LoadPresetAsync(name);
-        if (settings != null)
+        if (settings != null && _settings != null)
         {
 
             // Store Prompt Page property values
@@ -514,10 +516,10 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
 
         if (Model != null)
         {
-            _settings.Model = (ModelViewModel)Model;
+            _settings.Model = (ModelViewModel?)Model;
         }
 
-        _settings.Sampler = Sampler;
+        _settings.Sampler = Sampler ?? "Euler a";
 
         if (long.TryParse(Seed, out var pSeed) ||
             long.TryParse(SeedPlaceholder, out pSeed))

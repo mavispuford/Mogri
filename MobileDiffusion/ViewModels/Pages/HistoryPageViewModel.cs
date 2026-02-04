@@ -29,27 +29,28 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     public partial ObservableCollection<IHistoryItemViewModel> HistoryItems { get; set; } = new();
 
     [ObservableProperty]
-    public partial IList<Object> SelectedItems { get; set; }
+    public partial IList<Object>? SelectedItems { get; set; }
 
     [ObservableProperty]
     public partial bool SelectionModeEnabled { get; set; }
 
     [ObservableProperty]
-    public partial string SelectedItemsText { get; set; }
+    public partial string? SelectedItemsText { get; set; }
 
     [ObservableProperty]
     public partial bool IsLoading { get; set; } = true;
 
     [ObservableProperty]
-    public partial string SearchText { get; set; }
+    public partial string? SearchText { get; set; }
 
-    private CancellationTokenSource _searchDebounceCts;
+    private CancellationTokenSource? _searchDebounceCts;
 
-    partial void OnSearchTextChanged(string value)
+    partial void OnSearchTextChanged(string? value)
     {
         _searchDebounceCts?.Cancel();
-        _searchDebounceCts = new CancellationTokenSource();
-        var token = _searchDebounceCts.Token;
+        var cts = new CancellationTokenSource();
+        _searchDebounceCts = cts;
+        var token = cts.Token;
 
         Task.Delay(500, token).ContinueWith(async t =>
         {
@@ -57,19 +58,26 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
             if (Application.Current != null)
             {
-                await Shell.Current.Dispatcher.DispatchAsync(async () =>
+                var dispatcher = Shell.Current?.Dispatcher;
+                if (dispatcher != null)
                 {
-                    itemIndex = 0;
-                    HistoryItems.Clear();
-                    await LoadItemsCommand.ExecuteAsync(null);
-                });
+                    await dispatcher.DispatchAsync(async () =>
+                    {
+                        itemIndex = 0;
+                        HistoryItems.Clear();
+                        if (LoadItemsCommand != null)
+                        {
+                            await LoadItemsCommand.ExecuteAsync(null);
+                        }
+                    });
+                }
             }
         });
     }
 
-    public ICommand HideBottomPanelCommand { get; set; }
+    public ICommand? HideBottomPanelCommand { get; set; }
 
-    public ICommand ShowBottomPanelCommand { get; set; }
+    public ICommand? ShowBottomPanelCommand { get; set; }
 
     public HistoryPageViewModel(IFileService fileService,
         IImageService imageService,
@@ -175,13 +183,15 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     [RelayCommand]
     private void ItemLongPressed(IHistoryItemViewModel item)
     {
+        if (item == null) return;
+
         if (SelectionModeEnabled) return;
 
         SelectionModeEnabled = true;
         ShowBottomPanelCommand?.Execute(null);
-        
+
         // Select the item that was long pressed
-        if (!SelectedItems.Contains(item))
+        if (SelectedItems != null && !SelectedItems.Contains(item))
         {
             SelectedItems.Add(item);
         }
@@ -208,10 +218,13 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
             foreach (var entity in results)
             {
                 var historyItem = _serviceProvider.GetService<IHistoryItemViewModel>();
-                HistoryItems.Add(historyItem);
-                
-                // Fire and forget initialization to keep UI responsive
-                _ = Task.Run(() => historyItem.InitWith(entity, _fileService, _imageService));
+                if (historyItem != null)
+                {
+                    HistoryItems.Add(historyItem);
+                    
+                    // Fire and forget initialization to keep UI responsive
+                    _ = Task.Run(() => historyItem.InitWith(entity, _fileService, _imageService));
+                }
             }
 
             // Only increment if we actually got results
@@ -234,7 +247,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         if (!SelectionModeEnabled)
         {
             HideBottomPanelCommand?.Execute(null);
-            SelectedItems.Clear();
+            SelectedItems?.Clear();
         }
         else
         {
@@ -246,8 +259,10 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     }
 
     [RelayCommand]
-    private void SelectionChanged(SelectionChangedEventArgs args)
+    private void SelectionChanged(SelectionChangedEventArgs? args)
     {
+        if (SelectedItems == null) return;
+
         if (_lastSelectionCount != 0 && SelectedItems.Count == 0 && SelectionModeEnabled)
         {
             ToggleSelectionMode();
@@ -262,7 +277,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     [RelayCommand]
     private void SelectAllResults()
     {
-        if (HistoryItems == null) return;
+        if (HistoryItems == null || SelectedItems == null) return;
 
         foreach (var item in HistoryItems)
         {
@@ -277,7 +292,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     [RelayCommand]
     private async Task DeleteSelectedItems()
     {
-        if (SelectedItems.Count == 0)
+        if (SelectedItems == null || SelectedItems.Count == 0)
         {
             return;
         }

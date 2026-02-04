@@ -11,16 +11,16 @@ public class SegmentationService : ISegmentationService, IDisposable
     private readonly IImageService _imageService;
 
     private Stopwatch _stopwatch = new();
-    private Task _initTask;
-    private InferenceSession _encoderSession;
-    private InferenceSession _decoderSession;
+    private Task? _initTask;
+    private InferenceSession? _encoderSession;
+    private InferenceSession? _decoderSession;
 
     private int _imageWidth;
     private int _imageHeight;
     private float _scaleX;
     private float _scaleY;
-    private Tensor<float> _imageEmbeddings;
-    private Tensor<float> _lowResMasks;
+    private Tensor<float>? _imageEmbeddings;
+    private Tensor<float>? _lowResMasks;
 
     public SKColor MaskColor => SKColors.Red;
 
@@ -145,6 +145,12 @@ public class SegmentationService : ISegmentationService, IDisposable
 
             var encoderInputs = new NamedOnnxValue[] { NamedOnnxValue.CreateFromTensor("input_image", imageDataTensor) };
 
+            if (_encoderSession == null)
+            {
+                 Console.WriteLine("Encoder session is null.");
+                 return false;
+            }
+
             var encoderInputMeta = _encoderSession.InputMetadata;
             var encoderOutputMeta = _encoderSession.OutputMetadata;
 
@@ -181,7 +187,7 @@ public class SegmentationService : ISegmentationService, IDisposable
         return true;
     }
 
-    public async Task<SKBitmap> DoSegmentation(SKPoint[] points, bool reset = false)
+    public async Task<SKBitmap?> DoSegmentation(SKPoint[] points, bool reset = false)
     {
         if (_imageEmbeddings == null ||
             _imageWidth == 0 ||
@@ -193,11 +199,17 @@ public class SegmentationService : ISegmentationService, IDisposable
 
         await InitAsync().ConfigureAwait(false);
 
+        if (_decoderSession == null)
+        {
+             return null;
+        }
+
         return await Task.Run(() =>
         {
             try
             {
                 // STEP - Use image encoder output (image embeddings) as decoder input
+                if (_decoderSession == null) return null;
 
                 var decoderInputMeta = _decoderSession.InputMetadata;
                 var decoderOutputMeta = _decoderSession.OutputMetadata;
@@ -282,6 +294,11 @@ public class SegmentationService : ISegmentationService, IDisposable
         int targetWidth = 1024;
         int targetHeight = 1024;
         var resized = _imageService.GetResizedSKBitmap(bitmap, targetWidth, targetHeight, false, true, false);
+
+        if (resized == null)
+        {
+            throw new Exception("Failed to resize image");
+        }
 
         _scaleX = resized.Width / (float)bitmap.Width;
         _scaleY = resized.Height / (float)bitmap.Height;

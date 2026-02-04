@@ -6,8 +6,8 @@ namespace MobileDiffusion.Interfaces.ViewModels.Pages;
 public interface IMainPageViewModel : IPageViewModel
 {
     bool HasInitImage { get; set; }
-    string Prompt { get; set; }
-    string NegativePrompt { get; set; }
+    string? Prompt { get; set; }
+    string? NegativePrompt { get; set; }
     float Progress { get; set; }
     bool ServerConnected { get; set; }
     bool IsGenerating { get; }

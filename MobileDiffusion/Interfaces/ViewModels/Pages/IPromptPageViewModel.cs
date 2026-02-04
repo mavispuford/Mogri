@@ -5,11 +5,11 @@ namespace MobileDiffusion.Interfaces.ViewModels.Pages;
 
 public interface IPromptPageViewModel : IPageViewModel
 {
-    string Prompt { get; set; }
+    string? Prompt { get; set; }
 
-    string PromptPlaceholder { get; set; }
+    string? PromptPlaceholder { get; set; }
 
-    string NegativePrompt { get; set; }
+    string? NegativePrompt { get; set; }
 
     List<IPromptStyleViewModel> AvailablePromptStyles { get; set; }
 

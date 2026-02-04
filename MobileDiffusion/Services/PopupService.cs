@@ -161,7 +161,7 @@ namespace MobileDiffusion.Services
             return Shell.Current.Dispatcher.DispatchAsync(() => Shell.Current.DisplayPromptAsync(title, message, accept, cancel, placeholder, maxLength, keyboard, initialValue));
         }
 
-        public Task<string> DisplayActionSheetAsync(string title, string cancel, string destruction, params string[] buttons)
+        public Task<string> DisplayActionSheetAsync(string title, string cancel, string? destruction, params string[] buttons)
         {
             return Shell.Current.Dispatcher.DispatchAsync(() => Shell.Current.DisplayActionSheetAsync(title, cancel, destruction, buttons));
         }

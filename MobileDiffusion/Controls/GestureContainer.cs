@@ -21,7 +21,7 @@ public class GestureContainer : ContentView
     private double prevTotalY;
     private double totalXDelta;
     private double totalYDelta;
-    private Timer pinchTimer;
+    private Timer? pinchTimer;
 
     public bool EnablePanning
     {
@@ -149,7 +149,7 @@ public class GestureContainer : ContentView
         }
     }
 
-    void OnPinchUpdated(object sender, PinchGestureUpdatedEventArgs e)
+    void OnPinchUpdated(object? sender, PinchGestureUpdatedEventArgs e)
     {
         if (!EnableZooming)
         {
@@ -234,7 +234,7 @@ public class GestureContainer : ContentView
         }
     }
 
-    private void PanGesture_PanUpdated(object sender, PanUpdatedEventArgs e)
+    private void PanGesture_PanUpdated(object? sender, PanUpdatedEventArgs e)
     {
         if (!EnablePanning || !canPan)
         {

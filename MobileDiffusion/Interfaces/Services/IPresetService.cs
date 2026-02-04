@@ -7,6 +7,6 @@ namespace MobileDiffusion.Interfaces.Services
         Task<List<string>> GetPresetsAsync();
         Task SavePresetAsync(string name, PromptSettings settings);
         Task DeletePresetAsync(string name);
-        Task<PromptSettings> LoadPresetAsync(string name);
+        Task<PromptSettings?> LoadPresetAsync(string name);
     }
 }

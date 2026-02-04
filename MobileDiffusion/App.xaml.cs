@@ -33,7 +33,7 @@ public partial class App : Application
 		return exception;
 	}
 
-    protected override Window CreateWindow(IActivationState activationState)
+    protected override Window CreateWindow(IActivationState? activationState)
     {
         return new Window(new AppShell());
     }

@@ -37,7 +37,7 @@ public class MainActivity : MauiAppCompatActivity
         }
     }
 
-    protected override void OnCreate(Bundle savedInstanceState)
+    protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
 
@@ -46,14 +46,14 @@ public class MainActivity : MauiAppCompatActivity
         checkForSharedImageIntent(intent);
     }
 
-    protected override void OnNewIntent(Intent intent)
+    protected override void OnNewIntent(Intent? intent)
     {
         checkForSharedImageIntent(intent);
 
         base.OnNewIntent(intent);
     }
 
-    private async void checkForSharedImageIntent(Intent intent)
+    private async void checkForSharedImageIntent(Intent? intent)
     {
         if (intent?.Action == null ||
             intent.Action != Intent.ActionSend)
@@ -61,7 +61,7 @@ public class MainActivity : MauiAppCompatActivity
             return;
         }
 
-        if (intent.Extras.Get(Intent.ExtraStream) is Android.Net.Uri uri)
+        if (intent.Extras?.Get(Intent.ExtraStream) is Android.Net.Uri uri)
         {
             try
             {
@@ -70,8 +70,8 @@ public class MainActivity : MauiAppCompatActivity
                 {
                     var parameters = new Dictionary<string, object>
                     {
-                        { NavigationParams.AppShareFileUri, uri.ToString() },
-                        { NavigationParams.AppShareContentType, intent.Type }
+                        { NavigationParams.AppShareFileUri, uri.ToString() ?? string.Empty },
+                        { NavigationParams.AppShareContentType, intent.Type ?? string.Empty }
                     };
 
                     // Outputting some things from the console because the app crashes when sharing files while the 
@@ -82,12 +82,16 @@ public class MainActivity : MauiAppCompatActivity
                         Console.WriteLine($"{param.Key}\t\t : {param.Value}");
                     }
 
-                    var dispatcher = Dispatcher.GetForCurrentThread() ?? Microsoft.Maui.Controls.Application.Current.Windows[0].Page.Dispatcher;
+                    var dispatcher = Dispatcher.GetForCurrentThread() ?? 
+                        Microsoft.Maui.Controls.Application.Current?.Windows.FirstOrDefault()?.Page?.Dispatcher;
 
-                    await dispatcher.DispatchAsync(async () =>
+                    if (dispatcher != null)
                     {
-                        await Shell.Current.GoToAsync("///MainPageTab", parameters);
-                    });
+                        await dispatcher.DispatchAsync(async () =>
+                        {
+                            await Shell.Current.GoToAsync("///MainPageTab", parameters);
+                        });
+                    }
                 });
             }
             catch

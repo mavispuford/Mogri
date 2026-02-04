@@ -11,7 +11,7 @@ public partial class EditMasksPopup : BasePopup
 		InitializeComponent();
 	}
 
-    private void OnCloseClicked(object sender, EventArgs e)
+    private void OnCloseClicked(object? sender, EventArgs e)
     {
         MopupService.Instance.PopAsync();
     }

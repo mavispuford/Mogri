@@ -33,15 +33,15 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     Color PaletteIconColor { get; set; }
 
-    ImageSource SavedImageSource { get; set; }
+    ImageSource? SavedImageSource { get; set; }
 
     bool ShowMaskLayer { get; set; }
 
-    SKBitmap SourceBitmap { get; set; }
+    SKBitmap? SourceBitmap { get; set; }
 
     bool SegmentationAdd { get; }
 
-    SKBitmap SegmentationBitmap { get; set; }
+    SKBitmap? SegmentationBitmap { get; set; }
 
     bool SettingSegmentationImage { get; set; }
     
@@ -91,5 +91,5 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     IRelayCommand ToggleActionsVisibilityCommand { get; }
 
-    IRelayCommand ResetZoomCommand { get; set; }
+    IRelayCommand? ResetZoomCommand { get; set; }
 }

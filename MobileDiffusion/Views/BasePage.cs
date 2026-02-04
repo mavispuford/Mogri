@@ -16,7 +16,8 @@ public class BasePage : ContentPage
         backButtonBehavior.SetBinding(BackButtonBehavior.CommandProperty, nameof(IPageViewModel.BackButtonCommand));
         Shell.SetBackButtonBehavior(this, backButtonBehavior);
 
-        if (Application.Current.Resources.TryGetValue("Primary", out var lightStatusBarColor) &&
+        if (Application.Current != null &&
+            Application.Current.Resources.TryGetValue("Primary", out var lightStatusBarColor) &&
             Application.Current.Resources.TryGetValue("Black", out var darkStatusBarColor))
         {
             var statusBarBehavior = new StatusBarBehavior()

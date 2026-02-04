@@ -13,11 +13,11 @@ namespace MobileDiffusion.Views;
 
 public partial class CanvasPage : BasePage
 {
-    private MaskLineViewModel _currentLine;
-    private MaskLineViewModel _segmentationLine;
-    private Timer _brushSizeTimer;
-    private Timer _alphaTimer;
-    private Timer _noiseTimer;
+    private MaskLineViewModel? _currentLine;
+    private MaskLineViewModel? _segmentationLine;
+    private Timer? _brushSizeTimer;
+    private Timer? _alphaTimer;
+    private Timer? _noiseTimer;
     private bool _hasCreatedBoundingBox;
     private bool _isSaving;
     private bool _hapticsEnabled = false;
@@ -28,9 +28,9 @@ public partial class CanvasPage : BasePage
         set => SetValue(BitmapProperty, value);
     }
 
-    public SKBitmap SegmentationBitmap
+    public SKBitmap? SegmentationBitmap
     {
-        get => (SKBitmap)GetValue(SegmentationBitmapProperty);
+        get => (SKBitmap?)GetValue(SegmentationBitmapProperty);
         set => SetValue(SegmentationBitmapProperty, value);
     }
 
@@ -229,7 +229,7 @@ public partial class CanvasPage : BasePage
         TemporaryCanvasView.SizeChanged += TemporaryCanvasView_SizeChanged;
     }
 
-    private void TemporaryCanvasView_SizeChanged(object sender, EventArgs e)
+    private void TemporaryCanvasView_SizeChanged(object? sender, EventArgs e)
     {
         if (TemporaryCanvasView.Width != -1 &&
             TemporaryCanvasView.Height != -1)
@@ -266,13 +266,13 @@ public partial class CanvasPage : BasePage
         });
     }
 
-    private void SourceImageCanvasView_SizeChanged(object sender, EventArgs e)
+    private void SourceImageCanvasView_SizeChanged(object? sender, EventArgs e)
     {
         UpdateCanvasSizes();
     }
 
 
-    private void OnTouchTemporarySurface(object sender, SKTouchEventArgs e)
+    private void OnTouchTemporarySurface(object? sender, SKTouchEventArgs e)
     {
         HideSliders();
 
@@ -439,7 +439,7 @@ public partial class CanvasPage : BasePage
 
     private SKPoint getPixelPoint(SKPoint location) => new SKPoint(location.X * (float)BoundingBoxScale, location.Y * (float)BoundingBoxScale);
 
-    private void OnPaintSourceImageSurface(object sender, SKPaintSurfaceEventArgs e)
+    private void OnPaintSourceImageSurface(object? sender, SKPaintSurfaceEventArgs e)
     {
         var canvas = e.Surface.Canvas;
         canvas.Clear(SKColors.Transparent);
@@ -459,7 +459,7 @@ public partial class CanvasPage : BasePage
         }
     }
 
-    private void OnPaintMaskSurface(object sender, SKPaintSurfaceEventArgs e)
+    private void OnPaintMaskSurface(object? sender, SKPaintSurfaceEventArgs e)
     {
         var canvas = e.Surface.Canvas;
         canvas.Clear(SKColors.Transparent);
@@ -473,7 +473,7 @@ public partial class CanvasPage : BasePage
             scale = (float)e.Info.Width / Bitmap.Width;
         }
 
-        if (CanvasActions != null)
+        if (CanvasActions != null && Bitmap != null)
         {
             foreach (var canvasAction in CanvasActions.Where(ca => ca.CanvasActionType == CanvasActionType.Mask))
             {
@@ -499,7 +499,7 @@ public partial class CanvasPage : BasePage
         }
     }
 
-    private void OnPaintTemporarySurface(object sender, SKPaintSurfaceEventArgs e)
+    private void OnPaintTemporarySurface(object? sender, SKPaintSurfaceEventArgs e)
     {
         var canvas = e.Surface.Canvas;
         canvas.Clear(SKColors.Transparent);
@@ -547,7 +547,7 @@ public partial class CanvasPage : BasePage
         }
     }
 
-    private void OnPaintSegmentationImageSurface(object sender, SKPaintSurfaceEventArgs e)
+    private void OnPaintSegmentationImageSurface(object? sender, SKPaintSurfaceEventArgs e)
     {
         var canvas = e.Surface.Canvas;
         canvas.Clear(SKColors.Transparent);
@@ -558,7 +558,7 @@ public partial class CanvasPage : BasePage
         }
     }
 
-    private void Brush_Size_Button_Clicked(object sender, EventArgs e)
+    private void Brush_Size_Button_Clicked(object? sender, EventArgs e)
     {
         vibrate(HapticFeedbackType.Click);
 
@@ -567,7 +567,7 @@ public partial class CanvasPage : BasePage
         ShowHideNoiseSlider(false);
     }
 
-    private void Alpha_Button_Clicked(object sender, EventArgs e)
+    private void Alpha_Button_Clicked(object? sender, EventArgs e)
     {
         vibrate(HapticFeedbackType.Click);
 
@@ -576,7 +576,7 @@ public partial class CanvasPage : BasePage
         ShowHideNoiseSlider(false);
     }
 
-    private void Noise_Button_Clicked(object sender, EventArgs e)
+    private void Noise_Button_Clicked(object? sender, EventArgs e)
     {
         vibrate(HapticFeedbackType.Click);
 
@@ -758,7 +758,7 @@ public partial class CanvasPage : BasePage
         NoiseSliderContainer.IsVisible = false;
     }
 
-    private void OnCanvasActionsChanged(ObservableCollection<CanvasActionViewModel> oldValue, ObservableCollection<CanvasActionViewModel> newValue)
+    private void OnCanvasActionsChanged(ObservableCollection<CanvasActionViewModel>? oldValue, ObservableCollection<CanvasActionViewModel>? newValue)
     {
         if (oldValue != null)
         {
@@ -781,7 +781,7 @@ public partial class CanvasPage : BasePage
         MaskCanvasView.InvalidateSurface();
     }
 
-    private void CanvasActions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    private void CanvasActions_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.OldItems != null)
         {
@@ -802,7 +802,7 @@ public partial class CanvasPage : BasePage
         MaskCanvasView.InvalidateSurface();
     }
 
-    private void OnCanvasActionPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void OnCanvasActionPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         MaskCanvasView.InvalidateSurface();
     }
@@ -852,7 +852,7 @@ public partial class CanvasPage : BasePage
         BoundingBoxScale = Bitmap.Width / width;
     }
 
-    private async Task PrepareForSaving(IAsyncRelayCommand callbackCommand)
+    private async Task PrepareForSaving(IAsyncRelayCommand? callbackCommand)
     {
         if (callbackCommand == null)
         {
@@ -867,13 +867,21 @@ public partial class CanvasPage : BasePage
         await Task.Delay(300);
 
         var maskCapture = await MaskCanvasView.CaptureAsync();
-        var result = new CanvasCaptureResult();
+        
+        SKBitmap? maskBitmap = null;
 
         if (maskCapture != null)
         {
             using var maskStream = await maskCapture.OpenReadAsync();
-            result.MaskBitmap = SKBitmap.Decode(maskStream);
+            maskBitmap = SKBitmap.Decode(maskStream);
         }
+
+        maskBitmap ??= new SKBitmap();
+
+        var result = new CanvasCaptureResult
+        {
+            MaskBitmap = maskBitmap
+        };
 
         await callbackCommand.ExecuteAsync(result);
 
@@ -882,7 +890,7 @@ public partial class CanvasPage : BasePage
         MaskCanvasView.InvalidateSurface();
     }
 
-    private void MaskGrid_SizeChanged(object sender, EventArgs e)
+    private void MaskGrid_SizeChanged(object? sender, EventArgs e)
     {
         UpdateCanvasSizes();
     }
@@ -893,7 +901,7 @@ public partial class CanvasPage : BasePage
         MaskCanvasView.Animate("FadeInOutMaskCanvasView", value => MaskCanvasView.Opacity = value, MaskCanvasView.Opacity, ShowMaskLayer ? 1 : 0, easing: Easing.CubicInOut);
     }
 
-    private void ToolCollectionView_SelectedItemChanged(object sender, SelectionChangedEventArgs e)
+    private void ToolCollectionView_SelectedItemChanged(object? sender, SelectionChangedEventArgs e)
     {
         vibrate(HapticFeedbackType.Click);
     }
@@ -907,7 +915,7 @@ public partial class CanvasPage : BasePage
         }
     }
 
-    private void Vibrate_Button_Tapped(object sender, TappedEventArgs e)
+    private void Vibrate_Button_Tapped(object? sender, TappedEventArgs e)
     {
         vibrate(HapticFeedbackType.Click);
     }

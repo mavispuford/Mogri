@@ -10,7 +10,7 @@ public static class PngMetadataHelper
 {
     private static readonly byte[] PngSignature = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
 
-    public static async Task<(string Positive, string Negative, string Raw)> ReadParametersAsync(string filePath)
+    public static async Task<(string? Positive, string? Negative, string? Raw)> ReadParametersAsync(string filePath)
     {
         if (!File.Exists(filePath))
             return (null, null, null);
@@ -27,7 +27,7 @@ public static class PngMetadataHelper
         }
     }
 
-    public static async Task<(string Positive, string Negative, string Raw)> ReadParametersFromStreamAsync(Stream stream)
+    public static async Task<(string? Positive, string? Negative, string? Raw)> ReadParametersFromStreamAsync(Stream stream)
     {
         var buffer = new byte[8];
         if (await stream.ReadAsync(buffer, 0, 8) != 8 || !UnsafeCompare(buffer, PngSignature))
@@ -77,13 +77,13 @@ public static class PngMetadataHelper
         return (null, null, null);
     }
 
-    private static (string Positive, string Negative, string Raw) ParseStableDiffusionParameters(string parameters)
+    private static (string? Positive, string? Negative, string? Raw) ParseStableDiffusionParameters(string parameters)
     {
         if (string.IsNullOrWhiteSpace(parameters))
             return (null, null, parameters);
 
-        string positive = null;
-        string negative = null;
+        string? positive = null;
+        string? negative = null;
 
         var parts = parameters.Split(new[] { "Negative prompt:" }, StringSplitOptions.None);
         if (parts.Length > 0)

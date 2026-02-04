@@ -8,7 +8,8 @@ namespace MobileDiffusion.Services
     {
         private const string PresetsFileName = "presets.json";
         private string _filePath;
-        private Dictionary<string, PromptSettings> _presets;
+        private Dictionary<string, PromptSettings> _presets = new();
+        private bool _isInitialized;
 
         public PresetService()
         {
@@ -17,24 +18,24 @@ namespace MobileDiffusion.Services
 
         private async Task InitializeAsync()
         {
-            if (_presets != null) return;
+            if (_isInitialized) return;
 
             if (File.Exists(_filePath))
             {
                 try
                 {
                     using var stream = File.OpenRead(_filePath);
-                    _presets = await JsonSerializer.DeserializeAsync<Dictionary<string, PromptSettings>>(stream);
+                    var loaded = await JsonSerializer.DeserializeAsync<Dictionary<string, PromptSettings>>(stream);
+                    if (loaded != null)
+                        _presets = loaded;
                 }
                 catch
                 {
-                    _presets = new Dictionary<string, PromptSettings>();
+                    // Keep empty dictionary
                 }
             }
-            else
-            {
-                _presets = new Dictionary<string, PromptSettings>();
-            }
+            
+            _isInitialized = true;
         }
 
         private async Task SaveToFileAsync()
@@ -84,7 +85,7 @@ namespace MobileDiffusion.Services
             }
         }
 
-        public async Task<PromptSettings> LoadPresetAsync(string name)
+        public async Task<PromptSettings?> LoadPresetAsync(string name)
         {
             await InitializeAsync();
 

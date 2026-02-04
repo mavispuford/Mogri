@@ -11,29 +11,29 @@ namespace MobileDiffusion.ViewModels;
 public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemViewModel
 {
     private readonly IPopupService _popupService;
-    private Action<IEditMaskItemViewModel> _deleteAction;
-    private Action<IEditMaskItemViewModel> _duplicateAction;
+    private Action<IEditMaskItemViewModel>? _deleteAction;
+    private Action<IEditMaskItemViewModel>? _duplicateAction;
 
     [ObservableProperty]
-    private CanvasActionViewModel _canvasAction;
+    private CanvasActionViewModel? _canvasAction;
 
     [ObservableProperty]
-    private string _icon;
+    private string _icon = string.Empty;
 
     [ObservableProperty]
     private bool _isColorVisible;
 
     [ObservableProperty]
-    private Color _displayColor;
+    private Color _displayColor = Colors.Transparent;
 
     [ObservableProperty]
     private double _alpha;
 
     [ObservableProperty]
-    private Color _colorWithAlpha;
+    private Color _colorWithAlpha = Colors.Transparent;
 
     [ObservableProperty]
-    private string _description;
+    private string _description = string.Empty;
 
     public EditMaskItemViewModel(IPopupService popupService)
     {
@@ -103,7 +103,7 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
         }
     }
 
-    private void action_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void action_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (e.PropertyName == "Color")
         {
@@ -138,6 +138,8 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
     [RelayCommand]
     private async Task EditAsync()
     {
+        if (CanvasAction == null) return;
+
         var parameters = new Dictionary<string, object>
         {
             { "Action", CanvasAction }

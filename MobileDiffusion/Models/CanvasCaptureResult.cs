@@ -4,5 +4,5 @@ namespace MobileDiffusion.Models;
 
 public class CanvasCaptureResult
 {
-    public SKBitmap MaskBitmap { get; set; }
+    public required SKBitmap MaskBitmap { get; set; }
 }

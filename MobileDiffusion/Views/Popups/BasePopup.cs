@@ -12,16 +12,18 @@ public class BasePopup : PopupPage
     {
         // Global styles don't seem to be working with Popups, so we'll set it up here
 
-        if (!Application.Current.Resources.TryGetValue("BlackSeventyThreePercent", out var bgColor))
+        object bgColor = Color.FromArgb("BB000000");
+
+        if (Application.Current != null && Application.Current.Resources.TryGetValue("BlackSeventyThreePercent", out var foundColor))
         {
-            bgColor = Color.FromArgb("BB000000");
+            bgColor = foundColor;
         }
 
         BackgroundColor = (Color)bgColor;
 
         CloseWhenBackgroundIsClicked = false;
 
-        if (Application.Current.Resources.TryGetValue("Gray950", out var statusBarColor))
+        if (Application.Current != null && Application.Current.Resources.TryGetValue("Gray950", out var statusBarColor))
         {
             Behaviors.Add(new StatusBarBehavior()
             {

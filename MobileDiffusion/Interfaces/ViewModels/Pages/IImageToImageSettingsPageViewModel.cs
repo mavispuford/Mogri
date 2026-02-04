@@ -12,13 +12,13 @@ public interface IImageToImageSettingsPageViewModel : IPageViewModel
 
     bool IsLoadingMaskImage { get; set; }
 
-    string Strength { get; set; }
+    string? Strength { get; set; }
 
-    string StrengthPlaceholder { get; set; }
+    string? StrengthPlaceholder { get; set; }
 
-    ImageSource InitImageSource { get; set; }
+    ImageSource? InitImageSource { get; set; }
 
-    ImageSource MaskImageSource { get; set; }
+    ImageSource? MaskImageSource { get; set; }
 
     IAsyncRelayCommand ResetValuesCommand { get; }
 

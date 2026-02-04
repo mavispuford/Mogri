@@ -4,9 +4,9 @@ namespace MobileDiffusion.Interfaces.ViewModels.Popups;
 
 public interface IHistoryItemPopupViewModel : IPopupBaseViewModel
 {
-    IHistoryItemViewModel HistoryItem { get; set; }
+    IHistoryItemViewModel? HistoryItem { get; set; }
 
-    ImageSource FullImageSource { get; set; }
+    ImageSource? FullImageSource { get; set; }
 
     IAsyncRelayCommand DeleteCommand { get; }
 

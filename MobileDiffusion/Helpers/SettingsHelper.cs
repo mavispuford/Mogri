@@ -1,4 +1,5 @@
-﻿using MobileDiffusion.Models;
+﻿using MobileDiffusion.Interfaces.ViewModels;
+using MobileDiffusion.Models;
 using MobileDiffusion.ViewModels;
 
 namespace MobileDiffusion.Helpers;
@@ -12,7 +13,7 @@ public static class SettingsHelper
         return GetCombinedPromptAndPromptStyles(settings.Prompt, settings.NegativePrompt, settings.PromptStyles);
     }
 
-    public static (string Prompt, string NegativePrompt) GetCombinedPromptAndPromptStyles(string prompt, string negativePrompt, List<PromptStyleViewModel> promptStyles)
+    public static (string Prompt, string NegativePrompt) GetCombinedPromptAndPromptStyles(string prompt, string negativePrompt, IEnumerable<IPromptStyleViewModel> promptStyles)
     {
         if (promptStyles == null)
         {

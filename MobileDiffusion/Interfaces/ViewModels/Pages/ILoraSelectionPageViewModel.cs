@@ -9,7 +9,7 @@ public interface ILoraSelectionPageViewModel : IPageViewModel
 
     ObservableCollection<ILoraViewModel> SelectedLoras { get; set; }
 
-    ILoraViewModel LoraToAdd { get; set; }
+    ILoraViewModel? LoraToAdd { get; set; }
 
     IAsyncRelayCommand CancelCommand { get; }
 

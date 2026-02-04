@@ -180,14 +180,14 @@ public class HistoryService : IHistoryService
 
                 if (isExact)
                 {
-                    candidates = candidates.Where(x => IsWholeWordMatch(x.UserPrompt, cleanQuery) || IsWholeWordMatch(x.NegativePrompt, cleanQuery));
+                    candidates = candidates.Where(x => IsWholeWordMatch(x.UserPrompt ?? string.Empty, cleanQuery) || IsWholeWordMatch(x.NegativePrompt ?? string.Empty, cleanQuery));
                 }
 
                 result = candidates
                     .Select(x => 
                     {
-                        var score1 = GetStringScore(x.UserPrompt, cleanQuery);
-                        var score2 = GetStringScore(x.NegativePrompt, cleanQuery);
+                        var score1 = GetStringScore(x.UserPrompt ?? string.Empty, cleanQuery);
+                        var score2 = GetStringScore(x.NegativePrompt ?? string.Empty, cleanQuery);
                         var finalScore = Math.Min(score1, score2);
                         return new { Item = x, Score = finalScore };
                     })

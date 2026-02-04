@@ -7,7 +7,7 @@ public partial class PromptSettingsPage : BasePage
         InitializeComponent();
     }
 
-    private void Slider_ValueChanged(object sender, ValueChangedEventArgs e)
+    private void Slider_ValueChanged(object? sender, ValueChangedEventArgs e)
     {
         if (sender is Slider slider)
         {

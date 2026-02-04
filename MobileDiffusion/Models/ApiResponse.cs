@@ -5,7 +5,7 @@
 /// </summary>
 public class ApiResponse
 {
-    public object ResponseObject { get; set; }
+    public object? ResponseObject { get; set; }
 
     public double Progress { get; set; }
 } 

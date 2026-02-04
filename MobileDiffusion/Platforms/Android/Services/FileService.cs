@@ -14,15 +14,18 @@ public class FileService : IFileService
 
     private const string extFolderNameMasks = "Pictures/MobileDiffusion/Masks/";
 
-    public async Task<Stream> GetFileStreamUsingExactUriAsync(string uriString)
+    public async Task<Stream?> GetFileStreamUsingExactUriAsync(string uriString)
     {
         await checkForReadPermission();
 
-        var contentResolver = Platform.CurrentActivity.ContentResolver;
+        var contentResolver = Platform.CurrentActivity?.ContentResolver;
+
+        if (contentResolver == null) return null;
 
         try
         {
             var uri = AndroidNet.Uri.Parse(uriString);
+            if (uri == null) return null;
 
             return contentResolver.OpenInputStream(uri);
         }
@@ -36,16 +39,18 @@ public class FileService : IFileService
         return null;
     }
 
-    public async Task<Stream> GetFileStreamFromExternalStorageAsync(string fileName)
+    public async Task<Stream?> GetFileStreamFromExternalStorageAsync(string fileName)
     {
         await checkForReadPermission();
+
+        if (MediaStore.Images.Media.ExternalContentUri == null) return null;
 
         return await getFileStreamFromStorageUsingBaseUri(fileName, MediaStore.Images.Media.ExternalContentUri);
 
         //return await getFileStreamFromStorageUsingBaseUri(fileName, AndroidNet.Uri.WithAppendedPath(MediaStore.Images.Media.ExternalContentUri, extFolderName));
     }
 
-    public Task<Stream> GetFileStreamFromInternalStorageAsync(string fileName)
+    public Task<Stream?> GetFileStreamFromInternalStorageAsync(string fileName)
     {
         var fullPath = fileName.Contains(FileSystem.CacheDirectory) ? fileName : Path.Combine(FileSystem.CacheDirectory, fileName);
 
@@ -53,7 +58,7 @@ public class FileService : IFileService
         {
             var reader = new StreamReader(fullPath, true);
 
-            return Task.FromResult(reader.BaseStream);
+            return Task.FromResult<Stream?>(reader.BaseStream);
         }
         catch (Exception)
         {
@@ -62,10 +67,10 @@ public class FileService : IFileService
             Console.WriteLine($"Error reading requested file from \"{fullPath}\"");
         }
 
-        return Task.FromResult<Stream>(null);
+        return Task.FromResult<Stream?>(null);
     }
 
-    private Task<Stream> getFileStreamFromStorageUsingBaseUri(string fileName, AndroidNet.Uri baseUri)
+    private Task<Stream?> getFileStreamFromStorageUsingBaseUri(string fileName, AndroidNet.Uri baseUri)
     {
         if (string.IsNullOrEmpty(fileName))
         {
@@ -77,7 +82,9 @@ public class FileService : IFileService
             throw new ArgumentNullException(nameof(baseUri));
         }
 
-        var contentResolver = Platform.CurrentActivity.ContentResolver;
+        var contentResolver = Platform.CurrentActivity?.ContentResolver;
+
+        if (contentResolver == null) return Task.FromResult<Stream?>(null);
 
         try
         {
@@ -95,27 +102,15 @@ public class FileService : IFileService
             var selection = $"{MediaStore.Images.Media.InterfaceConsts.DisplayName} = '{fileName}'";
             var mediaCursor = contentResolver.Query(baseUri, projection, selection, null, null);
 
+            if (mediaCursor == null) return Task.FromResult<Stream?>(null);
+
             var columnIndexIdIndex = mediaCursor.GetColumnIndexOrThrow(MediaStore.Images.Media.InterfaceConsts.Id);
-            var titleIndex = mediaCursor.GetColumnIndexOrThrow(MediaStore.IMediaColumns.Title);
-            var displayNameIndex = mediaCursor.GetColumnIndexOrThrow(MediaStore.Images.Media.InterfaceConsts.DisplayName);
-            var mimeTypeIndex = mediaCursor.GetColumnIndexOrThrow(MediaStore.IMediaColumns.MimeType);
-            var volumeNameIndex = mediaCursor.GetColumnIndexOrThrow(MediaStore.Images.Media.InterfaceConsts.VolumeName);
-            var documentIdIndex = mediaCursor.GetColumnIndexOrThrow(MediaStore.Images.Media.InterfaceConsts.DocumentId);
-            var relativePathIndex = mediaCursor.GetColumnIndexOrThrow(MediaStore.Images.Media.InterfaceConsts.RelativePath);
-
-            var items = new List<string>();
-
+            
             while (mediaCursor.MoveToNext())
             {
                 var id = mediaCursor.GetLong(columnIndexIdIndex);
-                var title = mediaCursor.GetString(titleIndex);
-                var displayName = mediaCursor.GetString(displayNameIndex);
-                var mimeType = mediaCursor.GetString(mimeTypeIndex);
-                var volumeName = mediaCursor.GetString(volumeNameIndex);
-                var documentId = mediaCursor.GetString(documentIdIndex);
-                var relativePath = mediaCursor.GetString(relativePathIndex);
-
                 var contentUri = ContentUris.WithAppendedId(baseUri, id);
+                if (contentUri == null) continue;
 
                 return Task.FromResult(contentResolver.OpenInputStream(contentUri));
             }
@@ -127,7 +122,7 @@ public class FileService : IFileService
             Console.WriteLine($"Error getting requested file \"{fileName}\" \"(uri: {baseUri})\"");
         }
 
-        return Task.FromResult<Stream>(null);
+        return Task.FromResult<Stream?>(null);
     }
 
     public async Task<string> WriteFileToInternalStorageAsync(string fileName, Stream stream)
@@ -149,7 +144,7 @@ public class FileService : IFileService
 
             Console.WriteLine($"Error writing requested file \"{fileName}\" to \"{fullPath}\"");
 
-            return null;
+            return string.Empty;
         }
 
         return fullPath;
@@ -181,23 +176,35 @@ public class FileService : IFileService
         contentValues.Put(MediaStore.Images.Media.InterfaceConsts.IsPending, 1);
 #endif
 
-        AndroidNet.Uri uri;
-        var contentResolver = Platform.CurrentActivity.ContentResolver;
+        AndroidNet.Uri? uri;
+        var contentResolver = Platform.CurrentActivity?.ContentResolver;
+
+        if (contentResolver == null) return string.Empty;
+
+        if (MediaStore.Images.Media.ExternalContentUri == null) return string.Empty;
 
         try
         {
             uri = contentResolver.Insert(MediaStore.Images.Media.ExternalContentUri, contentValues);
 
-            var outputStream = contentResolver.OpenOutputStream(uri);
-            await stream.CopyToAsync(outputStream);
-
+            if (uri != null)
+            {
+                var outputStream = contentResolver.OpenOutputStream(uri);
+                if (outputStream != null)
+                {
+                    await stream.CopyToAsync(outputStream);
+                }
+            }
 #if ANDROID30_0_OR_GREATER
             contentValues.Clear();
             contentValues.Put(MediaStore.Images.Media.InterfaceConsts.IsPending, 0);
-            contentResolver.Update(uri, contentValues, null);
+            if (uri != null)
+            {
+                contentResolver.Update(uri, contentValues, null, null);
+            }
 #endif
 
-            return uri.ToString();
+            return uri?.ToString() ?? string.Empty;
         }
         catch (Exception)
         {
@@ -209,7 +216,7 @@ public class FileService : IFileService
         return string.Empty;
     }
 
-    public async Task<MaskViewModel> GetMaskFileFromAppDataAsync(string imageFileName)
+    public async Task<MaskViewModel?> GetMaskFileFromAppDataAsync(string imageFileName)
     {
         await checkForWritePermission();
 
@@ -326,7 +333,7 @@ public class FileService : IFileService
 #endif
     }
 
-    public Task<string[]> GetFileListFromInternalStorageAsync(string path = null)
+    public Task<string[]> GetFileListFromInternalStorageAsync(string? path = null)
     {
         try
         {
@@ -340,7 +347,7 @@ public class FileService : IFileService
         catch
         {
             // Ignored
-            return Task.FromResult<string[]>(null);
+            return Task.FromResult(Array.Empty<string>());
         }
     }
 
