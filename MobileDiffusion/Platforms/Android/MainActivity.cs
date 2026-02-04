@@ -31,8 +31,9 @@ public class MainActivity : MauiAppCompatActivity
         {
             base.OnDestroy();
         }
-        catch (Exception)
+        catch
         {
+            // Ignored
         }
     }
 

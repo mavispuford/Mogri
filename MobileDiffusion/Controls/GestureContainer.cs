@@ -73,8 +73,8 @@ public class GestureContainer : ContentView
 
             if (animate)
             {
-                Content.ScaleTo(1, 250, Easing.CubicInOut);
-                Content.TranslateTo(0, 0, 250, Easing.CubicInOut);
+                _ = Content.ScaleToAsync(1, 250, Easing.CubicInOut);
+                _ = Content.TranslateToAsync(0, 0, 250, Easing.CubicInOut);
             }
             else
             {
@@ -101,7 +101,7 @@ public class GestureContainer : ContentView
         GestureRecognizers.Add(doubleTapGesture);
     }
 
-    private void OnDoubleTapped(object? sender, TappedEventArgs e)
+    private async void OnDoubleTapped(object? sender, TappedEventArgs e)
     {
         if (Content == null) return;
 
@@ -144,8 +144,8 @@ public class GestureContainer : ContentView
             targetTranslationX = Math.Clamp(targetTranslationX, -maxTranslationX, maxTranslationX);
             targetTranslationY = Math.Clamp(targetTranslationY, -maxTranslationY, maxTranslationY);
 
-            Content.ScaleTo(currentScale, 250, Easing.CubicInOut);
-            Content.TranslateTo(targetTranslationX, targetTranslationY, 250, Easing.CubicInOut);
+            _ = Content.ScaleToAsync(currentScale, 250, Easing.CubicInOut);
+            _ = Content.TranslateToAsync(targetTranslationX, targetTranslationY, 250, Easing.CubicInOut);
         }
     }
 
@@ -303,7 +303,7 @@ public class GestureContainer : ContentView
                         SwipeRightCommand.Execute(null);
                     }
 
-                    Content.TranslateTo(0, 0, 250, Easing.SpringOut);
+                    _ = Content.TranslateToAsync(0, 0, 250, Easing.SpringOut);
                     isPanning = false;
                     return;
                 }

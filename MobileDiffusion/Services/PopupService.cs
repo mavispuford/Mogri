@@ -22,7 +22,7 @@ namespace MobileDiffusion.Services
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
-        public async Task ShowPopupAsync(string name, IDictionary<string, object> parameters)
+        public async Task ShowPopupAsync(string name, IDictionary<string, object>? parameters)
         {
             var popupType = PopupRegistrations.GetPopupTypeByName(name);
             var popup = _serviceProvider.GetService(popupType) as PopupPage;
@@ -37,7 +37,7 @@ namespace MobileDiffusion.Services
             {
                 queryAttributable.ApplyQueryAttributes(parameters);
             }
-            else if (popup is IQueryAttributable queryAttributablePopup)
+            else if (popup is IQueryAttributable queryAttributablePopup && parameters != null)
             {
                 queryAttributablePopup.ApplyQueryAttributes(parameters);
             }
@@ -60,7 +60,7 @@ namespace MobileDiffusion.Services
             }
         }
 
-        public async Task<object?> ShowPopupForResultAsync(string name, IDictionary<string, object> parameters)
+        public async Task<object?> ShowPopupForResultAsync(string name, IDictionary<string, object>? parameters)
         {
             var popupType = PopupRegistrations.GetPopupTypeByName(name);
             var popup = _serviceProvider.GetService(popupType) as PopupPage;
@@ -156,7 +156,7 @@ namespace MobileDiffusion.Services
             return Shell.Current.Dispatcher.DispatchAsync(() => Shell.Current.DisplayAlertAsync(title, message, accept, cancel));
         }
 
-        public Task<string> DisplayPromptAsync(string title, string message, string accept = "OK", string cancel = "Cancel", string placeholder = null, int maxLength = -1, Keyboard keyboard = null, string initialValue = "")
+        public Task<string?> DisplayPromptAsync(string title, string message, string accept = "OK", string cancel = "Cancel", string? placeholder = null, int maxLength = -1, Keyboard? keyboard = null, string initialValue = "")
         {
             return Shell.Current.Dispatcher.DispatchAsync(() => Shell.Current.DisplayPromptAsync(title, message, accept, cancel, placeholder, maxLength, keyboard, initialValue));
         }

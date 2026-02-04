@@ -165,7 +165,7 @@ public class SegmentationService : ISegmentationService, IDisposable
                 _lowResMasks = null; // Reset mask state for new image
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             _imageEmbeddings = null;
             _imageWidth = 0;
@@ -270,7 +270,7 @@ public class SegmentationService : ISegmentationService, IDisposable
                     return GetImageFromMaskTensorPointer(maskTensor);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }

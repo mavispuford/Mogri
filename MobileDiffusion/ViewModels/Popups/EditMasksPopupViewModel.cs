@@ -45,7 +45,7 @@ public partial class EditMasksPopupViewModel : PopupBaseViewModel, IEditMasksPop
         }
     }
 
-    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    public override void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         base.ApplyQueryAttributes(query);
 

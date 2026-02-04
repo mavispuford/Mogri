@@ -931,8 +931,8 @@ public partial class CanvasPage : BasePage
         {
             Dispatcher.Dispatch(async () =>
             {
-                await ShowActionsButton.ScaleTo(1.25, 200, Easing.CubicOut);
-                await ShowActionsButton.ScaleTo(1.0, 200, Easing.CubicIn);
+                await ShowActionsButton.ScaleToAsync(1.25, 200, Easing.CubicOut);
+                await ShowActionsButton.ScaleToAsync(1.0, 200, Easing.CubicIn);
             });
         }
 

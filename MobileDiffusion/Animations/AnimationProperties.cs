@@ -9,17 +9,17 @@ namespace MobileDiffusion.Animations;
 /// There are two ways of using this. You can set a single animation, or an array of animations.
 /// Single:
 /// <code>
-///     <animations:AnimationProperties.Animations>
-///             <animations:ScaleToAnimation Scale = "1" Easing="{x:Static Easing.CubicInOut}" Length="200" />
-///     </animations:AnimationProperties.Animations>
+///     &lt;AnimationProperties.Animations&gt;
+///             &lt;ScaleToAnimation Scale = "1" Easing="{x:Static Easing.CubicInOut}" Length="200" /&gt;
+///     &lt;/AnimationProperties.Animations&gt;
 /// </code>
 /// 
 /// Array:
 /// <code>
-///     <x:Array Type="{x:Type toolkit:BaseAnimation}">
-///         <animations:ScaleToAnimation Scale = "1" Easing="{x:Static Easing.CubicInOut}" Length="200" />
-///         <animations:ColorToAnimation FromColor = "Black" ToColor="Red" BindableProperty="{x:Static VisualElement.BackgroundColorProperty}" />
-///     </x:Array>
+///     &lt;x:Array Type="{x:Type toolkit:BaseAnimation}"&gt;
+///         &lt;ScaleToAnimation Scale = "1" Easing="{x:Static Easing.CubicInOut}" Length="200" /&gt;
+///         &lt;ColorToAnimation FromColor = "Black" ToColor="Red" BindableProperty="{x:Static VisualElement.BackgroundColorProperty}" /&gt;
+///     &lt;/x:Array&gt;
 /// </code>
 /// </remarks>
 public static class AnimationProperties

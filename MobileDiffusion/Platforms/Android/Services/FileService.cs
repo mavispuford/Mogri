@@ -26,7 +26,7 @@ public class FileService : IFileService
 
             return contentResolver.OpenInputStream(uri);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             // TODO - Handle exception
 
@@ -55,14 +55,14 @@ public class FileService : IFileService
 
             return Task.FromResult(reader.BaseStream);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             // TODO - Handle exception
 
             Console.WriteLine($"Error reading requested file from \"{fullPath}\"");
         }
 
-        return null;
+        return Task.FromResult<Stream>(null);
     }
 
     private Task<Stream> getFileStreamFromStorageUsingBaseUri(string fileName, AndroidNet.Uri baseUri)
@@ -120,14 +120,14 @@ public class FileService : IFileService
                 return Task.FromResult(contentResolver.OpenInputStream(contentUri));
             }
         }
-        catch (Exception e)
+        catch (Exception)
         {
             // TODO - Handle exception
 
             Console.WriteLine($"Error getting requested file \"{fileName}\" \"(uri: {baseUri})\"");
         }
 
-        return null;
+        return Task.FromResult<Stream>(null);
     }
 
     public async Task<string> WriteFileToInternalStorageAsync(string fileName, Stream stream)
@@ -143,7 +143,7 @@ public class FileService : IFileService
 
             fileStream.Close();
         }
-        catch (Exception e)
+        catch (Exception)
         {
             // TODO - Handle exception
 
@@ -199,7 +199,7 @@ public class FileService : IFileService
 
             return uri.ToString();
         }
-        catch (Exception e)
+        catch (Exception)
         {
             // TODO - Handle exception
 
@@ -235,7 +235,7 @@ public class FileService : IFileService
             return mask;
 
         }
-        catch (Exception e)
+        catch (Exception)
         {
             Console.WriteLine($"Unable to read requested file \"{maskFileName}\" from \"{fullPath}\"");
         }
@@ -270,7 +270,7 @@ public class FileService : IFileService
 
             return fullPath;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             // TODO - Handle exception
 
@@ -339,7 +339,8 @@ public class FileService : IFileService
         }
         catch
         {
-            return null;
+            // Ignored
+            return Task.FromResult<string[]>(null);
         }
     }
 

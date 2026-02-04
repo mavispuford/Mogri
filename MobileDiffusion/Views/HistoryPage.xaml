@@ -82,7 +82,7 @@
                                        IsVisible="{Binding IsLoading}"
                                        IsRunning="{Binding IsLoading}" />
                     <Label Grid.Row="2" Text="{Binding IsLoading, Converter={StaticResource BoolToLoadingText}}"
-                           FontSize="Large"
+                           FontSize="18"
                            HorizontalTextAlignment="Center"/>
                 </Grid>
             </CollectionView.EmptyView>
@@ -173,7 +173,7 @@
                 </animations:CustomAnimationBehavior>
             </Border.Behaviors>
             <Grid ColumnDefinitions="*,auto">
-                <Label Grid.Column="0" Margin="30,0,0,0" Text="{Binding SelectedItemsText}" FontSize="Medium" VerticalTextAlignment="Center"/>
+                <Label Grid.Column="0" Margin="30,0,0,0" Text="{Binding SelectedItemsText}" FontSize="16" VerticalTextAlignment="Center"/>
 
                 <ContentView Grid.Column="1"
                              Padding="20"

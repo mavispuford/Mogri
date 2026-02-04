@@ -372,7 +372,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
             await Toast.Make("Mask saved.").Show();
         }
-        catch (Exception e)
+        catch (Exception)
         {
             await Toast.Make("Failed to save mask file. Please try again.").Show();
         }
@@ -479,7 +479,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                     await Toast.Make($"{fileName} saved.").Show();
                 });
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 await dispatcher?.DispatchAsync(async () =>
                 {
@@ -595,9 +595,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                     await Shell.Current.GoToAsync("///MainPageTab", parameters);
                 });
             }
-            catch (Exception e)
+            catch
             {
-                //
+                // Ignored
             }
         });
 
@@ -685,9 +685,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                     await Toast.Make("Section has been cropped and set as source image.").Show();
                 });
             }
-            catch (Exception e)
+            catch
             {
-                //
+                // Ignored
             }
         });
 

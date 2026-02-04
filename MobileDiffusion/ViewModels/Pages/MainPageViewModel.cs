@@ -418,7 +418,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         {
             await _stableDiffusionService.CancelAsync();
         }
-        catch(Exception)
+        catch
         {
             // Ignore
         }
