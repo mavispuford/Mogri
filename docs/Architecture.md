@@ -102,3 +102,6 @@ foreach (var item in items)
 ## Configuration & Settings
 - App settings (like Server URL) are persisted using native `Preferences`
 - `SettingsHelper` provides a strongly-typed wrapper around these preferences
+
+## Builds
+- When building, the goal is always to have 0 Warnings and (obviously) 0 Errors.
