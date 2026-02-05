@@ -647,6 +647,68 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     }
 
     [RelayCommand]
+    private async Task ApplyPaintAndMasks()
+    {
+        ShowActions = false;
+
+        if (SourceBitmap == null)
+        {
+            await Toast.Make("There is no image to apply paint/masks to.").Show();
+            return;
+        }
+
+        var result = await Shell.Current.DisplayAlertAsync("Apply Paint and Masks?",
+            "This will permanently apply the paint/masks and replace the canvas image. Continue?",
+            "YES",
+            "NO");
+
+        if (!result)
+        {
+            return;
+        }
+
+        await (PrepareForSavingCommand?.ExecuteAsync(FinishApplyingPaintAndMasksCommand) ?? Task.CompletedTask);
+    }
+
+    [RelayCommand]
+    private async Task FinishApplyingPaintAndMasks(CanvasCaptureResult result)
+    {
+        IsBusy = true;
+
+        var sourceBitmap = SourceBitmap;
+        if (sourceBitmap == null)
+        {
+            IsBusy = false;
+            return;
+        }
+
+        await Task.Run(async () =>
+        {
+            using var rawMaskBitmap = GenerateRenderedLayer(sourceBitmap.Width, sourceBitmap.Height);
+
+            var mergedBitmap = CreateMaskedBitmap(sourceBitmap, rawMaskBitmap);
+
+            if (mergedBitmap != null)
+            {
+                var dispatcher = Shell.Current.CurrentPage?.Dispatcher;
+                await (dispatcher?.DispatchAsync(async () =>
+                {
+                    var oldBitmap = SourceBitmap;
+                    SourceBitmap = mergedBitmap;
+                    oldBitmap?.Dispose();
+
+                    CanvasActions.Clear();
+                    ClearSegmentationMask();
+
+                    await Toast.Make("Paint and Masks applied.").Show();
+                }) ?? Task.CompletedTask);
+            }
+        });
+
+        IsBusy = false;
+    }
+
+    [RelayCommand]
     private async Task FinishCroppingWithBoundingBox(CanvasCaptureResult result)
     {
         IsBusy = true;

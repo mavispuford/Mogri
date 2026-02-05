@@ -488,6 +488,24 @@
 
             <Border>
                 <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ApplyPaintAndMasksCommand}" />
+                </Border.GestureRecognizers>
+                <HorizontalStackLayout>
+                    <Image>
+                        <Image.Source>
+                            <FontImageSource Glyph="&#xe155;" FontFamily="MaterialIconsRound300" Size="24" />
+                        </Image.Source>
+                        <Image.Behaviors>
+                            <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Primary}" />
+                        </Image.Behaviors>
+                    </Image>
+
+                    <Label Text="Apply Paint/Masks" />
+                </HorizontalStackLayout>
+            </Border>
+
+            <Border>
+                <Border.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding PatchCommand}" />
                 </Border.GestureRecognizers>
                 <HorizontalStackLayout>
@@ -539,8 +557,6 @@
                     <Label Text="Use Canvas" />
                 </HorizontalStackLayout>
             </Border>
-
-            
 
         </VerticalStackLayout>
 
