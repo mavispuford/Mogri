@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using MobileDiffusion.Helpers;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
@@ -10,9 +10,9 @@ public partial class SegmentationMaskViewModel : PaintActionViewModel
 {
     [ObservableProperty]
     [property: JsonIgnore]
-    public partial SKBitmap Bitmap { get; set; }
+    public partial SKBitmap? Bitmap { get; set; }
 
-    public byte[] BitmapBytes
+    public byte[]? BitmapBytes
     {
         get => Bitmap?.Encode(SKEncodedImageFormat.Png, 100).ToArray();
         set

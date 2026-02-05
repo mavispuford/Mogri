@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 
 using CommunityToolkit.Maui.Views;
 using MobileDiffusion.Interfaces.Services;
@@ -14,7 +14,7 @@ namespace MobileDiffusion.Services
     public class PopupService : IPopupService
     {
         private static Dictionary<PopupPage, TaskCompletionSource<object?>> activePopups = new();
-        
+
         private readonly IServiceProvider _serviceProvider;
 
         public PopupService(IServiceProvider serviceProvider)
@@ -22,7 +22,7 @@ namespace MobileDiffusion.Services
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
-        public async Task ShowPopupAsync(string name, IDictionary<string, object> parameters)
+        public async Task ShowPopupAsync(string name, IDictionary<string, object>? parameters)
         {
             var popupType = PopupRegistrations.GetPopupTypeByName(name);
             var popup = _serviceProvider.GetService(popupType) as PopupPage;
@@ -37,7 +37,7 @@ namespace MobileDiffusion.Services
             {
                 queryAttributable.ApplyQueryAttributes(parameters);
             }
-            else if (popup is IQueryAttributable queryAttributablePopup)
+            else if (popup is IQueryAttributable queryAttributablePopup && parameters != null)
             {
                 queryAttributablePopup.ApplyQueryAttributes(parameters);
             }
@@ -49,7 +49,7 @@ namespace MobileDiffusion.Services
             await MopupService.Instance.PushAsync(popup);
 
             // It takes a bit of time for the popup to show...
-            for(var i = 0; i < 5; i++)
+            for (var i = 0; i < 5; i++)
             {
                 if (MopupService.Instance.PopupStack.Contains(popup))
                 {
@@ -60,7 +60,7 @@ namespace MobileDiffusion.Services
             }
         }
 
-        public async Task<object?> ShowPopupForResultAsync(string name, IDictionary<string, object> parameters)
+        public async Task<object?> ShowPopupForResultAsync(string name, IDictionary<string, object>? parameters)
         {
             var popupType = PopupRegistrations.GetPopupTypeByName(name);
             var popup = _serviceProvider.GetService(popupType) as PopupPage;
@@ -77,7 +77,7 @@ namespace MobileDiffusion.Services
             }
 
             var tcs = new TaskCompletionSource<object?>();
-            
+
             activePopups.Add(popup, tcs);
 
             await MopupService.Instance.PushAsync(popup);
@@ -156,12 +156,12 @@ namespace MobileDiffusion.Services
             return Shell.Current.Dispatcher.DispatchAsync(() => Shell.Current.DisplayAlertAsync(title, message, accept, cancel));
         }
 
-        public Task<string> DisplayPromptAsync(string title, string message, string accept = "OK", string cancel = "Cancel", string placeholder = null, int maxLength = -1, Keyboard keyboard = null, string initialValue = "")
+        public Task<string?> DisplayPromptAsync(string title, string message, string accept = "OK", string cancel = "Cancel", string? placeholder = null, int maxLength = -1, Keyboard? keyboard = null, string initialValue = "")
         {
             return Shell.Current.Dispatcher.DispatchAsync(() => Shell.Current.DisplayPromptAsync(title, message, accept, cancel, placeholder, maxLength, keyboard, initialValue));
         }
 
-        public Task<string> DisplayActionSheetAsync(string title, string cancel, string destruction, params string[] buttons)
+        public Task<string> DisplayActionSheetAsync(string title, string cancel, string? destruction, params string[] buttons)
         {
             return Shell.Current.Dispatcher.DispatchAsync(() => Shell.Current.DisplayActionSheetAsync(title, cancel, destruction, buttons));
         }

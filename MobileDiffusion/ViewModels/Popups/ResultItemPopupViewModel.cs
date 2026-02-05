@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
@@ -59,7 +59,12 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
     [RelayCommand]
     private async Task Save()
     {
+        if (ResultItem == null) return;
+
         var stream = await _fileService.GetFileStreamFromInternalStorageAsync(ResultItem.InternalUri);
+
+        if (stream == null) return;
+
         await _fileService.WriteImageFileToExternalStorageAsync(Path.GetFileName(ResultItem.InternalUri), stream);
 
         await Toast.Make("Image saved.").Show();
@@ -68,6 +73,8 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
     [RelayCommand]
     private async Task UseSeed()
     {
+        if (ResultItem?.Settings == null) return;
+
         var parameters = new Dictionary<string, object>
         {
             { NavigationParams.Seed, ResultItem.Settings.Seed }
@@ -90,11 +97,14 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
 
     private async Task SendImageBack(string parameterName, bool asFormattedString)
     {
+        if (ResultItem == null) return;
+
         try
         {
             using (var memoryStream = new MemoryStream())
             {
                 var stream = await _fileService.GetFileStreamFromInternalStorageAsync(ResultItem.InternalUri);
+                if (stream == null) return;
 
                 stream.CopyTo(memoryStream);
                 var imageBytes = memoryStream.ToArray();

@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Maui.Animations;
+using CommunityToolkit.Maui.Animations;
 using MobileDiffusion.Helpers;
 
 namespace MobileDiffusion.Animations;
@@ -6,15 +6,15 @@ namespace MobileDiffusion.Animations;
 public class ColorToAnimation : BaseAnimation
 {
     public static readonly BindableProperty ToColorProperty = BindableProperty.Create(nameof(ToColor), typeof(Color), typeof(ColorToAnimation), Colors.Transparent);
-    public Color ToColor 
-    { 
+    public Color ToColor
+    {
         get => (Color)GetValue(ToColorProperty);
         set => SetValue(ToColorProperty, value);
     }
 
     public static readonly BindableProperty TargetPropertyProperty = BindableProperty.Create(nameof(TargetProperty), typeof(BindableProperty), typeof(ColorToAnimation), null);
-    public BindableProperty TargetProperty 
-    { 
+    public BindableProperty TargetProperty
+    {
         get => (BindableProperty)GetValue(TargetPropertyProperty);
         set => SetValue(TargetPropertyProperty, value);
     }
@@ -27,7 +27,7 @@ public class ColorToAnimation : BaseAnimation
         }
 
         string animationName = $"ColorTo_{TargetProperty.PropertyName}";
-        
+
         // Abort any existing animation on this property first
         view.AbortAnimation(animationName);
 

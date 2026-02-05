@@ -7,8 +7,8 @@ public class GenerationProfile
     public int DefaultSteps { get; set; }
     public double DefaultCfg { get; set; }
     public double? DefaultDistilledCfg { get; set; }
-    public string DefaultSampler { get; set; }
-    public string DefaultScheduler { get; set; }
+    public required string DefaultSampler { get; set; }
+    public string? DefaultScheduler { get; set; }
     public double DefaultWidth { get; set; }
     public double DefaultHeight { get; set; }
 

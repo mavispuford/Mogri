@@ -42,19 +42,19 @@ namespace MobileDiffusion.Services
 
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IServiceProvider _serviceProvider;
-        private SdForgeNeoClient _client;
-        private SdForgeNeoClient _progressClient;
-        private string _baseUrl;
-        private CancellationTokenSource _mainRequestCancellationSource;
-        private Task _initializeTask;
+        private SdForgeNeoClient? _client;
+        private SdForgeNeoClient? _progressClient;
+        private string? _baseUrl;
+        private CancellationTokenSource? _mainRequestCancellationSource;
+        private Task? _initializeTask;
 
-        private List<SamplerItem> _samplers;
-        private List<SchedulerItem> _schedulers;
-        private List<PromptStyleItem> _promptStyles;
-        private List<SDModelItem> _models;
-        private List<LoraItem> _loras;
-        private List<UpscalerItem> _upscalers;
-        private Options _options;
+        private List<SamplerItem>? _samplers;
+        private List<SchedulerItem>? _schedulers;
+        private List<PromptStyleItem>? _promptStyles;
+        private List<SDModelItem>? _models;
+        private List<LoraItem>? _loras;
+        private List<UpscalerItem>? _upscalers;
+        private Options? _options;
 
         public bool Initialized { get; private set; }
 
@@ -66,19 +66,30 @@ namespace MobileDiffusion.Services
 
         public async Task InitializeAsync()
         {
-             _baseUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
+            _baseUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
 
-            if (string.IsNullOrEmpty(_baseUrl) || !_baseUrl.Contains("http"))
+            if (string.IsNullOrWhiteSpace(_baseUrl) || !_baseUrl.Contains("http"))
             {
                 Initialized = false;
                 return;
             }
-            
+
+            Uri baseUri;
+            try
+            {
+                baseUri = new Uri(_baseUrl);
+            }
+            catch
+            {
+                Initialized = false;
+                return;
+            }
+
             // Initialize client
             var httpClient = _httpClientFactory.CreateClient();
-            httpClient.BaseAddress = new Uri(_baseUrl);
+            httpClient.BaseAddress = baseUri;
             httpClient.Timeout = TimeSpan.FromMinutes(15);
-            
+
             // Kiota setup
             var authProvider = new AnonymousAuthenticationProvider();
             var adapter = new HttpClientRequestAdapter(authProvider, httpClient: httpClient);
@@ -87,7 +98,7 @@ namespace MobileDiffusion.Services
 
             // Initialize progress client
             var progressHttpClient = _httpClientFactory.CreateClient();
-            progressHttpClient.BaseAddress = new Uri(_baseUrl);
+            progressHttpClient.BaseAddress = baseUri;
             progressHttpClient.Timeout = TimeSpan.FromSeconds(10);
 
             var progressAdapter = new HttpClientRequestAdapter(authProvider, httpClient: progressHttpClient);
@@ -156,7 +167,7 @@ namespace MobileDiffusion.Services
         private async IAsyncEnumerable<ApiResponse> sendTextToImageRequest(PromptSettings settings)
         {
             var request = txt2ImageRequestFromSettings(settings);
-            
+
             if (_mainRequestCancellationSource?.IsCancellationRequested == false)
             {
                 _mainRequestCancellationSource.Cancel();
@@ -166,10 +177,11 @@ namespace MobileDiffusion.Services
             var progressCancellationTokenSource = new CancellationTokenSource();
             var progressToken = progressCancellationTokenSource.Token;
 
-            TextToImageResponse txt2ImgResponse = null;
+            TextToImageResponse? txt2ImgResponse = null;
 
             var textToImageTask = Task.Run(async () =>
             {
+                if (_client == null) return;
                 try
                 {
                     txt2ImgResponse = await _client.Sdapi.V1.Txt2img.PostAsync(request, cancellationToken: _mainRequestCancellationSource.Token);
@@ -181,7 +193,7 @@ namespace MobileDiffusion.Services
                 }
             });
 
-            ApiResponse apiResponse = null;
+            ApiResponse? apiResponse = null;
             var skipCurrentImage = false;
             var finished = false;
 
@@ -204,8 +216,8 @@ namespace MobileDiffusion.Services
 
                         var generationResponse = new GenerationResponse
                         {
-                            Images = txt2ImgResponse?.Images,
-                            Info = txt2ImgResponse?.Info
+                            Images = txt2ImgResponse?.Images ?? [],
+                            Info = txt2ImgResponse?.Info ?? string.Empty
                         };
 
                         apiResponse = new ApiResponse
@@ -224,8 +236,8 @@ namespace MobileDiffusion.Services
                     // Set the final response
                     var generationResponse = new GenerationResponse
                     {
-                        Images = txt2ImgResponse?.Images,
-                        Info = txt2ImgResponse?.Info
+                        Images = txt2ImgResponse?.Images ?? [],
+                        Info = txt2ImgResponse?.Info ?? string.Empty
                     };
 
                     apiResponse = new ApiResponse
@@ -237,7 +249,10 @@ namespace MobileDiffusion.Services
                     finished = true;
                 }
 
-                yield return apiResponse;
+                if (apiResponse != null)
+                {
+                    yield return apiResponse;
+                }
 
                 // Skip current image every other time
                 skipCurrentImage = !skipCurrentImage;
@@ -257,10 +272,11 @@ namespace MobileDiffusion.Services
             var progressCancellationTokenSource = new CancellationTokenSource();
             var progressToken = progressCancellationTokenSource.Token;
 
-            ImageToImageResponse img2ImgResponse = null;
+            ImageToImageResponse? img2ImgResponse = null;
 
             var imgToImageTask = Task.Run(async () =>
             {
+                if (_client == null) return;
                 try
                 {
                     img2ImgResponse = await _client.Sdapi.V1.Img2img.PostAsync(request, cancellationToken: _mainRequestCancellationSource.Token);
@@ -272,7 +288,7 @@ namespace MobileDiffusion.Services
                 }
             });
 
-            ApiResponse apiResponse = null;
+            ApiResponse? apiResponse = null;
             var skipCurrentImage = true;
             var finished = false;
 
@@ -295,8 +311,8 @@ namespace MobileDiffusion.Services
 
                         var generationResponse = new GenerationResponse
                         {
-                            Images = img2ImgResponse?.Images,
-                            Info = img2ImgResponse?.Info
+                            Images = img2ImgResponse?.Images ?? [],
+                            Info = img2ImgResponse?.Info ?? string.Empty
                         };
 
                         apiResponse = new ApiResponse
@@ -315,8 +331,8 @@ namespace MobileDiffusion.Services
                     // Set the final response
                     var generationResponse = new GenerationResponse
                     {
-                        Images = img2ImgResponse?.Images,
-                        Info = img2ImgResponse?.Info
+                        Images = img2ImgResponse?.Images ?? [],
+                        Info = img2ImgResponse?.Info ?? string.Empty
                     };
 
                     apiResponse = new ApiResponse
@@ -328,7 +344,10 @@ namespace MobileDiffusion.Services
                     finished = true;
                 }
 
-                yield return apiResponse;
+                if (apiResponse != null)
+                {
+                    yield return apiResponse;
+                }
 
                 // Skip current image every other time
                 // skipCurrentImage = !skipCurrentImage;
@@ -337,6 +356,11 @@ namespace MobileDiffusion.Services
 
         private async Task<ApiResponse> getCurrentProgress(CancellationToken token, bool skipCurrentImage)
         {
+            if (_progressClient == null)
+            {
+                throw new InvalidOperationException("API Client not initialized");
+            }
+
             return await Task.Run(async () =>
             {
                 await Task.Delay(500, token);
@@ -346,15 +370,21 @@ namespace MobileDiffusion.Services
                 // Note: Kiota client doesn't support query parameters easily in the generated method signature if not exposed.
                 // The generated method is: GetAsync(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
                 // We need to set skip_current_image query param.
-                
-                var progressGetResponse = await _progressClient.Sdapi.V1.Progress.GetAsync((config) => {
+
+                var progressGetResponse = await _progressClient.Sdapi.V1.Progress.GetAsync((config) =>
+                {
                     config.QueryParameters.SkipCurrentImage = skipCurrentImage;
                 }, token);
+
+                if (progressGetResponse == null)
+                {
+                    return new ApiResponse { Progress = 0, ResponseObject = new ProgressResponse() };
+                }
 
                 var progress = progressGetResponse.EtaRelative > 0 ? progressGetResponse.Progress : 1d;
 
                 var isInterrupted = false;
-                if (progressGetResponse.State?.AdditionalData != null && 
+                if (progressGetResponse.State?.AdditionalData != null &&
                     progressGetResponse.State.AdditionalData.TryGetValue("interrupted", out var interruptedObj))
                 {
                     if (interruptedObj is UntypedBoolean interruptedBool)
@@ -378,7 +408,7 @@ namespace MobileDiffusion.Services
                 var progressApiResponse = new ApiResponse
                 {
                     ResponseObject = progressResponse,
-                    Progress = progress.Value
+                    Progress = progress ?? 0
                 };
 
                 return progressApiResponse;
@@ -423,7 +453,7 @@ namespace MobileDiffusion.Services
             {
                 request.Scheduler = settings.Scheduler;
                 System.Diagnostics.Debug.WriteLine($"[SdForgeNeoService] ZImage Scheduler: {settings.Scheduler}");
-                
+
                 if (settings.DistilledCfgScale.HasValue)
                 {
                     request.AdditionalData.Add("distilled_cfg_scale", settings.DistilledCfgScale.Value);
@@ -459,13 +489,13 @@ namespace MobileDiffusion.Services
             request.NegativePrompt = combinedPromptAndStyles.NegativePrompt;
 
             request.SamplerName = settings.Sampler;
-            
+
             var initImagesList = new List<UntypedNode>
             {
                 new UntypedString(settings.InitImage)
             };
             request.InitImages = new UntypedArray(initImagesList);
-            
+
             request.Mask = !string.IsNullOrEmpty(settings.Mask) ? settings.Mask : null;
             request.InpaintingFill = 1;
 
@@ -495,8 +525,10 @@ namespace MobileDiffusion.Services
         }
 
         public Task<byte[]> GetImageBytesAsync(string url) => throw new NotImplementedException();
-        public async Task<PromptSettings> GetImageInfoAsync(string base64EncodedImage)
+        public async Task<PromptSettings?> GetImageInfoAsync(string base64EncodedImage)
         {
+            if (_client == null || string.IsNullOrWhiteSpace(base64EncodedImage)) return null;
+
             var request = new PNGInfoRequest()
             {
                 Image = base64EncodedImage
@@ -504,7 +536,7 @@ namespace MobileDiffusion.Services
 
             var imageInfoResult = await _client.Sdapi.V1.PngInfo.PostAsync(request);
 
-            if (string.IsNullOrEmpty(imageInfoResult.Info))
+            if (imageInfoResult?.Info == null || string.IsNullOrEmpty(imageInfoResult.Info))
             {
                 return null;
             }
@@ -516,7 +548,7 @@ namespace MobileDiffusion.Services
                 return null;
             }
 
-            var commaSplit = newLineSplit.LastOrDefault().Split(',');
+            var commaSplit = newLineSplit.LastOrDefault()?.Split(',') ?? [];
 
             var properties = new Dictionary<string, string>();
 
@@ -544,13 +576,16 @@ namespace MobileDiffusion.Services
                     continue;
                 }
 
-                var lora = new LoraViewModel
+                if (float.TryParse(match.Groups[2].Value, out var strength))
                 {
-                    Name = name,
-                    Strength = float.Parse(match.Groups[2].Value),
-                };
+                    var lora = new LoraViewModel
+                    {
+                        Name = name,
+                        Strength = strength,
+                    };
 
-                loras.Add(lora);
+                    loras.Add(lora);
+                }
 
                 prompt = prompt.Replace(match.Groups[0].Value, string.Empty);
             }
@@ -571,16 +606,16 @@ namespace MobileDiffusion.Services
                     switch (property.Key.ToLower())
                     {
                         case PngInfoProperties.Steps:
-                            settings.Steps = int.Parse(property.Value);
+                            if (int.TryParse(property.Value, out var steps)) settings.Steps = steps;
                             break;
                         case PngInfoProperties.Sampler:
                             settings.Sampler = property.Value;
                             break;
                         case PngInfoProperties.CfgScale:
-                            settings.GuidanceScale = double.Parse(property.Value);
+                            if (double.TryParse(property.Value, out var cfg)) settings.GuidanceScale = cfg;
                             break;
                         case PngInfoProperties.Seed:
-                            settings.Seed = long.Parse(property.Value);
+                            if (long.TryParse(property.Value, out var seed)) settings.Seed = seed;
                             break;
                         case PngInfoProperties.Size:
                             var size = property.Value.Split('x');
@@ -590,21 +625,21 @@ namespace MobileDiffusion.Services
                                 break;
                             }
 
-                            settings.Width = double.Parse(size[0]);
-                            settings.Height = double.Parse(size[1]);
+                            if (double.TryParse(size[0], out var width)) settings.Width = width;
+                            if (double.TryParse(size[1], out var height)) settings.Height = height;
                             break;
                         case PngInfoProperties.DenoisingStrength:
-                            settings.DenoisingStrength = double.Parse(property.Value);
+                            if (double.TryParse(property.Value, out var denoise)) settings.DenoisingStrength = denoise;
                             break;
                         case PngInfoProperties.HiresUpscaler:
                             settings.Upscaler = property.Value;
                             settings.EnableUpscaling = !string.IsNullOrEmpty(property.Value);
                             break;
                         case PngInfoProperties.HiresUpscale:
-                            settings.UpscaleLevel = int.Parse(property.Value);
+                            if (int.TryParse(property.Value, out var upscale)) settings.UpscaleLevel = upscale;
                             break;
                         case PngInfoProperties.HiresSteps:
-                            settings.UpscaleSteps = int.Parse(property.Value);
+                            if (int.TryParse(property.Value, out var hrSteps)) settings.UpscaleSteps = hrSteps;
                             break;
                         case PngInfoProperties.Scheduler:
                         case PngInfoProperties.ScheduleType:
@@ -614,25 +649,25 @@ namespace MobileDiffusion.Services
                         case PngInfoProperties.DistilledCfgScale:
                         case PngInfoProperties.DistilledCfgScaleKey:
                         case PngInfoProperties.Shift:
-                            settings.DistilledCfgScale = double.Parse(property.Value);
+                            if (double.TryParse(property.Value, out var distCfg)) settings.DistilledCfgScale = distCfg;
                             break;
                         case PngInfoProperties.Model:
-                            if (settings.Model == null)
+                            if (settings.Model == null && _models != null)
                             {
                                 var matchingModel = _models.FirstOrDefault(m => m.ModelName == property.Value);
                                 if (matchingModel != null)
                                 {
-                                    settings.Model = (ModelViewModel)convertModelToViewModel(matchingModel);
+                                    settings.Model = (ModelViewModel?)convertModelToViewModel(matchingModel);
                                 }
                             }
                             break;
                         case PngInfoProperties.ModelHash:
-                            if (settings.Model == null)
+                            if (settings.Model == null && _models != null)
                             {
                                 var matchingModel = _models.FirstOrDefault(m => m.Hash == property.Value);
                                 if (matchingModel != null)
                                 {
-                                    settings.Model = (ModelViewModel)convertModelToViewModel(matchingModel);
+                                    settings.Model = (ModelViewModel?)convertModelToViewModel(matchingModel);
                                 }
                             }
                             break;
@@ -648,7 +683,7 @@ namespace MobileDiffusion.Services
 
             if (settings.Model == null)
             {
-                settings.Model = (ModelViewModel)await GetSelectedModelAsync();
+                settings.Model = (ModelViewModel?)await GetSelectedModelAsync();
             }
 
             return settings;
@@ -656,7 +691,7 @@ namespace MobileDiffusion.Services
 
         public async Task RefreshResourcesAsync()
         {
-            if (_client == null) return;
+            if (_client == null || _baseUrl == null) return;
 
             // 1. Connectivity Probe
             // We use a dedicated, short-lived HttpClient to perform a strict connectivity check.
@@ -690,7 +725,7 @@ namespace MobileDiffusion.Services
                 Task.Run(async () => _schedulers = await _client.Sdapi.V1.Schedulers.GetAsync(cancellationToken: cts.Token)),
                 Task.Run(async () => _promptStyles = await _client.Sdapi.V1.PromptStyles.GetAsync(cancellationToken: cts.Token)),
                 Task.Run(async () => _models = await _client.Sdapi.V1.SdModels.GetAsync(cancellationToken: cts.Token)),
-                Task.Run(async () => 
+                Task.Run(async () =>
                 {
                     var lorasNode = await _client.Sdapi.V1.Loras.GetAsync(cancellationToken: cts.Token);
                     _loras = ParseLoras(lorasNode);
@@ -704,13 +739,13 @@ namespace MobileDiffusion.Services
                 while (remainingTasks.Count > 0)
                 {
                     var finishedTask = await Task.WhenAny(remainingTasks);
-                    
+
                     if (finishedTask.IsFaulted || finishedTask.IsCanceled)
                     {
-                        cts.Cancel(); 
-                        await finishedTask; 
+                        cts.Cancel();
+                        await finishedTask;
                     }
-                    
+
                     remainingTasks.Remove(finishedTask);
                 }
             }
@@ -721,29 +756,35 @@ namespace MobileDiffusion.Services
             }
         }
 
-        private List<LoraItem> ParseLoras(UntypedNode node)
+        private List<LoraItem> ParseLoras(UntypedNode? node)
         {
             var loras = new List<LoraItem>();
             if (node is UntypedArray array)
             {
-                foreach (var item in array.GetValue())
+                var items = array.GetValue();
+                if (items != null)
                 {
-                    if (item is UntypedObject obj)
+                    foreach (var item in items)
                     {
-                        var properties = obj.GetValue();
-                        var lora = new LoraItem();
-                        
-                        if (properties.TryGetValue("name", out var nameNode) && nameNode is UntypedString nameStr)
+                        if (item is UntypedObject obj)
                         {
-                            lora.Name = nameStr.GetValue();
+                            var properties = obj.GetValue();
+                            if (properties == null) continue;
+
+                            var lora = new LoraItem();
+
+                            if (properties.TryGetValue("name", out var nameNode) && nameNode is UntypedString nameStr)
+                            {
+                                lora.Name = nameStr.GetValue();
+                            }
+
+                            if (properties.TryGetValue("alias", out var aliasNode) && aliasNode is UntypedString aliasStr)
+                            {
+                                lora.Alias = aliasStr.GetValue();
+                            }
+
+                            loras.Add(lora);
                         }
-                        
-                        if (properties.TryGetValue("alias", out var aliasNode) && aliasNode is UntypedString aliasStr)
-                        {
-                            lora.Alias = aliasStr.GetValue();
-                        }
-                        
-                        loras.Add(lora);
                     }
                 }
             }
@@ -761,7 +802,11 @@ namespace MobileDiffusion.Services
 
             foreach (var sampler in _samplers)
             {
-                result.TryAdd(sampler.Name, sampler.Aliases?.FirstOrDefault() ?? sampler.Name);
+                var name = sampler.Name;
+                if (!string.IsNullOrEmpty(name))
+                {
+                    result.TryAdd(name, sampler.Aliases?.FirstOrDefault() ?? name);
+                }
             }
 
             return Task.FromResult(result);
@@ -778,7 +823,10 @@ namespace MobileDiffusion.Services
 
             foreach (var scheduler in _schedulers)
             {
-                result.Add(scheduler.Name);
+                if (!string.IsNullOrEmpty(scheduler.Name))
+                {
+                    result.Add(scheduler.Name);
+                }
             }
 
             return Task.FromResult(result);
@@ -797,9 +845,9 @@ namespace MobileDiffusion.Services
             {
                 result.Add(new PromptStyleViewModel
                 {
-                    Name = item.Name,
-                    Prompt = item.Prompt,
-                    NegativePrompt = item.NegativePrompt
+                    Name = item.Name ?? string.Empty,
+                    Prompt = item.Prompt ?? string.Empty,
+                    NegativePrompt = item.NegativePrompt ?? string.Empty
                 });
             }
 
@@ -818,6 +866,7 @@ namespace MobileDiffusion.Services
             foreach (var model in _models)
             {
                 var viewModel = convertModelToViewModel(model);
+                // convertModelToViewModel now returns IModelViewModel? so we can filter nulls
                 if (viewModel != null)
                     result.Add(viewModel);
             }
@@ -838,8 +887,8 @@ namespace MobileDiffusion.Services
             {
                 result.Add(new LoraViewModel
                 {
-                    Alias = lora.Alias,
-                    Name = lora.Name
+                    Alias = lora.Alias ?? string.Empty,
+                    Name = lora.Name ?? string.Empty
                 });
             }
 
@@ -859,8 +908,8 @@ namespace MobileDiffusion.Services
             {
                 result.Add(new UpscalerViewModel
                 {
-                    Name = upscaler.Name,
-                    ModelName = upscaler.ModelName,
+                    Name = upscaler.Name ?? string.Empty,
+                    ModelName = upscaler.ModelName ?? string.Empty,
                     Scale = upscaler.Scale ?? 1.0,
                 });
             }
@@ -868,29 +917,30 @@ namespace MobileDiffusion.Services
             return Task.FromResult(result);
         }
 
-        public Task<IModelViewModel> GetSelectedModelAsync()
+        public Task<IModelViewModel?> GetSelectedModelAsync()
         {
             var result = _serviceProvider.GetService<IModelViewModel>();
 
-            if (_options == null || _models == null) return Task.FromResult(result);
+            if (_options == null || _models == null) return Task.FromResult<IModelViewModel?>(result);
 
             var checkpointHash = GetOptionValue(_options.SdCheckpointHash);
             var selectedModel = _models.FirstOrDefault(m => m.Sha256 == checkpointHash);
 
-            if (selectedModel != null)
+            if (selectedModel != null && result != null)
             {
-                result.DisplayName = selectedModel.ModelName;
-                result.Key = selectedModel.Title;
+                result.DisplayName = selectedModel.ModelName ?? string.Empty;
+                result.Key = selectedModel.Title ?? string.Empty;
             }
 
-            return Task.FromResult(result);
+            return Task.FromResult<IModelViewModel?>(result);
         }
 
         public async Task SaveSettingsAsync(PromptSettings settings)
         {
-            if (_client == null) return;
+            if (_client == null || settings == null) return;
 
             _options = await _client.Sdapi.V1.OptionsPath.GetAsync();
+            if (_options == null) return;
 
             var requestBody = new OptionsPostRequestBody();
 
@@ -903,7 +953,8 @@ namespace MobileDiffusion.Services
                 {
                     if (currentCheckpointHash != selectedModel.Sha256)
                     {
-                        requestBody.AdditionalData.Add("sd_model_checkpoint", selectedModel.Title);
+                        // TryAdd to avoid exception if key exists (though new request body shouldn't have)
+                        requestBody.AdditionalData.TryAdd("sd_model_checkpoint", selectedModel.Title);
                     }
 
                     // Handle Z-Image Turbo setting
@@ -913,7 +964,7 @@ namespace MobileDiffusion.Services
                         desiredUnetStorage = "Automatic (fp16 LoRA)";
                     }
 
-                    string currentUnetStorage = null;
+                    string? currentUnetStorage = null;
                     if (_options.AdditionalData.TryGetValue("forge_unet_storage_dtype", out var unetStorageObj))
                     {
                         if (unetStorageObj is UntypedString unetStorageStr)
@@ -928,11 +979,11 @@ namespace MobileDiffusion.Services
 
                     if (currentUnetStorage != desiredUnetStorage)
                     {
-                        requestBody.AdditionalData.Add("forge_unet_storage_dtype", desiredUnetStorage);
+                        requestBody.AdditionalData.TryAdd("forge_unet_storage_dtype", desiredUnetStorage);
                     }
                 }
             }
-            
+
             if (!requestBody.AdditionalData.Any())
             {
                 return;
@@ -945,6 +996,7 @@ namespace MobileDiffusion.Services
 
         public async Task<bool> CancelAsync()
         {
+            if (_client == null) return false;
             try
             {
                 await _client.Sdapi.V1.Interrupt.PostAsync();
@@ -956,7 +1008,7 @@ namespace MobileDiffusion.Services
             }
         }
 
-        private IModelViewModel convertModelToViewModel(SDModelItem model)
+        private IModelViewModel? convertModelToViewModel(SDModelItem model)
         {
             if (model == null)
             {
@@ -964,14 +1016,15 @@ namespace MobileDiffusion.Services
             }
 
             var viewModel = _serviceProvider.GetService<IModelViewModel>();
+            if (viewModel == null) return null;
 
-            viewModel.DisplayName = model.ModelName;
-            viewModel.Key = model.Title;
+            viewModel.DisplayName = model.ModelName ?? string.Empty;
+            viewModel.Key = model.Title ?? string.Empty;
 
             return viewModel;
         }
 
-        private string GetOptionValue(UntypedNode node)
+        private string? GetOptionValue(UntypedNode? node)
         {
             if (node is UntypedString str)
             {

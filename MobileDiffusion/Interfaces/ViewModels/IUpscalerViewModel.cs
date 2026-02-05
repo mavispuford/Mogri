@@ -1,4 +1,4 @@
-﻿namespace MobileDiffusion.Interfaces.ViewModels;
+namespace MobileDiffusion.Interfaces.ViewModels;
 
 public interface IUpscalerViewModel : IBaseViewModel
 {

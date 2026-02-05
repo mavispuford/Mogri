@@ -11,29 +11,29 @@ namespace MobileDiffusion.ViewModels;
 public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemViewModel
 {
     private readonly IPopupService _popupService;
-    private Action<IEditMaskItemViewModel> _deleteAction;
-    private Action<IEditMaskItemViewModel> _duplicateAction;
+    private Action<IEditMaskItemViewModel>? _deleteAction;
+    private Action<IEditMaskItemViewModel>? _duplicateAction;
 
     [ObservableProperty]
-    private CanvasActionViewModel _canvasAction;
+    private CanvasActionViewModel? _canvasAction;
 
     [ObservableProperty]
-    private string _icon;
+    private string _icon = string.Empty;
 
     [ObservableProperty]
     private bool _isColorVisible;
 
     [ObservableProperty]
-    private Color _displayColor;
+    private Color _displayColor = Colors.Transparent;
 
     [ObservableProperty]
     private double _alpha;
 
     [ObservableProperty]
-    private Color _colorWithAlpha;
+    private Color _colorWithAlpha = Colors.Transparent;
 
     [ObservableProperty]
-    private string _description;
+    private string _description = string.Empty;
 
     public EditMaskItemViewModel(IPopupService popupService)
     {
@@ -58,7 +58,7 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
                 Icon = "\ue6d0"; // Erase
                 IsColorVisible = false;
                 DisplayColor = Colors.Transparent; // Or generic color since not visible
-                Alpha = 1.0; 
+                Alpha = 1.0;
             }
             else
             {
@@ -103,11 +103,11 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
         }
     }
 
-    private void action_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void action_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (e.PropertyName == "Color")
         {
-             if (CanvasAction is MaskLineViewModel maskLine)
+            if (CanvasAction is MaskLineViewModel maskLine)
             {
                 DisplayColor = maskLine.Color;
             }
@@ -118,13 +118,13 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
         }
         else if (e.PropertyName == "Alpha")
         {
-             if (CanvasAction is MaskLineViewModel maskLine)
+            if (CanvasAction is MaskLineViewModel maskLine)
             {
                 Alpha = maskLine.Alpha;
             }
             else if (CanvasAction is SegmentationMaskViewModel segMask)
             {
-                Alpha = segMask.Alpha;  
+                Alpha = segMask.Alpha;
             }
 
             updateDescription();
@@ -138,6 +138,8 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
     [RelayCommand]
     private async Task EditAsync()
     {
+        if (CanvasAction == null) return;
+
         var parameters = new Dictionary<string, object>
         {
             { "Action", CanvasAction }
@@ -158,7 +160,7 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
         _duplicateAction?.Invoke(this);
     }
 
-    private void updateDescription() 
+    private void updateDescription()
     {
         if (CanvasAction is MaskLineViewModel maskLine)
         {

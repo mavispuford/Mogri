@@ -16,7 +16,7 @@ public abstract partial class PaintActionViewModel : CanvasActionViewModel
     public partial float Alpha { get; set; }
 
     [ObservableProperty]
-    public partial Color Color { get; set; }
+    public partial Color Color { get; set; } = Colors.Transparent;
 
     [ObservableProperty]
     public partial double Noise { get; set; }

@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Maui;
+using CommunityToolkit.Maui;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 using MobileDiffusion.Registrations;
 using Microsoft.Maui.Handlers;
@@ -42,17 +42,17 @@ public static class MauiProgram
 #endif
 
 #if ANDROID
-        EntryHandler.Mapper.AppendToMapping("NoUnderline", (h, v) => 
-        { 
-            h.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Colors.Transparent.ToPlatform());
-        });
-
-        EditorHandler.Mapper.AppendToMapping("NoUnderline", (h, v) => 
+        EntryHandler.Mapper.AppendToMapping("NoUnderline", (h, v) =>
         {
             h.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Colors.Transparent.ToPlatform());
         });
 
-        PickerHandler.Mapper.AppendToMapping("NoUnderline", (h, v) => 
+        EditorHandler.Mapper.AppendToMapping("NoUnderline", (h, v) =>
+        {
+            h.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Colors.Transparent.ToPlatform());
+        });
+
+        PickerHandler.Mapper.AppendToMapping("NoUnderline", (h, v) =>
         {
             h.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Colors.Transparent.ToPlatform());
         });

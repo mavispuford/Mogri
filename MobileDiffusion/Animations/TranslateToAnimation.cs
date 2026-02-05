@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Maui.Animations;
+using CommunityToolkit.Maui.Animations;
 
 namespace MobileDiffusion.Animations;
 

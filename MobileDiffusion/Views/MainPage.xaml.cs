@@ -1,17 +1,17 @@
-﻿using MobileDiffusion.Controls;
+using MobileDiffusion.Controls;
 
 namespace MobileDiffusion.Views;
 
 public partial class MainPage : BasePage
 {
-	public MainPage()
-	{
-		InitializeComponent();
+    public MainPage()
+    {
+        InitializeComponent();
 
         ImageLayout.ChildAdded += ImageLayout_ChildAdded;
     }
 
-    private async void ImageLayout_ChildAdded(object sender, ElementEventArgs e)
+    private async void ImageLayout_ChildAdded(object? sender, ElementEventArgs e)
     {
         if (e.Element is VisualElement visualElement)
         {
@@ -32,7 +32,7 @@ public partial class MainPage : BasePage
 
             var imageHeight = imageWidth / ratio;
 
-            foreach(ImageResultControl imageResult in ImageLayout.Children)
+            foreach (ImageResultControl imageResult in ImageLayout.Children)
             {
                 if (imageResult.Image != null)
                 {

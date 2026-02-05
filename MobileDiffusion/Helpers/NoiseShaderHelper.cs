@@ -28,7 +28,7 @@ namespace MobileDiffusion.Helpers
                 }
 
                 var bmp = new SKBitmap(NoiseBitmapSize, NoiseBitmapSize, SKColorType.Rgba8888, SKAlphaType.Unpremul);
-                
+
                 // Use a standard deviation that provides good texture (e.g., 60). 
                 // Values are centered at 128. Higher stdDev = Punchier noise.
                 const double stdDev = 30.0;
@@ -42,7 +42,7 @@ namespace MobileDiffusion.Helpers
                         byte r = (byte)Math.Clamp(128 + NoiseHelper.NextGaussian(_random, 0, stdDev), 0, 255);
                         byte g = (byte)Math.Clamp(128 + NoiseHelper.NextGaussian(_random, 0, stdDev), 0, 255);
                         byte b = (byte)Math.Clamp(128 + NoiseHelper.NextGaussian(_random, 0, stdDev), 0, 255);
-                        
+
                         // Set alpha to 255 (Opaque). The 'Strength' of the noise will be controlled by blending or color filters later.
                         bmp.SetPixel(x, y, new SKColor(r, g, b, 255));
                     }
@@ -79,11 +79,11 @@ namespace MobileDiffusion.Helpers
             //    We want 128 * s + offset = 128  => offset = 128(1-s).
             //    (assuming 0-255 range. Skia color matrix values are typically multiplied by unnormalized or normalized values depending on context,
             //    but usually the offset (5th column) is added directly. For normalized (0..1), offset is 0.5(1-s)).
-            
+
             float s = (float)strength;
             // Use 0-1 range logic to create the offset.
             // 0.5 corresponds to 128 (Neutral Gray).
-            float normOffset = 0.5f * (1 - s); 
+            float normOffset = 0.5f * (1 - s);
 
             // Matrix to scale contrast around 0.5 (Gray)
             var matrix = new float[]
@@ -104,7 +104,7 @@ namespace MobileDiffusion.Helpers
             // 4. Compose the Color and Noise.
             //    We use 'HardLight' which resembles the arithmetic addition/subtraction.
             //    It darkens bright colors when noise is dark, and lightens dark colors when noise is light.
-            
+
             return SKShader.CreateCompose(colorShader, adjustedNoiseShader, SKBlendMode.HardLight);
         }
     }

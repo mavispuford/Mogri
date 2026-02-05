@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Enums;
 using MobileDiffusion.ViewModels;
 using SkiaSharp;
@@ -33,18 +33,18 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     Color PaletteIconColor { get; set; }
 
-    ImageSource SavedImageSource { get; set; }
+    ImageSource? SavedImageSource { get; set; }
 
     bool ShowMaskLayer { get; set; }
 
-    SKBitmap SourceBitmap { get; set; }
+    SKBitmap? SourceBitmap { get; set; }
 
     bool SegmentationAdd { get; }
 
-    SKBitmap SegmentationBitmap { get; set; }
+    SKBitmap? SegmentationBitmap { get; set; }
 
     bool SettingSegmentationImage { get; set; }
-    
+
     bool HasSegmentationImage { get; set; }
 
     IRelayCommand UndoCommand { get; }
@@ -55,7 +55,7 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     bool GettingColorPalette { get; set; }
 
-    bool ShowActions {get; set; }
+    bool ShowActions { get; set; }
 
     IAsyncRelayCommand BeginCropImageRectCommand { get; }
 
@@ -76,7 +76,7 @@ public interface ICanvasPageViewModel : IPageViewModel
     IAsyncRelayCommand SaveCommand { get; }
 
     IAsyncRelayCommand SendToImageToImageCommand { get; }
-    
+
     IRelayCommand ToggleMaskLayerVisibilityCommand { get; }
 
     IRelayCommand<IPaintingToolViewModel> SelectToolCommand { get; }
@@ -91,5 +91,5 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     IRelayCommand ToggleActionsVisibilityCommand { get; }
 
-    IRelayCommand ResetZoomCommand { get; set; }
+    IRelayCommand? ResetZoomCommand { get; set; }
 }

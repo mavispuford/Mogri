@@ -61,7 +61,7 @@
     <Shell.TitleView>
         <HorizontalStackLayout HorizontalOptions="Start">
             <ImageButton ToolTipProperties.Text="Pick Image"
-                         VerticalOptions="FillAndExpand"
+                         VerticalOptions="Fill"
                          Command="{Binding ShowMediaPickerCommand}"
                          WidthRequest="50"
                          HeightRequest="50"

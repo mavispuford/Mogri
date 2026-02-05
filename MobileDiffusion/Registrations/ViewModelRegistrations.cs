@@ -1,4 +1,4 @@
-﻿using MobileDiffusion.Interfaces.ViewModels;
+using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Interfaces.ViewModels.Popups;
 using MobileDiffusion.Interfaces.ViewModels.Pages;
 using MobileDiffusion.ViewModels;

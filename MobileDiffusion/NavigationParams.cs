@@ -1,4 +1,4 @@
-﻿namespace MobileDiffusion;
+namespace MobileDiffusion;
 
 public static class NavigationParams
 {

@@ -1,4 +1,4 @@
-﻿namespace MobileDiffusion.Enums;
+namespace MobileDiffusion.Enums;
 
 public enum MaskEffect
 {

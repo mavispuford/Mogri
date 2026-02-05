@@ -10,7 +10,7 @@ namespace MobileDiffusion.ViewModels;
 
 public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskItemPopupViewModel, IRecipient<MaskSliderDragMessage>
 {
-    private CanvasActionViewModel _action;
+    private CanvasActionViewModel? _action;
 
     [ObservableProperty]
     private bool _isBrush;
@@ -28,7 +28,7 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
     private float _alpha;
 
     [ObservableProperty]
-    private Color _displayColor;
+    private Color _displayColor = Colors.Transparent;
 
     [ObservableProperty]
     private bool _isNoiseVisible;
@@ -37,7 +37,7 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
     private bool _isDragging;
 
     [ObservableProperty]
-    private string _dragInfoText;
+    private string _dragInfoText = string.Empty;
 
     public EditMaskItemPopupViewModel(IPopupService popupService) : base(popupService)
     {
@@ -61,7 +61,7 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
         // Must keep opacity slightly above 0 to maintain touch interaction with the slider
         ContentOpacity = message.Value ? 0 : 1;
         IsDragging = message.Value;
-        
+
         if (message.Value)
         {
             PopupBackgroundColor = Colors.Transparent;
@@ -82,7 +82,7 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
     public void InitWith(CanvasActionViewModel action)
     {
         _action = action;
-        
+
         if (_action is MaskLineViewModel line)
         {
             IsBrush = true;
@@ -103,7 +103,7 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
             Alpha = seg.Alpha;
             Noise = seg.Noise;
             DisplayColor = seg.Color;
-            BrushSize = 0; 
+            BrushSize = 0;
         }
     }
 
@@ -166,7 +166,7 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
         }
 
         var result = await _popupService.ShowPopupForResultAsync("ColorPickerPopup", parameters);
-        
+
         if (result is Color color)
         {
             DisplayColor = color;

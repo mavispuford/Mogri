@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Models;
 
 namespace MobileDiffusion.Interfaces.ViewModels;

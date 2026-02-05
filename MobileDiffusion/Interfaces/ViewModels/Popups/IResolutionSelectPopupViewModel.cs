@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Input;
 
 namespace MobileDiffusion.Interfaces.ViewModels.Popups;
 
@@ -6,25 +6,25 @@ public interface IResolutionSelectPopupViewModel : IPopupBaseViewModel
 {
     double AspectRatioDouble { get; set; }
 
-    string AspectRatioString { get; set; }
+    string? AspectRatioString { get; set; }
 
-    string AspectRatioEntryValue { get; set; }
+    string? AspectRatioEntryValue { get; set; }
 
     double Width { get; set; }
 
-    string WidthEntryValue { get; set; }
+    string? WidthEntryValue { get; set; }
 
     double WidthSliderValue { get; set; }
 
     double Height { get; set; }
 
-    string HeightEntryValue { get; set; }
+    string? HeightEntryValue { get; set; }
 
     double HeightSliderValue { get; set; }
 
     bool PreserveAspectRatio { get; set; }
 
-    ImageSource InitImageSource { get; set; }
+    ImageSource? InitImageSource { get; set; }
 
     double ExampleRectangleContainerWidth { get; set; }
 

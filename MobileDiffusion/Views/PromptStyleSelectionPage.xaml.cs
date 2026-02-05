@@ -2,8 +2,8 @@ namespace MobileDiffusion.Views;
 
 public partial class PromptStyleSelectionPage : BasePage
 {
-	public PromptStyleSelectionPage()
-	{
+    public PromptStyleSelectionPage()
+    {
         InitializeComponent();
     }
 }
