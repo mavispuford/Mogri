@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Maui.Core.Extensions;
+using CommunityToolkit.Maui.Core.Extensions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MobileDiffusion.Enums;
 using MobileDiffusion.Helpers;
@@ -10,7 +10,7 @@ public partial class MaskLineViewModel : PaintActionViewModel
 {
     [ObservableProperty]
     public partial float BrushSize { get; set; }
-    
+
     public float TouchScale { get; set; } = 1f;
 
     public List<SKPoint> Path { get; set; } = new();
@@ -42,7 +42,7 @@ public partial class MaskLineViewModel : PaintActionViewModel
         }
 
         var points = Path;
-        if (points == null || points.Count == 0) 
+        if (points == null || points.Count == 0)
         {
             return;
         }
@@ -78,7 +78,7 @@ public partial class MaskLineViewModel : PaintActionViewModel
             // Draw a tiny line/dot so a single tap is visible
             path.LineTo(points[0].X, points[0].Y);
         }
-        
+
         // PRIORITY 1: Visual Fallback for Low Alpha (Only when NOT saving)
         // If the alpha is very low, we show the hatch pattern so the user can see where they are drawing.
         // But if we are saving (Exporting), we skip this validation so the actual noise/color is rendered.
@@ -98,7 +98,7 @@ public partial class MaskLineViewModel : PaintActionViewModel
         {
             paint.Shader = null;
         }
-        
+
         canvas.DrawPath(path, paint);
     }
 

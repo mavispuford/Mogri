@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace MobileDiffusion.Json;
@@ -14,8 +14,10 @@ public class CustomJsonConverter : JsonConverter
         return objectType == typeof(object);
     }
 
-    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
+        if (reader == null) return null;
+
         switch (reader.TokenType)
         {
             case JsonToken.StartArray:
@@ -23,51 +25,49 @@ public class CustomJsonConverter : JsonConverter
                 return JToken.Load(reader).ToObject<List<object>>();
             case JsonToken.StartObject:
                 // Dictionaries to dictionaries with lists
-                var loaded = JToken.Load(reader).ToObject<Dictionary<string, object>>();
+                var token = JToken.Load(reader);
+                var loaded = token.ToObject<Dictionary<string, object?>>();
 
-                var dictionary = new Dictionary<string, object>();
+                if (loaded == null) return null;
+
+                var dictionary = new Dictionary<string, object?>();
 
                 foreach (var item in loaded)
                 {
-                    switch (item.Value)
+                    if (item.Value is JArray jArray)
                     {
-                        case JArray:
-                            var jArray = item.Value as JArray;
+                        var jTokenType = jArray.First?.Type;
 
-                            var jTokenType = jArray?.First?.Type;
+                        if (jTokenType == null)
+                        {
+                            dictionary.Add(item.Key, jArray.ToObject<List<object>>());
+                            continue;
+                        }
 
-                            if (jTokenType == null)
-                            {
-                                dictionary.Add(item.Key, jArray.ToObject<List<object>>());
-                                break;
-                            }
-
-                            if (jTokenType is JTokenType.String)
-                            {
-                                dictionary.Add(item.Key, jArray.ToObject<List<string>>());
-                            }
-                            else if (jTokenType is JTokenType.Integer)
-                            {
-                                dictionary.Add(item.Key, jArray.ToObject<List<long>>());
-                            }
-                            else if (jTokenType is JTokenType.Boolean)
-                            {
-                                dictionary.Add(item.Key, jArray.ToObject<List<bool>>());
-                            }
-                            else if (jTokenType is JTokenType.Float)
-                            {
-                                dictionary.Add(item.Key, jArray.ToObject<List<double>>());
-                            }
-                            else
-                            {
-                                dictionary.Add(item.Key, jArray.ToObject<List<object>>());
-                            }
-
-                            break;
-                        default:
-                            dictionary.Add(item.Key, item.Value);
-
-                            break;
+                        if (jTokenType is JTokenType.String)
+                        {
+                            dictionary.Add(item.Key, jArray.ToObject<List<string>>());
+                        }
+                        else if (jTokenType is JTokenType.Integer)
+                        {
+                            dictionary.Add(item.Key, jArray.ToObject<List<long>>());
+                        }
+                        else if (jTokenType is JTokenType.Boolean)
+                        {
+                            dictionary.Add(item.Key, jArray.ToObject<List<bool>>());
+                        }
+                        else if (jTokenType is JTokenType.Float)
+                        {
+                            dictionary.Add(item.Key, jArray.ToObject<List<double>>());
+                        }
+                        else
+                        {
+                            dictionary.Add(item.Key, jArray.ToObject<List<object>>());
+                        }
+                    }
+                    else
+                    {
+                        dictionary.Add(item.Key, item.Value);
                     }
                 }
 
@@ -79,7 +79,7 @@ public class CustomJsonConverter : JsonConverter
         }
     }
 
-    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
         throw new NotImplementedException();
     }

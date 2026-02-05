@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 
 namespace MobileDiffusion.Interfaces.ViewModels.Pages;
@@ -9,7 +9,7 @@ public interface ILoraSelectionPageViewModel : IPageViewModel
 
     ObservableCollection<ILoraViewModel> SelectedLoras { get; set; }
 
-    ILoraViewModel LoraToAdd { get; set; }
+    ILoraViewModel? LoraToAdd { get; set; }
 
     IAsyncRelayCommand CancelCommand { get; }
 

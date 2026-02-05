@@ -1,4 +1,4 @@
-﻿using MobileDiffusion.Enums;
+using MobileDiffusion.Enums;
 
 namespace MobileDiffusion.Interfaces.ViewModels;
 

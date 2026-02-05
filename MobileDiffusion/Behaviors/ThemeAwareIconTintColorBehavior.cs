@@ -53,7 +53,7 @@ public class ThemeAwareIconTintColorBehavior : Behavior<View>
     protected override void OnAttachedTo(View bindable)
     {
         base.OnAttachedTo(bindable);
-        
+
         // Add the wrapped behavior to the element
         bindable.Behaviors.Add(_wrappedBehavior);
 
@@ -70,10 +70,10 @@ public class ThemeAwareIconTintColorBehavior : Behavior<View>
         {
             Application.Current.RequestedThemeChanged -= OnRequestedThemeChanged;
         }
-        
+
         // Clean up
         bindable.Behaviors.Remove(_wrappedBehavior);
-        
+
         base.OnDetachingFrom(bindable);
     }
 

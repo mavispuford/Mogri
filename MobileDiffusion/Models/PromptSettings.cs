@@ -1,4 +1,4 @@
-﻿using MobileDiffusion.Enums;
+using MobileDiffusion.Enums;
 using MobileDiffusion.ViewModels;
 using Newtonsoft.Json;
 
@@ -14,24 +14,24 @@ public class PromptSettings
     public double GuidanceScale { get; set; } = 7.5;
     public double? DistilledCfgScale { get; set; } = 3;
     public double Height { get; set; } = Preferences.Default.Get<double>(Constants.PreferenceKeys.DefaultWidth, 512);
-    public string InitImage { get; set; }
-    public string InitImageThumbnail { get; set; }
+    public string? InitImage { get; set; }
+    public string? InitImageThumbnail { get; set; }
     public OnOff InvertMask { get; set; }
-    public string Mask { get; set; }
+    public string? Mask { get; set; }
     public int MaskBlur { get; set; } = 0;
     public ModelType ModelType { get; set; } = ModelType.StableDiffusion;
     public int Steps { get; set; } = 30;
     public int BatchCount { get; set; } = 1;
     public int BatchSize { get; set; } = 1;
-    public string Prompt { get; set; }
-    public string NegativePrompt { get; set; }
+    public string Prompt { get; set; } = string.Empty;
+    public string NegativePrompt { get; set; } = string.Empty;
     public double DenoisingStrength { get; set; } = .5;
-    public ModelViewModel Model { get; set; }
-    public string Sampler { get; set; }
-    public string Scheduler { get; set; }
+    public ModelViewModel? Model { get; set; }
+    public string? Sampler { get; set; }
+    public string? Scheduler { get; set; }
     public OnOff Seamless { get; set; }
     public long Seed { get; set; } = -1;
-    public string Upscaler { get; set; }
+    public string? Upscaler { get; set; }
     public int UpscaleLevel { get; set; } = 2;
     public int UpscaleSteps { get; set; } = 10;
     public double VariationAmount { get; set; } = .1;
@@ -39,11 +39,11 @@ public class PromptSettings
     public OnOff WithVariations { get; set; }
     public List<LoraViewModel> Loras { get; set; } = new();
     public List<PromptStyleViewModel> PromptStyles { get; set; } = new();
-    
+
     public PromptSettings Clone()
     {
         var json = JsonConvert.SerializeObject(this);
 
-        return JsonConvert.DeserializeObject<PromptSettings>(json);
+        return JsonConvert.DeserializeObject<PromptSettings>(json) ?? new PromptSettings();
     }
 }

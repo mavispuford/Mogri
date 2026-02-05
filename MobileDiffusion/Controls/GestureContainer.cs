@@ -1,4 +1,4 @@
-﻿using System.Windows.Input;
+using System.Windows.Input;
 using MauiControls = Microsoft.Maui.Controls;
 
 namespace MobileDiffusion.Controls;
@@ -9,7 +9,7 @@ public class GestureContainer : ContentView
     private const double maxDelta = 50;
     private double currentScale = 1;
     private double startScale = 1;
-    private Point startOffset = new ();
+    private Point startOffset = new();
     private bool canPan = true;
     private bool canZoom = true;
     private bool isPanning;
@@ -21,7 +21,7 @@ public class GestureContainer : ContentView
     private double prevTotalY;
     private double totalXDelta;
     private double totalYDelta;
-    private Timer pinchTimer;
+    private Timer? pinchTimer;
 
     public bool EnablePanning
     {
@@ -73,8 +73,8 @@ public class GestureContainer : ContentView
 
             if (animate)
             {
-                Content.ScaleTo(1, 250, Easing.CubicInOut);
-                Content.TranslateTo(0, 0, 250, Easing.CubicInOut);
+                _ = Content.ScaleToAsync(1, 250, Easing.CubicInOut);
+                _ = Content.TranslateToAsync(0, 0, 250, Easing.CubicInOut);
             }
             else
             {
@@ -89,19 +89,19 @@ public class GestureContainer : ContentView
     {
         var panGesture = new PanGestureRecognizer();
         panGesture.PanUpdated += PanGesture_PanUpdated;
-        
+
         var pinchGesture = new PinchGestureRecognizer();
         pinchGesture.PinchUpdated += OnPinchUpdated;
 
         var doubleTapGesture = new TapGestureRecognizer { NumberOfTapsRequired = 2 };
         doubleTapGesture.Tapped += OnDoubleTapped;
-        
+
         GestureRecognizers.Add(panGesture);
         GestureRecognizers.Add(pinchGesture);
         GestureRecognizers.Add(doubleTapGesture);
     }
 
-    private void OnDoubleTapped(object? sender, TappedEventArgs e)
+    private async void OnDoubleTapped(object? sender, TappedEventArgs e)
     {
         if (Content == null) return;
 
@@ -144,12 +144,12 @@ public class GestureContainer : ContentView
             targetTranslationX = Math.Clamp(targetTranslationX, -maxTranslationX, maxTranslationX);
             targetTranslationY = Math.Clamp(targetTranslationY, -maxTranslationY, maxTranslationY);
 
-            Content.ScaleTo(currentScale, 250, Easing.CubicInOut);
-            Content.TranslateTo(targetTranslationX, targetTranslationY, 250, Easing.CubicInOut);
+            _ = Content.ScaleToAsync(currentScale, 250, Easing.CubicInOut);
+            _ = Content.TranslateToAsync(targetTranslationX, targetTranslationY, 250, Easing.CubicInOut);
         }
     }
 
-    void OnPinchUpdated(object sender, PinchGestureUpdatedEventArgs e)
+    void OnPinchUpdated(object? sender, PinchGestureUpdatedEventArgs e)
     {
         if (!EnableZooming)
         {
@@ -189,7 +189,7 @@ public class GestureContainer : ContentView
 
                 Content.Scale = currentScale;
 
-                if (currentScale == 1 && 
+                if (currentScale == 1 &&
                     !Content.AnimationIsRunning(nameof(MauiControls.ViewExtensions.TranslateTo)) &&
                     Content.TranslationX != 0 &&
                     Content.TranslationY != 0)
@@ -234,7 +234,7 @@ public class GestureContainer : ContentView
         }
     }
 
-    private void PanGesture_PanUpdated(object sender, PanUpdatedEventArgs e)
+    private void PanGesture_PanUpdated(object? sender, PanUpdatedEventArgs e)
     {
         if (!EnablePanning || !canPan)
         {
@@ -303,7 +303,7 @@ public class GestureContainer : ContentView
                         SwipeRightCommand.Execute(null);
                     }
 
-                    Content.TranslateTo(0, 0, 250, Easing.SpringOut);
+                    _ = Content.TranslateToAsync(0, 0, 250, Easing.SpringOut);
                     isPanning = false;
                     return;
                 }
@@ -317,7 +317,7 @@ public class GestureContainer : ContentView
 
                         return false;
                     }
-                    
+
                     Content.TranslationX += distance;
 
                     clampTranslation();
@@ -367,7 +367,7 @@ public class GestureContainer : ContentView
         // Only allow panning if the zoomed content is larger than the viewport.
         // The max allowed translation is half the difference between scaled content size and viewport size.
         // This ensures the edge of the content never crosses the edge of the viewport (no whitespace).
-        
+
         var maxTranslationX = Math.Max(0, (Content.Width * currentScale - Content.Width) / 2);
         var maxTranslationY = Math.Max(0, (Content.Height * currentScale - Content.Height) / 2);
 

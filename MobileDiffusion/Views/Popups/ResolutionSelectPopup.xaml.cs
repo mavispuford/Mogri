@@ -4,8 +4,8 @@ namespace MobileDiffusion.Views.Popups;
 
 public partial class ResolutionSelectPopup : BasePopup
 {
-	public ResolutionSelectPopup()
-	{
+    public ResolutionSelectPopup()
+    {
         InitializeComponent();
 
         MainBorder.GestureRecognizers.Add(new TapGestureRecognizer

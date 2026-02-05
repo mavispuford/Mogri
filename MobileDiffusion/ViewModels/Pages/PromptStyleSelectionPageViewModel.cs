@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
@@ -13,13 +13,13 @@ internal partial class PromptStyleSelectionPageViewModel : PageViewModel, IPromp
     private readonly IImageGenerationService _stableDiffusionService;
     private readonly IPopupService _popupService;
     private List<IPromptStyleViewModel> _allPromptStyles = new();
-    private PromptSettings _settings;
+    private PromptSettings? _settings;
 
     [ObservableProperty]
     public partial List<IPromptStyleViewModel> AvailablePromptStyles { get; set; } = new();
 
     [ObservableProperty]
-    public partial ObservableCollection<object> SelectedPromptStyles { get; set; } = new();
+    public partial ObservableCollection<IPromptStyleViewModel> SelectedPromptStyles { get; set; } = new();
 
     public PromptStyleSelectionPageViewModel(
         IImageGenerationService stableDiffusionService,
@@ -42,8 +42,8 @@ internal partial class PromptStyleSelectionPageViewModel : PageViewModel, IPromp
 
             if (_settings?.PromptStyles?.Any() == true)
             {
-                var matchingStyles = AvailablePromptStyles.SelectMany(a => _settings.PromptStyles.Where(p => p.Name.Equals(a.Name, StringComparison.Ordinal)));
-                SelectedPromptStyles = new ObservableCollection<object>(matchingStyles);
+                var matchingStyles = AvailablePromptStyles.Where(a => _settings.PromptStyles.Any(p => p.Name.Equals(a.Name, StringComparison.Ordinal)));
+                SelectedPromptStyles = new ObservableCollection<IPromptStyleViewModel>(matchingStyles);
             }
         }
         catch
@@ -79,7 +79,7 @@ internal partial class PromptStyleSelectionPageViewModel : PageViewModel, IPromp
     private async Task Cancel()
     {
         // Not modifying the settings, so just send the same ones back
-        var parameters = new Dictionary<string, object>
+        var parameters = new Dictionary<string, object?>
             {
                 { NavigationParams.PromptSettings, _settings }
             };
@@ -90,12 +90,12 @@ internal partial class PromptStyleSelectionPageViewModel : PageViewModel, IPromp
     [RelayCommand]
     private async Task Confirm()
     {
-        if (SelectedPromptStyles != null)
+        if (SelectedPromptStyles != null && _settings != null)
         {
             var newSettings = _settings.Clone();
             newSettings.PromptStyles = SelectedPromptStyles
+                .OfType<PromptStyleViewModel>()
                 .Distinct()
-                .Select(ps => ps as PromptStyleViewModel)
                 .Where(ps => !string.IsNullOrEmpty(ps.Prompt) || !string.IsNullOrEmpty(ps.NegativePrompt))
                 .ToList();
 
@@ -128,7 +128,7 @@ internal partial class PromptStyleSelectionPageViewModel : PageViewModel, IPromp
     [RelayCommand]
     private async Task ShowPromptStyleInfo(IPromptStyleViewModel promptStyleViewModel)
     {
-        if (promptStyleViewModel == null || 
+        if (promptStyleViewModel == null ||
             (string.IsNullOrEmpty(promptStyleViewModel.Prompt) && string.IsNullOrEmpty(promptStyleViewModel.NegativePrompt)))
         {
             await Shell.Current.DisplayAlertAsync("No Style Info", "This style has no prompts.", "OK");

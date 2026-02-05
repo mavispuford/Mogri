@@ -1,4 +1,4 @@
-﻿using MobileDiffusion.Interfaces.ViewModels;
+using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Interfaces.ViewModels.Pages;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
@@ -22,8 +22,8 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     private readonly IImageService _imageService;
 
     private PromptSettings _settings = new();
-    private string _resizedInitImage;
-    private string _resizedMaskImage;
+    private string? _resizedInitImage;
+    private string? _resizedMaskImage;
     private bool _initImageNeedsResize = true;
     private float _targetProgress = 0;
 
@@ -31,10 +31,10 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     public partial bool HasInitImage { get; set; }
 
     [ObservableProperty]
-    public partial string Prompt { get; set; } = _defaultPrompt;
+    public partial string? Prompt { get; set; } = _defaultPrompt;
 
     [ObservableProperty]
-    public partial string NegativePrompt { get; set; }
+    public partial string? NegativePrompt { get; set; }
 
     [ObservableProperty]
     public partial float Progress { get; set; }
@@ -95,7 +95,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             _settings.GuidanceScale = profile.DefaultCfg;
             _settings.Width = profile.DefaultWidth;
             _settings.Height = profile.DefaultHeight;
-            
+
             if (samplers != null && !samplers.ContainsKey(profile.DefaultSampler))
             {
                 _settings.Sampler = samplers.FirstOrDefault().Key ?? "Euler";
@@ -105,7 +105,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                 _settings.Sampler = profile.DefaultSampler;
             }
 
-            _settings.Model = (ModelViewModel)await _stableDiffusionService.GetSelectedModelAsync();
+            _settings.Model = (ModelViewModel?)await _stableDiffusionService.GetSelectedModelAsync();
         }
         catch
         {
@@ -165,11 +165,15 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
             var settings = _settings.Clone();
 
+            if (settings == null) return;
+
             for (var i = 0; i < settings.BatchCount * settings.BatchSize; i++)
             {
                 var resultItem = _serviceProvider.GetService<IResultItemViewModel>();
 
-                resultItem.ApplyQueryParamsFromResultItemCommand = new RelayCommand<IDictionary<string,object>>(ApplyQueryAttributes);
+                if (resultItem == null) continue;
+
+                resultItem.ApplyQueryParamsFromResultItemCommand = new RelayCommand<IDictionary<string, object>>(ApplyQueryAttributes);
 
                 Results.Add(resultItem);
             }
@@ -178,7 +182,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             {
                 if (_initImageNeedsResize)
                 {
-                    var initImageResult = await GetResizedImageStringFromSettingsAsync(settings, settings.InitImage, filterImage: true);
+                    var initImageResult = await GetResizedImageStringFromSettingsAsync(settings, settings.InitImage ?? string.Empty, filterImage: true);
 
                     if (!string.IsNullOrEmpty(initImageResult.ImageString))
                     {
@@ -230,11 +234,11 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                     }
                     else if (response.ResponseObject is GenerationResponse generationResponse)
                     {
-                        IDictionary<string, object> autoResponseInfo = null;
+                        IDictionary<string, object>? autoResponseInfo = null;
 
                         try
                         {
-                            autoResponseInfo = JsonConvert.DeserializeObject<IDictionary<string, object>>(generationResponse.Info, new JsonSerializerSettings
+                            autoResponseInfo = JsonConvert.DeserializeObject<IDictionary<string, object>?>(generationResponse.Info ?? string.Empty, new JsonSerializerSettings
                             {
                                 ContractResolver = CustomContractResolver.Instance
                             });
@@ -248,9 +252,9 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                         {
                             var seeds = autoResponseInfo["all_seeds"] as List<long>;
 
-                            foreach (var image in generationResponse.Images)
+                            foreach (var image in generationResponse.Images ?? Enumerable.Empty<string>())
                             {
-                                var seedString = seeds?.ElementAt(imageNumber) ?? settings.Seed + imageNumber;
+                                var seedString = seeds?.ElementAtOrDefault(imageNumber) ?? settings.Seed + imageNumber;
                                 var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{seedString}-{DateTime.Now.Ticks}";
 
                                 var result = Results.FirstOrDefault(r => r.ApiResponse == null);
@@ -369,12 +373,18 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
     private async Task retrieveResultImageAsync(IResultItemViewModel result, string fileName, int number)
     {
-        byte[] imageBytes = null;
+        byte[]? imageBytes = null;
 
-        if (result.ApiResponse.ResponseObject is GenerationResponse generationResponse)
+        if (result.ApiResponse.ResponseObject is GenerationResponse generationResponse && generationResponse.Images != null)
         {
-            imageBytes = Convert.FromBase64String(generationResponse.Images.ElementAt(number));
+            var imageString = generationResponse.Images.ElementAtOrDefault(number);
+            if (imageString != null)
+            {
+                imageBytes = Convert.FromBase64String(imageString);
+            }
         }
+
+        if (imageBytes == null) return;
 
         var uri = await _fileService.WriteFileToInternalStorageAsync($"{fileName}-{number++}.png", imageBytes);
 
@@ -418,7 +428,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         {
             await _stableDiffusionService.CancelAsync();
         }
-        catch(Exception)
+        catch
         {
             // Ignore
         }
@@ -461,8 +471,10 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         await Shell.Current.GoToAsync("PromptSettingsPage", parameters);
     }
 
-    public override async void ApplyQueryAttributes(IDictionary<string, object> query)
+    public override async void ApplyQueryAttributes(IDictionary<string, object>? query)
     {
+        if (query == null) return;
+
         if (query.TryGetValue(NavigationParams.PromptSettings, out var promptSettings) &&
             promptSettings is PromptSettings settings)
         {
@@ -504,16 +516,21 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
         if (query.TryGetValue(NavigationParams.CanvasImageString, out var canvasImageParam))
         {
-            var parameters = new Dictionary<string, object>
-            {
-                {NavigationParams.CanvasImageString, canvasImageParam as string}
-            };
+            var imageString = canvasImageParam as string;
 
-            await Shell.Current.Dispatcher.DispatchAsync(async () =>
+            if (imageString != null)
             {
-                await Shell.Current.Navigation.PopToRootAsync();
-                await Shell.Current.GoToAsync("///CanvasPageTab", parameters);
-            });
+                var parameters = new Dictionary<string, object>
+                {
+                    {NavigationParams.CanvasImageString, imageString}
+                };
+
+                await Shell.Current.Dispatcher.DispatchAsync(async () =>
+                {
+                    await Shell.Current.Navigation.PopToRootAsync();
+                    await Shell.Current.GoToAsync("///CanvasPageTab", parameters);
+                });
+            }
         }
 
         double? requestedWidth = null, requestedHeight = null;
@@ -571,7 +588,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         {
             query.TryGetValue(NavigationParams.AppShareContentType, out var appShareContentTypeParam);
 
-            await LoadSharedImage(imageUri, appShareContentTypeParam as string);
+            await LoadSharedImage(imageUri, appShareContentTypeParam as string ?? "image/png");
         }
 
         // Workaround for https://github.com/dotnet/maui/issues/10294

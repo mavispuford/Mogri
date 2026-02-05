@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 
 using CommunityToolkit.Maui.Animations;
 using CommunityToolkit.Maui.Behaviors;
@@ -44,7 +44,7 @@ public class CustomAnimationBehavior : EventToCommandBehavior
 
         // Binding context isn't currently inherited from the parent, so we are manually setting/tracking it here.
         BindingContext = bindable.BindingContext;
-        
+
         bindable.BindingContextChanged += OnBindableBindingContextChanged;
     }
 

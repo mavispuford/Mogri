@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace MobileDiffusion.Models;
 
@@ -8,14 +8,14 @@ namespace MobileDiffusion.Models;
 public class LoraItem
 {
     [JsonProperty("name")]
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     [JsonProperty("alias")]
-    public string Alias { get; set; }
+    public string? Alias { get; set; }
 
     [JsonProperty("path")]
-    public string Path { get; set; }
+    public string? Path { get; set; }
 
     [JsonProperty("metadata")]
-    public Dictionary<string, object> Metadata { get; set; }
+    public Dictionary<string, object>? Metadata { get; set; }
 }

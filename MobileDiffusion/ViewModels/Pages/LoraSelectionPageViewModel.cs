@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
@@ -12,8 +12,8 @@ public partial class LoraSelectionPageViewModel : PageViewModel, ILoraSelectionP
 {
     private readonly IImageGenerationService _stableDiffusionService;
 
-    private List<ILoraViewModel> _allLoras;
-    private PromptSettings _settings;
+    private List<ILoraViewModel> _allLoras = new();
+    private PromptSettings? _settings;
 
     [ObservableProperty]
     public partial List<ILoraViewModel> AvailableLoras { get; set; } = new();
@@ -22,7 +22,7 @@ public partial class LoraSelectionPageViewModel : PageViewModel, ILoraSelectionP
     public partial ObservableCollection<ILoraViewModel> SelectedLoras { get; set; } = new();
 
     [ObservableProperty]
-    public partial ILoraViewModel LoraToAdd { get; set; }
+    public partial ILoraViewModel? LoraToAdd { get; set; }
 
     public LoraSelectionPageViewModel(
         IImageGenerationService stableDiffusionService,
@@ -59,7 +59,7 @@ public partial class LoraSelectionPageViewModel : PageViewModel, ILoraSelectionP
 
             if (_settings?.Loras?.Any() == true)
             {
-                var matchingLoras = AvailableLoras.SelectMany(a => _settings.Loras.Where(p => p.Name.Equals(a.Name, StringComparison.Ordinal)));
+                var matchingLoras = AvailableLoras.Where(a => _settings.Loras.Any(p => p.Name.Equals(a.Name, StringComparison.Ordinal)));
                 SelectedLoras = new ObservableCollection<ILoraViewModel>(matchingLoras);
             }
         }
@@ -73,7 +73,7 @@ public partial class LoraSelectionPageViewModel : PageViewModel, ILoraSelectionP
     private async Task Cancel()
     {
         // Not modifying the settings, so just send the same ones back
-        var parameters = new Dictionary<string, object>
+        var parameters = new Dictionary<string, object?>
             {
                 { NavigationParams.PromptSettings, _settings }
             };
@@ -84,12 +84,12 @@ public partial class LoraSelectionPageViewModel : PageViewModel, ILoraSelectionP
     [RelayCommand]
     private async Task Confirm()
     {
-        if (SelectedLoras != null)
+        if (SelectedLoras != null && _settings != null)
         {
             var newSettings = _settings.Clone();
             newSettings.Loras = SelectedLoras
+                .OfType<LoraViewModel>()
                 .Distinct()
-                .Select(l => l as LoraViewModel)
                 .ToList();
 
             var parameters = new Dictionary<string, object>
@@ -130,7 +130,7 @@ public partial class LoraSelectionPageViewModel : PageViewModel, ILoraSelectionP
         return true;
     }
 
-    partial void OnLoraToAddChanged(ILoraViewModel value)
+    partial void OnLoraToAddChanged(ILoraViewModel? value)
     {
         if (value == null)
         {

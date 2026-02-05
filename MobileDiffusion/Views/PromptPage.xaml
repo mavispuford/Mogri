@@ -15,7 +15,7 @@
         <Label Grid.Row="0"
                Text="Prompt:"
                VerticalOptions="Center"
-               FontSize="Large" />
+               FontSize="18" />
 
         <ScrollView Orientation="Vertical"
                     Grid.Row="1"
@@ -27,7 +27,7 @@
                     Placeholder="{Binding PromptPlaceholder}"
                     AutoSize="TextChanges"
                     TextColor="{StaticResource IndependenceAccent}"
-                    FontSize="Body"/>
+                    FontSize="14"/>
 
         </ScrollView>
 
@@ -35,7 +35,7 @@
         <Label Grid.Row="2"
                Text="Negative Prompt:"
                VerticalOptions="Center"
-               FontSize="Large" />
+               FontSize="18" />
 
         <ScrollView Orientation="Vertical"
                     Grid.Row="3"
@@ -46,7 +46,7 @@
                     Text="{Binding NegativePrompt}"
                     TextColor="{StaticResource IndependenceAccent}"
                     AutoSize="TextChanges"
-                    FontSize="Body"/>
+                    FontSize="14"/>
 
         </ScrollView>
 
@@ -57,7 +57,7 @@
                        Text="Styles:"
                        VerticalOptions="Center"
                        VerticalTextAlignment="Center"
-                       FontSize="Large" />
+                       FontSize="18" />
 
             <ImageButton Grid.Column="1"
                          Command="{Binding ShowPromptStyleSelectionPageCommand}"
@@ -114,7 +114,7 @@
                Text="LoRAs:"
                VerticalOptions="Center"
                VerticalTextAlignment="Center"
-               FontSize="Large" />
+               FontSize="18" />
 
             <ImageButton Grid.Column="1"
                          Command="{Binding ShowLoraSelectionPageCommand}"

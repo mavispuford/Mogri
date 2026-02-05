@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Interfaces.ViewModels.Pages;
@@ -39,7 +39,7 @@ public partial class PageViewModel : BaseViewModel, IPageViewModel
     }
 
     [RelayCommand]
-    public async Task BackButton()  
+    public async Task BackButton()
     {
         OnBackButtonPressed();
     }

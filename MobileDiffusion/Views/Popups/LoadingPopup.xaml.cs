@@ -3,8 +3,8 @@ namespace MobileDiffusion.Views.Popups;
 
 public partial class LoadingPopup : BasePopup, IQueryAttributable
 {
-	public LoadingPopup()
-	{
+    public LoadingPopup()
+    {
         InitializeComponent();
     }
 

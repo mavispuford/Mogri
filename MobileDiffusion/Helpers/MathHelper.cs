@@ -1,4 +1,4 @@
-﻿namespace MobileDiffusion.Helpers;
+namespace MobileDiffusion.Helpers;
 
 public static class MathHelper
 {
@@ -119,7 +119,7 @@ public static class MathHelper
                         targetHeight = Constants.MaximumWidthHeight;
                         targetWidth = targetHeight * aspectRatio;
                     }
-                    else if (height < Constants.MinimumWidthHeight) 
+                    else if (height < Constants.MinimumWidthHeight)
                     {
                         // Height is less than minimum, instead calculate off the width
                         if (!widthWithinBounds)
@@ -130,7 +130,7 @@ public static class MathHelper
                         {
                             targetWidth = width;
                         }
-                        
+
                         targetHeight = targetWidth / aspectRatio;
                     }
                 }
@@ -158,11 +158,11 @@ public static class MathHelper
                     }
                 }
 
-                
+
                 break;
             default:
                 break;
-        }        
+        }
 
         // Make sure resulting dimensions are multiples of Constants.ResolutionValueDivisor
         var constrainedWidth = ConstrainDimensionValue(targetWidth);

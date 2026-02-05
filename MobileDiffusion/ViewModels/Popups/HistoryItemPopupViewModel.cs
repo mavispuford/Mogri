@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileDiffusion.Interfaces.Services;
@@ -7,6 +7,7 @@ using MobileDiffusion.Interfaces.ViewModels.Popups;
 using SkiaSharp;
 using SkiaSharp.Views.Maui.Controls;
 using Microsoft.Maui.ApplicationModel;
+using MobileDiffusion.Models;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -16,13 +17,13 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
     private readonly IImageService _imageService;
     private readonly IImageGenerationService _stableDiffusionService;
 
-    private IList<IHistoryItemViewModel> _historyItems;
+    private IList<IHistoryItemViewModel>? _historyItems;
 
     [ObservableProperty]
-    public partial IHistoryItemViewModel HistoryItem { get; set; }
+    public partial IHistoryItemViewModel? HistoryItem { get; set; }
 
     [ObservableProperty]
-    public partial ImageSource FullImageSource { get; set; }
+    public partial ImageSource? FullImageSource { get; set; }
 
     public HistoryItemPopupViewModel(
         IPopupService popupService,
@@ -75,7 +76,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
         _ = LoadImageAsync();
     }
 
-    partial void OnHistoryItemChanged(IHistoryItemViewModel value)
+    partial void OnHistoryItemChanged(IHistoryItemViewModel? value)
     {
         _ = LoadImageAsync();
     }
@@ -93,15 +94,20 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
 
         if (!string.IsNullOrEmpty(currentItem.FileName))
         {
-            SKBitmapImageSource imageSource = null;
+            SKBitmapImageSource? imageSource = null;
 
             await Task.Run(async () =>
             {
                 using var fileStream = await _fileService.GetFileStreamFromInternalStorageAsync(currentItem.FileName);
-             
+
+                if (fileStream == null)
+                {
+                    return;
+                }
+
                 var originalBitmap = _imageService.GetSkBitmapFromStream(fileStream);
                 var resizedBitmap = _imageService.GetResizedSKBitmap(originalBitmap, (int)Constants.MaximumDisplayWidthHeight, (int)Constants.MaximumDisplayWidthHeight, filterImage: true, onlyIfLarger: true);
-                
+
                 imageSource = new SKBitmapImageSource
                 {
                     Bitmap = resizedBitmap
@@ -122,6 +128,8 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
             _ = Task.Run(async () =>
             {
                 using var imageFileStream = await _fileService.GetFileStreamFromInternalStorageAsync(currentItem.FileName);
+                if (imageFileStream == null) return;
+
                 using var memoryStream = new MemoryStream();
                 await imageFileStream.CopyToAsync(memoryStream);
                 var imageString = Convert.ToBase64String(memoryStream.ToArray());
@@ -167,6 +175,8 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
     [RelayCommand]
     private async Task Delete()
     {
+        if (HistoryItem == null) return;
+
         var result = await Shell.Current.DisplayAlertAsync("Confirm", "Are you sure you would like to delete this image?", "DELETE", "Cancel");
 
         if (!result)
@@ -176,7 +186,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
 
         await _fileService.DeleteFileFromInternalStorage(HistoryItem.FileName);
         await _fileService.DeleteFileFromInternalStorage(HistoryItem.ThumbnailFileName);
-        
+
         var parameters = new Dictionary<string, object>
         {
             { NavigationParams.DeletedHistoryItem, true }
@@ -194,7 +204,12 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
     [RelayCommand]
     private async Task Save()
     {
+        if (HistoryItem == null) return;
+
         var stream = await _fileService.GetFileStreamFromInternalStorageAsync(HistoryItem.FileName);
+
+        if (stream == null) return;
+
         await _fileService.WriteImageFileToExternalStorageAsync(Path.GetFileName(HistoryItem.FileName), stream);
 
         await Toast.Make("Image saved.").Show();
@@ -203,9 +218,11 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
     [RelayCommand]
     private async Task UseSettings()
     {
+        if (HistoryItem == null) return;
+
         var parameters = new Dictionary<string, object>
         {
-            { NavigationParams.PromptSettings, HistoryItem.Settings }
+            { NavigationParams.PromptSettings, HistoryItem.Settings ?? new PromptSettings() }
         };
 
         await ClosePopupAsync(parameters);
@@ -214,7 +231,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
     [RelayCommand]
     private async Task ImageInfo()
     {
-        if (HistoryItem.Settings == null)
+        if (HistoryItem?.Settings == null)
         {
             await Shell.Current.DisplayAlertAsync("No Image Info", "Unable to retrieve image info. Please try again later.", "Close");
 
@@ -224,8 +241,8 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
         var message = $"Prompt: {HistoryItem.Settings.Prompt}\n\n" +
             $"Negative Prompt: {HistoryItem.Settings.NegativePrompt}\n\n" +
             $"Steps: {HistoryItem.Settings.Steps}, Sampler: {HistoryItem.Settings.Sampler}\n" +
-            $"Guidance Scale (Cfg): {HistoryItem.Settings.GuidanceScale}\n" + 
-            $"Seed: {HistoryItem.Settings.Seed}\n" + 
+            $"Guidance Scale (Cfg): {HistoryItem.Settings.GuidanceScale}\n" +
+            $"Seed: {HistoryItem.Settings.Seed}\n" +
             $"Size: {HistoryItem.Settings.Width}x{HistoryItem.Settings.Height}\n" +
             $"Denoising Strength: {HistoryItem.Settings.DenoisingStrength}\n" +
             $"Model: {HistoryItem.Settings.Model?.DisplayName ?? "Unknown"}";
@@ -272,11 +289,14 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
 
     private async Task SendImageBack(string parameterName, bool asFormattedString)
     {
+        if (HistoryItem == null) return;
+
         try
         {
             using (var memoryStream = new MemoryStream())
             {
                 var stream = await _fileService.GetFileStreamFromInternalStorageAsync(HistoryItem.FileName);
+                if (stream == null) return;
 
                 stream.CopyTo(memoryStream);
                 var imageBytes = memoryStream.ToArray();

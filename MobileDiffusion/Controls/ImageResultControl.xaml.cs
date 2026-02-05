@@ -16,7 +16,7 @@ public partial class ImageResultControl : ContentView
         {
             ((ImageResultControl)bindable).OnImageSourceChanged();
         });
-        
+
     public ImageSource Source
     {
         get => (ImageSource)GetValue(SourceProperty);

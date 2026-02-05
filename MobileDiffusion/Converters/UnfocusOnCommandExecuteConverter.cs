@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 
 using CommunityToolkit.Mvvm.Input;
 using System.Globalization;
@@ -12,7 +12,7 @@ namespace MobileDiffusion.Converters
     /// </summary>
     public class UnfocusOnCommandExecuteConverter : IValueConverter
     {
-        public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value is RelayCommand relayCommand)
             {

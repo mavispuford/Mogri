@@ -7,7 +7,7 @@ namespace MobileDiffusion.Services
 {
     public class AotGanPatchService : IPatchService
     {
-        private InferenceSession _session;
+        private InferenceSession? _session;
         private const int ModelInputSize = 512;
         private bool _isLoading = false;
 
@@ -44,11 +44,11 @@ namespace MobileDiffusion.Services
                     using var stream = await FileSystem.OpenAppPackageFileAsync("aot_gan.onnx");
                     using var fileStream = File.Create(modelPath);
                     await stream.CopyToAsync(fileStream);
-                     Console.WriteLine($"[AotGanPatchService] Model extracted to: {modelPath}");
+                    Console.WriteLine($"[AotGanPatchService] Model extracted to: {modelPath}");
                 }
-                
+
                 var options = new SessionOptions();
-                
+
                 if (DeviceInfo.Current.DeviceType == DeviceType.Virtual)
                 {
                     Console.WriteLine("[AotGanPatchService] Emulator detected: Using CPU settings");
@@ -58,7 +58,7 @@ namespace MobileDiffusion.Services
                     options.InterOpNumThreads = 2;
                     options.IntraOpNumThreads = 2;
                     options.GraphOptimizationLevel = GraphOptimizationLevel.ORT_ENABLE_BASIC;
-                    
+
                     options.LogSeverityLevel = OrtLoggingLevel.ORT_LOGGING_LEVEL_VERBOSE;
                 }
                 else
@@ -77,7 +77,7 @@ namespace MobileDiffusion.Services
 
                 _session = new InferenceSession(modelPath, options);
                 Console.WriteLine("[AotGanPatchService] InferenceSession created successfully.");
-                
+
                 // Log metadata
                 foreach (var input in _session.InputMetadata)
                 {
@@ -125,14 +125,14 @@ namespace MobileDiffusion.Services
                 if (_session == null)
                 {
                     await InitializeModelAsync();
-                    if (_session == null) 
+                    if (_session == null)
                     {
                         Console.WriteLine("[AotGanPatchService] Failed to initialize session");
                         throw new InvalidOperationException("Model not loaded");
                     }
                 }
 
-                return await Task.Run(() => 
+                return await Task.Run(() =>
                 {
                     // 1. Get Bounding Box since 4K resizing is destructive
                     Console.WriteLine("[AotGanPatchService] Calculating ROI...");
@@ -142,15 +142,15 @@ namespace MobileDiffusion.Services
                         Console.WriteLine("[AotGanPatchService] Empty mask, returning original image.");
                         return image.Copy();
                     }
-                    
+
                     // 2. Expand to Square Crop
                     var cropRect = GetExpandedCropRect(bbox, image.Width, image.Height);
                     Console.WriteLine($"[AotGanPatchService] ROI: {bbox}, Crop: {cropRect}");
-                    
+
                     // 3. Crop Image and Mask
                     using var croppedImage = new SKBitmap(cropRect.Width, cropRect.Height);
                     using var croppedMask = new SKBitmap(cropRect.Width, cropRect.Height);
-                    
+
                     using (var c = new SKCanvas(croppedImage))
                     {
                         c.Clear(SKColors.Black);
@@ -165,7 +165,7 @@ namespace MobileDiffusion.Services
 
                     // FIX: Ensure mask is truly transparent where black/empty, to support DstIn blending.
                     EnsureMaskTransparency(croppedMask);
-                    
+
                     // 4. Resize to 512x512 for Model
                     using var resizedImage = croppedImage.Resize(new SKImageInfo(ModelInputSize, ModelInputSize, SKColorType.Rgba8888), SKSamplingOptions.Default);
                     // Use Nearest Neighbor for mask to preserve hard edges and avoid gray halos
@@ -173,42 +173,42 @@ namespace MobileDiffusion.Services
 
                     if (resizedImage == null || resizedMask == null)
                     {
-                    throw new Exception("Failed to resize crop to 512x512");
+                        throw new Exception("Failed to resize crop to 512x512");
                     }
-                    
+
                     // 5. Run Inference
                     using var output512 = RunAotGanModel(resizedImage, resizedMask);
-                    
+
                     // 6. Resize output back to Crop Size
                     using var outputCroppedSize = output512.Resize(new SKImageInfo(cropRect.Width, cropRect.Height), SKSamplingOptions.Default);
-                    
+
                     // 7. Composite back onto full image
                     Console.WriteLine("[AotGanPatchService] Compositing patch back to original...");
                     var result = image.Copy();
-                    
+
                     using (var canvas = new SKCanvas(result))
                     {
                         // Use a layer to mask the prediction
                         // We want to draw 'outputCroppedSize' but only where 'croppedMask' indicates a hole.
-                        
+
                         using (var paint = new SKPaint())
                         {
                             // 1. Save a layer for the crop area
                             canvas.SaveLayer(new SKRect(cropRect.Left, cropRect.Top, cropRect.Right, cropRect.Bottom), null);
-                            
+
                             // 2. Draw the predicted patch (opaque)
                             canvas.DrawBitmap(outputCroppedSize, cropRect.Left, cropRect.Top);
-                            
+
                             // 3. Mask it with the original mask using DstIn (Keep DST (prediction) where SRC (mask) is opaque)
                             // The croppedMask likely has high alpha where the user painted.
                             paint.BlendMode = SKBlendMode.DstIn;
                             canvas.DrawBitmap(croppedMask, cropRect.Left, cropRect.Top, paint);
-                            
+
                             // 4. Restore the layer, which composites the masked prediction onto the original image
                             canvas.Restore();
                         }
                     }
-                    
+
                     Console.WriteLine("[AotGanPatchService] PatchImageAsync completed successfully");
                     return result;
                 });
@@ -227,11 +227,11 @@ namespace MobileDiffusion.Services
                 throw new ArgumentException($"RunAotGanModel expects {ModelInputSize}x{ModelInputSize} image");
 
             Console.WriteLine("[AotGanPatchService] Preparing tensors for AOT-GAN...");
-            
+
             var inputPixelCount = ModelInputSize * ModelInputSize;
             var imageArray = new float[1 * 3 * inputPixelCount];
             var maskArray = new float[1 * 1 * inputPixelCount];
-            
+
             // Channel offsets
             // Note: AOT-GAN (and many PyTorch conversions referenced in InpaintMask.cs) expect BGR layout.
             // BGR: Channel 0 = Blue, Channel 1 = Green, Channel 2 = Red.
@@ -245,7 +245,7 @@ namespace MobileDiffusion.Services
             for (int i = 0; i < inputPixelCount; i++)
             {
                 int ptrOffset = i * 4;
-                
+
                 // 1. Process Mask
                 // AOT-GAN: 1 for invalid (masked) regions, 0 for valid.
                 // FIX: Ensure we don't treat opaque black background as mask
@@ -269,7 +269,7 @@ namespace MobileDiffusion.Services
                 float rNorm = r / 255.0f;
                 float gNorm = g / 255.0f;
                 float bNorm = b / 255.0f;
-                
+
                 // 3. Apply Mask Logic
                 if (maskVal > 0.5f)
                 {
@@ -286,10 +286,10 @@ namespace MobileDiffusion.Services
                     imageArray[bOffset + i] = bNorm;
                 }
             }
-            
+
             var imageTensor = new DenseTensor<float>(imageArray, new[] { 1, 3, ModelInputSize, ModelInputSize });
             var maskTensor = new DenseTensor<float>(maskArray, new[] { 1, 1, ModelInputSize, ModelInputSize });
-            
+
             // Inputs
             var inputs = new List<NamedOnnxValue>
             {
@@ -298,10 +298,15 @@ namespace MobileDiffusion.Services
             };
 
             Console.WriteLine("[AotGanPatchService] Running inference...");
-            
+
             // Force GC before run to clear previous large buffers
             GC.Collect();
-            
+
+            if (_session == null)
+            {
+                throw new InvalidOperationException("Inference session not initialized");
+            }
+
             using var results = _session.Run(inputs);
             var outputTensor = results.First().AsTensor<float>();
 
@@ -317,9 +322,9 @@ namespace MobileDiffusion.Services
             // Post-process
             var outputBitmap = new SKBitmap(ModelInputSize, ModelInputSize, SKColorType.Rgba8888, SKAlphaType.Premul);
             byte* outPtr = (byte*)outputBitmap.GetPixels().ToPointer();
-            
+
             bool isZeroOne = minVal >= 0 && maxVal <= 1.0f;
-            
+
             for (int y = 0; y < ModelInputSize; y++)
             {
                 for (int x = 0; x < ModelInputSize; x++)
@@ -330,16 +335,16 @@ namespace MobileDiffusion.Services
                     float bRaw = outputTensor[0, 0, y, x];
                     float gRaw = outputTensor[0, 1, y, x];
                     float rRaw = outputTensor[0, 2, y, x];
-                    
+
                     // Denormalize
                     float rNorm, gNorm, bNorm;
-                    
+
                     if (isZeroOne)
                     {
-                         // Likely [0, 1] range
-                         rNorm = rRaw;
-                         gNorm = gRaw;
-                         bNorm = bRaw;
+                        // Likely [0, 1] range
+                        rNorm = rRaw;
+                        gNorm = gRaw;
+                        bNorm = bRaw;
                     }
                     else
                     {
@@ -352,7 +357,7 @@ namespace MobileDiffusion.Services
                     int r = (int)(rNorm * 255.0f);
                     int g = (int)(gNorm * 255.0f);
                     int b = (int)(bNorm * 255.0f);
-                    
+
                     int outIdx = (y * ModelInputSize + x) * 4;
                     outPtr[outIdx] = (byte)Math.Clamp(r, 0, 255);
                     outPtr[outIdx + 1] = (byte)Math.Clamp(g, 0, 255);
@@ -360,7 +365,7 @@ namespace MobileDiffusion.Services
                     outPtr[outIdx + 3] = 255; // Alpha
                 }
             }
-            
+
             return outputBitmap;
         }
 
@@ -390,10 +395,10 @@ namespace MobileDiffusion.Services
                         // Even if Argb8888 (Alpha at 0), this heuristic is decent if we check all channels.
                         // But explicitly: Skia standard is byte order R,G,B,A or B,G,R,A in memory.
                         // If we check b3 > 0 (Alpha) and any of b0,b1,b2 > 10 (Color)
-                        
+
                         // Note: If A is 0, then b3 is Blue or Red.
                         // However, standard Skia surfaces on mobile are Rgba8888 or Bgra8888.
-                        
+
                         byte b0 = row[x * 4];
                         byte b1 = row[x * 4 + 1];
                         byte b2 = row[x * 4 + 2];
@@ -419,7 +424,7 @@ namespace MobileDiffusion.Services
                     {
                         var color = mask.GetPixel(x, y);
                         // FIX: Ensure we don't treat opaque black background as mask
-                        if (color.Alpha > 0 && (color.Red > 10 || color.Green > 10 || color.Blue > 10)) 
+                        if (color.Alpha > 0 && (color.Red > 10 || color.Green > 10 || color.Blue > 10))
                         {
                             if (x < minX) minX = x;
                             if (x > maxX) maxX = x;
@@ -430,7 +435,7 @@ namespace MobileDiffusion.Services
                     }
                 }
             }
-            
+
             if (!found) return SKRectI.Empty;
             return new SKRectI(minX, minY, maxX + 1, maxY + 1);
         }
@@ -445,41 +450,41 @@ namespace MobileDiffusion.Services
             // AOT-GAN works best with significant context. 1.25x is often too tight, causing "blob" artifacts.
             // 3x provides a good balance of context vs resolution.
             int targetSize = requiredSize * 2;
-            
+
             // 2. Constrain size - but NEVER smaller than the required bbox
             // (Original logic clamped to Min(W,H) which caused cutoffs for large masks)
             int maxSize = Math.Max(imageWidth, imageHeight); // Allow crop up to largest image dimension initially
-            
+
             int size = targetSize;
             if (size > maxSize) size = maxSize;
-            
+
             // If the mask itself is huge, we must process at least that size, even if it exceeds image bounds.
             if (size < requiredSize) size = requiredSize;
 
             // 3. Center
             int cx = bbox.MidX;
             int cy = bbox.MidY;
-            
+
             int half = size / 2;
             int left = cx - half;
             int top = cy - half;
-            
+
             // 4. Smart Clamp
             // Only slide the window if the size fits within the dimension.
             // If size > dimension, we center it (leave it negative/overflowing).
-            
+
             if (size <= imageWidth)
             {
                 if (left < 0) left = 0;
                 if (left + size > imageWidth) left = imageWidth - size;
             }
-            
+
             if (size <= imageHeight)
             {
                 if (top < 0) top = 0;
                 if (top + size > imageHeight) top = imageHeight - size;
             }
-            
+
             var rect = new SKRectI(left, top, left + size, top + size);
             rect.Intersect(new SKRectI(0, 0, imageWidth, imageHeight));
             return rect;
@@ -489,7 +494,7 @@ namespace MobileDiffusion.Services
         {
             // Fixes the issue where a black background is treated as "masked" by DstIn blending.
             // We force pixels that are visually black (background) to be fully transparent.
-            
+
             // Direct pointer access avoids copying to/from SKBitmap.Pixels array
             if (mask.BytesPerPixel == 4)
             {

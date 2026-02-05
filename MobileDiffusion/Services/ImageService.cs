@@ -1,4 +1,4 @@
-﻿using ColorMine.ColorSpaces.Comparisons;
+using ColorMine.ColorSpaces.Comparisons;
 using ColorMine.ColorSpaces;
 using MobileDiffusion.Interfaces.Services;
 using SkiaSharp;
@@ -7,11 +7,11 @@ namespace MobileDiffusion.Services;
 
 public class ImageService : IImageService
 {
-    public Task<MemoryStream> GetStreamFromContentTypeStringAsync(string imageString, CancellationToken token)
+    public Task<MemoryStream?> GetStreamFromContentTypeStringAsync(string? imageString, CancellationToken token)
     {
         if (string.IsNullOrEmpty(imageString))
         {
-            return Task.FromResult<MemoryStream>(null);
+            return Task.FromResult<MemoryStream?>(null);
         }
 
         var matchResult = Constants.ImageDataRegex.Match(imageString);
@@ -33,20 +33,20 @@ public class ImageService : IImageService
 
             if (token.IsCancellationRequested)
             {
-                return Task.FromResult<MemoryStream>(null);
+                return Task.FromResult<MemoryStream?>(null);
             }
 
-            return Task.FromResult(new MemoryStream(imageBytes));
+            return Task.FromResult<MemoryStream?>(new MemoryStream(imageBytes));
         }
         catch
         {
             // TODO - Handle exceptions
         }
-        
-        return Task.FromResult<MemoryStream>(null);
+
+        return Task.FromResult<MemoryStream?>(null);
     }
 
-    public async Task<ImageSource> GetImageSourceFromContentTypeStringAsync(string imageString, CancellationToken token)
+    public async Task<ImageSource?> GetImageSourceFromContentTypeStringAsync(string? imageString, CancellationToken token)
     {
         var stream = await GetStreamFromContentTypeStringAsync(imageString, token);
 
@@ -58,7 +58,7 @@ public class ImageService : IImageService
         return ImageSource.FromStream(() => stream);
     }
 
-    public SKBitmap GetSkBitmapFromStream(Stream stream)
+    public SKBitmap? GetSkBitmapFromStream(Stream? stream)
     {
         if (stream == null)
         {
@@ -88,8 +88,13 @@ public class ImageService : IImageService
         }
     }
 
-    public SKBitmap GetResizedSKBitmap(SKBitmap bitmap, int width, int height, bool forceExactSize = false, bool filterImage = false, bool onlyIfLarger = false)
+    public SKBitmap? GetResizedSKBitmap(SKBitmap? bitmap, int width, int height, bool forceExactSize = false, bool filterImage = false, bool onlyIfLarger = false)
     {
+        if (bitmap == null)
+        {
+            return null;
+        }
+
         try
         {
             if (forceExactSize)
@@ -102,8 +107,8 @@ public class ImageService : IImageService
             {
                 return bitmap;
             }
-            
-            if (onlyIfLarger && 
+
+            if (onlyIfLarger &&
                 bitmap.Width < width &&
                 bitmap.Height < height)
             {
@@ -149,13 +154,23 @@ public class ImageService : IImageService
         return null;
     }
 
-    public (byte[] Bytes, int ActualWidth, int ActualHeight) GetResizedImageStreamBytes(Stream stream, int width, int height, bool forceExactSize = false, bool filterImage = false, bool onlyIfLarger = false)
+    public (byte[]? Bytes, int ActualWidth, int ActualHeight) GetResizedImageStreamBytes(Stream? stream, int width, int height, bool forceExactSize = false, bool filterImage = false, bool onlyIfLarger = false)
     {
         try
         {
             var bitmap = GetSkBitmapFromStream(stream);
 
+            if (bitmap == null)
+            {
+                return (null, 0, 0);
+            }
+
             var resizedBitmap = GetResizedSKBitmap(bitmap, width, height, forceExactSize, filterImage, onlyIfLarger);
+
+            if (resizedBitmap == null)
+            {
+                return (null, 0, 0);
+            }
 
             using (var memStream = new MemoryStream())
             {
@@ -176,12 +191,19 @@ public class ImageService : IImageService
         return (null, 0, 0);
     }
 
-    public string GetThumbnailString(Stream stream, string contentType, int width = 256, int height = 256)
+    public string? GetThumbnailString(Stream? stream, string contentType, int width = 256, int height = 256)
     {
         try
         {
+            if (stream == null) return null;
             stream.Seek(0, SeekOrigin.Begin);
             var bitmap = GetSkBitmapFromStream(stream);
+
+            if (bitmap == null)
+            {
+                return null;
+            }
+
             return GetThumbnailString(bitmap, contentType, width, height);
         }
         catch
@@ -192,7 +214,7 @@ public class ImageService : IImageService
         return null;
     }
 
-    public string GetThumbnailString(SKBitmap bitmap, string contentType, int width = 256, int height = 256)
+    public string? GetThumbnailString(SKBitmap? bitmap, string contentType, int width = 256, int height = 256)
     {
         try
         {
@@ -250,7 +272,7 @@ public class ImageService : IImageService
         return result;
     }
 
-    unsafe public List<Color> ExtractColorPalette(SKBitmap bitmap, int targetNumber = 30)
+    unsafe public List<Color>? ExtractColorPalette(SKBitmap? bitmap, int targetNumber = 30)
     {
         if (bitmap == null)
         {
@@ -260,6 +282,11 @@ public class ImageService : IImageService
         const int maxSize = 128;
 
         var smallBitmap = GetResizedSKBitmap(bitmap, maxSize, maxSize, false, false, false);
+
+        if (smallBitmap == null)
+        {
+            return null;
+        }
 
         SKColorType colorType = smallBitmap.ColorType;
 

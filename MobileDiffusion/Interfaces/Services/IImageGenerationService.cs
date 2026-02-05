@@ -1,4 +1,4 @@
-﻿using MobileDiffusion.Interfaces.ViewModels;
+using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Models;
 
 namespace MobileDiffusion.Interfaces.Services;
@@ -11,7 +11,7 @@ public interface IImageGenerationService
 
     Task<byte[]> GetImageBytesAsync(string url);
 
-    Task<PromptSettings> GetImageInfoAsync(string base64EncodedImage);
+    Task<PromptSettings?> GetImageInfoAsync(string base64EncodedImage);
 
     Task InitializeAsync();
 
@@ -29,8 +29,8 @@ public interface IImageGenerationService
 
     Task<List<string>> GetSchedulersAsync();
 
-    Task<IModelViewModel> GetSelectedModelAsync();
-    
+    Task<IModelViewModel?> GetSelectedModelAsync();
+
     Task SaveSettingsAsync(PromptSettings settings);
 
     Task<bool> CancelAsync();

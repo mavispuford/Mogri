@@ -13,7 +13,7 @@ namespace MobileDiffusion.ViewModels;
 public partial class EditMasksPopupViewModel : PopupBaseViewModel, IEditMasksPopupViewModel, IRecipient<MaskSliderDragMessage>
 {
     private readonly IServiceProvider _serviceProvider;
-    private ObservableCollection<CanvasActionViewModel> _sourceActions;
+    private ObservableCollection<CanvasActionViewModel>? _sourceActions;
 
     [ObservableProperty]
     private ObservableCollection<IEditMaskItemViewModel> _items = new();
@@ -45,7 +45,7 @@ public partial class EditMasksPopupViewModel : PopupBaseViewModel, IEditMasksPop
         }
     }
 
-    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    public override void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         base.ApplyQueryAttributes(query);
 
@@ -62,7 +62,7 @@ public partial class EditMasksPopupViewModel : PopupBaseViewModel, IEditMasksPop
         if (_sourceActions == null) return;
 
         var filtered = _sourceActions
-            .Where(a => 
+            .Where(a =>
                 (a is MaskLineViewModel m && (m.MaskEffect == MaskEffect.Paint || m.MaskEffect == MaskEffect.Erase)) ||
                 (a is SegmentationMaskViewModel))
             .Reverse();
