@@ -385,13 +385,6 @@ public class ImageService : IImageService
         int lum2 = (int)(lum * repetitions);
         int v2 = (int)(hsv.V * repetitions);
 
-        // TODO - Reverse luminosity sorting to smooth color layout
-        //if (h2 % 2 == 1)
-        //{
-        //    v2 = repetitions - v2;
-        //    lum2 = repetitions - lum2;
-        //}
-
         return (h2, lum2, v2);
     }
 }

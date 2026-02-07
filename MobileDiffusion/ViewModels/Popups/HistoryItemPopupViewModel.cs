@@ -61,9 +61,9 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
                     await ClosePopupAsync();
                 });
             }
-            catch
+            catch (Exception ex)
             {
-                // TODO - Handle this
+                Console.WriteLine($"Failed to close popup: {ex}");
             }
         }
 

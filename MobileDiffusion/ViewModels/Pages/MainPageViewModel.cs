@@ -458,11 +458,18 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     {
         if (!_stableDiffusionService.Initialized)
         {
-            // TODO - Show that app is busy here
+            await LoadingService.ShowAsync("Initializing...");
 
-            if (!await initializeStableDiffusionService())
+            try
             {
-                return;
+                if (!await initializeStableDiffusionService())
+                {
+                    return;
+                }
+            }
+            finally
+            {
+                await LoadingService.HideAsync();
             }
         }
 

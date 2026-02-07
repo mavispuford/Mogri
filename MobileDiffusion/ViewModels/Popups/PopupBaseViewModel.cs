@@ -70,9 +70,9 @@ public partial class PopupBaseViewModel : BaseViewModel, IPopupBaseViewModel
                 await ClosePopupAsync();
             });
         }
-        catch
+        catch (Exception ex)
         {
-            // TODO - Handle this
+            Console.WriteLine($"Failed to close popup on back button: {ex}");
         }
     }
 }

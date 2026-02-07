@@ -33,9 +33,9 @@ public partial class PromptStyleInfoPopupViewModel : PopupBaseViewModel, IPrompt
                     await ClosePopupAsync();
                 });
             }
-            catch
+            catch (Exception ex)
             {
-                // TODO - Handle this
+                Console.WriteLine($"Failed to close popup: {ex}");
             }
         }
 

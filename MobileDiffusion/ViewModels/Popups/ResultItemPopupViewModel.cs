@@ -40,9 +40,9 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
                     await ClosePopupAsync();
                 });
             }
-            catch
+            catch (Exception ex)
             {
-                // TODO - Handle this
+                Console.WriteLine($"Failed to close popup: {ex}");
             }
         }
 
