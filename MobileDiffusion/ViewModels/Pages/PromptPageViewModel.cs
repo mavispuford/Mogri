@@ -12,6 +12,7 @@ namespace MobileDiffusion.ViewModels;
 public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
 {
     private readonly IImageGenerationService _stableDiffusionService;
+    private readonly IPopupService _popupService;
 
     private PromptSettings? _settings;
 
@@ -38,9 +39,11 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
 
     public PromptPageViewModel(
         IImageGenerationService stableDiffusionService,
-        ILoadingService loadingService) : base(loadingService)
+        ILoadingService loadingService,
+        IPopupService popupService) : base(loadingService)
     {
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
+        _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
     }
 
     [RelayCommand]
@@ -138,9 +141,9 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
                     }
                 }));
         }
-        catch
+        catch (Exception ex)
         {
-            // TODO - Handle this
+            await _popupService.DisplayAlertAsync("Error", $"Failed to load settings: {ex.Message}", "OK");
         }
     }
 

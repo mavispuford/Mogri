@@ -1275,8 +1275,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 byte mskByte3 = *mskPtr++;         // blue or red
                 byte mskByte4 = *mskPtr++;         // alpha
 
-                // TODO - Make this configurable per SD service, since they accept different masks
-                // Also, mask expectations can change even in the same SD repo
+                // Check generic mask alpha. 
+                // Note: Mask logic may need configuration per SD service backend.
                 if (mskByte4 != 0)
                 {
                     // Pure black

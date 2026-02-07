@@ -223,9 +223,9 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
 
             AvailablePresets = await _presetService.GetPresetsAsync();
         }
-        catch
+        catch (Exception ex)
         {
-            // TODO - Handle this
+            await _popupService.DisplayAlertAsync("Error", $"Failed to initialize settings: {ex.Message}", "OK");
         }
 
         mapSettingsToProperties();

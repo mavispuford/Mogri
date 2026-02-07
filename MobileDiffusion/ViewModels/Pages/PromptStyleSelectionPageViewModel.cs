@@ -46,9 +46,9 @@ internal partial class PromptStyleSelectionPageViewModel : PageViewModel, IPromp
                 SelectedPromptStyles = new ObservableCollection<IPromptStyleViewModel>(matchingStyles);
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // TODO - Handle this
+            await _popupService.DisplayAlertAsync("Error", $"Failed to load prompt styles: {ex.Message}", "OK");
         }
     }
 

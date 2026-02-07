@@ -11,6 +11,7 @@ namespace MobileDiffusion.ViewModels;
 public partial class LoraSelectionPageViewModel : PageViewModel, ILoraSelectionPageViewModel
 {
     private readonly IImageGenerationService _stableDiffusionService;
+    private readonly IPopupService _popupService;
 
     private List<ILoraViewModel> _allLoras = new();
     private PromptSettings? _settings;
@@ -26,9 +27,11 @@ public partial class LoraSelectionPageViewModel : PageViewModel, ILoraSelectionP
 
     public LoraSelectionPageViewModel(
         IImageGenerationService stableDiffusionService,
+        IPopupService popupService,
         ILoadingService loadingService) : base(loadingService)
     {
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
+        _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
     }
 
     public override void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -63,9 +66,9 @@ public partial class LoraSelectionPageViewModel : PageViewModel, ILoraSelectionP
                 SelectedLoras = new ObservableCollection<ILoraViewModel>(matchingLoras);
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // TODO - Handle this
+            await _popupService.DisplayAlertAsync("Error", $"Failed to load Loras: {ex.Message}", "OK");
         }
     }
 
