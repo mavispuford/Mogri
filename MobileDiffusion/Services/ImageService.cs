@@ -3,10 +3,19 @@ using ColorMine.ColorSpaces;
 using MobileDiffusion.Interfaces.Services;
 using SkiaSharp;
 
+using Microsoft.Extensions.Logging;
+
 namespace MobileDiffusion.Services;
 
 public class ImageService : IImageService
 {
+    private readonly ILogger<ImageService> _logger;
+
+    public ImageService(ILogger<ImageService> logger)
+    {
+        _logger = logger;
+    }
+
     public Task<MemoryStream?> GetStreamFromContentTypeStringAsync(string? imageString, CancellationToken token)
     {
         if (string.IsNullOrEmpty(imageString))
@@ -38,9 +47,9 @@ public class ImageService : IImageService
 
             return Task.FromResult<MemoryStream?>(new MemoryStream(imageBytes));
         }
-        catch
+        catch (Exception ex)
         {
-            // TODO - Handle exceptions
+            _logger.LogError(ex, "Failed to convert base64 image string to stream");
         }
 
         return Task.FromResult<MemoryStream?>(null);
@@ -82,8 +91,9 @@ public class ImageService : IImageService
 
             return SKBitmap.Decode(codec, info);
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Failed to decode SKBitmap from stream");
             return null;
         }
     }
@@ -146,9 +156,9 @@ public class ImageService : IImageService
 
             return resizeBitmap(bitmap, targetWidth, targetHeight, filterImage);
         }
-        catch
+        catch (Exception ex)
         {
-            // TODO - Handle this
+            _logger.LogError(ex, "Failed to resize SKBitmap");
         }
 
         return null;
@@ -183,9 +193,9 @@ public class ImageService : IImageService
                 }
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // TODO - Handle this
+            _logger.LogError(ex, "Failed to get resized image stream bytes");
         }
 
         return (null, 0, 0);
@@ -206,9 +216,9 @@ public class ImageService : IImageService
 
             return GetThumbnailString(bitmap, contentType, width, height);
         }
-        catch
+        catch (Exception ex)
         {
-            // TODO - Handle exceptions
+            _logger.LogError(ex, "Failed to get thumbnail string from stream");
         }
 
         return null;
@@ -233,9 +243,9 @@ public class ImageService : IImageService
                 }
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // TODO - Handle exceptions
+            _logger.LogError(ex, "Failed to get thumbnail string from bitmap");
         }
 
         return null;

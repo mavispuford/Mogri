@@ -310,9 +310,9 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
                 await ClosePopupAsync(parameters);
             }
         }
-        catch
+        catch (Exception)
         {
-            // TODO - Handle exceptions
+            await _popupService.DisplayAlertAsync("Error", "Failed to process image", "OK");
         }
     }
 }

@@ -1116,7 +1116,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            // TODO - Handle exceptions
+            await _popupService.DisplayAlertAsync("Error", "Failed to load mask data", "OK");
         }
         finally
         {

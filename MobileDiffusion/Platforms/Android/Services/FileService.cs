@@ -1,5 +1,6 @@
 using Android.Content;
 using Android.Provider;
+using Microsoft.Extensions.Logging;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Models;
 using MobileDiffusion.ViewModels;
@@ -13,6 +14,15 @@ public class FileService : IFileService
     private const string extFolderName = "Pictures/MobileDiffusion/";
 
     private const string extFolderNameMasks = "Pictures/MobileDiffusion/Masks/";
+
+    private readonly ILogger<FileService> _logger;
+    private readonly IPopupService _popupService;
+
+    public FileService(ILogger<FileService> logger, IPopupService popupService)
+    {
+        _logger = logger;
+        _popupService = popupService;
+    }
 
     public async Task<Stream?> GetFileStreamUsingExactUriAsync(string uriString)
     {
@@ -29,11 +39,9 @@ public class FileService : IFileService
 
             return contentResolver.OpenInputStream(uri);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // TODO - Handle exception
-
-            Console.WriteLine($"Error getting requested file \"(uri: {uriString})\"");
+            _logger.LogError(ex, $"Error getting requested file (uri: {uriString})");
         }
 
         return null;
@@ -60,11 +68,9 @@ public class FileService : IFileService
 
             return Task.FromResult<Stream?>(reader.BaseStream);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // TODO - Handle exception
-
-            Console.WriteLine($"Error reading requested file from \"{fullPath}\"");
+            _logger.LogError(ex, $"Error reading requested file from {fullPath}");
         }
 
         return Task.FromResult<Stream?>(null);
@@ -115,11 +121,9 @@ public class FileService : IFileService
                 return Task.FromResult(contentResolver.OpenInputStream(contentUri));
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // TODO - Handle exception
-
-            Console.WriteLine($"Error getting requested file \"{fileName}\" \"(uri: {baseUri})\"");
+            _logger.LogError(ex, $"Error getting requested file {fileName} (uri: {baseUri})");
         }
 
         return Task.FromResult<Stream?>(null);
@@ -138,11 +142,9 @@ public class FileService : IFileService
 
             fileStream.Close();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // TODO - Handle exception
-
-            Console.WriteLine($"Error writing requested file \"{fileName}\" to \"{fullPath}\"");
+            _logger.LogError(ex, $"Error writing requested file {fileName} to {fullPath}");
 
             return string.Empty;
         }
@@ -206,11 +208,10 @@ public class FileService : IFileService
 
             return uri?.ToString() ?? string.Empty;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // TODO - Handle exception
-
-            Console.WriteLine($"Error writing requested file \"{fileName}\" to \"{MediaStore.Images.Media.ExternalContentUri}\"");
+            _logger.LogError(ex, $"Error writing requested file {fileName} to {MediaStore.Images.Media.ExternalContentUri}");
+            await _popupService.DisplayAlertAsync("Error", "Failed to save image to gallery.", "OK");
         }
 
         return string.Empty;
@@ -242,9 +243,9 @@ public class FileService : IFileService
             return mask;
 
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            Console.WriteLine($"Unable to read requested file \"{maskFileName}\" from \"{fullPath}\"");
+            _logger.LogError(ex, $"Unable to read requested file {maskFileName} from {fullPath}");
         }
 
         return null;
@@ -277,11 +278,10 @@ public class FileService : IFileService
 
             return fullPath;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // TODO - Handle exception
-
-            Console.WriteLine($"Error writing requested file \"{maskFileName}\" to \"{fullPath}\"");
+            _logger.LogError(ex, $"Error writing requested file {maskFileName} to {fullPath}");
+            await _popupService.DisplayAlertAsync("Error", "Failed to save mask data.", "OK");
         }
 
         return string.Empty;
@@ -344,9 +344,9 @@ public class FileService : IFileService
 
             return Task.FromResult(files);
         }
-        catch
+        catch (Exception ex)
         {
-            // Ignored
+            _logger.LogError(ex, "Error getting file list from internal storage");
             return Task.FromResult(Array.Empty<string>());
         }
     }
@@ -366,8 +366,9 @@ public class FileService : IFileService
         {
             File.Delete(fullPath);
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, $"Error deleting file from internal storage (path: {fullPath})");
             return Task.FromResult(false);
         }
 
