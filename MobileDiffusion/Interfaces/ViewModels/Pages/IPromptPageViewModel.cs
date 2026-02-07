@@ -19,6 +19,8 @@ public interface IPromptPageViewModel : IPageViewModel
 
     ObservableCollection<IPromptStyleViewModel> SelectedPromptStyles { get; set; }
 
+    IRelayCommand ResetPageCommand { get; }
+
     IAsyncRelayCommand ConfirmCommand { get; }
 
     IRelayCommand<IPromptStyleViewModel> RemovePromptStyleCommand { get; }
