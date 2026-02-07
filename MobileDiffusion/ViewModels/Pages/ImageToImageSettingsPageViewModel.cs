@@ -12,6 +12,7 @@ namespace MobileDiffusion.ViewModels;
 public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageToImageSettingsPageViewModel
 {
     private readonly IImageService _imageService;
+    private readonly IPopupService _popupService;
 
     private PromptSettings? _settings;
 
@@ -51,9 +52,11 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
 
     public ImageToImageSettingsPageViewModel(
         IImageService imageService,
+        IPopupService popupService,
         ILoadingService loadingService) : base(loadingService)
     {
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
+        _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
     }
 
     public override void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -247,9 +250,9 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
                 MaskImageSource = ImageSource.FromStream(() => memoryStream);
             }
         }
-        catch
+        catch (Exception)
         {
-            // TODO - Handle exceptions
+            await _popupService.DisplayAlertAsync("Error", "Failed to load image", "OK");
         }
         finally
         {

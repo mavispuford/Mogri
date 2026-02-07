@@ -118,9 +118,9 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
                 await ClosePopupAsync(parameters);
             }
         }
-        catch
+        catch (Exception)
         {
-            // TODO - Handle exceptions
+            await _popupService.DisplayAlertAsync("Error", "Failed to process image", "OK");
         }
     }
 }
