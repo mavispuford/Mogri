@@ -10,85 +10,95 @@
                 Title="Prompt Editor"
                 Shell.TabBarIsVisible="False"
                 x:DataType="pages:IPromptPageViewModel">
-    <Grid RowDefinitions="auto,*,auto,*,auto,*,auto,*"
-          Padding="30">
-        <Label Grid.Row="0"
-               Text="Prompt:"
-               VerticalOptions="Center"
-               FontSize="18" />
 
-        <ScrollView Orientation="Vertical"
-                    Grid.Row="1"
-                    Margin="0,6,0,0"
-                    VerticalScrollBarVisibility="Never">
+    <views:BasePage.Resources>
+        <ResourceDictionary>
+            <Style x:Key="PromptBorderStyle" TargetType="Border">
+                <Setter Property="Padding" Value="10" />
+                <Setter Property="Stroke" Value="{StaticResource IndependenceAccent}" />
+                <Setter Property="StrokeThickness" Value="1" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 10" />
+                <Style.Triggers>
+                    <DataTrigger TargetType="Border"
+                                 Binding="{Binding Content.IsFocused, Source={RelativeSource Self}}"
+                                 Value="True">
+                        <Setter Property="StrokeThickness" Value="2" />
+                        <Setter Property="Stroke" Value="{StaticResource Primary}" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </ResourceDictionary>
+    </views:BasePage.Resources>
 
-            <Editor x:Name="PromptEditor"
-                    Text="{Binding Prompt}"
-                    Placeholder="{Binding PromptPlaceholder}"
-                    AutoSize="TextChanges"
-                    TextColor="{StaticResource IndependenceAccent}"
-                    FontSize="14"/>
+    <views:BasePage.ToolbarItems>
+        <ToolbarItem Command="{Binding ResetPageCommand}"
+                     Text="Reset">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Size="24" Color="{StaticResource White}" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </views:BasePage.ToolbarItems>
 
-        </ScrollView>
+    <ScrollView>
+        <VerticalStackLayout Spacing="15" Padding="30">
+            
+            <!-- Positive Prompt -->
+            <Label Text="Prompt:"
+                   VerticalOptions="Center"
+                   FontSize="18" />
 
+            <Border Style="{StaticResource PromptBorderStyle}">
+                <Editor x:Name="PromptEditor"
+                        Text="{Binding Prompt}"
+                        Placeholder="{Binding PromptPlaceholder}"
+                        AutoSize="TextChanges"
+                        TextColor="{StaticResource IndependenceAccent}"
+                        FontSize="14"/>
+            </Border>
 
-        <Label Grid.Row="2"
-               Text="Negative Prompt:"
-               VerticalOptions="Center"
-               FontSize="18" />
+            <!-- Negative Prompt -->
+            <Label Text="Negative Prompt:"
+                   VerticalOptions="Center"
+                   FontSize="18" />
 
-        <ScrollView Orientation="Vertical"
-                    Grid.Row="3"
-                    Margin="0,6,0,0"
-                    VerticalScrollBarVisibility="Never">
+            <Border Style="{StaticResource PromptBorderStyle}">
+                <Editor x:Name="NegativePromptEditor"
+                        Text="{Binding NegativePrompt}"
+                        TextColor="{StaticResource IndependenceAccent}"
+                        AutoSize="TextChanges"
+                        FontSize="14"/>
+            </Border>
 
-            <Editor x:Name="NegativePromptEditor"
-                    Text="{Binding NegativePrompt}"
-                    TextColor="{StaticResource IndependenceAccent}"
-                    AutoSize="TextChanges"
-                    FontSize="14"/>
-
-        </ScrollView>
-
-        <Grid Grid.Row="4"
-              ColumnDefinitions="*,auto,auto"
-              ColumnSpacing="10">
-            <Label Grid.Column="0"
+            <!-- Styles Header -->
+            <Grid ColumnDefinitions="*,auto,auto"
+                  ColumnSpacing="10">
+                <Label Grid.Column="0"
                        Text="Styles:"
                        VerticalOptions="Center"
                        VerticalTextAlignment="Center"
                        FontSize="18" />
 
-            <ImageButton Grid.Column="1"
-                         Command="{Binding ShowPromptStyleSelectionPageCommand}"
-                         VerticalOptions="Center"
-                         ToolTipProperties.Text="Select a style to add">
-                <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe03b;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
-                </ImageButton.Source>
-            </ImageButton>
+                <ImageButton Grid.Column="1"
+                             Command="{Binding ShowPromptStyleSelectionPageCommand}"
+                             VerticalOptions="Center"
+                             ToolTipProperties.Text="Select a style to add">
+                    <ImageButton.Source>
+                        <FontImageSource Glyph="&#xe03b;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                    </ImageButton.Source>
+                </ImageButton>
 
-            <!--<Button Grid.Column="2"
-                    Text="Create"
-                    Command="{Binding ShowPromptStyleCreationPromptCommand}"
-                    VerticalOptions="Center"
-                    ToolTipProperties.Text="Create a new style using your prompt(s)"/>-->
+                <ImageButton Grid.Column="2"
+                             Command="{Binding ShowPromptStyleExtractionPromptCommand}"
+                             VerticalOptions="Center"
+                             ToolTipProperties.Text="Extract the prompt(s) from the selected styles">
+                    <ImageButton.Source>
+                        <FontImageSource Glyph="&#xe5d8;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                    </ImageButton.Source>
+                </ImageButton>
+            </Grid>
 
-            <ImageButton Grid.Column="2"
-                         Command="{Binding ShowPromptStyleExtractionPromptCommand}"
-                         VerticalOptions="Center"
-                         ToolTipProperties.Text="Extract the prompt(s) from the selected styles">
-                <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe5d8;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
-                </ImageButton.Source>
-            </ImageButton>
-        </Grid>
-
-        <ScrollView Orientation="Vertical"
-                    Grid.Row="5"
-                    Margin="0,6"
-                    VerticalScrollBarVisibility="Never">
-
+            <!-- Styles List -->
             <FlexLayout Wrap="Wrap"
                         JustifyContent="Center"
                         AlignContent="Start"
@@ -100,54 +110,49 @@
                             Text="{Binding Name}"
                             TooltipText="Remove Style"
                             Command="{Binding RemovePromptStyleCommand, Source={RelativeSource AncestorType={x:Type pages:IPromptPageViewModel}}}"
-                            CommandParameter="{Binding .}" />
+                            CommandParameter="{Binding .}" 
+                            Margin="0,0,6,6"/>
                     </DataTemplate>
                 </BindableLayout.ItemTemplate>
             </FlexLayout>
 
-        </ScrollView>
+            <!-- LoRAs Header -->
+            <Grid ColumnDefinitions="*,auto"
+                  ColumnSpacing="10">
+                <Label Grid.Column="0"
+                       Text="LoRAs:"
+                       VerticalOptions="Center"
+                       VerticalTextAlignment="Center"
+                       FontSize="18" />
 
-        <Grid Grid.Row="6"
-              ColumnDefinitions="*,auto"
-              ColumnSpacing="10">
-            <Label Grid.Column="0"
-               Text="LoRAs:"
-               VerticalOptions="Center"
-               VerticalTextAlignment="Center"
-               FontSize="18" />
+                <ImageButton Grid.Column="1"
+                             Command="{Binding ShowLoraSelectionPageCommand}"
+                             VerticalOptions="Center"
+                             ToolTipProperties.Text="Select a LoRA to add">
+                    <ImageButton.Source>
+                        <FontImageSource Glyph="&#xe03b;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                    </ImageButton.Source>
+                </ImageButton>
+            </Grid>
 
-            <ImageButton Grid.Column="1"
-                         Command="{Binding ShowLoraSelectionPageCommand}"
-                         VerticalOptions="Center"
-                         ToolTipProperties.Text="Select a LoRA to add">
-                <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe03b;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
-                </ImageButton.Source>
-            </ImageButton>
-        </Grid>
-
-        <ScrollView Orientation="Vertical"
-                    Grid.Row="7"
-                    Margin="0,6"
-                    VerticalScrollBarVisibility="Never">
-
+            <!-- LoRAs List -->
             <FlexLayout Wrap="Wrap"
-                JustifyContent="Center"
-                AlignContent="Start"
-                AlignItems="Start"
-                BindableLayout.ItemsSource="{Binding SelectedLoras}">
+                    JustifyContent="Center"
+                    AlignContent="Start"
+                    AlignItems="Start"
+                    BindableLayout.ItemsSource="{Binding SelectedLoras}">
                 <BindableLayout.ItemTemplate>
                     <DataTemplate x:DataType="viewModels:ILoraViewModel">
                         <controls:PillControl
                             Text="{Binding Name}"
                             TooltipText="Remove Lora"
                             Command="{Binding RemoveLoraCommand, Source={RelativeSource AncestorType={x:Type pages:IPromptPageViewModel}}}"
-                            CommandParameter="{Binding .}" />
+                            CommandParameter="{Binding .}" 
+                            Margin="0,0,6,6"/>
                     </DataTemplate>
                 </BindableLayout.ItemTemplate>
             </FlexLayout>
 
-        </ScrollView>
-
-    </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
 </views:BasePage>

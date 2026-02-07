@@ -43,6 +43,15 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
     }
 
+    [RelayCommand]
+    private void ResetPage()
+    {
+        Prompt = string.Empty;
+        NegativePrompt = string.Empty;
+        SelectedPromptStyles.Clear();
+        SelectedLoras.Clear();
+    }
+
     public override void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (query.TryGetValue(NavigationParams.PromptSettings, out var promptSettings) &&
@@ -256,7 +265,7 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
     {
         if (_settings == null) return;
 
-        Prompt = _settings.Prompt;
+        Prompt = _settings.Prompt != PromptPlaceholder ? _settings.Prompt : string.Empty;
         NegativePrompt = _settings.NegativePrompt;
     }
 }
