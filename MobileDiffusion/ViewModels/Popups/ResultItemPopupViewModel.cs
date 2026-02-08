@@ -10,6 +10,7 @@ namespace MobileDiffusion.ViewModels;
 public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemPopupViewModel
 {
     private readonly IFileService _fileService;
+    private IList<IResultItemViewModel> _resultItems;
 
     [ObservableProperty]
     public partial IResultItemViewModel ResultItem { get; set; }
@@ -24,6 +25,12 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
     public override async void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         base.ApplyQueryAttributes(query);
+
+        if (query.TryGetValue(NavigationParams.ImageResultItems, out var imageResultItemsParam) &&
+            imageResultItemsParam is IList<IResultItemViewModel> imageResultItems)
+        {
+            _resultItems = imageResultItems;
+        }
 
         if (query.TryGetValue(NavigationParams.ImageResultItem, out var imageResultParam) &&
             imageResultParam is IResultItemViewModel imageResultItem)
@@ -121,6 +128,28 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
         catch (Exception)
         {
             await _popupService.DisplayAlertAsync("Error", "Failed to process image", "OK");
+        }
+    }
+
+    [RelayCommand]
+    private async Task SwipeLeft()
+    {
+        if (_resultItems == null || ResultItem == null) return;
+        var index = _resultItems.IndexOf(ResultItem);
+        if (index < _resultItems.Count - 1)
+        {
+            ResultItem = _resultItems[index + 1];
+        }
+    }
+
+    [RelayCommand]
+    private async Task SwipeRight()
+    {
+        if (_resultItems == null || ResultItem == null) return;
+        var index = _resultItems.IndexOf(ResultItem);
+        if (index > 0)
+        {
+            ResultItem = _resultItems[index - 1];
         }
     }
 }

@@ -13,6 +13,8 @@ public interface IResultItemViewModel : IBaseViewModel
 
     ApiResponse ApiResponse { get; set; }
 
+    IList<IResultItemViewModel> ParentCollection { get; set; }
+
     IAsyncRelayCommand TappedCommand { get; }
 
     IRelayCommand ApplyQueryParamsFromResultItemCommand { get; set; }

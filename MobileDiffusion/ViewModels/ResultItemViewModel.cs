@@ -20,6 +20,9 @@ public partial class ResultItemViewModel : BaseViewModel, IResultItemViewModel
     public partial ApiResponse ApiResponse { get; set; }
 
     [ObservableProperty]
+    public partial IList<IResultItemViewModel> ParentCollection { get; set; }
+
+    [ObservableProperty]
     public partial string InternalUri { get; set; }
 
     [ObservableProperty]
@@ -46,7 +49,8 @@ public partial class ResultItemViewModel : BaseViewModel, IResultItemViewModel
 
         var parameters = new Dictionary<string, object>
         {
-            { NavigationParams.ImageResultItem, this }
+            { NavigationParams.ImageResultItem, this },
+            { NavigationParams.ImageResultItems, ParentCollection }
         };
 
         var result = (await _popupService.ShowPopupForResultAsync("ResultItemPopup", parameters)) as Dictionary<string, object>;

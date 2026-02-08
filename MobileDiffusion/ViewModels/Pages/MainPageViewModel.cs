@@ -173,6 +173,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
                 if (resultItem == null) continue;
 
+                resultItem.ParentCollection = Results;
                 resultItem.ApplyQueryParamsFromResultItemCommand = new RelayCommand<IDictionary<string, object>>(ApplyQueryAttributes);
 
                 Results.Add(resultItem);

@@ -15,4 +15,8 @@ public interface IResultItemPopupViewModel : IPopupBaseViewModel
     IAsyncRelayCommand ImageToImageCommand { get; }
 
     IAsyncRelayCommand SendToCanvasCommand { get; }
+
+    IAsyncRelayCommand SwipeLeftCommand { get; }
+
+    IAsyncRelayCommand SwipeRightCommand { get; }
 }
