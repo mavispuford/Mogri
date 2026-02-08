@@ -281,9 +281,8 @@ public class GestureContainer : ContentView
                 if (currentScale > 1)
                 {
                     Content.TranslationY += totalYDelta;
+                    clampTranslation();
                 }
-
-                clampTranslation();
 
                 prevTotalX = e.TotalX;
                 prevTotalY = e.TotalY;

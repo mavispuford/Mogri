@@ -12,6 +12,7 @@ public static class NavigationParams
     public const string HistoryItems = nameof(HistoryItems);
     public const string ImageHeight = nameof(ImageHeight);
     public const string ImageResultItem = nameof(ImageResultItem);
+    public const string ImageResultItems = nameof(ImageResultItems);
     public const string ImageWidth = nameof(ImageWidth);
     public const string InitImgString = nameof(InitImgString);
     public const string InitImgThumbnail = nameof(InitImgThumbnail);
