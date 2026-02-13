@@ -7,8 +7,6 @@ using MobileDiffusion.Models;
 using System.Collections.ObjectModel;
 using SkiaSharp.Views.Maui.Controls;
 using CommunityToolkit.Maui.Alerts;
-using Newtonsoft.Json;
-using MobileDiffusion.Json;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -235,45 +233,10 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                     }
                     else if (response.ResponseObject is GenerationResponse generationResponse)
                     {
-                        IDictionary<string, object>? autoResponseInfo = null;
-
-                        try
+                        foreach (var image in generationResponse.Images ?? Enumerable.Empty<string>())
                         {
-                            autoResponseInfo = JsonConvert.DeserializeObject<IDictionary<string, object>?>(generationResponse.Info ?? string.Empty, new JsonSerializerSettings
-                            {
-                                ContractResolver = CustomContractResolver.Instance
-                            });
-                        }
-                        catch
-                        {
-                            // Not JSON - treat Info as a raw seed string
-                        }
-
-                        if (autoResponseInfo != null && autoResponseInfo.ContainsKey("all_seeds"))
-                        {
-                            var seeds = autoResponseInfo["all_seeds"] as List<long>;
-
-                            foreach (var image in generationResponse.Images ?? Enumerable.Empty<string>())
-                            {
-                                var seedString = seeds?.ElementAtOrDefault(imageNumber) ?? settings.Seed + imageNumber;
-                                var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{seedString}-{DateTime.Now.Ticks}";
-
-                                var result = Results.FirstOrDefault(r => r.ApiResponse == null);
-
-                                if (result != null)
-                                {
-                                    result.ApiResponse = response;
-                                    result.Settings = settings.Clone();
-                                    result.Settings.Seed = seedString;
-
-                                    await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            var seed = generationResponse.Info;
-                            var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{seed}-{DateTime.Now.Ticks}";
+                            var currentSeed = generationResponse.Seeds?.ElementAtOrDefault(imageNumber) ?? settings.Seed + imageNumber;
+                            var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{currentSeed}-{DateTime.Now.Ticks}";
 
                             var result = Results.FirstOrDefault(r => r.ApiResponse == null);
 
@@ -281,6 +244,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                             {
                                 result.ApiResponse = response;
                                 result.Settings = settings.Clone();
+                                result.Settings.Seed = currentSeed;
 
                                 await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
                             }

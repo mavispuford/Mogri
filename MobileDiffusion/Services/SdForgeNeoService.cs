@@ -9,6 +9,8 @@ using MobileDiffusion.Helpers;
 using Microsoft.Kiota.Http.HttpClientLibrary;
 using Microsoft.Kiota.Abstractions.Authentication;
 using Microsoft.Kiota.Abstractions.Serialization;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 
 namespace MobileDiffusion.Services
@@ -219,6 +221,7 @@ namespace MobileDiffusion.Services
                             Images = txt2ImgResponse?.Images ?? [],
                             Info = txt2ImgResponse?.Info ?? string.Empty
                         };
+                        PopulateSeeds(generationResponse);
 
                         apiResponse = new ApiResponse
                         {
@@ -239,6 +242,7 @@ namespace MobileDiffusion.Services
                         Images = txt2ImgResponse?.Images ?? [],
                         Info = txt2ImgResponse?.Info ?? string.Empty
                     };
+                    PopulateSeeds(generationResponse);
 
                     apiResponse = new ApiResponse
                     {
@@ -314,6 +318,7 @@ namespace MobileDiffusion.Services
                             Images = img2ImgResponse?.Images ?? [],
                             Info = img2ImgResponse?.Info ?? string.Empty
                         };
+                        PopulateSeeds(generationResponse);
 
                         apiResponse = new ApiResponse
                         {
@@ -334,6 +339,7 @@ namespace MobileDiffusion.Services
                         Images = img2ImgResponse?.Images ?? [],
                         Info = img2ImgResponse?.Info ?? string.Empty
                     };
+                    PopulateSeeds(generationResponse);
 
                     apiResponse = new ApiResponse
                     {
@@ -1005,6 +1011,48 @@ namespace MobileDiffusion.Services
             catch (Exception)
             {
                 return false;
+            }
+        }
+
+        private void PopulateSeeds(GenerationResponse response)
+        {
+            if (string.IsNullOrEmpty(response.Info))
+            {
+                return;
+            }
+
+            try
+            {
+                var infoObject = JsonConvert.DeserializeObject<JObject>(response.Info);
+
+                if (infoObject != null)
+                {
+                    if (infoObject.ContainsKey("all_seeds"))
+                    {
+                        response.Seeds = infoObject["all_seeds"]?.ToObject<List<long>>();
+                        return;
+                    }
+
+                    if (infoObject.ContainsKey("seed"))
+                    {
+                        var seedToken = infoObject["seed"];
+                        if (seedToken != null)
+                        {
+                            var seed = seedToken.ToObject<long>();
+                            response.Seeds = new List<long> { seed };
+                            return;
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // Ignore json errors
+            }
+
+            if (long.TryParse(response.Info, out var parsedSeed))
+            {
+                response.Seeds = new List<long> { parsedSeed };
             }
         }
 
