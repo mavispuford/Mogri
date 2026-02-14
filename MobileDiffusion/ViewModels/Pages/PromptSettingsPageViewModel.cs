@@ -296,10 +296,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             if (!modelChangeResult)
             {
                 // Keep currently selected model
-                if (currentModel is ModelViewModel modelViewModel)
-                {
-                    _settings.Model = modelViewModel;
-                }
+                _settings.Model = currentModel;
             }
 
             await _stableDiffusionService.SaveSettingsAsync(_settings);
@@ -516,7 +513,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
 
         if (Model != null)
         {
-            _settings.Model = (ModelViewModel?)Model;
+            _settings.Model = Model;
         }
 
         _settings.Sampler = Sampler ?? "Euler a";

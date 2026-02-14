@@ -15,33 +15,10 @@ using System.Text.RegularExpressions;
 
 namespace MobileDiffusion.Services
 {
-    public class SdForgeNeoService : IImageGenerationService
+    public class SdForgeNeoService : IImageGenerationBackend
     {
-        private static class PngInfoProperties
-        {
-            public const string Steps = "steps";
-            public const string Sampler = "sampler";
-            public const string CfgScale = "cfg scale";
-            public const string Seed = "seed";
-            public const string Size = "size";
-            public const string ModelHash = "model hash";
-            public const string Model = "model";
-            public const string LoraHashes = "lora hashes";
-            public const string DenoisingStrength = "denoising strength";
-            public const string Eta = "eta";
-            public const string Version = "version";
-            public const string HiresUpscaler = "hires upscaler";
-            public const string HiresUpscale = "hires upscale";
-            public const string HiresSteps = "hires steps";
-            public const string Scheduler = "scheduler";
-            public const string ScheduleType = "schedule type";
-            public const string DistilledCfgScale = "distilled cfg scale";
-            public const string DistilledCfgScaleKey = "distilled_cfg_scale";
-            public const string Shift = "shift";
-        }
-
-        private Regex _loraRegex = new Regex("<lora:([^:]*):([^>]*)>", RegexOptions.Compiled);
-
+        public string Name => "SD Forge Neo";
+        
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IServiceProvider _serviceProvider;
         private SdForgeNeoClient? _client;
@@ -66,7 +43,7 @@ namespace MobileDiffusion.Services
             _serviceProvider = serviceProvider;
         }
 
-        public async Task InitializeAsync()
+        public async Task InitializeAsync(CancellationToken cancellationToken = default)
         {
             _baseUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
 
@@ -111,27 +88,39 @@ namespace MobileDiffusion.Services
             {
                 _initializeTask = Task.Run(async () =>
                 {
-                    await RefreshResourcesAsync();
-                });
+                    await RefreshResourcesAsync(cancellationToken);
+                }, cancellationToken);
             }
 
-            await _initializeTask;
-            _initializeTask = null;
+            try 
+            {
+                await _initializeTask;
+            }
+            catch (OperationCanceledException)
+            {
+                // Ignore
+            }
+            finally
+            {
+                _initializeTask = null;
+            }
 
             Initialized = true;
         }
 
-        public async Task<bool> CheckServerAsync()
+        public async Task<bool> CheckServerAsync(CancellationToken cancellationToken = default)
         {
             if (_client == null)
             {
-                await InitializeAsync();
+                await InitializeAsync(cancellationToken);
                 if (_client == null) return false;
             }
 
             try
             {
-                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                cts.CancelAfter(TimeSpan.FromSeconds(5));
+                
                 await _client.Sdapi.V1.OptionsPath.GetAsync(cancellationToken: cts.Token);
                 return true;
             }
@@ -141,7 +130,7 @@ namespace MobileDiffusion.Services
             }
         }
 
-        public async IAsyncEnumerable<ApiResponse> SubmitImageRequestAsync(PromptSettings settings)
+        public async IAsyncEnumerable<ApiResponse> SubmitImageRequestAsync(PromptSettings settings, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             if (settings is null)
             {
@@ -151,7 +140,7 @@ namespace MobileDiffusion.Services
             if (string.IsNullOrEmpty(settings.InitImage))
             {
                 // No image - Just do txt2img
-                await foreach (ApiResponse apiResponse in sendTextToImageRequest(settings))
+                await foreach (ApiResponse apiResponse in sendTextToImageRequest(settings, cancellationToken))
                 {
                     yield return apiResponse;
                 }
@@ -159,14 +148,14 @@ namespace MobileDiffusion.Services
             else
             {
                 // Image included - Do img2img
-                await foreach (ApiResponse apiResponse in sendImageToImageRequest(settings))
+                await foreach (ApiResponse apiResponse in sendImageToImageRequest(settings, cancellationToken))
                 {
                     yield return apiResponse;
                 }
             }
         }
 
-        private async IAsyncEnumerable<ApiResponse> sendTextToImageRequest(PromptSettings settings)
+        private async IAsyncEnumerable<ApiResponse> sendTextToImageRequest(PromptSettings settings, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
         {
             var request = txt2ImageRequestFromSettings(settings);
 
@@ -175,8 +164,8 @@ namespace MobileDiffusion.Services
                 _mainRequestCancellationSource.Cancel();
             }
 
-            _mainRequestCancellationSource = new CancellationTokenSource();
-            var progressCancellationTokenSource = new CancellationTokenSource();
+            _mainRequestCancellationSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            var progressCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             var progressToken = progressCancellationTokenSource.Token;
 
             TextToImageResponse? txt2ImgResponse = null;
@@ -193,7 +182,7 @@ namespace MobileDiffusion.Services
                     _mainRequestCancellationSource = null;
                     progressCancellationTokenSource.Cancel();
                 }
-            });
+            }, cancellationToken);
 
             ApiResponse? apiResponse = null;
             var skipCurrentImage = false;
@@ -201,6 +190,11 @@ namespace MobileDiffusion.Services
 
             while (!finished)
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    yield break;
+                }
+
                 try
                 {
                     apiResponse = await getCurrentProgress(progressToken, skipCurrentImage);
@@ -263,7 +257,7 @@ namespace MobileDiffusion.Services
             }
         }
 
-        private async IAsyncEnumerable<ApiResponse> sendImageToImageRequest(PromptSettings settings)
+        private async IAsyncEnumerable<ApiResponse> sendImageToImageRequest(PromptSettings settings, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
         {
             var request = image2ImageRequestFromSettings(settings);
 
@@ -272,8 +266,8 @@ namespace MobileDiffusion.Services
                 _mainRequestCancellationSource.Cancel();
             }
 
-            _mainRequestCancellationSource = new CancellationTokenSource();
-            var progressCancellationTokenSource = new CancellationTokenSource();
+            _mainRequestCancellationSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            var progressCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             var progressToken = progressCancellationTokenSource.Token;
 
             ImageToImageResponse? img2ImgResponse = null;
@@ -290,7 +284,7 @@ namespace MobileDiffusion.Services
                     _mainRequestCancellationSource = null;
                     progressCancellationTokenSource.Cancel();
                 }
-            });
+            }, cancellationToken);
 
             ApiResponse? apiResponse = null;
             var skipCurrentImage = true;
@@ -298,6 +292,11 @@ namespace MobileDiffusion.Services
 
             while (!finished)
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    yield break;
+                }
+
                 try
                 {
                     apiResponse = await getCurrentProgress(progressToken, skipCurrentImage);
@@ -530,8 +529,24 @@ namespace MobileDiffusion.Services
             return request;
         }
 
-        public Task<byte[]> GetImageBytesAsync(string url) => throw new NotImplementedException();
-        public async Task<PromptSettings?> GetImageInfoAsync(string base64EncodedImage)
+        public Task<byte[]> GetImageBytesAsync(string url, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrEmpty(url)) return Task.FromResult(Array.Empty<byte>());
+
+            return Task.Run(async () =>
+            {
+                try
+                {
+                    using var client = _httpClientFactory.CreateClient();
+                    return await client.GetByteArrayAsync(url, cancellationToken);
+                }
+                catch
+                {
+                    return Array.Empty<byte>();
+                }
+            }, cancellationToken);
+        }
+        public async Task<PromptSettings?> GetImageInfoAsync(string base64EncodedImage, CancellationToken cancellationToken = default)
         {
             if (_client == null || string.IsNullOrWhiteSpace(base64EncodedImage)) return null;
 
@@ -540,162 +555,27 @@ namespace MobileDiffusion.Services
                 Image = base64EncodedImage
             };
 
-            var imageInfoResult = await _client.Sdapi.V1.PngInfo.PostAsync(request);
+            var imageInfoResult = await _client.Sdapi.V1.PngInfo.PostAsync(request, cancellationToken: cancellationToken);
 
             if (imageInfoResult?.Info == null || string.IsNullOrEmpty(imageInfoResult.Info))
             {
                 return null;
             }
 
-            var newLineSplit = imageInfoResult.Info.Split('\n');
+            var settings = ForgeMetadataParser.Parse(
+                imageInfoResult.Info,
+                _models,
+                (model) => convertModelToViewModel(model));
 
-            if (newLineSplit.Length <= 1)
+            if (settings != null && settings.Model == null)
             {
-                return null;
-            }
-
-            var commaSplit = newLineSplit.LastOrDefault()?.Split(',') ?? [];
-
-            var properties = new Dictionary<string, string>();
-
-            foreach (var item in commaSplit)
-            {
-                var itemSplit = item.Trim().Split(": ");
-
-                if (itemSplit.Length == 2)
-                {
-                    properties.TryAdd(itemSplit.First(), itemSplit.Last());
-                }
-            }
-
-            var prompt = newLineSplit[0];
-
-            var loraMatches = _loraRegex.Matches(prompt);
-            var loras = new List<LoraViewModel>();
-
-            foreach (Match match in loraMatches)
-            {
-                var name = match.Groups[1].Value;
-
-                if (loras.Any(l => l.Name == name))
-                {
-                    continue;
-                }
-
-                if (float.TryParse(match.Groups[2].Value, out var strength))
-                {
-                    var lora = new LoraViewModel
-                    {
-                        Name = name,
-                        Strength = strength,
-                    };
-
-                    loras.Add(lora);
-                }
-
-                prompt = prompt.Replace(match.Groups[0].Value, string.Empty);
-            }
-
-            var negativePrompt = newLineSplit.Length > 2 ? newLineSplit[1].Trim().Split(": ").Last() : string.Empty;
-
-            var settings = new PromptSettings
-            {
-                Prompt = prompt,
-                NegativePrompt = negativePrompt,
-                Loras = loras
-            };
-
-            foreach (var property in properties)
-            {
-                try
-                {
-                    switch (property.Key.ToLower())
-                    {
-                        case PngInfoProperties.Steps:
-                            if (int.TryParse(property.Value, out var steps)) settings.Steps = steps;
-                            break;
-                        case PngInfoProperties.Sampler:
-                            settings.Sampler = property.Value;
-                            break;
-                        case PngInfoProperties.CfgScale:
-                            if (double.TryParse(property.Value, out var cfg)) settings.GuidanceScale = cfg;
-                            break;
-                        case PngInfoProperties.Seed:
-                            if (long.TryParse(property.Value, out var seed)) settings.Seed = seed;
-                            break;
-                        case PngInfoProperties.Size:
-                            var size = property.Value.Split('x');
-
-                            if (size.Length != 2)
-                            {
-                                break;
-                            }
-
-                            if (double.TryParse(size[0], out var width)) settings.Width = width;
-                            if (double.TryParse(size[1], out var height)) settings.Height = height;
-                            break;
-                        case PngInfoProperties.DenoisingStrength:
-                            if (double.TryParse(property.Value, out var denoise)) settings.DenoisingStrength = denoise;
-                            break;
-                        case PngInfoProperties.HiresUpscaler:
-                            settings.Upscaler = property.Value;
-                            settings.EnableUpscaling = !string.IsNullOrEmpty(property.Value);
-                            break;
-                        case PngInfoProperties.HiresUpscale:
-                            if (int.TryParse(property.Value, out var upscale)) settings.UpscaleLevel = upscale;
-                            break;
-                        case PngInfoProperties.HiresSteps:
-                            if (int.TryParse(property.Value, out var hrSteps)) settings.UpscaleSteps = hrSteps;
-                            break;
-                        case PngInfoProperties.Scheduler:
-                        case PngInfoProperties.ScheduleType:
-                            settings.Scheduler = property.Value.ToLower();
-                            settings.ModelType = Enums.ModelType.ZImage;
-                            break;
-                        case PngInfoProperties.DistilledCfgScale:
-                        case PngInfoProperties.DistilledCfgScaleKey:
-                        case PngInfoProperties.Shift:
-                            if (double.TryParse(property.Value, out var distCfg)) settings.DistilledCfgScale = distCfg;
-                            break;
-                        case PngInfoProperties.Model:
-                            if (settings.Model == null && _models != null)
-                            {
-                                var matchingModel = _models.FirstOrDefault(m => m.ModelName == property.Value);
-                                if (matchingModel != null)
-                                {
-                                    settings.Model = (ModelViewModel?)convertModelToViewModel(matchingModel);
-                                }
-                            }
-                            break;
-                        case PngInfoProperties.ModelHash:
-                            if (settings.Model == null && _models != null)
-                            {
-                                var matchingModel = _models.FirstOrDefault(m => m.Hash == property.Value);
-                                if (matchingModel != null)
-                                {
-                                    settings.Model = (ModelViewModel?)convertModelToViewModel(matchingModel);
-                                }
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                catch
-                {
-                    // Skip to the next property
-                }
-            }
-
-            if (settings.Model == null)
-            {
-                settings.Model = (ModelViewModel?)await GetSelectedModelAsync();
+                settings.Model = await GetSelectedModelAsync(cancellationToken);
             }
 
             return settings;
         }
 
-        public async Task RefreshResourcesAsync()
+        public async Task RefreshResourcesAsync(CancellationToken cancellationToken = default)
         {
             if (_client == null || _baseUrl == null) return;
 
@@ -708,7 +588,8 @@ namespace MobileDiffusion.Services
                 probeClient.Timeout = TimeSpan.FromSeconds(4); // Hard cap on the probe
                 try
                 {
-                    using var probeCts = new CancellationTokenSource(TimeSpan.FromSeconds(4));
+                    using var probeCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                    probeCts.CancelAfter(TimeSpan.FromSeconds(4));
                     // Just fetch headers to be fast
                     using var response = await probeClient.GetAsync("sdapi/v1/options", HttpCompletionOption.ResponseHeadersRead, probeCts.Token);
                     response.EnsureSuccessStatusCode();
@@ -721,22 +602,23 @@ namespace MobileDiffusion.Services
             }
 
             // 2. If connected, proceed with parallel resource fetching.
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            cts.CancelAfter(TimeSpan.FromSeconds(10));
 
             var tasks = new List<Task>
             {
                 // Options is strictly required and fetched first/parallel
-                Task.Run(async () => _options = await _client.Sdapi.V1.OptionsPath.GetAsync(cancellationToken: cts.Token)),
-                Task.Run(async () => _samplers = await _client.Sdapi.V1.Samplers.GetAsync(cancellationToken: cts.Token)),
-                Task.Run(async () => _schedulers = await _client.Sdapi.V1.Schedulers.GetAsync(cancellationToken: cts.Token)),
-                Task.Run(async () => _promptStyles = await _client.Sdapi.V1.PromptStyles.GetAsync(cancellationToken: cts.Token)),
-                Task.Run(async () => _models = await _client.Sdapi.V1.SdModels.GetAsync(cancellationToken: cts.Token)),
+                Task.Run(async () => _options = await _client.Sdapi.V1.OptionsPath.GetAsync(cancellationToken: cts.Token), cancellationToken),
+                Task.Run(async () => _samplers = await _client.Sdapi.V1.Samplers.GetAsync(cancellationToken: cts.Token), cancellationToken),
+                Task.Run(async () => _schedulers = await _client.Sdapi.V1.Schedulers.GetAsync(cancellationToken: cts.Token), cancellationToken),
+                Task.Run(async () => _promptStyles = await _client.Sdapi.V1.PromptStyles.GetAsync(cancellationToken: cts.Token), cancellationToken),
+                Task.Run(async () => _models = await _client.Sdapi.V1.SdModels.GetAsync(cancellationToken: cts.Token), cancellationToken),
                 Task.Run(async () =>
                 {
                     var lorasNode = await _client.Sdapi.V1.Loras.GetAsync(cancellationToken: cts.Token);
                     _loras = ParseLoras(lorasNode);
-                }),
-                Task.Run(async () => _upscalers = await _client.Sdapi.V1.Upscalers.GetAsync(cancellationToken: cts.Token))
+                }, cancellationToken),
+                Task.Run(async () => _upscalers = await _client.Sdapi.V1.Upscalers.GetAsync(cancellationToken: cts.Token), cancellationToken)
             };
 
             try
@@ -797,7 +679,7 @@ namespace MobileDiffusion.Services
             return loras;
         }
 
-        public Task<Dictionary<string, string>> GetSamplersAsync()
+        public Task<Dictionary<string, string>> GetSamplersAsync(CancellationToken cancellationToken = default)
         {
             var result = new Dictionary<string, string>();
 
@@ -818,7 +700,7 @@ namespace MobileDiffusion.Services
             return Task.FromResult(result);
         }
 
-        public Task<List<string>> GetSchedulersAsync()
+        public Task<List<string>> GetSchedulersAsync(CancellationToken cancellationToken = default)
         {
             var result = new List<string>();
 
@@ -838,7 +720,7 @@ namespace MobileDiffusion.Services
             return Task.FromResult(result);
         }
 
-        public Task<List<IPromptStyleViewModel>> GetPromptStylesAsync()
+        public Task<List<IPromptStyleViewModel>> GetPromptStylesAsync(CancellationToken cancellationToken = default)
         {
             var result = new List<IPromptStyleViewModel>();
 
@@ -860,7 +742,7 @@ namespace MobileDiffusion.Services
             return Task.FromResult(result);
         }
 
-        public Task<List<IModelViewModel>> GetModelsAsync()
+        public Task<List<IModelViewModel>> GetModelsAsync(CancellationToken cancellationToken = default)
         {
             var result = new List<IModelViewModel>();
 
@@ -880,7 +762,7 @@ namespace MobileDiffusion.Services
             return Task.FromResult(result);
         }
 
-        public Task<List<ILoraViewModel>> GetLorasAsync()
+        public Task<List<ILoraViewModel>> GetLorasAsync(CancellationToken cancellationToken = default)
         {
             var result = new List<ILoraViewModel>();
 
@@ -901,7 +783,7 @@ namespace MobileDiffusion.Services
             return Task.FromResult(result);
         }
 
-        public Task<List<IUpscalerViewModel>> GetUpscalersAsync()
+        public Task<List<IUpscalerViewModel>> GetUpscalersAsync(CancellationToken cancellationToken = default)
         {
             var result = new List<IUpscalerViewModel>();
 
@@ -923,7 +805,7 @@ namespace MobileDiffusion.Services
             return Task.FromResult(result);
         }
 
-        public Task<IModelViewModel?> GetSelectedModelAsync()
+        public Task<IModelViewModel?> GetSelectedModelAsync(CancellationToken cancellationToken = default)
         {
             var result = _serviceProvider.GetService<IModelViewModel>();
 
@@ -941,11 +823,11 @@ namespace MobileDiffusion.Services
             return Task.FromResult<IModelViewModel?>(result);
         }
 
-        public async Task SaveSettingsAsync(PromptSettings settings)
+        public async Task SaveSettingsAsync(PromptSettings settings, CancellationToken cancellationToken = default)
         {
             if (_client == null || settings == null) return;
 
-            _options = await _client.Sdapi.V1.OptionsPath.GetAsync();
+            _options = await _client.Sdapi.V1.OptionsPath.GetAsync(cancellationToken: cancellationToken);
             if (_options == null) return;
 
             var requestBody = new OptionsPostRequestBody();
@@ -995,17 +877,17 @@ namespace MobileDiffusion.Services
                 return;
             }
 
-            await _client.Sdapi.V1.OptionsPath.PostAsync(requestBody);
+            await _client.Sdapi.V1.OptionsPath.PostAsync(requestBody, cancellationToken: cancellationToken);
 
-            await RefreshResourcesAsync();
+            await RefreshResourcesAsync(cancellationToken);
         }
 
-        public async Task<bool> CancelAsync()
+        public async Task<bool> CancelAsync(CancellationToken cancellationToken = default)
         {
             if (_client == null) return false;
             try
             {
-                await _client.Sdapi.V1.Interrupt.PostAsync();
+                await _client.Sdapi.V1.Interrupt.PostAsync(cancellationToken: cancellationToken);
                 return true;
             }
             catch (Exception)

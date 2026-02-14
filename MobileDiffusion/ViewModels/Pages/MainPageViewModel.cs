@@ -23,6 +23,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     private string? _resizedInitImage;
     private string? _resizedMaskImage;
     private bool _initImageNeedsResize = true;
+    private bool _forceReinitialize;
     private float _targetProgress = 0;
 
     [ObservableProperty]
@@ -68,11 +69,13 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
     private async Task<bool> initializeStableDiffusionService()
     {
-        if (_stableDiffusionService.Initialized)
+        if (_stableDiffusionService.Initialized && !_forceReinitialize)
         {
             ServerConnected = true;
             return true;
         }
+
+        _forceReinitialize = false;
 
         try
         {
@@ -103,7 +106,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                 _settings.Sampler = profile.DefaultSampler;
             }
 
-            _settings.Model = (ModelViewModel?)await _stableDiffusionService.GetSelectedModelAsync();
+            _settings.Model = await _stableDiffusionService.GetSelectedModelAsync();
         }
         catch
         {
@@ -446,6 +449,11 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     public override async void ApplyQueryAttributes(IDictionary<string, object>? query)
     {
         if (query == null) return;
+
+        if (query.ContainsKey(NavigationParams.ForceReinitialize))
+        {
+            _forceReinitialize = true;
+        }
 
         if (query.TryGetValue(NavigationParams.PromptSettings, out var promptSettings) &&
             promptSettings is PromptSettings settings)

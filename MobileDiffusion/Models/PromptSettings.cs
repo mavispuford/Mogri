@@ -1,6 +1,5 @@
 using MobileDiffusion.Enums;
-using MobileDiffusion.ViewModels;
-using Newtonsoft.Json;
+using MobileDiffusion.Interfaces.ViewModels;
 
 namespace MobileDiffusion.Models;
 
@@ -26,7 +25,7 @@ public class PromptSettings
     public string Prompt { get; set; } = string.Empty;
     public string NegativePrompt { get; set; } = string.Empty;
     public double DenoisingStrength { get; set; } = .5;
-    public ModelViewModel? Model { get; set; }
+    public IModelViewModel? Model { get; set; }
     public string? Sampler { get; set; }
     public string? Scheduler { get; set; }
     public OnOff Seamless { get; set; }
@@ -37,13 +36,46 @@ public class PromptSettings
     public double VariationAmount { get; set; } = .1;
     public double Width { get; set; } = Preferences.Default.Get<double>(Constants.PreferenceKeys.DefaultHeight, 512);
     public OnOff WithVariations { get; set; }
-    public List<LoraViewModel> Loras { get; set; } = new();
-    public List<PromptStyleViewModel> PromptStyles { get; set; } = new();
+    public List<ILoraViewModel> Loras { get; set; } = new();
+    public List<IPromptStyleViewModel> PromptStyles { get; set; } = new();
 
     public PromptSettings Clone()
     {
-        var json = JsonConvert.SerializeObject(this);
-
-        return JsonConvert.DeserializeObject<PromptSettings>(json) ?? new PromptSettings();
+        return new PromptSettings
+        {
+            EnableGfpgan = EnableGfpgan,
+            EnableUpscaling = EnableUpscaling,
+            Fit = Fit,
+            FitClientSide = FitClientSide,
+            GfpganStrength = GfpganStrength,
+            GuidanceScale = GuidanceScale,
+            DistilledCfgScale = DistilledCfgScale,
+            Height = Height,
+            InitImage = InitImage,
+            InitImageThumbnail = InitImageThumbnail,
+            InvertMask = InvertMask,
+            Mask = Mask,
+            MaskBlur = MaskBlur,
+            ModelType = ModelType,
+            Steps = Steps,
+            BatchCount = BatchCount,
+            BatchSize = BatchSize,
+            Prompt = Prompt,
+            NegativePrompt = NegativePrompt,
+            DenoisingStrength = DenoisingStrength,
+            Model = Model,
+            Sampler = Sampler,
+            Scheduler = Scheduler,
+            Seamless = Seamless,
+            Seed = Seed,
+            Upscaler = Upscaler,
+            UpscaleLevel = UpscaleLevel,
+            UpscaleSteps = UpscaleSteps,
+            VariationAmount = VariationAmount,
+            Width = Width,
+            WithVariations = WithVariations,
+            Loras = new List<ILoraViewModel>(Loras),
+            PromptStyles = new List<IPromptStyleViewModel>(PromptStyles),
+        };
     }
 }

@@ -8,6 +8,8 @@ namespace MobileDiffusion.ViewModels;
 
 internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPageViewModel
 {
+    private readonly IBackendRegistry _backendRegistry;
+
     [ObservableProperty]
     public partial string ServerUrl { get; set; }
 
@@ -17,11 +19,24 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
     [ObservableProperty]
     public partial string DefaultHeight { get; set; }
 
-    public AppSettingsPageViewModel(ILoadingService loadingService) : base(loadingService)
+    [ObservableProperty]
+    public partial IReadOnlyList<string> AvailableBackends { get; set; }
+
+    [ObservableProperty]
+    public partial string SelectedBackend { get; set; }
+
+    public AppSettingsPageViewModel(
+        ILoadingService loadingService,
+        IBackendRegistry backendRegistry) : base(loadingService)
     {
+        _backendRegistry = backendRegistry;
+        
         ServerUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
         DefaultWidth = Preferences.Default.Get<double>(Constants.PreferenceKeys.DefaultWidth, 512).ToString();
         DefaultHeight = Preferences.Default.Get<double>(Constants.PreferenceKeys.DefaultHeight, 512).ToString();
+
+        AvailableBackends = _backendRegistry.GetAllBackends().Select(b => b.Name).ToList();
+        SelectedBackend = Preferences.Default.Get(Constants.PreferenceKeys.SelectedBackend, AvailableBackends.FirstOrDefault() ?? "SD Forge Neo");
     }
 
     [RelayCommand]
@@ -48,7 +63,14 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
             Preferences.Default.Set(Constants.PreferenceKeys.DefaultHeight, defaultHeight);
         }
 
-        await Shell.Current.GoToAsync("..");
+        if (!string.IsNullOrEmpty(SelectedBackend))
+        {
+            Preferences.Default.Set(Constants.PreferenceKeys.SelectedBackend, SelectedBackend);
+        }
+
+        var parameters = new Dictionary<string, object> { { NavigationParams.ForceReinitialize, true } };
+
+        await Shell.Current.GoToAsync("..", parameters);
     }
 
     [RelayCommand]

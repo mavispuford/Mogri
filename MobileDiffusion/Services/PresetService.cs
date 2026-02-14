@@ -1,6 +1,9 @@
 using System.Text.Json;
 using MobileDiffusion.Interfaces.Services;
+using MobileDiffusion.Interfaces.ViewModels;
+using MobileDiffusion.Json;
 using MobileDiffusion.Models;
+using MobileDiffusion.ViewModels;
 
 namespace MobileDiffusion.Services
 {
@@ -10,6 +13,16 @@ namespace MobileDiffusion.Services
         private string _filePath;
         private Dictionary<string, PromptSettings> _presets = new();
         private bool _isInitialized;
+
+        private static readonly JsonSerializerOptions _jsonOptions = new()
+        {
+            Converters =
+            {
+                new InterfaceConverter<IModelViewModel, ModelViewModel>(),
+                new InterfaceListConverter<ILoraViewModel, LoraViewModel>(),
+                new InterfaceListConverter<IPromptStyleViewModel, PromptStyleViewModel>(),
+            }
+        };
 
         public PresetService()
         {
@@ -25,7 +38,7 @@ namespace MobileDiffusion.Services
                 try
                 {
                     using var stream = File.OpenRead(_filePath);
-                    var loaded = await JsonSerializer.DeserializeAsync<Dictionary<string, PromptSettings>>(stream);
+                    var loaded = await JsonSerializer.DeserializeAsync<Dictionary<string, PromptSettings>>(stream, _jsonOptions);
                     if (loaded != null)
                         _presets = loaded;
                 }
@@ -41,7 +54,7 @@ namespace MobileDiffusion.Services
         private async Task SaveToFileAsync()
         {
             using var stream = File.Create(_filePath);
-            await JsonSerializer.SerializeAsync(stream, _presets);
+            await JsonSerializer.SerializeAsync(stream, _presets, _jsonOptions);
         }
 
         public async Task<List<string>> GetPresetsAsync()

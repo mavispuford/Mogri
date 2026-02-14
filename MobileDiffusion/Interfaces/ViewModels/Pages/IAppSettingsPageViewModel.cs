@@ -10,6 +10,10 @@ internal interface IAppSettingsPageViewModel : IPageViewModel
 
     string DefaultHeight { get; set; }
 
+    IReadOnlyList<string> AvailableBackends { get; }
+
+    string SelectedBackend { get; set; }
+
     IAsyncRelayCommand ResetValuesCommand { get; }
 
     IAsyncRelayCommand CancelCommand { get; }
