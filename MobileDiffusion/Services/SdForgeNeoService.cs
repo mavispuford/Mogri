@@ -548,31 +548,51 @@ namespace MobileDiffusion.Services
         }
         public async Task<PromptSettings?> GetImageInfoAsync(string base64EncodedImage, CancellationToken cancellationToken = default)
         {
-            if (_client == null || string.IsNullOrWhiteSpace(base64EncodedImage)) return null;
+            if (string.IsNullOrWhiteSpace(base64EncodedImage)) return null;
 
-            var request = new PNGInfoRequest()
+            try 
             {
-                Image = base64EncodedImage
-            };
+                // Remove data uri prefix if present
+                var base64Data = base64EncodedImage;
+                if (base64Data.Contains(","))
+                {
+                    base64Data = base64Data.Split(',')[1];
+                }
 
-            var imageInfoResult = await _client.Sdapi.V1.PngInfo.PostAsync(request, cancellationToken: cancellationToken);
+                var bytes = Convert.FromBase64String(base64Data);
+                using var stream = new MemoryStream(bytes);
+                
+                var (positive, negative, raw) = await PngMetadataHelper.ReadParametersFromStreamAsync(stream);
 
-            if (imageInfoResult?.Info == null || string.IsNullOrEmpty(imageInfoResult.Info))
+                if (string.IsNullOrWhiteSpace(raw))
+                {
+                    // Fallback to trying to parse via server if local parsing fails? 
+                    // No, keeping it inconsistent is confusing. If local parsing fails, likely server would too or file is not valid.
+                    return null;
+                }
+
+                var settings = ForgeMetadataParser.Parse(
+                    raw,
+                    _models,
+                    (model) => convertModelToViewModel(model));
+
+                if (settings != null && settings.Model == null)
+                {
+                    // If we are initialized, try to set the currently selected model as fallback
+                    // Only if we actually have a client/connection
+                    if (_client != null) 
+                    {
+                        settings.Model = await GetSelectedModelAsync(cancellationToken);
+                    }
+                }
+
+                return settings;
+            }
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"Failed to parse image info locally: {ex}");
                 return null;
             }
-
-            var settings = ForgeMetadataParser.Parse(
-                imageInfoResult.Info,
-                _models,
-                (model) => convertModelToViewModel(model));
-
-            if (settings != null && settings.Model == null)
-            {
-                settings.Model = await GetSelectedModelAsync(cancellationToken);
-            }
-
-            return settings;
         }
 
         public async Task RefreshResourcesAsync(CancellationToken cancellationToken = default)

@@ -92,14 +92,29 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             var samplers = await _stableDiffusionService.GetSamplersAsync();
 
             var profile = GenerationProfile.GetDefault(Enums.ModelType.StableDiffusion);
+            
+            // Preserve current sampler if it exists in the new list (e.g. switching backends)
+            var currentSampler = _settings.Sampler;
+            
             _settings.Steps = profile.DefaultSteps;
             _settings.GuidanceScale = profile.DefaultCfg;
             _settings.Width = profile.DefaultWidth;
             _settings.Height = profile.DefaultHeight;
 
-            if (samplers != null && !samplers.ContainsKey(profile.DefaultSampler))
+            if (samplers != null)
             {
-                _settings.Sampler = samplers.FirstOrDefault().Key ?? "Euler";
+                if (!string.IsNullOrEmpty(currentSampler) && samplers.ContainsKey(currentSampler))
+                {
+                    _settings.Sampler = currentSampler;
+                }
+                else if (samplers.ContainsKey(profile.DefaultSampler))
+                {
+                    _settings.Sampler = profile.DefaultSampler;
+                }
+                else
+                {
+                    _settings.Sampler = samplers.FirstOrDefault().Key ?? "Euler";
+                }
             }
             else
             {
@@ -458,7 +473,8 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         if (query.TryGetValue(NavigationParams.PromptSettings, out var promptSettings) &&
             promptSettings is PromptSettings settings)
         {
-
+            // Validate that the model/resources exist in the current backend
+            _ = validateSettingsResourcesAsync(settings);
 
             _settings = settings;
 
@@ -575,9 +591,53 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         query.Clear();
     }
 
-    public override Task OnAppearingAsync()
+    private async Task validateSettingsResourcesAsync(PromptSettings settings)
     {
-        return base.OnAppearingAsync();
+        try 
+        {
+            // Only validate if we are connected, otherwise getting models/loras might fail or try to init unnecessarily
+            if (!_stableDiffusionService.Initialized && !await _stableDiffusionService.CheckServerAsync()) return;
+
+            var messages = new List<string>();
+            
+            // Validate Model
+            if (settings.Model != null)
+            {
+                var models = await _stableDiffusionService.GetModelsAsync();
+                if (models != null && !models.Any(m => m.Key == settings.Model.Key))
+                {
+                     messages.Add($"Model: {settings.Model.DisplayName}");
+                }
+            }
+
+            // Validate Loras
+            if (settings.Loras != null && settings.Loras.Any())
+            {
+                var loras = await _stableDiffusionService.GetLorasAsync();
+                if (loras != null) 
+                {
+                    foreach (var lora in settings.Loras)
+                    {
+                        if (!loras.Any(l => l.Name == lora.Name))
+                        {
+                            messages.Add($"LoRA: {lora.Name}");
+                        }
+                    }
+                }
+            }
+
+            if (messages.Any())
+            {
+                var list = string.Join("\n", messages);
+                await Shell.Current.DisplayAlertAsync("Missing Resources", 
+                    $"The following resources are missing from the current backend:\n\n{list}\n\nGeneration may look different or fail.", 
+                    "OK");
+            }
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine($"Error validating resources: {ex}");
+        }
     }
 
     private async Task LoadSharedImage(string imageUri, string contentType)

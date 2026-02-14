@@ -41,7 +41,30 @@ public class ProxyImageGenerationService : IImageGenerationService
 
     public Task<byte[]> GetImageBytesAsync(string url, CancellationToken cancellationToken = default) => ActiveBackend.GetImageBytesAsync(url, cancellationToken);
 
-    public Task<PromptSettings?> GetImageInfoAsync(string base64EncodedImage, CancellationToken cancellationToken = default) => ActiveBackend.GetImageInfoAsync(base64EncodedImage, cancellationToken);
+    public async Task<PromptSettings?> GetImageInfoAsync(string base64EncodedImage, CancellationToken cancellationToken = default)
+    {
+        // Try the active backend first
+        var result = await ActiveBackend.GetImageInfoAsync(base64EncodedImage, cancellationToken);
+        if (result != null) return result;
+
+        // If that fails, try all other registered backends to see if any can parse the format
+        foreach (var backend in _registry.GetAllBackends())
+        {
+            if (backend == ActiveBackend) continue;
+
+            try 
+            {
+                var backendResult = await backend.GetImageInfoAsync(base64EncodedImage, cancellationToken);
+                if (backendResult != null) return backendResult;
+            }
+            catch
+            {
+                // Ignore errors from other backends
+            }
+        }
+
+        return null;
+    }
 
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
