@@ -1,14 +1,49 @@
 namespace MobileDiffusion.Models;
 
+/// <summary>
+/// Defines which features a backend supports.
+/// The UI uses this to hide/show relevant controls.
+/// </summary>
 public record BackendCapabilities
 {
+    /// <summary>
+    /// Gets whether the backend supports tiled/seamless generation.
+    /// </summary>
     public bool SupportsSeamless { get; init; }
+
+    /// <summary>
+    /// Gets whether the backend supports face restoration (e.g. CodeFormer, GFPGAN).
+    /// </summary>
     public bool SupportsFaceRestoration { get; init; }
+
+    /// <summary>
+    /// Gets whether the backend supports upscaling.
+    /// </summary>
     public bool SupportsUpscaling { get; init; }
+
+    /// <summary>
+    /// Gets whether the backend can provide a list of samplers.
+    /// </summary>
     public bool SupportsSamplerList { get; init; }
+
+    /// <summary>
+    /// Gets whether the backend supports cancelling a generation request.
+    /// </summary>
     public bool SupportsCancellation { get; init; }
+
+    /// <summary>
+    /// Gets whether the backend supports LoRA (Low-Rank Adaptation) models.
+    /// </summary>
     public bool SupportsLoras { get; init; }
+
+    /// <summary>
+    /// Gets whether the backend supports predefined prompt styles.
+    /// </summary>
     public bool SupportsStyles { get; init; }
+
+    /// <summary>
+    /// Gets whether the backend supports explicit scheduler selection (separate from samplers).
+    /// </summary>
     public bool SupportsSchedulers { get; init; }
 
     public static BackendCapabilities None => new();
