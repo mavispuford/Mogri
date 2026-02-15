@@ -86,7 +86,7 @@
                 <Button Grid.Column="0"
                         Text="Cancel"
                         Command="{Binding CancelCommand}"
-                        IsVisible="{Binding IsGenerating}"/>
+                        IsVisible="{Binding ShowCancelButton}"/>
 
                 <ImageButton Grid.Column="1"
                              HorizontalOptions="Fill"

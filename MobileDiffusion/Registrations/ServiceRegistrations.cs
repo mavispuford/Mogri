@@ -34,7 +34,9 @@ public static class ServiceRegistrations
 #endif
         });
 
-        builder.Services.AddSingleton<IImageGenerationService, SdForgeNeoService>();
+        builder.Services.AddSingleton<IImageGenerationBackend, SdForgeNeoService>();
+        builder.Services.AddSingleton<IBackendRegistry, BackendRegistry>();
+        builder.Services.AddSingleton<IImageGenerationService, ProxyImageGenerationService>();
         builder.Services.AddSingleton<IPopupService, PopupService>();
         builder.Services.AddSingleton<IImageService, ImageService>();
         builder.Services.AddSingleton<ISegmentationService, SegmentationService>();

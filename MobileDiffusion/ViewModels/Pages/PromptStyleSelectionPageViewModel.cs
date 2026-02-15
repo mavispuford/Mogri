@@ -94,7 +94,6 @@ internal partial class PromptStyleSelectionPageViewModel : PageViewModel, IPromp
         {
             var newSettings = _settings.Clone();
             newSettings.PromptStyles = SelectedPromptStyles
-                .OfType<PromptStyleViewModel>()
                 .Distinct()
                 .Where(ps => !string.IsNullOrEmpty(ps.Prompt) || !string.IsNullOrEmpty(ps.NegativePrompt))
                 .ToList();

@@ -7,8 +7,6 @@ using MobileDiffusion.Models;
 using System.Collections.ObjectModel;
 using SkiaSharp.Views.Maui.Controls;
 using CommunityToolkit.Maui.Alerts;
-using Newtonsoft.Json;
-using MobileDiffusion.Json;
 
 namespace MobileDiffusion.ViewModels;
 
@@ -25,6 +23,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     private string? _resizedInitImage;
     private string? _resizedMaskImage;
     private bool _initImageNeedsResize = true;
+    private bool _forceReinitialize;
     private float _targetProgress = 0;
 
     [ObservableProperty]
@@ -43,7 +42,14 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     public partial bool ServerConnected { get; set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowCancelButton))]
     public partial bool IsGenerating { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowCancelButton))]
+    public partial BackendCapabilities CurrentCapabilities { get; set; } = BackendCapabilities.None;
+
+    public bool ShowCancelButton => IsGenerating && CurrentCapabilities.SupportsCancellation;
 
     [ObservableProperty]
     public partial ObservableCollection<IResultItemViewModel> Results { get; set; } = new();
@@ -70,11 +76,13 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
     private async Task<bool> initializeStableDiffusionService()
     {
-        if (_stableDiffusionService.Initialized)
+        if (_stableDiffusionService.Initialized && !_forceReinitialize)
         {
             ServerConnected = true;
             return true;
         }
+
+        _forceReinitialize = false;
 
         try
         {
@@ -91,21 +99,36 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             var samplers = await _stableDiffusionService.GetSamplersAsync();
 
             var profile = GenerationProfile.GetDefault(Enums.ModelType.StableDiffusion);
+            
+            // Preserve current sampler if it exists in the new list (e.g. switching backends)
+            var currentSampler = _settings.Sampler;
+            
             _settings.Steps = profile.DefaultSteps;
             _settings.GuidanceScale = profile.DefaultCfg;
             _settings.Width = profile.DefaultWidth;
             _settings.Height = profile.DefaultHeight;
 
-            if (samplers != null && !samplers.ContainsKey(profile.DefaultSampler))
+            if (samplers != null)
             {
-                _settings.Sampler = samplers.FirstOrDefault().Key ?? "Euler";
+                if (!string.IsNullOrEmpty(currentSampler) && samplers.ContainsKey(currentSampler))
+                {
+                    _settings.Sampler = currentSampler;
+                }
+                else if (samplers.ContainsKey(profile.DefaultSampler))
+                {
+                    _settings.Sampler = profile.DefaultSampler;
+                }
+                else
+                {
+                    _settings.Sampler = samplers.FirstOrDefault().Key ?? "Euler";
+                }
             }
             else
             {
                 _settings.Sampler = profile.DefaultSampler;
             }
 
-            _settings.Model = (ModelViewModel?)await _stableDiffusionService.GetSelectedModelAsync();
+            _settings.Model = await _stableDiffusionService.GetSelectedModelAsync();
         }
         catch
         {
@@ -123,6 +146,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         }
 
         ServerConnected = true;
+        CurrentCapabilities = _stableDiffusionService.Capabilities;
         return true;
     }
 
@@ -235,45 +259,10 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                     }
                     else if (response.ResponseObject is GenerationResponse generationResponse)
                     {
-                        IDictionary<string, object>? autoResponseInfo = null;
-
-                        try
+                        foreach (var image in generationResponse.Images ?? Enumerable.Empty<string>())
                         {
-                            autoResponseInfo = JsonConvert.DeserializeObject<IDictionary<string, object>?>(generationResponse.Info ?? string.Empty, new JsonSerializerSettings
-                            {
-                                ContractResolver = CustomContractResolver.Instance
-                            });
-                        }
-                        catch
-                        {
-                            // Not JSON - treat Info as a raw seed string
-                        }
-
-                        if (autoResponseInfo != null && autoResponseInfo.ContainsKey("all_seeds"))
-                        {
-                            var seeds = autoResponseInfo["all_seeds"] as List<long>;
-
-                            foreach (var image in generationResponse.Images ?? Enumerable.Empty<string>())
-                            {
-                                var seedString = seeds?.ElementAtOrDefault(imageNumber) ?? settings.Seed + imageNumber;
-                                var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{seedString}-{DateTime.Now.Ticks}";
-
-                                var result = Results.FirstOrDefault(r => r.ApiResponse == null);
-
-                                if (result != null)
-                                {
-                                    result.ApiResponse = response;
-                                    result.Settings = settings.Clone();
-                                    result.Settings.Seed = seedString;
-
-                                    await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            var seed = generationResponse.Info;
-                            var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{seed}-{DateTime.Now.Ticks}";
+                            var currentSeed = generationResponse.Seeds?.ElementAtOrDefault(imageNumber) ?? settings.Seed + imageNumber;
+                            var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{currentSeed}-{DateTime.Now.Ticks}";
 
                             var result = Results.FirstOrDefault(r => r.ApiResponse == null);
 
@@ -281,6 +270,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                             {
                                 result.ApiResponse = response;
                                 result.Settings = settings.Clone();
+                                result.Settings.Seed = currentSeed;
 
                                 await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
                             }
@@ -483,10 +473,16 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     {
         if (query == null) return;
 
+        if (query.ContainsKey(NavigationParams.ForceReinitialize))
+        {
+            _forceReinitialize = true;
+        }
+
         if (query.TryGetValue(NavigationParams.PromptSettings, out var promptSettings) &&
             promptSettings is PromptSettings settings)
         {
-
+            // Validate that the model/resources exist in the current backend
+            _ = validateSettingsResourcesAsync(settings);
 
             _settings = settings;
 
@@ -603,9 +599,53 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         query.Clear();
     }
 
-    public override Task OnAppearingAsync()
+    private async Task validateSettingsResourcesAsync(PromptSettings settings)
     {
-        return base.OnAppearingAsync();
+        try 
+        {
+            // Only validate if we are connected, otherwise getting models/loras might fail or try to init unnecessarily
+            if (!_stableDiffusionService.Initialized && !await _stableDiffusionService.CheckServerAsync()) return;
+
+            var messages = new List<string>();
+            
+            // Validate Model
+            if (settings.Model != null)
+            {
+                var models = await _stableDiffusionService.GetModelsAsync();
+                if (models != null && !models.Any(m => m.Key == settings.Model.Key))
+                {
+                     messages.Add($"Model: {settings.Model.DisplayName}");
+                }
+            }
+
+            // Validate Loras
+            if (settings.Loras != null && settings.Loras.Any())
+            {
+                var loras = await _stableDiffusionService.GetLorasAsync();
+                if (loras != null) 
+                {
+                    foreach (var lora in settings.Loras)
+                    {
+                        if (!loras.Any(l => l.Name == lora.Name))
+                        {
+                            messages.Add($"LoRA: {lora.Name}");
+                        }
+                    }
+                }
+            }
+
+            if (messages.Any())
+            {
+                var list = string.Join("\n", messages);
+                await Shell.Current.DisplayAlertAsync("Missing Resources", 
+                    $"The following resources are missing from the current backend:\n\n{list}\n\nGeneration may look different or fail.", 
+                    "OK");
+            }
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine($"Error validating resources: {ex}");
+        }
     }
 
     private async Task LoadSharedImage(string imageUri, string contentType)

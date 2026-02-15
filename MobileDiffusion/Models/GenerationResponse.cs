@@ -6,5 +6,6 @@ namespace MobileDiffusion.Models
     {
         public List<string>? Images { get; set; }
         public string? Info { get; set; }
+        public List<long>? Seeds { get; set; }
     }
 }

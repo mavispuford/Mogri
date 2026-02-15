@@ -91,7 +91,6 @@ public partial class LoraSelectionPageViewModel : PageViewModel, ILoraSelectionP
         {
             var newSettings = _settings.Clone();
             newSettings.Loras = SelectedLoras
-                .OfType<LoraViewModel>()
                 .Distinct()
                 .ToList();
 

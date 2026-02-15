@@ -1712,6 +1712,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private void ToggleActionsVisibility()
     {
         ShowActions = !ShowActions;
+
+        vibrate(HapticFeedbackType.Click);
     }
 
     public override bool OnBackButtonPressed()
@@ -1792,6 +1794,14 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                     OnPropertyChanged(nameof(SourceBitmap));
                 }
             }
+        }
+    }
+
+    private void vibrate(HapticFeedbackType type)
+    {
+        if (HapticFeedback.Default.IsSupported)
+        {
+            HapticFeedback.Default.Perform(type);
         }
     }
 }
