@@ -154,7 +154,7 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
 
         if (_settings != null)
         {
-            _settings.PromptStyles = SelectedPromptStyles.OfType<PromptStyleViewModel>().Distinct().ToList();
+            _settings.PromptStyles = SelectedPromptStyles.Distinct().ToList();
         }
     }
 
@@ -165,7 +165,7 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
 
         if (_settings != null)
         {
-            _settings.Loras = SelectedLoras.OfType<LoraViewModel>().Distinct().ToList();
+            _settings.Loras = SelectedLoras.Distinct().ToList();
         }
     }
 

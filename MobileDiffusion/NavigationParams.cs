@@ -8,6 +8,7 @@ public static class NavigationParams
     public const string Color = nameof(Color);
     public const string ColorPalette = nameof(ColorPalette);
     public const string DeletedHistoryItem = nameof(DeletedHistoryItem);
+    public const string ForceReinitialize = nameof(ForceReinitialize);
     public const string HistoryItem = nameof(HistoryItem);
     public const string HistoryItems = nameof(HistoryItems);
     public const string ImageHeight = nameof(ImageHeight);

@@ -105,3 +105,19 @@ foreach (var item in items)
 
 ## Builds
 - When building, the goal is always to have 0 Warnings and (obviously) 0 Errors.
+
+## Naming
+The following naming conventions are used in this application:
+- **Interfaces**: `IPascalCase` (e.g., `IImageService`)
+- **Classes, Structs, Enums, Events**: `PascalCase` (e.g., `MainPageViewModel`)
+- **Properties**: `PascalCase` (e.g., `IsLoading`)
+- **Public & Protected Methods**: `PascalCase` (e.g., `InitializeAsync`)
+- **Private Methods**: `camelCase` (e.g., `loadItems`)
+- **Private Fields**: `_camelCase` with underscore prefix (e.g., `_fileService`)
+- **Local Variables & Parameters**: `camelCase` (e.g., `settings`)
+- **Constants**: `PascalCase` (e.g., `MaxRetries`)
+- **Async Methods**: Always end with `Async` suffix (e.g. `SaveSettingsAsync()`)
+
+## Other Patterns
+- Aim to create one file per class (avoid having multiple classes in a single file)
+- Enums should also be defined in their own file in the `Enums` folder
