@@ -15,6 +15,10 @@ using System.Text.RegularExpressions;
 
 namespace MobileDiffusion.Services
 {
+    /// <summary>
+    /// Implementation of IImageGenerationBackend for the "SD Forge Neo" (Automatic1111 fork) API.
+    /// Handles communication with the /sdapi/v1 endpoints.
+    /// </summary>
     public class SdForgeNeoService : IImageGenerationBackend
     {
         public string Name => "SD Forge Neo";

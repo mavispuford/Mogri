@@ -3,6 +3,10 @@ using MobileDiffusion.Models;
 
 namespace MobileDiffusion.Interfaces.Services;
 
+/// <summary>
+/// The primary interface for all image generation operations.
+/// This contract is implemented by both the Proxy (for routing) and concrete backends.
+/// </summary>
 public interface IImageGenerationService
 {
     public Task<bool> CheckServerAsync(CancellationToken cancellationToken = default);
