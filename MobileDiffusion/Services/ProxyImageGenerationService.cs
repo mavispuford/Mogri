@@ -35,6 +35,8 @@ public class ProxyImageGenerationService : IImageGenerationService
 
     public bool Initialized => ActiveBackend.Initialized;
 
+    public BackendCapabilities Capabilities => _activeBackend?.Capabilities ?? BackendCapabilities.None;
+
     public Task<bool> CheckServerAsync(CancellationToken cancellationToken = default) => ActiveBackend.CheckServerAsync(cancellationToken);
 
     public IAsyncEnumerable<ApiResponse> SubmitImageRequestAsync(PromptSettings settings, CancellationToken cancellationToken = default) => ActiveBackend.SubmitImageRequestAsync(settings, cancellationToken);

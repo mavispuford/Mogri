@@ -5,11 +5,16 @@ namespace MobileDiffusion.Models;
 
 public class PromptSettings
 {
-    public bool EnableGfpgan { get; set; } = false;
+    public bool EnableFaceRestoration { get; set; } = false;
+
     public bool EnableUpscaling { get; set; } = false;
-    public OnOff Fit { get; set; } = OnOff.on;
+
+    public bool EnableFitServerSide { get; set; } = true;
+
     public bool FitClientSide { get; set; } = true;
-    public double GfpganStrength { get; set; } = .75;
+
+    public double FaceRestorationStrength { get; set; } = .75;
+
     public double GuidanceScale { get; set; } = 7.5;
     public double? DistilledCfgScale { get; set; } = 3;
     public double Height { get; set; } = Preferences.Default.Get<double>(Constants.PreferenceKeys.DefaultWidth, 512);
@@ -28,7 +33,9 @@ public class PromptSettings
     public IModelViewModel? Model { get; set; }
     public string? Sampler { get; set; }
     public string? Scheduler { get; set; }
-    public OnOff Seamless { get; set; }
+
+    public bool EnableTiling { get; set; }
+
     public long Seed { get; set; } = -1;
     public string? Upscaler { get; set; }
     public int UpscaleLevel { get; set; } = 2;
@@ -38,16 +45,17 @@ public class PromptSettings
     public OnOff WithVariations { get; set; }
     public List<ILoraViewModel> Loras { get; set; } = new();
     public List<IPromptStyleViewModel> PromptStyles { get; set; } = new();
+    public Dictionary<string, object> BackendParameters { get; set; } = new();
 
     public PromptSettings Clone()
     {
         return new PromptSettings
         {
-            EnableGfpgan = EnableGfpgan,
+            EnableFaceRestoration = EnableFaceRestoration,
             EnableUpscaling = EnableUpscaling,
-            Fit = Fit,
+            EnableFitServerSide = EnableFitServerSide,
             FitClientSide = FitClientSide,
-            GfpganStrength = GfpganStrength,
+            FaceRestorationStrength = FaceRestorationStrength,
             GuidanceScale = GuidanceScale,
             DistilledCfgScale = DistilledCfgScale,
             Height = Height,
@@ -66,7 +74,7 @@ public class PromptSettings
             Model = Model,
             Sampler = Sampler,
             Scheduler = Scheduler,
-            Seamless = Seamless,
+            EnableTiling = EnableTiling,
             Seed = Seed,
             Upscaler = Upscaler,
             UpscaleLevel = UpscaleLevel,
@@ -76,6 +84,9 @@ public class PromptSettings
             WithVariations = WithVariations,
             Loras = new List<ILoraViewModel>(Loras),
             PromptStyles = new List<IPromptStyleViewModel>(PromptStyles),
+            BackendParameters = BackendParameters.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value is ICloneable c ? c.Clone() : kvp.Value)
         };
     }
 }

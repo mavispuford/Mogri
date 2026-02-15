@@ -53,11 +53,11 @@ public interface IPromptSettingsPageViewModel : IPageViewModel
 
     string? SeedPlaceholder { get; set; }
 
-    bool EnableGfpgan { get; set; }
+    bool EnableFaceRestoration { get; set; }
 
-    string? GfpganStrength { get; set; }
+    string? FaceRestorationStrength { get; set; }
 
-    string? GfpganStrengthPlaceholder { get; set; }
+    string? FaceRestorationStrengthPlaceholder { get; set; }
 
     bool EnableUpscaling { get; set; }
 
@@ -69,7 +69,7 @@ public interface IPromptSettingsPageViewModel : IPageViewModel
 
     string? UpscaleStepsPlaceholder { get; set; }
 
-    bool MakeSeamless { get; set; }
+    bool EnableTiling { get; set; }
 
     IAsyncRelayCommand ResetValuesCommand { get; }
 
@@ -84,4 +84,6 @@ public interface IPromptSettingsPageViewModel : IPageViewModel
     IAsyncRelayCommand LoadPresetCommand { get; }
 
     List<string> AvailablePresets { get; set; }
+
+    MobileDiffusion.Models.BackendCapabilities CurrentCapabilities { get; }
 }

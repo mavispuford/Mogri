@@ -36,4 +36,6 @@ public interface IImageGenerationService
     Task<bool> CancelAsync(CancellationToken cancellationToken = default);
 
     bool Initialized { get; }
+
+    BackendCapabilities Capabilities { get; }
 }

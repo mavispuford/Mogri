@@ -42,7 +42,14 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     public partial bool ServerConnected { get; set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowCancelButton))]
     public partial bool IsGenerating { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowCancelButton))]
+    public partial BackendCapabilities CurrentCapabilities { get; set; } = BackendCapabilities.None;
+
+    public bool ShowCancelButton => IsGenerating && CurrentCapabilities.SupportsCancellation;
 
     [ObservableProperty]
     public partial ObservableCollection<IResultItemViewModel> Results { get; set; } = new();
@@ -139,6 +146,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         }
 
         ServerConnected = true;
+        CurrentCapabilities = _stableDiffusionService.Capabilities;
         return true;
     }
 

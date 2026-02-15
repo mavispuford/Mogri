@@ -142,7 +142,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
         Strength = _settings.DenoisingStrength.ToString();
         MaskBlur = _settings.MaskBlur.ToString();
 
-        FitImageServerSide = _settings.Fit == Enums.OnOff.on;
+        FitImageServerSide = _settings.EnableFitServerSide;
         FitImageClientSide = _settings.FitClientSide;
 
         _initCancellationTokenSource = new CancellationTokenSource();
@@ -181,7 +181,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
             _settings.MaskBlur = maskBlur;
         }
 
-        _settings.Fit = FitImageServerSide ? Enums.OnOff.on : Enums.OnOff.Default;
+        _settings.EnableFitServerSide = FitImageServerSide;
         _settings.FitClientSide = FitImageClientSide;
     }
 

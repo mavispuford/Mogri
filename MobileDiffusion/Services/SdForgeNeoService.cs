@@ -18,6 +18,7 @@ namespace MobileDiffusion.Services
     public class SdForgeNeoService : IImageGenerationBackend
     {
         public string Name => "SD Forge Neo";
+        public BackendCapabilities Capabilities => BackendCapabilities.Full;
         
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IServiceProvider _serviceProvider;
@@ -427,13 +428,13 @@ namespace MobileDiffusion.Services
             request.NIter = settings.BatchCount;
             request.BatchSize = settings.BatchSize;
             request.CfgScale = settings.GuidanceScale;
-            request.RestoreFaces = settings.EnableGfpgan;
+            request.RestoreFaces = settings.EnableFaceRestoration;
             request.Width = (int)settings.Width;
             request.Height = (int)settings.Height;
             request.DenoisingStrength = settings.DenoisingStrength;
             request.Steps = settings.Steps;
             request.Seed = settings.Seed;
-            request.Tiling = settings.Seamless == Enums.OnOff.on;
+            request.Tiling = settings.EnableTiling;
 
             // Hires Fix
             request.EnableHr = settings.EnableUpscaling &&
@@ -481,13 +482,13 @@ namespace MobileDiffusion.Services
             request.NIter = settings.BatchCount;
             request.BatchSize = settings.BatchSize;
             request.CfgScale = settings.GuidanceScale;
-            request.RestoreFaces = settings.EnableGfpgan;
+            request.RestoreFaces = settings.EnableFaceRestoration;
             request.Width = (int)settings.Width;
             request.Height = (int)settings.Height;
             request.DenoisingStrength = settings.DenoisingStrength;
             request.Steps = settings.Steps;
             request.Seed = settings.Seed;
-            request.Tiling = settings.Seamless == Enums.OnOff.on;
+            request.Tiling = settings.EnableTiling;
 
             var combinedPromptAndStyles = settings.GetCombinedPromptAndPromptStyles();
             request.Prompt = combinedPromptAndStyles.Prompt;
