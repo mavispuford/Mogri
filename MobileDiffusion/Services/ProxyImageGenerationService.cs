@@ -4,6 +4,10 @@ using MobileDiffusion.Models;
 
 namespace MobileDiffusion.Services;
 
+/// <summary>
+/// A proxy service that sits between the ViewModels and the concrete ImageGenerationBackends.
+/// It routes requests to the currently selected backend (e.g. Forge, ComfyUI) based on user settings.
+/// </summary>
 public class ProxyImageGenerationService : IImageGenerationService
 {
     private readonly IBackendRegistry _registry;

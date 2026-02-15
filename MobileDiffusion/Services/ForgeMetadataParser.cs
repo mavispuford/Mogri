@@ -7,6 +7,10 @@ using MobileDiffusion.Enums;
 
 namespace MobileDiffusion.Services;
 
+/// <summary>
+/// Specialized parser for extracting generation metadata (prompts, seeds, steps) 
+/// from the raw PNG text chunks created by Automatic1111/Forge WebUI.
+/// </summary>
 public static class ForgeMetadataParser
 {
     private static class PngInfoProperties
