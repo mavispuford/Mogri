@@ -80,7 +80,7 @@ foreach (var item in items)
 - The above pattern allows async work to happen if necessary, since it is bad practice to do it in the constructor.
 
 ### OpenAPI Specs
-- The `OpenApiSpecs` folder contains OpenAPI specifications for the APIs that the app targets (for example, the `SdForgeNeo` folder has the openapi specs for SD Forge Neo)
+- The `OpenApiSpecs` folder contains OpenAPI specifications for the APIs that the app targets (for example, the `SdForgeNeo` folder has the openapi specs for SD Forge Neo, and `ComfyUi` for ComfyUI)
 - Each OpenAPI spec folder should have a `README.md` file that contains any details about that API spec (gotchas, modifications, commands for code generation, etc.)
 
 ## Key Frameworks & Libraries

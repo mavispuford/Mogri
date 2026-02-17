@@ -23,7 +23,13 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
     public partial IReadOnlyList<string> AvailableBackends { get; set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsComfyUiSelected))]
     public partial string SelectedBackend { get; set; }
+
+    [ObservableProperty]
+    public partial string ComfyUiApiKey { get; set; }
+
+    public bool IsComfyUiSelected => SelectedBackend == "ComfyUI";
 
     public AppSettingsPageViewModel(
         ILoadingService loadingService,
@@ -32,6 +38,7 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
         _backendRegistry = backendRegistry;
         
         ServerUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
+        ComfyUiApiKey = Preferences.Default.Get(Constants.PreferenceKeys.ComfyUiApiKey, string.Empty);
         DefaultWidth = Preferences.Default.Get<double>(Constants.PreferenceKeys.DefaultWidth, 512).ToString();
         DefaultHeight = Preferences.Default.Get<double>(Constants.PreferenceKeys.DefaultHeight, 512).ToString();
 
@@ -51,6 +58,11 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
         if (!string.IsNullOrEmpty(ServerUrl))
         {
             Preferences.Default.Set(Constants.PreferenceKeys.ServerUrl, ServerUrl);
+        }
+
+        if (!string.IsNullOrEmpty(ComfyUiApiKey))
+        {
+            Preferences.Default.Set(Constants.PreferenceKeys.ComfyUiApiKey, ComfyUiApiKey);
         }
 
         if (!string.IsNullOrEmpty(DefaultWidth) && double.TryParse(DefaultWidth, out double defaultWidth))
@@ -84,7 +96,10 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
         }
 
         ServerUrl = string.Empty;
+        ComfyUiApiKey = string.Empty;
         DefaultWidth = "512";
         DefaultHeight = "512";
+
+        SelectedBackend = AvailableBackends.FirstOrDefault() ?? "SD Forge Neo";
     }
 }
