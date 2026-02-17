@@ -27,7 +27,7 @@ public static class ServiceRegistrations
             {
                 PooledConnectionLifetime = TimeSpan.FromMinutes(20),
                 PooledConnectionIdleTimeout = TimeSpan.FromMinutes(20),
-                // Proxy = new WebProxy() { Address = new Uri("http://192.168.68.52:9000") }
+                Proxy = new WebProxy() { Address = new Uri("http://192.168.68.52:9000") }
             };
 #else
             return new HttpClientHandler();

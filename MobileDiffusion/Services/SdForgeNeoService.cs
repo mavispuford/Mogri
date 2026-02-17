@@ -551,6 +551,11 @@ namespace MobileDiffusion.Services
                 }
             }, cancellationToken);
         }
+        /// <summary>
+        /// Reads generation parameters from an image stream.
+        /// Prioritizes the JSON format but falls back to Forge's text format.
+        /// Attempts to resolve the full Model object from the currently loaded list.
+        /// </summary>
         public async Task<PromptSettings?> GetImageInfoAsync(string base64EncodedImage, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(base64EncodedImage)) return null;
@@ -567,25 +572,34 @@ namespace MobileDiffusion.Services
                 var bytes = Convert.FromBase64String(base64Data);
                 using var stream = new MemoryStream(bytes);
                 
-                var (positive, negative, raw) = await PngMetadataHelper.ReadParametersFromStreamAsync(stream);
+                var settings = await PngMetadataHelper.ReadSettingsFromStreamAsync(stream);
 
-                if (string.IsNullOrWhiteSpace(raw))
+                if (settings != null)
                 {
-                    // Fallback to trying to parse via server if local parsing fails? 
-                    // No, keeping it inconsistent is confusing. If local parsing fails, likely server would too or file is not valid.
-                    return null;
-                }
+                    // Try to resolve the model model (which might just have Name/Key from JSON)
+                    // against our actual loaded model list to ensure we have the full object
+                    if (settings.Model != null && _models?.Any() == true)
+                    {
+                        // Match by Hash (Key) or Name
+                        var matchingModel = _models.FirstOrDefault(m => 
+                            (settings.Model.Key != null && m.Sha256 == settings.Model.Key) ||
+                            (settings.Model.DisplayName != null && m.ModelName == settings.Model.DisplayName) ||
+                            (settings.Model.DisplayName != null && m.Title == settings.Model.DisplayName)
+                        );
 
-                var settings = ForgeMetadataParser.Parse(
-                    raw,
-                    _models,
-                    (model) => convertModelToViewModel(model));
+                        if (matchingModel != null)
+                        {
+                            var modelVm = _serviceProvider.GetService<IModelViewModel>();
+                            if (modelVm != null)
+                            {
+                                modelVm.DisplayName = matchingModel.ModelName ?? string.Empty;
+                                modelVm.Key = matchingModel.Title ?? string.Empty;
+                                settings.Model = modelVm;
+                            }
+                        }
+                    }
 
-                if (settings != null && settings.Model == null)
-                {
-                    // If we are initialized, try to set the currently selected model as fallback
-                    // Only if we actually have a client/connection
-                    if (_client != null) 
+                    if (settings.Model == null && _client != null)
                     {
                         settings.Model = await GetSelectedModelAsync(cancellationToken);
                     }

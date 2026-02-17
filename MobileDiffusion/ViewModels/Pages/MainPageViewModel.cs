@@ -372,6 +372,10 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             if (imageString != null)
             {
                 imageBytes = Convert.FromBase64String(imageString);
+                if (result.Settings != null)
+                {
+                    imageBytes = MobileDiffusion.Helpers.PngMetadataHelper.WriteSettings(imageBytes, result.Settings);
+                }
             }
         }
 

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Text;
 using MobileDiffusion.Clients.ComfyUi;
@@ -16,6 +17,11 @@ using PromptRequest_prompt = MobileDiffusion.Clients.ComfyUi.Models.PromptReques
 
 namespace MobileDiffusion.Services;
 
+/// <summary>
+/// Implementation of IImageGenerationBackend for ComfyUI.
+/// Handles the full lifecycle: constructing workflows, submitting via HTTP,
+/// listening for progress via WebSocket, and retrieving resulting images.
+/// </summary>
 public class ComfyUiService : IImageGenerationBackend
 {
     private readonly IHttpClientFactory _httpClientFactory;
@@ -60,7 +66,7 @@ public class ComfyUiService : IImageGenerationBackend
             _apiKey = Preferences.Get(Constants.PreferenceKeys.ApiKey, string.Empty);
 
             // 1. Create wrapper HttpClient
-            _httpClient = _httpClientFactory.CreateClient("ComfyUi");
+            _httpClient = _httpClientFactory.CreateClient();
             _httpClient.BaseAddress = new Uri(_baseUrl);
             
             if (!string.IsNullOrEmpty(_apiKey))
@@ -84,6 +90,7 @@ public class ComfyUiService : IImageGenerationBackend
         }
         catch (Exception ex)
         {
+            Debug.WriteLine($"ComfyUI Initialization Failed: {ex}");
             Console.WriteLine($"ComfyUI Initialization Failed: {ex}");
             Initialized = false;
             throw;
@@ -167,6 +174,7 @@ public class ComfyUiService : IImageGenerationBackend
         }
         catch (Exception ex)
         {
+            Debug.WriteLine($"Failed to refresh resources: {ex.Message}");
             Console.WriteLine($"Failed to refresh resources: {ex.Message}");
             // Don't fail completely, just empty lists
         }
@@ -262,6 +270,7 @@ public class ComfyUiService : IImageGenerationBackend
         }
         catch (Exception ex)
         {
+             Debug.WriteLine($"Failed to submit workflow: {ex.Message}");
              throw new Exception($"Failed to submit workflow: {ex.Message}", ex);
         }
 
@@ -273,12 +282,21 @@ public class ComfyUiService : IImageGenerationBackend
         // 5. Listen for Progress
         // Note: We cannot use try-catch around yield return. Exceptions will bubble up to caller.
         bool receivedFinalResponse = false;
+        bool isInterrupted = false;
         
         // We can capture the enumerator to handle clean-up if needed, but simple foreach is fine.
         // If an exception occurs in Listener, it will propagate.
         
         await foreach (var progress in wsClient.ListenForPromptAsync(promptId, cancellationToken))
         {
+            if (progress.ResponseObject is ProgressResponse progResponse)
+            {
+               if (progResponse.IsInterrupted)
+               {
+                   isInterrupted = true;
+               }
+            }
+
             // If completed, we need to download images before yielding
             if (progress.ResponseObject is GenerationResponse genResponse)
             {
@@ -305,7 +323,7 @@ public class ComfyUiService : IImageGenerationBackend
             yield return progress;
         }
 
-        if (!receivedFinalResponse && !cancellationToken.IsCancellationRequested)
+        if (!receivedFinalResponse && !isInterrupted && !cancellationToken.IsCancellationRequested)
         {
             throw new Exception("Connection closed unexpectedly before generation completed.");
         }
@@ -348,8 +366,9 @@ public class ComfyUiService : IImageGenerationBackend
         {
             bytes = Convert.FromBase64String(base64Image);
         }
-        catch (FormatException)
+        catch (FormatException ex)
         {
+             Debug.WriteLine($"Invalid Base64 image data: {ex.Message}");
              throw new Exception("Invalid Base64 image data.");
         }
 
@@ -400,6 +419,7 @@ public class ComfyUiService : IImageGenerationBackend
         }
         catch (Exception ex)
         {
+            Debug.WriteLine($"Failed to download image: {filename}, {ex.Message}");
             Console.WriteLine($"Failed to download image: {filename}, {ex.Message}");
             return null; // Return null to skip this image but continue processing if others succeeded
         }
@@ -416,10 +436,24 @@ public class ComfyUiService : IImageGenerationBackend
         return await _httpClientFactory.CreateClient().GetByteArrayAsync(url, cancellationToken);
     }
 
-    public Task<PromptSettings?> GetImageInfoAsync(string base64EncodedImage, CancellationToken cancellationToken = default)
+    public async Task<PromptSettings?> GetImageInfoAsync(string base64EncodedImage, CancellationToken cancellationToken = default)
     {
-        // Use PngMetadataHelper if possible, but for now return null as per plan
-        return Task.FromResult<PromptSettings?>(null);
+        if (string.IsNullOrWhiteSpace(base64EncodedImage)) return null;
+
+        try
+        {
+            var base64Data = base64EncodedImage.Contains(',')
+                ? base64EncodedImage.Split(',')[1]
+                : base64EncodedImage;
+            
+            var bytes = Convert.FromBase64String(base64Data);
+            using var stream = new MemoryStream(bytes);
+            return await PngMetadataHelper.ReadSettingsFromStreamAsync(stream);
+        }
+        catch
+        {
+            return null;
+        }
     }
     
     // Resource Getters
