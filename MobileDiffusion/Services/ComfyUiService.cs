@@ -60,6 +60,8 @@ public class ComfyUiService : IImageGenerationBackend
 
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
+        Initialized = false;
+
         try
         {
             _baseUrl = Preferences.Get(Constants.PreferenceKeys.ServerUrl, "https://cloud.comfy.org");
@@ -176,7 +178,8 @@ public class ComfyUiService : IImageGenerationBackend
         {
             Debug.WriteLine($"Failed to refresh resources: {ex.Message}");
             Console.WriteLine($"Failed to refresh resources: {ex.Message}");
-            // Don't fail completely, just empty lists
+            
+            throw;
         }
     }
 

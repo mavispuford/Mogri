@@ -50,11 +50,12 @@ namespace MobileDiffusion.Services
 
         public async Task InitializeAsync(CancellationToken cancellationToken = default)
         {
+            Initialized = false;
+
             _baseUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
 
             if (string.IsNullOrWhiteSpace(_baseUrl) || !_baseUrl.Contains("http"))
             {
-                Initialized = false;
                 return;
             }
 
@@ -65,7 +66,6 @@ namespace MobileDiffusion.Services
             }
             catch
             {
-                Initialized = false;
                 return;
             }
 
