@@ -86,7 +86,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
         try
         {
-            await LoadingService.ShowAsync("Initializing...");
+            await LoadingService.ShowAsync("Connecting...");
 
             await _stableDiffusionService.InitializeAsync();
 

@@ -101,10 +101,6 @@ namespace MobileDiffusion.Services
             {
                 await _initializeTask;
             }
-            catch (OperationCanceledException)
-            {
-                // Ignore
-            }
             finally
             {
                 _initializeTask = null;
