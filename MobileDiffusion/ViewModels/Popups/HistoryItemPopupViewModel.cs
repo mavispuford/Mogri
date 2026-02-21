@@ -71,11 +71,6 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
         query.Clear();
     }
 
-    public override async Task OnAppearingAsync()
-    {
-        _ = LoadImageAsync();
-    }
-
     partial void OnHistoryItemChanged(IHistoryItemViewModel? value)
     {
         _ = LoadImageAsync();

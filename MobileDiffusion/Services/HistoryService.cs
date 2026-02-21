@@ -115,14 +115,22 @@ public class HistoryService : IHistoryService
                     try
                     {
                         var fileInfo = kvp.Value;
-                        var (positive, negative, raw) = await PngMetadataHelper.ReadParametersAsync(filePath);
+                        string positive = "";
+                        string negative = "";
+
+                        var settings = await PngMetadataHelper.ReadSettingsAsync(filePath);
+                        if (settings != null)
+                        {
+                            positive = settings.Prompt;
+                            negative = settings.NegativePrompt;
+                        }
 
                         var entity = new HistoryEntity
                         {
                             ImageFileName = filePath,
                             ThumbnailFileName = Path.Combine(cacheDir, Constants.ThumbnailPrefix + fileInfo.Name), // Approximate, standard naming convention
-                            UserPrompt = positive ?? "",
-                            NegativePrompt = negative ?? "",
+                            UserPrompt = positive,
+                            NegativePrompt = negative,
                             CreatedAt = fileInfo.CreationTime
                         };
                         newEntities.Add(entity);

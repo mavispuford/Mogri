@@ -40,7 +40,7 @@ public class PromptSettings
     /// Specific guidance scale for distilled models (e.g. Flux.1).
     /// These models behave differently than standard SD and typically require lower values (e.g. 2.0 - 4.0).
     /// Increasing the value (e.g., to 4 or 5) improves prompt adherence but may introduce overcooked, high-contrast, or distorted results, particularly in Flux.1-dev.
-    /// Setting the value too low (e.g., < 1.0) can lead to images that do not follow the prompt or lack detail.
+    /// Setting the value too low (e.g., &lt; 1.0) can lead to images that do not follow the prompt or lack detail.
     /// </summary>
     public double? DistilledCfgScale { get; set; } = 3;
 

@@ -16,7 +16,7 @@
         <ScrollView Grid.Row="0" Orientation="Vertical">
             <Grid x:Name="MainGrid"
               Padding="30"
-              RowDefinitions="auto, auto, auto, auto, auto"
+              RowDefinitions="auto, auto, auto, auto, auto, auto"
               RowSpacing="10"
               ColumnSpacing="16"
               ColumnDefinitions="32,auto,*"
@@ -38,16 +38,25 @@
                 <Label Grid.Row="2" Grid.Column="1" Text="Backend:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
                 <Picker Grid.Row="2" Grid.Column="2" ItemsSource="{Binding AvailableBackends}" SelectedItem="{Binding SelectedBackend}" HorizontalOptions="Fill"/>
 
-                <Image Grid.Row="3" Grid.Column="0" WidthRequest="32">
+                <!-- ComfyUI API Key Section -->
+                <Image Grid.Row="3" Grid.Column="0" WidthRequest="32" IsVisible="{Binding IsComfyUiSelected}">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xe897;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                    </Image.Source>
+                </Image>
+                <Label Grid.Row="3" Grid.Column="1" Text="ComfyUI API Key:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16" IsVisible="{Binding IsComfyUiSelected}"/>
+                <Entry Grid.Row="3" Grid.Column="2" Text="{Binding ComfyUiApiKey}" Placeholder="Optional (for cloud)" IsPassword="True" HorizontalOptions="Fill" IsVisible="{Binding IsComfyUiSelected}"/>
+
+                <Image Grid.Row="4" Grid.Column="0" WidthRequest="32">
                     <Image.Source>
                         <FontImageSource Glyph="&#xe85b;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="3" Grid.Column="1" Text="Default Width:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
-                <Entry Grid.Row="3" Grid.Column="2" Text="{Binding DefaultWidth}" Placeholder="512" Keyboard="Numeric" HorizontalOptions="Fill"/>
+                <Label Grid.Row="4" Grid.Column="1" Text="Default Width:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+                <Entry Grid.Row="4" Grid.Column="2" Text="{Binding DefaultWidth}" Placeholder="512" Keyboard="Numeric" HorizontalOptions="Fill"/>
 
-                <Label Grid.Row="4" Grid.Column="1" Text="Default Height:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
-                <Entry Grid.Row="4" Grid.Column="2" Text="{Binding DefaultHeight}" Placeholder="512" Keyboard="Numeric" HorizontalOptions="Fill"/>
+                <Label Grid.Row="5" Grid.Column="1" Text="Default Height:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+                <Entry Grid.Row="5" Grid.Column="2" Text="{Binding DefaultHeight}" Placeholder="512" Keyboard="Numeric" HorizontalOptions="Fill"/>
             </Grid>
         </ScrollView>
 

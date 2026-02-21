@@ -79,20 +79,27 @@ public partial class MaskLineViewModel : PaintActionViewModel
             path.LineTo(points[0].X, points[0].Y);
         }
 
-        // PRIORITY 1: Visual Fallback for Low Alpha (Only when NOT saving)
-        // If the alpha is very low, we show the hatch pattern so the user can see where they are drawing.
-        // But if we are saving (Exporting), we skip this validation so the actual noise/color is rendered.
-        if (!isSaving && Alpha <= 0.1f && _bitmapShader != null)
+        if (MaskEffect == MaskEffect.Paint)
         {
-            paint.Shader = _bitmapShader;
-            paint.Color = SKColors.White; // Full opacity for the hatch pattern lines
-        }
-        // PRIORITY 2: Noise Shader (If enabled)
-        // Used for saving OR if alpha is high enough to be visible.
-        else if (Noise > 0 && _noiseShader != null)
-        {
-            // Use the cached Noise shader (created in PaintActionViewModel.UpdateShaders)
-            paint.Shader = _noiseShader;
+            // PRIORITY 1: Visual Fallback for Low Alpha (Only when NOT saving)
+            // If the alpha is very low, we show the hatch pattern so the user can see where they are drawing.
+            // But if we are saving (Exporting), we skip this validation so the actual noise/color is rendered.
+            if (!isSaving && Alpha <= 0.1f && _bitmapShader != null)
+            {
+                paint.Shader = _bitmapShader;
+                paint.Color = SKColors.White; // Full opacity for the hatch pattern lines
+            }
+            // PRIORITY 2: Noise Shader (If enabled)
+            // Used for saving OR if alpha is high enough to be visible.
+            else if (Noise > 0 && _noiseShader != null)
+            {
+                // Use the cached Noise shader (created in PaintActionViewModel.UpdateShaders)
+                paint.Shader = _noiseShader;
+            }
+            else
+            {
+                paint.Shader = null;
+            }
         }
         else
         {

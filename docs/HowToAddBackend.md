@@ -49,8 +49,9 @@ Open `MobileDiffusion/Registrations/ServiceRegistrations.cs` (or `MauiProgram.cs
 ```csharp
 // In ServiceRegistrations.cs inside RegisterServices method:
 
-// Existing backend
+// Existing backends
 builder.Services.AddSingleton<IImageGenerationBackend, SdForgeNeoService>();
+builder.Services.AddSingleton<IImageGenerationBackend, ComfyUiService>();
 
 // NEW backend
 builder.Services.AddSingleton<IImageGenerationBackend, MyNewBackendService>();

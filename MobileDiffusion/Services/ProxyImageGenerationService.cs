@@ -50,24 +50,10 @@ public class ProxyImageGenerationService : IImageGenerationService
     public async Task<PromptSettings?> GetImageInfoAsync(string base64EncodedImage, CancellationToken cancellationToken = default)
     {
         // Try the active backend first
+        // Both backends now use PngMetadataHelper locally, but SdForgeNeoService has extra model resolution logic
+        // So sticking with the active backend first is correct to get the "upgraded" model object if possible
         var result = await ActiveBackend.GetImageInfoAsync(base64EncodedImage, cancellationToken);
         if (result != null) return result;
-
-        // If that fails, try all other registered backends to see if any can parse the format
-        foreach (var backend in _registry.GetAllBackends())
-        {
-            if (backend == ActiveBackend) continue;
-
-            try 
-            {
-                var backendResult = await backend.GetImageInfoAsync(base64EncodedImage, cancellationToken);
-                if (backendResult != null) return backendResult;
-            }
-            catch
-            {
-                // Ignore errors from other backends
-            }
-        }
 
         return null;
     }

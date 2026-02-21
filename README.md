@@ -33,4 +33,6 @@ For a detailed breakdown of the application structure, including Views, ViewMode
 
 1.  Build and deploy the application to your device.
 2.  Navigate to the **Settings** page.
-3.  Enter your backend server URL (e.g., `http://192.168.1.x:7860`).
+3.  Select your backend (**SD Forge Neo** or **ComfyUI**) from the dropdown.
+4.  Enter your backend server URL (e.g., `http://192.168.1.x:7860` for Forge, `http://192.168.1.x:8188` for ComfyUI).
+5.  If using Comfy Cloud, enter your API Key.
