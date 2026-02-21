@@ -14,12 +14,6 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
     public partial string ServerUrl { get; set; }
 
     [ObservableProperty]
-    public partial string DefaultWidth { get; set; }
-
-    [ObservableProperty]
-    public partial string DefaultHeight { get; set; }
-
-    [ObservableProperty]
     public partial IReadOnlyList<string> AvailableBackends { get; set; }
 
     [ObservableProperty]
@@ -39,8 +33,6 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
         
         ServerUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
         ComfyUiApiKey = Preferences.Default.Get(Constants.PreferenceKeys.ComfyUiApiKey, string.Empty);
-        DefaultWidth = Preferences.Default.Get<double>(Constants.PreferenceKeys.DefaultWidth, 512).ToString();
-        DefaultHeight = Preferences.Default.Get<double>(Constants.PreferenceKeys.DefaultHeight, 512).ToString();
 
         AvailableBackends = _backendRegistry.GetAllBackends().Select(b => b.Name).ToList();
         SelectedBackend = Preferences.Default.Get(Constants.PreferenceKeys.SelectedBackend, AvailableBackends.FirstOrDefault() ?? "SD Forge Neo");
@@ -65,16 +57,6 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
             Preferences.Default.Set(Constants.PreferenceKeys.ComfyUiApiKey, ComfyUiApiKey);
         }
 
-        if (!string.IsNullOrEmpty(DefaultWidth) && double.TryParse(DefaultWidth, out double defaultWidth))
-        {
-            Preferences.Default.Set(Constants.PreferenceKeys.DefaultWidth, defaultWidth);
-        }
-
-        if (!string.IsNullOrEmpty(DefaultHeight) && double.TryParse(DefaultHeight, out double defaultHeight))
-        {
-            Preferences.Default.Set(Constants.PreferenceKeys.DefaultHeight, defaultHeight);
-        }
-
         if (!string.IsNullOrEmpty(SelectedBackend))
         {
             Preferences.Default.Set(Constants.PreferenceKeys.SelectedBackend, SelectedBackend);
@@ -97,8 +79,6 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
 
         ServerUrl = string.Empty;
         ComfyUiApiKey = string.Empty;
-        DefaultWidth = "512";
-        DefaultHeight = "512";
 
         SelectedBackend = AvailableBackends.FirstOrDefault() ?? "SD Forge Neo";
     }

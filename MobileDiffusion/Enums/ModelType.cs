@@ -2,7 +2,8 @@ namespace MobileDiffusion.Enums;
 
 public enum ModelType
 {
-    StableDiffusion,
-    ZImage,
+    SD15,
+    SDXL,
+    ZImageTurbo,
     Flux
 }

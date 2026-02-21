@@ -20,7 +20,5 @@ public static class Constants
         public const string ApiKey = nameof(ApiKey);
         public const string ComfyUiApiKey = nameof(ComfyUiApiKey);
         public const string SelectedBackend = nameof(SelectedBackend);
-        public const string DefaultWidth = nameof(DefaultWidth);
-        public const string DefaultHeight = nameof(DefaultHeight);
     }
 }

@@ -151,7 +151,6 @@ public static class ForgeMetadataParser
                     case PngInfoProperties.Scheduler:
                     case PngInfoProperties.ScheduleType:
                         settings.Scheduler = property.Value.ToLower();
-                        settings.ModelType = ModelType.ZImage;
                         break;
                     case PngInfoProperties.DistilledCfgScale:
                     case PngInfoProperties.DistilledCfgScaleKey:
