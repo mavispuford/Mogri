@@ -110,9 +110,6 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     public partial List<string> AvailableSchedulers { get; set; } = new();
 
     [ObservableProperty]
-    public partial bool IsSchedulerVisible { get; set; }
-
-    [ObservableProperty]
     public partial string? Scheduler { get; set; }
 
     [ObservableProperty]
@@ -153,8 +150,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             Sampler = profile.DefaultSampler;
             Scheduler = profile.DefaultScheduler;
 
-            IsSchedulerVisible = value == ModelType.ZImage;
-            IsDistilledCfgScaleVisible = value == ModelType.ZImage || value == ModelType.Flux;
+            IsDistilledCfgScaleVisible = value == ModelType.ZImageTurbo || value == ModelType.Flux;
         }
         catch (Exception ex)
         {
@@ -380,8 +376,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             UpscaleSteps = _settings.UpscaleSteps.ToString();
             Width = _settings.Width.ToString();
 
-            IsSchedulerVisible = SelectedModelType == ModelType.ZImage;
-            IsDistilledCfgScaleVisible = SelectedModelType == ModelType.ZImage || SelectedModelType == ModelType.Flux;
+            IsDistilledCfgScaleVisible = SelectedModelType == ModelType.ZImageTurbo || SelectedModelType == ModelType.Flux;
         }
         finally
         {

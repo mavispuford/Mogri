@@ -16,7 +16,7 @@ public class GenerationProfile
     {
         return modelType switch
         {
-            ModelType.ZImage => new GenerationProfile
+            ModelType.ZImageTurbo => new GenerationProfile
             {
                 DefaultSteps = 8,
                 DefaultCfg = 1.0,
@@ -36,13 +36,23 @@ public class GenerationProfile
                 DefaultWidth = 1024,
                 DefaultHeight = 1024
             },
-            _ => new GenerationProfile // Stable Diffusion
+            ModelType.SD15 => new GenerationProfile
             {
                 DefaultSteps = 30,
-                DefaultCfg = 7.0,
+                DefaultCfg = 6.0,
                 DefaultDistilledCfg = null,
                 DefaultSampler = "DPM++ 2M",
-                DefaultScheduler = null,
+                DefaultScheduler = "karras",
+                DefaultWidth = 512,
+                DefaultHeight = 512
+            },
+            _ => new GenerationProfile // SDXL
+            {
+                DefaultSteps = 30,
+                DefaultCfg = 6.0,
+                DefaultDistilledCfg = null,
+                DefaultSampler = "DPM++ 2M",
+                DefaultScheduler = "karras",
                 DefaultWidth = 1024,
                 DefaultHeight = 1024
             }

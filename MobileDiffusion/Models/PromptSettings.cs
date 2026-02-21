@@ -47,7 +47,7 @@ public class PromptSettings
     /// <summary>
     /// Target image height in pixels.
     /// </summary>
-    public double Height { get; set; } = Preferences.Default.Get<double>(Constants.PreferenceKeys.DefaultWidth, 512);
+    public double Height { get; set; } = 1024;
 
     /// <summary>
     /// Base64 encoded string of the initial image for Img2Img operations.
@@ -77,7 +77,7 @@ public class PromptSettings
     /// <summary>
     /// The high-level model type (SD, SDXL, Flux) which may affect parameter defaults.
     /// </summary>
-    public ModelType ModelType { get; set; } = ModelType.StableDiffusion;
+    public ModelType ModelType { get; set; } = ModelType.SDXL;
 
     /// <summary>
     /// Number of sampling steps.
@@ -158,7 +158,7 @@ public class PromptSettings
     /// <summary>
     /// Target image width in pixels.
     /// </summary>
-    public double Width { get; set; } = Preferences.Default.Get<double>(Constants.PreferenceKeys.DefaultHeight, 512);
+    public double Width { get; set; } = 1024;
 
     /// <summary>
     /// Whether to enable variation seeds.

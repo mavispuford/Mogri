@@ -114,13 +114,13 @@
                 <Label Grid.Row="9" Grid.Column="1" Text="Sampler:" Style="{StaticResource SettingLabel}" IsVisible="{Binding CurrentCapabilities.SupportsSamplerList}"/>
                 <Picker Grid.Row="9" Grid.Column="2" Title="Sampler" ItemsSource="{Binding AvailableSamplerValues}" SelectedItem="{Binding Sampler}" FontSize="16" HorizontalTextAlignment="End" IsVisible="{Binding CurrentCapabilities.SupportsSamplerList}"/>
 
-                <Image Grid.Row="10" WidthRequest="32" IsVisible="{Binding IsSchedulerVisible}">
+                <Image Grid.Row="10" WidthRequest="32" IsVisible="{Binding CurrentCapabilities.SupportsSchedulers}">
                     <Image.Source>
                         <FontImageSource Glyph="&#xe924;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="10" Grid.Column="1" Text="Scheduler:" Style="{StaticResource SettingLabel}" IsVisible="{Binding IsSchedulerVisible}"/>
-                <Picker Grid.Row="10" Grid.Column="2" Title="Scheduler" ItemsSource="{Binding AvailableSchedulers}" SelectedItem="{Binding Scheduler}" FontSize="16" HorizontalTextAlignment="End" IsVisible="{Binding IsSchedulerVisible}"/>
+                <Label Grid.Row="10" Grid.Column="1" Text="Scheduler:" Style="{StaticResource SettingLabel}" IsVisible="{Binding CurrentCapabilities.SupportsSchedulers}"/>
+                <Picker Grid.Row="10" Grid.Column="2" Title="Scheduler" ItemsSource="{Binding AvailableSchedulers}" SelectedItem="{Binding Scheduler}" FontSize="16" HorizontalTextAlignment="End" IsVisible="{Binding CurrentCapabilities.SupportsSchedulers}"/>
 
                 <Image Grid.Row="11" WidthRequest="32">
                     <Image.Source>

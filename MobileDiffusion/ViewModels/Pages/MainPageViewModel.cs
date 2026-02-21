@@ -98,10 +98,11 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
             var samplers = await _stableDiffusionService.GetSamplersAsync();
 
-            var profile = GenerationProfile.GetDefault(Enums.ModelType.StableDiffusion);
+            var profile = GenerationProfile.GetDefault(Enums.ModelType.SDXL);
             
             // Preserve current sampler if it exists in the new list (e.g. switching backends)
             var currentSampler = _settings.Sampler;
+            var currentScheduler = _settings.Scheduler;
             
             _settings.Steps = profile.DefaultSteps;
             _settings.GuidanceScale = profile.DefaultCfg;
@@ -126,6 +127,28 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             else
             {
                 _settings.Sampler = profile.DefaultSampler;
+            }
+
+            var schedulers = await _stableDiffusionService.GetSchedulersAsync();
+
+            if (schedulers != null && schedulers.Any())
+            {
+                if (!string.IsNullOrEmpty(currentScheduler) && schedulers.Contains(currentScheduler))
+                {
+                    _settings.Scheduler = currentScheduler;
+                }
+                else if (!string.IsNullOrEmpty(profile.DefaultScheduler) && schedulers.Contains(profile.DefaultScheduler))
+                {
+                    _settings.Scheduler = profile.DefaultScheduler;
+                }
+                else
+                {
+                    _settings.Scheduler = schedulers.FirstOrDefault();
+                }
+            }
+            else
+            {
+                _settings.Scheduler = profile.DefaultScheduler;
             }
 
             _settings.Model = await _stableDiffusionService.GetSelectedModelAsync();

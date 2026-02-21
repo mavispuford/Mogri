@@ -584,7 +584,7 @@
                     HeightRequest="56"
                     StrokeShape="RoundRectangle 15">
                 <Border.Shadow>
-                    <Shadow Radius="5" Opacity=".2" />
+                    <Shadow Radius="2" Offset="0,1" Opacity=".3" />
                 </Border.Shadow>
                 <animations:AnimationProperties.Animations>
                     <animations:ScaleToAnimation Scale="{Binding ShowActions, Converter={StaticResource BoolToScaleOutDoubleConverter}}" Easing="{x:Static Easing.CubicInOut}" Length="200" />

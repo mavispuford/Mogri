@@ -455,15 +455,15 @@ namespace MobileDiffusion.Services
             System.Diagnostics.Debug.WriteLine($"[SdForgeNeoService] Model: {settings.Model?.DisplayName}");
             System.Diagnostics.Debug.WriteLine($"[SdForgeNeoService] Steps: {settings.Steps}, CFG: {settings.GuidanceScale}, Sampler: {settings.Sampler}");
 
-            if (settings.ModelType == Enums.ModelType.ZImage)
-            {
-                request.Scheduler = settings.Scheduler;
-                System.Diagnostics.Debug.WriteLine($"[SdForgeNeoService] ZImage Scheduler: {settings.Scheduler}");
+            request.Scheduler = settings.Scheduler;
+            System.Diagnostics.Debug.WriteLine($"[SdForgeNeoService] Scheduler: {settings.Scheduler}");
 
+            if (settings.ModelType == Enums.ModelType.ZImageTurbo || settings.ModelType == Enums.ModelType.Flux)
+            {
                 if (settings.DistilledCfgScale.HasValue)
                 {
                     request.AdditionalData.Add("distilled_cfg_scale", settings.DistilledCfgScale.Value);
-                    System.Diagnostics.Debug.WriteLine($"[SdForgeNeoService] ZImage DistilledCfgScale: {settings.DistilledCfgScale.Value}");
+                    System.Diagnostics.Debug.WriteLine($"[SdForgeNeoService] DistilledCfgScale: {settings.DistilledCfgScale.Value}");
                 }
             }
 
@@ -512,10 +512,10 @@ namespace MobileDiffusion.Services
             request.MaskBlurY = settings.MaskBlur;
             request.MaskRound = false;
 
-            if (settings.ModelType == Enums.ModelType.ZImage)
-            {
-                request.Scheduler = settings.Scheduler;
+            request.Scheduler = settings.Scheduler;
 
+            if (settings.ModelType == Enums.ModelType.ZImageTurbo || settings.ModelType == Enums.ModelType.Flux)
+            {
                 if (settings.DistilledCfgScale.HasValue)
                 {
                     request.AdditionalData.Add("distilled_cfg_scale", settings.DistilledCfgScale.Value);
@@ -882,7 +882,7 @@ namespace MobileDiffusion.Services
 
                     // Handle Z-Image Turbo setting
                     string desiredUnetStorage = "Automatic";
-                    if (settings.ModelType == MobileDiffusion.Enums.ModelType.ZImage && settings.Loras?.Any() == true)
+                    if (settings.ModelType == MobileDiffusion.Enums.ModelType.ZImageTurbo && settings.Loras?.Any() == true)
                     {
                         desiredUnetStorage = "Automatic (fp16 LoRA)";
                     }
