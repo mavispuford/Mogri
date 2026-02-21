@@ -183,7 +183,7 @@
                         <FontImageSource Glyph="&#xe421;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="19" Grid.Column="1" Text="Make Seamless:" Style="{StaticResource SettingLabel}" IsVisible="{Binding CurrentCapabilities.SupportsSeamless}"/>
+                <Label Grid.Row="19" Grid.Column="1" Text="Make Tiled:" Style="{StaticResource SettingLabel}" IsVisible="{Binding CurrentCapabilities.SupportsSeamless}"/>
                 <Switch Grid.Row="19" Grid.Column="2" IsToggled="{Binding EnableTiling}" IsVisible="{Binding CurrentCapabilities.SupportsSeamless}"/>
 
             </Grid>

@@ -16,7 +16,7 @@
         <ScrollView Grid.Row="0" Orientation="Vertical">
             <Grid x:Name="MainGrid"
               Padding="30"
-              RowDefinitions="auto, auto, auto, auto"
+              RowDefinitions="auto, auto, auto, auto, auto"
               RowSpacing="10"
               ColumnSpacing="16"
               ColumnDefinitions="32,auto,*"
@@ -45,7 +45,7 @@
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="3" Grid.Column="1" Text="ComfyUI API Key:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16" IsVisible="{Binding IsComfyUiSelected}"/>
-                <Entry Grid.Row="3" Grid.Column="2" Text="{Binding ComfyUiApiKey}" Placeholder="Optional (for cloud)" IsPassword="True" HorizontalOptions="Fill" IsVisible="{Binding IsComfyUiSelected}"/>
+                <Entry Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding ComfyUiApiKey}" Placeholder="Optional (for cloud)" IsPassword="True" HorizontalOptions="Fill" IsVisible="{Binding IsComfyUiSelected}"/>
             </Grid>
         </ScrollView>
 
