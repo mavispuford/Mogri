@@ -10,14 +10,22 @@ using Microsoft.Kiota.Serialization.Text;
 using MobileDiffusion.Clients.SdForgeNeo.Api;
 using MobileDiffusion.Clients.SdForgeNeo.App_id;
 using MobileDiffusion.Clients.SdForgeNeo.Assets;
+using MobileDiffusion.Clients.SdForgeNeo.Call;
+using MobileDiffusion.Clients.SdForgeNeo.Cancel;
+using MobileDiffusion.Clients.SdForgeNeo.Component_server;
 using MobileDiffusion.Clients.SdForgeNeo.Config;
 using MobileDiffusion.Clients.SdForgeNeo.Controlnet;
+using MobileDiffusion.Clients.SdForgeNeo.Custom_component;
+using MobileDiffusion.Clients.SdForgeNeo.Dev;
 using MobileDiffusion.Clients.SdForgeNeo.FaviconIco;
 using MobileDiffusion.Clients.SdForgeNeo.FileNamespace;
+using MobileDiffusion.Clients.SdForgeNeo.Heartbeat;
 using MobileDiffusion.Clients.SdForgeNeo.Info;
 using MobileDiffusion.Clients.SdForgeNeo.Internal;
 using MobileDiffusion.Clients.SdForgeNeo.Login;
 using MobileDiffusion.Clients.SdForgeNeo.Login_check;
+using MobileDiffusion.Clients.SdForgeNeo.Logout;
+using MobileDiffusion.Clients.SdForgeNeo.Monitoring;
 using MobileDiffusion.Clients.SdForgeNeo.Queue;
 using MobileDiffusion.Clients.SdForgeNeo.Reset;
 using MobileDiffusion.Clients.SdForgeNeo.RobotsTxt;
@@ -30,6 +38,7 @@ using MobileDiffusion.Clients.SdForgeNeo.StreamNamespace;
 using MobileDiffusion.Clients.SdForgeNeo.ThemeCss;
 using MobileDiffusion.Clients.SdForgeNeo.Token;
 using MobileDiffusion.Clients.SdForgeNeo.Upload;
+using MobileDiffusion.Clients.SdForgeNeo.Upload_progress;
 using MobileDiffusion.Clients.SdForgeNeo.User;
 using MobileDiffusion.Clients.SdForgeNeo.WithPath_or_url;
 using MobileDiffusion.Clients.SdForgeNeo.WithUrl_path;
@@ -61,6 +70,21 @@ namespace MobileDiffusion.Clients.SdForgeNeo
         {
             get => new global::MobileDiffusion.Clients.SdForgeNeo.Assets.AssetsRequestBuilder(PathParameters, RequestAdapter);
         }
+        /// <summary>The call property</summary>
+        public global::MobileDiffusion.Clients.SdForgeNeo.Call.CallRequestBuilder Call
+        {
+            get => new global::MobileDiffusion.Clients.SdForgeNeo.Call.CallRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The cancel property</summary>
+        public global::MobileDiffusion.Clients.SdForgeNeo.Cancel.CancelRequestBuilder Cancel
+        {
+            get => new global::MobileDiffusion.Clients.SdForgeNeo.Cancel.CancelRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The component_server property</summary>
+        public global::MobileDiffusion.Clients.SdForgeNeo.Component_server.Component_serverRequestBuilder Component_server
+        {
+            get => new global::MobileDiffusion.Clients.SdForgeNeo.Component_server.Component_serverRequestBuilder(PathParameters, RequestAdapter);
+        }
         /// <summary>The config property</summary>
         public global::MobileDiffusion.Clients.SdForgeNeo.Config.ConfigRequestBuilder Config
         {
@@ -71,6 +95,16 @@ namespace MobileDiffusion.Clients.SdForgeNeo
         {
             get => new global::MobileDiffusion.Clients.SdForgeNeo.Controlnet.ControlnetRequestBuilder(PathParameters, RequestAdapter);
         }
+        /// <summary>The custom_component property</summary>
+        public global::MobileDiffusion.Clients.SdForgeNeo.Custom_component.Custom_componentRequestBuilder Custom_component
+        {
+            get => new global::MobileDiffusion.Clients.SdForgeNeo.Custom_component.Custom_componentRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The dev property</summary>
+        public global::MobileDiffusion.Clients.SdForgeNeo.Dev.DevRequestBuilder Dev
+        {
+            get => new global::MobileDiffusion.Clients.SdForgeNeo.Dev.DevRequestBuilder(PathParameters, RequestAdapter);
+        }
         /// <summary>The faviconIco property</summary>
         public global::MobileDiffusion.Clients.SdForgeNeo.FaviconIco.FaviconIcoRequestBuilder FaviconIco
         {
@@ -80,6 +114,11 @@ namespace MobileDiffusion.Clients.SdForgeNeo
         public global::MobileDiffusion.Clients.SdForgeNeo.FileNamespace.FileRequestBuilder File
         {
             get => new global::MobileDiffusion.Clients.SdForgeNeo.FileNamespace.FileRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The heartbeat property</summary>
+        public global::MobileDiffusion.Clients.SdForgeNeo.Heartbeat.HeartbeatRequestBuilder Heartbeat
+        {
+            get => new global::MobileDiffusion.Clients.SdForgeNeo.Heartbeat.HeartbeatRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The info property</summary>
         public global::MobileDiffusion.Clients.SdForgeNeo.Info.InfoRequestBuilder Info
@@ -100,6 +139,16 @@ namespace MobileDiffusion.Clients.SdForgeNeo
         public global::MobileDiffusion.Clients.SdForgeNeo.Login_check.Login_checkRequestBuilder Login_check
         {
             get => new global::MobileDiffusion.Clients.SdForgeNeo.Login_check.Login_checkRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The logout property</summary>
+        public global::MobileDiffusion.Clients.SdForgeNeo.Logout.LogoutRequestBuilder Logout
+        {
+            get => new global::MobileDiffusion.Clients.SdForgeNeo.Logout.LogoutRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The monitoring property</summary>
+        public global::MobileDiffusion.Clients.SdForgeNeo.Monitoring.MonitoringRequestBuilder Monitoring
+        {
+            get => new global::MobileDiffusion.Clients.SdForgeNeo.Monitoring.MonitoringRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The queue property</summary>
         public global::MobileDiffusion.Clients.SdForgeNeo.Queue.QueueRequestBuilder Queue
@@ -160,6 +209,11 @@ namespace MobileDiffusion.Clients.SdForgeNeo
         public global::MobileDiffusion.Clients.SdForgeNeo.Upload.UploadRequestBuilder Upload
         {
             get => new global::MobileDiffusion.Clients.SdForgeNeo.Upload.UploadRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The upload_progress property</summary>
+        public global::MobileDiffusion.Clients.SdForgeNeo.Upload_progress.Upload_progressRequestBuilder Upload_progress
+        {
+            get => new global::MobileDiffusion.Clients.SdForgeNeo.Upload_progress.Upload_progressRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The user property</summary>
         public global::MobileDiffusion.Clients.SdForgeNeo.User.UserRequestBuilder User

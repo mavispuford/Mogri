@@ -38,6 +38,8 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
         public double? DenoisingStrength { get; set; }
         /// <summary>The disable_extra_networks property</summary>
         public bool? DisableExtraNetworks { get; set; }
+        /// <summary>The distilled_cfg_scale property</summary>
+        public double? DistilledCfgScale { get; set; }
         /// <summary>The do_not_save_grid property</summary>
         public bool? DoNotSaveGrid { get; set; }
         /// <summary>The do_not_save_samples property</summary>
@@ -62,6 +64,8 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #endif
         /// <summary>The height property</summary>
         public int? Height { get; set; }
+        /// <summary>The hr_distilled_cfg property</summary>
+        public double? HrDistilledCfg { get; set; }
         /// <summary>The image_cfg_scale property</summary>
         public double? ImageCfgScale { get; set; }
         /// <summary>The include_init_images property</summary>
@@ -110,10 +114,6 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #endif
         /// <summary>The mask_blur property</summary>
         public int? MaskBlur { get; set; }
-        /// <summary>The mask_blur_x property</summary>
-        public int? MaskBlurX { get; set; }
-        /// <summary>The mask_blur_y property</summary>
-        public int? MaskBlurY { get; set; }
         /// <summary>The mask_round property</summary>
         public bool? MaskRound { get; set; }
         /// <summary>The negative_prompt property</summary>
@@ -210,8 +210,6 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
         public int? SeedResizeFromW { get; set; }
         /// <summary>The send_images property</summary>
         public bool? SendImages { get; set; }
-        /// <summary>The skip_early_cond property</summary>
-        public double? SkipEarlyCond { get; set; }
         /// <summary>The s_min_uncond property</summary>
         public double? SMinUncond { get; set; }
         /// <summary>The s_noise property</summary>
@@ -236,10 +234,6 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
         public double? SubseedStrength { get; set; }
         /// <summary>The tiling property</summary>
         public bool? Tiling { get; set; }
-        /// <summary>The token_merging_ratio property</summary>
-        public double? TokenMergingRatio { get; set; }
-        /// <summary>The token_merging_ratio_hr property</summary>
-        public double? TokenMergingRatioHr { get; set; }
         /// <summary>The width property</summary>
         public int? Width { get; set; }
         /// <summary>
@@ -274,12 +268,14 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
                 { "comments", n => { Comments = n.GetObjectValue<global::MobileDiffusion.Clients.SdForgeNeo.Models.StableDiffusionProcessingImg2Img_comments>(global::MobileDiffusion.Clients.SdForgeNeo.Models.StableDiffusionProcessingImg2Img_comments.CreateFromDiscriminatorValue); } },
                 { "denoising_strength", n => { DenoisingStrength = n.GetDoubleValue(); } },
                 { "disable_extra_networks", n => { DisableExtraNetworks = n.GetBoolValue(); } },
+                { "distilled_cfg_scale", n => { DistilledCfgScale = n.GetDoubleValue(); } },
                 { "do_not_save_grid", n => { DoNotSaveGrid = n.GetBoolValue(); } },
                 { "do_not_save_samples", n => { DoNotSaveSamples = n.GetBoolValue(); } },
                 { "eta", n => { Eta = n.GetDoubleValue(); } },
                 { "firstpass_image", n => { FirstpassImage = n.GetStringValue(); } },
                 { "force_task_id", n => { ForceTaskId = n.GetStringValue(); } },
                 { "height", n => { Height = n.GetIntValue(); } },
+                { "hr_distilled_cfg", n => { HrDistilledCfg = n.GetDoubleValue(); } },
                 { "image_cfg_scale", n => { ImageCfgScale = n.GetDoubleValue(); } },
                 { "include_init_images", n => { IncludeInitImages = n.GetBoolValue(); } },
                 { "infotext", n => { Infotext = n.GetStringValue(); } },
@@ -292,8 +288,6 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
                 { "latent_mask", n => { LatentMask = n.GetStringValue(); } },
                 { "mask", n => { Mask = n.GetStringValue(); } },
                 { "mask_blur", n => { MaskBlur = n.GetIntValue(); } },
-                { "mask_blur_x", n => { MaskBlurX = n.GetIntValue(); } },
-                { "mask_blur_y", n => { MaskBlurY = n.GetIntValue(); } },
                 { "mask_round", n => { MaskRound = n.GetBoolValue(); } },
                 { "n_iter", n => { NIter = n.GetIntValue(); } },
                 { "negative_prompt", n => { NegativePrompt = n.GetStringValue(); } },
@@ -319,14 +313,11 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
                 { "seed_resize_from_h", n => { SeedResizeFromH = n.GetIntValue(); } },
                 { "seed_resize_from_w", n => { SeedResizeFromW = n.GetIntValue(); } },
                 { "send_images", n => { SendImages = n.GetBoolValue(); } },
-                { "skip_early_cond", n => { SkipEarlyCond = n.GetDoubleValue(); } },
                 { "steps", n => { Steps = n.GetIntValue(); } },
                 { "styles", n => { Styles = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "subseed", n => { Subseed = n.GetIntValue(); } },
                 { "subseed_strength", n => { SubseedStrength = n.GetDoubleValue(); } },
                 { "tiling", n => { Tiling = n.GetBoolValue(); } },
-                { "token_merging_ratio", n => { TokenMergingRatio = n.GetDoubleValue(); } },
-                { "token_merging_ratio_hr", n => { TokenMergingRatioHr = n.GetDoubleValue(); } },
                 { "width", n => { Width = n.GetIntValue(); } },
             };
         }
@@ -343,12 +334,14 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
             writer.WriteObjectValue<global::MobileDiffusion.Clients.SdForgeNeo.Models.StableDiffusionProcessingImg2Img_comments>("comments", Comments);
             writer.WriteDoubleValue("denoising_strength", DenoisingStrength);
             writer.WriteBoolValue("disable_extra_networks", DisableExtraNetworks);
+            writer.WriteDoubleValue("distilled_cfg_scale", DistilledCfgScale);
             writer.WriteBoolValue("do_not_save_grid", DoNotSaveGrid);
             writer.WriteBoolValue("do_not_save_samples", DoNotSaveSamples);
             writer.WriteDoubleValue("eta", Eta);
             writer.WriteStringValue("firstpass_image", FirstpassImage);
             writer.WriteStringValue("force_task_id", ForceTaskId);
             writer.WriteIntValue("height", Height);
+            writer.WriteDoubleValue("hr_distilled_cfg", HrDistilledCfg);
             writer.WriteDoubleValue("image_cfg_scale", ImageCfgScale);
             writer.WriteBoolValue("include_init_images", IncludeInitImages);
             writer.WriteStringValue("infotext", Infotext);
@@ -361,8 +354,6 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
             writer.WriteStringValue("latent_mask", LatentMask);
             writer.WriteStringValue("mask", Mask);
             writer.WriteIntValue("mask_blur", MaskBlur);
-            writer.WriteIntValue("mask_blur_x", MaskBlurX);
-            writer.WriteIntValue("mask_blur_y", MaskBlurY);
             writer.WriteBoolValue("mask_round", MaskRound);
             writer.WriteStringValue("negative_prompt", NegativePrompt);
             writer.WriteIntValue("n_iter", NIter);
@@ -384,7 +375,6 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
             writer.WriteIntValue("seed_resize_from_h", SeedResizeFromH);
             writer.WriteIntValue("seed_resize_from_w", SeedResizeFromW);
             writer.WriteBoolValue("send_images", SendImages);
-            writer.WriteDoubleValue("skip_early_cond", SkipEarlyCond);
             writer.WriteDoubleValue("s_min_uncond", SMinUncond);
             writer.WriteDoubleValue("s_noise", SNoise);
             writer.WriteIntValue("steps", Steps);
@@ -394,8 +384,6 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
             writer.WriteIntValue("subseed", Subseed);
             writer.WriteDoubleValue("subseed_strength", SubseedStrength);
             writer.WriteBoolValue("tiling", Tiling);
-            writer.WriteDoubleValue("token_merging_ratio", TokenMergingRatio);
-            writer.WriteDoubleValue("token_merging_ratio_hr", TokenMergingRatioHr);
             writer.WriteIntValue("width", Width);
             writer.WriteAdditionalData(AdditionalData);
         }

@@ -38,7 +38,6 @@ namespace MobileDiffusion.Services
         private List<SDModelItem>? _models;
         private List<LoraItem>? _loras;
         private List<UpscalerItem>? _upscalers;
-        private List<SDVaeItem>? _vaes;
         private List<string>? _moduleVaes;
         private List<string>? _textEncoders;
         private Options? _options;
@@ -447,6 +446,7 @@ namespace MobileDiffusion.Services
             request.HrScale = settings.UpscaleLevel;
             request.HrSecondPassSteps = settings.UpscaleSteps;
             request.HrUpscaler = settings.Upscaler;
+            request.HrAdditionalModules = new UntypedArray(new List<UntypedNode>());
 
             var combinedPromptAndStyles = settings.GetCombinedPromptAndPromptStyles();
             request.Prompt = combinedPromptAndStyles.Prompt;
@@ -511,8 +511,6 @@ namespace MobileDiffusion.Services
             // Because we colorize the image, blurring the mask would cause some of the colorized pixels to stay
             // However, if the user has explicitly set a mask blur, we should honor it.
             request.MaskBlur = settings.MaskBlur;
-            request.MaskBlurX = settings.MaskBlur;
-            request.MaskBlurY = settings.MaskBlur;
             request.MaskRound = false;
 
             request.Scheduler = settings.Scheduler;
@@ -672,14 +670,6 @@ namespace MobileDiffusion.Services
                     catch { /* Ignore if endpoint doesn't exist */ }
                 }, cancellationToken),
                 Task.Run(async () => _models = await _client.Sdapi.V1.SdModels.GetAsync(cancellationToken: cts.Token), cancellationToken),
-                Task.Run(async () =>
-                {
-                    try
-                    {
-                        _vaes = await _client.Sdapi.V1.SdVae.GetAsync(cancellationToken: cts.Token);
-                    }
-                    catch { /* Ignore if endpoint doesn't exist */ }
-                }, cancellationToken),
                 Task.Run(async () =>
                 {
                     try
@@ -921,17 +911,6 @@ namespace MobileDiffusion.Services
         public Task<List<string>> GetVaesAsync(CancellationToken cancellationToken = default)
         {
             var result = new List<string> { "Automatic", "None" };
-
-            if (_vaes != null)
-            {
-                foreach (var vae in _vaes)
-                {
-                    if (!string.IsNullOrEmpty(vae.ModelName) && !result.Contains(vae.ModelName))
-                    {
-                        result.Add(vae.ModelName);
-                    }
-                }
-            }
 
             if (_moduleVaes != null)
             {

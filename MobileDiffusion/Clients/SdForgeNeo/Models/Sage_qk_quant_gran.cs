@@ -3,9 +3,10 @@ using System.Runtime.Serialization;
 using System;
 namespace MobileDiffusion.Clients.SdForgeNeo.Models
 {
-    /// <summary>An enumeration.</summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+    #pragma warning disable CS1591
     public enum Sage_qk_quant_gran
+    #pragma warning restore CS1591
     {
         [EnumMember(Value = "per_warp")]
         #pragma warning disable CS1591

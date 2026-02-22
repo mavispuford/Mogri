@@ -21,13 +21,12 @@ using MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.RefreshCheckpoints;
 using MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.RefreshEmbeddings;
 using MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.RefreshLoras;
 using MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.RefreshVae;
-using MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.ReloadCheckpoint;
 using MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.Samplers;
 using MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.Schedulers;
 using MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.ScriptInfo;
 using MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.Scripts;
 using MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.SdModels;
-using MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.SdVae;
+using MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.SdModules;
 using MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.Skip;
 using MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.Txt2img;
 using MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.UnloadCheckpoint;
@@ -139,11 +138,6 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1
         {
             get => new global::MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.RefreshVae.RefreshVaeRequestBuilder(PathParameters, RequestAdapter);
         }
-        /// <summary>The reloadCheckpoint property</summary>
-        public global::MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.ReloadCheckpoint.ReloadCheckpointRequestBuilder ReloadCheckpoint
-        {
-            get => new global::MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.ReloadCheckpoint.ReloadCheckpointRequestBuilder(PathParameters, RequestAdapter);
-        }
         /// <summary>The samplers property</summary>
         public global::MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.Samplers.SamplersRequestBuilder Samplers
         {
@@ -169,10 +163,10 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1
         {
             get => new global::MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.SdModels.SdModelsRequestBuilder(PathParameters, RequestAdapter);
         }
-        /// <summary>The sdVae property</summary>
-        public global::MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.SdVae.SdVaeRequestBuilder SdVae
+        /// <summary>The sdModules property</summary>
+        public global::MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.SdModules.SdModulesRequestBuilder SdModules
         {
-            get => new global::MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.SdVae.SdVaeRequestBuilder(PathParameters, RequestAdapter);
+            get => new global::MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.SdModules.SdModulesRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The skip property</summary>
         public global::MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.Skip.SkipRequestBuilder Skip
