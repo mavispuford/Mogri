@@ -443,10 +443,31 @@ namespace MobileDiffusion.Services
                 !string.IsNullOrEmpty(settings.Upscaler) &&
                 settings.UpscaleLevel > 0 &&
                 settings.UpscaleSteps > 0;
-            request.HrScale = settings.UpscaleLevel;
-            request.HrSecondPassSteps = settings.UpscaleSteps;
-            request.HrUpscaler = settings.Upscaler;
-            request.HrAdditionalModules = new UntypedArray(new List<UntypedNode>());
+
+            if (request.EnableHr == true)
+            {
+                request.HrScale = settings.UpscaleLevel;
+                request.HrSecondPassSteps = settings.UpscaleSteps;
+                request.HrUpscaler = settings.Upscaler;
+
+                var additionalModules = new List<UntypedNode>();
+
+                if (!string.IsNullOrEmpty(settings.Vae) && settings.Vae != "Automatic" && settings.Vae != "None")
+                {
+                    if (_moduleVaes != null && _moduleVaes.Contains(settings.Vae))
+                    {
+                        additionalModules.Add(new UntypedString(settings.Vae));
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(settings.TextEncoder) && settings.TextEncoder != "None")
+                {
+                    additionalModules.Add(new UntypedString(settings.TextEncoder));
+                }
+
+                request.HrAdditionalModules = new UntypedArray(additionalModules);
+            }
+            
 
             var combinedPromptAndStyles = settings.GetCombinedPromptAndPromptStyles();
             request.Prompt = combinedPromptAndStyles.Prompt;
