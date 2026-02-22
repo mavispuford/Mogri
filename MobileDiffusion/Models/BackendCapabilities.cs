@@ -46,6 +46,16 @@ public record BackendCapabilities
     /// </summary>
     public bool SupportsSchedulers { get; init; }
 
+    /// <summary>
+    /// Gets whether the backend supports explicit VAE selection.
+    /// </summary>
+    public bool SupportsVaes { get; init; }
+
+    /// <summary>
+    /// Gets whether the backend supports explicit Text Encoder selection.
+    /// </summary>
+    public bool SupportsTextEncoders { get; init; }
+
     public static BackendCapabilities None => new();
 
     public static BackendCapabilities Full => new()
@@ -57,6 +67,8 @@ public record BackendCapabilities
         SupportsCancellation = true,
         SupportsLoras = true,
         SupportsStyles = true,
-        SupportsSchedulers = true
+        SupportsSchedulers = true,
+        SupportsVaes = true,
+        SupportsTextEncoders = true
     };
 }

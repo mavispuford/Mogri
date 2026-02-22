@@ -33,6 +33,10 @@ public interface IImageGenerationService
 
     Task<List<string>> GetSchedulersAsync(CancellationToken cancellationToken = default);
 
+    Task<List<string>> GetVaesAsync(CancellationToken cancellationToken = default);
+
+    Task<List<string>> GetTextEncodersAsync(CancellationToken cancellationToken = default);
+
     Task<IModelViewModel?> GetSelectedModelAsync(CancellationToken cancellationToken = default);
 
     Task SaveSettingsAsync(PromptSettings settings, CancellationToken cancellationToken = default);

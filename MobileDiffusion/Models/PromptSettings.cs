@@ -126,6 +126,16 @@ public class PromptSettings
     public string? Scheduler { get; set; }
 
     /// <summary>
+    /// The VAE to use.
+    /// </summary>
+    public string? Vae { get; set; }
+
+    /// <summary>
+    /// The Text Encoder to use.
+    /// </summary>
+    public string? TextEncoder { get; set; }
+
+    /// <summary>
     /// Generic intent for tiled/seamless generation.
     /// </summary>
     public bool EnableTiling { get; set; }
@@ -208,6 +218,8 @@ public class PromptSettings
             Model = Model,
             Sampler = Sampler,
             Scheduler = Scheduler,
+            Vae = Vae,
+            TextEncoder = TextEncoder,
             EnableTiling = EnableTiling,
             Seed = Seed,
             Upscaler = Upscaler,

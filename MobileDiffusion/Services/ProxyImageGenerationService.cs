@@ -79,6 +79,10 @@ public class ProxyImageGenerationService : IImageGenerationService
 
     public Task<List<string>> GetSchedulersAsync(CancellationToken cancellationToken = default) => ActiveBackend.GetSchedulersAsync(cancellationToken);
 
+    public Task<List<string>> GetVaesAsync(CancellationToken cancellationToken = default) => ActiveBackend.GetVaesAsync(cancellationToken);
+
+    public Task<List<string>> GetTextEncodersAsync(CancellationToken cancellationToken = default) => ActiveBackend.GetTextEncodersAsync(cancellationToken);
+
     public Task<IModelViewModel?> GetSelectedModelAsync(CancellationToken cancellationToken = default) => ActiveBackend.GetSelectedModelAsync(cancellationToken);
 
     public Task SaveSettingsAsync(PromptSettings settings, CancellationToken cancellationToken = default) => ActiveBackend.SaveSettingsAsync(settings, cancellationToken);

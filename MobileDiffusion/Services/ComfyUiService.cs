@@ -466,6 +466,12 @@ public class ComfyUiService : IImageGenerationBackend
     public Task<List<string>> GetSchedulersAsync(CancellationToken cancellationToken = default) 
         => Task.FromResult(_schedulers);
 
+    public Task<List<string>> GetVaesAsync(CancellationToken cancellationToken = default) 
+        => Task.FromResult(new List<string>());
+
+    public Task<List<string>> GetTextEncodersAsync(CancellationToken cancellationToken = default) 
+        => Task.FromResult(new List<string>());
+
     public Task<List<IModelViewModel>> GetModelsAsync(CancellationToken cancellationToken = default) 
         => Task.FromResult(_models);
 
