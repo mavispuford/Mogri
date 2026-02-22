@@ -6,12 +6,6 @@ namespace MobileDiffusion.Models;
 public class PromptSettings
 {
     /// <summary>
-    /// Generic intent for face restoration.
-    /// Backends should map this to their specific implementation (e.g., GFPGAN, CodeFormer, FaceDetailer).
-    /// </summary>
-    public bool EnableFaceRestoration { get; set; } = false;
-
-    /// <summary>
     /// Whether to apply an upscaler to the generated image.
     /// </summary>
     public bool EnableUpscaling { get; set; } = false;
@@ -25,11 +19,6 @@ public class PromptSettings
     /// Whether to resize/crop the input image on the client before sending.
     /// </summary>
     public bool FitClientSide { get; set; } = true;
-
-    /// <summary>
-    /// Strength of the face restoration effect (0.0 to 1.0).
-    /// </summary>
-    public double FaceRestorationStrength { get; set; } = .75;
 
     /// <summary>
     /// Classifier-Free Guidance scale. Controls how closely the generation follows the prompt.
@@ -195,11 +184,9 @@ public class PromptSettings
     {
         return new PromptSettings
         {
-            EnableFaceRestoration = EnableFaceRestoration,
             EnableUpscaling = EnableUpscaling,
             EnableFitServerSide = EnableFitServerSide,
             FitClientSide = FitClientSide,
-            FaceRestorationStrength = FaceRestorationStrength,
             GuidanceScale = GuidanceScale,
             DistilledCfgScale = DistilledCfgScale,
             Height = Height,

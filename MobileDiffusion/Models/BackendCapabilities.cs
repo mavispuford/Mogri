@@ -12,11 +12,6 @@ public record BackendCapabilities
     public bool SupportsSeamless { get; init; }
 
     /// <summary>
-    /// Gets whether the backend supports face restoration (e.g. CodeFormer, GFPGAN).
-    /// </summary>
-    public bool SupportsFaceRestoration { get; init; }
-
-    /// <summary>
     /// Gets whether the backend supports upscaling.
     /// </summary>
     public bool SupportsUpscaling { get; init; }
@@ -61,7 +56,6 @@ public record BackendCapabilities
     public static BackendCapabilities Full => new()
     {
         SupportsSeamless = true,
-        SupportsFaceRestoration = true,
         SupportsUpscaling = true,
         SupportsSamplerList = true,
         SupportsCancellation = true,

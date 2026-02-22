@@ -74,15 +74,6 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     public partial string? SeedPlaceholder { get; set; }
 
     [ObservableProperty]
-    public partial bool EnableFaceRestoration { get; set; }
-
-    [ObservableProperty]
-    public partial string? FaceRestorationStrength { get; set; }
-
-    [ObservableProperty]
-    public partial string? FaceRestorationStrengthPlaceholder { get; set; }
-
-    [ObservableProperty]
     public partial bool EnableUpscaling { get; set; }
 
     [ObservableProperty]
@@ -249,7 +240,6 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         CfgScalePlaceholder = defaultSettings.GuidanceScale.ToString();
         DistilledCfgScalePlaceholder = defaultSettings.DistilledCfgScale?.ToString();
         SeedPlaceholder = defaultSettings.Seed.ToString();
-        FaceRestorationStrengthPlaceholder = defaultSettings.FaceRestorationStrength.ToString();
         UpscaleStepsPlaceholder = defaultSettings.UpscaleSteps.ToString();
     }
 
@@ -323,9 +313,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
 
         var defaultSettings = new PromptSettings();
         CfgScale = defaultSettings.GuidanceScale.ToString();
-        EnableFaceRestoration = defaultSettings.EnableFaceRestoration;
         EnableUpscaling = defaultSettings.EnableUpscaling;
-        FaceRestorationStrength = defaultSettings.FaceRestorationStrength.ToString();
         Height = defaultSettings.Height.ToString();
         BatchCount = defaultSettings.BatchCount.ToString();
         BatchSize = defaultSettings.BatchSize.ToString();
@@ -452,9 +440,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         {
             CfgScale = _settings.GuidanceScale.ToString();
             DistilledCfgScale = _settings.DistilledCfgScale?.ToString();
-            EnableFaceRestoration = _settings.EnableFaceRestoration;
             EnableUpscaling = _settings.EnableUpscaling;
-            FaceRestorationStrength = _settings.FaceRestorationStrength.ToString();
             Height = _settings.Height.ToString();
             BatchCount = _settings.BatchCount.ToString();
             BatchSize = _settings.BatchSize.ToString();
@@ -618,14 +604,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             _settings.DistilledCfgScale = pDistilledCfgScale;
         }
 
-        _settings.EnableFaceRestoration = EnableFaceRestoration;
         _settings.EnableUpscaling = EnableUpscaling;
-
-        if (double.TryParse(FaceRestorationStrength, out var pFaceRestorationStrength) ||
-            double.TryParse(FaceRestorationStrengthPlaceholder, out pFaceRestorationStrength))
-        {
-            _settings.FaceRestorationStrength = pFaceRestorationStrength;
-        }
 
         if (double.TryParse(Height, out var pHeight))
         {

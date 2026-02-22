@@ -430,7 +430,6 @@ namespace MobileDiffusion.Services
             request.NIter = settings.BatchCount;
             request.BatchSize = settings.BatchSize;
             request.CfgScale = settings.GuidanceScale;
-            request.RestoreFaces = settings.EnableFaceRestoration;
             request.Width = (int)settings.Width;
             request.Height = (int)settings.Height;
             request.DenoisingStrength = settings.DenoisingStrength;
@@ -506,7 +505,6 @@ namespace MobileDiffusion.Services
             request.NIter = settings.BatchCount;
             request.BatchSize = settings.BatchSize;
             request.CfgScale = settings.GuidanceScale;
-            request.RestoreFaces = settings.EnableFaceRestoration;
             request.Width = (int)settings.Width;
             request.Height = (int)settings.Height;
             request.DenoisingStrength = settings.DenoisingStrength;
