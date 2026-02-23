@@ -51,12 +51,6 @@ public interface IPromptSettingsPageViewModel : IPageViewModel
 
     string? SeedPlaceholder { get; set; }
 
-    bool EnableFaceRestoration { get; set; }
-
-    string? FaceRestorationStrength { get; set; }
-
-    string? FaceRestorationStrengthPlaceholder { get; set; }
-
     bool EnableUpscaling { get; set; }
 
     string? Upscaler { get; set; }

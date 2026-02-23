@@ -74,15 +74,6 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
     public partial string? SeedPlaceholder { get; set; }
 
     [ObservableProperty]
-    public partial bool EnableFaceRestoration { get; set; }
-
-    [ObservableProperty]
-    public partial string? FaceRestorationStrength { get; set; }
-
-    [ObservableProperty]
-    public partial string? FaceRestorationStrengthPlaceholder { get; set; }
-
-    [ObservableProperty]
     public partial bool EnableUpscaling { get; set; }
 
     [ObservableProperty]
@@ -111,6 +102,18 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
 
     [ObservableProperty]
     public partial string? Scheduler { get; set; }
+
+    [ObservableProperty]
+    public partial List<string> AvailableVaes { get; set; } = new();
+
+    [ObservableProperty]
+    public partial string? Vae { get; set; }
+
+    [ObservableProperty]
+    public partial List<string> AvailableTextEncoders { get; set; } = new();
+
+    [ObservableProperty]
+    public partial string? TextEncoder { get; set; }
 
     [ObservableProperty]
     public partial List<string> AvailablePresets { get; set; } = new();
@@ -150,11 +153,68 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             Sampler = profile.DefaultSampler;
             Scheduler = profile.DefaultScheduler;
 
+            if (!string.IsNullOrEmpty(profile.DefaultVae))
+            {
+                var match = AvailableVaes.FirstOrDefault(v => v.Contains(profile.DefaultVae, StringComparison.OrdinalIgnoreCase));
+                if (match != null) Vae = match;
+            }
+            else
+            {
+                Vae = "Automatic";
+            }
+
+            if (!string.IsNullOrEmpty(profile.DefaultTextEncoder))
+            {
+                var match = AvailableTextEncoders.FirstOrDefault(v => v.Contains(profile.DefaultTextEncoder, StringComparison.OrdinalIgnoreCase));
+                if (match != null) TextEncoder = match;
+            }
+            else
+            {
+                TextEncoder = "None";
+            }
+
             IsDistilledCfgScaleVisible = value == ModelType.ZImageTurbo || value == ModelType.Flux;
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Error in OnSelectedModelTypeChanged: {ex}");
+        }
+    }
+
+    partial void OnModelChanged(IModelViewModel? value)
+    {
+        if (_isInitializing || value == null) return;
+
+        string savedVae;
+        if (Preferences.Default.ContainsKey($"Vae_{value.Key}"))
+        {
+            savedVae = Preferences.Default.Get($"Vae_{value.Key}", "Automatic");
+        }
+        else
+        {
+            var profile = GenerationProfile.GetDefault(SelectedModelType);
+            savedVae = AvailableVaes.FirstOrDefault(v => !string.IsNullOrEmpty(profile.DefaultVae) && v.Contains(profile.DefaultVae, StringComparison.OrdinalIgnoreCase)) ?? "Automatic";
+        }
+
+        if (AvailableVaes.Contains(savedVae))
+        {
+            Vae = savedVae;
+        }
+
+        string savedTextEncoder;
+        if (Preferences.Default.ContainsKey($"TextEncoder_{value.Key}"))
+        {
+            savedTextEncoder = Preferences.Default.Get($"TextEncoder_{value.Key}", "None");
+        }
+        else
+        {
+            var profile = GenerationProfile.GetDefault(SelectedModelType);
+            savedTextEncoder = AvailableTextEncoders.FirstOrDefault(v => !string.IsNullOrEmpty(profile.DefaultTextEncoder) && v.Contains(profile.DefaultTextEncoder, StringComparison.OrdinalIgnoreCase)) ?? "None";
+        }
+
+        if (AvailableTextEncoders.Contains(savedTextEncoder))
+        {
+            TextEncoder = savedTextEncoder;
         }
     }
 
@@ -180,7 +240,6 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         CfgScalePlaceholder = defaultSettings.GuidanceScale.ToString();
         DistilledCfgScalePlaceholder = defaultSettings.DistilledCfgScale?.ToString();
         SeedPlaceholder = defaultSettings.Seed.ToString();
-        FaceRestorationStrengthPlaceholder = defaultSettings.FaceRestorationStrength.ToString();
         UpscaleStepsPlaceholder = defaultSettings.UpscaleSteps.ToString();
     }
 
@@ -222,6 +281,16 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
 
             AvailableSchedulers = schedulers;
 
+            if (CurrentCapabilities.SupportsVaes)
+            {
+                AvailableVaes = await _stableDiffusionService.GetVaesAsync();
+            }
+
+            if (CurrentCapabilities.SupportsTextEncoders)
+            {
+                AvailableTextEncoders = await _stableDiffusionService.GetTextEncodersAsync();
+            }
+
             AvailablePresets = await _presetService.GetPresetsAsync();
         }
         catch (Exception ex)
@@ -244,9 +313,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
 
         var defaultSettings = new PromptSettings();
         CfgScale = defaultSettings.GuidanceScale.ToString();
-        EnableFaceRestoration = defaultSettings.EnableFaceRestoration;
         EnableUpscaling = defaultSettings.EnableUpscaling;
-        FaceRestorationStrength = defaultSettings.FaceRestorationStrength.ToString();
         Height = defaultSettings.Height.ToString();
         BatchCount = defaultSettings.BatchCount.ToString();
         BatchSize = defaultSettings.BatchSize.ToString();
@@ -254,6 +321,11 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         Model = defaultSettings.Model;
         Sampler = defaultSettings.Sampler;
         Scheduler = defaultSettings.Scheduler;
+
+        var profile = GenerationProfile.GetDefault(SelectedModelType);
+        Vae = AvailableVaes.FirstOrDefault(v => !string.IsNullOrEmpty(profile.DefaultVae) && v.Contains(profile.DefaultVae, StringComparison.OrdinalIgnoreCase)) ?? "Automatic";
+        TextEncoder = AvailableTextEncoders.FirstOrDefault(v => !string.IsNullOrEmpty(profile.DefaultTextEncoder) && v.Contains(profile.DefaultTextEncoder, StringComparison.OrdinalIgnoreCase)) ?? "None";
+
         Seed = defaultSettings.Seed.ToString();
         Steps = defaultSettings.Steps.ToString();
         Upscaler = defaultSettings.Upscaler?.ToString();
@@ -298,6 +370,18 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             {
                 // Keep currently selected model
                 _settings.Model = currentModel;
+            }
+
+            if (_settings.Model != null)
+            {
+                if (!string.IsNullOrEmpty(_settings.Vae))
+                {
+                    Preferences.Default.Set($"Vae_{_settings.Model.Key}", _settings.Vae);
+                }
+                if (!string.IsNullOrEmpty(_settings.TextEncoder))
+                {
+                    Preferences.Default.Set($"TextEncoder_{_settings.Model.Key}", _settings.TextEncoder);
+                }
             }
 
             await _stableDiffusionService.SaveSettingsAsync(_settings);
@@ -356,9 +440,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         {
             CfgScale = _settings.GuidanceScale.ToString();
             DistilledCfgScale = _settings.DistilledCfgScale?.ToString();
-            EnableFaceRestoration = _settings.EnableFaceRestoration;
             EnableUpscaling = _settings.EnableUpscaling;
-            FaceRestorationStrength = _settings.FaceRestorationStrength.ToString();
             Height = _settings.Height.ToString();
             BatchCount = _settings.BatchCount.ToString();
             BatchSize = _settings.BatchSize.ToString();
@@ -368,6 +450,43 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
                 : null;
             Sampler = _settings.Sampler;
             Scheduler = _settings.Scheduler;
+            
+            if (Model != null)
+            {
+                if (_settings.Vae != null)
+                {
+                    Vae = _settings.Vae;
+                }
+                else if (Preferences.Default.ContainsKey($"Vae_{Model.Key}"))
+                {
+                    Vae = Preferences.Default.Get($"Vae_{Model.Key}", "Automatic");
+                }
+                else
+                {
+                    var profile = GenerationProfile.GetDefault(_settings.ModelType);
+                    Vae = AvailableVaes.FirstOrDefault(v => !string.IsNullOrEmpty(profile.DefaultVae) && v.Contains(profile.DefaultVae, StringComparison.OrdinalIgnoreCase)) ?? "Automatic";
+                }
+
+                if (_settings.TextEncoder != null)
+                {
+                    TextEncoder = _settings.TextEncoder;
+                }
+                else if (Preferences.Default.ContainsKey($"TextEncoder_{Model.Key}"))
+                {
+                    TextEncoder = Preferences.Default.Get($"TextEncoder_{Model.Key}", "None");
+                }
+                else
+                {
+                    var profile = GenerationProfile.GetDefault(_settings.ModelType);
+                    TextEncoder = AvailableTextEncoders.FirstOrDefault(v => !string.IsNullOrEmpty(profile.DefaultTextEncoder) && v.Contains(profile.DefaultTextEncoder, StringComparison.OrdinalIgnoreCase)) ?? "None";
+                }
+            }
+            else
+            {
+                Vae = _settings.Vae;
+                TextEncoder = _settings.TextEncoder;
+            }
+
             Seed = _settings.Seed.ToString();
             SelectedModelType = _settings.ModelType;
             Steps = _settings.Steps.ToString();
@@ -485,14 +604,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             _settings.DistilledCfgScale = pDistilledCfgScale;
         }
 
-        _settings.EnableFaceRestoration = EnableFaceRestoration;
         _settings.EnableUpscaling = EnableUpscaling;
-
-        if (double.TryParse(FaceRestorationStrength, out var pFaceRestorationStrength) ||
-            double.TryParse(FaceRestorationStrengthPlaceholder, out pFaceRestorationStrength))
-        {
-            _settings.FaceRestorationStrength = pFaceRestorationStrength;
-        }
 
         if (double.TryParse(Height, out var pHeight))
         {
@@ -549,5 +661,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
 
         _settings.ModelType = SelectedModelType;
         _settings.Scheduler = Scheduler;
+        _settings.Vae = Vae;
+        _settings.TextEncoder = TextEncoder;
     }
 }

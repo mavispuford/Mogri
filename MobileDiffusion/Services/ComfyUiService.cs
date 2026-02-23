@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using MobileDiffusion.Clients.ComfyUi;
 using MobileDiffusion.Clients.ComfyUi.Models;
+using MobileDiffusion.Enums;
 using MobileDiffusion.Helpers;
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
@@ -43,7 +44,6 @@ public class ComfyUiService : IImageGenerationBackend
     public BackendCapabilities Capabilities => new()
     {
         SupportsSeamless = false,
-        SupportsFaceRestoration = false,
         SupportsUpscaling = false, // Can add later
         SupportsSamplerList = true,
         SupportsCancellation = true,
@@ -466,6 +466,12 @@ public class ComfyUiService : IImageGenerationBackend
     public Task<List<string>> GetSchedulersAsync(CancellationToken cancellationToken = default) 
         => Task.FromResult(_schedulers);
 
+    public Task<List<string>> GetVaesAsync(CancellationToken cancellationToken = default) 
+        => Task.FromResult(new List<string>());
+
+    public Task<List<string>> GetTextEncodersAsync(CancellationToken cancellationToken = default) 
+        => Task.FromResult(new List<string>());
+
     public Task<List<IModelViewModel>> GetModelsAsync(CancellationToken cancellationToken = default) 
         => Task.FromResult(_models);
 
@@ -484,9 +490,15 @@ public class ComfyUiService : IImageGenerationBackend
         return _models.FirstOrDefault();
     }
 
+    public Task<ModelType> GetCurrentModelTypeAsync(CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult((ModelType)Preferences.Default.Get(Constants.PreferenceKeys.ComfyUiModelType, (int)ModelType.SDXL));
+    }
+
     public Task SaveSettingsAsync(PromptSettings settings, CancellationToken cancellationToken = default)
     {
-         return Task.CompletedTask;
+        Preferences.Default.Set(Constants.PreferenceKeys.ComfyUiModelType, (int)settings.ModelType);
+        return Task.CompletedTask;
     }
 
     public async Task<bool> CancelAsync(CancellationToken cancellationToken = default)

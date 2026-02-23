@@ -2,6 +2,7 @@
 #pragma warning disable CS0618
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions;
+using MobileDiffusion.Clients.SdForgeNeo.Controlnet.Control_types;
 using MobileDiffusion.Clients.SdForgeNeo.Controlnet.Detect;
 using MobileDiffusion.Clients.SdForgeNeo.Controlnet.Model_list;
 using MobileDiffusion.Clients.SdForgeNeo.Controlnet.Module_list;
@@ -17,6 +18,11 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Controlnet
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class ControlnetRequestBuilder : BaseRequestBuilder
     {
+        /// <summary>The control_types property</summary>
+        public global::MobileDiffusion.Clients.SdForgeNeo.Controlnet.Control_types.Control_typesRequestBuilder Control_types
+        {
+            get => new global::MobileDiffusion.Clients.SdForgeNeo.Controlnet.Control_types.Control_typesRequestBuilder(PathParameters, RequestAdapter);
+        }
         /// <summary>The detect property</summary>
         public global::MobileDiffusion.Clients.SdForgeNeo.Controlnet.Detect.DetectRequestBuilder Detect
         {

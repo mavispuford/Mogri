@@ -2,6 +2,7 @@
 #pragma warning disable CS0618
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions;
+using MobileDiffusion.Clients.SdForgeNeo.Sd_extra_networks.CoverImages;
 using MobileDiffusion.Clients.SdForgeNeo.Sd_extra_networks.GetSingleCard;
 using MobileDiffusion.Clients.SdForgeNeo.Sd_extra_networks.Metadata;
 using MobileDiffusion.Clients.SdForgeNeo.Sd_extra_networks.Thumb;
@@ -17,6 +18,11 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Sd_extra_networks
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class Sd_extra_networksRequestBuilder : BaseRequestBuilder
     {
+        /// <summary>The coverImages property</summary>
+        public global::MobileDiffusion.Clients.SdForgeNeo.Sd_extra_networks.CoverImages.CoverImagesRequestBuilder CoverImages
+        {
+            get => new global::MobileDiffusion.Clients.SdForgeNeo.Sd_extra_networks.CoverImages.CoverImagesRequestBuilder(PathParameters, RequestAdapter);
+        }
         /// <summary>The getSingleCard property</summary>
         public global::MobileDiffusion.Clients.SdForgeNeo.Sd_extra_networks.GetSingleCard.GetSingleCardRequestBuilder GetSingleCard
         {

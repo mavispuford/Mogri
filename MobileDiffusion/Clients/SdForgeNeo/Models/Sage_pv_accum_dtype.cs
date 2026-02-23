@@ -3,9 +3,10 @@ using System.Runtime.Serialization;
 using System;
 namespace MobileDiffusion.Clients.SdForgeNeo.Models
 {
-    /// <summary>An enumeration.</summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+    #pragma warning disable CS1591
     public enum Sage_pv_accum_dtype
+    #pragma warning restore CS1591
     {
         [EnumMember(Value = "fp16")]
         #pragma warning disable CS1591

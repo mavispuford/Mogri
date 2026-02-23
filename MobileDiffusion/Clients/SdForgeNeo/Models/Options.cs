@@ -40,6 +40,178 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode AlwaysDiscardNextToLastSigma { get; set; }
 #endif
+        /// <summary>The anima_cfg0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? AnimaCfg0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode AnimaCfg0 { get; set; }
+#endif
+        /// <summary>The anima_cfg1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? AnimaCfg1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode AnimaCfg1 { get; set; }
+#endif
+        /// <summary>img2img CFG</summary>
+        public double? AnimaI2iCfg { get; set; }
+        /// <summary>The anima_i2i_dim0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? AnimaI2iDim0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode AnimaI2iDim0 { get; set; }
+#endif
+        /// <summary>The anima_i2i_dim1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? AnimaI2iDim1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode AnimaI2iDim1 { get; set; }
+#endif
+        /// <summary>img2img Height</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? AnimaI2iHeight { get; set; }
+#nullable restore
+#else
+        public UntypedNode AnimaI2iHeight { get; set; }
+#endif
+        /// <summary>img2img sampler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? AnimaI2iSampler { get; set; }
+#nullable restore
+#else
+        public string AnimaI2iSampler { get; set; }
+#endif
+        /// <summary>img2img scheduler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? AnimaI2iScheduler { get; set; }
+#nullable restore
+#else
+        public string AnimaI2iScheduler { get; set; }
+#endif
+        /// <summary>The anima_i2i_ss0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? AnimaI2iSs0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode AnimaI2iSs0 { get; set; }
+#endif
+        /// <summary>The anima_i2i_ss1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? AnimaI2iSs1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode AnimaI2iSs1 { get; set; }
+#endif
+        /// <summary>img2img Steps</summary>
+        public double? AnimaI2iStep { get; set; }
+        /// <summary>img2img Width</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? AnimaI2iWidth { get; set; }
+#nullable restore
+#else
+        public UntypedNode AnimaI2iWidth { get; set; }
+#endif
+        /// <summary>The anima_steps0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? AnimaSteps0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode AnimaSteps0 { get; set; }
+#endif
+        /// <summary>The anima_steps1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? AnimaSteps1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode AnimaSteps1 { get; set; }
+#endif
+        /// <summary>txt2img CFG</summary>
+        public double? AnimaT2iCfg { get; set; }
+        /// <summary>The anima_t2i_dim0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? AnimaT2iDim0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode AnimaT2iDim0 { get; set; }
+#endif
+        /// <summary>The anima_t2i_dim1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? AnimaT2iDim1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode AnimaT2iDim1 { get; set; }
+#endif
+        /// <summary>txt2img Height</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? AnimaT2iHeight { get; set; }
+#nullable restore
+#else
+        public UntypedNode AnimaT2iHeight { get; set; }
+#endif
+        /// <summary>txt2img Hires. CFG</summary>
+        public double? AnimaT2iHrCfg { get; set; }
+        /// <summary>txt2img Hires. Steps</summary>
+        public double? AnimaT2iHrStep { get; set; }
+        /// <summary>txt2img sampler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? AnimaT2iSampler { get; set; }
+#nullable restore
+#else
+        public string AnimaT2iSampler { get; set; }
+#endif
+        /// <summary>txt2img scheduler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? AnimaT2iScheduler { get; set; }
+#nullable restore
+#else
+        public string AnimaT2iScheduler { get; set; }
+#endif
+        /// <summary>The anima_t2i_ss0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? AnimaT2iSs0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode AnimaT2iSs0 { get; set; }
+#endif
+        /// <summary>The anima_t2i_ss1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? AnimaT2iSs1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode AnimaT2iSs1 { get; set; }
+#endif
+        /// <summary>txt2img Steps</summary>
+        public double? AnimaT2iStep { get; set; }
+        /// <summary>txt2img Width</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? AnimaT2iWidth { get; set; }
+#nullable restore
+#else
+        public UntypedNode AnimaT2iWidth { get; set; }
+#endif
         /// <summary>Allow &quot;http://&quot; and &quot;https://&quot; URLs as input images</summary>
         public bool? ApiEnableRequests { get; set; }
         /// <summary>Forbid URLs to local resources</summary>
@@ -52,6 +224,8 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode ApiUseragent { get; set; }
 #endif
+        /// <summary>Automatic backward compatibility</summary>
+        public bool? AutoBackcompat { get; set; }
         /// <summary>Launch the webui in browser on startup</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -64,100 +238,8 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
         public double? BetaDistAlpha { get; set; }
         /// <summary>Beta scheduler - beta</summary>
         public double? BetaDistBeta { get; set; }
-        /// <summary>Automatically expands an image that does not fit completely in the canvas area, similar to manually pressing the S and R buttons</summary>
-        public bool? CanvasAutoExpand { get; set; }
-        /// <summary>Take the focus off the prompt when working with a canvas</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? CanvasBlurPrompt { get; set; }
-#nullable restore
-#else
-        public UntypedNode CanvasBlurPrompt { get; set; }
-#endif
-        /// <summary>Disable function that you don&apos;t use</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? CanvasDisabledFunctions { get; set; }
-#nullable restore
-#else
-        public UntypedNode CanvasDisabledFunctions { get; set; }
-#endif
-        /// <summary>Adjust brush size</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public string? CanvasHotkeyAdjust { get; set; }
-#nullable restore
-#else
-        public string CanvasHotkeyAdjust { get; set; }
-#endif
-        /// <summary>Fullscreen Mode, maximizes the picture so that it fits into the screen and stretches it to its full width </summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public string? CanvasHotkeyFullscreen { get; set; }
-#nullable restore
-#else
-        public string CanvasHotkeyFullscreen { get; set; }
-#endif
-        /// <summary>Enlarge the brush size</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public string? CanvasHotkeyGrowBrush { get; set; }
-#nullable restore
-#else
-        public string CanvasHotkeyGrowBrush { get; set; }
-#endif
-        /// <summary>Moving the canvas</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public string? CanvasHotkeyMove { get; set; }
-#nullable restore
-#else
-        public string CanvasHotkeyMove { get; set; }
-#endif
-        /// <summary>Toggle overlap</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public string? CanvasHotkeyOverlap { get; set; }
-#nullable restore
-#else
-        public string CanvasHotkeyOverlap { get; set; }
-#endif
-        /// <summary>Reset zoom and canvas position</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public string? CanvasHotkeyReset { get; set; }
-#nullable restore
-#else
-        public string CanvasHotkeyReset { get; set; }
-#endif
-        /// <summary>Shrink the brush size</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public string? CanvasHotkeyShrinkBrush { get; set; }
-#nullable restore
-#else
-        public string CanvasHotkeyShrinkBrush { get; set; }
-#endif
-        /// <summary>Zoom canvas</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public string? CanvasHotkeyZoom { get; set; }
-#nullable restore
-#else
-        public string CanvasHotkeyZoom { get; set; }
-#endif
-        /// <summary>Enable tooltip on the canvas</summary>
-        public bool? CanvasShowTooltip { get; set; }
         /// <summary>Clean up the temporary directory above when starting webui</summary>
         public bool? CleanTempDirAtStart { get; set; }
-        /// <summary>Force Clip Skip for SDXL</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? ClipSkipSdxl { get; set; }
-#nullable restore
-#else
-        public UntypedNode ClipSkipSdxl { get; set; }
-#endif
         /// <summary>Clip Skip</summary>
         public double? CLIPStopAtLastLayers { get; set; }
         /// <summary>CodeFormer Strength</summary>
@@ -196,13 +278,13 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public string CrossAttentionOptimization { get; set; }
 #endif
-        /// <summary>Inference UNet in fast cublas operations</summary>
+        /// <summary>Revert [Ctrl + Enter] to only interrupt the generation</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public UntypedNode? CublasFast { get; set; }
+        public UntypedNode? CtrlEnterInterrupt { get; set; }
 #nullable restore
 #else
-        public UntypedNode CublasFast { get; set; }
+        public UntypedNode CtrlEnterInterrupt { get; set; }
 #endif
         /// <summary>img2img DDIM discretize</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -224,7 +306,7 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #endif
         /// <summary>Max length of prompts for the [prompt_words] pattern</summary>
         public double? DirectoriesMaxPromptWords { get; set; }
-        /// <summary>Disable all extensions (preserves the list of disabled extensions)</summary>
+        /// <summary>Disable all extensions</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? DisableAllExtensions { get; set; }
@@ -240,14 +322,6 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode DisabledExtensions { get; set; }
 #endif
-        /// <summary>Disable memmapping when loading .safetensors</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? DisableMmapLoadSafetensors { get; set; }
-#nullable restore
-#else
-        public UntypedNode DisableMmapLoadSafetensors { get; set; }
-#endif
         /// <summary>Disable Token Counter</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -256,8 +330,6 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode DisableTokenCounters { get; set; }
 #endif
-        /// <summary>Ignore checkpoint information when reading infotext</summary>
-        public bool? DisableWeightsAutoSwap { get; set; }
         /// <summary>The div00 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -282,37 +354,21 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode DivClassic { get; set; }
 #endif
-        /// <summary>The div_exp property</summary>
+        /// <summary>The divlumina property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public UntypedNode? DivExp { get; set; }
+        public UntypedNode? Divlumina { get; set; }
 #nullable restore
 #else
-        public UntypedNode DivExp { get; set; }
+        public UntypedNode Divlumina { get; set; }
 #endif
-        /// <summary>The div_exp_info property</summary>
+        /// <summary>The divqwen property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public UntypedNode? DivExpInfo { get; set; }
+        public UntypedNode? Divqwen { get; set; }
 #nullable restore
 #else
-        public UntypedNode DivExpInfo { get; set; }
-#endif
-        /// <summary>The div_ngms property</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? DivNgms { get; set; }
-#nullable restore
-#else
-        public UntypedNode DivNgms { get; set; }
-#endif
-        /// <summary>The div_skip_early property</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? DivSkipEarly { get; set; }
-#nullable restore
-#else
-        public UntypedNode DivSkipEarly { get; set; }
+        public UntypedNode Divqwen { get; set; }
 #endif
         /// <summary>The div_tome property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -321,14 +377,6 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #nullable restore
 #else
         public UntypedNode DivTome { get; set; }
-#endif
-        /// <summary>The div_tree property</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? DivTree { get; set; }
-#nullable restore
-#else
-        public UntypedNode DivTree { get; set; }
 #endif
         /// <summary>The divxl property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -374,6 +422,14 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
         public bool? EnablePnginfo { get; set; }
         /// <summary>Remove Comments from Prompts</summary>
         public bool? EnablePromptComments { get; set; }
+        /// <summary>Additionally reload the &quot;modules.ui&quot; scripts when using &quot;Reload UI&quot;</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? EnableReloadingUiScripts { get; set; }
+#nullable restore
+#else
+        public UntypedNode EnableReloadingUiScripts { get; set; }
+#endif
         /// <summary>Show a progress bar in the console for tiled upscaling</summary>
         public bool? EnableUpscaleProgressbar { get; set; }
         /// <summary>Tile Size for Upscalers</summary>
@@ -400,6 +456,14 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #endif
         /// <summary>Save copies of large images as JPG</summary>
         public bool? ExportFor4chan { get; set; }
+        /// <summary>The extra_dirs_div property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ExtraDirsDiv { get; set; }
+#nullable restore
+#else
+        public UntypedNode ExtraDirsDiv { get; set; }
+#endif
         /// <summary>Extra Networks Separator</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -454,13 +518,13 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #endif
         /// <summary>Default Weight for Extra Networks</summary>
         public double? ExtraNetworksDefaultMultiplier { get; set; }
-        /// <summary>Enable the Subdirectory Buttons</summary>
+        /// <summary>Add a &quot;/&quot; to the Dir buttons</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public UntypedNode? ExtraNetworksDirBtnEnable { get; set; }
+        public UntypedNode? ExtraNetworksDirButtonFunction { get; set; }
 #nullable restore
 #else
-        public UntypedNode ExtraNetworksDirBtnEnable { get; set; }
+        public UntypedNode ExtraNetworksDirButtonFunction { get; set; }
 #endif
         /// <summary>Show the Extra Networks in hidden directories</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -470,39 +534,19 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public string ExtraNetworksHiddenModels { get; set; }
 #endif
-        /// <summary>Patch the LoRAs in-place</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? ExtraNetworksPatchInplace { get; set; }
-#nullable restore
-#else
-        public UntypedNode ExtraNetworksPatchInplace { get; set; }
-#endif
-        /// <summary>Show the Tree View by default</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? ExtraNetworksTreeViewDefaultEnabled { get; set; }
-#nullable restore
-#else
-        public UntypedNode ExtraNetworksTreeViewDefaultEnabled { get; set; }
-#endif
-        /// <summary>Default Width for the Tree View</summary>
+        /// <summary>Show Dir buttons of hidden directories</summary>
+        public bool? ExtraNetworksShowHiddenDirectories { get; set; }
+        /// <summary>Show the Extra Networks Tree view by default</summary>
+        public bool? ExtraNetworksTreeViewDefaultEnabled { get; set; }
+        /// <summary>Default Width for the Tree view</summary>
         public double? ExtraNetworksTreeViewDefaultWidth { get; set; }
-        /// <summary>Enable the Tree View</summary>
+        /// <summary>Extra Networks UI Style</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public UntypedNode? ExtraNetworksTreeViewEnable { get; set; }
+        public string? ExtraNetworksTreeViewStyle { get; set; }
 #nullable restore
 #else
-        public UntypedNode ExtraNetworksTreeViewEnable { get; set; }
-#endif
-        /// <summary>The extra_networks_tree_view_explanation property</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public string? ExtraNetworksTreeViewExplanation { get; set; }
-#nullable restore
-#else
-        public string ExtraNetworksTreeViewExplanation { get; set; }
+        public string ExtraNetworksTreeViewStyle { get; set; }
 #endif
         /// <summary>Place added settings into an accordion</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -530,6 +574,14 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode ExtraOptionsTxt2img { get; set; }
 #endif
+        /// <summary>The extra_tree_div property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ExtraTreeDiv { get; set; }
+#nullable restore
+#else
+        public UntypedNode ExtraTreeDiv { get; set; }
+#endif
         /// <summary>Restore Faces</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -554,21 +606,489 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode FaceRestorationUnload { get; set; }
 #endif
-        /// <summary>Inference UNet in fast fp8 operations</summary>
+        /// <summary>The flux_cfg0 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public UntypedNode? Fp8Fast { get; set; }
+        public UntypedNode? FluxCfg0 { get; set; }
 #nullable restore
 #else
-        public UntypedNode Fp8Fast { get; set; }
+        public UntypedNode FluxCfg0 { get; set; }
 #endif
-        /// <summary>Store UNet Weights in fp8</summary>
+        /// <summary>The flux_cfg1 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public UntypedNode? Fp8Storage { get; set; }
+        public UntypedNode? FluxCfg1 { get; set; }
 #nullable restore
 #else
-        public UntypedNode Fp8Storage { get; set; }
+        public UntypedNode FluxCfg1 { get; set; }
+#endif
+        /// <summary>The flux_dcfg0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? FluxDcfg0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode FluxDcfg0 { get; set; }
+#endif
+        /// <summary>The flux_dcfg1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? FluxDcfg1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode FluxDcfg1 { get; set; }
+#endif
+        /// <summary>img2img CFG</summary>
+        public double? FluxI2iCfg { get; set; }
+        /// <summary>img2img Distilled CFG</summary>
+        public double? FluxI2iDcfg { get; set; }
+        /// <summary>The flux_i2i_dim0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? FluxI2iDim0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode FluxI2iDim0 { get; set; }
+#endif
+        /// <summary>The flux_i2i_dim1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? FluxI2iDim1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode FluxI2iDim1 { get; set; }
+#endif
+        /// <summary>img2img Height</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? FluxI2iHeight { get; set; }
+#nullable restore
+#else
+        public UntypedNode FluxI2iHeight { get; set; }
+#endif
+        /// <summary>img2img sampler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? FluxI2iSampler { get; set; }
+#nullable restore
+#else
+        public string FluxI2iSampler { get; set; }
+#endif
+        /// <summary>img2img scheduler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? FluxI2iScheduler { get; set; }
+#nullable restore
+#else
+        public string FluxI2iScheduler { get; set; }
+#endif
+        /// <summary>The flux_i2i_ss0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? FluxI2iSs0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode FluxI2iSs0 { get; set; }
+#endif
+        /// <summary>The flux_i2i_ss1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? FluxI2iSs1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode FluxI2iSs1 { get; set; }
+#endif
+        /// <summary>img2img Steps</summary>
+        public double? FluxI2iStep { get; set; }
+        /// <summary>img2img Width</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? FluxI2iWidth { get; set; }
+#nullable restore
+#else
+        public UntypedNode FluxI2iWidth { get; set; }
+#endif
+        /// <summary>The flux_steps0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? FluxSteps0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode FluxSteps0 { get; set; }
+#endif
+        /// <summary>The flux_steps1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? FluxSteps1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode FluxSteps1 { get; set; }
+#endif
+        /// <summary>txt2img CFG</summary>
+        public double? FluxT2iCfg { get; set; }
+        /// <summary>txt2img Distilled CFG</summary>
+        public double? FluxT2iDcfg { get; set; }
+        /// <summary>The flux_t2i_dim0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? FluxT2iDim0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode FluxT2iDim0 { get; set; }
+#endif
+        /// <summary>The flux_t2i_dim1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? FluxT2iDim1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode FluxT2iDim1 { get; set; }
+#endif
+        /// <summary>txt2img Height</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? FluxT2iHeight { get; set; }
+#nullable restore
+#else
+        public UntypedNode FluxT2iHeight { get; set; }
+#endif
+        /// <summary>txt2img Hires. CFG</summary>
+        public double? FluxT2iHrCfg { get; set; }
+        /// <summary>txt2img Hires. Distilled CFG</summary>
+        public double? FluxT2iHrDcfg { get; set; }
+        /// <summary>txt2img Hires. Steps</summary>
+        public double? FluxT2iHrStep { get; set; }
+        /// <summary>txt2img sampler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? FluxT2iSampler { get; set; }
+#nullable restore
+#else
+        public string FluxT2iSampler { get; set; }
+#endif
+        /// <summary>txt2img scheduler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? FluxT2iScheduler { get; set; }
+#nullable restore
+#else
+        public string FluxT2iScheduler { get; set; }
+#endif
+        /// <summary>The flux_t2i_ss0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? FluxT2iSs0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode FluxT2iSs0 { get; set; }
+#endif
+        /// <summary>The flux_t2i_ss1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? FluxT2iSs1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode FluxT2iSs1 { get; set; }
+#endif
+        /// <summary>txt2img Steps</summary>
+        public double? FluxT2iStep { get; set; }
+        /// <summary>txt2img Width</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? FluxT2iWidth { get; set; }
+#nullable restore
+#else
+        public UntypedNode FluxT2iWidth { get; set; }
+#endif
+        /// <summary>Forbidden Knowledge</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForbiddenKnowledge { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForbiddenKnowledge { get; set; }
+#endif
+        /// <summary>The forge_additional_modules property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeAdditionalModules { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeAdditionalModules { get; set; }
+#endif
+        /// <summary>The forge_additional_modules_anima property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeAdditionalModulesAnima { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeAdditionalModulesAnima { get; set; }
+#endif
+        /// <summary>The forge_additional_modules_flux property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeAdditionalModulesFlux { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeAdditionalModulesFlux { get; set; }
+#endif
+        /// <summary>The forge_additional_modules_klein property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeAdditionalModulesKlein { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeAdditionalModulesKlein { get; set; }
+#endif
+        /// <summary>The forge_additional_modules_lumina property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeAdditionalModulesLumina { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeAdditionalModulesLumina { get; set; }
+#endif
+        /// <summary>The forge_additional_modules_qwen property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeAdditionalModulesQwen { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeAdditionalModulesQwen { get; set; }
+#endif
+        /// <summary>The forge_additional_modules_sd property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeAdditionalModulesSd { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeAdditionalModulesSd { get; set; }
+#endif
+        /// <summary>The forge_additional_modules_wan property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeAdditionalModulesWan { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeAdditionalModulesWan { get; set; }
+#endif
+        /// <summary>The forge_additional_modules_xl property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeAdditionalModulesXl { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeAdditionalModulesXl { get; set; }
+#endif
+        /// <summary>The forge_additional_modules_zit property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeAdditionalModulesZit { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeAdditionalModulesZit { get; set; }
+#endif
+        /// <summary>Fixed Brush Size</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeCanvasConsistentBrush { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeCanvasConsistentBrush { get; set; }
+#endif
+        /// <summary>Canvas Height</summary>
+        public double? ForgeCanvasHeight { get; set; }
+        /// <summary>Plain Background</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeCanvasPlain { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeCanvasPlain { get; set; }
+#endif
+        /// <summary>Solid Color for Plain Background</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ForgeCanvasPlainColor { get; set; }
+#nullable restore
+#else
+        public string ForgeCanvasPlainColor { get; set; }
+#endif
+        /// <summary>Always Visible Toolbar</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeCanvasToolbarAlways { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeCanvasToolbarAlways { get; set; }
+#endif
+        /// <summary>The forge_checkpoint_anima property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeCheckpointAnima { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeCheckpointAnima { get; set; }
+#endif
+        /// <summary>The forge_checkpoint_flux property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeCheckpointFlux { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeCheckpointFlux { get; set; }
+#endif
+        /// <summary>The forge_checkpoint_klein property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeCheckpointKlein { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeCheckpointKlein { get; set; }
+#endif
+        /// <summary>The forge_checkpoint_lumina property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeCheckpointLumina { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeCheckpointLumina { get; set; }
+#endif
+        /// <summary>The forge_checkpoint_qwen property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeCheckpointQwen { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeCheckpointQwen { get; set; }
+#endif
+        /// <summary>The forge_checkpoint_sd property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeCheckpointSd { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeCheckpointSd { get; set; }
+#endif
+        /// <summary>The forge_checkpoint_wan property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeCheckpointWan { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeCheckpointWan { get; set; }
+#endif
+        /// <summary>The forge_checkpoint_xl property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeCheckpointXl { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeCheckpointXl { get; set; }
+#endif
+        /// <summary>The forge_checkpoint_zit property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeCheckpointZit { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeCheckpointZit { get; set; }
+#endif
+        /// <summary>The forge_preset property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ForgePreset { get; set; }
+#nullable restore
+#else
+        public string ForgePreset { get; set; }
+#endif
+        /// <summary>Try to reproduce the results from external software</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ForgeTryReproduce { get; set; }
+#nullable restore
+#else
+        public string ForgeTryReproduce { get; set; }
+#endif
+        /// <summary>The forge_unet_storage_dtype property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ForgeUnetStorageDtype { get; set; }
+#nullable restore
+#else
+        public string ForgeUnetStorageDtype { get; set; }
+#endif
+        /// <summary>The forge_unet_storage_dtype_anima property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ForgeUnetStorageDtypeAnima { get; set; }
+#nullable restore
+#else
+        public string ForgeUnetStorageDtypeAnima { get; set; }
+#endif
+        /// <summary>The forge_unet_storage_dtype_flux property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ForgeUnetStorageDtypeFlux { get; set; }
+#nullable restore
+#else
+        public string ForgeUnetStorageDtypeFlux { get; set; }
+#endif
+        /// <summary>The forge_unet_storage_dtype_klein property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ForgeUnetStorageDtypeKlein { get; set; }
+#nullable restore
+#else
+        public string ForgeUnetStorageDtypeKlein { get; set; }
+#endif
+        /// <summary>The forge_unet_storage_dtype_lumina property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ForgeUnetStorageDtypeLumina { get; set; }
+#nullable restore
+#else
+        public string ForgeUnetStorageDtypeLumina { get; set; }
+#endif
+        /// <summary>The forge_unet_storage_dtype_qwen property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ForgeUnetStorageDtypeQwen { get; set; }
+#nullable restore
+#else
+        public string ForgeUnetStorageDtypeQwen { get; set; }
+#endif
+        /// <summary>The forge_unet_storage_dtype_sd property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ForgeUnetStorageDtypeSd { get; set; }
+#nullable restore
+#else
+        public string ForgeUnetStorageDtypeSd { get; set; }
+#endif
+        /// <summary>The forge_unet_storage_dtype_wan property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ForgeUnetStorageDtypeWan { get; set; }
+#nullable restore
+#else
+        public string ForgeUnetStorageDtypeWan { get; set; }
+#endif
+        /// <summary>The forge_unet_storage_dtype_xl property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ForgeUnetStorageDtypeXl { get; set; }
+#nullable restore
+#else
+        public string ForgeUnetStorageDtypeXl { get; set; }
+#endif
+        /// <summary>The forge_unet_storage_dtype_zit property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ForgeUnetStorageDtypeZit { get; set; }
+#nullable restore
+#else
+        public string ForgeUnetStorageDtypeZit { get; set; }
 #endif
         /// <summary>Gallery Height</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -660,14 +1180,6 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode HideSamplers { get; set; }
 #endif
-        /// <summary>Invert the above setting</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? HideSamplersInvert { get; set; }
-#nullable restore
-#else
-        public UntypedNode HideSamplersInvert { get; set; }
-#endif
         /// <summary>When using the [✨] button, insert the upscaled image to the gallery</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -675,14 +1187,6 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #nullable restore
 #else
         public UntypedNode HiresButtonGalleryInsert { get; set; }
-#endif
-        /// <summary>Which pass during Hires. fix to enable Refiner</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public string? HiresFixRefinerPass { get; set; }
-#nullable restore
-#else
-        public string HiresFixRefinerPass { get; set; }
 #endif
         /// <summary>[Hires. fix]: Show prompt and negative prompt textboxes</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -700,7 +1204,7 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode HiresFixShowSampler { get; set; }
 #endif
-        /// <summary>For Hires. fix, calculate conds of second pass using extra networks of first pass</summary>
+        /// <summary>For hires fix, calculate conds of second pass using extra networks of first pass.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public UntypedNode? HiresFixUseFirstpassConds { get; set; }
@@ -710,6 +1214,14 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #endif
         /// <summary>When the above option is enabled, automatically select the upscaled image</summary>
         public bool? HiresInsertIndex { get; set; }
+        /// <summary>Automatically update the Width and Height when uploading image to img2img input</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? Img2imgAutosize { get; set; }
+#nullable restore
+#else
+        public UntypedNode Img2imgAutosize { get; set; }
+#endif
         /// <summary>For img2img, fill the transparent parts of the input image with this color</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -720,6 +1232,14 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #endif
         /// <summary>Show the first N batch of img2img results in UI</summary>
         public double? Img2imgBatchShowResultsLimit { get; set; }
+        /// <summary>In img2img Batch, use the input filenames when saving</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? Img2imgBatchUseOriginalName { get; set; }
+#nullable restore
+#else
+        public UntypedNode Img2imgBatchUseOriginalName { get; set; }
+#endif
         /// <summary>Apply color correction to img2img results to match original colors</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -728,8 +1248,6 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode Img2imgColorCorrection { get; set; }
 #endif
-        /// <summary>Height of the Image Editor</summary>
-        public double? Img2imgEditorHeight { get; set; }
         /// <summary>Extra Noise Multiplier for img2img and Hires. fix</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -754,14 +1272,10 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public string Img2imgInpaintMaskBrushColor { get; set; }
 #endif
-        /// <summary>For inpainting, process the &quot;Mask blur&quot; in fp32 instead of uint8 precision; improve blending result</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? Img2imgInpaintPreciseMask { get; set; }
-#nullable restore
-#else
-        public UntypedNode Img2imgInpaintPreciseMask { get; set; }
-#endif
+        /// <summary>Use high-contrast brush for inpainting</summary>
+        public bool? Img2imgInpaintMaskHighContrast { get; set; }
+        /// <summary>Inpaint mask alpha (transparency)</summary>
+        public double? Img2imgInpaintMaskScribbleAlpha { get; set; }
         /// <summary>Initial Brush Color for Inpaint Sketch</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -828,6 +1342,14 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode InterruptAfterCurrent { get; set; }
 #endif
+        /// <summary>invert_sigmas</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? InvertSigmas { get; set; }
+#nullable restore
+#else
+        public UntypedNode InvertSigmas { get; set; }
+#endif
         /// <summary>JPEG Quality</summary>
         public double? JpegQuality { get; set; }
         /// <summary>Show the live previews in full page image viewer</summary>
@@ -874,6 +1396,178 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
         public double? KeyeditPrecisionAttention { get; set; }
         /// <summary>Precision for &lt;lora:0.9&gt; when editing the prompt with Ctrl + Up/Down</summary>
         public double? KeyeditPrecisionExtra { get; set; }
+        /// <summary>The klein_cfg0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KleinCfg0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KleinCfg0 { get; set; }
+#endif
+        /// <summary>The klein_cfg1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KleinCfg1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KleinCfg1 { get; set; }
+#endif
+        /// <summary>img2img CFG</summary>
+        public double? KleinI2iCfg { get; set; }
+        /// <summary>The klein_i2i_dim0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KleinI2iDim0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KleinI2iDim0 { get; set; }
+#endif
+        /// <summary>The klein_i2i_dim1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KleinI2iDim1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KleinI2iDim1 { get; set; }
+#endif
+        /// <summary>img2img Height</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KleinI2iHeight { get; set; }
+#nullable restore
+#else
+        public UntypedNode KleinI2iHeight { get; set; }
+#endif
+        /// <summary>img2img sampler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? KleinI2iSampler { get; set; }
+#nullable restore
+#else
+        public string KleinI2iSampler { get; set; }
+#endif
+        /// <summary>img2img scheduler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? KleinI2iScheduler { get; set; }
+#nullable restore
+#else
+        public string KleinI2iScheduler { get; set; }
+#endif
+        /// <summary>The klein_i2i_ss0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KleinI2iSs0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KleinI2iSs0 { get; set; }
+#endif
+        /// <summary>The klein_i2i_ss1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KleinI2iSs1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KleinI2iSs1 { get; set; }
+#endif
+        /// <summary>img2img Steps</summary>
+        public double? KleinI2iStep { get; set; }
+        /// <summary>img2img Width</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KleinI2iWidth { get; set; }
+#nullable restore
+#else
+        public UntypedNode KleinI2iWidth { get; set; }
+#endif
+        /// <summary>The klein_steps0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KleinSteps0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KleinSteps0 { get; set; }
+#endif
+        /// <summary>The klein_steps1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KleinSteps1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KleinSteps1 { get; set; }
+#endif
+        /// <summary>txt2img CFG</summary>
+        public double? KleinT2iCfg { get; set; }
+        /// <summary>The klein_t2i_dim0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KleinT2iDim0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KleinT2iDim0 { get; set; }
+#endif
+        /// <summary>The klein_t2i_dim1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KleinT2iDim1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KleinT2iDim1 { get; set; }
+#endif
+        /// <summary>txt2img Height</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KleinT2iHeight { get; set; }
+#nullable restore
+#else
+        public UntypedNode KleinT2iHeight { get; set; }
+#endif
+        /// <summary>txt2img Hires. CFG</summary>
+        public double? KleinT2iHrCfg { get; set; }
+        /// <summary>txt2img Hires. Steps</summary>
+        public double? KleinT2iHrStep { get; set; }
+        /// <summary>txt2img sampler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? KleinT2iSampler { get; set; }
+#nullable restore
+#else
+        public string KleinT2iSampler { get; set; }
+#endif
+        /// <summary>txt2img scheduler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? KleinT2iScheduler { get; set; }
+#nullable restore
+#else
+        public string KleinT2iScheduler { get; set; }
+#endif
+        /// <summary>The klein_t2i_ss0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KleinT2iSs0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KleinT2iSs0 { get; set; }
+#endif
+        /// <summary>The klein_t2i_ss1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KleinT2iSs1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KleinT2iSs1 { get; set; }
+#endif
+        /// <summary>txt2img Steps</summary>
+        public double? KleinT2iStep { get; set; }
+        /// <summary>txt2img Width</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KleinT2iWidth { get; set; }
+#nullable restore
+#else
+        public UntypedNode KleinT2iWidth { get; set; }
+#endif
         /// <summary>List the models/files under hidden directories</summary>
         public bool? ListHiddenFiles { get; set; }
         /// <summary>Return image with the selected preview method on interruption</summary>
@@ -904,43 +1598,227 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public string Localization { get; set; }
 #endif
-        /// <summary>Append LoRA hashes to infotext</summary>
-        public bool? LoraAddHashesToInfotext { get; set; }
-        /// <summary>When adding syntax to prompt, refer to LoRA by</summary>
+        /// <summary>The lumina_cfg0 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public string? LoraPreferredName { get; set; }
+        public UntypedNode? LuminaCfg0 { get; set; }
 #nullable restore
 #else
-        public string LoraPreferredName { get; set; }
+        public UntypedNode LuminaCfg0 { get; set; }
 #endif
-        /// <summary>Always show all LoRA cards</summary>
+        /// <summary>The lumina_cfg1 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public UntypedNode? LoraShowAll { get; set; }
+        public UntypedNode? LuminaCfg1 { get; set; }
 #nullable restore
 #else
-        public UntypedNode LoraShowAll { get; set; }
+        public UntypedNode LuminaCfg1 { get; set; }
+#endif
+        /// <summary>The lumina_dcfg0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? LuminaDcfg0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode LuminaDcfg0 { get; set; }
+#endif
+        /// <summary>The lumina_dcfg1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? LuminaDcfg1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode LuminaDcfg1 { get; set; }
+#endif
+        /// <summary>img2img CFG</summary>
+        public double? LuminaI2iCfg { get; set; }
+        /// <summary>img2img Shift</summary>
+        public double? LuminaI2iDcfg { get; set; }
+        /// <summary>The lumina_i2i_dim0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? LuminaI2iDim0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode LuminaI2iDim0 { get; set; }
+#endif
+        /// <summary>The lumina_i2i_dim1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? LuminaI2iDim1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode LuminaI2iDim1 { get; set; }
+#endif
+        /// <summary>img2img Height</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? LuminaI2iHeight { get; set; }
+#nullable restore
+#else
+        public UntypedNode LuminaI2iHeight { get; set; }
+#endif
+        /// <summary>img2img sampler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? LuminaI2iSampler { get; set; }
+#nullable restore
+#else
+        public string LuminaI2iSampler { get; set; }
+#endif
+        /// <summary>img2img scheduler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? LuminaI2iScheduler { get; set; }
+#nullable restore
+#else
+        public string LuminaI2iScheduler { get; set; }
+#endif
+        /// <summary>The lumina_i2i_ss0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? LuminaI2iSs0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode LuminaI2iSs0 { get; set; }
+#endif
+        /// <summary>The lumina_i2i_ss1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? LuminaI2iSs1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode LuminaI2iSs1 { get; set; }
+#endif
+        /// <summary>img2img Steps</summary>
+        public double? LuminaI2iStep { get; set; }
+        /// <summary>img2img Width</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? LuminaI2iWidth { get; set; }
+#nullable restore
+#else
+        public UntypedNode LuminaI2iWidth { get; set; }
+#endif
+        /// <summary>The lumina_steps0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? LuminaSteps0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode LuminaSteps0 { get; set; }
+#endif
+        /// <summary>The lumina_steps1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? LuminaSteps1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode LuminaSteps1 { get; set; }
+#endif
+        /// <summary>txt2img CFG</summary>
+        public double? LuminaT2iCfg { get; set; }
+        /// <summary>txt2img Shift</summary>
+        public double? LuminaT2iDcfg { get; set; }
+        /// <summary>The lumina_t2i_dim0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? LuminaT2iDim0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode LuminaT2iDim0 { get; set; }
+#endif
+        /// <summary>The lumina_t2i_dim1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? LuminaT2iDim1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode LuminaT2iDim1 { get; set; }
+#endif
+        /// <summary>txt2img Height</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? LuminaT2iHeight { get; set; }
+#nullable restore
+#else
+        public UntypedNode LuminaT2iHeight { get; set; }
+#endif
+        /// <summary>txt2img Hires. CFG</summary>
+        public double? LuminaT2iHrCfg { get; set; }
+        /// <summary>txt2img Hires. Shift</summary>
+        public double? LuminaT2iHrDcfg { get; set; }
+        /// <summary>txt2img Hires. Steps</summary>
+        public double? LuminaT2iHrStep { get; set; }
+        /// <summary>txt2img sampler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? LuminaT2iSampler { get; set; }
+#nullable restore
+#else
+        public string LuminaT2iSampler { get; set; }
+#endif
+        /// <summary>txt2img scheduler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? LuminaT2iScheduler { get; set; }
+#nullable restore
+#else
+        public string LuminaT2iScheduler { get; set; }
+#endif
+        /// <summary>The lumina_t2i_ss0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? LuminaT2iSs0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode LuminaT2iSs0 { get; set; }
+#endif
+        /// <summary>The lumina_t2i_ss1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? LuminaT2iSs1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode LuminaT2iSs1 { get; set; }
+#endif
+        /// <summary>txt2img Steps</summary>
+        public double? LuminaT2iStep { get; set; }
+        /// <summary>txt2img Width</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? LuminaT2iWidth { get; set; }
+#nullable restore
+#else
+        public UntypedNode LuminaT2iWidth { get; set; }
 #endif
         /// <summary>VRAM usage polls per second during generation</summary>
         public double? MemmonPollRate { get; set; }
         /// <summary>Add an additional progress bar to the console to show the total progress of an entire job</summary>
         public bool? MultipleTqdm { get; set; }
-        /// <summary>Do not make DPM++ SDE deterministic across different batch sizes</summary>
+        /// <summary>[Lumina] Negative Template</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? NetaTemplateNegative { get; set; }
+#nullable restore
+#else
+        public string NetaTemplateNegative { get; set; }
+#endif
+        /// <summary>[Lumina] Positive Template</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? NetaTemplatePositive { get; set; }
+#nullable restore
+#else
+        public string NetaTemplatePositive { get; set; }
+#endif
+        /// <summary>Do not make DPM++ SDE deterministic across different batch sizes.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public UntypedNode? NoDpmppSdeBatchDeterminism { get; set; }
 #nullable restore
 #else
         public UntypedNode NoDpmppSdeBatchDeterminism { get; set; }
-#endif
-        /// <summary>Force the background color of the &quot;Reloading...&quot; screen to be black</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? NoFlashbang { get; set; }
-#nullable restore
-#else
-        public UntypedNode NoFlashbang { get; set; }
 #endif
         /// <summary>Play a notification sound after image generation</summary>
         public bool? NotificationAudio { get; set; }
@@ -955,14 +1833,6 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #nullable restore
 #else
         public string OpenDirButtonChoice { get; set; }
-#endif
-        /// <summary>Enable optimization for JPG/PNG</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? OptImage { get; set; }
-#nullable restore
-#else
-        public UntypedNode OptImage { get; set; }
 #endif
         /// <summary>Output Directory for Extras Images</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -1004,7 +1874,7 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public string OutdirInitImages { get; set; }
 #endif
-        /// <summary>Output Directory for Images</summary>
+        /// <summary>Output Directory</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public UntypedNode? OutdirSamples { get; set; }
@@ -1036,6 +1906,14 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public string OutdirTxt2imgSamples { get; set; }
 #endif
+        /// <summary>Output Directory for Videos</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? OutdirVideos { get; set; }
+#nullable restore
+#else
+        public string OutdirVideos { get; set; }
+#endif
         /// <summary>For inpainting, overlay the resulting image back onto the original image</summary>
         public bool? OverlayInpaint { get; set; }
         /// <summary>Disable the &quot;Read generation parameters&quot; button (↙️) when negative prompt is not empty</summary>
@@ -1048,6 +1926,14 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #endif
         /// <summary>Persistent Cond Cache</summary>
         public bool? PersistentCondCache { get; set; }
+        /// <summary>Disable Postprocessing operations in Extras tab</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? PostprocessingDisableInExtras { get; set; }
+#nullable restore
+#else
+        public UntypedNode PostprocessingDisableInExtras { get; set; }
+#endif
         /// <summary>Enable Postprocessing operations in txt2img and img2img</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -1072,13 +1958,61 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode PreferFp16Upscalers { get; set; }
 #endif
-        /// <summary>Prefer VAE in float16 precision</summary>
+        /// <summary>Force the screen to stay awake during generation</summary>
+        public bool? PreventScreenSleepDuringGeneration { get; set; }
+        /// <summary>Activities</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public UntypedNode? PreferVaePrecisionFloat16 { get; set; }
+        public UntypedNode? ProfilingActivities { get; set; }
 #nullable restore
 #else
-        public UntypedNode PreferVaePrecisionFloat16 { get; set; }
+        public UntypedNode ProfilingActivities { get; set; }
+#endif
+        /// <summary>Enable Profiling</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ProfilingEnable { get; set; }
+#nullable restore
+#else
+        public UntypedNode ProfilingEnable { get; set; }
+#endif
+        /// <summary>The profiling_explanation property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ProfilingExplanation { get; set; }
+#nullable restore
+#else
+        public string ProfilingExplanation { get; set; }
+#endif
+        /// <summary>Profile Filename</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ProfilingFilename { get; set; }
+#nullable restore
+#else
+        public string ProfilingFilename { get; set; }
+#endif
+        /// <summary>Profile Memory</summary>
+        public bool? ProfilingProfileMemory { get; set; }
+        /// <summary>Record Shapes</summary>
+        public bool? ProfilingRecordShapes { get; set; }
+        /// <summary>Include Python Stack</summary>
+        public bool? ProfilingWithStack { get; set; }
+        /// <summary>Place the Quicksettings under an Accordion</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? QuicksettingsAccordion { get; set; }
+#nullable restore
+#else
+        public UntypedNode QuicksettingsAccordion { get; set; }
+#endif
+        /// <summary>Close the Accordion on startup</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? QuicksettingsAccordionStartsClosed { get; set; }
+#nullable restore
+#else
+        public UntypedNode QuicksettingsAccordionStartsClosed { get; set; }
 #endif
         /// <summary>Quicksettings List</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -1088,6 +2022,186 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode QuicksettingsList { get; set; }
 #endif
+        /// <summary>The qwen_cfg0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? QwenCfg0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode QwenCfg0 { get; set; }
+#endif
+        /// <summary>The qwen_cfg1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? QwenCfg1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode QwenCfg1 { get; set; }
+#endif
+        /// <summary>img2img CFG</summary>
+        public double? QwenI2iCfg { get; set; }
+        /// <summary>The qwen_i2i_dim0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? QwenI2iDim0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode QwenI2iDim0 { get; set; }
+#endif
+        /// <summary>The qwen_i2i_dim1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? QwenI2iDim1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode QwenI2iDim1 { get; set; }
+#endif
+        /// <summary>img2img Height</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? QwenI2iHeight { get; set; }
+#nullable restore
+#else
+        public UntypedNode QwenI2iHeight { get; set; }
+#endif
+        /// <summary>img2img sampler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? QwenI2iSampler { get; set; }
+#nullable restore
+#else
+        public string QwenI2iSampler { get; set; }
+#endif
+        /// <summary>img2img scheduler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? QwenI2iScheduler { get; set; }
+#nullable restore
+#else
+        public string QwenI2iScheduler { get; set; }
+#endif
+        /// <summary>The qwen_i2i_ss0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? QwenI2iSs0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode QwenI2iSs0 { get; set; }
+#endif
+        /// <summary>The qwen_i2i_ss1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? QwenI2iSs1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode QwenI2iSs1 { get; set; }
+#endif
+        /// <summary>img2img Steps</summary>
+        public double? QwenI2iStep { get; set; }
+        /// <summary>img2img Width</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? QwenI2iWidth { get; set; }
+#nullable restore
+#else
+        public UntypedNode QwenI2iWidth { get; set; }
+#endif
+        /// <summary>The qwen_steps0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? QwenSteps0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode QwenSteps0 { get; set; }
+#endif
+        /// <summary>The qwen_steps1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? QwenSteps1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode QwenSteps1 { get; set; }
+#endif
+        /// <summary>txt2img CFG</summary>
+        public double? QwenT2iCfg { get; set; }
+        /// <summary>The qwen_t2i_dim0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? QwenT2iDim0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode QwenT2iDim0 { get; set; }
+#endif
+        /// <summary>The qwen_t2i_dim1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? QwenT2iDim1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode QwenT2iDim1 { get; set; }
+#endif
+        /// <summary>txt2img Height</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? QwenT2iHeight { get; set; }
+#nullable restore
+#else
+        public UntypedNode QwenT2iHeight { get; set; }
+#endif
+        /// <summary>txt2img Hires. CFG</summary>
+        public double? QwenT2iHrCfg { get; set; }
+        /// <summary>txt2img Hires. Steps</summary>
+        public double? QwenT2iHrStep { get; set; }
+        /// <summary>txt2img sampler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? QwenT2iSampler { get; set; }
+#nullable restore
+#else
+        public string QwenT2iSampler { get; set; }
+#endif
+        /// <summary>txt2img scheduler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? QwenT2iScheduler { get; set; }
+#nullable restore
+#else
+        public string QwenT2iScheduler { get; set; }
+#endif
+        /// <summary>The qwen_t2i_ss0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? QwenT2iSs0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode QwenT2iSs0 { get; set; }
+#endif
+        /// <summary>The qwen_t2i_ss1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? QwenT2iSs1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode QwenT2iSs1 { get; set; }
+#endif
+        /// <summary>txt2img Steps</summary>
+        public double? QwenT2iStep { get; set; }
+        /// <summary>txt2img Width</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? QwenT2iWidth { get; set; }
+#nullable restore
+#else
+        public UntypedNode QwenT2iWidth { get; set; }
+#endif
+        /// <summary>Resize input image to 1 megapixel for Qwen-Image-Edit ref_latent</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? QwenVaeResize { get; set; }
+#nullable restore
+#else
+        public UntypedNode QwenVaeResize { get; set; }
+#endif
         /// <summary>Random Number Generator</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -1095,6 +2209,38 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #nullable restore
 #else
         public string RandnSource { get; set; }
+#endif
+        /// <summary>Reload &quot;state_dict&quot; Only</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? RefinerFastSd { get; set; }
+#nullable restore
+#else
+        public UntypedNode RefinerFastSd { get; set; }
+#endif
+        /// <summary>The refiner_lora_explanation property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? RefinerLoraExplanation { get; set; }
+#nullable restore
+#else
+        public string RefinerLoraExplanation { get; set; }
+#endif
+        /// <summary>Lora Replacements</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? RefinerLoraReplacement { get; set; }
+#nullable restore
+#else
+        public string RefinerLoraReplacement { get; set; }
+#endif
+        /// <summary>Switch based on &quot;steps&quot; instead</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? RefinerUseSteps { get; set; }
+#nullable restore
+#else
+        public UntypedNode RefinerUseSteps { get; set; }
 #endif
         /// <summary>Config state file to restore from, under &quot;config-states/&quot; folder</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -1242,6 +2388,8 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode SaveTxt { get; set; }
 #endif
+        /// <summary>Write the generation parameters to a log.csv when saving images using the &quot;Save&quot; button</summary>
+        public bool? SaveWriteLogCsv { get; set; }
         /// <summary>Epsilon Scaling</summary>
         public double? ScalingFactor { get; set; }
         /// <summary>sigma churn</summary>
@@ -1252,13 +2400,29 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode SChurn { get; set; }
 #endif
-        /// <summary>Number of Checkpoints to cache in RAM</summary>
+        /// <summary>Scrollable Prompt Layout</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public UntypedNode? SdCheckpointCache { get; set; }
+        public UntypedNode? ScrollablePromptBox { get; set; }
 #nullable restore
 #else
-        public UntypedNode SdCheckpointCache { get; set; }
+        public UntypedNode ScrollablePromptBox { get; set; }
+#endif
+        /// <summary>The sd_cfg0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? SdCfg0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode SdCfg0 { get; set; }
+#endif
+        /// <summary>The sd_cfg1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? SdCfg1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode SdCfg1 { get; set; }
 #endif
         /// <summary>Show filenames without folder in the Checkpoint dropdown</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -1276,15 +2440,75 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode SdCheckpointHash { get; set; }
 #endif
-        /// <summary>Append LoRA to prompt</summary>
+        /// <summary>img2img CFG</summary>
+        public double? SdI2iCfg { get; set; }
+        /// <summary>The sd_i2i_dim0 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public string? SdLora { get; set; }
+        public UntypedNode? SdI2iDim0 { get; set; }
 #nullable restore
 #else
-        public string SdLora { get; set; }
+        public UntypedNode SdI2iDim0 { get; set; }
 #endif
-        /// <summary>Stable Diffusion Checkpoint</summary>
+        /// <summary>The sd_i2i_dim1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? SdI2iDim1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode SdI2iDim1 { get; set; }
+#endif
+        /// <summary>img2img Height</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? SdI2iHeight { get; set; }
+#nullable restore
+#else
+        public UntypedNode SdI2iHeight { get; set; }
+#endif
+        /// <summary>img2img sampler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? SdI2iSampler { get; set; }
+#nullable restore
+#else
+        public string SdI2iSampler { get; set; }
+#endif
+        /// <summary>img2img scheduler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? SdI2iScheduler { get; set; }
+#nullable restore
+#else
+        public string SdI2iScheduler { get; set; }
+#endif
+        /// <summary>The sd_i2i_ss0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? SdI2iSs0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode SdI2iSs0 { get; set; }
+#endif
+        /// <summary>The sd_i2i_ss1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? SdI2iSs1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode SdI2iSs1 { get; set; }
+#endif
+        /// <summary>img2img Steps</summary>
+        public double? SdI2iStep { get; set; }
+        /// <summary>img2img Width</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? SdI2iWidth { get; set; }
+#nullable restore
+#else
+        public UntypedNode SdI2iWidth { get; set; }
+#endif
+        /// <summary>(Managed by Forge)</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public UntypedNode? SdModelCheckpoint { get; set; }
@@ -1299,6 +2523,94 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #nullable restore
 #else
         public string SdNoiseSchedule { get; set; }
+#endif
+        /// <summary>The sd_steps0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? SdSteps0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode SdSteps0 { get; set; }
+#endif
+        /// <summary>The sd_steps1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? SdSteps1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode SdSteps1 { get; set; }
+#endif
+        /// <summary>txt2img CFG</summary>
+        public double? SdT2iCfg { get; set; }
+        /// <summary>The sd_t2i_dim0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? SdT2iDim0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode SdT2iDim0 { get; set; }
+#endif
+        /// <summary>The sd_t2i_dim1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? SdT2iDim1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode SdT2iDim1 { get; set; }
+#endif
+        /// <summary>txt2img Height</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? SdT2iHeight { get; set; }
+#nullable restore
+#else
+        public UntypedNode SdT2iHeight { get; set; }
+#endif
+        /// <summary>txt2img Hires. CFG</summary>
+        public double? SdT2iHrCfg { get; set; }
+        /// <summary>txt2img Hires. Steps</summary>
+        public double? SdT2iHrStep { get; set; }
+        /// <summary>txt2img sampler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? SdT2iSampler { get; set; }
+#nullable restore
+#else
+        public string SdT2iSampler { get; set; }
+#endif
+        /// <summary>txt2img scheduler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? SdT2iScheduler { get; set; }
+#nullable restore
+#else
+        public string SdT2iScheduler { get; set; }
+#endif
+        /// <summary>The sd_t2i_ss0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? SdT2iSs0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode SdT2iSs0 { get; set; }
+#endif
+        /// <summary>The sd_t2i_ss1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? SdT2iSs1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode SdT2iSs1 { get; set; }
+#endif
+        /// <summary>txt2img Steps</summary>
+        public double? SdT2iStep { get; set; }
+        /// <summary>txt2img Width</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? SdT2iWidth { get; set; }
+#nullable restore
+#else
+        public UntypedNode SdT2iWidth { get; set; }
 #endif
         /// <summary>SD UNet</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -1315,14 +2627,6 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #nullable restore
 #else
         public string SdVae { get; set; }
-#endif
-        /// <summary>Number of VAE to cache in RAM</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? SdVaeCheckpointCache { get; set; }
-#nullable restore
-#else
-        public UntypedNode SdVaeCheckpointCache { get; set; }
 #endif
         /// <summary>VAE for Decoding</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -1350,16 +2654,6 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #endif
         /// <summary>&quot;SD VAE&quot; option overrides per-model preference</summary>
         public bool? SdVaeOverridesPerModelPreferences { get; set; }
-        /// <summary>Enable tiling optimizations for VAE</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? SdVaeTiledOps { get; set; }
-#nullable restore
-#else
-        public UntypedNode SdVaeTiledOps { get; set; }
-#endif
-        /// <summary>Tile Size</summary>
-        public double? SdVaeTiledSize { get; set; }
         /// <summary>[Lightbox]: control icon unfocused opacity</summary>
         public double? SdWebuiModalLightboxIconOpacity { get; set; }
         /// <summary>[Lightbox]: tool bar opacity</summary>
@@ -1384,20 +2678,24 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
         public double? SdxlRefinerHighAestheticScore { get; set; }
         /// <summary>[SDXL] Low Aesthetic Score</summary>
         public double? SdxlRefinerLowAestheticScore { get; set; }
-        /// <summary>Send the CFG information when using the &quot;Send to&quot; buttons</summary>
-        public bool? SendCfg { get; set; }
-        /// <summary>When using the &quot;Send to img2img&quot; button (in txt2img tab), use the parameters in the infotext rather than the UI fields</summary>
+        /// <summary>For SDXL, zero out the conditioning when negative prompt is empty</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public UntypedNode? SendImageInfoT2iToI2i { get; set; }
+        public UntypedNode? SdxlZeroNeg { get; set; }
 #nullable restore
 #else
-        public UntypedNode SendImageInfoT2iToI2i { get; set; }
+        public UntypedNode SdxlZeroNeg { get; set; }
 #endif
+        /// <summary>Send the CFG information when using the &quot;Send to&quot; buttons</summary>
+        public bool? SendCfg { get; set; }
         /// <summary>Send the Seed information when using the &quot;Send to&quot; buttons</summary>
         public bool? SendSeed { get; set; }
         /// <summary>Send the Resolution information when using the &quot;Send to&quot; buttons</summary>
         public bool? SendSize { get; set; }
+        /// <summary>Automatically set the &quot;Scale by&quot; factor based on the name of the selected Upscaler</summary>
+        public bool? SetScaleByWhenChangingUpscaler { get; set; }
+        /// <summary>GPU Weights</summary>
+        public double? SettingAllocatedVram { get; set; }
         /// <summary>The settings_in_ui property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -1462,14 +2760,6 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode ShowRescaleCfg { get; set; }
 #endif
-        /// <summary>Display the Scheduler Dropdown</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? ShowScheduler { get; set; }
-#nullable restore
-#else
-        public UntypedNode ShowScheduler { get; set; }
-#endif
         /// <summary>Show warnings in console</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -1502,22 +2792,6 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode SkipEarlyCond { get; set; }
 #endif
-        /// <summary> - Skip Early for Hires. fix</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? SkipEarlyCondHr { get; set; }
-#nullable restore
-#else
-        public UntypedNode SkipEarlyCondHr { get; set; }
-#endif
-        /// <summary> - Skip Early for img2img</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? SkipEarlyCondImg2img { get; set; }
-#nullable restore
-#else
-        public UntypedNode SkipEarlyCondImg2img { get; set; }
-#endif
         /// <summary>Skip Negative Prompt during Later Steps</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -1526,21 +2800,13 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode SMinUncond { get; set; }
 #endif
-        /// <summary> - Skip Later for Hires. fix</summary>
+        /// <summary>For the above option, skip every step</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public UntypedNode? SMinUncondHr { get; set; }
+        public UntypedNode? SMinUncondAll { get; set; }
 #nullable restore
 #else
-        public UntypedNode SMinUncondHr { get; set; }
-#endif
-        /// <summary> - Skip Later for img2img</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? SMinUncondImg2img { get; set; }
-#nullable restore
-#else
-        public UntypedNode SMinUncondImg2img { get; set; }
+        public UntypedNode SMinUncondAll { get; set; }
 #endif
         /// <summary>sigma noise</summary>
         public double? SNoise { get; set; }
@@ -1560,6 +2826,58 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode STmin { get; set; }
 #endif
+        /// <summary>stochastic_sampling</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? StochasticSampling { get; set; }
+#nullable restore
+#else
+        public UntypedNode StochasticSampling { get; set; }
+#endif
+        /// <summary>Attention</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? SvdqAttention { get; set; }
+#nullable restore
+#else
+        public string SvdqAttention { get; set; }
+#endif
+        /// <summary>Cache Threshold</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? SvdqCacheThreshold { get; set; }
+#nullable restore
+#else
+        public UntypedNode SvdqCacheThreshold { get; set; }
+#endif
+        /// <summary>CPU Offload</summary>
+        public bool? SvdqCpuOffload { get; set; }
+        /// <summary>The svdq_flux_exp property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? SvdqFluxExp { get; set; }
+#nullable restore
+#else
+        public string SvdqFluxExp { get; set; }
+#endif
+        /// <summary>Blocks on GPU</summary>
+        public double? SvdqNumBlocksOnGpu { get; set; }
+        /// <summary>The svdq_qwen_exp property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? SvdqQwenExp { get; set; }
+#nullable restore
+#else
+        public string SvdqQwenExp { get; set; }
+#endif
+        /// <summary>Use Pinned Memory</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? SvdqUsePinMemory { get; set; }
+#nullable restore
+#else
+        public UntypedNode SvdqUsePinMemory { get; set; }
+#endif
         /// <summary>Width/Height limit for the above option</summary>
         public double? TargetSideLength { get; set; }
         /// <summary>Directory for temporary images; leave empty to use the system TEMP folder</summary>
@@ -1570,20 +2888,6 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public string TempDir { get; set; }
 #endif
-        /// <summary>Append Textual Inversion hashes to infotext</summary>
-        public bool? TextualInversionAddHashesToInfotext { get; set; }
-        /// <summary>The tile_exp_div property</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? TileExpDiv { get; set; }
-#nullable restore
-#else
-        public UntypedNode TileExpDiv { get; set; }
-#endif
-        /// <summary>Overlap for Tiled VAE</summary>
-        public double? TileOverlap { get; set; }
-        /// <summary>Tile Size for Tiled VAE</summary>
-        public double? TileSize { get; set; }
         /// <summary>Tiling</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -1678,7 +2982,15 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #endif
         /// <summary>Number of upscaled images to cache</summary>
         public double? UpscalingMaxImagesInCache { get; set; }
-        /// <summary>Downcast alphas_cumprod to fp16 before sampling</summary>
+        /// <summary>use_beta_sigmas</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? UseBetaSigmas { get; set; }
+#nullable restore
+#else
+        public UntypedNode UseBetaSigmas { get; set; }
+#endif
+        /// <summary>Downcast model alphas_cumprod to fp16 before sampling. For reproducing old seeds.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public UntypedNode? UseDowncastedAlphaBar { get; set; }
@@ -1686,7 +2998,31 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode UseDowncastedAlphaBar { get; set; }
 #endif
-        /// <summary>For Hires. fix, use width/height sliders to set final resolution rather than first pass</summary>
+        /// <summary>use_dynamic_shifting</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? UseDynamicShifting { get; set; }
+#nullable restore
+#else
+        public UntypedNode UseDynamicShifting { get; set; }
+#endif
+        /// <summary>use_exponential_sigmas</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? UseExponentialSigmas { get; set; }
+#nullable restore
+#else
+        public UntypedNode UseExponentialSigmas { get; set; }
+#endif
+        /// <summary>use_karras_sigmas</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? UseKarrasSigmas { get; set; }
+#nullable restore
+#else
+        public UntypedNode UseKarrasSigmas { get; set; }
+#endif
+        /// <summary>For hires fix, use width/height sliders to set final resolution rather than first pass (disables Upscale by, Resize width/height to).</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public UntypedNode? UseOldHiresFixWidthHeight { get; set; }
@@ -1694,7 +3030,7 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode UseOldHiresFixWidthHeight { get; set; }
 #endif
-        /// <summary>Use the old karras scheduler sigmas</summary>
+        /// <summary>Use old karras scheduler sigmas (0.1 to 10).</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public UntypedNode? UseOldKarrasSchedulerSigmas { get; set; }
@@ -1702,7 +3038,7 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode UseOldKarrasSchedulerSigmas { get; set; }
 #endif
-        /// <summary>Use the old prompt editing timelines implementation</summary>
+        /// <summary>Use old prompt editing timelines.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public UntypedNode? UseOldScheduling { get; set; }
@@ -1720,6 +3056,260 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode UseSaveToDirsForUi { get; set; }
 #endif
+        /// <summary>internal version for breaking-changes</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? VERSIONUID { get; set; }
+#nullable restore
+#else
+        public UntypedNode VERSIONUID { get; set; }
+#endif
+        /// <summary>Extension</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? VideoContainer { get; set; }
+#nullable restore
+#else
+        public string VideoContainer { get; set; }
+#endif
+        /// <summary>CRF</summary>
+        public double? VideoCrf { get; set; }
+        /// <summary>The video_explanation property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? VideoExplanation { get; set; }
+#nullable restore
+#else
+        public string VideoExplanation { get; set; }
+#endif
+        /// <summary>Play the generated video when done</summary>
+        public bool? VideoPlayerAuto { get; set; }
+        /// <summary>Make the video player loop the playback</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? VideoPlayerLoop { get; set; }
+#nullable restore
+#else
+        public UntypedNode VideoPlayerLoop { get; set; }
+#endif
+        /// <summary>Preset</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? VideoPreset { get; set; }
+#nullable restore
+#else
+        public string VideoPreset { get; set; }
+#endif
+        /// <summary>Profile</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? VideoProfile { get; set; }
+#nullable restore
+#else
+        public string VideoProfile { get; set; }
+#endif
+        /// <summary>Save intermediate frames when generating video</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? VideoSaveFrames { get; set; }
+#nullable restore
+#else
+        public UntypedNode VideoSaveFrames { get; set; }
+#endif
+        /// <summary>The wan_cfg0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? WanCfg0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode WanCfg0 { get; set; }
+#endif
+        /// <summary>The wan_cfg1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? WanCfg1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode WanCfg1 { get; set; }
+#endif
+        /// <summary>The wan_dcfg0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? WanDcfg0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode WanDcfg0 { get; set; }
+#endif
+        /// <summary>The wan_dcfg1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? WanDcfg1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode WanDcfg1 { get; set; }
+#endif
+        /// <summary>img2img CFG</summary>
+        public double? WanI2iCfg { get; set; }
+        /// <summary>img2img Shift</summary>
+        public double? WanI2iDcfg { get; set; }
+        /// <summary>The wan_i2i_dim0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? WanI2iDim0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode WanI2iDim0 { get; set; }
+#endif
+        /// <summary>The wan_i2i_dim1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? WanI2iDim1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode WanI2iDim1 { get; set; }
+#endif
+        /// <summary>img2img Height</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? WanI2iHeight { get; set; }
+#nullable restore
+#else
+        public UntypedNode WanI2iHeight { get; set; }
+#endif
+        /// <summary>img2img sampler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? WanI2iSampler { get; set; }
+#nullable restore
+#else
+        public string WanI2iSampler { get; set; }
+#endif
+        /// <summary>img2img scheduler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? WanI2iScheduler { get; set; }
+#nullable restore
+#else
+        public string WanI2iScheduler { get; set; }
+#endif
+        /// <summary>The wan_i2i_ss0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? WanI2iSs0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode WanI2iSs0 { get; set; }
+#endif
+        /// <summary>The wan_i2i_ss1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? WanI2iSs1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode WanI2iSs1 { get; set; }
+#endif
+        /// <summary>img2img Steps</summary>
+        public double? WanI2iStep { get; set; }
+        /// <summary>img2img Width</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? WanI2iWidth { get; set; }
+#nullable restore
+#else
+        public UntypedNode WanI2iWidth { get; set; }
+#endif
+        /// <summary>The wan_steps0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? WanSteps0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode WanSteps0 { get; set; }
+#endif
+        /// <summary>The wan_steps1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? WanSteps1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode WanSteps1 { get; set; }
+#endif
+        /// <summary>txt2img CFG</summary>
+        public double? WanT2iCfg { get; set; }
+        /// <summary>txt2img Shift</summary>
+        public double? WanT2iDcfg { get; set; }
+        /// <summary>The wan_t2i_dim0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? WanT2iDim0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode WanT2iDim0 { get; set; }
+#endif
+        /// <summary>The wan_t2i_dim1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? WanT2iDim1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode WanT2iDim1 { get; set; }
+#endif
+        /// <summary>txt2img Height</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? WanT2iHeight { get; set; }
+#nullable restore
+#else
+        public UntypedNode WanT2iHeight { get; set; }
+#endif
+        /// <summary>txt2img Hires. CFG</summary>
+        public double? WanT2iHrCfg { get; set; }
+        /// <summary>txt2img Hires. Shift</summary>
+        public double? WanT2iHrDcfg { get; set; }
+        /// <summary>txt2img Hires. Steps</summary>
+        public double? WanT2iHrStep { get; set; }
+        /// <summary>txt2img sampler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? WanT2iSampler { get; set; }
+#nullable restore
+#else
+        public string WanT2iSampler { get; set; }
+#endif
+        /// <summary>txt2img scheduler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? WanT2iScheduler { get; set; }
+#nullable restore
+#else
+        public string WanT2iScheduler { get; set; }
+#endif
+        /// <summary>The wan_t2i_ss0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? WanT2iSs0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode WanT2iSs0 { get; set; }
+#endif
+        /// <summary>The wan_t2i_ss1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? WanT2iSs1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode WanT2iSs1 { get; set; }
+#endif
+        /// <summary>txt2img Steps</summary>
+        public double? WanT2iStep { get; set; }
+        /// <summary>txt2img Width</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? WanT2iWidth { get; set; }
+#nullable restore
+#else
+        public UntypedNode WanT2iWidth { get; set; }
+#endif
         /// <summary>Lossless WebP</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -1728,21 +3318,383 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode WebpLossless { get; set; }
 #endif
+        /// <summary>The xl_cfg0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? XlCfg0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode XlCfg0 { get; set; }
+#endif
+        /// <summary>The xl_cfg1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? XlCfg1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode XlCfg1 { get; set; }
+#endif
+        /// <summary>img2img CFG</summary>
+        public double? XlI2iCfg { get; set; }
+        /// <summary>The xl_i2i_dim0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? XlI2iDim0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode XlI2iDim0 { get; set; }
+#endif
+        /// <summary>The xl_i2i_dim1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? XlI2iDim1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode XlI2iDim1 { get; set; }
+#endif
+        /// <summary>img2img Height</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? XlI2iHeight { get; set; }
+#nullable restore
+#else
+        public UntypedNode XlI2iHeight { get; set; }
+#endif
+        /// <summary>img2img sampler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? XlI2iSampler { get; set; }
+#nullable restore
+#else
+        public string XlI2iSampler { get; set; }
+#endif
+        /// <summary>img2img scheduler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? XlI2iScheduler { get; set; }
+#nullable restore
+#else
+        public string XlI2iScheduler { get; set; }
+#endif
+        /// <summary>The xl_i2i_ss0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? XlI2iSs0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode XlI2iSs0 { get; set; }
+#endif
+        /// <summary>The xl_i2i_ss1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? XlI2iSs1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode XlI2iSs1 { get; set; }
+#endif
+        /// <summary>img2img Steps</summary>
+        public double? XlI2iStep { get; set; }
+        /// <summary>img2img Width</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? XlI2iWidth { get; set; }
+#nullable restore
+#else
+        public UntypedNode XlI2iWidth { get; set; }
+#endif
+        /// <summary>The xl_steps0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? XlSteps0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode XlSteps0 { get; set; }
+#endif
+        /// <summary>The xl_steps1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? XlSteps1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode XlSteps1 { get; set; }
+#endif
+        /// <summary>txt2img CFG</summary>
+        public double? XlT2iCfg { get; set; }
+        /// <summary>The xl_t2i_dim0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? XlT2iDim0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode XlT2iDim0 { get; set; }
+#endif
+        /// <summary>The xl_t2i_dim1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? XlT2iDim1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode XlT2iDim1 { get; set; }
+#endif
+        /// <summary>txt2img Height</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? XlT2iHeight { get; set; }
+#nullable restore
+#else
+        public UntypedNode XlT2iHeight { get; set; }
+#endif
+        /// <summary>txt2img Hires. CFG</summary>
+        public double? XlT2iHrCfg { get; set; }
+        /// <summary>txt2img Hires. Steps</summary>
+        public double? XlT2iHrStep { get; set; }
+        /// <summary>txt2img sampler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? XlT2iSampler { get; set; }
+#nullable restore
+#else
+        public string XlT2iSampler { get; set; }
+#endif
+        /// <summary>txt2img scheduler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? XlT2iScheduler { get; set; }
+#nullable restore
+#else
+        public string XlT2iScheduler { get; set; }
+#endif
+        /// <summary>The xl_t2i_ss0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? XlT2iSs0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode XlT2iSs0 { get; set; }
+#endif
+        /// <summary>The xl_t2i_ss1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? XlT2iSs1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode XlT2iSs1 { get; set; }
+#endif
+        /// <summary>txt2img Steps</summary>
+        public double? XlT2iStep { get; set; }
+        /// <summary>txt2img Width</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? XlT2iWidth { get; set; }
+#nullable restore
+#else
+        public UntypedNode XlT2iWidth { get; set; }
+#endif
+        /// <summary>The zit_cfg0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ZitCfg0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ZitCfg0 { get; set; }
+#endif
+        /// <summary>The zit_cfg1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ZitCfg1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ZitCfg1 { get; set; }
+#endif
+        /// <summary>The zit_dcfg0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ZitDcfg0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ZitDcfg0 { get; set; }
+#endif
+        /// <summary>The zit_dcfg1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ZitDcfg1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ZitDcfg1 { get; set; }
+#endif
+        /// <summary>img2img CFG</summary>
+        public double? ZitI2iCfg { get; set; }
+        /// <summary>img2img Shift</summary>
+        public double? ZitI2iDcfg { get; set; }
+        /// <summary>The zit_i2i_dim0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ZitI2iDim0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ZitI2iDim0 { get; set; }
+#endif
+        /// <summary>The zit_i2i_dim1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ZitI2iDim1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ZitI2iDim1 { get; set; }
+#endif
+        /// <summary>img2img Height</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ZitI2iHeight { get; set; }
+#nullable restore
+#else
+        public UntypedNode ZitI2iHeight { get; set; }
+#endif
+        /// <summary>img2img sampler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ZitI2iSampler { get; set; }
+#nullable restore
+#else
+        public string ZitI2iSampler { get; set; }
+#endif
+        /// <summary>img2img scheduler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ZitI2iScheduler { get; set; }
+#nullable restore
+#else
+        public string ZitI2iScheduler { get; set; }
+#endif
+        /// <summary>The zit_i2i_ss0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ZitI2iSs0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ZitI2iSs0 { get; set; }
+#endif
+        /// <summary>The zit_i2i_ss1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ZitI2iSs1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ZitI2iSs1 { get; set; }
+#endif
+        /// <summary>img2img Steps</summary>
+        public double? ZitI2iStep { get; set; }
+        /// <summary>img2img Width</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ZitI2iWidth { get; set; }
+#nullable restore
+#else
+        public UntypedNode ZitI2iWidth { get; set; }
+#endif
+        /// <summary>The zit_steps0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ZitSteps0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ZitSteps0 { get; set; }
+#endif
+        /// <summary>The zit_steps1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ZitSteps1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ZitSteps1 { get; set; }
+#endif
+        /// <summary>txt2img CFG</summary>
+        public double? ZitT2iCfg { get; set; }
+        /// <summary>txt2img Shift</summary>
+        public double? ZitT2iDcfg { get; set; }
+        /// <summary>The zit_t2i_dim0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ZitT2iDim0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ZitT2iDim0 { get; set; }
+#endif
+        /// <summary>The zit_t2i_dim1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ZitT2iDim1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ZitT2iDim1 { get; set; }
+#endif
+        /// <summary>txt2img Height</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ZitT2iHeight { get; set; }
+#nullable restore
+#else
+        public UntypedNode ZitT2iHeight { get; set; }
+#endif
+        /// <summary>txt2img Hires. CFG</summary>
+        public double? ZitT2iHrCfg { get; set; }
+        /// <summary>txt2img Hires. Shift</summary>
+        public double? ZitT2iHrDcfg { get; set; }
+        /// <summary>txt2img Hires. Steps</summary>
+        public double? ZitT2iHrStep { get; set; }
+        /// <summary>txt2img sampler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ZitT2iSampler { get; set; }
+#nullable restore
+#else
+        public string ZitT2iSampler { get; set; }
+#endif
+        /// <summary>txt2img scheduler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ZitT2iScheduler { get; set; }
+#nullable restore
+#else
+        public string ZitT2iScheduler { get; set; }
+#endif
+        /// <summary>The zit_t2i_ss0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ZitT2iSs0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ZitT2iSs0 { get; set; }
+#endif
+        /// <summary>The zit_t2i_ss1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ZitT2iSs1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ZitT2iSs1 { get; set; }
+#endif
+        /// <summary>txt2img Steps</summary>
+        public double? ZitT2iStep { get; set; }
+        /// <summary>txt2img Width</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ZitT2iWidth { get; set; }
+#nullable restore
+#else
+        public UntypedNode ZitT2iWidth { get; set; }
+#endif
         /// <summary>
         /// Instantiates a new <see cref="global::MobileDiffusion.Clients.SdForgeNeo.Models.Options"/> and sets the default values.
         /// </summary>
         public Options()
         {
             AdditionalData = new Dictionary<string, object>();
+            AnimaI2iSampler = "ER SDE";
+            AnimaI2iScheduler = "Beta";
+            AnimaT2iSampler = "ER SDE";
+            AnimaT2iScheduler = "Beta";
             AutoLaunchBrowser = "Local";
-            CanvasHotkeyAdjust = "Ctrl";
-            CanvasHotkeyFullscreen = "S";
-            CanvasHotkeyGrowBrush = "W";
-            CanvasHotkeyMove = "F";
-            CanvasHotkeyOverlap = "O";
-            CanvasHotkeyReset = "R";
-            CanvasHotkeyShrinkBrush = "Q";
-            CanvasHotkeyZoom = "Alt";
             CompatibilityExplanation = "Don't touch these unless you know what you are doing...";
             CrossAttentionOptimization = "Automatic";
             DdimDiscretize = "uniform";
@@ -1753,14 +3705,30 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
             ExtraNetworksCardOrder = "Ascending";
             ExtraNetworksCardOrderField = "Path";
             ExtraNetworksHiddenModels = "When searched";
-            ExtraNetworksTreeViewExplanation = "<b>Tree View</b> is a rather... \"controversial\" feature,\nwhich adds a folder structure to visualize the ExtraNetworks.\nHowever, the resulting UI is quite... sluggish.";
+            ExtraNetworksTreeViewStyle = "Dirs";
             FaceRestorationModel = "CodeFormer";
+            FluxI2iSampler = "Euler";
+            FluxI2iScheduler = "Beta";
+            FluxT2iSampler = "Euler";
+            FluxT2iScheduler = "Beta";
+            ForgeCanvasPlainColor = "#808080";
+            ForgePreset = "sd";
+            ForgeTryReproduce = "None";
+            ForgeUnetStorageDtype = "Automatic";
+            ForgeUnetStorageDtypeAnima = "Automatic";
+            ForgeUnetStorageDtypeFlux = "Automatic";
+            ForgeUnetStorageDtypeKlein = "Automatic";
+            ForgeUnetStorageDtypeLumina = "Automatic";
+            ForgeUnetStorageDtypeQwen = "Automatic";
+            ForgeUnetStorageDtypeSd = "Automatic";
+            ForgeUnetStorageDtypeWan = "Automatic";
+            ForgeUnetStorageDtypeXl = "Automatic";
+            ForgeUnetStorageDtypeZit = "Automatic";
             GradioTheme = "Default";
             GridBackgroundColor = "#ffffff";
             GridFormat = "jpg";
             GridTextActiveColor = "#000000";
             GridTextInactiveColor = "#999999";
-            HiresFixRefinerPass = "second pass";
             Img2imgBackgroundColor = "#808080";
             Img2imgInpaintMaskBrushColor = "#808080";
             Img2imgInpaintSketchDefaultBrushColor = "#ff0000";
@@ -1768,9 +3736,18 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
             InfotextExplanation = "Infotext is what the webui calls the text that contains generation parameters, and can be used to generate the same image again.";
             InfotextStyles = "Apply if any";
             KeyeditDelimiters = ".,\\/!?%^*;:{}=`~() ";
+            KleinI2iSampler = "Euler";
+            KleinI2iScheduler = "Beta";
+            KleinT2iSampler = "Euler";
+            KleinT2iScheduler = "Beta";
             LivePreviewsImageFormat = "jpeg";
             Localization = "None";
-            LoraPreferredName = "Alias";
+            LuminaI2iSampler = "Res Multistep";
+            LuminaI2iScheduler = "Simple";
+            LuminaT2iSampler = "Res Multistep";
+            LuminaT2iScheduler = "Simple";
+            NetaTemplateNegative = "You are an assistant designed to generate low-quality images based on textual prompts. <Prompt Start>";
+            NetaTemplatePositive = "You are an assistant designed to generate anime images with the highest degree of image-text alignment based on danbooru tags. <Prompt Start>";
             OpenDirButtonChoice = "Subdirectory";
             OutdirExtrasSamples = "output\\extras-images";
             OutdirImg2imgGrids = "output\\img2img-grids";
@@ -1779,21 +3756,52 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
             OutdirSave = "output\\images";
             OutdirTxt2imgGrids = "output\\txt2img-grids";
             OutdirTxt2imgSamples = "output\\txt2img-images";
+            OutdirVideos = "output\\videos";
+            ProfilingExplanation = "These settings allow you to enable PyTorch profiler during generation.<br>\nProfiling allows you to see which code uses how much of the computer's resources.\nEach generation writes its own profile to one file, overwriting previous ones.\nThe file can be viewed in <a href=\"chrome:tracing\">Chrome</a> or on the <a href=\"https://ui.perfetto.dev/\">Perfetto</a> website.\n<br><b>Warning:</b> Writing profile can take up to 30 seconds, and the file itself can be around 500MB in size.";
+            ProfilingFilename = "trace.json";
+            QwenI2iSampler = "LCM";
+            QwenI2iScheduler = "Normal";
+            QwenT2iSampler = "LCM";
+            QwenT2iScheduler = "Normal";
             RandnSource = "CPU";
+            RefinerLoraExplanation = "Use the \"Lora Replacements\" to load different LoRAs between the normal pass and the refiner pass.<br>\nSeparate the original and the target with an equal sign; Place each entry in its own line.";
+            RefinerLoraReplacement = "high_noise=low_noise";
             SamplesFormat = "png";
             SaveImagesReplaceAction = "Override";
-            SdLora = "None";
+            SdI2iSampler = "Euler a";
+            SdI2iScheduler = "Automatic";
             SdNoiseSchedule = "Default";
+            SdT2iSampler = "Euler a";
+            SdT2iScheduler = "Automatic";
             SdUnet = "Automatic";
             SdVae = "Automatic";
             SdVaeDecodeMethod = "Full";
             SdVaeEncodeMethod = "Full";
             SdVaeExplanation = "<abbr title='Variational AutoEncoder'>VAE</abbr> is a neural network that transforms a standard <abbr title='Red/Green/Blue'>RGB</abbr>\nimage to and from latent space representation. Latent space is what Stable Diffusion works on during generation. For txt2img, VAE is used\nto create the resulting image after the sampling is finished. For img2img, VAE is additionally used to process user's input image before the sampling.";
             SettingsInUi = "This page allows you to add some settings to the main interface of txt2img and img2img tabs.";
-            ShowProgressType = "TAESD";
+            ShowProgressType = "RGB";
+            SvdqAttention = "nunchaku-fp16";
+            SvdqFluxExp = "Flux";
+            SvdqQwenExp = "Qwen";
             TempDir = "tmp";
             TokenMergingExplanation = "<b>Token Merging</b> speeds up the diffusion process by fusing \"redundant\" tokens together, but also reduces quality as a result.\n[<a href=\"https://github.com/dbolya/tomesd\">GitHub</a>] <br>\n<b>Note:</b> Has no effect on SDXL when Max Downsample is set to 1";
             UpscalerForImg2img = "None";
+            VideoContainer = "mp4";
+            VideoExplanation = "Parameters for encoding videos in <b>H.264</b> using <b>FFmpeg</b><br>\nRefer to the <a href=\"https://trac.ffmpeg.org/wiki/Encode/H.264\">Wiki</a> for what these parameters mean";
+            VideoPreset = "fast";
+            VideoProfile = "main";
+            WanI2iSampler = "Euler";
+            WanI2iScheduler = "Simple";
+            WanT2iSampler = "Euler";
+            WanT2iScheduler = "Simple";
+            XlI2iSampler = "Euler a";
+            XlI2iScheduler = "Automatic";
+            XlT2iSampler = "Euler a";
+            XlT2iScheduler = "Automatic";
+            ZitI2iSampler = "Euler";
+            ZitI2iScheduler = "Beta";
+            ZitT2iSampler = "Euler";
+            ZitT2iScheduler = "Beta";
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -1820,52 +3828,61 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
                 { "add_vae_name_to_info", n => { AddVaeNameToInfo = n.GetBoolValue(); } },
                 { "add_version_to_infotext", n => { AddVersionToInfotext = n.GetBoolValue(); } },
                 { "always_discard_next_to_last_sigma", n => { AlwaysDiscardNextToLastSigma = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "anima_cfg0", n => { AnimaCfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "anima_cfg1", n => { AnimaCfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "anima_i2i_cfg", n => { AnimaI2iCfg = n.GetDoubleValue(); } },
+                { "anima_i2i_dim0", n => { AnimaI2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "anima_i2i_dim1", n => { AnimaI2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "anima_i2i_height", n => { AnimaI2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "anima_i2i_sampler", n => { AnimaI2iSampler = n.GetStringValue(); } },
+                { "anima_i2i_scheduler", n => { AnimaI2iScheduler = n.GetStringValue(); } },
+                { "anima_i2i_ss0", n => { AnimaI2iSs0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "anima_i2i_ss1", n => { AnimaI2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "anima_i2i_step", n => { AnimaI2iStep = n.GetDoubleValue(); } },
+                { "anima_i2i_width", n => { AnimaI2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "anima_steps0", n => { AnimaSteps0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "anima_steps1", n => { AnimaSteps1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "anima_t2i_cfg", n => { AnimaT2iCfg = n.GetDoubleValue(); } },
+                { "anima_t2i_dim0", n => { AnimaT2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "anima_t2i_dim1", n => { AnimaT2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "anima_t2i_height", n => { AnimaT2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "anima_t2i_hr_cfg", n => { AnimaT2iHrCfg = n.GetDoubleValue(); } },
+                { "anima_t2i_hr_step", n => { AnimaT2iHrStep = n.GetDoubleValue(); } },
+                { "anima_t2i_sampler", n => { AnimaT2iSampler = n.GetStringValue(); } },
+                { "anima_t2i_scheduler", n => { AnimaT2iScheduler = n.GetStringValue(); } },
+                { "anima_t2i_ss0", n => { AnimaT2iSs0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "anima_t2i_ss1", n => { AnimaT2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "anima_t2i_step", n => { AnimaT2iStep = n.GetDoubleValue(); } },
+                { "anima_t2i_width", n => { AnimaT2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "api_enable_requests", n => { ApiEnableRequests = n.GetBoolValue(); } },
                 { "api_forbid_local_requests", n => { ApiForbidLocalRequests = n.GetBoolValue(); } },
                 { "api_useragent", n => { ApiUseragent = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "auto_backcompat", n => { AutoBackcompat = n.GetBoolValue(); } },
                 { "auto_launch_browser", n => { AutoLaunchBrowser = n.GetStringValue(); } },
                 { "beta_dist_alpha", n => { BetaDistAlpha = n.GetDoubleValue(); } },
                 { "beta_dist_beta", n => { BetaDistBeta = n.GetDoubleValue(); } },
                 { "CLIP_stop_at_last_layers", n => { CLIPStopAtLastLayers = n.GetDoubleValue(); } },
-                { "canvas_auto_expand", n => { CanvasAutoExpand = n.GetBoolValue(); } },
-                { "canvas_blur_prompt", n => { CanvasBlurPrompt = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "canvas_disabled_functions", n => { CanvasDisabledFunctions = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "canvas_hotkey_adjust", n => { CanvasHotkeyAdjust = n.GetStringValue(); } },
-                { "canvas_hotkey_fullscreen", n => { CanvasHotkeyFullscreen = n.GetStringValue(); } },
-                { "canvas_hotkey_grow_brush", n => { CanvasHotkeyGrowBrush = n.GetStringValue(); } },
-                { "canvas_hotkey_move", n => { CanvasHotkeyMove = n.GetStringValue(); } },
-                { "canvas_hotkey_overlap", n => { CanvasHotkeyOverlap = n.GetStringValue(); } },
-                { "canvas_hotkey_reset", n => { CanvasHotkeyReset = n.GetStringValue(); } },
-                { "canvas_hotkey_shrink_brush", n => { CanvasHotkeyShrinkBrush = n.GetStringValue(); } },
-                { "canvas_hotkey_zoom", n => { CanvasHotkeyZoom = n.GetStringValue(); } },
-                { "canvas_show_tooltip", n => { CanvasShowTooltip = n.GetBoolValue(); } },
                 { "clean_temp_dir_at_start", n => { CleanTempDirAtStart = n.GetBoolValue(); } },
-                { "clip_skip_sdxl", n => { ClipSkipSdxl = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "code_former_weight", n => { CodeFormerWeight = n.GetDoubleValue(); } },
                 { "comma_padding_backtrack", n => { CommaPaddingBacktrack = n.GetDoubleValue(); } },
                 { "compact_prompt_box", n => { CompactPromptBox = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "compatibility_explanation", n => { CompatibilityExplanation = n.GetStringValue(); } },
                 { "composite_tiles_on_gpu", n => { CompositeTilesOnGpu = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "cross_attention_optimization", n => { CrossAttentionOptimization = n.GetStringValue(); } },
-                { "cublas_fast", n => { CublasFast = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "ctrl_enter_interrupt", n => { CtrlEnterInterrupt = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "ddim_discretize", n => { DdimDiscretize = n.GetStringValue(); } },
                 { "dimensions_and_batch_together", n => { DimensionsAndBatchTogether = n.GetBoolValue(); } },
                 { "directories_filename_pattern", n => { DirectoriesFilenamePattern = n.GetStringValue(); } },
                 { "directories_max_prompt_words", n => { DirectoriesMaxPromptWords = n.GetDoubleValue(); } },
                 { "disable_all_extensions", n => { DisableAllExtensions = n.GetStringValue(); } },
-                { "disable_mmap_load_safetensors", n => { DisableMmapLoadSafetensors = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "disable_token_counters", n => { DisableTokenCounters = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "disable_weights_auto_swap", n => { DisableWeightsAutoSwap = n.GetBoolValue(); } },
                 { "disabled_extensions", n => { DisabledExtensions = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "div00", n => { Div00 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "div01", n => { Div01 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "div_classic", n => { DivClassic = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "div_exp", n => { DivExp = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "div_exp_info", n => { DivExpInfo = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "div_ngms", n => { DivNgms = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "div_skip_early", n => { DivSkipEarly = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "div_tome", n => { DivTome = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "div_tree", n => { DivTree = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "divlumina", n => { Divlumina = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "divqwen", n => { Divqwen = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "divxl", n => { Divxl = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "do_not_show_images", n => { DoNotShowImages = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "dump_stacks_on_signal", n => { DumpStacksOnSignal = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -1875,11 +3892,13 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
                 { "enable_console_prompts", n => { EnableConsolePrompts = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "enable_pnginfo", n => { EnablePnginfo = n.GetBoolValue(); } },
                 { "enable_prompt_comments", n => { EnablePromptComments = n.GetBoolValue(); } },
+                { "enable_reloading_ui_scripts", n => { EnableReloadingUiScripts = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "enable_upscale_progressbar", n => { EnableUpscaleProgressbar = n.GetBoolValue(); } },
                 { "eta_ancestral", n => { EtaAncestral = n.GetDoubleValue(); } },
                 { "eta_ddim", n => { EtaDdim = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "eta_noise_seed_delta", n => { EtaNoiseSeedDelta = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "export_for_4chan", n => { ExportFor4chan = n.GetBoolValue(); } },
+                { "extra_dirs_div", n => { ExtraDirsDiv = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "extra_networks_add_text_separator", n => { ExtraNetworksAddTextSeparator = n.GetStringValue(); } },
                 { "extra_networks_card_description_is_html", n => { ExtraNetworksCardDescriptionIsHtml = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "extra_networks_card_height", n => { ExtraNetworksCardHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -1889,22 +3908,88 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
                 { "extra_networks_card_text_scale", n => { ExtraNetworksCardTextScale = n.GetDoubleValue(); } },
                 { "extra_networks_card_width", n => { ExtraNetworksCardWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "extra_networks_default_multiplier", n => { ExtraNetworksDefaultMultiplier = n.GetDoubleValue(); } },
-                { "extra_networks_dir_btn_enable", n => { ExtraNetworksDirBtnEnable = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "extra_networks_dir_button_function", n => { ExtraNetworksDirButtonFunction = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "extra_networks_hidden_models", n => { ExtraNetworksHiddenModels = n.GetStringValue(); } },
-                { "extra_networks_patch_inplace", n => { ExtraNetworksPatchInplace = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "extra_networks_tree_view_default_enabled", n => { ExtraNetworksTreeViewDefaultEnabled = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "extra_networks_show_hidden_directories", n => { ExtraNetworksShowHiddenDirectories = n.GetBoolValue(); } },
+                { "extra_networks_tree_view_default_enabled", n => { ExtraNetworksTreeViewDefaultEnabled = n.GetBoolValue(); } },
                 { "extra_networks_tree_view_default_width", n => { ExtraNetworksTreeViewDefaultWidth = n.GetDoubleValue(); } },
-                { "extra_networks_tree_view_enable", n => { ExtraNetworksTreeViewEnable = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "extra_networks_tree_view_explanation", n => { ExtraNetworksTreeViewExplanation = n.GetStringValue(); } },
+                { "extra_networks_tree_view_style", n => { ExtraNetworksTreeViewStyle = n.GetStringValue(); } },
                 { "extra_options_accordion", n => { ExtraOptionsAccordion = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "extra_options_cols", n => { ExtraOptionsCols = n.GetDoubleValue(); } },
                 { "extra_options_img2img", n => { ExtraOptionsImg2img = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "extra_options_txt2img", n => { ExtraOptionsTxt2img = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "extra_tree_div", n => { ExtraTreeDiv = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "face_restoration", n => { FaceRestoration = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "face_restoration_model", n => { FaceRestorationModel = n.GetStringValue(); } },
                 { "face_restoration_unload", n => { FaceRestorationUnload = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "fp8_fast", n => { Fp8Fast = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "fp8_storage", n => { Fp8Storage = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "flux_cfg0", n => { FluxCfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "flux_cfg1", n => { FluxCfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "flux_dcfg0", n => { FluxDcfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "flux_dcfg1", n => { FluxDcfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "flux_i2i_cfg", n => { FluxI2iCfg = n.GetDoubleValue(); } },
+                { "flux_i2i_dcfg", n => { FluxI2iDcfg = n.GetDoubleValue(); } },
+                { "flux_i2i_dim0", n => { FluxI2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "flux_i2i_dim1", n => { FluxI2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "flux_i2i_height", n => { FluxI2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "flux_i2i_sampler", n => { FluxI2iSampler = n.GetStringValue(); } },
+                { "flux_i2i_scheduler", n => { FluxI2iScheduler = n.GetStringValue(); } },
+                { "flux_i2i_ss0", n => { FluxI2iSs0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "flux_i2i_ss1", n => { FluxI2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "flux_i2i_step", n => { FluxI2iStep = n.GetDoubleValue(); } },
+                { "flux_i2i_width", n => { FluxI2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "flux_steps0", n => { FluxSteps0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "flux_steps1", n => { FluxSteps1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "flux_t2i_cfg", n => { FluxT2iCfg = n.GetDoubleValue(); } },
+                { "flux_t2i_dcfg", n => { FluxT2iDcfg = n.GetDoubleValue(); } },
+                { "flux_t2i_dim0", n => { FluxT2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "flux_t2i_dim1", n => { FluxT2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "flux_t2i_height", n => { FluxT2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "flux_t2i_hr_cfg", n => { FluxT2iHrCfg = n.GetDoubleValue(); } },
+                { "flux_t2i_hr_dcfg", n => { FluxT2iHrDcfg = n.GetDoubleValue(); } },
+                { "flux_t2i_hr_step", n => { FluxT2iHrStep = n.GetDoubleValue(); } },
+                { "flux_t2i_sampler", n => { FluxT2iSampler = n.GetStringValue(); } },
+                { "flux_t2i_scheduler", n => { FluxT2iScheduler = n.GetStringValue(); } },
+                { "flux_t2i_ss0", n => { FluxT2iSs0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "flux_t2i_ss1", n => { FluxT2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "flux_t2i_step", n => { FluxT2iStep = n.GetDoubleValue(); } },
+                { "flux_t2i_width", n => { FluxT2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forbidden_knowledge", n => { ForbiddenKnowledge = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_additional_modules", n => { ForgeAdditionalModules = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_additional_modules_anima", n => { ForgeAdditionalModulesAnima = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_additional_modules_flux", n => { ForgeAdditionalModulesFlux = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_additional_modules_klein", n => { ForgeAdditionalModulesKlein = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_additional_modules_lumina", n => { ForgeAdditionalModulesLumina = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_additional_modules_qwen", n => { ForgeAdditionalModulesQwen = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_additional_modules_sd", n => { ForgeAdditionalModulesSd = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_additional_modules_wan", n => { ForgeAdditionalModulesWan = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_additional_modules_xl", n => { ForgeAdditionalModulesXl = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_additional_modules_zit", n => { ForgeAdditionalModulesZit = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_canvas_consistent_brush", n => { ForgeCanvasConsistentBrush = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_canvas_height", n => { ForgeCanvasHeight = n.GetDoubleValue(); } },
+                { "forge_canvas_plain", n => { ForgeCanvasPlain = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_canvas_plain_color", n => { ForgeCanvasPlainColor = n.GetStringValue(); } },
+                { "forge_canvas_toolbar_always", n => { ForgeCanvasToolbarAlways = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_checkpoint_anima", n => { ForgeCheckpointAnima = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_checkpoint_flux", n => { ForgeCheckpointFlux = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_checkpoint_klein", n => { ForgeCheckpointKlein = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_checkpoint_lumina", n => { ForgeCheckpointLumina = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_checkpoint_qwen", n => { ForgeCheckpointQwen = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_checkpoint_sd", n => { ForgeCheckpointSd = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_checkpoint_wan", n => { ForgeCheckpointWan = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_checkpoint_xl", n => { ForgeCheckpointXl = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_checkpoint_zit", n => { ForgeCheckpointZit = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_preset", n => { ForgePreset = n.GetStringValue(); } },
+                { "forge_try_reproduce", n => { ForgeTryReproduce = n.GetStringValue(); } },
+                { "forge_unet_storage_dtype", n => { ForgeUnetStorageDtype = n.GetStringValue(); } },
+                { "forge_unet_storage_dtype_anima", n => { ForgeUnetStorageDtypeAnima = n.GetStringValue(); } },
+                { "forge_unet_storage_dtype_flux", n => { ForgeUnetStorageDtypeFlux = n.GetStringValue(); } },
+                { "forge_unet_storage_dtype_klein", n => { ForgeUnetStorageDtypeKlein = n.GetStringValue(); } },
+                { "forge_unet_storage_dtype_lumina", n => { ForgeUnetStorageDtypeLumina = n.GetStringValue(); } },
+                { "forge_unet_storage_dtype_qwen", n => { ForgeUnetStorageDtypeQwen = n.GetStringValue(); } },
+                { "forge_unet_storage_dtype_sd", n => { ForgeUnetStorageDtypeSd = n.GetStringValue(); } },
+                { "forge_unet_storage_dtype_wan", n => { ForgeUnetStorageDtypeWan = n.GetStringValue(); } },
+                { "forge_unet_storage_dtype_xl", n => { ForgeUnetStorageDtypeXl = n.GetStringValue(); } },
+                { "forge_unet_storage_dtype_zit", n => { ForgeUnetStorageDtypeZit = n.GetStringValue(); } },
                 { "gallery_height", n => { GalleryHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "gradio_theme", n => { GradioTheme = n.GetStringValue(); } },
                 { "gradio_themes_cache", n => { GradioThemesCache = n.GetBoolValue(); } },
@@ -1920,21 +4005,21 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
                 { "grid_zip_filename_pattern", n => { GridZipFilenamePattern = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "hidden_tabs", n => { HiddenTabs = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "hide_samplers", n => { HideSamplers = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "hide_samplers_invert", n => { HideSamplersInvert = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "hires_button_gallery_insert", n => { HiresButtonGalleryInsert = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "hires_fix_refiner_pass", n => { HiresFixRefinerPass = n.GetStringValue(); } },
                 { "hires_fix_show_prompts", n => { HiresFixShowPrompts = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "hires_fix_show_sampler", n => { HiresFixShowSampler = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "hires_fix_use_firstpass_conds", n => { HiresFixUseFirstpassConds = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "hires_insert_index", n => { HiresInsertIndex = n.GetBoolValue(); } },
+                { "img2img_autosize", n => { Img2imgAutosize = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "img2img_background_color", n => { Img2imgBackgroundColor = n.GetStringValue(); } },
                 { "img2img_batch_show_results_limit", n => { Img2imgBatchShowResultsLimit = n.GetDoubleValue(); } },
+                { "img2img_batch_use_original_name", n => { Img2imgBatchUseOriginalName = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "img2img_color_correction", n => { Img2imgColorCorrection = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "img2img_editor_height", n => { Img2imgEditorHeight = n.GetDoubleValue(); } },
                 { "img2img_extra_noise", n => { Img2imgExtraNoise = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "img2img_fix_steps", n => { Img2imgFixSteps = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "img2img_inpaint_mask_brush_color", n => { Img2imgInpaintMaskBrushColor = n.GetStringValue(); } },
-                { "img2img_inpaint_precise_mask", n => { Img2imgInpaintPreciseMask = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "img2img_inpaint_mask_high_contrast", n => { Img2imgInpaintMaskHighContrast = n.GetBoolValue(); } },
+                { "img2img_inpaint_mask_scribble_alpha", n => { Img2imgInpaintMaskScribbleAlpha = n.GetDoubleValue(); } },
                 { "img2img_inpaint_sketch_default_brush_color", n => { Img2imgInpaintSketchDefaultBrushColor = n.GetStringValue(); } },
                 { "img2img_settings_accordion", n => { Img2imgSettingsAccordion = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "img2img_sketch_default_brush_color", n => { Img2imgSketchDefaultBrushColor = n.GetStringValue(); } },
@@ -1947,6 +4032,7 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
                 { "initial_noise_multiplier", n => { InitialNoiseMultiplier = n.GetDoubleValue(); } },
                 { "inpainting_mask_weight", n => { InpaintingMaskWeight = n.GetDoubleValue(); } },
                 { "interrupt_after_current", n => { InterruptAfterCurrent = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "invert_sigmas", n => { InvertSigmas = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "jpeg_quality", n => { JpegQuality = n.GetDoubleValue(); } },
                 { "js_live_preview_in_modal_lightbox", n => { JsLivePreviewInModalLightbox = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "js_modal_lightbox", n => { JsModalLightbox = n.GetBoolValue(); } },
@@ -1958,24 +4044,78 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
                 { "keyedit_move", n => { KeyeditMove = n.GetBoolValue(); } },
                 { "keyedit_precision_attention", n => { KeyeditPrecisionAttention = n.GetDoubleValue(); } },
                 { "keyedit_precision_extra", n => { KeyeditPrecisionExtra = n.GetDoubleValue(); } },
+                { "klein_cfg0", n => { KleinCfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "klein_cfg1", n => { KleinCfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "klein_i2i_cfg", n => { KleinI2iCfg = n.GetDoubleValue(); } },
+                { "klein_i2i_dim0", n => { KleinI2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "klein_i2i_dim1", n => { KleinI2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "klein_i2i_height", n => { KleinI2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "klein_i2i_sampler", n => { KleinI2iSampler = n.GetStringValue(); } },
+                { "klein_i2i_scheduler", n => { KleinI2iScheduler = n.GetStringValue(); } },
+                { "klein_i2i_ss0", n => { KleinI2iSs0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "klein_i2i_ss1", n => { KleinI2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "klein_i2i_step", n => { KleinI2iStep = n.GetDoubleValue(); } },
+                { "klein_i2i_width", n => { KleinI2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "klein_steps0", n => { KleinSteps0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "klein_steps1", n => { KleinSteps1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "klein_t2i_cfg", n => { KleinT2iCfg = n.GetDoubleValue(); } },
+                { "klein_t2i_dim0", n => { KleinT2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "klein_t2i_dim1", n => { KleinT2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "klein_t2i_height", n => { KleinT2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "klein_t2i_hr_cfg", n => { KleinT2iHrCfg = n.GetDoubleValue(); } },
+                { "klein_t2i_hr_step", n => { KleinT2iHrStep = n.GetDoubleValue(); } },
+                { "klein_t2i_sampler", n => { KleinT2iSampler = n.GetStringValue(); } },
+                { "klein_t2i_scheduler", n => { KleinT2iScheduler = n.GetStringValue(); } },
+                { "klein_t2i_ss0", n => { KleinT2iSs0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "klein_t2i_ss1", n => { KleinT2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "klein_t2i_step", n => { KleinT2iStep = n.GetDoubleValue(); } },
+                { "klein_t2i_width", n => { KleinT2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "list_hidden_files", n => { ListHiddenFiles = n.GetBoolValue(); } },
                 { "live_preview_fast_interrupt", n => { LivePreviewFastInterrupt = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "live_preview_refresh_period", n => { LivePreviewRefreshPeriod = n.GetDoubleValue(); } },
                 { "live_previews_enable", n => { LivePreviewsEnable = n.GetBoolValue(); } },
                 { "live_previews_image_format", n => { LivePreviewsImageFormat = n.GetStringValue(); } },
                 { "localization", n => { Localization = n.GetStringValue(); } },
-                { "lora_add_hashes_to_infotext", n => { LoraAddHashesToInfotext = n.GetBoolValue(); } },
-                { "lora_preferred_name", n => { LoraPreferredName = n.GetStringValue(); } },
-                { "lora_show_all", n => { LoraShowAll = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "lumina_cfg0", n => { LuminaCfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "lumina_cfg1", n => { LuminaCfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "lumina_dcfg0", n => { LuminaDcfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "lumina_dcfg1", n => { LuminaDcfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "lumina_i2i_cfg", n => { LuminaI2iCfg = n.GetDoubleValue(); } },
+                { "lumina_i2i_dcfg", n => { LuminaI2iDcfg = n.GetDoubleValue(); } },
+                { "lumina_i2i_dim0", n => { LuminaI2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "lumina_i2i_dim1", n => { LuminaI2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "lumina_i2i_height", n => { LuminaI2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "lumina_i2i_sampler", n => { LuminaI2iSampler = n.GetStringValue(); } },
+                { "lumina_i2i_scheduler", n => { LuminaI2iScheduler = n.GetStringValue(); } },
+                { "lumina_i2i_ss0", n => { LuminaI2iSs0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "lumina_i2i_ss1", n => { LuminaI2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "lumina_i2i_step", n => { LuminaI2iStep = n.GetDoubleValue(); } },
+                { "lumina_i2i_width", n => { LuminaI2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "lumina_steps0", n => { LuminaSteps0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "lumina_steps1", n => { LuminaSteps1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "lumina_t2i_cfg", n => { LuminaT2iCfg = n.GetDoubleValue(); } },
+                { "lumina_t2i_dcfg", n => { LuminaT2iDcfg = n.GetDoubleValue(); } },
+                { "lumina_t2i_dim0", n => { LuminaT2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "lumina_t2i_dim1", n => { LuminaT2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "lumina_t2i_height", n => { LuminaT2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "lumina_t2i_hr_cfg", n => { LuminaT2iHrCfg = n.GetDoubleValue(); } },
+                { "lumina_t2i_hr_dcfg", n => { LuminaT2iHrDcfg = n.GetDoubleValue(); } },
+                { "lumina_t2i_hr_step", n => { LuminaT2iHrStep = n.GetDoubleValue(); } },
+                { "lumina_t2i_sampler", n => { LuminaT2iSampler = n.GetStringValue(); } },
+                { "lumina_t2i_scheduler", n => { LuminaT2iScheduler = n.GetStringValue(); } },
+                { "lumina_t2i_ss0", n => { LuminaT2iSs0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "lumina_t2i_ss1", n => { LuminaT2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "lumina_t2i_step", n => { LuminaT2iStep = n.GetDoubleValue(); } },
+                { "lumina_t2i_width", n => { LuminaT2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "memmon_poll_rate", n => { MemmonPollRate = n.GetDoubleValue(); } },
                 { "multiple_tqdm", n => { MultipleTqdm = n.GetBoolValue(); } },
                 { "n_rows", n => { NRows = n.GetDoubleValue(); } },
+                { "neta_template_negative", n => { NetaTemplateNegative = n.GetStringValue(); } },
+                { "neta_template_positive", n => { NetaTemplatePositive = n.GetStringValue(); } },
                 { "no_dpmpp_sde_batch_determinism", n => { NoDpmppSdeBatchDeterminism = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "no_flashbang", n => { NoFlashbang = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "notification_audio", n => { NotificationAudio = n.GetBoolValue(); } },
                 { "notification_volume", n => { NotificationVolume = n.GetDoubleValue(); } },
                 { "open_dir_button_choice", n => { OpenDirButtonChoice = n.GetStringValue(); } },
-                { "opt_image", n => { OptImage = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "outdir_extras_samples", n => { OutdirExtrasSamples = n.GetStringValue(); } },
                 { "outdir_grids", n => { OutdirGrids = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "outdir_img2img_grids", n => { OutdirImg2imgGrids = n.GetStringValue(); } },
@@ -1985,15 +4125,57 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
                 { "outdir_save", n => { OutdirSave = n.GetStringValue(); } },
                 { "outdir_txt2img_grids", n => { OutdirTxt2imgGrids = n.GetStringValue(); } },
                 { "outdir_txt2img_samples", n => { OutdirTxt2imgSamples = n.GetStringValue(); } },
+                { "outdir_videos", n => { OutdirVideos = n.GetStringValue(); } },
                 { "overlay_inpaint", n => { OverlayInpaint = n.GetBoolValue(); } },
                 { "paste_safe_guard", n => { PasteSafeGuard = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "persistent_cond_cache", n => { PersistentCondCache = n.GetBoolValue(); } },
+                { "postprocessing_disable_in_extras", n => { PostprocessingDisableInExtras = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "postprocessing_enable_in_main_ui", n => { PostprocessingEnableInMainUi = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "postprocessing_operation_order", n => { PostprocessingOperationOrder = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "prefer_fp16_upscalers", n => { PreferFp16Upscalers = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "prefer_vae_precision_float16", n => { PreferVaePrecisionFloat16 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "prevent_screen_sleep_during_generation", n => { PreventScreenSleepDuringGeneration = n.GetBoolValue(); } },
+                { "profiling_activities", n => { ProfilingActivities = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "profiling_enable", n => { ProfilingEnable = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "profiling_explanation", n => { ProfilingExplanation = n.GetStringValue(); } },
+                { "profiling_filename", n => { ProfilingFilename = n.GetStringValue(); } },
+                { "profiling_profile_memory", n => { ProfilingProfileMemory = n.GetBoolValue(); } },
+                { "profiling_record_shapes", n => { ProfilingRecordShapes = n.GetBoolValue(); } },
+                { "profiling_with_stack", n => { ProfilingWithStack = n.GetBoolValue(); } },
+                { "quicksettings_accordion", n => { QuicksettingsAccordion = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "quicksettings_accordion_starts_closed", n => { QuicksettingsAccordionStartsClosed = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "quicksettings_list", n => { QuicksettingsList = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "qwen_cfg0", n => { QwenCfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "qwen_cfg1", n => { QwenCfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "qwen_i2i_cfg", n => { QwenI2iCfg = n.GetDoubleValue(); } },
+                { "qwen_i2i_dim0", n => { QwenI2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "qwen_i2i_dim1", n => { QwenI2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "qwen_i2i_height", n => { QwenI2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "qwen_i2i_sampler", n => { QwenI2iSampler = n.GetStringValue(); } },
+                { "qwen_i2i_scheduler", n => { QwenI2iScheduler = n.GetStringValue(); } },
+                { "qwen_i2i_ss0", n => { QwenI2iSs0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "qwen_i2i_ss1", n => { QwenI2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "qwen_i2i_step", n => { QwenI2iStep = n.GetDoubleValue(); } },
+                { "qwen_i2i_width", n => { QwenI2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "qwen_steps0", n => { QwenSteps0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "qwen_steps1", n => { QwenSteps1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "qwen_t2i_cfg", n => { QwenT2iCfg = n.GetDoubleValue(); } },
+                { "qwen_t2i_dim0", n => { QwenT2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "qwen_t2i_dim1", n => { QwenT2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "qwen_t2i_height", n => { QwenT2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "qwen_t2i_hr_cfg", n => { QwenT2iHrCfg = n.GetDoubleValue(); } },
+                { "qwen_t2i_hr_step", n => { QwenT2iHrStep = n.GetDoubleValue(); } },
+                { "qwen_t2i_sampler", n => { QwenT2iSampler = n.GetStringValue(); } },
+                { "qwen_t2i_scheduler", n => { QwenT2iScheduler = n.GetStringValue(); } },
+                { "qwen_t2i_ss0", n => { QwenT2iSs0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "qwen_t2i_ss1", n => { QwenT2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "qwen_t2i_step", n => { QwenT2iStep = n.GetDoubleValue(); } },
+                { "qwen_t2i_width", n => { QwenT2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "qwen_vae_resize", n => { QwenVaeResize = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "randn_source", n => { RandnSource = n.GetStringValue(); } },
+                { "refiner_fast_sd", n => { RefinerFastSd = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "refiner_lora_explanation", n => { RefinerLoraExplanation = n.GetStringValue(); } },
+                { "refiner_lora_replacement", n => { RefinerLoraReplacement = n.GetStringValue(); } },
+                { "refiner_use_steps", n => { RefinerUseSteps = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "restore_config_state_file", n => { RestoreConfigStateFile = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "return_grid", n => { ReturnGrid = n.GetBoolValue(); } },
                 { "return_mask", n => { ReturnMask = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -2001,8 +4183,7 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
                 { "rho", n => { Rho = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "s_churn", n => { SChurn = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "s_min_uncond", n => { SMinUncond = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "s_min_uncond_hr", n => { SMinUncondHr = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "s_min_uncond_img2img", n => { SMinUncondImg2img = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "s_min_uncond_all", n => { SMinUncondAll = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "s_noise", n => { SNoise = n.GetDoubleValue(); } },
                 { "s_tmax", n => { STmax = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "s_tmin", n => { STmin = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -2023,32 +4204,57 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
                 { "save_selected_only", n => { SaveSelectedOnly = n.GetBoolValue(); } },
                 { "save_to_dirs", n => { SaveToDirs = n.GetBoolValue(); } },
                 { "save_txt", n => { SaveTxt = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "save_write_log_csv", n => { SaveWriteLogCsv = n.GetBoolValue(); } },
                 { "scaling_factor", n => { ScalingFactor = n.GetDoubleValue(); } },
-                { "sd_checkpoint_cache", n => { SdCheckpointCache = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "scrollable_prompt_box", n => { ScrollablePromptBox = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "sd_cfg0", n => { SdCfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "sd_cfg1", n => { SdCfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "sd_checkpoint_dropdown_use_short", n => { SdCheckpointDropdownUseShort = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "sd_checkpoint_hash", n => { SdCheckpointHash = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "sd_lora", n => { SdLora = n.GetStringValue(); } },
+                { "sd_i2i_cfg", n => { SdI2iCfg = n.GetDoubleValue(); } },
+                { "sd_i2i_dim0", n => { SdI2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "sd_i2i_dim1", n => { SdI2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "sd_i2i_height", n => { SdI2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "sd_i2i_sampler", n => { SdI2iSampler = n.GetStringValue(); } },
+                { "sd_i2i_scheduler", n => { SdI2iScheduler = n.GetStringValue(); } },
+                { "sd_i2i_ss0", n => { SdI2iSs0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "sd_i2i_ss1", n => { SdI2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "sd_i2i_step", n => { SdI2iStep = n.GetDoubleValue(); } },
+                { "sd_i2i_width", n => { SdI2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "sd_model_checkpoint", n => { SdModelCheckpoint = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "sd_noise_schedule", n => { SdNoiseSchedule = n.GetStringValue(); } },
+                { "sd_steps0", n => { SdSteps0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "sd_steps1", n => { SdSteps1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "sd_t2i_cfg", n => { SdT2iCfg = n.GetDoubleValue(); } },
+                { "sd_t2i_dim0", n => { SdT2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "sd_t2i_dim1", n => { SdT2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "sd_t2i_height", n => { SdT2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "sd_t2i_hr_cfg", n => { SdT2iHrCfg = n.GetDoubleValue(); } },
+                { "sd_t2i_hr_step", n => { SdT2iHrStep = n.GetDoubleValue(); } },
+                { "sd_t2i_sampler", n => { SdT2iSampler = n.GetStringValue(); } },
+                { "sd_t2i_scheduler", n => { SdT2iScheduler = n.GetStringValue(); } },
+                { "sd_t2i_ss0", n => { SdT2iSs0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "sd_t2i_ss1", n => { SdT2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "sd_t2i_step", n => { SdT2iStep = n.GetDoubleValue(); } },
+                { "sd_t2i_width", n => { SdT2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "sd_unet", n => { SdUnet = n.GetStringValue(); } },
                 { "sd_vae", n => { SdVae = n.GetStringValue(); } },
-                { "sd_vae_checkpoint_cache", n => { SdVaeCheckpointCache = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "sd_vae_decode_method", n => { SdVaeDecodeMethod = n.GetStringValue(); } },
                 { "sd_vae_encode_method", n => { SdVaeEncodeMethod = n.GetStringValue(); } },
                 { "sd_vae_explanation", n => { SdVaeExplanation = n.GetStringValue(); } },
                 { "sd_vae_overrides_per_model_preferences", n => { SdVaeOverridesPerModelPreferences = n.GetBoolValue(); } },
-                { "sd_vae_tiled_ops", n => { SdVaeTiledOps = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "sd_vae_tiled_size", n => { SdVaeTiledSize = n.GetDoubleValue(); } },
                 { "sd_webui_modal_lightbox_icon_opacity", n => { SdWebuiModalLightboxIconOpacity = n.GetDoubleValue(); } },
                 { "sd_webui_modal_lightbox_toolbar_opacity", n => { SdWebuiModalLightboxToolbarOpacity = n.GetDoubleValue(); } },
                 { "sdxl_crop_left", n => { SdxlCropLeft = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "sdxl_crop_top", n => { SdxlCropTop = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "sdxl_refiner_high_aesthetic_score", n => { SdxlRefinerHighAestheticScore = n.GetDoubleValue(); } },
                 { "sdxl_refiner_low_aesthetic_score", n => { SdxlRefinerLowAestheticScore = n.GetDoubleValue(); } },
+                { "sdxl_zero_neg", n => { SdxlZeroNeg = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "send_cfg", n => { SendCfg = n.GetBoolValue(); } },
-                { "send_image_info_t2i_to_i2i", n => { SendImageInfoT2iToI2i = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "send_seed", n => { SendSeed = n.GetBoolValue(); } },
                 { "send_size", n => { SendSize = n.GetBoolValue(); } },
+                { "set_scale_by_when_changing_upscaler", n => { SetScaleByWhenChangingUpscaler = n.GetBoolValue(); } },
+                { "setting_allocated_vram", n => { SettingAllocatedVram = n.GetDoubleValue(); } },
                 { "settings_in_ui", n => { SettingsInUi = n.GetStringValue(); } },
                 { "sgm_noise_multiplier", n => { SgmNoiseMultiplier = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "show_gradio_deprecation_warnings", n => { ShowGradioDeprecationWarnings = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -2060,19 +4266,20 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
                 { "show_progressbar", n => { ShowProgressbar = n.GetBoolValue(); } },
                 { "show_refiner", n => { ShowRefiner = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "show_rescale_cfg", n => { ShowRescaleCfg = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "show_scheduler", n => { ShowScheduler = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "show_warnings", n => { ShowWarnings = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "sigma_max", n => { SigmaMax = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "sigma_min", n => { SigmaMin = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "skip_early_cond", n => { SkipEarlyCond = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "skip_early_cond_hr", n => { SkipEarlyCondHr = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "skip_early_cond_img2img", n => { SkipEarlyCondImg2img = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "stochastic_sampling", n => { StochasticSampling = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "svdq_attention", n => { SvdqAttention = n.GetStringValue(); } },
+                { "svdq_cache_threshold", n => { SvdqCacheThreshold = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "svdq_cpu_offload", n => { SvdqCpuOffload = n.GetBoolValue(); } },
+                { "svdq_flux_exp", n => { SvdqFluxExp = n.GetStringValue(); } },
+                { "svdq_num_blocks_on_gpu", n => { SvdqNumBlocksOnGpu = n.GetDoubleValue(); } },
+                { "svdq_qwen_exp", n => { SvdqQwenExp = n.GetStringValue(); } },
+                { "svdq_use_pin_memory", n => { SvdqUsePinMemory = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "target_side_length", n => { TargetSideLength = n.GetDoubleValue(); } },
                 { "temp_dir", n => { TempDir = n.GetStringValue(); } },
-                { "textual_inversion_add_hashes_to_infotext", n => { TextualInversionAddHashesToInfotext = n.GetBoolValue(); } },
-                { "tile_exp_div", n => { TileExpDiv = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "tile_overlap", n => { TileOverlap = n.GetDoubleValue(); } },
-                { "tile_size", n => { TileSize = n.GetDoubleValue(); } },
                 { "tiling", n => { Tiling = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "token_merging_downsample", n => { TokenMergingDownsample = n.GetDoubleValue(); } },
                 { "token_merging_explanation", n => { TokenMergingExplanation = n.GetStringValue(); } },
@@ -2087,13 +4294,114 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
                 { "ui_tab_order", n => { UiTabOrder = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "upscaler_for_img2img", n => { UpscalerForImg2img = n.GetStringValue(); } },
                 { "upscaling_max_images_in_cache", n => { UpscalingMaxImagesInCache = n.GetDoubleValue(); } },
+                { "use_beta_sigmas", n => { UseBetaSigmas = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "use_downcasted_alpha_bar", n => { UseDowncastedAlphaBar = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "use_dynamic_shifting", n => { UseDynamicShifting = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "use_exponential_sigmas", n => { UseExponentialSigmas = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "use_karras_sigmas", n => { UseKarrasSigmas = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "use_old_hires_fix_width_height", n => { UseOldHiresFixWidthHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "use_old_karras_scheduler_sigmas", n => { UseOldKarrasSchedulerSigmas = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "use_old_scheduling", n => { UseOldScheduling = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "use_original_name_batch", n => { UseOriginalNameBatch = n.GetBoolValue(); } },
                 { "use_save_to_dirs_for_ui", n => { UseSaveToDirsForUi = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "VERSION_UID", n => { VERSIONUID = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "video_container", n => { VideoContainer = n.GetStringValue(); } },
+                { "video_crf", n => { VideoCrf = n.GetDoubleValue(); } },
+                { "video_explanation", n => { VideoExplanation = n.GetStringValue(); } },
+                { "video_player_auto", n => { VideoPlayerAuto = n.GetBoolValue(); } },
+                { "video_player_loop", n => { VideoPlayerLoop = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "video_preset", n => { VideoPreset = n.GetStringValue(); } },
+                { "video_profile", n => { VideoProfile = n.GetStringValue(); } },
+                { "video_save_frames", n => { VideoSaveFrames = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "wan_cfg0", n => { WanCfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "wan_cfg1", n => { WanCfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "wan_dcfg0", n => { WanDcfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "wan_dcfg1", n => { WanDcfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "wan_i2i_cfg", n => { WanI2iCfg = n.GetDoubleValue(); } },
+                { "wan_i2i_dcfg", n => { WanI2iDcfg = n.GetDoubleValue(); } },
+                { "wan_i2i_dim0", n => { WanI2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "wan_i2i_dim1", n => { WanI2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "wan_i2i_height", n => { WanI2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "wan_i2i_sampler", n => { WanI2iSampler = n.GetStringValue(); } },
+                { "wan_i2i_scheduler", n => { WanI2iScheduler = n.GetStringValue(); } },
+                { "wan_i2i_ss0", n => { WanI2iSs0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "wan_i2i_ss1", n => { WanI2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "wan_i2i_step", n => { WanI2iStep = n.GetDoubleValue(); } },
+                { "wan_i2i_width", n => { WanI2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "wan_steps0", n => { WanSteps0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "wan_steps1", n => { WanSteps1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "wan_t2i_cfg", n => { WanT2iCfg = n.GetDoubleValue(); } },
+                { "wan_t2i_dcfg", n => { WanT2iDcfg = n.GetDoubleValue(); } },
+                { "wan_t2i_dim0", n => { WanT2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "wan_t2i_dim1", n => { WanT2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "wan_t2i_height", n => { WanT2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "wan_t2i_hr_cfg", n => { WanT2iHrCfg = n.GetDoubleValue(); } },
+                { "wan_t2i_hr_dcfg", n => { WanT2iHrDcfg = n.GetDoubleValue(); } },
+                { "wan_t2i_hr_step", n => { WanT2iHrStep = n.GetDoubleValue(); } },
+                { "wan_t2i_sampler", n => { WanT2iSampler = n.GetStringValue(); } },
+                { "wan_t2i_scheduler", n => { WanT2iScheduler = n.GetStringValue(); } },
+                { "wan_t2i_ss0", n => { WanT2iSs0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "wan_t2i_ss1", n => { WanT2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "wan_t2i_step", n => { WanT2iStep = n.GetDoubleValue(); } },
+                { "wan_t2i_width", n => { WanT2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "webp_lossless", n => { WebpLossless = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "xl_cfg0", n => { XlCfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "xl_cfg1", n => { XlCfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "xl_i2i_cfg", n => { XlI2iCfg = n.GetDoubleValue(); } },
+                { "xl_i2i_dim0", n => { XlI2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "xl_i2i_dim1", n => { XlI2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "xl_i2i_height", n => { XlI2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "xl_i2i_sampler", n => { XlI2iSampler = n.GetStringValue(); } },
+                { "xl_i2i_scheduler", n => { XlI2iScheduler = n.GetStringValue(); } },
+                { "xl_i2i_ss0", n => { XlI2iSs0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "xl_i2i_ss1", n => { XlI2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "xl_i2i_step", n => { XlI2iStep = n.GetDoubleValue(); } },
+                { "xl_i2i_width", n => { XlI2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "xl_steps0", n => { XlSteps0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "xl_steps1", n => { XlSteps1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "xl_t2i_cfg", n => { XlT2iCfg = n.GetDoubleValue(); } },
+                { "xl_t2i_dim0", n => { XlT2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "xl_t2i_dim1", n => { XlT2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "xl_t2i_height", n => { XlT2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "xl_t2i_hr_cfg", n => { XlT2iHrCfg = n.GetDoubleValue(); } },
+                { "xl_t2i_hr_step", n => { XlT2iHrStep = n.GetDoubleValue(); } },
+                { "xl_t2i_sampler", n => { XlT2iSampler = n.GetStringValue(); } },
+                { "xl_t2i_scheduler", n => { XlT2iScheduler = n.GetStringValue(); } },
+                { "xl_t2i_ss0", n => { XlT2iSs0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "xl_t2i_ss1", n => { XlT2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "xl_t2i_step", n => { XlT2iStep = n.GetDoubleValue(); } },
+                { "xl_t2i_width", n => { XlT2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "zit_cfg0", n => { ZitCfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "zit_cfg1", n => { ZitCfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "zit_dcfg0", n => { ZitDcfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "zit_dcfg1", n => { ZitDcfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "zit_i2i_cfg", n => { ZitI2iCfg = n.GetDoubleValue(); } },
+                { "zit_i2i_dcfg", n => { ZitI2iDcfg = n.GetDoubleValue(); } },
+                { "zit_i2i_dim0", n => { ZitI2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "zit_i2i_dim1", n => { ZitI2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "zit_i2i_height", n => { ZitI2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "zit_i2i_sampler", n => { ZitI2iSampler = n.GetStringValue(); } },
+                { "zit_i2i_scheduler", n => { ZitI2iScheduler = n.GetStringValue(); } },
+                { "zit_i2i_ss0", n => { ZitI2iSs0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "zit_i2i_ss1", n => { ZitI2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "zit_i2i_step", n => { ZitI2iStep = n.GetDoubleValue(); } },
+                { "zit_i2i_width", n => { ZitI2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "zit_steps0", n => { ZitSteps0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "zit_steps1", n => { ZitSteps1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "zit_t2i_cfg", n => { ZitT2iCfg = n.GetDoubleValue(); } },
+                { "zit_t2i_dcfg", n => { ZitT2iDcfg = n.GetDoubleValue(); } },
+                { "zit_t2i_dim0", n => { ZitT2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "zit_t2i_dim1", n => { ZitT2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "zit_t2i_height", n => { ZitT2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "zit_t2i_hr_cfg", n => { ZitT2iHrCfg = n.GetDoubleValue(); } },
+                { "zit_t2i_hr_dcfg", n => { ZitT2iHrDcfg = n.GetDoubleValue(); } },
+                { "zit_t2i_hr_step", n => { ZitT2iHrStep = n.GetDoubleValue(); } },
+                { "zit_t2i_sampler", n => { ZitT2iSampler = n.GetStringValue(); } },
+                { "zit_t2i_scheduler", n => { ZitT2iScheduler = n.GetStringValue(); } },
+                { "zit_t2i_ss0", n => { ZitT2iSs0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "zit_t2i_ss1", n => { ZitT2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "zit_t2i_step", n => { ZitT2iStep = n.GetDoubleValue(); } },
+                { "zit_t2i_width", n => { ZitT2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
             };
         }
         /// <summary>
@@ -2110,26 +4418,40 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
             writer.WriteBoolValue("add_vae_name_to_info", AddVaeNameToInfo);
             writer.WriteBoolValue("add_version_to_infotext", AddVersionToInfotext);
             writer.WriteObjectValue<UntypedNode>("always_discard_next_to_last_sigma", AlwaysDiscardNextToLastSigma);
+            writer.WriteObjectValue<UntypedNode>("anima_cfg0", AnimaCfg0);
+            writer.WriteObjectValue<UntypedNode>("anima_cfg1", AnimaCfg1);
+            writer.WriteDoubleValue("anima_i2i_cfg", AnimaI2iCfg);
+            writer.WriteObjectValue<UntypedNode>("anima_i2i_dim0", AnimaI2iDim0);
+            writer.WriteObjectValue<UntypedNode>("anima_i2i_dim1", AnimaI2iDim1);
+            writer.WriteObjectValue<UntypedNode>("anima_i2i_height", AnimaI2iHeight);
+            writer.WriteStringValue("anima_i2i_sampler", AnimaI2iSampler);
+            writer.WriteStringValue("anima_i2i_scheduler", AnimaI2iScheduler);
+            writer.WriteObjectValue<UntypedNode>("anima_i2i_ss0", AnimaI2iSs0);
+            writer.WriteObjectValue<UntypedNode>("anima_i2i_ss1", AnimaI2iSs1);
+            writer.WriteDoubleValue("anima_i2i_step", AnimaI2iStep);
+            writer.WriteObjectValue<UntypedNode>("anima_i2i_width", AnimaI2iWidth);
+            writer.WriteObjectValue<UntypedNode>("anima_steps0", AnimaSteps0);
+            writer.WriteObjectValue<UntypedNode>("anima_steps1", AnimaSteps1);
+            writer.WriteDoubleValue("anima_t2i_cfg", AnimaT2iCfg);
+            writer.WriteObjectValue<UntypedNode>("anima_t2i_dim0", AnimaT2iDim0);
+            writer.WriteObjectValue<UntypedNode>("anima_t2i_dim1", AnimaT2iDim1);
+            writer.WriteObjectValue<UntypedNode>("anima_t2i_height", AnimaT2iHeight);
+            writer.WriteDoubleValue("anima_t2i_hr_cfg", AnimaT2iHrCfg);
+            writer.WriteDoubleValue("anima_t2i_hr_step", AnimaT2iHrStep);
+            writer.WriteStringValue("anima_t2i_sampler", AnimaT2iSampler);
+            writer.WriteStringValue("anima_t2i_scheduler", AnimaT2iScheduler);
+            writer.WriteObjectValue<UntypedNode>("anima_t2i_ss0", AnimaT2iSs0);
+            writer.WriteObjectValue<UntypedNode>("anima_t2i_ss1", AnimaT2iSs1);
+            writer.WriteDoubleValue("anima_t2i_step", AnimaT2iStep);
+            writer.WriteObjectValue<UntypedNode>("anima_t2i_width", AnimaT2iWidth);
             writer.WriteBoolValue("api_enable_requests", ApiEnableRequests);
             writer.WriteBoolValue("api_forbid_local_requests", ApiForbidLocalRequests);
             writer.WriteObjectValue<UntypedNode>("api_useragent", ApiUseragent);
+            writer.WriteBoolValue("auto_backcompat", AutoBackcompat);
             writer.WriteStringValue("auto_launch_browser", AutoLaunchBrowser);
             writer.WriteDoubleValue("beta_dist_alpha", BetaDistAlpha);
             writer.WriteDoubleValue("beta_dist_beta", BetaDistBeta);
-            writer.WriteBoolValue("canvas_auto_expand", CanvasAutoExpand);
-            writer.WriteObjectValue<UntypedNode>("canvas_blur_prompt", CanvasBlurPrompt);
-            writer.WriteObjectValue<UntypedNode>("canvas_disabled_functions", CanvasDisabledFunctions);
-            writer.WriteStringValue("canvas_hotkey_adjust", CanvasHotkeyAdjust);
-            writer.WriteStringValue("canvas_hotkey_fullscreen", CanvasHotkeyFullscreen);
-            writer.WriteStringValue("canvas_hotkey_grow_brush", CanvasHotkeyGrowBrush);
-            writer.WriteStringValue("canvas_hotkey_move", CanvasHotkeyMove);
-            writer.WriteStringValue("canvas_hotkey_overlap", CanvasHotkeyOverlap);
-            writer.WriteStringValue("canvas_hotkey_reset", CanvasHotkeyReset);
-            writer.WriteStringValue("canvas_hotkey_shrink_brush", CanvasHotkeyShrinkBrush);
-            writer.WriteStringValue("canvas_hotkey_zoom", CanvasHotkeyZoom);
-            writer.WriteBoolValue("canvas_show_tooltip", CanvasShowTooltip);
             writer.WriteBoolValue("clean_temp_dir_at_start", CleanTempDirAtStart);
-            writer.WriteObjectValue<UntypedNode>("clip_skip_sdxl", ClipSkipSdxl);
             writer.WriteDoubleValue("CLIP_stop_at_last_layers", CLIPStopAtLastLayers);
             writer.WriteDoubleValue("code_former_weight", CodeFormerWeight);
             writer.WriteDoubleValue("comma_padding_backtrack", CommaPaddingBacktrack);
@@ -2137,25 +4459,20 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
             writer.WriteStringValue("compatibility_explanation", CompatibilityExplanation);
             writer.WriteObjectValue<UntypedNode>("composite_tiles_on_gpu", CompositeTilesOnGpu);
             writer.WriteStringValue("cross_attention_optimization", CrossAttentionOptimization);
-            writer.WriteObjectValue<UntypedNode>("cublas_fast", CublasFast);
+            writer.WriteObjectValue<UntypedNode>("ctrl_enter_interrupt", CtrlEnterInterrupt);
             writer.WriteStringValue("ddim_discretize", DdimDiscretize);
             writer.WriteBoolValue("dimensions_and_batch_together", DimensionsAndBatchTogether);
             writer.WriteStringValue("directories_filename_pattern", DirectoriesFilenamePattern);
             writer.WriteDoubleValue("directories_max_prompt_words", DirectoriesMaxPromptWords);
             writer.WriteStringValue("disable_all_extensions", DisableAllExtensions);
             writer.WriteObjectValue<UntypedNode>("disabled_extensions", DisabledExtensions);
-            writer.WriteObjectValue<UntypedNode>("disable_mmap_load_safetensors", DisableMmapLoadSafetensors);
             writer.WriteObjectValue<UntypedNode>("disable_token_counters", DisableTokenCounters);
-            writer.WriteBoolValue("disable_weights_auto_swap", DisableWeightsAutoSwap);
             writer.WriteObjectValue<UntypedNode>("div00", Div00);
             writer.WriteObjectValue<UntypedNode>("div01", Div01);
             writer.WriteObjectValue<UntypedNode>("div_classic", DivClassic);
-            writer.WriteObjectValue<UntypedNode>("div_exp", DivExp);
-            writer.WriteObjectValue<UntypedNode>("div_exp_info", DivExpInfo);
-            writer.WriteObjectValue<UntypedNode>("div_ngms", DivNgms);
-            writer.WriteObjectValue<UntypedNode>("div_skip_early", DivSkipEarly);
+            writer.WriteObjectValue<UntypedNode>("divlumina", Divlumina);
+            writer.WriteObjectValue<UntypedNode>("divqwen", Divqwen);
             writer.WriteObjectValue<UntypedNode>("div_tome", DivTome);
-            writer.WriteObjectValue<UntypedNode>("div_tree", DivTree);
             writer.WriteObjectValue<UntypedNode>("divxl", Divxl);
             writer.WriteObjectValue<UntypedNode>("do_not_show_images", DoNotShowImages);
             writer.WriteObjectValue<UntypedNode>("dump_stacks_on_signal", DumpStacksOnSignal);
@@ -2163,6 +4480,7 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
             writer.WriteObjectValue<UntypedNode>("enable_console_prompts", EnableConsolePrompts);
             writer.WriteBoolValue("enable_pnginfo", EnablePnginfo);
             writer.WriteBoolValue("enable_prompt_comments", EnablePromptComments);
+            writer.WriteObjectValue<UntypedNode>("enable_reloading_ui_scripts", EnableReloadingUiScripts);
             writer.WriteBoolValue("enable_upscale_progressbar", EnableUpscaleProgressbar);
             writer.WriteDoubleValue("ESRGAN_tile", ESRGANTile);
             writer.WriteDoubleValue("ESRGAN_tile_overlap", ESRGANTileOverlap);
@@ -2170,6 +4488,7 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
             writer.WriteObjectValue<UntypedNode>("eta_ddim", EtaDdim);
             writer.WriteObjectValue<UntypedNode>("eta_noise_seed_delta", EtaNoiseSeedDelta);
             writer.WriteBoolValue("export_for_4chan", ExportFor4chan);
+            writer.WriteObjectValue<UntypedNode>("extra_dirs_div", ExtraDirsDiv);
             writer.WriteStringValue("extra_networks_add_text_separator", ExtraNetworksAddTextSeparator);
             writer.WriteObjectValue<UntypedNode>("extra_networks_card_description_is_html", ExtraNetworksCardDescriptionIsHtml);
             writer.WriteObjectValue<UntypedNode>("extra_networks_card_height", ExtraNetworksCardHeight);
@@ -2179,22 +4498,88 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
             writer.WriteDoubleValue("extra_networks_card_text_scale", ExtraNetworksCardTextScale);
             writer.WriteObjectValue<UntypedNode>("extra_networks_card_width", ExtraNetworksCardWidth);
             writer.WriteDoubleValue("extra_networks_default_multiplier", ExtraNetworksDefaultMultiplier);
-            writer.WriteObjectValue<UntypedNode>("extra_networks_dir_btn_enable", ExtraNetworksDirBtnEnable);
+            writer.WriteObjectValue<UntypedNode>("extra_networks_dir_button_function", ExtraNetworksDirButtonFunction);
             writer.WriteStringValue("extra_networks_hidden_models", ExtraNetworksHiddenModels);
-            writer.WriteObjectValue<UntypedNode>("extra_networks_patch_inplace", ExtraNetworksPatchInplace);
-            writer.WriteObjectValue<UntypedNode>("extra_networks_tree_view_default_enabled", ExtraNetworksTreeViewDefaultEnabled);
+            writer.WriteBoolValue("extra_networks_show_hidden_directories", ExtraNetworksShowHiddenDirectories);
+            writer.WriteBoolValue("extra_networks_tree_view_default_enabled", ExtraNetworksTreeViewDefaultEnabled);
             writer.WriteDoubleValue("extra_networks_tree_view_default_width", ExtraNetworksTreeViewDefaultWidth);
-            writer.WriteObjectValue<UntypedNode>("extra_networks_tree_view_enable", ExtraNetworksTreeViewEnable);
-            writer.WriteStringValue("extra_networks_tree_view_explanation", ExtraNetworksTreeViewExplanation);
+            writer.WriteStringValue("extra_networks_tree_view_style", ExtraNetworksTreeViewStyle);
             writer.WriteObjectValue<UntypedNode>("extra_options_accordion", ExtraOptionsAccordion);
             writer.WriteDoubleValue("extra_options_cols", ExtraOptionsCols);
             writer.WriteObjectValue<UntypedNode>("extra_options_img2img", ExtraOptionsImg2img);
             writer.WriteObjectValue<UntypedNode>("extra_options_txt2img", ExtraOptionsTxt2img);
+            writer.WriteObjectValue<UntypedNode>("extra_tree_div", ExtraTreeDiv);
             writer.WriteObjectValue<UntypedNode>("face_restoration", FaceRestoration);
             writer.WriteStringValue("face_restoration_model", FaceRestorationModel);
             writer.WriteObjectValue<UntypedNode>("face_restoration_unload", FaceRestorationUnload);
-            writer.WriteObjectValue<UntypedNode>("fp8_fast", Fp8Fast);
-            writer.WriteObjectValue<UntypedNode>("fp8_storage", Fp8Storage);
+            writer.WriteObjectValue<UntypedNode>("flux_cfg0", FluxCfg0);
+            writer.WriteObjectValue<UntypedNode>("flux_cfg1", FluxCfg1);
+            writer.WriteObjectValue<UntypedNode>("flux_dcfg0", FluxDcfg0);
+            writer.WriteObjectValue<UntypedNode>("flux_dcfg1", FluxDcfg1);
+            writer.WriteDoubleValue("flux_i2i_cfg", FluxI2iCfg);
+            writer.WriteDoubleValue("flux_i2i_dcfg", FluxI2iDcfg);
+            writer.WriteObjectValue<UntypedNode>("flux_i2i_dim0", FluxI2iDim0);
+            writer.WriteObjectValue<UntypedNode>("flux_i2i_dim1", FluxI2iDim1);
+            writer.WriteObjectValue<UntypedNode>("flux_i2i_height", FluxI2iHeight);
+            writer.WriteStringValue("flux_i2i_sampler", FluxI2iSampler);
+            writer.WriteStringValue("flux_i2i_scheduler", FluxI2iScheduler);
+            writer.WriteObjectValue<UntypedNode>("flux_i2i_ss0", FluxI2iSs0);
+            writer.WriteObjectValue<UntypedNode>("flux_i2i_ss1", FluxI2iSs1);
+            writer.WriteDoubleValue("flux_i2i_step", FluxI2iStep);
+            writer.WriteObjectValue<UntypedNode>("flux_i2i_width", FluxI2iWidth);
+            writer.WriteObjectValue<UntypedNode>("flux_steps0", FluxSteps0);
+            writer.WriteObjectValue<UntypedNode>("flux_steps1", FluxSteps1);
+            writer.WriteDoubleValue("flux_t2i_cfg", FluxT2iCfg);
+            writer.WriteDoubleValue("flux_t2i_dcfg", FluxT2iDcfg);
+            writer.WriteObjectValue<UntypedNode>("flux_t2i_dim0", FluxT2iDim0);
+            writer.WriteObjectValue<UntypedNode>("flux_t2i_dim1", FluxT2iDim1);
+            writer.WriteObjectValue<UntypedNode>("flux_t2i_height", FluxT2iHeight);
+            writer.WriteDoubleValue("flux_t2i_hr_cfg", FluxT2iHrCfg);
+            writer.WriteDoubleValue("flux_t2i_hr_dcfg", FluxT2iHrDcfg);
+            writer.WriteDoubleValue("flux_t2i_hr_step", FluxT2iHrStep);
+            writer.WriteStringValue("flux_t2i_sampler", FluxT2iSampler);
+            writer.WriteStringValue("flux_t2i_scheduler", FluxT2iScheduler);
+            writer.WriteObjectValue<UntypedNode>("flux_t2i_ss0", FluxT2iSs0);
+            writer.WriteObjectValue<UntypedNode>("flux_t2i_ss1", FluxT2iSs1);
+            writer.WriteDoubleValue("flux_t2i_step", FluxT2iStep);
+            writer.WriteObjectValue<UntypedNode>("flux_t2i_width", FluxT2iWidth);
+            writer.WriteObjectValue<UntypedNode>("forbidden_knowledge", ForbiddenKnowledge);
+            writer.WriteObjectValue<UntypedNode>("forge_additional_modules", ForgeAdditionalModules);
+            writer.WriteObjectValue<UntypedNode>("forge_additional_modules_anima", ForgeAdditionalModulesAnima);
+            writer.WriteObjectValue<UntypedNode>("forge_additional_modules_flux", ForgeAdditionalModulesFlux);
+            writer.WriteObjectValue<UntypedNode>("forge_additional_modules_klein", ForgeAdditionalModulesKlein);
+            writer.WriteObjectValue<UntypedNode>("forge_additional_modules_lumina", ForgeAdditionalModulesLumina);
+            writer.WriteObjectValue<UntypedNode>("forge_additional_modules_qwen", ForgeAdditionalModulesQwen);
+            writer.WriteObjectValue<UntypedNode>("forge_additional_modules_sd", ForgeAdditionalModulesSd);
+            writer.WriteObjectValue<UntypedNode>("forge_additional_modules_wan", ForgeAdditionalModulesWan);
+            writer.WriteObjectValue<UntypedNode>("forge_additional_modules_xl", ForgeAdditionalModulesXl);
+            writer.WriteObjectValue<UntypedNode>("forge_additional_modules_zit", ForgeAdditionalModulesZit);
+            writer.WriteObjectValue<UntypedNode>("forge_canvas_consistent_brush", ForgeCanvasConsistentBrush);
+            writer.WriteDoubleValue("forge_canvas_height", ForgeCanvasHeight);
+            writer.WriteObjectValue<UntypedNode>("forge_canvas_plain", ForgeCanvasPlain);
+            writer.WriteStringValue("forge_canvas_plain_color", ForgeCanvasPlainColor);
+            writer.WriteObjectValue<UntypedNode>("forge_canvas_toolbar_always", ForgeCanvasToolbarAlways);
+            writer.WriteObjectValue<UntypedNode>("forge_checkpoint_anima", ForgeCheckpointAnima);
+            writer.WriteObjectValue<UntypedNode>("forge_checkpoint_flux", ForgeCheckpointFlux);
+            writer.WriteObjectValue<UntypedNode>("forge_checkpoint_klein", ForgeCheckpointKlein);
+            writer.WriteObjectValue<UntypedNode>("forge_checkpoint_lumina", ForgeCheckpointLumina);
+            writer.WriteObjectValue<UntypedNode>("forge_checkpoint_qwen", ForgeCheckpointQwen);
+            writer.WriteObjectValue<UntypedNode>("forge_checkpoint_sd", ForgeCheckpointSd);
+            writer.WriteObjectValue<UntypedNode>("forge_checkpoint_wan", ForgeCheckpointWan);
+            writer.WriteObjectValue<UntypedNode>("forge_checkpoint_xl", ForgeCheckpointXl);
+            writer.WriteObjectValue<UntypedNode>("forge_checkpoint_zit", ForgeCheckpointZit);
+            writer.WriteStringValue("forge_preset", ForgePreset);
+            writer.WriteStringValue("forge_try_reproduce", ForgeTryReproduce);
+            writer.WriteStringValue("forge_unet_storage_dtype", ForgeUnetStorageDtype);
+            writer.WriteStringValue("forge_unet_storage_dtype_anima", ForgeUnetStorageDtypeAnima);
+            writer.WriteStringValue("forge_unet_storage_dtype_flux", ForgeUnetStorageDtypeFlux);
+            writer.WriteStringValue("forge_unet_storage_dtype_klein", ForgeUnetStorageDtypeKlein);
+            writer.WriteStringValue("forge_unet_storage_dtype_lumina", ForgeUnetStorageDtypeLumina);
+            writer.WriteStringValue("forge_unet_storage_dtype_qwen", ForgeUnetStorageDtypeQwen);
+            writer.WriteStringValue("forge_unet_storage_dtype_sd", ForgeUnetStorageDtypeSd);
+            writer.WriteStringValue("forge_unet_storage_dtype_wan", ForgeUnetStorageDtypeWan);
+            writer.WriteStringValue("forge_unet_storage_dtype_xl", ForgeUnetStorageDtypeXl);
+            writer.WriteStringValue("forge_unet_storage_dtype_zit", ForgeUnetStorageDtypeZit);
             writer.WriteObjectValue<UntypedNode>("gallery_height", GalleryHeight);
             writer.WriteStringValue("gradio_theme", GradioTheme);
             writer.WriteBoolValue("gradio_themes_cache", GradioThemesCache);
@@ -2210,21 +4595,21 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
             writer.WriteObjectValue<UntypedNode>("grid_zip_filename_pattern", GridZipFilenamePattern);
             writer.WriteObjectValue<UntypedNode>("hidden_tabs", HiddenTabs);
             writer.WriteObjectValue<UntypedNode>("hide_samplers", HideSamplers);
-            writer.WriteObjectValue<UntypedNode>("hide_samplers_invert", HideSamplersInvert);
             writer.WriteObjectValue<UntypedNode>("hires_button_gallery_insert", HiresButtonGalleryInsert);
-            writer.WriteStringValue("hires_fix_refiner_pass", HiresFixRefinerPass);
             writer.WriteObjectValue<UntypedNode>("hires_fix_show_prompts", HiresFixShowPrompts);
             writer.WriteObjectValue<UntypedNode>("hires_fix_show_sampler", HiresFixShowSampler);
             writer.WriteObjectValue<UntypedNode>("hires_fix_use_firstpass_conds", HiresFixUseFirstpassConds);
             writer.WriteBoolValue("hires_insert_index", HiresInsertIndex);
+            writer.WriteObjectValue<UntypedNode>("img2img_autosize", Img2imgAutosize);
             writer.WriteStringValue("img2img_background_color", Img2imgBackgroundColor);
             writer.WriteDoubleValue("img2img_batch_show_results_limit", Img2imgBatchShowResultsLimit);
+            writer.WriteObjectValue<UntypedNode>("img2img_batch_use_original_name", Img2imgBatchUseOriginalName);
             writer.WriteObjectValue<UntypedNode>("img2img_color_correction", Img2imgColorCorrection);
-            writer.WriteDoubleValue("img2img_editor_height", Img2imgEditorHeight);
             writer.WriteObjectValue<UntypedNode>("img2img_extra_noise", Img2imgExtraNoise);
             writer.WriteObjectValue<UntypedNode>("img2img_fix_steps", Img2imgFixSteps);
             writer.WriteStringValue("img2img_inpaint_mask_brush_color", Img2imgInpaintMaskBrushColor);
-            writer.WriteObjectValue<UntypedNode>("img2img_inpaint_precise_mask", Img2imgInpaintPreciseMask);
+            writer.WriteBoolValue("img2img_inpaint_mask_high_contrast", Img2imgInpaintMaskHighContrast);
+            writer.WriteDoubleValue("img2img_inpaint_mask_scribble_alpha", Img2imgInpaintMaskScribbleAlpha);
             writer.WriteStringValue("img2img_inpaint_sketch_default_brush_color", Img2imgInpaintSketchDefaultBrushColor);
             writer.WriteObjectValue<UntypedNode>("img2img_settings_accordion", Img2imgSettingsAccordion);
             writer.WriteStringValue("img2img_sketch_default_brush_color", Img2imgSketchDefaultBrushColor);
@@ -2237,6 +4622,7 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
             writer.WriteDoubleValue("initial_noise_multiplier", InitialNoiseMultiplier);
             writer.WriteDoubleValue("inpainting_mask_weight", InpaintingMaskWeight);
             writer.WriteObjectValue<UntypedNode>("interrupt_after_current", InterruptAfterCurrent);
+            writer.WriteObjectValue<UntypedNode>("invert_sigmas", InvertSigmas);
             writer.WriteDoubleValue("jpeg_quality", JpegQuality);
             writer.WriteObjectValue<UntypedNode>("js_live_preview_in_modal_lightbox", JsLivePreviewInModalLightbox);
             writer.WriteBoolValue("js_modal_lightbox", JsModalLightbox);
@@ -2248,24 +4634,78 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
             writer.WriteBoolValue("keyedit_move", KeyeditMove);
             writer.WriteDoubleValue("keyedit_precision_attention", KeyeditPrecisionAttention);
             writer.WriteDoubleValue("keyedit_precision_extra", KeyeditPrecisionExtra);
+            writer.WriteObjectValue<UntypedNode>("klein_cfg0", KleinCfg0);
+            writer.WriteObjectValue<UntypedNode>("klein_cfg1", KleinCfg1);
+            writer.WriteDoubleValue("klein_i2i_cfg", KleinI2iCfg);
+            writer.WriteObjectValue<UntypedNode>("klein_i2i_dim0", KleinI2iDim0);
+            writer.WriteObjectValue<UntypedNode>("klein_i2i_dim1", KleinI2iDim1);
+            writer.WriteObjectValue<UntypedNode>("klein_i2i_height", KleinI2iHeight);
+            writer.WriteStringValue("klein_i2i_sampler", KleinI2iSampler);
+            writer.WriteStringValue("klein_i2i_scheduler", KleinI2iScheduler);
+            writer.WriteObjectValue<UntypedNode>("klein_i2i_ss0", KleinI2iSs0);
+            writer.WriteObjectValue<UntypedNode>("klein_i2i_ss1", KleinI2iSs1);
+            writer.WriteDoubleValue("klein_i2i_step", KleinI2iStep);
+            writer.WriteObjectValue<UntypedNode>("klein_i2i_width", KleinI2iWidth);
+            writer.WriteObjectValue<UntypedNode>("klein_steps0", KleinSteps0);
+            writer.WriteObjectValue<UntypedNode>("klein_steps1", KleinSteps1);
+            writer.WriteDoubleValue("klein_t2i_cfg", KleinT2iCfg);
+            writer.WriteObjectValue<UntypedNode>("klein_t2i_dim0", KleinT2iDim0);
+            writer.WriteObjectValue<UntypedNode>("klein_t2i_dim1", KleinT2iDim1);
+            writer.WriteObjectValue<UntypedNode>("klein_t2i_height", KleinT2iHeight);
+            writer.WriteDoubleValue("klein_t2i_hr_cfg", KleinT2iHrCfg);
+            writer.WriteDoubleValue("klein_t2i_hr_step", KleinT2iHrStep);
+            writer.WriteStringValue("klein_t2i_sampler", KleinT2iSampler);
+            writer.WriteStringValue("klein_t2i_scheduler", KleinT2iScheduler);
+            writer.WriteObjectValue<UntypedNode>("klein_t2i_ss0", KleinT2iSs0);
+            writer.WriteObjectValue<UntypedNode>("klein_t2i_ss1", KleinT2iSs1);
+            writer.WriteDoubleValue("klein_t2i_step", KleinT2iStep);
+            writer.WriteObjectValue<UntypedNode>("klein_t2i_width", KleinT2iWidth);
             writer.WriteBoolValue("list_hidden_files", ListHiddenFiles);
             writer.WriteObjectValue<UntypedNode>("live_preview_fast_interrupt", LivePreviewFastInterrupt);
             writer.WriteDoubleValue("live_preview_refresh_period", LivePreviewRefreshPeriod);
             writer.WriteBoolValue("live_previews_enable", LivePreviewsEnable);
             writer.WriteStringValue("live_previews_image_format", LivePreviewsImageFormat);
             writer.WriteStringValue("localization", Localization);
-            writer.WriteBoolValue("lora_add_hashes_to_infotext", LoraAddHashesToInfotext);
-            writer.WriteStringValue("lora_preferred_name", LoraPreferredName);
-            writer.WriteObjectValue<UntypedNode>("lora_show_all", LoraShowAll);
+            writer.WriteObjectValue<UntypedNode>("lumina_cfg0", LuminaCfg0);
+            writer.WriteObjectValue<UntypedNode>("lumina_cfg1", LuminaCfg1);
+            writer.WriteObjectValue<UntypedNode>("lumina_dcfg0", LuminaDcfg0);
+            writer.WriteObjectValue<UntypedNode>("lumina_dcfg1", LuminaDcfg1);
+            writer.WriteDoubleValue("lumina_i2i_cfg", LuminaI2iCfg);
+            writer.WriteDoubleValue("lumina_i2i_dcfg", LuminaI2iDcfg);
+            writer.WriteObjectValue<UntypedNode>("lumina_i2i_dim0", LuminaI2iDim0);
+            writer.WriteObjectValue<UntypedNode>("lumina_i2i_dim1", LuminaI2iDim1);
+            writer.WriteObjectValue<UntypedNode>("lumina_i2i_height", LuminaI2iHeight);
+            writer.WriteStringValue("lumina_i2i_sampler", LuminaI2iSampler);
+            writer.WriteStringValue("lumina_i2i_scheduler", LuminaI2iScheduler);
+            writer.WriteObjectValue<UntypedNode>("lumina_i2i_ss0", LuminaI2iSs0);
+            writer.WriteObjectValue<UntypedNode>("lumina_i2i_ss1", LuminaI2iSs1);
+            writer.WriteDoubleValue("lumina_i2i_step", LuminaI2iStep);
+            writer.WriteObjectValue<UntypedNode>("lumina_i2i_width", LuminaI2iWidth);
+            writer.WriteObjectValue<UntypedNode>("lumina_steps0", LuminaSteps0);
+            writer.WriteObjectValue<UntypedNode>("lumina_steps1", LuminaSteps1);
+            writer.WriteDoubleValue("lumina_t2i_cfg", LuminaT2iCfg);
+            writer.WriteDoubleValue("lumina_t2i_dcfg", LuminaT2iDcfg);
+            writer.WriteObjectValue<UntypedNode>("lumina_t2i_dim0", LuminaT2iDim0);
+            writer.WriteObjectValue<UntypedNode>("lumina_t2i_dim1", LuminaT2iDim1);
+            writer.WriteObjectValue<UntypedNode>("lumina_t2i_height", LuminaT2iHeight);
+            writer.WriteDoubleValue("lumina_t2i_hr_cfg", LuminaT2iHrCfg);
+            writer.WriteDoubleValue("lumina_t2i_hr_dcfg", LuminaT2iHrDcfg);
+            writer.WriteDoubleValue("lumina_t2i_hr_step", LuminaT2iHrStep);
+            writer.WriteStringValue("lumina_t2i_sampler", LuminaT2iSampler);
+            writer.WriteStringValue("lumina_t2i_scheduler", LuminaT2iScheduler);
+            writer.WriteObjectValue<UntypedNode>("lumina_t2i_ss0", LuminaT2iSs0);
+            writer.WriteObjectValue<UntypedNode>("lumina_t2i_ss1", LuminaT2iSs1);
+            writer.WriteDoubleValue("lumina_t2i_step", LuminaT2iStep);
+            writer.WriteObjectValue<UntypedNode>("lumina_t2i_width", LuminaT2iWidth);
             writer.WriteDoubleValue("memmon_poll_rate", MemmonPollRate);
             writer.WriteBoolValue("multiple_tqdm", MultipleTqdm);
+            writer.WriteStringValue("neta_template_negative", NetaTemplateNegative);
+            writer.WriteStringValue("neta_template_positive", NetaTemplatePositive);
             writer.WriteObjectValue<UntypedNode>("no_dpmpp_sde_batch_determinism", NoDpmppSdeBatchDeterminism);
-            writer.WriteObjectValue<UntypedNode>("no_flashbang", NoFlashbang);
             writer.WriteBoolValue("notification_audio", NotificationAudio);
             writer.WriteDoubleValue("notification_volume", NotificationVolume);
             writer.WriteDoubleValue("n_rows", NRows);
             writer.WriteStringValue("open_dir_button_choice", OpenDirButtonChoice);
-            writer.WriteObjectValue<UntypedNode>("opt_image", OptImage);
             writer.WriteStringValue("outdir_extras_samples", OutdirExtrasSamples);
             writer.WriteObjectValue<UntypedNode>("outdir_grids", OutdirGrids);
             writer.WriteStringValue("outdir_img2img_grids", OutdirImg2imgGrids);
@@ -2275,15 +4715,57 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
             writer.WriteStringValue("outdir_save", OutdirSave);
             writer.WriteStringValue("outdir_txt2img_grids", OutdirTxt2imgGrids);
             writer.WriteStringValue("outdir_txt2img_samples", OutdirTxt2imgSamples);
+            writer.WriteStringValue("outdir_videos", OutdirVideos);
             writer.WriteBoolValue("overlay_inpaint", OverlayInpaint);
             writer.WriteObjectValue<UntypedNode>("paste_safe_guard", PasteSafeGuard);
             writer.WriteBoolValue("persistent_cond_cache", PersistentCondCache);
+            writer.WriteObjectValue<UntypedNode>("postprocessing_disable_in_extras", PostprocessingDisableInExtras);
             writer.WriteObjectValue<UntypedNode>("postprocessing_enable_in_main_ui", PostprocessingEnableInMainUi);
             writer.WriteObjectValue<UntypedNode>("postprocessing_operation_order", PostprocessingOperationOrder);
             writer.WriteObjectValue<UntypedNode>("prefer_fp16_upscalers", PreferFp16Upscalers);
-            writer.WriteObjectValue<UntypedNode>("prefer_vae_precision_float16", PreferVaePrecisionFloat16);
+            writer.WriteBoolValue("prevent_screen_sleep_during_generation", PreventScreenSleepDuringGeneration);
+            writer.WriteObjectValue<UntypedNode>("profiling_activities", ProfilingActivities);
+            writer.WriteObjectValue<UntypedNode>("profiling_enable", ProfilingEnable);
+            writer.WriteStringValue("profiling_explanation", ProfilingExplanation);
+            writer.WriteStringValue("profiling_filename", ProfilingFilename);
+            writer.WriteBoolValue("profiling_profile_memory", ProfilingProfileMemory);
+            writer.WriteBoolValue("profiling_record_shapes", ProfilingRecordShapes);
+            writer.WriteBoolValue("profiling_with_stack", ProfilingWithStack);
+            writer.WriteObjectValue<UntypedNode>("quicksettings_accordion", QuicksettingsAccordion);
+            writer.WriteObjectValue<UntypedNode>("quicksettings_accordion_starts_closed", QuicksettingsAccordionStartsClosed);
             writer.WriteObjectValue<UntypedNode>("quicksettings_list", QuicksettingsList);
+            writer.WriteObjectValue<UntypedNode>("qwen_cfg0", QwenCfg0);
+            writer.WriteObjectValue<UntypedNode>("qwen_cfg1", QwenCfg1);
+            writer.WriteDoubleValue("qwen_i2i_cfg", QwenI2iCfg);
+            writer.WriteObjectValue<UntypedNode>("qwen_i2i_dim0", QwenI2iDim0);
+            writer.WriteObjectValue<UntypedNode>("qwen_i2i_dim1", QwenI2iDim1);
+            writer.WriteObjectValue<UntypedNode>("qwen_i2i_height", QwenI2iHeight);
+            writer.WriteStringValue("qwen_i2i_sampler", QwenI2iSampler);
+            writer.WriteStringValue("qwen_i2i_scheduler", QwenI2iScheduler);
+            writer.WriteObjectValue<UntypedNode>("qwen_i2i_ss0", QwenI2iSs0);
+            writer.WriteObjectValue<UntypedNode>("qwen_i2i_ss1", QwenI2iSs1);
+            writer.WriteDoubleValue("qwen_i2i_step", QwenI2iStep);
+            writer.WriteObjectValue<UntypedNode>("qwen_i2i_width", QwenI2iWidth);
+            writer.WriteObjectValue<UntypedNode>("qwen_steps0", QwenSteps0);
+            writer.WriteObjectValue<UntypedNode>("qwen_steps1", QwenSteps1);
+            writer.WriteDoubleValue("qwen_t2i_cfg", QwenT2iCfg);
+            writer.WriteObjectValue<UntypedNode>("qwen_t2i_dim0", QwenT2iDim0);
+            writer.WriteObjectValue<UntypedNode>("qwen_t2i_dim1", QwenT2iDim1);
+            writer.WriteObjectValue<UntypedNode>("qwen_t2i_height", QwenT2iHeight);
+            writer.WriteDoubleValue("qwen_t2i_hr_cfg", QwenT2iHrCfg);
+            writer.WriteDoubleValue("qwen_t2i_hr_step", QwenT2iHrStep);
+            writer.WriteStringValue("qwen_t2i_sampler", QwenT2iSampler);
+            writer.WriteStringValue("qwen_t2i_scheduler", QwenT2iScheduler);
+            writer.WriteObjectValue<UntypedNode>("qwen_t2i_ss0", QwenT2iSs0);
+            writer.WriteObjectValue<UntypedNode>("qwen_t2i_ss1", QwenT2iSs1);
+            writer.WriteDoubleValue("qwen_t2i_step", QwenT2iStep);
+            writer.WriteObjectValue<UntypedNode>("qwen_t2i_width", QwenT2iWidth);
+            writer.WriteObjectValue<UntypedNode>("qwen_vae_resize", QwenVaeResize);
             writer.WriteStringValue("randn_source", RandnSource);
+            writer.WriteObjectValue<UntypedNode>("refiner_fast_sd", RefinerFastSd);
+            writer.WriteStringValue("refiner_lora_explanation", RefinerLoraExplanation);
+            writer.WriteStringValue("refiner_lora_replacement", RefinerLoraReplacement);
+            writer.WriteObjectValue<UntypedNode>("refiner_use_steps", RefinerUseSteps);
             writer.WriteObjectValue<UntypedNode>("restore_config_state_file", RestoreConfigStateFile);
             writer.WriteBoolValue("return_grid", ReturnGrid);
             writer.WriteObjectValue<UntypedNode>("return_mask", ReturnMask);
@@ -2306,33 +4788,58 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
             writer.WriteBoolValue("save_selected_only", SaveSelectedOnly);
             writer.WriteBoolValue("save_to_dirs", SaveToDirs);
             writer.WriteObjectValue<UntypedNode>("save_txt", SaveTxt);
+            writer.WriteBoolValue("save_write_log_csv", SaveWriteLogCsv);
             writer.WriteDoubleValue("scaling_factor", ScalingFactor);
             writer.WriteObjectValue<UntypedNode>("s_churn", SChurn);
-            writer.WriteObjectValue<UntypedNode>("sd_checkpoint_cache", SdCheckpointCache);
+            writer.WriteObjectValue<UntypedNode>("scrollable_prompt_box", ScrollablePromptBox);
+            writer.WriteObjectValue<UntypedNode>("sd_cfg0", SdCfg0);
+            writer.WriteObjectValue<UntypedNode>("sd_cfg1", SdCfg1);
             writer.WriteObjectValue<UntypedNode>("sd_checkpoint_dropdown_use_short", SdCheckpointDropdownUseShort);
             writer.WriteObjectValue<UntypedNode>("sd_checkpoint_hash", SdCheckpointHash);
-            writer.WriteStringValue("sd_lora", SdLora);
+            writer.WriteDoubleValue("sd_i2i_cfg", SdI2iCfg);
+            writer.WriteObjectValue<UntypedNode>("sd_i2i_dim0", SdI2iDim0);
+            writer.WriteObjectValue<UntypedNode>("sd_i2i_dim1", SdI2iDim1);
+            writer.WriteObjectValue<UntypedNode>("sd_i2i_height", SdI2iHeight);
+            writer.WriteStringValue("sd_i2i_sampler", SdI2iSampler);
+            writer.WriteStringValue("sd_i2i_scheduler", SdI2iScheduler);
+            writer.WriteObjectValue<UntypedNode>("sd_i2i_ss0", SdI2iSs0);
+            writer.WriteObjectValue<UntypedNode>("sd_i2i_ss1", SdI2iSs1);
+            writer.WriteDoubleValue("sd_i2i_step", SdI2iStep);
+            writer.WriteObjectValue<UntypedNode>("sd_i2i_width", SdI2iWidth);
             writer.WriteObjectValue<UntypedNode>("sd_model_checkpoint", SdModelCheckpoint);
             writer.WriteStringValue("sd_noise_schedule", SdNoiseSchedule);
+            writer.WriteObjectValue<UntypedNode>("sd_steps0", SdSteps0);
+            writer.WriteObjectValue<UntypedNode>("sd_steps1", SdSteps1);
+            writer.WriteDoubleValue("sd_t2i_cfg", SdT2iCfg);
+            writer.WriteObjectValue<UntypedNode>("sd_t2i_dim0", SdT2iDim0);
+            writer.WriteObjectValue<UntypedNode>("sd_t2i_dim1", SdT2iDim1);
+            writer.WriteObjectValue<UntypedNode>("sd_t2i_height", SdT2iHeight);
+            writer.WriteDoubleValue("sd_t2i_hr_cfg", SdT2iHrCfg);
+            writer.WriteDoubleValue("sd_t2i_hr_step", SdT2iHrStep);
+            writer.WriteStringValue("sd_t2i_sampler", SdT2iSampler);
+            writer.WriteStringValue("sd_t2i_scheduler", SdT2iScheduler);
+            writer.WriteObjectValue<UntypedNode>("sd_t2i_ss0", SdT2iSs0);
+            writer.WriteObjectValue<UntypedNode>("sd_t2i_ss1", SdT2iSs1);
+            writer.WriteDoubleValue("sd_t2i_step", SdT2iStep);
+            writer.WriteObjectValue<UntypedNode>("sd_t2i_width", SdT2iWidth);
             writer.WriteStringValue("sd_unet", SdUnet);
             writer.WriteStringValue("sd_vae", SdVae);
-            writer.WriteObjectValue<UntypedNode>("sd_vae_checkpoint_cache", SdVaeCheckpointCache);
             writer.WriteStringValue("sd_vae_decode_method", SdVaeDecodeMethod);
             writer.WriteStringValue("sd_vae_encode_method", SdVaeEncodeMethod);
             writer.WriteStringValue("sd_vae_explanation", SdVaeExplanation);
             writer.WriteBoolValue("sd_vae_overrides_per_model_preferences", SdVaeOverridesPerModelPreferences);
-            writer.WriteObjectValue<UntypedNode>("sd_vae_tiled_ops", SdVaeTiledOps);
-            writer.WriteDoubleValue("sd_vae_tiled_size", SdVaeTiledSize);
             writer.WriteDoubleValue("sd_webui_modal_lightbox_icon_opacity", SdWebuiModalLightboxIconOpacity);
             writer.WriteDoubleValue("sd_webui_modal_lightbox_toolbar_opacity", SdWebuiModalLightboxToolbarOpacity);
             writer.WriteObjectValue<UntypedNode>("sdxl_crop_left", SdxlCropLeft);
             writer.WriteObjectValue<UntypedNode>("sdxl_crop_top", SdxlCropTop);
             writer.WriteDoubleValue("sdxl_refiner_high_aesthetic_score", SdxlRefinerHighAestheticScore);
             writer.WriteDoubleValue("sdxl_refiner_low_aesthetic_score", SdxlRefinerLowAestheticScore);
+            writer.WriteObjectValue<UntypedNode>("sdxl_zero_neg", SdxlZeroNeg);
             writer.WriteBoolValue("send_cfg", SendCfg);
-            writer.WriteObjectValue<UntypedNode>("send_image_info_t2i_to_i2i", SendImageInfoT2iToI2i);
             writer.WriteBoolValue("send_seed", SendSeed);
             writer.WriteBoolValue("send_size", SendSize);
+            writer.WriteBoolValue("set_scale_by_when_changing_upscaler", SetScaleByWhenChangingUpscaler);
+            writer.WriteDoubleValue("setting_allocated_vram", SettingAllocatedVram);
             writer.WriteStringValue("settings_in_ui", SettingsInUi);
             writer.WriteObjectValue<UntypedNode>("sgm_noise_multiplier", SgmNoiseMultiplier);
             writer.WriteObjectValue<UntypedNode>("show_gradio_deprecation_warnings", ShowGradioDeprecationWarnings);
@@ -2344,25 +4851,25 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
             writer.WriteStringValue("show_progress_type", ShowProgressType);
             writer.WriteObjectValue<UntypedNode>("show_refiner", ShowRefiner);
             writer.WriteObjectValue<UntypedNode>("show_rescale_cfg", ShowRescaleCfg);
-            writer.WriteObjectValue<UntypedNode>("show_scheduler", ShowScheduler);
             writer.WriteObjectValue<UntypedNode>("show_warnings", ShowWarnings);
             writer.WriteObjectValue<UntypedNode>("sigma_max", SigmaMax);
             writer.WriteObjectValue<UntypedNode>("sigma_min", SigmaMin);
             writer.WriteObjectValue<UntypedNode>("skip_early_cond", SkipEarlyCond);
-            writer.WriteObjectValue<UntypedNode>("skip_early_cond_hr", SkipEarlyCondHr);
-            writer.WriteObjectValue<UntypedNode>("skip_early_cond_img2img", SkipEarlyCondImg2img);
             writer.WriteObjectValue<UntypedNode>("s_min_uncond", SMinUncond);
-            writer.WriteObjectValue<UntypedNode>("s_min_uncond_hr", SMinUncondHr);
-            writer.WriteObjectValue<UntypedNode>("s_min_uncond_img2img", SMinUncondImg2img);
+            writer.WriteObjectValue<UntypedNode>("s_min_uncond_all", SMinUncondAll);
             writer.WriteDoubleValue("s_noise", SNoise);
             writer.WriteObjectValue<UntypedNode>("s_tmax", STmax);
             writer.WriteObjectValue<UntypedNode>("s_tmin", STmin);
+            writer.WriteObjectValue<UntypedNode>("stochastic_sampling", StochasticSampling);
+            writer.WriteStringValue("svdq_attention", SvdqAttention);
+            writer.WriteObjectValue<UntypedNode>("svdq_cache_threshold", SvdqCacheThreshold);
+            writer.WriteBoolValue("svdq_cpu_offload", SvdqCpuOffload);
+            writer.WriteStringValue("svdq_flux_exp", SvdqFluxExp);
+            writer.WriteDoubleValue("svdq_num_blocks_on_gpu", SvdqNumBlocksOnGpu);
+            writer.WriteStringValue("svdq_qwen_exp", SvdqQwenExp);
+            writer.WriteObjectValue<UntypedNode>("svdq_use_pin_memory", SvdqUsePinMemory);
             writer.WriteDoubleValue("target_side_length", TargetSideLength);
             writer.WriteStringValue("temp_dir", TempDir);
-            writer.WriteBoolValue("textual_inversion_add_hashes_to_infotext", TextualInversionAddHashesToInfotext);
-            writer.WriteObjectValue<UntypedNode>("tile_exp_div", TileExpDiv);
-            writer.WriteDoubleValue("tile_overlap", TileOverlap);
-            writer.WriteDoubleValue("tile_size", TileSize);
             writer.WriteObjectValue<UntypedNode>("tiling", Tiling);
             writer.WriteDoubleValue("token_merging_downsample", TokenMergingDownsample);
             writer.WriteStringValue("token_merging_explanation", TokenMergingExplanation);
@@ -2377,13 +4884,114 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
             writer.WriteObjectValue<UntypedNode>("ui_tab_order", UiTabOrder);
             writer.WriteStringValue("upscaler_for_img2img", UpscalerForImg2img);
             writer.WriteDoubleValue("upscaling_max_images_in_cache", UpscalingMaxImagesInCache);
+            writer.WriteObjectValue<UntypedNode>("use_beta_sigmas", UseBetaSigmas);
             writer.WriteObjectValue<UntypedNode>("use_downcasted_alpha_bar", UseDowncastedAlphaBar);
+            writer.WriteObjectValue<UntypedNode>("use_dynamic_shifting", UseDynamicShifting);
+            writer.WriteObjectValue<UntypedNode>("use_exponential_sigmas", UseExponentialSigmas);
+            writer.WriteObjectValue<UntypedNode>("use_karras_sigmas", UseKarrasSigmas);
             writer.WriteObjectValue<UntypedNode>("use_old_hires_fix_width_height", UseOldHiresFixWidthHeight);
             writer.WriteObjectValue<UntypedNode>("use_old_karras_scheduler_sigmas", UseOldKarrasSchedulerSigmas);
             writer.WriteObjectValue<UntypedNode>("use_old_scheduling", UseOldScheduling);
             writer.WriteBoolValue("use_original_name_batch", UseOriginalNameBatch);
             writer.WriteObjectValue<UntypedNode>("use_save_to_dirs_for_ui", UseSaveToDirsForUi);
+            writer.WriteObjectValue<UntypedNode>("VERSION_UID", VERSIONUID);
+            writer.WriteStringValue("video_container", VideoContainer);
+            writer.WriteDoubleValue("video_crf", VideoCrf);
+            writer.WriteStringValue("video_explanation", VideoExplanation);
+            writer.WriteBoolValue("video_player_auto", VideoPlayerAuto);
+            writer.WriteObjectValue<UntypedNode>("video_player_loop", VideoPlayerLoop);
+            writer.WriteStringValue("video_preset", VideoPreset);
+            writer.WriteStringValue("video_profile", VideoProfile);
+            writer.WriteObjectValue<UntypedNode>("video_save_frames", VideoSaveFrames);
+            writer.WriteObjectValue<UntypedNode>("wan_cfg0", WanCfg0);
+            writer.WriteObjectValue<UntypedNode>("wan_cfg1", WanCfg1);
+            writer.WriteObjectValue<UntypedNode>("wan_dcfg0", WanDcfg0);
+            writer.WriteObjectValue<UntypedNode>("wan_dcfg1", WanDcfg1);
+            writer.WriteDoubleValue("wan_i2i_cfg", WanI2iCfg);
+            writer.WriteDoubleValue("wan_i2i_dcfg", WanI2iDcfg);
+            writer.WriteObjectValue<UntypedNode>("wan_i2i_dim0", WanI2iDim0);
+            writer.WriteObjectValue<UntypedNode>("wan_i2i_dim1", WanI2iDim1);
+            writer.WriteObjectValue<UntypedNode>("wan_i2i_height", WanI2iHeight);
+            writer.WriteStringValue("wan_i2i_sampler", WanI2iSampler);
+            writer.WriteStringValue("wan_i2i_scheduler", WanI2iScheduler);
+            writer.WriteObjectValue<UntypedNode>("wan_i2i_ss0", WanI2iSs0);
+            writer.WriteObjectValue<UntypedNode>("wan_i2i_ss1", WanI2iSs1);
+            writer.WriteDoubleValue("wan_i2i_step", WanI2iStep);
+            writer.WriteObjectValue<UntypedNode>("wan_i2i_width", WanI2iWidth);
+            writer.WriteObjectValue<UntypedNode>("wan_steps0", WanSteps0);
+            writer.WriteObjectValue<UntypedNode>("wan_steps1", WanSteps1);
+            writer.WriteDoubleValue("wan_t2i_cfg", WanT2iCfg);
+            writer.WriteDoubleValue("wan_t2i_dcfg", WanT2iDcfg);
+            writer.WriteObjectValue<UntypedNode>("wan_t2i_dim0", WanT2iDim0);
+            writer.WriteObjectValue<UntypedNode>("wan_t2i_dim1", WanT2iDim1);
+            writer.WriteObjectValue<UntypedNode>("wan_t2i_height", WanT2iHeight);
+            writer.WriteDoubleValue("wan_t2i_hr_cfg", WanT2iHrCfg);
+            writer.WriteDoubleValue("wan_t2i_hr_dcfg", WanT2iHrDcfg);
+            writer.WriteDoubleValue("wan_t2i_hr_step", WanT2iHrStep);
+            writer.WriteStringValue("wan_t2i_sampler", WanT2iSampler);
+            writer.WriteStringValue("wan_t2i_scheduler", WanT2iScheduler);
+            writer.WriteObjectValue<UntypedNode>("wan_t2i_ss0", WanT2iSs0);
+            writer.WriteObjectValue<UntypedNode>("wan_t2i_ss1", WanT2iSs1);
+            writer.WriteDoubleValue("wan_t2i_step", WanT2iStep);
+            writer.WriteObjectValue<UntypedNode>("wan_t2i_width", WanT2iWidth);
             writer.WriteObjectValue<UntypedNode>("webp_lossless", WebpLossless);
+            writer.WriteObjectValue<UntypedNode>("xl_cfg0", XlCfg0);
+            writer.WriteObjectValue<UntypedNode>("xl_cfg1", XlCfg1);
+            writer.WriteDoubleValue("xl_i2i_cfg", XlI2iCfg);
+            writer.WriteObjectValue<UntypedNode>("xl_i2i_dim0", XlI2iDim0);
+            writer.WriteObjectValue<UntypedNode>("xl_i2i_dim1", XlI2iDim1);
+            writer.WriteObjectValue<UntypedNode>("xl_i2i_height", XlI2iHeight);
+            writer.WriteStringValue("xl_i2i_sampler", XlI2iSampler);
+            writer.WriteStringValue("xl_i2i_scheduler", XlI2iScheduler);
+            writer.WriteObjectValue<UntypedNode>("xl_i2i_ss0", XlI2iSs0);
+            writer.WriteObjectValue<UntypedNode>("xl_i2i_ss1", XlI2iSs1);
+            writer.WriteDoubleValue("xl_i2i_step", XlI2iStep);
+            writer.WriteObjectValue<UntypedNode>("xl_i2i_width", XlI2iWidth);
+            writer.WriteObjectValue<UntypedNode>("xl_steps0", XlSteps0);
+            writer.WriteObjectValue<UntypedNode>("xl_steps1", XlSteps1);
+            writer.WriteDoubleValue("xl_t2i_cfg", XlT2iCfg);
+            writer.WriteObjectValue<UntypedNode>("xl_t2i_dim0", XlT2iDim0);
+            writer.WriteObjectValue<UntypedNode>("xl_t2i_dim1", XlT2iDim1);
+            writer.WriteObjectValue<UntypedNode>("xl_t2i_height", XlT2iHeight);
+            writer.WriteDoubleValue("xl_t2i_hr_cfg", XlT2iHrCfg);
+            writer.WriteDoubleValue("xl_t2i_hr_step", XlT2iHrStep);
+            writer.WriteStringValue("xl_t2i_sampler", XlT2iSampler);
+            writer.WriteStringValue("xl_t2i_scheduler", XlT2iScheduler);
+            writer.WriteObjectValue<UntypedNode>("xl_t2i_ss0", XlT2iSs0);
+            writer.WriteObjectValue<UntypedNode>("xl_t2i_ss1", XlT2iSs1);
+            writer.WriteDoubleValue("xl_t2i_step", XlT2iStep);
+            writer.WriteObjectValue<UntypedNode>("xl_t2i_width", XlT2iWidth);
+            writer.WriteObjectValue<UntypedNode>("zit_cfg0", ZitCfg0);
+            writer.WriteObjectValue<UntypedNode>("zit_cfg1", ZitCfg1);
+            writer.WriteObjectValue<UntypedNode>("zit_dcfg0", ZitDcfg0);
+            writer.WriteObjectValue<UntypedNode>("zit_dcfg1", ZitDcfg1);
+            writer.WriteDoubleValue("zit_i2i_cfg", ZitI2iCfg);
+            writer.WriteDoubleValue("zit_i2i_dcfg", ZitI2iDcfg);
+            writer.WriteObjectValue<UntypedNode>("zit_i2i_dim0", ZitI2iDim0);
+            writer.WriteObjectValue<UntypedNode>("zit_i2i_dim1", ZitI2iDim1);
+            writer.WriteObjectValue<UntypedNode>("zit_i2i_height", ZitI2iHeight);
+            writer.WriteStringValue("zit_i2i_sampler", ZitI2iSampler);
+            writer.WriteStringValue("zit_i2i_scheduler", ZitI2iScheduler);
+            writer.WriteObjectValue<UntypedNode>("zit_i2i_ss0", ZitI2iSs0);
+            writer.WriteObjectValue<UntypedNode>("zit_i2i_ss1", ZitI2iSs1);
+            writer.WriteDoubleValue("zit_i2i_step", ZitI2iStep);
+            writer.WriteObjectValue<UntypedNode>("zit_i2i_width", ZitI2iWidth);
+            writer.WriteObjectValue<UntypedNode>("zit_steps0", ZitSteps0);
+            writer.WriteObjectValue<UntypedNode>("zit_steps1", ZitSteps1);
+            writer.WriteDoubleValue("zit_t2i_cfg", ZitT2iCfg);
+            writer.WriteDoubleValue("zit_t2i_dcfg", ZitT2iDcfg);
+            writer.WriteObjectValue<UntypedNode>("zit_t2i_dim0", ZitT2iDim0);
+            writer.WriteObjectValue<UntypedNode>("zit_t2i_dim1", ZitT2iDim1);
+            writer.WriteObjectValue<UntypedNode>("zit_t2i_height", ZitT2iHeight);
+            writer.WriteDoubleValue("zit_t2i_hr_cfg", ZitT2iHrCfg);
+            writer.WriteDoubleValue("zit_t2i_hr_dcfg", ZitT2iHrDcfg);
+            writer.WriteDoubleValue("zit_t2i_hr_step", ZitT2iHrStep);
+            writer.WriteStringValue("zit_t2i_sampler", ZitT2iSampler);
+            writer.WriteStringValue("zit_t2i_scheduler", ZitT2iScheduler);
+            writer.WriteObjectValue<UntypedNode>("zit_t2i_ss0", ZitT2iSs0);
+            writer.WriteObjectValue<UntypedNode>("zit_t2i_ss1", ZitT2iSs1);
+            writer.WriteDoubleValue("zit_t2i_step", ZitT2iStep);
+            writer.WriteObjectValue<UntypedNode>("zit_t2i_width", ZitT2iWidth);
             writer.WriteAdditionalData(AdditionalData);
         }
     }

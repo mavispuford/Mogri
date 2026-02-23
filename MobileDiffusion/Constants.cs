@@ -19,6 +19,7 @@ public static class Constants
         public const string ServerUrl = nameof(ServerUrl);
         public const string ApiKey = nameof(ApiKey);
         public const string ComfyUiApiKey = nameof(ComfyUiApiKey);
+        public const string ComfyUiModelType = nameof(ComfyUiModelType);
         public const string SelectedBackend = nameof(SelectedBackend);
     }
 }

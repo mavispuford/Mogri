@@ -27,7 +27,7 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Info
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public InfoRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/info{?serialize*}", pathParameters)
+        public InfoRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/info{?all_endpoints*}", pathParameters)
         {
         }
         /// <summary>
@@ -35,7 +35,7 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Info
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public InfoRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/info{?serialize*}", rawUrl)
+        public InfoRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/info{?all_endpoints*}", rawUrl)
         {
         }
         /// <summary>
@@ -95,8 +95,8 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Info
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class InfoRequestBuilderGetQueryParameters 
         {
-            [QueryParameter("serialize")]
-            public bool? Serialize { get; set; }
+            [QueryParameter("all_endpoints")]
+            public bool? AllEndpoints { get; set; }
         }
         /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.

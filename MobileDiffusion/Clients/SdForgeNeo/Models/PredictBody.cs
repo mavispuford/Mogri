@@ -19,18 +19,18 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
         /// <summary>The data property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public UntypedNode? Data { get; set; }
+        public List<global::MobileDiffusion.Clients.SdForgeNeo.Models.PredictBody_data>? Data { get; set; }
 #nullable restore
 #else
-        public UntypedNode Data { get; set; }
+        public List<global::MobileDiffusion.Clients.SdForgeNeo.Models.PredictBody_data> Data { get; set; }
 #endif
         /// <summary>The event_data property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public UntypedNode? EventData { get; set; }
+        public global::MobileDiffusion.Clients.SdForgeNeo.Models.PredictBody_event_data? EventData { get; set; }
 #nullable restore
 #else
-        public UntypedNode EventData { get; set; }
+        public global::MobileDiffusion.Clients.SdForgeNeo.Models.PredictBody_event_data EventData { get; set; }
 #endif
         /// <summary>The event_id property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -45,10 +45,10 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
         /// <summary>The request property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public List<global::MobileDiffusion.Clients.SdForgeNeo.Models.PredictBody_request>? Request { get; set; }
+        public global::MobileDiffusion.Clients.SdForgeNeo.Models.PredictBody_request? Request { get; set; }
 #nullable restore
 #else
-        public List<global::MobileDiffusion.Clients.SdForgeNeo.Models.PredictBody_request> Request { get; set; }
+        public global::MobileDiffusion.Clients.SdForgeNeo.Models.PredictBody_request Request { get; set; }
 #endif
         /// <summary>The session_hash property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -58,6 +58,10 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public string SessionHash { get; set; }
 #endif
+        /// <summary>The simple_format property</summary>
+        public bool? SimpleFormat { get; set; }
+        /// <summary>The trigger_id property</summary>
+        public int? TriggerId { get; set; }
         /// <summary>
         /// Instantiates a new <see cref="global::MobileDiffusion.Clients.SdForgeNeo.Models.PredictBody"/> and sets the default values.
         /// </summary>
@@ -84,12 +88,14 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
             return new Dictionary<string, Action<IParseNode>>
             {
                 { "batched", n => { Batched = n.GetBoolValue(); } },
-                { "data", n => { Data = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "event_data", n => { EventData = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "data", n => { Data = n.GetCollectionOfObjectValues<global::MobileDiffusion.Clients.SdForgeNeo.Models.PredictBody_data>(global::MobileDiffusion.Clients.SdForgeNeo.Models.PredictBody_data.CreateFromDiscriminatorValue)?.AsList(); } },
+                { "event_data", n => { EventData = n.GetObjectValue<global::MobileDiffusion.Clients.SdForgeNeo.Models.PredictBody_event_data>(global::MobileDiffusion.Clients.SdForgeNeo.Models.PredictBody_event_data.CreateFromDiscriminatorValue); } },
                 { "event_id", n => { EventId = n.GetStringValue(); } },
                 { "fn_index", n => { FnIndex = n.GetIntValue(); } },
-                { "request", n => { Request = n.GetCollectionOfObjectValues<global::MobileDiffusion.Clients.SdForgeNeo.Models.PredictBody_request>(global::MobileDiffusion.Clients.SdForgeNeo.Models.PredictBody_request.CreateFromDiscriminatorValue)?.AsList(); } },
+                { "request", n => { Request = n.GetObjectValue<global::MobileDiffusion.Clients.SdForgeNeo.Models.PredictBody_request>(global::MobileDiffusion.Clients.SdForgeNeo.Models.PredictBody_request.CreateFromDiscriminatorValue); } },
                 { "session_hash", n => { SessionHash = n.GetStringValue(); } },
+                { "simple_format", n => { SimpleFormat = n.GetBoolValue(); } },
+                { "trigger_id", n => { TriggerId = n.GetIntValue(); } },
             };
         }
         /// <summary>
@@ -100,12 +106,14 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteBoolValue("batched", Batched);
-            writer.WriteObjectValue<UntypedNode>("data", Data);
-            writer.WriteObjectValue<UntypedNode>("event_data", EventData);
+            writer.WriteCollectionOfObjectValues<global::MobileDiffusion.Clients.SdForgeNeo.Models.PredictBody_data>("data", Data);
+            writer.WriteObjectValue<global::MobileDiffusion.Clients.SdForgeNeo.Models.PredictBody_event_data>("event_data", EventData);
             writer.WriteStringValue("event_id", EventId);
             writer.WriteIntValue("fn_index", FnIndex);
-            writer.WriteCollectionOfObjectValues<global::MobileDiffusion.Clients.SdForgeNeo.Models.PredictBody_request>("request", Request);
+            writer.WriteObjectValue<global::MobileDiffusion.Clients.SdForgeNeo.Models.PredictBody_request>("request", Request);
             writer.WriteStringValue("session_hash", SessionHash);
+            writer.WriteBoolValue("simple_format", SimpleFormat);
+            writer.WriteIntValue("trigger_id", TriggerId);
             writer.WriteAdditionalData(AdditionalData);
         }
     }
