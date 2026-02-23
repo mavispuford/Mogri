@@ -1,6 +1,7 @@
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Models;
+using MobileDiffusion.Enums;
 using MobileDiffusion.Clients.SdForgeNeo;
 using MobileDiffusion.Clients.SdForgeNeo.Models;
 using MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.Options;
@@ -1146,6 +1147,39 @@ namespace MobileDiffusion.Services
                 return str.GetValue();
             }
             return null;
+        }
+
+        public Task<ModelType> GetCurrentModelTypeAsync(CancellationToken cancellationToken = default)
+        {
+            if (_options == null)
+            {
+                return Task.FromResult(ModelType.SDXL);
+            }
+
+            var currentModel = GetOptionValue(_options.SdModelCheckpoint);
+            if (string.IsNullOrEmpty(currentModel))
+            {
+                return Task.FromResult(ModelType.SDXL);
+            }
+
+            if (currentModel == GetOptionValue(_options.ForgeCheckpointSd))
+            {
+                return Task.FromResult(ModelType.SD15);
+            }
+            if (currentModel == GetOptionValue(_options.ForgeCheckpointXl))
+            {
+                return Task.FromResult(ModelType.SDXL);
+            }
+            if (currentModel == GetOptionValue(_options.ForgeCheckpointZit))
+            {
+                return Task.FromResult(ModelType.ZImageTurbo);
+            }
+            if (currentModel == GetOptionValue(_options.ForgeCheckpointFlux))
+            {
+                return Task.FromResult(ModelType.Flux);
+            }
+
+            return Task.FromResult(ModelType.SDXL);
         }
     }
 }
