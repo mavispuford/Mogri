@@ -3,9 +3,10 @@ using System.Runtime.Serialization;
 using System;
 namespace MobileDiffusion.Clients.SdForgeNeo.Models
 {
-    /// <summary>An enumeration.</summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+    #pragma warning disable CS1591
     public enum Sage_quantization_backend
+    #pragma warning restore CS1591
     {
         [EnumMember(Value = "cuda")]
         #pragma warning disable CS1591

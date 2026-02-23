@@ -22,7 +22,21 @@ for schema_name in ['StableDiffusionProcessingTxt2Img', 'StableDiffusionProcessi
             props['seed']['format'] = 'int64'
             print(f"Patched {schema_name}.seed format to int64")
 
-# 2. Fix unescaped backslashes in default values
+# 2. Flatten anyOf with null
+for schema_name, schema in schemas.items():
+    properties = schema.get('properties', {})
+    for prop_name, prop_details in properties.items():
+        if 'anyOf' in prop_details:
+            any_of = prop_details['anyOf']
+            if len(any_of) == 2 and any({'type': 'null'} == t for t in any_of):
+                # Find the non-null type
+                non_null_type = next(t for t in any_of if t != {'type': 'null'})
+                # Merge the non-null type into the property details
+                prop_details.update(non_null_type)
+                del prop_details['anyOf']
+                # print(f"Flattened anyOf for {schema_name}.{prop_name}")
+
+# 3. Fix unescaped backslashes in default values
 # This iterates through all schemas and properties to find string defaults with backslashes
 for schema_name, schema in schemas.items():
     properties = schema.get('properties', {})

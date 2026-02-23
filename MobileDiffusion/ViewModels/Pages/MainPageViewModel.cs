@@ -96,10 +96,12 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                 return false;
             }
 
+            var currentModelType = await _stableDiffusionService.GetCurrentModelTypeAsync();
+            _settings.ModelType = currentModelType;
+            var profile = GenerationProfile.GetDefault(currentModelType);
+
             var samplers = await _stableDiffusionService.GetSamplersAsync();
 
-            var profile = GenerationProfile.GetDefault(Enums.ModelType.SDXL);
-            
             // Preserve current sampler if it exists in the new list (e.g. switching backends)
             var currentSampler = _settings.Sampler;
             var currentScheduler = _settings.Scheduler;

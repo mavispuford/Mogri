@@ -9,6 +9,8 @@ public class GenerationProfile
     public double? DefaultDistilledCfg { get; set; }
     public required string DefaultSampler { get; set; }
     public string? DefaultScheduler { get; set; }
+    public string? DefaultVae { get; set; }
+    public string? DefaultTextEncoder { get; set; }
     public double DefaultWidth { get; set; }
     public double DefaultHeight { get; set; }
 
@@ -23,6 +25,8 @@ public class GenerationProfile
                 DefaultDistilledCfg = 3.5,
                 DefaultSampler = "Euler",
                 DefaultScheduler = "beta",
+                DefaultVae = "ae.safetensors",
+                DefaultTextEncoder = "Qwen3",
                 DefaultWidth = 1024,
                 DefaultHeight = 1024
             },
@@ -33,6 +37,8 @@ public class GenerationProfile
                 DefaultDistilledCfg = 3.5,
                 DefaultSampler = "Euler",
                 DefaultScheduler = "beta",
+                DefaultVae = "ae.safetensors",
+                DefaultTextEncoder = "t5xxl",
                 DefaultWidth = 1024,
                 DefaultHeight = 1024
             },

@@ -76,14 +76,6 @@ public class PngMetadataDto
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public int UpscaleSteps { get; set; }
 
-    [JsonPropertyName("enableFaceRestoration")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public bool EnableFaceRestoration { get; set; }
-
-    [JsonPropertyName("faceRestorationStrength")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public double FaceRestorationStrength { get; set; }
-
     [JsonPropertyName("enableTiling")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool EnableTiling { get; set; }
@@ -120,8 +112,6 @@ public class PngMetadataDto
             Upscaler = settings.Upscaler,
             UpscaleLevel = settings.UpscaleLevel,
             UpscaleSteps = settings.UpscaleSteps,
-            EnableFaceRestoration = settings.EnableFaceRestoration,
-            FaceRestorationStrength = settings.FaceRestorationStrength,
             EnableTiling = settings.EnableTiling,
             Loras = settings.Loras?.Select(l => new LoraEntry(l.Name, l.Alias, l.Strength)).ToList(),
             PromptStyleNames = settings.PromptStyles?.Select(s => s.Name).ToList()
@@ -147,8 +137,6 @@ public class PngMetadataDto
             Upscaler = this.Upscaler,
             UpscaleLevel = this.UpscaleLevel,
             UpscaleSteps = this.UpscaleSteps,
-            EnableFaceRestoration = this.EnableFaceRestoration,
-            FaceRestorationStrength = this.FaceRestorationStrength,
             EnableTiling = this.EnableTiling
         };
 

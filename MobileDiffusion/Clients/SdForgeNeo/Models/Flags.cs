@@ -14,30 +14,12 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
     {
         /// <summary>Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.</summary>
         public IDictionary<string, object> AdditionalData { get; set; }
+        /// <summary>does not do anything</summary>
+        public bool? AddStopRoute { get; set; }
         /// <summary>Administrator rights</summary>
         public bool? Administrator { get; set; }
         /// <summary>show the &quot;sampler parameters&quot; advanced settings</summary>
         public bool? AdvSamplers { get; set; }
-        /// <summary>show non-UI parameters in X/Y/Z Plot options</summary>
-        public bool? AdvXyz { get; set; }
-        /// <summary>The all_in_fp16 property</summary>
-        public bool? AllInFp16 { get; set; }
-        /// <summary>The all_in_fp32 property</summary>
-        public bool? AllInFp32 { get; set; }
-        /// <summary>The always_cpu property</summary>
-        public bool? AlwaysCpu { get; set; }
-        /// <summary>The always_gpu property</summary>
-        public bool? AlwaysGpu { get; set; }
-        /// <summary>The always_high_vram property</summary>
-        public bool? AlwaysHighVram { get; set; }
-        /// <summary>The always_low_vram property</summary>
-        public bool? AlwaysLowVram { get; set; }
-        /// <summary>The always_normal_vram property</summary>
-        public bool? AlwaysNormalVram { get; set; }
-        /// <summary>The always_no_vram property</summary>
-        public bool? AlwaysNoVram { get; set; }
-        /// <summary>The always_offload_from_vram property</summary>
-        public bool? AlwaysOffloadFromVram { get; set; }
         /// <summary>use api=True to launch the API together with the webui (use --nowebui instead for only the API)</summary>
         public bool? Api { get; set; }
         /// <summary>Set authentication for API like &quot;username:password&quot;; or comma-delimit multiple like &quot;u1:p1,u2:p2,u3:p3&quot;</summary>
@@ -52,37 +34,27 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
         public bool? ApiLog { get; set; }
         /// <summary>enable server stop/restart/kill via api</summary>
         public bool? ApiServerStop { get; set; }
-        /// <summary>The attention_pytorch property</summary>
-        public bool? AttentionPytorch { get; set; }
         /// <summary>open the webui URL in the system&apos;s default browser upon launch</summary>
         public bool? Autolaunch { get; set; }
-        /// <summary>path to checkpoint of stable diffusion model; if specified, this checkpoint will be added to the list of checkpoints and loaded</summary>
+        /// <summary>torch.backends.cudnn.benchmark</summary>
+        public bool? Autotune { get; set; }
+        /// <summary>Store the text encoder in bf16</summary>
+        public bool? Bf16TextEnc { get; set; }
+        /// <summary>Store the diffusion model in bf16</summary>
+        public bool? Bf16Unet { get; set; }
+        /// <summary>Run the VAE in bf16</summary>
+        public bool? Bf16Vae { get; set; }
+        /// <summary>install bitsandbytes for 4-bit inference</summary>
+        public bool? Bnb { get; set; }
+        /// <summary>Directories for Checkpoint model(s)</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public string? Ckpt { get; set; }
+        public UntypedNode? CkptDirs { get; set; }
 #nullable restore
 #else
-        public string Ckpt { get; set; }
+        public UntypedNode CkptDirs { get; set; }
 #endif
-        /// <summary>Path to directory with stable diffusion checkpoints</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public string? CkptDir { get; set; }
-#nullable restore
-#else
-        public string CkptDir { get; set; }
-#endif
-        /// <summary>The clip_in_fp16 property</summary>
-        public bool? ClipInFp16 { get; set; }
-        /// <summary>The clip_in_fp32 property</summary>
-        public bool? ClipInFp32 { get; set; }
-        /// <summary>The clip_in_fp8_e4m3fn property</summary>
-        public bool? ClipInFp8E4m3fn { get; set; }
-        /// <summary>The clip_in_fp8_e5m2 property</summary>
-        public bool? ClipInFp8E5m2 { get; set; }
-        /// <summary>The clip_in_gpu property</summary>
-        public bool? ClipInGpu { get; set; }
-        /// <summary>Path to directory with codeformer model file(s).</summary>
+        /// <summary>Directory for CodeFormer model file(s)</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? CodeformerModelsPath { get; set; }
@@ -90,13 +62,13 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public string CodeformerModelsPath { get; set; }
 #endif
-        /// <summary>path to config which constructs model</summary>
+        /// <summary>[Extension][Config-Presets] Path to directory with Config Presets configuration files (use forward slashes or double blackslashes). Default config files will be created if none exist.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public string? Config { get; set; }
+        public string? ConfigpresetsDir { get; set; }
 #nullable restore
 #else
-        public string Config { get; set; }
+        public string ConfigpresetsDir { get; set; }
 #endif
         /// <summary>Path to directory with ControlNet models</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -114,7 +86,7 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public string ControlnetLoglevel { get; set; }
 #endif
-        /// <summary>Path to directory with annotator model directories</summary>
+        /// <summary>Path to directory with Annotator models</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? ControlnetPreprocessorModelsDir { get; set; }
@@ -138,10 +110,22 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public string CorsAllowOriginsRegex { get; set; }
 #endif
-        /// <summary>The cuda_malloc property</summary>
+        /// <summary>Use the CPU for everything (slow)</summary>
+        public bool? Cpu { get; set; }
+        /// <summary>Run the text encoder on the CPU</summary>
+        public bool? CpuTextEnc { get; set; }
+        /// <summary>Run the VAE on the CPU</summary>
+        public bool? CpuVae { get; set; }
+        /// <summary>improve memory allocation</summary>
         public bool? CudaMalloc { get; set; }
-        /// <summary>The cuda_stream property</summary>
-        public bool? CudaStream { get; set; }
+        /// <summary>improve offloading</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? CudaStream { get; set; }
+#nullable restore
+#else
+        public string CudaStream { get; set; }
+#endif
         /// <summary>base path where all user data is stored</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -150,6 +134,8 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public string DataDir { get; set; }
 #endif
+        /// <summary>Use slower deterministic algorithms when possible</summary>
+        public bool? Deterministic { get; set; }
         /// <summary>Select the default CUDA device to use (export CUDA_VISIBLE_DEVICES=0,1,etc might be needed before)</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -158,26 +144,34 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public string DeviceId { get; set; }
 #endif
-        /// <summary>The directml property</summary>
-        public bool? Directml { get; set; }
+        /// <summary>Use torch-directml</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? Directml { get; set; }
+#nullable restore
+#else
+        public string Directml { get; set; }
+#endif
         /// <summary>prevent all extensions from running regardless of any other settings</summary>
         public bool? DisableAllExtensions { get; set; }
-        /// <summary>The disable_attention_upcast property</summary>
-        public bool? DisableAttentionUpcast { get; set; }
         /// <summary>do not output progressbars to console</summary>
         public bool? DisableConsoleProgressbars { get; set; }
         /// <summary>prevent all extensions except built-in from running regardless of any other settings</summary>
         public bool? DisableExtraExtensions { get; set; }
-        /// <summary>The disable_flash property</summary>
+        /// <summary>disable flash_attn</summary>
         public bool? DisableFlash { get; set; }
-        /// <summary>The disable_ipex_hijack property</summary>
-        public bool? DisableIpexHijack { get; set; }
-        /// <summary>do not check if produced images/latent spaces have nans; useful for running without a checkpoint in CI</summary>
-        public bool? DisableNanCheck { get; set; }
-        /// <summary>does absolutely nothing</summary>
+        /// <summary>Disable the low VRAM warnings</summary>
+        public bool? DisableGpuWarning { get; set; }
+        /// <summary>Disable ipex.optimize default when loading models with Intel&apos;s Extension for PyTorch</summary>
+        public bool? DisableIpexOptimize { get; set; }
+        /// <summary>Don&apos;t use mmap when loading safetensors</summary>
+        public bool? DisableMmap { get; set; }
+        /// <summary>disable checking pytorch models for malicious code</summary>
         public bool? DisableSafeUnpickle { get; set; }
-        /// <summary>The disable_sage property</summary>
+        /// <summary>disable sageattention</summary>
         public bool? DisableSage { get; set; }
+        /// <summary>Aggressively offload to RAM instead of keeping models in VRAM when possible</summary>
+        public bool? DisableSmartMemory { get; set; }
         /// <summary>When passed, enables the use of self-signed certificates.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -186,11 +180,11 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public string DisableTlsVerify { get; set; }
 #endif
-        /// <summary>The disable_xformers property</summary>
+        /// <summary>disable xformers</summary>
         public bool? DisableXformers { get; set; }
         /// <summary>launch.py argument: dump limited sysinfo file (without information about extensions, options) to disk and quit</summary>
         public bool? DumpSysinfo { get; set; }
-        /// <summary>textual inversion directory</summary>
+        /// <summary>Directory for Textual Inversion model(s)</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? EmbeddingsDir { get; set; }
@@ -198,9 +192,11 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public string EmbeddingsDir { get; set; }
 #endif
+        /// <summary>does not do anything</summary>
+        public bool? EnableConsolePrompts { get; set; }
         /// <summary>enable extensions tab regardless of other options</summary>
         public bool? EnableInsecureExtensionAccess { get; set; }
-        /// <summary>Path to directory with ESRGAN model file(s).</summary>
+        /// <summary>Directory for ESRGAN model file(s)</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? EsrganModelsPath { get; set; }
@@ -210,11 +206,25 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #endif
         /// <summary>==SUPPRESS==</summary>
         public bool? F { get; set; }
-        /// <summary>The fast_fp16 property</summary>
+        /// <summary>torch.backends.cuda.matmul.allow_fp16_accumulation</summary>
         public bool? FastFp16 { get; set; }
+        /// <summary>torch._scaled_mm</summary>
+        public bool? FastFp8 { get; set; }
+        /// <summary>maximal length of filenames of saved images. If you override it, it can conflict with your file system</summary>
+        public int? FilenamesMaxLength { get; set; }
         /// <summary>install flash_attn</summary>
         public bool? Flash { get; set; }
-        /// <summary>Look for models in an existing A1111 checkout&apos;s path</summary>
+        /// <summary>Force fp16</summary>
+        public bool? ForceFp16 { get; set; }
+        /// <summary>Force fp32</summary>
+        public bool? ForceFp32 { get; set; }
+        /// <summary>Use non-blocking operations for all applicable tensors</summary>
+        public bool? ForceNonBlocking { get; set; }
+        /// <summary>Always upcast to fp32 during attention</summary>
+        public bool? ForceUpcastAttention { get; set; }
+        /// <summary>Force VAE to use xformers attention (meant to use with PyTorch cross attention)</summary>
+        public bool? ForceXformersVae { get; set; }
+        /// <summary>Look for models in an existing installation of Automatic1111 Webui</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? ForgeRefA1111Home { get; set; }
@@ -222,8 +232,44 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public string ForgeRefA1111Home { get; set; }
 #endif
-        /// <summary>refresh rate for threads</summary>
-        public int? Fps { get; set; }
+        /// <summary>Look for models in an existing installation of ComfyUI</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ForgeRefComfyHome { get; set; }
+#nullable restore
+#else
+        public string ForgeRefComfyHome { get; set; }
+#endif
+        /// <summary>Look for models based on ComfyUI-style YAML config</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ForgeRefComfyYaml { get; set; }
+#nullable restore
+#else
+        public string ForgeRefComfyYaml { get; set; }
+#endif
+        /// <summary>Store the text encoder in fp16</summary>
+        public bool? Fp16TextEnc { get; set; }
+        /// <summary>Store the diffusion model in fp16</summary>
+        public bool? Fp16Unet { get; set; }
+        /// <summary>Run the VAE in fp16 (might cause black images)</summary>
+        public bool? Fp16Vae { get; set; }
+        /// <summary>Store the text encoder in fp32</summary>
+        public bool? Fp32TextEnc { get; set; }
+        /// <summary>Store the diffusion model in fp32</summary>
+        public bool? Fp32Unet { get; set; }
+        /// <summary>Run the VAE in full precision fp32</summary>
+        public bool? Fp32Vae { get; set; }
+        /// <summary>Store the text encoder in fp8_e4m3fn</summary>
+        public bool? Fp8E4m3fnTextEnc { get; set; }
+        /// <summary>Store the diffusion model in fp8_e4m3fn</summary>
+        public bool? Fp8E4m3fnUnet { get; set; }
+        /// <summary>Store the text encoder in fp8_e5m2</summary>
+        public bool? Fp8E5m2TextEnc { get; set; }
+        /// <summary>Store the diffusion model in fp8_e5m2</summary>
+        public bool? Fp8E5m2Unet { get; set; }
+        /// <summary>Store the diffusion model in fp8_e8m0fnu</summary>
+        public bool? Fp8E8m0fnuUnet { get; set; }
         /// <summary>disable editing of all settings globally</summary>
         public bool? FreezeSettings { get; set; }
         /// <summary>disable editing settings in specific sections of the settings page by specifying a comma-delimited list such like &quot;saving-images,upscaling&quot;. The list of setting names can be found in the modules/shared_options.py file</summary>
@@ -242,23 +288,7 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public string FreezeSpecificSettings { get; set; }
 #endif
-        /// <summary>GFPGAN directory</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public string? GfpganDir { get; set; }
-#nullable restore
-#else
-        public string GfpganDir { get; set; }
-#endif
-        /// <summary>GFPGAN model file name</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public string? GfpganModel { get; set; }
-#nullable restore
-#else
-        public string GfpganModel { get; set; }
-#endif
-        /// <summary>Path to directory with GFPGAN model file(s).</summary>
+        /// <summary>Directory for GFPGAN model file(s)</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? GfpganModelsPath { get; set; }
@@ -266,7 +296,7 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public string GfpganModelsPath { get; set; }
 #endif
-        /// <summary>The gpu_device_id property</summary>
+        /// <summary>Set the id of device to use (all other devices will not be visible)</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? GpuDeviceId { get; set; }
@@ -274,6 +304,8 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public string GpuDeviceId { get; set; }
 #endif
+        /// <summary>Store and run everything on the GPU</summary>
+        public bool? GpuOnly { get; set; }
         /// <summary>add path to gradio&apos;s allowed_paths, make it possible to serve files from it</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -302,11 +334,13 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
         public bool? GradioDebug { get; set; }
         /// <summary>hide directory configuration from webui</summary>
         public bool? HideUiDirConfig { get; set; }
+        /// <summary>Keeps models in VRAM after usage</summary>
+        public bool? Highvram { get; set; }
         /// <summary>Copy database file to and from /tmp when transacting (workaround for filesystems sqlite does not support)</summary>
         public bool? ImageBrowserTmpDb { get; set; }
         /// <summary>launch gradio with 0.0.0.0 as server name, allowing to respond to network requests</summary>
         public bool? Listen { get; set; }
-        /// <summary>localizations directory</summary>
+        /// <summary>Directory for localization file(s)</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? LocalizationsDir { get; set; }
@@ -314,7 +348,7 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public string LocalizationsDir { get; set; }
 #endif
-        /// <summary>log level; one of: CRITICAL, ERROR, WARNING, INFO, DEBUG</summary>
+        /// <summary>Set the logging level</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? Loglevel { get; set; }
@@ -324,7 +358,7 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #endif
         /// <summary>launch.py argument: print a detailed log of what&apos;s happening at startup</summary>
         public bool? LogStartup { get; set; }
-        /// <summary>Path to directory with LoRA networks</summary>
+        /// <summary>Path to directory with Lora networks.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? LoraDir { get; set; }
@@ -332,6 +366,18 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public string LoraDir { get; set; }
 #endif
+        /// <summary>Directories for LoRA(s)</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? LoraDirs { get; set; }
+#nullable restore
+#else
+        public UntypedNode LoraDirs { get; set; }
+#endif
+        /// <summary>Split the diffusion model in parts to use less VRAM</summary>
+        public bool? Lowvram { get; set; }
+        /// <summary>Use mmap when loading ckpt/pt files</summary>
+        public bool? MmapTorchFiles { get; set; }
         /// <summary>base path for all models</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -356,21 +402,31 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public global::MobileDiffusion.Clients.SdForgeNeo.Models.Flags_ngrok_options NgrokOptions { get; set; }
 #endif
-        /// <summary>don&apos;t download SD1.5 model even if no model is found in --ckpt-dir</summary>
-        public bool? NoDownloadSdModel { get; set; }
+        /// <summary>does not do anything.</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? NgrokRegion { get; set; }
+#nullable restore
+#else
+        public string NgrokRegion { get; set; }
+#endif
         /// <summary>Disables gradio queue; causes the webpage to use http requests instead of websockets; was the default in earlier versions</summary>
         public bool? NoGradioQueue { get; set; }
-        /// <summary>do not switch the model to 16-bit floats</summary>
-        public bool? NoHalf { get; set; }
         /// <summary>disable sha256 hashing of checkpoints to help loading performance</summary>
         public bool? NoHashing { get; set; }
+        /// <summary>disable read prompt from last generation feature; settings this argument will not create &apos;--data_path/params.txt&apos; file</summary>
+        public bool? NoPromptHistory { get; set; }
+        /// <summary>Force NORMAL_VRAM in case LOW_VRAM gets automatically enabled</summary>
+        public bool? Normalvram { get; set; }
+        /// <summary>When even LOW_VRAM is still not enough</summary>
+        public bool? Novram { get; set; }
         /// <summary>use api=True to launch the API instead of the webui</summary>
         public bool? Nowebui { get; set; }
+        /// <summary>install nunchaku for SVDQ inference</summary>
+        public bool? Nunchaku { get; set; }
         /// <summary>install nightly onnxruntime-gpu with cu130 support</summary>
         public bool? OnnxruntimeGpu { get; set; }
-        /// <summary>The persistent_patches property</summary>
-        public bool? PersistentPatches { get; set; }
-        /// <summary>The pin_shared_memory property</summary>
+        /// <summary>improve RAM utilization</summary>
         public bool? PinSharedMemory { get; set; }
         /// <summary>launch gradio with given server port, you need root/admin rights for ports &lt; 1024, defaults to 7860 if available</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -380,12 +436,18 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public string Port { get; set; }
 #endif
-        /// <summary>The pytorch_deterministic property</summary>
-        public bool? PytorchDeterministic { get; set; }
         /// <summary>launch.py argument: install the appropriate version of torch even if you have some version already installed</summary>
         public bool? ReinstallTorch { get; set; }
         /// <summary>launch.py argument: install the appropriate version of xformers even if you have some version already installed</summary>
         public bool? ReinstallXformers { get; set; }
+        /// <summary>Set the amount of VRAM you want to reserve for other software (by default some amount is reserved)</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ReserveVram { get; set; }
+#nullable restore
+#else
+        public string ReserveVram { get; set; }
+#endif
         /// <summary>install sageattention</summary>
         public bool? Sage { get; set; }
         /// <summary>The sage2_function property</summary>
@@ -432,6 +494,22 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public string Subpath { get; set; }
 #endif
+        /// <summary>Set the device to load text encoder (e.g. &quot;cuda:1&quot;)</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? TextEncDevice { get; set; }
+#nullable restore
+#else
+        public string TextEncDevice { get; set; }
+#endif
+        /// <summary>Directories for Text Encoder model(s)</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? TextEncoderDirs { get; set; }
+#nullable restore
+#else
+        public UntypedNode TextEncoderDirs { get; set; }
+#endif
         /// <summary>launches the UI with light or dark theme</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -476,17 +554,11 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public string UiSettingsFile { get; set; }
 #endif
-        /// <summary>The unet_in_bf16 property</summary>
-        public bool? UnetInBf16 { get; set; }
-        /// <summary>The unet_in_fp16 property</summary>
-        public bool? UnetInFp16 { get; set; }
-        /// <summary>The unet_in_fp8_e4m3fn property</summary>
-        public bool? UnetInFp8E4m3fn { get; set; }
-        /// <summary>The unet_in_fp8_e5m2 property</summary>
-        public bool? UnetInFp8E5m2 { get; set; }
+        /// <summary>allow any symbols except &apos;/&apos; in filenames. May conflict with your browser and file system</summary>
+        public bool? UnixFilenamesSanitization { get; set; }
         /// <summary>launch.py argument: download updates for all extensions when starting the program</summary>
         public bool? UpdateAllExtensions { get; set; }
-        /// <summary>use CPU as torch device for specified modules</summary>
+        /// <summary>required by adetailer</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public UntypedNode? UseCpu { get; set; }
@@ -494,39 +566,31 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
 #else
         public UntypedNode UseCpu { get; set; }
 #endif
-        /// <summary>use Intel XPU as torch device</summary>
-        public bool? UseIpex { get; set; }
+        /// <summary>Use the PyTorch cross attention (override sageattention/flash_attn/xformers)</summary>
+        public bool? UsePytorchCrossAttention { get; set; }
         /// <summary>use textbox for seeds in UI (no up/down, but possible to input long seeds)</summary>
         public bool? UseTextboxSeed { get; set; }
         /// <summary>Use the uv package manager</summary>
         public bool? Uv { get; set; }
         /// <summary>Use the uv package manager with symlink</summary>
         public bool? UvSymlink { get; set; }
-        /// <summary>Path to directory with VAE files</summary>
+        /// <summary>Set the device to load VAE (e.g. &quot;cuda:1&quot;)</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public string? VaeDir { get; set; }
+        public string? VaeDevice { get; set; }
 #nullable restore
 #else
-        public string VaeDir { get; set; }
+        public string VaeDevice { get; set; }
 #endif
-        /// <summary>The vae_in_bf16 property</summary>
-        public bool? VaeInBf16 { get; set; }
-        /// <summary>The vae_in_cpu property</summary>
-        public bool? VaeInCpu { get; set; }
-        /// <summary>The vae_in_fp16 property</summary>
-        public bool? VaeInFp16 { get; set; }
-        /// <summary>The vae_in_fp32 property</summary>
-        public bool? VaeInFp32 { get; set; }
-        /// <summary>Checkpoint to use as VAE; setting this argument disables all settings related to VAE</summary>
+        /// <summary>Directories for VAE model(s)</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public string? VaePath { get; set; }
+        public UntypedNode? VaeDirs { get; set; }
 #nullable restore
 #else
-        public string VaePath { get; set; }
+        public UntypedNode VaeDirs { get; set; }
 #endif
-        /// <summary>install xformers for cross attention</summary>
+        /// <summary>install xformers</summary>
         public bool? Xformers { get; set; }
         /// <summary>
         /// Instantiates a new <see cref="global::MobileDiffusion.Clients.SdForgeNeo.Models.Flags"/> and sets the default values.
@@ -534,14 +598,13 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
         public Flags()
         {
             AdditionalData = new Dictionary<string, object>();
-            Ckpt = "D:\\StableDiffusion\\sd-webui-forge-classic\\model.ckpt";
             CodeformerModelsPath = "D:\\StableDiffusion\\sd-webui-forge-classic\\models\\Codeformer";
-            Config = "D:\\StableDiffusion\\sd-webui-forge-classic\\configs\\v1-inference.yaml";
+            ControlnetDir = "D:\\StableDiffusion\\sd-webui-forge-classic\\models\\ControlNet";
             ControlnetLoglevel = "INFO";
+            ControlnetPreprocessorModelsDir = "D:\\StableDiffusion\\sd-webui-forge-classic\\models\\ControlNetPreprocessor";
             DataDir = "D:\\StableDiffusion\\sd-webui-forge-classic";
             EmbeddingsDir = "D:\\StableDiffusion\\sd-webui-forge-classic\\models\\embeddings";
             EsrganModelsPath = "D:\\StableDiffusion\\sd-webui-forge-classic\\models\\ESRGAN";
-            GfpganDir = "./GFPGAN";
             GfpganModelsPath = "D:\\StableDiffusion\\sd-webui-forge-classic\\models\\GFPGAN";
             LocalizationsDir = "D:\\StableDiffusion\\sd-webui-forge-classic\\localizations";
             LoraDir = "D:\\StableDiffusion\\sd-webui-forge-classic\\models\\Lora";
@@ -570,96 +633,115 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
         {
             return new Dictionary<string, Action<IParseNode>>
             {
+                { "add_stop_route", n => { AddStopRoute = n.GetBoolValue(); } },
                 { "administrator", n => { Administrator = n.GetBoolValue(); } },
                 { "adv_samplers", n => { AdvSamplers = n.GetBoolValue(); } },
-                { "adv_xyz", n => { AdvXyz = n.GetBoolValue(); } },
-                { "all_in_fp16", n => { AllInFp16 = n.GetBoolValue(); } },
-                { "all_in_fp32", n => { AllInFp32 = n.GetBoolValue(); } },
-                { "always_cpu", n => { AlwaysCpu = n.GetBoolValue(); } },
-                { "always_gpu", n => { AlwaysGpu = n.GetBoolValue(); } },
-                { "always_high_vram", n => { AlwaysHighVram = n.GetBoolValue(); } },
-                { "always_low_vram", n => { AlwaysLowVram = n.GetBoolValue(); } },
-                { "always_no_vram", n => { AlwaysNoVram = n.GetBoolValue(); } },
-                { "always_normal_vram", n => { AlwaysNormalVram = n.GetBoolValue(); } },
-                { "always_offload_from_vram", n => { AlwaysOffloadFromVram = n.GetBoolValue(); } },
                 { "api", n => { Api = n.GetBoolValue(); } },
                 { "api_auth", n => { ApiAuth = n.GetStringValue(); } },
                 { "api_log", n => { ApiLog = n.GetBoolValue(); } },
                 { "api_server_stop", n => { ApiServerStop = n.GetBoolValue(); } },
-                { "attention_pytorch", n => { AttentionPytorch = n.GetBoolValue(); } },
                 { "autolaunch", n => { Autolaunch = n.GetBoolValue(); } },
-                { "ckpt", n => { Ckpt = n.GetStringValue(); } },
-                { "ckpt_dir", n => { CkptDir = n.GetStringValue(); } },
-                { "clip_in_fp16", n => { ClipInFp16 = n.GetBoolValue(); } },
-                { "clip_in_fp32", n => { ClipInFp32 = n.GetBoolValue(); } },
-                { "clip_in_fp8_e4m3fn", n => { ClipInFp8E4m3fn = n.GetBoolValue(); } },
-                { "clip_in_fp8_e5m2", n => { ClipInFp8E5m2 = n.GetBoolValue(); } },
-                { "clip_in_gpu", n => { ClipInGpu = n.GetBoolValue(); } },
+                { "autotune", n => { Autotune = n.GetBoolValue(); } },
+                { "bf16_text_enc", n => { Bf16TextEnc = n.GetBoolValue(); } },
+                { "bf16_unet", n => { Bf16Unet = n.GetBoolValue(); } },
+                { "bf16_vae", n => { Bf16Vae = n.GetBoolValue(); } },
+                { "bnb", n => { Bnb = n.GetBoolValue(); } },
+                { "ckpt_dirs", n => { CkptDirs = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "codeformer_models_path", n => { CodeformerModelsPath = n.GetStringValue(); } },
-                { "config", n => { Config = n.GetStringValue(); } },
+                { "configpresets_dir", n => { ConfigpresetsDir = n.GetStringValue(); } },
                 { "controlnet_dir", n => { ControlnetDir = n.GetStringValue(); } },
                 { "controlnet_loglevel", n => { ControlnetLoglevel = n.GetStringValue(); } },
                 { "controlnet_preprocessor_models_dir", n => { ControlnetPreprocessorModelsDir = n.GetStringValue(); } },
                 { "cors_allow_origins", n => { CorsAllowOrigins = n.GetStringValue(); } },
                 { "cors_allow_origins_regex", n => { CorsAllowOriginsRegex = n.GetStringValue(); } },
+                { "cpu", n => { Cpu = n.GetBoolValue(); } },
+                { "cpu_text_enc", n => { CpuTextEnc = n.GetBoolValue(); } },
+                { "cpu_vae", n => { CpuVae = n.GetBoolValue(); } },
                 { "cuda_malloc", n => { CudaMalloc = n.GetBoolValue(); } },
-                { "cuda_stream", n => { CudaStream = n.GetBoolValue(); } },
+                { "cuda_stream", n => { CudaStream = n.GetStringValue(); } },
                 { "data_dir", n => { DataDir = n.GetStringValue(); } },
+                { "deterministic", n => { Deterministic = n.GetBoolValue(); } },
                 { "device_id", n => { DeviceId = n.GetStringValue(); } },
-                { "directml", n => { Directml = n.GetBoolValue(); } },
+                { "directml", n => { Directml = n.GetStringValue(); } },
                 { "disable_all_extensions", n => { DisableAllExtensions = n.GetBoolValue(); } },
-                { "disable_attention_upcast", n => { DisableAttentionUpcast = n.GetBoolValue(); } },
                 { "disable_console_progressbars", n => { DisableConsoleProgressbars = n.GetBoolValue(); } },
                 { "disable_extra_extensions", n => { DisableExtraExtensions = n.GetBoolValue(); } },
                 { "disable_flash", n => { DisableFlash = n.GetBoolValue(); } },
-                { "disable_ipex_hijack", n => { DisableIpexHijack = n.GetBoolValue(); } },
-                { "disable_nan_check", n => { DisableNanCheck = n.GetBoolValue(); } },
+                { "disable_gpu_warning", n => { DisableGpuWarning = n.GetBoolValue(); } },
+                { "disable_ipex_optimize", n => { DisableIpexOptimize = n.GetBoolValue(); } },
+                { "disable_mmap", n => { DisableMmap = n.GetBoolValue(); } },
                 { "disable_safe_unpickle", n => { DisableSafeUnpickle = n.GetBoolValue(); } },
                 { "disable_sage", n => { DisableSage = n.GetBoolValue(); } },
+                { "disable_smart_memory", n => { DisableSmartMemory = n.GetBoolValue(); } },
                 { "disable_tls_verify", n => { DisableTlsVerify = n.GetStringValue(); } },
                 { "disable_xformers", n => { DisableXformers = n.GetBoolValue(); } },
                 { "dump_sysinfo", n => { DumpSysinfo = n.GetBoolValue(); } },
                 { "embeddings_dir", n => { EmbeddingsDir = n.GetStringValue(); } },
+                { "enable_console_prompts", n => { EnableConsolePrompts = n.GetBoolValue(); } },
                 { "enable_insecure_extension_access", n => { EnableInsecureExtensionAccess = n.GetBoolValue(); } },
                 { "esrgan_models_path", n => { EsrganModelsPath = n.GetStringValue(); } },
                 { "f", n => { F = n.GetBoolValue(); } },
                 { "fast_fp16", n => { FastFp16 = n.GetBoolValue(); } },
+                { "fast_fp8", n => { FastFp8 = n.GetBoolValue(); } },
+                { "filenames_max_length", n => { FilenamesMaxLength = n.GetIntValue(); } },
                 { "flash", n => { Flash = n.GetBoolValue(); } },
+                { "force_fp16", n => { ForceFp16 = n.GetBoolValue(); } },
+                { "force_fp32", n => { ForceFp32 = n.GetBoolValue(); } },
+                { "force_non_blocking", n => { ForceNonBlocking = n.GetBoolValue(); } },
+                { "force_upcast_attention", n => { ForceUpcastAttention = n.GetBoolValue(); } },
+                { "force_xformers_vae", n => { ForceXformersVae = n.GetBoolValue(); } },
                 { "forge_ref_a1111_home", n => { ForgeRefA1111Home = n.GetStringValue(); } },
-                { "fps", n => { Fps = n.GetIntValue(); } },
+                { "forge_ref_comfy_home", n => { ForgeRefComfyHome = n.GetStringValue(); } },
+                { "forge_ref_comfy_yaml", n => { ForgeRefComfyYaml = n.GetStringValue(); } },
+                { "fp16_text_enc", n => { Fp16TextEnc = n.GetBoolValue(); } },
+                { "fp16_unet", n => { Fp16Unet = n.GetBoolValue(); } },
+                { "fp16_vae", n => { Fp16Vae = n.GetBoolValue(); } },
+                { "fp32_text_enc", n => { Fp32TextEnc = n.GetBoolValue(); } },
+                { "fp32_unet", n => { Fp32Unet = n.GetBoolValue(); } },
+                { "fp32_vae", n => { Fp32Vae = n.GetBoolValue(); } },
+                { "fp8_e4m3fn_text_enc", n => { Fp8E4m3fnTextEnc = n.GetBoolValue(); } },
+                { "fp8_e4m3fn_unet", n => { Fp8E4m3fnUnet = n.GetBoolValue(); } },
+                { "fp8_e5m2_text_enc", n => { Fp8E5m2TextEnc = n.GetBoolValue(); } },
+                { "fp8_e5m2_unet", n => { Fp8E5m2Unet = n.GetBoolValue(); } },
+                { "fp8_e8m0fnu_unet", n => { Fp8E8m0fnuUnet = n.GetBoolValue(); } },
                 { "freeze_settings", n => { FreezeSettings = n.GetBoolValue(); } },
                 { "freeze_settings_in_sections", n => { FreezeSettingsInSections = n.GetStringValue(); } },
                 { "freeze_specific_settings", n => { FreezeSpecificSettings = n.GetStringValue(); } },
-                { "gfpgan_dir", n => { GfpganDir = n.GetStringValue(); } },
-                { "gfpgan_model", n => { GfpganModel = n.GetStringValue(); } },
                 { "gfpgan_models_path", n => { GfpganModelsPath = n.GetStringValue(); } },
                 { "gpu_device_id", n => { GpuDeviceId = n.GetStringValue(); } },
+                { "gpu_only", n => { GpuOnly = n.GetBoolValue(); } },
                 { "gradio_allowed_path", n => { GradioAllowedPath = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "gradio_auth", n => { GradioAuth = n.GetStringValue(); } },
                 { "gradio_auth_path", n => { GradioAuthPath = n.GetStringValue(); } },
                 { "gradio_debug", n => { GradioDebug = n.GetBoolValue(); } },
                 { "hide_ui_dir_config", n => { HideUiDirConfig = n.GetBoolValue(); } },
+                { "highvram", n => { Highvram = n.GetBoolValue(); } },
                 { "image_browser_tmp_db", n => { ImageBrowserTmpDb = n.GetBoolValue(); } },
                 { "listen", n => { Listen = n.GetBoolValue(); } },
                 { "localizations_dir", n => { LocalizationsDir = n.GetStringValue(); } },
                 { "log_startup", n => { LogStartup = n.GetBoolValue(); } },
                 { "loglevel", n => { Loglevel = n.GetStringValue(); } },
                 { "lora_dir", n => { LoraDir = n.GetStringValue(); } },
+                { "lora_dirs", n => { LoraDirs = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "lowvram", n => { Lowvram = n.GetBoolValue(); } },
+                { "mmap_torch_files", n => { MmapTorchFiles = n.GetBoolValue(); } },
                 { "model_ref", n => { ModelRef = n.GetStringValue(); } },
                 { "ngrok", n => { Ngrok = n.GetStringValue(); } },
                 { "ngrok_options", n => { NgrokOptions = n.GetObjectValue<global::MobileDiffusion.Clients.SdForgeNeo.Models.Flags_ngrok_options>(global::MobileDiffusion.Clients.SdForgeNeo.Models.Flags_ngrok_options.CreateFromDiscriminatorValue); } },
-                { "no_download_sd_model", n => { NoDownloadSdModel = n.GetBoolValue(); } },
+                { "ngrok_region", n => { NgrokRegion = n.GetStringValue(); } },
                 { "no_gradio_queue", n => { NoGradioQueue = n.GetBoolValue(); } },
-                { "no_half", n => { NoHalf = n.GetBoolValue(); } },
                 { "no_hashing", n => { NoHashing = n.GetBoolValue(); } },
+                { "no_prompt_history", n => { NoPromptHistory = n.GetBoolValue(); } },
+                { "normalvram", n => { Normalvram = n.GetBoolValue(); } },
+                { "novram", n => { Novram = n.GetBoolValue(); } },
                 { "nowebui", n => { Nowebui = n.GetBoolValue(); } },
+                { "nunchaku", n => { Nunchaku = n.GetBoolValue(); } },
                 { "onnxruntime_gpu", n => { OnnxruntimeGpu = n.GetBoolValue(); } },
-                { "persistent_patches", n => { PersistentPatches = n.GetBoolValue(); } },
                 { "pin_shared_memory", n => { PinSharedMemory = n.GetBoolValue(); } },
                 { "port", n => { Port = n.GetStringValue(); } },
-                { "pytorch_deterministic", n => { PytorchDeterministic = n.GetBoolValue(); } },
                 { "reinstall_torch", n => { ReinstallTorch = n.GetBoolValue(); } },
                 { "reinstall_xformers", n => { ReinstallXformers = n.GetBoolValue(); } },
+                { "reserve_vram", n => { ReserveVram = n.GetStringValue(); } },
                 { "sage", n => { Sage = n.GetBoolValue(); } },
                 { "sage2_function", n => { Sage2Function = n.GetEnumValue<global::MobileDiffusion.Clients.SdForgeNeo.Models.SageAttentionFuncs>(); } },
                 { "sage_accum_dtype", n => { SageAccumDtype = n.GetEnumValue<global::MobileDiffusion.Clients.SdForgeNeo.Models.Sage_pv_accum_dtype>(); } },
@@ -674,6 +756,8 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
                 { "skip_version_check", n => { SkipVersionCheck = n.GetBoolValue(); } },
                 { "styles_file", n => { StylesFile = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "subpath", n => { Subpath = n.GetStringValue(); } },
+                { "text_enc_device", n => { TextEncDevice = n.GetStringValue(); } },
+                { "text_encoder_dirs", n => { TextEncoderDirs = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "theme", n => { Theme = n.GetStringValue(); } },
                 { "timeout_keep_alive", n => { TimeoutKeepAlive = n.GetIntValue(); } },
                 { "tls_certfile", n => { TlsCertfile = n.GetStringValue(); } },
@@ -681,22 +765,15 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
                 { "ui_config_file", n => { UiConfigFile = n.GetStringValue(); } },
                 { "ui_debug_mode", n => { UiDebugMode = n.GetBoolValue(); } },
                 { "ui_settings_file", n => { UiSettingsFile = n.GetStringValue(); } },
-                { "unet_in_bf16", n => { UnetInBf16 = n.GetBoolValue(); } },
-                { "unet_in_fp16", n => { UnetInFp16 = n.GetBoolValue(); } },
-                { "unet_in_fp8_e4m3fn", n => { UnetInFp8E4m3fn = n.GetBoolValue(); } },
-                { "unet_in_fp8_e5m2", n => { UnetInFp8E5m2 = n.GetBoolValue(); } },
+                { "unix_filenames_sanitization", n => { UnixFilenamesSanitization = n.GetBoolValue(); } },
                 { "update_all_extensions", n => { UpdateAllExtensions = n.GetBoolValue(); } },
                 { "use_cpu", n => { UseCpu = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "use_ipex", n => { UseIpex = n.GetBoolValue(); } },
+                { "use_pytorch_cross_attention", n => { UsePytorchCrossAttention = n.GetBoolValue(); } },
                 { "use_textbox_seed", n => { UseTextboxSeed = n.GetBoolValue(); } },
                 { "uv", n => { Uv = n.GetBoolValue(); } },
                 { "uv_symlink", n => { UvSymlink = n.GetBoolValue(); } },
-                { "vae_dir", n => { VaeDir = n.GetStringValue(); } },
-                { "vae_in_bf16", n => { VaeInBf16 = n.GetBoolValue(); } },
-                { "vae_in_cpu", n => { VaeInCpu = n.GetBoolValue(); } },
-                { "vae_in_fp16", n => { VaeInFp16 = n.GetBoolValue(); } },
-                { "vae_in_fp32", n => { VaeInFp32 = n.GetBoolValue(); } },
-                { "vae_path", n => { VaePath = n.GetStringValue(); } },
+                { "vae_device", n => { VaeDevice = n.GetStringValue(); } },
+                { "vae_dirs", n => { VaeDirs = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "xformers", n => { Xformers = n.GetBoolValue(); } },
             };
         }
@@ -707,96 +784,115 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
         public virtual void Serialize(ISerializationWriter writer)
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+            writer.WriteBoolValue("add_stop_route", AddStopRoute);
             writer.WriteBoolValue("administrator", Administrator);
             writer.WriteBoolValue("adv_samplers", AdvSamplers);
-            writer.WriteBoolValue("adv_xyz", AdvXyz);
-            writer.WriteBoolValue("all_in_fp16", AllInFp16);
-            writer.WriteBoolValue("all_in_fp32", AllInFp32);
-            writer.WriteBoolValue("always_cpu", AlwaysCpu);
-            writer.WriteBoolValue("always_gpu", AlwaysGpu);
-            writer.WriteBoolValue("always_high_vram", AlwaysHighVram);
-            writer.WriteBoolValue("always_low_vram", AlwaysLowVram);
-            writer.WriteBoolValue("always_normal_vram", AlwaysNormalVram);
-            writer.WriteBoolValue("always_no_vram", AlwaysNoVram);
-            writer.WriteBoolValue("always_offload_from_vram", AlwaysOffloadFromVram);
             writer.WriteBoolValue("api", Api);
             writer.WriteStringValue("api_auth", ApiAuth);
             writer.WriteBoolValue("api_log", ApiLog);
             writer.WriteBoolValue("api_server_stop", ApiServerStop);
-            writer.WriteBoolValue("attention_pytorch", AttentionPytorch);
             writer.WriteBoolValue("autolaunch", Autolaunch);
-            writer.WriteStringValue("ckpt", Ckpt);
-            writer.WriteStringValue("ckpt_dir", CkptDir);
-            writer.WriteBoolValue("clip_in_fp16", ClipInFp16);
-            writer.WriteBoolValue("clip_in_fp32", ClipInFp32);
-            writer.WriteBoolValue("clip_in_fp8_e4m3fn", ClipInFp8E4m3fn);
-            writer.WriteBoolValue("clip_in_fp8_e5m2", ClipInFp8E5m2);
-            writer.WriteBoolValue("clip_in_gpu", ClipInGpu);
+            writer.WriteBoolValue("autotune", Autotune);
+            writer.WriteBoolValue("bf16_text_enc", Bf16TextEnc);
+            writer.WriteBoolValue("bf16_unet", Bf16Unet);
+            writer.WriteBoolValue("bf16_vae", Bf16Vae);
+            writer.WriteBoolValue("bnb", Bnb);
+            writer.WriteObjectValue<UntypedNode>("ckpt_dirs", CkptDirs);
             writer.WriteStringValue("codeformer_models_path", CodeformerModelsPath);
-            writer.WriteStringValue("config", Config);
+            writer.WriteStringValue("configpresets_dir", ConfigpresetsDir);
             writer.WriteStringValue("controlnet_dir", ControlnetDir);
             writer.WriteStringValue("controlnet_loglevel", ControlnetLoglevel);
             writer.WriteStringValue("controlnet_preprocessor_models_dir", ControlnetPreprocessorModelsDir);
             writer.WriteStringValue("cors_allow_origins", CorsAllowOrigins);
             writer.WriteStringValue("cors_allow_origins_regex", CorsAllowOriginsRegex);
+            writer.WriteBoolValue("cpu", Cpu);
+            writer.WriteBoolValue("cpu_text_enc", CpuTextEnc);
+            writer.WriteBoolValue("cpu_vae", CpuVae);
             writer.WriteBoolValue("cuda_malloc", CudaMalloc);
-            writer.WriteBoolValue("cuda_stream", CudaStream);
+            writer.WriteStringValue("cuda_stream", CudaStream);
             writer.WriteStringValue("data_dir", DataDir);
+            writer.WriteBoolValue("deterministic", Deterministic);
             writer.WriteStringValue("device_id", DeviceId);
-            writer.WriteBoolValue("directml", Directml);
+            writer.WriteStringValue("directml", Directml);
             writer.WriteBoolValue("disable_all_extensions", DisableAllExtensions);
-            writer.WriteBoolValue("disable_attention_upcast", DisableAttentionUpcast);
             writer.WriteBoolValue("disable_console_progressbars", DisableConsoleProgressbars);
             writer.WriteBoolValue("disable_extra_extensions", DisableExtraExtensions);
             writer.WriteBoolValue("disable_flash", DisableFlash);
-            writer.WriteBoolValue("disable_ipex_hijack", DisableIpexHijack);
-            writer.WriteBoolValue("disable_nan_check", DisableNanCheck);
+            writer.WriteBoolValue("disable_gpu_warning", DisableGpuWarning);
+            writer.WriteBoolValue("disable_ipex_optimize", DisableIpexOptimize);
+            writer.WriteBoolValue("disable_mmap", DisableMmap);
             writer.WriteBoolValue("disable_safe_unpickle", DisableSafeUnpickle);
             writer.WriteBoolValue("disable_sage", DisableSage);
+            writer.WriteBoolValue("disable_smart_memory", DisableSmartMemory);
             writer.WriteStringValue("disable_tls_verify", DisableTlsVerify);
             writer.WriteBoolValue("disable_xformers", DisableXformers);
             writer.WriteBoolValue("dump_sysinfo", DumpSysinfo);
             writer.WriteStringValue("embeddings_dir", EmbeddingsDir);
+            writer.WriteBoolValue("enable_console_prompts", EnableConsolePrompts);
             writer.WriteBoolValue("enable_insecure_extension_access", EnableInsecureExtensionAccess);
             writer.WriteStringValue("esrgan_models_path", EsrganModelsPath);
             writer.WriteBoolValue("f", F);
             writer.WriteBoolValue("fast_fp16", FastFp16);
+            writer.WriteBoolValue("fast_fp8", FastFp8);
+            writer.WriteIntValue("filenames_max_length", FilenamesMaxLength);
             writer.WriteBoolValue("flash", Flash);
+            writer.WriteBoolValue("force_fp16", ForceFp16);
+            writer.WriteBoolValue("force_fp32", ForceFp32);
+            writer.WriteBoolValue("force_non_blocking", ForceNonBlocking);
+            writer.WriteBoolValue("force_upcast_attention", ForceUpcastAttention);
+            writer.WriteBoolValue("force_xformers_vae", ForceXformersVae);
             writer.WriteStringValue("forge_ref_a1111_home", ForgeRefA1111Home);
-            writer.WriteIntValue("fps", Fps);
+            writer.WriteStringValue("forge_ref_comfy_home", ForgeRefComfyHome);
+            writer.WriteStringValue("forge_ref_comfy_yaml", ForgeRefComfyYaml);
+            writer.WriteBoolValue("fp16_text_enc", Fp16TextEnc);
+            writer.WriteBoolValue("fp16_unet", Fp16Unet);
+            writer.WriteBoolValue("fp16_vae", Fp16Vae);
+            writer.WriteBoolValue("fp32_text_enc", Fp32TextEnc);
+            writer.WriteBoolValue("fp32_unet", Fp32Unet);
+            writer.WriteBoolValue("fp32_vae", Fp32Vae);
+            writer.WriteBoolValue("fp8_e4m3fn_text_enc", Fp8E4m3fnTextEnc);
+            writer.WriteBoolValue("fp8_e4m3fn_unet", Fp8E4m3fnUnet);
+            writer.WriteBoolValue("fp8_e5m2_text_enc", Fp8E5m2TextEnc);
+            writer.WriteBoolValue("fp8_e5m2_unet", Fp8E5m2Unet);
+            writer.WriteBoolValue("fp8_e8m0fnu_unet", Fp8E8m0fnuUnet);
             writer.WriteBoolValue("freeze_settings", FreezeSettings);
             writer.WriteStringValue("freeze_settings_in_sections", FreezeSettingsInSections);
             writer.WriteStringValue("freeze_specific_settings", FreezeSpecificSettings);
-            writer.WriteStringValue("gfpgan_dir", GfpganDir);
-            writer.WriteStringValue("gfpgan_model", GfpganModel);
             writer.WriteStringValue("gfpgan_models_path", GfpganModelsPath);
             writer.WriteStringValue("gpu_device_id", GpuDeviceId);
+            writer.WriteBoolValue("gpu_only", GpuOnly);
             writer.WriteObjectValue<UntypedNode>("gradio_allowed_path", GradioAllowedPath);
             writer.WriteStringValue("gradio_auth", GradioAuth);
             writer.WriteStringValue("gradio_auth_path", GradioAuthPath);
             writer.WriteBoolValue("gradio_debug", GradioDebug);
             writer.WriteBoolValue("hide_ui_dir_config", HideUiDirConfig);
+            writer.WriteBoolValue("highvram", Highvram);
             writer.WriteBoolValue("image_browser_tmp_db", ImageBrowserTmpDb);
             writer.WriteBoolValue("listen", Listen);
             writer.WriteStringValue("localizations_dir", LocalizationsDir);
             writer.WriteStringValue("loglevel", Loglevel);
             writer.WriteBoolValue("log_startup", LogStartup);
             writer.WriteStringValue("lora_dir", LoraDir);
+            writer.WriteObjectValue<UntypedNode>("lora_dirs", LoraDirs);
+            writer.WriteBoolValue("lowvram", Lowvram);
+            writer.WriteBoolValue("mmap_torch_files", MmapTorchFiles);
             writer.WriteStringValue("model_ref", ModelRef);
             writer.WriteStringValue("ngrok", Ngrok);
             writer.WriteObjectValue<global::MobileDiffusion.Clients.SdForgeNeo.Models.Flags_ngrok_options>("ngrok_options", NgrokOptions);
-            writer.WriteBoolValue("no_download_sd_model", NoDownloadSdModel);
+            writer.WriteStringValue("ngrok_region", NgrokRegion);
             writer.WriteBoolValue("no_gradio_queue", NoGradioQueue);
-            writer.WriteBoolValue("no_half", NoHalf);
             writer.WriteBoolValue("no_hashing", NoHashing);
+            writer.WriteBoolValue("no_prompt_history", NoPromptHistory);
+            writer.WriteBoolValue("normalvram", Normalvram);
+            writer.WriteBoolValue("novram", Novram);
             writer.WriteBoolValue("nowebui", Nowebui);
+            writer.WriteBoolValue("nunchaku", Nunchaku);
             writer.WriteBoolValue("onnxruntime_gpu", OnnxruntimeGpu);
-            writer.WriteBoolValue("persistent_patches", PersistentPatches);
             writer.WriteBoolValue("pin_shared_memory", PinSharedMemory);
             writer.WriteStringValue("port", Port);
-            writer.WriteBoolValue("pytorch_deterministic", PytorchDeterministic);
             writer.WriteBoolValue("reinstall_torch", ReinstallTorch);
             writer.WriteBoolValue("reinstall_xformers", ReinstallXformers);
+            writer.WriteStringValue("reserve_vram", ReserveVram);
             writer.WriteBoolValue("sage", Sage);
             writer.WriteEnumValue<global::MobileDiffusion.Clients.SdForgeNeo.Models.SageAttentionFuncs>("sage2_function", Sage2Function);
             writer.WriteEnumValue<global::MobileDiffusion.Clients.SdForgeNeo.Models.Sage_pv_accum_dtype>("sage_accum_dtype", SageAccumDtype);
@@ -811,6 +907,8 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
             writer.WriteBoolValue("skip_version_check", SkipVersionCheck);
             writer.WriteObjectValue<UntypedNode>("styles_file", StylesFile);
             writer.WriteStringValue("subpath", Subpath);
+            writer.WriteStringValue("text_enc_device", TextEncDevice);
+            writer.WriteObjectValue<UntypedNode>("text_encoder_dirs", TextEncoderDirs);
             writer.WriteStringValue("theme", Theme);
             writer.WriteIntValue("timeout_keep_alive", TimeoutKeepAlive);
             writer.WriteStringValue("tls_certfile", TlsCertfile);
@@ -818,22 +916,15 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
             writer.WriteStringValue("ui_config_file", UiConfigFile);
             writer.WriteBoolValue("ui_debug_mode", UiDebugMode);
             writer.WriteStringValue("ui_settings_file", UiSettingsFile);
-            writer.WriteBoolValue("unet_in_bf16", UnetInBf16);
-            writer.WriteBoolValue("unet_in_fp16", UnetInFp16);
-            writer.WriteBoolValue("unet_in_fp8_e4m3fn", UnetInFp8E4m3fn);
-            writer.WriteBoolValue("unet_in_fp8_e5m2", UnetInFp8E5m2);
+            writer.WriteBoolValue("unix_filenames_sanitization", UnixFilenamesSanitization);
             writer.WriteBoolValue("update_all_extensions", UpdateAllExtensions);
             writer.WriteObjectValue<UntypedNode>("use_cpu", UseCpu);
-            writer.WriteBoolValue("use_ipex", UseIpex);
+            writer.WriteBoolValue("use_pytorch_cross_attention", UsePytorchCrossAttention);
             writer.WriteBoolValue("use_textbox_seed", UseTextboxSeed);
             writer.WriteBoolValue("uv", Uv);
             writer.WriteBoolValue("uv_symlink", UvSymlink);
-            writer.WriteStringValue("vae_dir", VaeDir);
-            writer.WriteBoolValue("vae_in_bf16", VaeInBf16);
-            writer.WriteBoolValue("vae_in_cpu", VaeInCpu);
-            writer.WriteBoolValue("vae_in_fp16", VaeInFp16);
-            writer.WriteBoolValue("vae_in_fp32", VaeInFp32);
-            writer.WriteStringValue("vae_path", VaePath);
+            writer.WriteStringValue("vae_device", VaeDevice);
+            writer.WriteObjectValue<UntypedNode>("vae_dirs", VaeDirs);
             writer.WriteBoolValue("xformers", Xformers);
             writer.WriteAdditionalData(AdditionalData);
         }

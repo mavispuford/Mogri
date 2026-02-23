@@ -1,6 +1,7 @@
 using MobileDiffusion.Interfaces.Services;
 using MobileDiffusion.Interfaces.ViewModels;
 using MobileDiffusion.Models;
+using MobileDiffusion.Enums;
 using MobileDiffusion.Clients.SdForgeNeo;
 using MobileDiffusion.Clients.SdForgeNeo.Models;
 using MobileDiffusion.Clients.SdForgeNeo.Sdapi.V1.Options;
@@ -38,6 +39,8 @@ namespace MobileDiffusion.Services
         private List<SDModelItem>? _models;
         private List<LoraItem>? _loras;
         private List<UpscalerItem>? _upscalers;
+        private List<string>? _moduleVaes;
+        private List<string>? _textEncoders;
         private Options? _options;
 
         public bool Initialized { get; private set; }
@@ -428,7 +431,6 @@ namespace MobileDiffusion.Services
             request.NIter = settings.BatchCount;
             request.BatchSize = settings.BatchSize;
             request.CfgScale = settings.GuidanceScale;
-            request.RestoreFaces = settings.EnableFaceRestoration;
             request.Width = (int)settings.Width;
             request.Height = (int)settings.Height;
             request.DenoisingStrength = settings.DenoisingStrength;
@@ -441,9 +443,31 @@ namespace MobileDiffusion.Services
                 !string.IsNullOrEmpty(settings.Upscaler) &&
                 settings.UpscaleLevel > 0 &&
                 settings.UpscaleSteps > 0;
-            request.HrScale = settings.UpscaleLevel;
-            request.HrSecondPassSteps = settings.UpscaleSteps;
-            request.HrUpscaler = settings.Upscaler;
+
+            if (request.EnableHr == true)
+            {
+                request.HrScale = settings.UpscaleLevel;
+                request.HrSecondPassSteps = settings.UpscaleSteps;
+                request.HrUpscaler = settings.Upscaler;
+
+                var additionalModules = new List<UntypedNode>();
+
+                if (!string.IsNullOrEmpty(settings.Vae) && settings.Vae != "Automatic" && settings.Vae != "None")
+                {
+                    if (_moduleVaes != null && _moduleVaes.Contains(settings.Vae))
+                    {
+                        additionalModules.Add(new UntypedString(settings.Vae));
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(settings.TextEncoder) && settings.TextEncoder != "None")
+                {
+                    additionalModules.Add(new UntypedString(settings.TextEncoder));
+                }
+
+                request.HrAdditionalModules = new UntypedArray(additionalModules);
+            }
+            
 
             var combinedPromptAndStyles = settings.GetCombinedPromptAndPromptStyles();
             request.Prompt = combinedPromptAndStyles.Prompt;
@@ -482,7 +506,6 @@ namespace MobileDiffusion.Services
             request.NIter = settings.BatchCount;
             request.BatchSize = settings.BatchSize;
             request.CfgScale = settings.GuidanceScale;
-            request.RestoreFaces = settings.EnableFaceRestoration;
             request.Width = (int)settings.Width;
             request.Height = (int)settings.Height;
             request.DenoisingStrength = settings.DenoisingStrength;
@@ -508,8 +531,6 @@ namespace MobileDiffusion.Services
             // Because we colorize the image, blurring the mask would cause some of the colorized pixels to stay
             // However, if the user has explicitly set a mask blur, we should honor it.
             request.MaskBlur = settings.MaskBlur;
-            request.MaskBlurX = settings.MaskBlur;
-            request.MaskBlurY = settings.MaskBlur;
             request.MaskRound = false;
 
             request.Scheduler = settings.Scheduler;
@@ -644,16 +665,83 @@ namespace MobileDiffusion.Services
             {
                 // Options is strictly required and fetched first/parallel
                 Task.Run(async () => _options = await _client.Sdapi.V1.OptionsPath.GetAsync(cancellationToken: cts.Token), cancellationToken),
-                Task.Run(async () => _samplers = await _client.Sdapi.V1.Samplers.GetAsync(cancellationToken: cts.Token), cancellationToken),
-                Task.Run(async () => _schedulers = await _client.Sdapi.V1.Schedulers.GetAsync(cancellationToken: cts.Token), cancellationToken),
-                Task.Run(async () => _promptStyles = await _client.Sdapi.V1.PromptStyles.GetAsync(cancellationToken: cts.Token), cancellationToken),
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        _samplers = await _client.Sdapi.V1.Samplers.GetAsync(cancellationToken: cts.Token);
+                    }
+                    catch { /* Ignore if endpoint doesn't exist */ }
+                }, cancellationToken),
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        _schedulers = await _client.Sdapi.V1.Schedulers.GetAsync(cancellationToken: cts.Token);
+                    }
+                    catch { /* Ignore if endpoint doesn't exist */ }
+                }, cancellationToken),
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        _promptStyles = await _client.Sdapi.V1.PromptStyles.GetAsync(cancellationToken: cts.Token);
+                    }
+                    catch { /* Ignore if endpoint doesn't exist */ }
+                }, cancellationToken),
                 Task.Run(async () => _models = await _client.Sdapi.V1.SdModels.GetAsync(cancellationToken: cts.Token), cancellationToken),
                 Task.Run(async () =>
                 {
-                    var lorasNode = await _client.Sdapi.V1.Loras.GetAsync(cancellationToken: cts.Token);
-                    _loras = ParseLoras(lorasNode);
+                    try
+                    {
+                        var response = await _httpClientFactory.CreateClient().GetAsync($"{_baseUrl.TrimEnd('/')}/sdapi/v1/sd-modules", cts.Token);
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var json = await response.Content.ReadAsStringAsync(cts.Token);
+                            var modules = JArray.Parse(json);
+                            
+                            _moduleVaes = new List<string>();
+                            _textEncoders = new List<string>();
+
+                            foreach (var module in modules)
+                            {
+                                var modelName = module["model_name"]?.ToString();
+                                var filename = module["filename"]?.ToString();
+
+                                if (!string.IsNullOrEmpty(modelName) && !string.IsNullOrEmpty(filename))
+                                {
+                                    if (filename.Contains("\\VAE\\", StringComparison.OrdinalIgnoreCase) || 
+                                        filename.Contains("/VAE/", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        _moduleVaes.Add(modelName);
+                                    }
+                                    else
+                                    {
+                                        _textEncoders.Add(modelName);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch { /* Ignore if endpoint doesn't exist */ }
                 }, cancellationToken),
-                Task.Run(async () => _upscalers = await _client.Sdapi.V1.Upscalers.GetAsync(cancellationToken: cts.Token), cancellationToken)
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        var lorasNode = await _client.Sdapi.V1.Loras.GetAsync(cancellationToken: cts.Token);
+                        _loras = ParseLoras(lorasNode);
+                    }
+                    catch { /* Ignore if endpoint doesn't exist */ }
+                }, cancellationToken),
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        _upscalers = await _client.Sdapi.V1.Upscalers.GetAsync(cancellationToken: cts.Token);
+                    }
+                    catch { /* Ignore if endpoint doesn't exist */ }
+                }, cancellationToken)
             };
 
             try
@@ -840,6 +928,42 @@ namespace MobileDiffusion.Services
             return Task.FromResult(result);
         }
 
+        public Task<List<string>> GetVaesAsync(CancellationToken cancellationToken = default)
+        {
+            var result = new List<string> { "Automatic", "None" };
+
+            if (_moduleVaes != null)
+            {
+                foreach (var vae in _moduleVaes)
+                {
+                    if (!result.Contains(vae))
+                    {
+                        result.Add(vae);
+                    }
+                }
+            }
+
+            return Task.FromResult(result);
+        }
+
+        public Task<List<string>> GetTextEncodersAsync(CancellationToken cancellationToken = default)
+        {
+            var result = new List<string> { "None" };
+
+            if (_textEncoders != null)
+            {
+                foreach (var encoder in _textEncoders)
+                {
+                    if (!result.Contains(encoder))
+                    {
+                        result.Add(encoder);
+                    }
+                }
+            }
+
+            return Task.FromResult(result);
+        }
+
         public Task<IModelViewModel?> GetSelectedModelAsync(CancellationToken cancellationToken = default)
         {
             var result = _serviceProvider.GetService<IModelViewModel>();
@@ -904,6 +1028,33 @@ namespace MobileDiffusion.Services
                     {
                         requestBody.AdditionalData.TryAdd("forge_unet_storage_dtype", desiredUnetStorage);
                     }
+
+                    var additionalModules = new List<string>();
+
+                    if (!string.IsNullOrEmpty(settings.Vae) && settings.Vae != "Automatic" && settings.Vae != "None")
+                    {
+                        // If the VAE is from the modules list, add it to additional_modules
+                        if (_moduleVaes != null && _moduleVaes.Contains(settings.Vae))
+                        {
+                            additionalModules.Add(settings.Vae);
+                            requestBody.AdditionalData.TryAdd("sd_vae", "Automatic"); // Reset sd_vae if using module
+                        }
+                        else
+                        {
+                            requestBody.AdditionalData.TryAdd("sd_vae", settings.Vae);
+                        }
+                    }
+                    else
+                    {
+                        requestBody.AdditionalData.TryAdd("sd_vae", settings.Vae ?? "Automatic");
+                    }
+
+                    if (!string.IsNullOrEmpty(settings.TextEncoder) && settings.TextEncoder != "None")
+                    {
+                        additionalModules.Add(settings.TextEncoder);
+                    }
+
+                    requestBody.AdditionalData.TryAdd("forge_additional_modules", additionalModules);
                 }
             }
 
@@ -996,6 +1147,39 @@ namespace MobileDiffusion.Services
                 return str.GetValue();
             }
             return null;
+        }
+
+        public Task<ModelType> GetCurrentModelTypeAsync(CancellationToken cancellationToken = default)
+        {
+            if (_options == null)
+            {
+                return Task.FromResult(ModelType.SDXL);
+            }
+
+            var currentModel = GetOptionValue(_options.SdModelCheckpoint);
+            if (string.IsNullOrEmpty(currentModel))
+            {
+                return Task.FromResult(ModelType.SDXL);
+            }
+
+            if (currentModel == GetOptionValue(_options.ForgeCheckpointSd))
+            {
+                return Task.FromResult(ModelType.SD15);
+            }
+            if (currentModel == GetOptionValue(_options.ForgeCheckpointXl))
+            {
+                return Task.FromResult(ModelType.SDXL);
+            }
+            if (currentModel == GetOptionValue(_options.ForgeCheckpointZit))
+            {
+                return Task.FromResult(ModelType.ZImageTurbo);
+            }
+            if (currentModel == GetOptionValue(_options.ForgeCheckpointFlux))
+            {
+                return Task.FromResult(ModelType.Flux);
+            }
+
+            return Task.FromResult(ModelType.SDXL);
         }
     }
 }

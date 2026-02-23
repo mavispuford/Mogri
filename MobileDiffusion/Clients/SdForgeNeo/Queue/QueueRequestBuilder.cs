@@ -2,6 +2,8 @@
 #pragma warning disable CS0618
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions;
+using MobileDiffusion.Clients.SdForgeNeo.Queue.Data;
+using MobileDiffusion.Clients.SdForgeNeo.Queue.Join;
 using MobileDiffusion.Clients.SdForgeNeo.Queue.Status;
 using System.Collections.Generic;
 using System.IO;
@@ -15,6 +17,16 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Queue
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class QueueRequestBuilder : BaseRequestBuilder
     {
+        /// <summary>The data property</summary>
+        public global::MobileDiffusion.Clients.SdForgeNeo.Queue.Data.DataRequestBuilder Data
+        {
+            get => new global::MobileDiffusion.Clients.SdForgeNeo.Queue.Data.DataRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The join property</summary>
+        public global::MobileDiffusion.Clients.SdForgeNeo.Queue.Join.JoinRequestBuilder Join
+        {
+            get => new global::MobileDiffusion.Clients.SdForgeNeo.Queue.Join.JoinRequestBuilder(PathParameters, RequestAdapter);
+        }
         /// <summary>The status property</summary>
         public global::MobileDiffusion.Clients.SdForgeNeo.Queue.Status.StatusRequestBuilder Status
         {

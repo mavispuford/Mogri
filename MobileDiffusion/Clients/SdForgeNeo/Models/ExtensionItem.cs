@@ -23,13 +23,7 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
         public string Branch { get; set; }
 #endif
         /// <summary>Extension Repository Commit Date</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public string? CommitDate { get; set; }
-#nullable restore
-#else
-        public string CommitDate { get; set; }
-#endif
+        public int? CommitDate { get; set; }
         /// <summary>Extension Repository Commit Hash</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -90,7 +84,7 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
             return new Dictionary<string, Action<IParseNode>>
             {
                 { "branch", n => { Branch = n.GetStringValue(); } },
-                { "commit_date", n => { CommitDate = n.GetStringValue(); } },
+                { "commit_date", n => { CommitDate = n.GetIntValue(); } },
                 { "commit_hash", n => { CommitHash = n.GetStringValue(); } },
                 { "enabled", n => { Enabled = n.GetBoolValue(); } },
                 { "name", n => { Name = n.GetStringValue(); } },
@@ -106,7 +100,7 @@ namespace MobileDiffusion.Clients.SdForgeNeo.Models
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteStringValue("branch", Branch);
-            writer.WriteStringValue("commit_date", CommitDate);
+            writer.WriteIntValue("commit_date", CommitDate);
             writer.WriteStringValue("commit_hash", CommitHash);
             writer.WriteBoolValue("enabled", Enabled);
             writer.WriteStringValue("name", Name);
