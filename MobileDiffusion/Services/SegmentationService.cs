@@ -42,6 +42,40 @@ public class SegmentationService : ISegmentationService, IDisposable
         _lowResMasks = null;
     }
 
+    public SKBitmap InvertMask(SKBitmap currentMask)
+    {
+        var result = new SKBitmap(currentMask.Info);
+        var maskColor = MaskColor;
+        
+        unsafe
+        {
+            var srcPtr = (byte*)currentMask.GetPixels().ToPointer();
+            var dstPtr = (byte*)result.GetPixels().ToPointer();
+            int length = currentMask.Width * currentMask.Height * 4;
+            
+            for (int i = 0; i < length; i += 4)
+            {
+                // Check alpha channel (index 3)
+                if (srcPtr[i + 3] == 0)
+                {
+                    dstPtr[i] = maskColor.Red;
+                    dstPtr[i + 1] = maskColor.Green;
+                    dstPtr[i + 2] = maskColor.Blue;
+                    dstPtr[i + 3] = maskColor.Alpha;
+                }
+                else
+                {
+                    dstPtr[i] = 0;
+                    dstPtr[i + 1] = 0;
+                    dstPtr[i + 2] = 0;
+                    dstPtr[i + 3] = 0;
+                }
+            }
+        }
+        
+        return result;
+    }
+
     public void UnloadModel()
     {
         Console.WriteLine("[SegmentationService] Unloading models to free memory...");
