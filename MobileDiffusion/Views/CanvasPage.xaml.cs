@@ -365,7 +365,7 @@ public partial class CanvasPage : BasePage
                         }
 
                         break;
-                    case ToolType.PaintBucket:
+                    case ToolType.MagicWand:
                         ShowMaskLayer = true;
 
                         _segmentationLine ??= new()
@@ -397,7 +397,7 @@ public partial class CanvasPage : BasePage
                     MaskCanvasView.InvalidateSurface();
                 }
 
-                if (CurrentTool.Type == ToolType.PaintBucket)
+                if (CurrentTool.Type == ToolType.MagicWand)
                 {
                     if (_segmentationLine != null &&
                         _segmentationLine.Path.Count > 1)

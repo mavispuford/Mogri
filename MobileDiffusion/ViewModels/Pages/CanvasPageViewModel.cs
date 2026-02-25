@@ -174,10 +174,10 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
         AvailableTools.Add(new PaintingToolViewModel
         {
-            Name = "Paint Bucket",
-            IconCode = "\ue997",
+            Name = "Magic Wand",
+            IconImagePath = "wand_stars.png",
             Effect = MaskEffect.Paint,
-            Type = ToolType.PaintBucket,
+            Type = ToolType.MagicWand,
             ContextButtons =
             [
                 ContextButtonType.Alpha,
@@ -289,15 +289,15 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 GettingColorPalette = false;
             }), Task.Run(async () =>
             {
-                var paintBucketTool = AvailableTools.FirstOrDefault(t => t.Type == ToolType.PaintBucket);
+                var magicWandTool = AvailableTools.FirstOrDefault(t => t.Type == ToolType.MagicWand);
 
-                if (paintBucketTool != null)
+                if (magicWandTool != null)
                 {
                     lock (_setSegmentationImageLock)
                     {
                         _setSegmentationImageRequestCount++;
 
-                        paintBucketTool.IsLoading = true;
+                        magicWandTool.IsLoading = true;
                         SettingSegmentationImage = true;
                     }
                 }
@@ -311,13 +311,13 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
                 HasSegmentationImage = await _segmentationService.SetImage(bitmap, _setSegmentationImageCancellationTokenSource?.Token ?? CancellationToken.None);
 
-                if (paintBucketTool != null)
+                if (magicWandTool != null)
                 {
                     lock (_setSegmentationImageLock)
                     {
                         _setSegmentationImageRequestCount--;
 
-                        paintBucketTool.IsLoading = _setSegmentationImageRequestCount > 0;
+                        magicWandTool.IsLoading = _setSegmentationImageRequestCount > 0;
                         SettingSegmentationImage = _setSegmentationImageRequestCount > 0;
                     }
                 }
@@ -1573,7 +1573,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             return;
         }
 
-        ShowContextMenu = value.Type == ToolType.PaintBucket;
+        ShowContextMenu = value.Type == ToolType.MagicWand;
         OnPropertyChanged(nameof(IsZoomMode));
     }
 

@@ -8,6 +8,8 @@ public interface IPaintingToolViewModel : IBaseViewModel
 
     string IconCode { get; set; }
 
+    string IconImagePath { get; set; }
+
     MaskEffect Effect { get; set; }
 
     ToolType Type { get; set; }

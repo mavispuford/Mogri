@@ -4,7 +4,7 @@ public enum ToolType
 {
     PaintBrush,
     Eraser,
-    PaintBucket,
+    MagicWand,
     Eyedropper,
     BoundingBox,
     Zoom
