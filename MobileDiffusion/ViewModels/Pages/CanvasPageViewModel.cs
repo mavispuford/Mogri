@@ -657,8 +657,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             return;
         }
 
-        var result = await Shell.Current.DisplayAlertAsync("Apply Paint and Masks?",
-            "This will permanently apply the paint/masks and replace the canvas image. Continue?",
+        var result = await Shell.Current.DisplayAlertAsync("Flatten Canvas?",
+            "This will permanently apply the paint/masks and replace the current canvas image.\n\nContinue?",
             "YES",
             "NO");
 
