@@ -16,25 +16,12 @@ public partial class ToolControl : ContentView
         set => SetValue(IconColorProperty, value);
     }
 
-    public static readonly BindableProperty IconColorProperty = BindableProperty.Create(nameof(IconColor), typeof(Color), typeof(ToolControl), Colors.Black, propertyChanged: (bindable, oldValue, newValue) =>
-    {
-        ((ToolControl)bindable).OnIconColorChanged();
-    });
+    public static readonly BindableProperty IconColorProperty = BindableProperty.Create(nameof(IconColor), typeof(Color), typeof(ToolControl), Colors.Black);
 
     public static readonly BindableProperty SelectCommandProperty = BindableProperty.Create(nameof(SelectCommand), typeof(ICommand), typeof(ToolControl), default);
 
     public ToolControl()
     {
         InitializeComponent();
-    }
-
-    private void OnIconColorChanged()
-    {
-        if (IconColor == null)
-        {
-            return;
-        }
-
-        FontImageSource.Color = IconColor;
     }
 }

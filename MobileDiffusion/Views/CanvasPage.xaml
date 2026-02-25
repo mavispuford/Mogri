@@ -130,7 +130,7 @@
                     HorizontalOptions="Center"
                     VerticalOptions="Center"
                     Opacity=".4"
-                    IsVisible="{Binding CurrentTool.Type, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:ToolType.PaintBucket}}"/>
+                    IsVisible="{Binding CurrentTool.Type, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:ToolType.MagicWand}}"/>
 
                 <skia:SKCanvasView x:Name="MaskCanvasView" 
                     PaintSurface="OnPaintMaskSurface"
@@ -569,9 +569,9 @@
                         AlignContent="Center"
                         AlignItems="Center"
                         JustifyContent="SpaceEvenly"
-                        IsVisible="{Binding CurrentTool.Type, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:ToolType.PaintBucket}}">
-                <Button Text="Apply Paint" Command="{Binding ApplySegmentationMaskCommand}" FontAttributes="Bold"/>
-                <Button Text="Clear Selection" BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark=Transparent}" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark=White}" BorderColor="{AppThemeBinding Light=Transparent, Dark={StaticResource IndependenceAccentFortyPercent}}" BorderWidth="1" Command="{Binding ClearSegmentationMaskCommand}" FontAttributes="Bold"/>
+                        IsVisible="{Binding CurrentTool.Type, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:ToolType.MagicWand}}">
+                <Button Text="Paint" Command="{Binding ApplySegmentationMaskCommand}" FontAttributes="Bold"/>
+                <Button Text="Deselect" BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark=Transparent}" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark=White}" BorderColor="{AppThemeBinding Light=Transparent, Dark={StaticResource IndependenceAccentFortyPercent}}" BorderWidth="1" Command="{Binding ClearSegmentationMaskCommand}" FontAttributes="Bold"/>
             </FlexLayout>
 
             <Border x:Name="ShowActionsButton"

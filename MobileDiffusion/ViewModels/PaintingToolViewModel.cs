@@ -13,6 +13,9 @@ public partial class PaintingToolViewModel : BaseViewModel, IPaintingToolViewMod
     public partial string IconCode { get; set; }
 
     [ObservableProperty]
+    public partial string IconImagePath { get; set; }
+
+    [ObservableProperty]
     public partial MaskEffect Effect { get; set; }
 
     [ObservableProperty]
