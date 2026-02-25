@@ -85,6 +85,8 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     IAsyncRelayCommand ApplySegmentationMaskCommand { get; }
 
+    IAsyncRelayCommand InvertSegmentationMaskCommand { get; }
+
     IRelayCommand ClearSegmentationMaskCommand { get; }
 
     IRelayCommand ToggleSegmentationAddCommand { get; }

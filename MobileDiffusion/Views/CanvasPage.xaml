@@ -570,8 +570,9 @@
                         AlignItems="Center"
                         JustifyContent="SpaceEvenly"
                         IsVisible="{Binding CurrentTool.Type, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:ToolType.MagicWand}}">
-                <Button Text="Paint" Command="{Binding ApplySegmentationMaskCommand}" FontAttributes="Bold"/>
-                <Button Text="Deselect" BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark=Transparent}" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark=White}" BorderColor="{AppThemeBinding Light=Transparent, Dark={StaticResource IndependenceAccentFortyPercent}}" BorderWidth="1" Command="{Binding ClearSegmentationMaskCommand}" FontAttributes="Bold"/>
+                <Button Text="Fill" Command="{Binding ApplySegmentationMaskCommand}" FontAttributes="Bold" WidthRequest="70"/>
+                <Button Text="Invert" BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark=Transparent}" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark=White}" BorderColor="{AppThemeBinding Light=Transparent, Dark={StaticResource IndependenceAccentFortyPercent}}" BorderWidth="1" Command="{Binding InvertSegmentationMaskCommand}" FontAttributes="Bold"/>
+                <Button Text="Clear" BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark=Transparent}" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark=White}" BorderColor="{AppThemeBinding Light=Transparent, Dark={StaticResource IndependenceAccentFortyPercent}}" BorderWidth="1" Command="{Binding ClearSegmentationMaskCommand}" FontAttributes="Bold"/>
             </FlexLayout>
 
             <Border x:Name="ShowActionsButton"

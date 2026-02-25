@@ -992,6 +992,38 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     }
 
     [RelayCommand]
+    private async Task InvertSegmentationMask()
+    {
+        if (SegmentationBitmap == null) return;
+
+        try
+        {
+            IsBusy = true;
+
+            var invertedBitmap = await Task.Run(() =>
+            {
+                return _segmentationService.InvertMask(SegmentationBitmap);
+            });
+
+            var oldBitmap = SegmentationBitmap;
+            SegmentationBitmap = invertedBitmap;
+            oldBitmap?.Dispose();
+
+            // Reset SAM state so subsequent taps start fresh instead of building on the pre-inverted state
+            _segmentationService.Reset();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            await Toast.Make("Failed to invert mask.").Show();
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
     private async Task ApplySegmentationMask()
     {
         if (SegmentationBitmap == null)
