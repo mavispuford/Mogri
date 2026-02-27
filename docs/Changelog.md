@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-02-27
+
+*This update significantly improves the user experience during long-running generation tasks by introducing a native Android Foreground Service. Users can now safely navigate away from the app without interrupting the generation process, and track progress directly from their device's notification drawer.*
+
+### Added
+- **Background Image Generation (Android)**: Image generation now runs seamlessly in the background via a persistent Foreground Service.
+  - Added a persistent notification channel that displays real-time progress percentages while generating.
+  - Implemented dynamic updates to the notification for successful completion states and error states without dismissing immediately.
+  - Tapping the notification safely returns the user to the `MainPage` to view their finished results.
+  - Automatic `PartialWakeLock` handling to prevent the CPU from sleeping and dropping the backend connection while generating in the background.
+  - Prompts users for `POST_NOTIFICATIONS` runtime permissions gracefully on Android 13+.
+- **Background Service Framework**: Introduced cross-platform task service interfaces (`IGenerationTaskService`) handling events, lifecycles, and results without coupling them to the user visible active UI view model. 
+
+### Changed
+- Refactored `MainPageViewModel` generation flow to rely on delegated service events (`ProgressChanged`, `Completed`), allowing the UI to safely detach and reconnect as the view model is navigated away from or destroyed/recreated.
+
 ## 2026-02-22
 
 *This update focuses on giving users more granular control over the generation pipeline by exposing VAE and Text Encoder selections. It also introduces automatic model type detection for better default settings and cleans up legacy features like face restoration that are no longer needed for modern models.*
