@@ -197,7 +197,6 @@ namespace MobileDiffusion.Platforms.Android.Services
                 if (service != null)
                 {
                     service.ShowCompleted(result.Images.Count);
-                    await Task.Delay(100);
                 }
             }
             catch (System.OperationCanceledException)
@@ -215,7 +214,6 @@ namespace MobileDiffusion.Platforms.Android.Services
                 if (service != null)
                 {
                     service.ShowFailed(ex.Message);
-                    await Task.Delay(100);
                 }
             }
             finally

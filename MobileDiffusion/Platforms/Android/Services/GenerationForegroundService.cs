@@ -16,10 +16,13 @@ namespace MobileDiffusion.Platforms.Android.Services
     {
         public static GenerationForegroundService? Instance { get; private set; }
 
-        private const string ChannelId = "image_generation";
-        private const int NotificationId = 1001;
+        private const string ProgressChannelId = "image_generation_progress";
+        private const string CompletionChannelId = "image_generation_completion";
+        private const int ProgressNotificationId = 1001;
+        private const int CompletionNotificationId = 1002;
         private NotificationManager? _notificationManager;
-        private NotificationCompat.Builder? _notificationBuilder;
+        private NotificationCompat.Builder? _progressNotificationBuilder;
+        private NotificationCompat.Builder? _completionNotificationBuilder;
 
         public override void OnCreate()
         {
@@ -28,25 +31,34 @@ namespace MobileDiffusion.Platforms.Android.Services
 
             _notificationManager = (NotificationManager?)GetSystemService(NotificationService);
             CreateNotificationChannel();
+            
+            var pendingIntent = CreatePendingIntent();
+
+            // Builder for the ongoing progress notification
+            _progressNotificationBuilder = new NotificationCompat.Builder(this, ProgressChannelId)
+                .SetSmallIcon(Resource.Mipmap.appicon)
+                .SetContentTitle("Generating Image…")
+                .SetContentText("0% complete")
+                .SetProgress(100, 0, true)
+                .SetContentIntent(pendingIntent)
+                .SetOngoing(true)
+                .SetPriority(NotificationCompat.PriorityLow) // Low priority helps prevent sound/vibration for progress
+                .SetForegroundServiceBehavior(NotificationCompat.ForegroundServiceImmediate);
+
+            // Builder for the completion/failure notification
+            _completionNotificationBuilder = new NotificationCompat.Builder(this, CompletionChannelId)
+                .SetSmallIcon(Resource.Mipmap.appicon)
+                .SetContentIntent(pendingIntent)
+                .SetOngoing(false)
+                .SetAutoCancel(true)
+                .SetPriority(NotificationCompat.PriorityHigh); // High priority allows for sound/vibration
         }
 
         public override StartCommandResult OnStartCommand(Intent? intent, StartCommandFlags flags, int startId)
         {
-            var pendingIntent = CreatePendingIntent();
-
-            _notificationBuilder = new NotificationCompat.Builder(this, ChannelId);
-            _notificationBuilder.SetSmallIcon(Resource.Mipmap.appicon);
-            _notificationBuilder.SetContentTitle("Generating Image…");
-            _notificationBuilder.SetContentText("0% complete");
-            _notificationBuilder.SetProgress(100, 0, true);
-            _notificationBuilder.SetContentIntent(pendingIntent);
-            _notificationBuilder.SetOngoing(true);
-            _notificationBuilder.SetPriority(NotificationCompat.PriorityLow);
-            _notificationBuilder.SetForegroundServiceBehavior(NotificationCompat.ForegroundServiceImmediate);
-
-            if (_notificationBuilder != null)
+            if (_progressNotificationBuilder != null)
             {
-                StartForeground(NotificationId, _notificationBuilder.Build());
+                StartForeground(ProgressNotificationId, _progressNotificationBuilder.Build());
             }
 
             return StartCommandResult.NotSticky;
@@ -75,48 +87,45 @@ namespace MobileDiffusion.Platforms.Android.Services
 
         public void UpdateProgress(float progress)
         {
-            if (_notificationBuilder == null || _notificationManager == null) return;
+            if (_progressNotificationBuilder == null || _notificationManager == null) return;
 
             var progressPercent = (int)(progress * 100);
             
-            _notificationBuilder.SetContentText($"{progressPercent}% complete");
-            _notificationBuilder.SetProgress(100, progressPercent, false);
+            _progressNotificationBuilder.SetContentText($"{progressPercent}% complete");
+            _progressNotificationBuilder.SetProgress(100, progressPercent, false);
 
-            _notificationManager.Notify(NotificationId, _notificationBuilder.Build());
+            _notificationManager.Notify(ProgressNotificationId, _progressNotificationBuilder.Build());
         }
 
         public void ShowCompleted(int imageCount)
         {
-            if (_notificationBuilder == null || _notificationManager == null) return;
+            if (_completionNotificationBuilder == null || _notificationManager == null) return;
 
-            _notificationBuilder.SetContentTitle("Generation Complete");
-            _notificationBuilder.SetContentText($"{imageCount} image{(imageCount == 1 ? "" : "s")} generated");
-            _notificationBuilder.SetProgress(0, 0, false);
-            _notificationBuilder.SetOngoing(false);
-            _notificationBuilder.SetAutoCancel(true);
-            _notificationBuilder.SetTimeoutAfter(5000); // Auto-dismiss after 5 seconds
-
-            _notificationManager.Notify(NotificationId, _notificationBuilder.Build());
+            _completionNotificationBuilder.SetContentTitle("Generation Complete");
+            _completionNotificationBuilder.SetContentText($"{imageCount} image{(imageCount == 1 ? "" : "s")} generated");
+            _completionNotificationBuilder.SetTimeoutAfter(5000); // Auto-dismiss after 5 seconds
         }
 
         public void ShowFailed(string message)
         {
-            if (_notificationBuilder == null || _notificationManager == null) return;
+            if (_completionNotificationBuilder == null || _notificationManager == null) return;
 
-            _notificationBuilder.SetContentTitle("Generation Failed");
-            _notificationBuilder.SetContentText($"Error: {message}");
-            _notificationBuilder.SetProgress(0, 0, false);
-            _notificationBuilder.SetOngoing(false);
-            _notificationBuilder.SetAutoCancel(true);
-            _notificationBuilder.SetTimeoutAfter(10000); // Auto-dismiss after 10 seconds
-
-            _notificationManager.Notify(NotificationId, _notificationBuilder.Build());
+            _completionNotificationBuilder.SetContentTitle("Generation Failed");
+            _completionNotificationBuilder.SetContentText($"Error: {message}");
+            _completionNotificationBuilder.SetTimeoutAfter(10000); // Auto-dismiss after 10 seconds
         }
 
         public void StopForegroundService(bool removeNotification = true)
         {
-            ServiceCompat.StopForeground(this, removeNotification ? ServiceCompat.StopForegroundRemove : ServiceCompat.StopForegroundDetach);
+            // Always remove the foreground state with its tied notification to prevent Android reverting it
+            ServiceCompat.StopForeground(this, ServiceCompat.StopForegroundRemove);
             
+            // Re-post the completion notification if requested
+            if (!removeNotification && _completionNotificationBuilder != null && _notificationManager != null)
+            {
+                _notificationManager.Notify(CompletionNotificationId, _completionNotificationBuilder.Build());
+            }
+
             StopSelf();
         }
 
@@ -124,12 +133,18 @@ namespace MobileDiffusion.Platforms.Android.Services
         {
             if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
             {
-                var channel = new NotificationChannel(ChannelId, "Image Generation", NotificationImportance.Low)
+                var progressChannel = new NotificationChannel(ProgressChannelId, "Image Generation Progress", NotificationImportance.Low)
                 {
-                    Description = "Shows progress for background image generation"
+                    Description = "Shows silent progress for background image generation"
+                };
+                
+                var completionChannel = new NotificationChannel(CompletionChannelId, "Image Generation Alerts", NotificationImportance.High)
+                {
+                    Description = "Alerts you when an image generation finishes or fails"
                 };
 
-                _notificationManager?.CreateNotificationChannel(channel);
+                _notificationManager?.CreateNotificationChannel(progressChannel);
+                _notificationManager?.CreateNotificationChannel(completionChannel);
             }
         }
 
