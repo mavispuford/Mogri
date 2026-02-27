@@ -1,4 +1,6 @@
 
+using CommunityToolkit.Mvvm.Messaging;
+
 namespace MobileDiffusion;
 
 public partial class App : Application
@@ -35,6 +37,11 @@ public partial class App : Application
 
     protected override Window CreateWindow(IActivationState? activationState)
     {
-        return new Window(new AppShell());
+        var window = new Window(new AppShell());
+        
+        window.Activated += (s, e) => CommunityToolkit.Mvvm.Messaging.WeakReferenceMessenger.Default.Send(new Messages.AppLifecycleMessage(true));
+        window.Deactivated += (s, e) => CommunityToolkit.Mvvm.Messaging.WeakReferenceMessenger.Default.Send(new Messages.AppLifecycleMessage(false));
+        
+        return window;
     }
 }

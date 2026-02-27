@@ -1,5 +1,7 @@
 # General Architecture Guidelines
 
+These guidelines are for developers and LLMs alike. The goal is to lay out the structure of this app as well as preferred patterns and practices.
+
 ## Main Components
 
 This .NET MAUI application follows the MVVM pattern. It consists mainly of these parts:
@@ -119,5 +121,8 @@ The following naming conventions are used in this application:
 - **Async Methods**: Always end with `Async` suffix (e.g. `SaveSettingsAsync()`)
 
 ## Other Patterns
-- Aim to create one file per class (avoid having multiple classes in a single file)
+- One file per class/interface/enum/etc. (avoid having multiple declarations in a single file)
 - Enums should also be defined in their own file in the `Enums` folder
+- Use `var` in all cases where it makes sense
+- Avoid conversational comments. Comments should be useful, explaining why a change was made in a succinct way.
+- Add Summary XML comments to classes, interfaces, enums, etc., explaining their purpose at a high level and any caveats to be aware of.

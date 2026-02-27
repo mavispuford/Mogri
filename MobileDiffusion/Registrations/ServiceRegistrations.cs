@@ -47,7 +47,10 @@ public static class ServiceRegistrations
         builder.Services.AddSingleton<IHistoryService, HistoryService>();
 
 #if ANDROID
+        builder.Services.AddSingleton<IGenerationTaskService, AndroidGenerationTaskService>();
         builder.Services.AddSingleton<IFileService, FileService>();
+#else
+        builder.Services.AddSingleton<IGenerationTaskService, GenerationTaskService>();
 #endif
 
         return builder;

@@ -44,7 +44,7 @@
                      Progress="{Binding Progress}"
                      HeightRequest="4"
                      ProgressColor="{StaticResource IndependenceAccent}"
-                     Opacity="{Binding CreateCommand.IsRunning, Converter={StaticResource BoolToOpacityConverter}}"/>
+                     Opacity="{Binding IsGenerating, Converter={StaticResource BoolToOpacityConverter}}"/>
 
         <Grid x:Name="MainGrid"
               Grid.Row="1"
