@@ -16,6 +16,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
     private readonly IFileService _fileService;
     private readonly IImageGenerationService _stableDiffusionService;
+    private readonly IGenerationTaskService _generationTaskService;
     private readonly IServiceProvider _serviceProvider;
     private readonly IImageService _imageService;
 
@@ -25,6 +26,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     private bool _initImageNeedsResize = true;
     private bool _forceReinitialize;
     private float _targetProgress = 0;
+    private static bool _notificationPermissionRequested;
 
     [ObservableProperty]
     public partial bool HasInitImage { get; set; }
@@ -57,19 +59,34 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     public MainPageViewModel(
         IFileService fileService,
         IImageGenerationService stableDiffusionService,
+        IGenerationTaskService generationTaskService,
         IServiceProvider serviceProvider,
         IImageService imageService,
         ILoadingService loadingService) : base(loadingService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
+        _generationTaskService = generationTaskService ?? throw new ArgumentNullException(nameof(generationTaskService));
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
+
+        _generationTaskService.ProgressChanged += onGenerationProgressChanged;
+        _generationTaskService.Completed += onGenerationCompleted;
     }
 
     public override async Task OnNavigatedToAsync()
     {
         await base.OnNavigatedToAsync();
+
+        if (_generationTaskService.IsRunning)
+        {
+            IsGenerating = true;
+        }
+        else if (_generationTaskService.LastResult != null)
+        {
+            // Process the result that completed while we were away
+            onGenerationCompleted(this, _generationTaskService.LastResult);
+        }
 
         await initializeStableDiffusionService();
     }
@@ -178,6 +195,54 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     [RelayCommand]
     private async Task Create()
     {
+        if (_generationTaskService.IsRunning)
+        {
+            await Shell.Current.CurrentPage.DisplayAlertAsync(
+                "Generation in progress",
+                "An image generation is already running. Please wait for it to finish or cancel it.",
+                "OK");
+            return;
+        }
+
+#if ANDROID
+        if (OperatingSystem.IsAndroidVersionAtLeast(33) && !_notificationPermissionRequested)
+        {
+            _notificationPermissionRequested = true;
+            try
+            {
+                var status = await Permissions.CheckStatusAsync<Permissions.PostNotifications>();
+                if (status == PermissionStatus.Granted)
+                {
+                    Preferences.Default.Remove("NotificationPermissionDenied");
+                }
+                else
+                {
+                    var hasPreviouslyDenied = Preferences.Default.Get("NotificationPermissionDenied", false);
+                    if (hasPreviouslyDenied)
+                    {
+                        await CommunityToolkit.Maui.Alerts.Toast.Make("Enable notifications for background progress updates").Show();
+                    }
+                    else
+                    {
+                        status = await Permissions.RequestAsync<Permissions.PostNotifications>();
+                        if (status != PermissionStatus.Granted)
+                        {
+                            Preferences.Default.Set("NotificationPermissionDenied", true);
+                            await Shell.Current.CurrentPage.DisplayAlertAsync(
+                                "Notification Permission Denied",
+                                "Background generation notifications will not appear.",
+                                "OK");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error requesting notification permission: {ex}");
+            }
+        }
+#endif
+
         if (!Preferences.Default.ContainsKey(Constants.PreferenceKeys.ServerUrl))
         {
             await Shell.Current.CurrentPage.DisplayAlertAsync(
@@ -266,63 +331,88 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             var sanitizedPrompt = settings.Prompt.Replace(" ", "_").ToLower();
             var length = Math.Min(sanitizedPrompt.Length, 90);
 
-            var imageNumber = 0;
-
-            try
+            var request = new GenerationTaskRequest
             {
-                await foreach (var response in _stableDiffusionService.SubmitImageRequestAsync(settings))
+                Settings = settings,
+                TotalExpectedImages = settings.BatchCount * settings.BatchSize,
+                SanitizedPrompt = sanitizedPrompt[..length]
+            };
+
+            await _generationTaskService.StartAsync(request);
+        }
+        catch (Exception e)
+        {
+            await Shell.Current.CurrentPage.DisplayAlertAsync("Error", $"An unexpected error occurred: {e.Message}", "OK");
+            IsGenerating = false;
+            DeviceDisplay.Current.KeepScreenOn = false;
+        }
+    }
+
+    private void onGenerationProgressChanged(object? sender, float progress)
+    {
+        reportProgress(progress);
+    }
+
+    private async void onGenerationCompleted(object? sender, GenerationTaskResult result)
+    {
+        try
+        {
+            // If we were backgrounded and the collection was cleared, rebuild placeholders
+            if (Results.Count == 0 && result.Images.Count > 0)
+            {
+                for (var i = 0; i < result.Images.Count; i++)
                 {
-                    // Some servers surface progress as a numeric Progress or a ProgressResponse object.
-                    if (response.Progress > 0)
+                    var resultItem = _serviceProvider.GetService<IResultItemViewModel>();
+                    if (resultItem != null)
                     {
-                        reportProgress((float)response.Progress);
-                    }
-
-                    if (response.ResponseObject is ProgressResponse progressResponse)
-                    {
-                        reportProgress((float)progressResponse.Progress);
-                    }
-                    else if (response.ResponseObject is GenerationResponse generationResponse)
-                    {
-                        foreach (var image in generationResponse.Images ?? Enumerable.Empty<string>())
-                        {
-                            var currentSeed = generationResponse.Seeds?.ElementAtOrDefault(imageNumber) ?? settings.Seed + imageNumber;
-                            var fileNameNoExtension = $"{sanitizedPrompt[..length]}-{currentSeed}-{DateTime.Now.Ticks}";
-
-                            var result = Results.FirstOrDefault(r => r.ApiResponse == null);
-
-                            if (result != null)
-                            {
-                                result.ApiResponse = response;
-                                result.Settings = settings.Clone();
-                                result.Settings.Seed = currentSeed;
-
-                                await retrieveResultImageAsync(result, fileNameNoExtension, imageNumber++);
-                            }
-                        }
+                        resultItem.ParentCollection = Results;
+                        resultItem.ApplyQueryParamsFromResultItemCommand = new RelayCommand<IDictionary<string, object>>(ApplyQueryAttributes);
+                        Results.Add(resultItem);
                     }
                 }
             }
-            catch (System.Net.Sockets.SocketException socketException)
+
+            if (result.Success)
             {
-                await Shell.Current.CurrentPage.DisplayAlertAsync("Connection Error", $"A network error occurred: {socketException.Message}", "OK");
+                foreach (var image in result.Images)
+                {
+                    var resultItem = Results.FirstOrDefault(r => r.ApiResponse == null);
+
+                    if (resultItem != null)
+                    {
+                        resultItem.ApiResponse = image.Response;
+                        resultItem.Settings = image.Settings;
+                        resultItem.InternalUri = image.InternalUri;
+
+                        await retrieveResultImageAsync(resultItem, image.InternalUri);
+                    }
+                }
             }
-            catch (System.Net.WebException webException)
+            else
             {
-                await Shell.Current.CurrentPage.DisplayAlertAsync("Web Error", $"A web error occurred: {webException.Message}", "OK");
-            }
-            catch (Exception e)
-            {
-                await Shell.Current.CurrentPage.DisplayAlertAsync("Error", $"An unexpected error occurred: {e.Message}", "OK");
+                if (result.ErrorMessage?.Contains("network error", StringComparison.OrdinalIgnoreCase) == true ||
+                    result.ErrorMessage?.Contains("SocketException", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    await Shell.Current.CurrentPage.DisplayAlertAsync("Connection Error", $"A network error occurred: {result.ErrorMessage}", "OK");
+                }
+                else if (result.ErrorMessage?.Contains("web error", StringComparison.OrdinalIgnoreCase) == true ||
+                         result.ErrorMessage?.Contains("WebException", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    await Shell.Current.CurrentPage.DisplayAlertAsync("Web Error", $"A web error occurred: {result.ErrorMessage}", "OK");
+                }
+                else if (result.ErrorMessage != "Generation cancelled.")
+                {
+                    await Shell.Current.CurrentPage.DisplayAlertAsync("Error", $"An unexpected error occurred: {result.ErrorMessage}", "OK");
+                }
             }
 
             // Any remaining results that weren't set have failed
-            foreach (var result in Results)
+            foreach (var resultItem in Results)
             {
-                if (result.IsLoading)
+                if (resultItem.IsLoading)
                 {
-                    result.IsLoading = false;
-                    result.Failed = true;
+                    resultItem.IsLoading = false;
+                    resultItem.Failed = true;
                 }
             }
 
@@ -332,6 +422,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         {
             IsGenerating = false;
             DeviceDisplay.Current.KeepScreenOn = false;
+            _generationTaskService.ClearLastResult();
         }
     }
 
@@ -387,35 +478,10 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         }, tokenSource.Token);
     }
 
-    private async Task retrieveResultImageAsync(IResultItemViewModel result, string fileName, int number)
+    private async Task retrieveResultImageAsync(IResultItemViewModel result, string internalUri)
     {
-        byte[]? imageBytes = null;
-
-        if (result.ApiResponse.ResponseObject is GenerationResponse generationResponse && generationResponse.Images != null)
-        {
-            var imageString = generationResponse.Images.ElementAtOrDefault(number);
-            if (imageString != null)
-            {
-                imageBytes = Convert.FromBase64String(imageString);
-                if (result.Settings != null)
-                {
-                    imageBytes = MobileDiffusion.Helpers.PngMetadataHelper.WriteSettings(imageBytes, result.Settings);
-                }
-            }
-        }
-
-        if (imageBytes == null) return;
-
-        var uri = await _fileService.WriteFileToInternalStorageAsync($"{fileName}-{number++}.png", imageBytes);
-
-        result.InternalUri = uri;
-
-        // Using a regular image source causes them to disappear when returning to the page: https://github.com/dotnet/maui/issues/15669
-        // ** They also don't seem to work with larger image files **
-        //result.ImageSource = ImageSource.FromFile(uri);
-
         // Resize if too large
-        using var fileStream = await _fileService.GetFileStreamFromInternalStorageAsync(uri);
+        using var fileStream = await _fileService.GetFileStreamFromInternalStorageAsync(internalUri);
         var bitmap = _imageService.GetSkBitmapFromStream(fileStream);
         bitmap = _imageService.GetResizedSKBitmap(bitmap, (int)Constants.MaximumDisplayWidthHeight, (int)Constants.MaximumDisplayWidthHeight, filterImage: true, onlyIfLarger: true);
 
@@ -446,7 +512,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     {
         try
         {
-            await _stableDiffusionService.CancelAsync();
+            await _generationTaskService.CancelAsync();
         }
         catch
         {
