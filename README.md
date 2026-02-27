@@ -6,7 +6,7 @@ Mobile Diffusion is a .NET MAUI mobile application for image generation and edit
 
 There are two main tabs in the app:
 
-- **Generate**: The user's main entry point to view generation results and edit settings.
+- **Generate**: The user's main entry point to view generation results and edit settings. Image generation can continue in the background via a persistent notification (Android only).
 - **Canvas**: A workspace to mask/paint on generated images (or images from the file system) or draw freehand sketches to use as a base for generation.
 
 ### Example Workflow

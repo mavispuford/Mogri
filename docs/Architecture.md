@@ -34,6 +34,7 @@ This .NET MAUI application follows the MVVM pattern. It consists mainly of these
 - Performs business logic and other common code for the `View Model`, such as API calls via HTTP clients, file operations, showing/hiding alert dialogs/action sheets/popups/etc, saving app settings, image segmentation, image operations, and more.
 - Services managing heavy resources (like `SegmentationService` with AI models) implement `IDisposable` and are responsible for resource cleanup.
 - Services may be stateful singletons (e.g., maintaining connection status or loaded models) and are registered as such.
+- Long-running background tasks (like image generation) are abstracted behind cross-platform service interfaces, allowing platform-specific implementations (like Android Foreground Services) to continue running when the app is backgrounded.
 - `Services` are expected to throw exceptions when errors happen, leaving it to the `View Model` to handle them gracefully
 
 ### Clients
@@ -99,6 +100,7 @@ foreach (var item in items)
 
 ## Platform Specifics
 - Platform-specific implementations live in the `Platforms/` folder or within handler mappings in `MauiProgram.cs`
+- Platform-specific services (e.g., Android Foreground Services) override default cross-platform implementations in `ServiceRegistrations.cs` using compiler directives (`#if ANDROID`).
 - Custom handlers (e.g., removing underlines from Android inputs) are configured in `MauiProgram.cs`
 
 ## Configuration & Settings
