@@ -97,7 +97,7 @@
             </Grid>
 
             <Grid ColumnDefinitions="*,auto">
-                <Label Grid.Column="0" Text="Aspect Ratio:" FontAttributes="Bold" VerticalTextAlignment="Center" />
+                <Label Grid.Column="0" Text="Aspect Ratio:" Style="{StaticResource LabelHeader}" VerticalTextAlignment="Center" />
                 <Entry Grid.Column="1" x:Name="AspectRatioEntry" Text="{Binding AspectRatioEntryValue}" VerticalOptions="Center">
                     <Entry.Behaviors>
                         <toolkit:EventToCommandBehavior EventName="Unfocused" Command="{Binding UpdateAllValuesCommand}" />
@@ -106,12 +106,12 @@
             </Grid>
 
             <Grid ColumnDefinitions="*,auto">
-                <Label Grid.Column="0" Text="Preserve Aspect Ratio" FontAttributes="Bold" VerticalTextAlignment="Center" />
+                <Label Grid.Column="0" Text="Preserve Aspect Ratio:" Style="{StaticResource LabelHeader}" VerticalTextAlignment="Center" />
                 <Switch Grid.Column="1" VerticalOptions="Center" IsToggled="{Binding PreserveAspectRatio}" />
             </Grid>
 
             <Grid ColumnDefinitions="*,auto">
-                <Label Grid.Column="0" Text="Width (mult. of 8):" FontAttributes="Bold" VerticalTextAlignment="Center" />
+                <Label Grid.Column="0" Text="Width (mult. of 8):" Style="{StaticResource LabelHeader}" VerticalTextAlignment="Center" />
                 <Entry Grid.Column="1" x:Name="WidthEntry" Text="{Binding WidthEntryValue}" Keyboard="Numeric" VerticalOptions="Center">
                     <Entry.Behaviors>
                         <toolkit:EventToCommandBehavior EventName="Unfocused" Command="{Binding UpdateAllValuesCommand}" />
@@ -121,7 +121,7 @@
             <Slider Minimum="{Binding MinimumWidthHeight}" Maximum="{Binding MaximumWidthHeight}" Value="{Binding WidthSliderValue}" DragCompletedCommand="{Binding UpdateAllValuesCommand}" />
 
             <Grid ColumnDefinitions="*,auto">
-                <Label Grid.Column="0" Text="Height (mult. of 8):" FontAttributes="Bold" VerticalTextAlignment="Center" />
+                <Label Grid.Column="0" Text="Height (mult. of 8):" Style="{StaticResource LabelHeader}" VerticalTextAlignment="Center" />
                 <Entry Grid.Column="1" x:Name="HeightEntry" Text="{Binding HeightEntryValue}" Keyboard="Numeric" VerticalOptions="Center">
                     <Entry.Behaviors>
                         <toolkit:EventToCommandBehavior EventName="Unfocused" Command="{Binding UpdateAllValuesCommand}" />

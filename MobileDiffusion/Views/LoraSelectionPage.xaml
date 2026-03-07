@@ -8,8 +8,10 @@
                 Shell.PresentationMode="Animated"
                 Shell.NavBarIsVisible="True"
                 Shell.TabBarIsVisible="False"
-                Title="LoRAs"
                 x:DataType="pages:ILoraSelectionPageViewModel">
+    <Shell.TitleView>
+        <Label Text="LoRA Settings" Style="{StaticResource LabelTitleView}" />
+    </Shell.TitleView>
     <Grid RowDefinitions="*, auto, auto">
         <Grid RowDefinitions="auto, *" 
               ColumnDefinitions="auto,*"
@@ -20,8 +22,7 @@
             <Label Grid.Row="0"
                    Grid.Column="0"
                    Text="Lora: "
-                   FontSize="18"
-                   FontAttributes="Bold"
+                   Style="{StaticResource LabelHeader}"
                    VerticalTextAlignment="Center"/>
             <Picker x:Name="LoraPicker"
                     Grid.Row="0" 
@@ -30,7 +31,10 @@
                     x:DataType="viewModels:ILoraViewModel"
                     ItemsSource="{Binding AvailableLoras, Source={x:RelativeSource AncestorType={x:Type pages:ILoraSelectionPageViewModel}}}" 
                     ItemDisplayBinding="{Binding Alias}"
-                    FontSize="18"
+                    FontFamily="ComfortaaRegular"
+                    FontSize="14"
+                    HorizontalOptions="Fill"
+                    HorizontalTextAlignment="End"
                     VerticalTextAlignment="Center"
                     SelectedItem="{Binding LoraToAdd, Source={x:RelativeSource AncestorType={x:Type pages:ILoraSelectionPageViewModel}}}"/>
 
@@ -46,8 +50,7 @@
                                 <Rectangle HeightRequest="1" HorizontalOptions="Fill" Fill="{StaticResource Gray200TwentySixPercent}" />
                                 <Grid ColumnDefinitions="*, auto">
                                     <Label Grid.Column="0"
-                                           FontSize="18" 
-                                           FontAttributes="Bold"
+                                           Style="{StaticResource LabelHeaderBold}"
                                            VerticalTextAlignment="Center"
                                            Text="{Binding Name}" />
 
@@ -61,14 +64,11 @@
                                     </ImageButton>
                                 </Grid>
 
-                                <Label FontSize="18">
-                                    <Label.FormattedText>
-                                        <FormattedString>
-                                            <Span Text="Strength: " FontAttributes="Bold"/>
-                                            <Span Text="{Binding Strength, StringFormat='{0:N1}'}" />
-                                        </FormattedString>
-                                    </Label.FormattedText>
-                                </Label>
+                                <Grid ColumnDefinitions="*, auto">
+                                    <Label Text="Strength: " Style="{StaticResource LabelHeader}"/>
+                                    <Label Text="{Binding Strength, StringFormat='{0:N1}'}" HorizontalTextAlignment="End" />                                    
+                                </Grid>
+                                
                                 <Slider Minimum=".1" Maximum="2.0" Value="{Binding Strength, Mode=TwoWay}" />
                             </VerticalStackLayout>
                         </DataTemplate>

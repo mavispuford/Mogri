@@ -26,7 +26,7 @@
     <Style TargetType="Button">
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Primary}}" />
         <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
-        <Setter Property="FontFamily" Value="OpenSansRegular"/>
+        <Setter Property="FontFamily" Value="ComfortaaBold"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="CornerRadius" Value="15"/>
         <Setter Property="Padding" Value="14,10"/>
@@ -139,7 +139,7 @@
         </Setter>
     </Style>
 
-    <Style TargetType="Label">
+    <Style TargetType="Label" x:Key="DefaultLabelStyle">
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
         <Setter Property="FontFamily" Value="OpenSansRegular" />
         <Setter Property="FontSize" Value="14" />
@@ -155,6 +155,25 @@
                 </VisualStateGroup>
             </VisualStateGroupList>
         </Setter>
+    </Style>
+
+    <Style TargetType="Label" BasedOn="{StaticResource DefaultLabelStyle}"/>
+
+    <Style TargetType="Label" x:Key="LabelHeader" BasedOn="{StaticResource DefaultLabelStyle}">
+        <Setter Property="FontFamily" Value="ComfortaaRegular" />
+        <Setter Property="FontSize" Value="14" />
+    </Style>
+
+    <Style TargetType="Label" x:Key="LabelHeaderBold" BasedOn="{StaticResource DefaultLabelStyle}">
+        <Setter Property="FontFamily" Value="ComfortaaBold" />
+        <Setter Property="FontSize" Value="14" />
+    </Style>
+
+    <Style TargetType="Label" x:Key="LabelTitleView">
+        <Setter Property="TextColor" Value="White" />
+        <Setter Property="VerticalOptions" Value="Center" />
+        <Setter Property="FontFamily" Value="ComfortaaBold" />
+        <Setter Property="FontSize" Value="18" />
     </Style>
 
     <Style TargetType="Picker">

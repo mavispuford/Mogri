@@ -62,7 +62,14 @@ public partial class LoraSelectionPageViewModel : PageViewModel, ILoraSelectionP
 
             if (_settings?.Loras?.Any() == true)
             {
-                var matchingLoras = AvailableLoras.Where(a => _settings.Loras.Any(p => p.Name.Equals(a.Name, StringComparison.Ordinal)));
+                var matchingLoras = AvailableLoras.Where(a => _settings.Loras.Any(p => p.Name.Equals(a.Name, StringComparison.Ordinal))).ToList();
+
+                foreach (var lora in matchingLoras)
+                {
+                    var savedLora = _settings.Loras.First(p => p.Name.Equals(lora.Name, StringComparison.Ordinal));
+                    lora.Strength = savedLora.Strength;
+                }
+
                 SelectedLoras = new ObservableCollection<ILoraViewModel>(matchingLoras);
             }
         }

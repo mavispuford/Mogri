@@ -10,15 +10,21 @@
                 x:DataType="pages:IImageToImageSettingsPageViewModel"
                 Shell.PresentationMode="Animated"
                 Shell.NavBarIsVisible="True"
-                Shell.TabBarIsVisible="False"
-                Title="Image to Image Settings">
+                Shell.TabBarIsVisible="False">
     <views:BasePage.Resources>
         <ResourceDictionary>
             <toolkit:VariableMultiValueConverter x:Key="AnyTrueConverter" ConditionType="Any" />
             <toolkit:IsNullConverter x:Key="IsNullConverter" />
             <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+
+            <Style TargetType="Label" x:Key="SettingLabel" BasedOn="{StaticResource LabelHeader}">
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+            </Style>
         </ResourceDictionary>
     </views:BasePage.Resources>
+    <Shell.TitleView>
+        <Label Text="Image to Image Settings" Style="{StaticResource LabelTitleView}" />
+    </Shell.TitleView>
     <Grid RowDefinitions="*,auto"
           Padding="0"
           Margin="0">
@@ -35,7 +41,7 @@
                         <FontImageSource Glyph="&#xe3e9;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="0" Grid.Column="1" Text="Strength:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+                <Label Grid.Row="0" Grid.Column="1" Text="Strength:" Style="{StaticResource SettingLabel}"/>
                 <Entry Grid.Row="0" Grid.Column="2" Placeholder="{Binding StrengthPlaceholder}" Text="{Binding Strength}" Keyboard="Numeric" FontSize="16" MaxLength="6" HorizontalTextAlignment="End" />
 
                 <Image Grid.Row="1" Grid.Column="0" WidthRequest="32">
@@ -43,7 +49,7 @@
                         <FontImageSource Glyph="&#xe3f4;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="1" Grid.Column="1" Text="Source Image:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+                <Label Grid.Row="1" Grid.Column="1" Text="Source Image:" Style="{StaticResource SettingLabel}"/>
 
                 <Border Grid.Row="2" Grid.ColumnSpan="3"
                         BackgroundColor="{StaticResource Gray300}"
@@ -82,7 +88,7 @@
                         <FontImageSource Glyph="&#xe72e;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="3" Grid.Column="1" Text="Mask Image:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+                <Label Grid.Row="3" Grid.Column="1" Text="Mask Image:" Style="{StaticResource SettingLabel}"/>
 
                 <Border Grid.Row="4" Grid.ColumnSpan="3"
                         BackgroundColor="{StaticResource Gray300}"
@@ -119,7 +125,7 @@
                         <FontImageSource Glyph="&#xe434;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="5" Grid.Column="1" Text="Fit Image (on server):" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+                <Label Grid.Row="5" Grid.Column="1" Text="Fit Image (on server):" Style="{StaticResource SettingLabel}"/>
                 <Switch Grid.Row="5" Grid.Column="2" HorizontalOptions="End" IsToggled="{Binding FitImageServerSide}" />
 
                 <Image Grid.Row="6" Grid.Column="0" WidthRequest="32">
@@ -127,7 +133,7 @@
                         <FontImageSource Glyph="&#xe434;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="6" Grid.Column="1" Text="Fit Image (before sending):" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+                <Label Grid.Row="6" Grid.Column="1" Text="Fit Image (before sending):" Style="{StaticResource SettingLabel}"/>
                 <Switch Grid.Row="6" Grid.Column="2" HorizontalOptions="End" IsToggled="{Binding FitImageClientSide}" />
 
                 <Image Grid.Row="7" Grid.Column="0" WidthRequest="32">
@@ -135,7 +141,7 @@
                         <FontImageSource Glyph="&#xe3e9;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="7" Grid.Column="1" Text="Mask Blur:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+                <Label Grid.Row="7" Grid.Column="1" Text="Mask Blur:" Style="{StaticResource SettingLabel}"/>
                 <Entry Grid.Row="7" Grid.Column="2" Placeholder="{Binding MaskBlurPlaceholder}" Text="{Binding MaskBlur}" Keyboard="Numeric" FontSize="16" MaxLength="3" HorizontalTextAlignment="End" />
             </Grid>
         </ScrollView>

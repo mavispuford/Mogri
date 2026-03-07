@@ -25,7 +25,7 @@
                             <FontImageSource Glyph="&#xe8b6;" FontFamily="MaterialIconsRound400" Size="20" Color="{AppThemeBinding Light=Gray, Dark=Gray}" />
                         </Image.Source>
                     </Image>
-                    <Entry Grid.Column="1" HeightRequest="46" Placeholder="Search history..." VerticalTextAlignment="Center" Text="{Binding SearchText}" VerticalOptions="Fill" BackgroundColor="Transparent" FontSize="14" ClearButtonVisibility="WhileEditing" ReturnType="Search" />
+                    <Entry Grid.Column="1" HeightRequest="46" Placeholder="Search history..." VerticalTextAlignment="Center" Text="{Binding SearchText}" VerticalOptions="Fill" BackgroundColor="Transparent" FontSize="14" ClearButtonVisibility="WhileEditing" ReturnType="Search" FontFamily="ComfortaaBold" />
                 </Grid>
             </Border>
 

@@ -20,7 +20,7 @@
                 <Grid Grid.Row="0">
                     <Label Text="Edit Masks"
                            FontSize="16"
-                           FontAttributes="Bold"
+                           FontFamily="ComfortaaBold"
                            HorizontalOptions="Center"
                            VerticalOptions="Center" />
 

@@ -10,8 +10,7 @@
                 x:DataType="pages:IPromptStyleSelectionPageViewModel"
                 Shell.PresentationMode="Animated"
                 Shell.NavBarIsVisible="True"
-                Shell.TabBarIsVisible="False"
-                Title="Prompt Styles">
+                Shell.TabBarIsVisible="False">
     <views:BasePage.Resources>
         <Style TargetType="Grid">
             <Setter Property="VisualStateManager.VisualStateGroups">
@@ -29,6 +28,10 @@
             </Setter>
         </Style>
     </views:BasePage.Resources>
+    <Shell.TitleView>
+        <Label Text="Prompt Styles" Style="{StaticResource LabelTitleView}" />
+    </Shell.TitleView>
+
     <Grid ColumnDefinitions="auto,*"
           RowDefinitions="auto,*,auto"
           ColumnSpacing="10"

@@ -25,7 +25,7 @@
                              HorizontalOptions="Center"
                              VerticalOptions="Center">
             <Label Text="Current Color:"
-                   FontAttributes="Bold" 
+                   FontFamily="ComfortaaRegular" 
                    FontSize="16"/>
             <Border Stroke="{StaticResource BlackSeventyThreePercent}"
                     HorizontalOptions="Center"
@@ -38,7 +38,7 @@
             <FlexLayout HorizontalOptions="Fill">
                 <Label FlexLayout.Grow="1"
                        Text="Hex Value:" 
-                       FontAttributes="Bold" 
+                       FontFamily="ComfortaaRegular" 
                        FontSize="16"
                        VerticalTextAlignment="Center"
                        HorizontalOptions="Fill"/>
@@ -54,7 +54,7 @@
             </FlexLayout>
 
             <Label Text="Swatches:"
-                   FontAttributes="Bold" 
+                   FontFamily="ComfortaaRegular" 
                    FontSize="16"/>
             <FlexLayout BindableLayout.ItemsSource="{Binding Swatches}"
                         Wrap="Wrap"
@@ -78,7 +78,7 @@
             </FlexLayout>
             
             <Label Text="From Image:"
-                   FontAttributes="Bold" 
+                   FontFamily="ComfortaaRegular" 
                    FontSize="16"
                    IsVisible="{Binding SwatchesFromImage, Converter={StaticResource ListNotNullOrEmpty}}"/>
             <FlexLayout BindableLayout.ItemsSource="{Binding SwatchesFromImage}"

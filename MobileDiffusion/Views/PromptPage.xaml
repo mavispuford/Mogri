@@ -7,10 +7,8 @@
                 xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
                 xmlns:views="clr-namespace:MobileDiffusion.Views;assembly=MobileDiffusion"
                 x:Class="MobileDiffusion.Views.PromptPage"
-                Title="Prompt Editor"
                 Shell.TabBarIsVisible="False"
                 x:DataType="pages:IPromptPageViewModel">
-
     <views:BasePage.Resources>
         <ResourceDictionary>
             <Style x:Key="PromptBorderStyle" TargetType="Border">
@@ -30,6 +28,9 @@
             </Style>
         </ResourceDictionary>
     </views:BasePage.Resources>
+    <Shell.TitleView>
+        <Label Text="Prompt Editor" Style="{StaticResource LabelTitleView}" />
+    </Shell.TitleView>
 
     <views:BasePage.ToolbarItems>
         <ToolbarItem Command="{Binding ResetPageCommand}"
