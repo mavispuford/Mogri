@@ -26,8 +26,8 @@
         <ScrollView Grid.Row="0" Orientation="Vertical">
             <VerticalStackLayout>
                 <Grid Padding="20, 20, 20, 0" ColumnDefinitions="*, *" ColumnSpacing="10">
-                    <Button Text="Load Preset" Command="{Binding LoadPresetCommand}" />
-                    <Button Grid.Column="1" Text="Save Preset" Command="{Binding SavePresetCommand}" />
+                    <Button BackgroundColor="{StaticResource LivingCoral}" Text="Load Preset" Command="{Binding LoadPresetCommand}" />
+                    <Button BackgroundColor="{StaticResource LivingCoral}" Grid.Column="1" Text="Save Preset" Command="{Binding SavePresetCommand}" />
                 </Grid>
                 <Grid Padding="20"
                       RowDefinitions="auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto"
@@ -225,7 +225,7 @@
                 </Button.ImageSource>
             </Button>
             <Button Text="Cancel" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
-            <Button Text="Apply" Command="{Binding ConfirmSettingsCommand}" WidthRequest="100" />
+            <Button Text="Apply" BackgroundColor="{StaticResource LivingCoral}" Command="{Binding ConfirmSettingsCommand}" WidthRequest="100" />
         </HorizontalStackLayout>
     </Grid>
 

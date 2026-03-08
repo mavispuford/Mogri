@@ -9,7 +9,7 @@
      <Border HorizontalOptions="Fill"
              VerticalOptions="Center"
              StrokeShape="RoundRectangle 10"
-             BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource IndependenceAccent}}"
+             BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Cadet}}"
              Stroke="Transparent"
              Margin="15"
              Padding="15"
@@ -89,7 +89,7 @@
                                     <ImageButton.Source>
                                         <FontImageSource Glyph="&#xe3c9;"
                                                          FontFamily="MaterialIconsRound400"
-                                                         Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary075}}"
+                                                         Color="{AppThemeBinding Light={StaticResource LivingCoral}, Dark={StaticResource Primary075}}"
                                                          Size="24"/>
                                     </ImageButton.Source>
                                 </ImageButton>

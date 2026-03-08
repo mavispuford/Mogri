@@ -13,7 +13,7 @@
             <toolkit:IsListNotNullOrEmptyConverter x:Key="ListNotNullOrEmpty" />
         </ResourceDictionary>
     </popups:BasePopup.Resources>
-    <Border Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource IndependenceAccent}}"
+    <Border Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Cadet}}"
             Stroke="Transparent"
             StrokeShape="RoundRectangle 10"
             VerticalOptions="Center"

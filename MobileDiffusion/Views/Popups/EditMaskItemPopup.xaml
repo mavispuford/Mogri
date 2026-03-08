@@ -16,7 +16,7 @@
         <Border HorizontalOptions="Fill"
                  VerticalOptions="Center"
                  StrokeShape="RoundRectangle 10"
-                 BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource IndependenceAccent}}"
+                 BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Cadet}}"
                  Stroke="Transparent"
                  Margin="30"
                  Padding="15"
@@ -58,7 +58,6 @@
                         <Slider Minimum="0.01" 
                                 Maximum="1.0" 
                                 Value="{Binding Alpha}"
-                                MinimumTrackColor="{StaticResource Primary}"
                                 DragStartedCommand="{Binding DragStartedCommand}"
                                 DragCompletedCommand="{Binding DragCompletedCommand}" />
                     </VerticalStackLayout>
@@ -72,7 +71,6 @@
                         <Slider Minimum="0" 
                                 Maximum="1.0" 
                                 Value="{Binding Noise}"
-                                MinimumTrackColor="{StaticResource Primary}"
                                 DragStartedCommand="{Binding DragStartedCommand}"
                                 DragCompletedCommand="{Binding DragCompletedCommand}" />
                     </VerticalStackLayout>
@@ -86,7 +84,6 @@
                         <Slider Minimum="1" 
                                 Maximum="50"
                                 Value="{Binding BrushSize}" 
-                                MinimumTrackColor="{StaticResource Primary}"
                                 DragStartedCommand="{Binding DragStartedCommand}"
                                 DragCompletedCommand="{Binding DragCompletedCommand}" />
                     </VerticalStackLayout>
@@ -104,7 +101,7 @@
                  InputTransparent="True"
                  HorizontalOptions="Center" 
                  VerticalOptions="Center" 
-                 BackgroundColor="{StaticResource IndependenceAccentFortyPercent}"
+                 BackgroundColor="{StaticResource CadetFortyPercent}"
                  Stroke="Transparent"
                  StrokeShape="RoundRectangle 10"
                  Padding="20,10">

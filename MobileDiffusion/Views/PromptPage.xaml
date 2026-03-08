@@ -13,7 +13,7 @@
         <ResourceDictionary>
             <Style x:Key="PromptBorderStyle" TargetType="Border">
                 <Setter Property="Padding" Value="10" />
-                <Setter Property="Stroke" Value="{StaticResource IndependenceAccent}" />
+                <Setter Property="Stroke" Value="{StaticResource Cadet}" />
                 <Setter Property="StrokeThickness" Value="1" />
                 <Setter Property="Background" Value="Transparent" />
                 <Setter Property="StrokeShape" Value="RoundRectangle 10" />
@@ -54,7 +54,7 @@
                         Text="{Binding Prompt}"
                         Placeholder="{Binding PromptPlaceholder}"
                         AutoSize="TextChanges"
-                        TextColor="{StaticResource IndependenceAccent}"
+                        TextColor="{StaticResource Cadet}"
                         FontSize="14"/>
             </Border>
 
@@ -66,7 +66,7 @@
             <Border Style="{StaticResource PromptBorderStyle}">
                 <Editor x:Name="NegativePromptEditor"
                         Text="{Binding NegativePrompt}"
-                        TextColor="{StaticResource IndependenceAccent}"
+                        TextColor="{StaticResource Cadet}"
                         AutoSize="TextChanges"
                         FontSize="14"/>
             </Border>

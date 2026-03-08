@@ -14,7 +14,7 @@
         <ResourceDictionary>
             <toolkit:IsListNotNullOrEmptyConverter x:Key="IsListNotNullOrEmptyConverter" />
             <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
-            <toolkit:BoolToObjectConverter x:Key="BoolToColorConverter" TrueObject="{StaticResource Tertiary}" FalseObject="{StaticResource IndependenceAccent}" />
+            <toolkit:BoolToObjectConverter x:Key="BoolToColorConverter" TrueObject="{StaticResource Tertiary}" FalseObject="{StaticResource Cadet}" />
             <toolkit:BoolToObjectConverter x:Key="BoolToOpacityConverter" TrueObject="1" FalseObject="0" />
             <toolkit:BoolToObjectConverter x:Key="ConnectivityBoolToImageSourceConverter">
                 <toolkit:BoolToObjectConverter.TrueObject>
@@ -43,7 +43,7 @@
                      Margin="0"
                      Progress="{Binding Progress}"
                      HeightRequest="4"
-                     ProgressColor="{StaticResource IndependenceAccent}"
+                     ProgressColor="{StaticResource AmberGold}"
                      Opacity="{Binding IsGenerating, Converter={StaticResource BoolToOpacityConverter}}"/>
 
         <Grid x:Name="MainGrid"
@@ -66,7 +66,7 @@
 
                 <Label 
                     Text="{Binding Prompt}"
-                    TextColor="{StaticResource IndependenceAccent}"/>
+                    TextColor="{StaticResource Cadet}"/>
 
                 <Label Text="{Binding NegativePrompt}"
                        TextColor="{StaticResource Primary}"
@@ -95,7 +95,7 @@
                              Command="{Binding ShowPromptSettingsCommand}"
                              Margin="4">
                     <ImageButton.Source>
-                        <FontImageSource Glyph="&#xe429;" FontFamily="MaterialIconsRound400" Color="{StaticResource IndependenceAccent}" />
+                        <FontImageSource Glyph="&#xe429;" FontFamily="MaterialIconsRound400" Color="{StaticResource Cadet}" />
                     </ImageButton.Source>
                 </ImageButton>
 
@@ -117,7 +117,7 @@
                              Command="{Binding ShowHistoryCommand}"
                              Margin="4">
                     <ImageButton.Source>
-                        <FontImageSource Glyph="&#xe889;" FontFamily="MaterialIconsRound400" Color="{StaticResource IndependenceAccent}" />
+                        <FontImageSource Glyph="&#xe889;" FontFamily="MaterialIconsRound400" Color="{StaticResource Cadet}" />
                     </ImageButton.Source>
                 </ImageButton>
             </Grid>

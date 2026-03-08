@@ -59,7 +59,7 @@
                         HorizontalOptions="Center">
                     <Grid Grid.Row="2" Grid.ColumnSpan="3"
                       HeightRequest="140" WidthRequest="140"
-                      BackgroundColor="{StaticResource Gray300}">
+                      BackgroundColor="{StaticResource MutedPeach}">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ShowMediaPickerCommand}">
                                 <TapGestureRecognizer.CommandParameter>
@@ -67,8 +67,8 @@
                                 </TapGestureRecognizer.CommandParameter>
                             </TapGestureRecognizer>
                         </Grid.GestureRecognizers>
-                        <Label Text="Tap to set source image" HorizontalOptions="Fill" VerticalOptions="Fill" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Padding="20" TextColor="White"
-                           IsVisible="{Binding InitImageSource, Converter={StaticResource IsNullConverter}}"/>
+                        <Label Text="Tap to set source image" HorizontalOptions="Fill" VerticalOptions="Fill" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Padding="20" TextColor="{StaticResource Tertiary}"
+                           IsVisible="{Binding InitImageSource, Converter={StaticResource IsNullConverter}}" />
                         <Image x:Name="InitImage"
                            Source="{Binding InitImageSource}" Aspect="AspectFit" HorizontalOptions="Fill" VerticalOptions="Fill"
                            IsVisible="{Binding InitImageSource, Converter={StaticResource IsNotNullConverter}}"/>
@@ -91,7 +91,7 @@
                 <Label Grid.Row="3" Grid.Column="1" Text="Mask Image:" Style="{StaticResource SettingLabel}"/>
 
                 <Border Grid.Row="4" Grid.ColumnSpan="3"
-                        BackgroundColor="{StaticResource Gray300}"
+                        BackgroundColor="{StaticResource MutedPeach}"
                         StrokeShape="RoundRectangle 10"
                         Stroke="Transparent"
                         StrokeThickness="0"
@@ -104,8 +104,8 @@
                                 </TapGestureRecognizer.CommandParameter>
                             </TapGestureRecognizer>
                         </Grid.GestureRecognizers>
-                        <Label Text="Tap to set the mask" HorizontalOptions="Fill" VerticalOptions="Fill" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Padding="20" TextColor="White"
-                           IsVisible="{Binding MaskImageSource, Converter={StaticResource IsNullConverter}}"/>
+                        <Label Text="Tap to set the mask" HorizontalOptions="Fill" VerticalOptions="Fill" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Padding="20" TextColor="{StaticResource Tertiary}"
+                           IsVisible="{Binding MaskImageSource, Converter={StaticResource IsNullConverter}}" />
                         <Image x:Name="MaskImage"
                            Source="{Binding MaskImageSource}" Aspect="AspectFit" HorizontalOptions="Fill" VerticalOptions="Fill"
                            IsVisible="{Binding MaskImageSource, Converter={StaticResource IsNotNullConverter}}"/>
