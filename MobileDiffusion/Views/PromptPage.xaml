@@ -22,7 +22,7 @@
                                  Binding="{Binding Content.IsFocused, Source={RelativeSource Self}}"
                                  Value="True">
                         <Setter Property="StrokeThickness" Value="2" />
-                        <Setter Property="Stroke" Value="{StaticResource Primary}" />
+                        <Setter Property="Stroke" Value="{StaticResource AmberGold}" />
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
@@ -36,7 +36,7 @@
         <ToolbarItem Command="{Binding ResetPageCommand}"
                      Text="Reset">
             <ToolbarItem.IconImageSource>
-                <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Size="24" Color="{StaticResource White}" />
+                <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Size="24" Color="{StaticResource MutedPeach}" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
     </views:BasePage.ToolbarItems>

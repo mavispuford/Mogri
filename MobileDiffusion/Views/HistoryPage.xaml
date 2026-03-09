@@ -37,7 +37,7 @@
 
             <ImageButton Grid.Column="2" ToolTipProperties.Text="Clear History" Command="{Binding ClearHistoryCommand}" IsVisible="{Binding SelectionModeEnabled, Converter={StaticResource InvertedBool}}">
                 <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe16c;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
+                    <FontImageSource Glyph="&#xe16c;" FontFamily="MaterialIconsRound400" Size="30" Color="{StaticResource MutedPeach}" />
                 </ImageButton.Source>
             </ImageButton>
 
@@ -186,7 +186,7 @@
                            VerticalOptions="Center"
                            InputTransparent="True">
                         <Image.Source>
-                            <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Size="64" Color="{StaticResource Primary}" />
+                            <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Size="64" Color="{StaticResource SteelRed}" />
                         </Image.Source>
                     </Image>
                 </ContentView>

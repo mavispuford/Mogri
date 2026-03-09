@@ -26,8 +26,8 @@
     <Color x:Key="SoftCream">#FFF9E9C8</Color>
 
     <!-- High Stakes/Destructive Interactions - "Delete All", etc -->
-    <Color x:Key="DeepPersimmon">#FFE67E22</Color>
-    <Color x:Key="DustyClay">#FFEDD6C4</Color>
+    <Color x:Key="SteelRed">#FFD9534F</Color>
+    <Color x:Key="Eva">#FFFFD1D1</Color>
 
     <Color x:Key="NeutralDarkGray">#FF4D4D4D</Color>
 
