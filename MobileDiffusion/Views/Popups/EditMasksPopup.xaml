@@ -32,7 +32,7 @@
                             <FontImageSource Glyph="&#xe16c;" 
                                              FontFamily="MaterialIconsRound300"
                                              Size="40"
-                                             Color="{AppThemeBinding Light={StaticResource SteelRed}, Dark={StaticResource White}}" />
+                                             Color="{AppThemeBinding Light={StaticResource SteelRed}, Dark={StaticResource Eva}}" />
                         </ImageButton.Source>
                     </ImageButton>
                 </Grid>
@@ -53,7 +53,7 @@
                                        FontFamily="MaterialIconsRound400" 
                                        FontSize="24" 
                                        VerticalOptions="Center"
-                                       TextColor="{AppThemeBinding Light={StaticResource NeutralDarkGray}, Dark={StaticResource White}}"/>
+                                       TextColor="{AppThemeBinding Light={StaticResource NeutralDarkGray}, Dark={StaticResource SoftCream}}"/>
                                 
                                 <Border Grid.Column="1"
                                        WidthRequest="40"
@@ -89,7 +89,7 @@
                                     <ImageButton.Source>
                                         <FontImageSource Glyph="&#xe3c9;"
                                                          FontFamily="MaterialIconsRound400"
-                                                         Color="{AppThemeBinding Light={StaticResource LivingCoral}, Dark={StaticResource Primary075}}"
+                                                         Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}"
                                                          Size="24"/>
                                     </ImageButton.Source>
                                 </ImageButton>

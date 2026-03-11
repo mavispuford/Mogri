@@ -69,7 +69,7 @@
                         HorizontalOptions="Center">
                     <Grid Grid.Row="2" Grid.ColumnSpan="3"
                       HeightRequest="140" WidthRequest="140"
-                      BackgroundColor="{StaticResource MutedPeach}">
+                      BackgroundColor="{AppThemeBinding Light={StaticResource MutedPeach}, Dark={StaticResource White}}">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ShowMediaPickerCommand}">
                                 <TapGestureRecognizer.CommandParameter>
@@ -101,7 +101,7 @@
                 <Label Grid.Row="3" Grid.Column="1" Text="Mask Image:" Style="{StaticResource SettingLabel}"/>
 
                 <Border Grid.Row="4" Grid.ColumnSpan="3"
-                        BackgroundColor="{StaticResource MutedPeach}"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource MutedPeach}, Dark={StaticResource White}}"
                         StrokeShape="RoundRectangle 10"
                         Stroke="Transparent"
                         StrokeThickness="0"

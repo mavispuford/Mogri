@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <views:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                xmlns:behaviors="clr-namespace:MobileDiffusion.Behaviors"
                 xmlns:mctviews="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui"
                 xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                 xmlns:pages="clr-namespace:MobileDiffusion.Interfaces.ViewModels.Pages"
@@ -27,6 +28,17 @@
             <toolkit:IsStringNotNullOrEmptyConverter x:Key="IsStringNotNullOrEmptyConverter" />
         </ResourceDictionary>
     </views:BasePage.Resources>
+
+    <Shell.TitleView>
+        <Grid HorizontalOptions="Start" Padding="0,0">
+            <Image HorizontalOptions="Start" Source="logo_small.png" Aspect="AspectFit" HeightRequest="40" >
+                <Image.Behaviors>
+                    <behaviors:ThemeAwareIconTintColorBehavior Light="White" Dark="{StaticResource Secondary}" />
+                </Image.Behaviors>
+            </Image>
+        </Grid>
+    </Shell.TitleView>
+
     <views:BasePage.ToolbarItems>
         <ToolbarItem IconImageSource="{Binding ServerConnected, Converter={StaticResource ConnectivityBoolToImageSourceConverter}}" />
         <ToolbarItem Text="Settings"
@@ -79,13 +91,22 @@
                   HorizontalOptions="Fill">
                 
                 <Button Grid.Column="0"
-                        Text="Create!"
+                        Text="Create"
                         Command="{Binding CreateCommand}"
-                        IsVisible="{Binding IsGenerating, Converter={StaticResource InvertedBoolConverter}}"/>
+                        ImageSource="sparkle.png"
+                        ContentLayout="Right"
+                        HeightRequest="44"
+                        IsVisible="{Binding IsGenerating, Converter={StaticResource InvertedBoolConverter}}">
+                        <Button.Behaviors>
+                            <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource White}" Dark="{StaticResource Primary}" />
+                        </Button.Behaviors>
+                </Button>
 
                 <Button Grid.Column="0"
                         Text="Cancel"
                         Command="{Binding CancelCommand}"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark=Transparent}"
+                        BorderColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}"
                         IsVisible="{Binding ShowCancelButton}"/>
 
                 <ImageButton Grid.Column="1"

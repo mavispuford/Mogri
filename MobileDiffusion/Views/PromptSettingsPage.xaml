@@ -36,8 +36,8 @@
         <ScrollView Grid.Row="0" Orientation="Vertical">
             <VerticalStackLayout>
                 <Grid Padding="20, 20, 20, 0" ColumnDefinitions="*, *" ColumnSpacing="10">
-                    <Button BackgroundColor="{StaticResource LivingCoral}" Text="Load Preset" Command="{Binding LoadPresetCommand}" />
-                    <Button BackgroundColor="{StaticResource LivingCoral}" Grid.Column="1" Text="Save Preset" Command="{Binding SavePresetCommand}" />
+                    <Button Text="Load Preset" Command="{Binding LoadPresetCommand}" />
+                    <Button Grid.Column="1" Text="Save Preset" Command="{Binding SavePresetCommand}" />
                 </Grid>
                 <Grid Padding="20"
                       RowDefinitions="auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto"
@@ -46,7 +46,7 @@
                       ColumnDefinitions="32,auto,*"
                       HorizontalOptions="Fill">
 
-                    <Image Grid.Row="0" WidthRequest="32" HeightRequest="32">
+                <Image Grid.Row="0" WidthRequest="32" HeightRequest="32">
                     <Image.Source>
                         <FontImageSource Glyph="&#xf609;" FontFamily="MaterialIconsRound300" Size="30" Color="{StaticResource Tertiary}" />
                     </Image.Source>
@@ -230,7 +230,7 @@
 
         <HorizontalStackLayout Grid.Row="1" Spacing="10" HorizontalOptions="End" Padding="10">
             <Button Text="Cancel" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
-            <Button Text="Apply" BackgroundColor="{StaticResource LivingCoral}" Command="{Binding ConfirmSettingsCommand}" WidthRequest="100" />
+            <Button Text="Apply" Command="{Binding ConfirmSettingsCommand}" WidthRequest="100" />
         </HorizontalStackLayout>
     </Grid>
 
