@@ -464,7 +464,7 @@
                              Opacity="0">
             <VerticalStackLayout.Resources>
                 <Style TargetType="Border">
-                    <Setter Property="BackgroundColor" Value="{StaticResource MutedPeach}"/>
+                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource MutedPeach}, Dark={StaticResource Secondary}}"/>
                     <Setter Property="HeightRequest" Value="56"/>
                     <Setter Property="StrokeShape" Value="RoundRectangle 28"/>
                     <Setter Property="Stroke" Value="Transparent"/>
@@ -578,7 +578,7 @@
 
             <Border x:Name="ShowActionsButton"
                     Grid.Column="1"
-                    BackgroundColor="{StaticResource LivingCoral}"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource LivingCoral}, Dark={StaticResource CaribbeanBlue}}"
                     Stroke="Transparent"
                     HorizontalOptions="End"
                     VerticalOptions="Center"
