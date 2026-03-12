@@ -61,7 +61,7 @@ public class PromptSettings
     /// <summary>
     /// Amount of blur to apply to the mask edges in pixels.
     /// </summary>
-    public int MaskBlur { get; set; } = 0;
+    public int MaskBlur { get; set; } = 5;
 
     /// <summary>
     /// The high-level model type (SD, SDXL, Flux) which may affect parameter defaults.

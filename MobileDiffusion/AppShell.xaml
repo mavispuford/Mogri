@@ -6,7 +6,7 @@
     xmlns:views="clr-namespace:MobileDiffusion.Views"
     Shell.FlyoutBehavior="Disabled">
 
-    <TabBar Shell.TabBarUnselectedColor="{StaticResource IndependenceAccent}">
+    <TabBar Shell.TabBarUnselectedColor="{StaticResource Cadet}">
         <Tab Title="Generate"
              Route="MainPageTab">
             <Tab.Icon>

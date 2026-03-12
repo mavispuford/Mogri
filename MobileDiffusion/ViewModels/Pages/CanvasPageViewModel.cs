@@ -137,7 +137,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         // Precompute the noise bitmap on a background thread so the first stroke is smooth
         NoiseShaderHelper.Initialize();
 
-        if (Application.Current?.Resources.TryGetValue("IndependenceAccent", out var independenceColor) == true &&
+        if (Application.Current?.Resources.TryGetValue("Cadet", out var independenceColor) == true &&
             independenceColor is Color paletteIconDarkColor)
         {
             _paletteIconDarkColor = paletteIconDarkColor;

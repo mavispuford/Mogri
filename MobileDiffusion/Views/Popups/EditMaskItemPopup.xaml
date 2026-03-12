@@ -5,12 +5,18 @@
                   xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels.Popups"
                   x:Class="MobileDiffusion.Views.Popups.EditMaskItemPopup"
                   x:DataType="viewModels:IEditMaskItemPopupViewModel">
-
+    <popups:BasePopup.Resources>
+        <ResourceDictionary>
+            <Style TargetType="Label" x:Key="SettingLabel" BasedOn="{StaticResource LabelHeader}">
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+            </Style>
+        </ResourceDictionary>
+    </popups:BasePopup.Resources>
     <Grid>
         <Border HorizontalOptions="Fill"
                  VerticalOptions="Center"
                  StrokeShape="RoundRectangle 10"
-                 BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource IndependenceAccent}}"
+                 BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Cadet}}"
                  Stroke="Transparent"
                  Margin="30"
                  Padding="15"
@@ -22,16 +28,14 @@
                     <!-- Header -->
                     <Label Grid.Row="0"
                            Text="Edit Mask"
-                           FontSize="20"
-                           FontAttributes="Bold"
+                           FontSize="18"
+                           FontFamily="ComfortaaBold"
                            HorizontalOptions="Center" />
 
                     <!-- Color -->
                     <Grid Grid.Row="1" ColumnDefinitions="*, Auto" ColumnSpacing="16" IsVisible="{Binding IsColorVisible}">
                         <Label Text="Color" 
-                               FontAttributes="Bold"
-                               VerticalOptions="Center" 
-                               FontSize="14"/>
+                               Style="{StaticResource SettingLabel}" />
                         <Border Grid.Column="1"
                                 HeightRequest="44"
                                 WidthRequest="80"   
@@ -48,13 +52,12 @@
                     <!-- Opacity -->
                     <VerticalStackLayout Grid.Row="2" Spacing="8" IsVisible="{Binding IsColorVisible}">
                         <Grid ColumnDefinitions="*, Auto">
-                            <Label Text="Opacity" FontAttributes="Bold" FontSize="14" />
+                            <Label Text="Opacity" Style="{StaticResource SettingLabel}" />
                             <Label Grid.Column="1" Text="{Binding Alpha, StringFormat='{0:P0}'}" FontSize="14" FontAttributes="Bold"/>
                         </Grid>
                         <Slider Minimum="0.01" 
                                 Maximum="1.0" 
                                 Value="{Binding Alpha}"
-                                MinimumTrackColor="{StaticResource Primary}"
                                 DragStartedCommand="{Binding DragStartedCommand}"
                                 DragCompletedCommand="{Binding DragCompletedCommand}" />
                     </VerticalStackLayout>
@@ -62,13 +65,12 @@
                     <!-- Noise -->
                     <VerticalStackLayout Grid.Row="3" Spacing="8" IsVisible="{Binding IsNoiseVisible}">
                         <Grid ColumnDefinitions="*, Auto">
-                            <Label Text="Noise" FontAttributes="Bold" FontSize="14" />
+                            <Label Text="Noise" Style="{StaticResource SettingLabel}" />
                             <Label Grid.Column="1" Text="{Binding Noise, StringFormat='{0:P0}'}" FontSize="14" FontAttributes="Bold"/>
                         </Grid>
                         <Slider Minimum="0" 
                                 Maximum="1.0" 
                                 Value="{Binding Noise}"
-                                MinimumTrackColor="{StaticResource Primary}"
                                 DragStartedCommand="{Binding DragStartedCommand}"
                                 DragCompletedCommand="{Binding DragCompletedCommand}" />
                     </VerticalStackLayout>
@@ -76,13 +78,12 @@
                     <!-- Size (Conditional) -->
                     <VerticalStackLayout Grid.Row="4" Spacing="8" IsVisible="{Binding IsBrush}">
                         <Grid ColumnDefinitions="*, Auto">
-                            <Label Text="Brush Size" FontAttributes="Bold" FontSize="14" />
+                            <Label Text="Brush Size" Style="{StaticResource SettingLabel}" />
                             <Label Grid.Column="1" Text="{Binding BrushSize, StringFormat='{0:F0}'}" FontSize="14" FontAttributes="Bold"/>
                         </Grid>
                         <Slider Minimum="1" 
                                 Maximum="50"
                                 Value="{Binding BrushSize}" 
-                                MinimumTrackColor="{StaticResource Primary}"
                                 DragStartedCommand="{Binding DragStartedCommand}"
                                 DragCompletedCommand="{Binding DragCompletedCommand}" />
                     </VerticalStackLayout>
@@ -100,14 +101,14 @@
                  InputTransparent="True"
                  HorizontalOptions="Center" 
                  VerticalOptions="Center" 
-                 BackgroundColor="{StaticResource IndependenceAccentFortyPercent}"
+                 BackgroundColor="{StaticResource CadetFortyPercent}"
                  Stroke="Transparent"
                  StrokeShape="RoundRectangle 10"
                  Padding="20,10">
                  
             <Label Text="{Binding DragInfoText}" 
                    TextColor="White" 
-                   FontAttributes="Bold"
+                   FontFamily="ComfortaaRegular"
                    FontSize="18"
                    HorizontalTextAlignment="Center"
                    VerticalTextAlignment="Center"/>

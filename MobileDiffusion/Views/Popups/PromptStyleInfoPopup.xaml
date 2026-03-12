@@ -10,7 +10,7 @@
     <Border Padding="15"
             Stroke="Transparent"
             StrokeShape="RoundRectangle 10"
-            Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource IndependenceAccent}}"
+            Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Cadet}}"
             HorizontalOptions="Center"
             VerticalOptions="Center">
         <Border.Resources>
@@ -24,14 +24,14 @@
                     <Label FontSize="18">
                         <Label.FormattedText>
                             <FormattedString>
-                                <Span Text="Name: " FontAttributes="Bold"/>
+                                <Span Text="Name: " Style="{StaticResource LabelHeader}" />
                                 <Span Text="{Binding PromptStyle.Name}"/>
                             </FormattedString>
                         </Label.FormattedText>
                     </Label>
-                    <Label Text="Prompt:" FontSize="18" IsVisible="{Binding PromptStyle.Prompt, Converter={StaticResource IsStringNotNullOrEmptyConverter}}" FontAttributes="Bold"/>
+                    <Label Text="Prompt:" IsVisible="{Binding PromptStyle.Prompt, Converter={StaticResource IsStringNotNullOrEmptyConverter}}" Style="{StaticResource LabelHeader}" />
                     <Label Text="{Binding PromptStyle.Prompt}" FontSize="14" IsVisible="{Binding PromptStyle.Prompt, Converter={StaticResource IsStringNotNullOrEmptyConverter}}"/>
-                    <Label Text="Negative Prompt:" FontSize="18" FontAttributes="Bold"/>
+                    <Label Text="Negative Prompt:" Style="{StaticResource LabelHeader}" />
                     <Label Text="{Binding PromptStyle.NegativePrompt}" FontSize="14"/>
                 </VerticalStackLayout>
             </ScrollView>

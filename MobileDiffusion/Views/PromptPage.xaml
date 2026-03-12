@@ -7,15 +7,13 @@
                 xmlns:viewModels="clr-namespace:MobileDiffusion.Interfaces.ViewModels"
                 xmlns:views="clr-namespace:MobileDiffusion.Views;assembly=MobileDiffusion"
                 x:Class="MobileDiffusion.Views.PromptPage"
-                Title="Prompt Editor"
                 Shell.TabBarIsVisible="False"
                 x:DataType="pages:IPromptPageViewModel">
-
     <views:BasePage.Resources>
         <ResourceDictionary>
             <Style x:Key="PromptBorderStyle" TargetType="Border">
                 <Setter Property="Padding" Value="10" />
-                <Setter Property="Stroke" Value="{StaticResource IndependenceAccent}" />
+                <Setter Property="Stroke" Value="{StaticResource Cadet}" />
                 <Setter Property="StrokeThickness" Value="1" />
                 <Setter Property="Background" Value="Transparent" />
                 <Setter Property="StrokeShape" Value="RoundRectangle 10" />
@@ -24,18 +22,21 @@
                                  Binding="{Binding Content.IsFocused, Source={RelativeSource Self}}"
                                  Value="True">
                         <Setter Property="StrokeThickness" Value="2" />
-                        <Setter Property="Stroke" Value="{StaticResource Primary}" />
+                        <Setter Property="Stroke" Value="{StaticResource AmberGold}" />
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
         </ResourceDictionary>
     </views:BasePage.Resources>
+    <Shell.TitleView>
+        <Label Text="Prompt Editor" Style="{StaticResource LabelTitleView}" />
+    </Shell.TitleView>
 
     <views:BasePage.ToolbarItems>
         <ToolbarItem Command="{Binding ResetPageCommand}"
                      Text="Reset">
             <ToolbarItem.IconImageSource>
-                <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Size="24" Color="{StaticResource White}" />
+                <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Size="24" Color="{StaticResource MutedPeach}" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
     </views:BasePage.ToolbarItems>
@@ -53,7 +54,7 @@
                         Text="{Binding Prompt}"
                         Placeholder="{Binding PromptPlaceholder}"
                         AutoSize="TextChanges"
-                        TextColor="{StaticResource IndependenceAccent}"
+                        TextColor="{StaticResource Cadet}"
                         FontSize="14"/>
             </Border>
 
@@ -65,7 +66,7 @@
             <Border Style="{StaticResource PromptBorderStyle}">
                 <Editor x:Name="NegativePromptEditor"
                         Text="{Binding NegativePrompt}"
-                        TextColor="{StaticResource IndependenceAccent}"
+                        TextColor="{StaticResource Cadet}"
                         AutoSize="TextChanges"
                         FontSize="14"/>
             </Border>

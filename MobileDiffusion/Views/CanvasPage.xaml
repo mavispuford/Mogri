@@ -156,7 +156,7 @@
                            InputTransparent="True"/>
 
         <Border Grid.Row="0"
-                BackgroundColor="{StaticResource IndependenceAccentSixtyPercent}"
+                BackgroundColor="{StaticResource CadetSixtyPercent}"
                 HorizontalOptions="Center"
                 VerticalOptions="Start"
                 Stroke="Transparent"
@@ -197,7 +197,7 @@
 
                                     <VisualState x:Name="Selected">
                                         <VisualState.Setters>
-                                            <Setter Property="BackgroundColor" Value="{StaticResource IndependenceAccentFortyPercent}" />
+                                            <Setter Property="BackgroundColor" Value="{StaticResource CadetFortyPercent}" />
                                             <Setter Property="IconColor" Value="{StaticResource White}" />
                                             <Setter Property="animations:AnimationProperties.Animations">
                                                 <animations:ScaleToAnimation Scale="1" Easing="{x:Static Easing.CubicInOut}" Length="200" />
@@ -224,7 +224,7 @@
                                    Spacing="20">
 
                 <Border x:Name="BrushSizeButton" 
-                        BackgroundColor="{StaticResource IndependenceAccentFortyPercent}"
+                        BackgroundColor="{StaticResource CadetFortyPercent}"
                         HeightRequest="50"
                         WidthRequest="50"
                         StrokeThickness="0"
@@ -256,7 +256,7 @@
                 </Border>
 
                 <Border x:Name="AlphaButton"
-                        BackgroundColor="{StaticResource IndependenceAccentFortyPercent}"
+                        BackgroundColor="{StaticResource CadetFortyPercent}"
                         StrokeThickness="0"
                         WidthRequest="50"
                         HeightRequest="50"
@@ -275,9 +275,9 @@
                 </Border>
 
                 <Border x:Name="ColorPaletteButton"
-                        BackgroundColor="{StaticResource IndependenceAccentFortyPercent}"
+                        BackgroundColor="{StaticResource CadetFortyPercent}"
                         StrokeThickness="1"
-                        Stroke="{StaticResource IndependenceAccentSixtyPercent}"
+                        Stroke="{StaticResource CadetSixtyPercent}"
                         IsEnabled="{Binding GettingColorPalette, Converter={StaticResource InvertedBool}}"
                         WidthRequest="50"
                         HeightRequest="50"
@@ -303,7 +303,7 @@
                 </Border>
 
                 <Border x:Name="NoiseButton"
-                        BackgroundColor="{StaticResource IndependenceAccentFortyPercent}"
+                        BackgroundColor="{StaticResource CadetFortyPercent}"
                         StrokeThickness="0"
                         WidthRequest="50"
                         HeightRequest="50"
@@ -322,7 +322,7 @@
                 </Border>
 
                 <Border x:Name="BoundingBoxSizeButton"
-                        BackgroundColor="{StaticResource IndependenceAccentFortyPercent}"
+                        BackgroundColor="{StaticResource CadetFortyPercent}"
                         StrokeThickness="0"
                         WidthRequest="50"
                         HeightRequest="50"
@@ -345,7 +345,7 @@
                 </Border>
 
                 <Border x:Name="AddRemoveButton"
-                        BackgroundColor="{StaticResource IndependenceAccentFortyPercent}"
+                        BackgroundColor="{StaticResource CadetFortyPercent}"
                         StrokeThickness="0"
                         WidthRequest="50"
                         HeightRequest="50"
@@ -361,7 +361,7 @@
                 </Border>
 
                 <Border x:Name="ResetZoomButton"
-                        BackgroundColor="{StaticResource IndependenceAccentFortyPercent}"
+                        BackgroundColor="{StaticResource CadetFortyPercent}"
                         StrokeThickness="0"
                         WidthRequest="50"
                         HeightRequest="50"
@@ -382,7 +382,7 @@
 
             <Grid x:Name="SecondaryButtonsLayout">
                 <Border x:Name="BrushSizeSliderContainer"
-                        BackgroundColor="{StaticResource IndependenceAccentEightyPercent}"
+                        BackgroundColor="{StaticResource CadetEightyPercent}"
                         Stroke="Transparent"
                         IsVisible="False"
                         HorizontalOptions="Start"
@@ -392,7 +392,7 @@
 
                         <Label Text="{Binding CurrentBrushSize, StringFormat='Size: {0:F0}'}"
                                TextColor="White"
-                               FontAttributes="Bold"
+                               FontFamily="ComfortaaBold"
                                HorizontalOptions="Center"/>
 
                         <Slider WidthRequest="200"
@@ -405,7 +405,7 @@
                 </Border>
 
                 <Border x:Name="AlphaSliderContainer"
-                        BackgroundColor="{StaticResource IndependenceAccentEightyPercent}"
+                        BackgroundColor="{StaticResource CadetEightyPercent}"
                         Stroke="Transparent"
                         IsVisible="False"
                         HorizontalOptions="Center"
@@ -415,7 +415,7 @@
 
                         <Label Text="{Binding CurrentAlpha, StringFormat='Alpha: {0:F2}'}"
                                TextColor="White"
-                               FontAttributes="Bold"
+                               FontFamily="ComfortaaBold"
                                HorizontalOptions="Center"/>
 
                         <Slider WidthRequest="200"
@@ -428,7 +428,7 @@
                 </Border>
 
                 <Border x:Name="NoiseSliderContainer"
-                        BackgroundColor="{StaticResource IndependenceAccentEightyPercent}"
+                        BackgroundColor="{StaticResource CadetEightyPercent}"
                         Stroke="Transparent"
                         IsVisible="False"
                         HorizontalOptions="End"
@@ -438,7 +438,7 @@
 
                         <Label Text="{Binding CurrentNoise, StringFormat='Noise: {0:P0}'}"
                                TextColor="White"
-                               FontAttributes="Bold"
+                               FontFamily="ComfortaaBold"
                                HorizontalOptions="Center"/>
 
                         <Slider WidthRequest="200"
@@ -464,7 +464,7 @@
                              Opacity="0">
             <VerticalStackLayout.Resources>
                 <Style TargetType="Border">
-                    <Setter Property="BackgroundColor" Value="{StaticResource Secondary}"/>
+                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource MutedPeach}, Dark={StaticResource Secondary}}"/>
                     <Setter Property="HeightRequest" Value="56"/>
                     <Setter Property="StrokeShape" Value="RoundRectangle 28"/>
                     <Setter Property="Stroke" Value="Transparent"/>
@@ -473,7 +473,8 @@
                 </Style>
 
                 <Style TargetType="Label">
-                    <Setter Property="FontSize" Value="16"/>
+                    <Setter Property="FontSize" Value="14"/>
+                    <Setter Property="FontFamily" Value="ComfortaaBold"/>
                     <Setter Property="TextColor" Value="{StaticResource Tertiary}"/>
                     <Setter Property="VerticalTextAlignment" Value="Center"/>
                 </Style>
@@ -570,14 +571,14 @@
                         AlignItems="Center"
                         JustifyContent="SpaceEvenly"
                         IsVisible="{Binding CurrentTool.Type, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:ToolType.MagicWand}}">
-                <Button Text="Fill" Command="{Binding ApplySegmentationMaskCommand}" FontAttributes="Bold" WidthRequest="70"/>
-                <Button Text="Invert" BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark=Transparent}" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark=White}" BorderColor="{AppThemeBinding Light=Transparent, Dark={StaticResource IndependenceAccentFortyPercent}}" BorderWidth="1" Command="{Binding InvertSegmentationMaskCommand}" FontAttributes="Bold"/>
-                <Button Text="Clear" BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark=Transparent}" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark=White}" BorderColor="{AppThemeBinding Light=Transparent, Dark={StaticResource IndependenceAccentFortyPercent}}" BorderWidth="1" Command="{Binding ClearSegmentationMaskCommand}" FontAttributes="Bold"/>
+                <Button Text="Fill" Command="{Binding ApplySegmentationMaskCommand}" WidthRequest="70"/>
+                <Button Text="Invert" BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark=Transparent}" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark=White}" BorderColor="{AppThemeBinding Light=Transparent, Dark={StaticResource CadetFortyPercent}}" BorderWidth="1" Command="{Binding InvertSegmentationMaskCommand}" />
+                <Button Text="Clear" BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark=Transparent}" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark=White}" BorderColor="{AppThemeBinding Light=Transparent, Dark={StaticResource CadetFortyPercent}}" BorderWidth="1" Command="{Binding ClearSegmentationMaskCommand}" />
             </FlexLayout>
 
             <Border x:Name="ShowActionsButton"
                     Grid.Column="1"
-                    BackgroundColor="{StaticResource Secondary}"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource LivingCoral}, Dark={StaticResource CaribbeanBlue}}"
                     Stroke="Transparent"
                     HorizontalOptions="End"
                     VerticalOptions="Center"
@@ -600,7 +601,7 @@
                         <FontImageSource Glyph="&#xf10a;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
                     </ImageButton.Source>
                     <ImageButton.Behaviors>
-                        <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Tertiary}" />
+                        <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource White}" />
                     </ImageButton.Behaviors>
                 </ImageButton>
             </Border>

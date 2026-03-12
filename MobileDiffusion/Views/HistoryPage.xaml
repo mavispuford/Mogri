@@ -22,10 +22,10 @@
                 <Grid ColumnDefinitions="Auto, *">
                     <Image Grid.Column="0" VerticalOptions="Center" Margin="0,0,5,0">
                         <Image.Source>
-                            <FontImageSource Glyph="&#xe8b6;" FontFamily="MaterialIconsRound400" Size="20" Color="{AppThemeBinding Light=Gray, Dark=Gray}" />
+                            <FontImageSource Glyph="&#xe8b6;" FontFamily="MaterialIconsRound400" Size="20" Color="{AppThemeBinding Light={StaticResource Primary}, Dark=Gray}" />
                         </Image.Source>
                     </Image>
-                    <Entry Grid.Column="1" HeightRequest="46" Placeholder="Search history..." VerticalTextAlignment="Center" Text="{Binding SearchText}" VerticalOptions="Fill" BackgroundColor="Transparent" FontSize="14" ClearButtonVisibility="WhileEditing" ReturnType="Search" />
+                    <Entry Grid.Column="1" HeightRequest="46" Placeholder="Search history..." VerticalTextAlignment="Center" Text="{Binding SearchText}" VerticalOptions="Fill" BackgroundColor="Transparent" FontSize="14" ClearButtonVisibility="WhileEditing" ReturnType="Search" FontFamily="ComfortaaBold" />
                 </Grid>
             </Border>
 
@@ -37,7 +37,7 @@
 
             <ImageButton Grid.Column="2" ToolTipProperties.Text="Clear History" Command="{Binding ClearHistoryCommand}" IsVisible="{Binding SelectionModeEnabled, Converter={StaticResource InvertedBool}}">
                 <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe16c;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
+                    <FontImageSource Glyph="&#xe16c;" FontFamily="MaterialIconsRound400" Size="30" Color="{StaticResource MutedPeach}" />
                 </ImageButton.Source>
             </ImageButton>
 
@@ -186,7 +186,7 @@
                            VerticalOptions="Center"
                            InputTransparent="True">
                         <Image.Source>
-                            <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Size="64" Color="{StaticResource Primary}" />
+                            <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Size="64" Color="{StaticResource SteelRed}" />
                         </Image.Source>
                     </Image>
                 </ContentView>

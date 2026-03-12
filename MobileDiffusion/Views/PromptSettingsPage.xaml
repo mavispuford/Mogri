@@ -9,34 +9,44 @@
                 x:DataType="pages:IPromptSettingsPageViewModel"
                 Shell.PresentationMode="Animated"
                 Shell.NavBarIsVisible="True"
-                Shell.TabBarIsVisible="False"
-                Title="Prompt Settings">
+                Shell.TabBarIsVisible="False">
     <views:BasePage.Resources>
         <ResourceDictionary>
-            <Style TargetType="Label" x:Key="SettingLabel">
+            <Style TargetType="Label" x:Key="SettingLabel" BasedOn="{StaticResource LabelHeader}">
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
-                <Setter Property="FontAttributes" Value="Bold" />
-                <Setter Property="FontSize" Value="16" />
             </Style>
         </ResourceDictionary>
     </views:BasePage.Resources>
+    <Shell.TitleView>
+        <Label Text="Prompt Settings" Style="{StaticResource LabelTitleView}" />
+    </Shell.TitleView>
+
+    <views:BasePage.ToolbarItems>
+        <ToolbarItem Command="{Binding ResetValuesCommand}"
+                     Text="Reset">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Size="24" Color="{StaticResource MutedPeach}" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </views:BasePage.ToolbarItems>
+
     <Grid RowDefinitions="*,auto"
           Padding="0"
           Margin="0">
         <ScrollView Grid.Row="0" Orientation="Vertical">
             <VerticalStackLayout>
-                <Grid Padding="30, 20, 30, 0" ColumnDefinitions="*, *" ColumnSpacing="10">
+                <Grid Padding="20, 20, 20, 0" ColumnDefinitions="*, *" ColumnSpacing="10">
                     <Button Text="Load Preset" Command="{Binding LoadPresetCommand}" />
                     <Button Grid.Column="1" Text="Save Preset" Command="{Binding SavePresetCommand}" />
                 </Grid>
-                <Grid Padding="30"
+                <Grid Padding="20"
                       RowDefinitions="auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto"
                       RowSpacing="10"
                       ColumnSpacing="16"
                       ColumnDefinitions="32,auto,*"
                       HorizontalOptions="Fill">
 
-                    <Image Grid.Row="0" WidthRequest="32" HeightRequest="32">
+                <Image Grid.Row="0" WidthRequest="32" HeightRequest="32">
                     <Image.Source>
                         <FontImageSource Glyph="&#xf609;" FontFamily="MaterialIconsRound300" Size="30" Color="{StaticResource Tertiary}" />
                     </Image.Source>
@@ -165,12 +175,12 @@
                         <FontImageSource Glyph="&#xe85b;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="13" Grid.Column="1" Text="Width/Height" Style="{StaticResource SettingLabel}">
+                <Label Grid.Row="13" Grid.Column="1" Text="Width/Height:" Style="{StaticResource SettingLabel}">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding ShowResolutionSelectCommand}"/>
                     </Label.GestureRecognizers>
                 </Label>
-                <Label Grid.Row="13" Grid.Column="2" VerticalTextAlignment="Center" HorizontalTextAlignment="End" FontAttributes="Bold" FontSize="16">
+                <Label Grid.Row="13" Grid.Column="2" VerticalTextAlignment="Center" HorizontalTextAlignment="End" FontSize="16">
                     <Label.FormattedText>
                         <FormattedString>
                             <Span Text="{Binding Width}" />
@@ -219,11 +229,6 @@
         </ScrollView>
 
         <HorizontalStackLayout Grid.Row="1" Spacing="10" HorizontalOptions="End" Padding="10">
-            <Button Command="{Binding ResetValuesCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}">
-                <Button.ImageSource>
-                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Color="{StaticResource Tertiary}" />
-                </Button.ImageSource>
-            </Button>
             <Button Text="Cancel" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
             <Button Text="Apply" Command="{Binding ConfirmSettingsCommand}" WidthRequest="100" />
         </HorizontalStackLayout>
