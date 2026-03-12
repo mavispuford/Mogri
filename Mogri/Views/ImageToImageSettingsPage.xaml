@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+                xmlns:pages="clr-namespace:Mogri.Interfaces.ViewModels.Pages"
+                xmlns:viewModels="clr-namespace:Mogri.Interfaces.ViewModels"
+                xmlns:views="clr-namespace:Mogri.Views"
+                xmlns:s="clr-namespace:System;assembly=mscorlib"
+                x:Class="Mogri.Views.ImageToImageSettingsPage"
+                x:DataType="pages:IImageToImageSettingsPageViewModel"
+                Shell.PresentationMode="Animated"
+                Shell.NavBarIsVisible="True"
+                Shell.TabBarIsVisible="False">
+    <views:BasePage.Resources>
+        <ResourceDictionary>
+            <toolkit:VariableMultiValueConverter x:Key="AnyTrueConverter" ConditionType="Any" />
+            <toolkit:IsNullConverter x:Key="IsNullConverter" />
+            <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+
+            <Style TargetType="Label" x:Key="SettingLabel" BasedOn="{StaticResource LabelHeader}">
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+            </Style>
+        </ResourceDictionary>
+    </views:BasePage.Resources>
+    <Shell.TitleView>
+        <Label Text="Image to Image Settings" Style="{StaticResource LabelTitleView}" />
+    </Shell.TitleView>
+
+    <views:BasePage.ToolbarItems>
+        <ToolbarItem Command="{Binding ResetValuesCommand}"
+                     Text="Reset">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Size="24" Color="{StaticResource MutedPeach}" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </views:BasePage.ToolbarItems>
+
+    <Grid RowDefinitions="*,auto"
+          Padding="0"
+          Margin="0">
+        <ScrollView Grid.Row="0" Orientation="Vertical">
+            <Grid Padding="30"
+                  RowDefinitions="auto, auto, auto, auto, auto, auto, auto, auto"
+                  RowSpacing="10"
+                  ColumnSpacing="16"
+                  ColumnDefinitions="32,*,auto"
+                  HorizontalOptions="Fill">
+
+                <Image Grid.Row="0" Grid.Column="0" WidthRequest="32">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xe3e9;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                    </Image.Source>
+                </Image>
+                <Label Grid.Row="0" Grid.Column="1" Text="Strength:" Style="{StaticResource SettingLabel}"/>
+                <Entry Grid.Row="0" Grid.Column="2" Placeholder="{Binding StrengthPlaceholder}" Text="{Binding Strength}" Keyboard="Numeric" FontSize="16" MaxLength="6" HorizontalTextAlignment="End" />
+
+                <Image Grid.Row="1" Grid.Column="0" WidthRequest="32">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xe3f4;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                    </Image.Source>
+                </Image>
+                <Label Grid.Row="1" Grid.Column="1" Text="Source Image:" Style="{StaticResource SettingLabel}"/>
+
+                <Border Grid.Row="2" Grid.ColumnSpan="3"
+                        BackgroundColor="{StaticResource Gray300}"
+                        StrokeShape="RoundRectangle 10"
+                        Stroke="Transparent"
+                        StrokeThickness="0"
+                        HorizontalOptions="Center">
+                    <Grid Grid.Row="2" Grid.ColumnSpan="3"
+                      HeightRequest="140" WidthRequest="140"
+                      BackgroundColor="{AppThemeBinding Light={StaticResource MutedPeach}, Dark={StaticResource White}}">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ShowMediaPickerCommand}">
+                                <TapGestureRecognizer.CommandParameter>
+                                    <s:Boolean>True</s:Boolean>
+                                </TapGestureRecognizer.CommandParameter>
+                            </TapGestureRecognizer>
+                        </Grid.GestureRecognizers>
+                        <Label Text="Tap to set source image" HorizontalOptions="Fill" VerticalOptions="Fill" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Padding="20" TextColor="{StaticResource Tertiary}"
+                           IsVisible="{Binding InitImageSource, Converter={StaticResource IsNullConverter}}" />
+                        <Image x:Name="InitImage"
+                           Source="{Binding InitImageSource}" Aspect="AspectFit" HorizontalOptions="Fill" VerticalOptions="Fill"
+                           IsVisible="{Binding InitImageSource, Converter={StaticResource IsNotNullConverter}}"/>
+                        <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center">
+                            <ActivityIndicator.IsRunning>
+                                <MultiBinding Converter="{StaticResource AnyTrueConverter}" >
+                                    <Binding Source="{x:Reference InitImage}" Path="IsLoading" />
+                                    <Binding Path="IsLoadingInitImage" />
+                                </MultiBinding>
+                            </ActivityIndicator.IsRunning>
+                        </ActivityIndicator>
+                    </Grid>
+                </Border>
+
+                <Image Grid.Row="3" Grid.Column="0" WidthRequest="32">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xe72e;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                    </Image.Source>
+                </Image>
+                <Label Grid.Row="3" Grid.Column="1" Text="Mask Image:" Style="{StaticResource SettingLabel}"/>
+
+                <Border Grid.Row="4" Grid.ColumnSpan="3"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource MutedPeach}, Dark={StaticResource White}}"
+                        StrokeShape="RoundRectangle 10"
+                        Stroke="Transparent"
+                        StrokeThickness="0"
+                        HorizontalOptions="Center">
+                    <Grid HeightRequest="140" WidthRequest="140">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ShowMediaPickerCommand}">
+                                <TapGestureRecognizer.CommandParameter>
+                                    <s:Boolean>False</s:Boolean>
+                                </TapGestureRecognizer.CommandParameter>
+                            </TapGestureRecognizer>
+                        </Grid.GestureRecognizers>
+                        <Label Text="Tap to set the mask" HorizontalOptions="Fill" VerticalOptions="Fill" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Padding="20" TextColor="{StaticResource Tertiary}"
+                           IsVisible="{Binding MaskImageSource, Converter={StaticResource IsNullConverter}}" />
+                        <Image x:Name="MaskImage"
+                           Source="{Binding MaskImageSource}" Aspect="AspectFit" HorizontalOptions="Fill" VerticalOptions="Fill"
+                           IsVisible="{Binding MaskImageSource, Converter={StaticResource IsNotNullConverter}}"/>
+                        <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center">
+                            <ActivityIndicator.IsRunning>
+                                <MultiBinding Converter="{StaticResource AnyTrueConverter}" >
+                                    <Binding Source="{x:Reference MaskImage}" Path="IsLoading" />
+                                    <Binding Path="IsLoadingMaskImage" />
+                                </MultiBinding>
+                            </ActivityIndicator.IsRunning>
+                        </ActivityIndicator>
+                    </Grid>
+                </Border>
+
+                <Image Grid.Row="5" Grid.Column="0" WidthRequest="32">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xe434;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                    </Image.Source>
+                </Image>
+                <Label Grid.Row="5" Grid.Column="1" Text="Fit Image (on server):" Style="{StaticResource SettingLabel}"/>
+                <Switch Grid.Row="5" Grid.Column="2" HorizontalOptions="End" IsToggled="{Binding FitImageServerSide}" />
+
+                <Image Grid.Row="6" Grid.Column="0" WidthRequest="32">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xe434;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                    </Image.Source>
+                </Image>
+                <Label Grid.Row="6" Grid.Column="1" Text="Fit Image (before sending):" Style="{StaticResource SettingLabel}"/>
+                <Switch Grid.Row="6" Grid.Column="2" HorizontalOptions="End" IsToggled="{Binding FitImageClientSide}" />
+
+                <Image Grid.Row="7" Grid.Column="0" WidthRequest="32">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xe3e9;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                    </Image.Source>
+                </Image>
+                <Label Grid.Row="7" Grid.Column="1" Text="Mask Blur:" Style="{StaticResource SettingLabel}"/>
+                <Entry Grid.Row="7" Grid.Column="2" Placeholder="{Binding MaskBlurPlaceholder}" Text="{Binding MaskBlur}" Keyboard="Numeric" FontSize="16" MaxLength="3" HorizontalTextAlignment="End" />
+            </Grid>
+        </ScrollView>
+
+        <HorizontalStackLayout Grid.Row="1" Spacing="10" HorizontalOptions="End" Padding="10">
+            <Button Text="Cancel" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
+            <Button Text="Confirm" Command="{Binding ConfirmSettingsCommand}" />
+        </HorizontalStackLayout>
+    </Grid>
+</views:BasePage>

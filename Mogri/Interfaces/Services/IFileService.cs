@@ -1,0 +1,28 @@
+using Mogri.ViewModels;
+
+namespace Mogri.Interfaces.Services;
+
+public interface IFileService
+{
+    Task<bool> DeleteFileFromInternalStorage(string filePath);
+
+    Task<bool> FileExistsInInternalStorageAsync(string filePath);
+
+    Task<Stream?> GetFileStreamUsingExactUriAsync(string uriString);
+
+    Task<Stream?> GetFileStreamFromExternalStorageAsync(string fileName);
+
+    Task<Stream?> GetFileStreamFromInternalStorageAsync(string fileName);
+
+    Task<string[]> GetFileListFromInternalStorageAsync(string? path = null);
+
+    Task<MaskViewModel?> GetMaskFileFromAppDataAsync(string imageFileName);
+
+    Task<string> WriteFileToInternalStorageAsync(string fileName, Stream stream);
+
+    Task<string> WriteFileToInternalStorageAsync(string fileName, byte[] bytes);
+
+    Task<string> WriteMaskFileToAppDataAsync(string imageFileName, MaskViewModel mask);
+
+    Task<string> WriteImageFileToExternalStorageAsync(string fileName, Stream stream, bool isMask = false);
+}

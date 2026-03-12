@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<popups:BasePopup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                  xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+                  xmlns:controls="clr-namespace:Mogri.Controls;assembly=Mogri"
+                  xmlns:mopups="clr-namespace:Mopups.Pages;assembly=Mopups"
+                  xmlns:viewModels="clr-namespace:Mogri.Interfaces.ViewModels.Popups"
+                  xmlns:popups="clr-namespace:Mogri.Views.Popups"
+                  x:Class="Mogri.Views.Popups.ColorPickerPopup"
+                  x:DataType="viewModels:IColorPickerPopupViewModel">
+    <popups:BasePopup.Resources>
+        <ResourceDictionary>
+            <toolkit:IsListNotNullOrEmptyConverter x:Key="ListNotNullOrEmpty" />
+        </ResourceDictionary>
+    </popups:BasePopup.Resources>
+    <Border Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Cadet}}"
+            Stroke="Transparent"
+            StrokeShape="RoundRectangle 10"
+            VerticalOptions="Center"
+            HorizontalOptions="Center"
+            Padding="15"
+            Margin="50">
+        <VerticalStackLayout x:Name="MainLayout"
+                             Spacing="10"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center">
+            <Label Text="Current Color:"
+                   FontFamily="ComfortaaRegular" 
+                   FontSize="16"/>
+            <Border Stroke="{StaticResource BlackSeventyThreePercent}"
+                    HorizontalOptions="Center"
+                    StrokeThickness="2"
+                    StrokeShape="RoundRectangle 10"
+                    BackgroundColor="{Binding CurrentColor}"
+                    HeightRequest="100"
+                    WidthRequest="100"/>
+
+            <FlexLayout HorizontalOptions="Fill">
+                <Label FlexLayout.Grow="1"
+                       Text="Hex Value:" 
+                       FontFamily="ComfortaaRegular" 
+                       FontSize="16"
+                       VerticalTextAlignment="Center"
+                       HorizontalOptions="Fill"/>
+                <Entry FlexLayout.Grow="2"
+                       Text="{Binding CurrentColorHexString}"
+                       FontSize="16"
+                       HorizontalOptions="Fill"
+                       VerticalOptions="Fill"
+                       HorizontalTextAlignment="End"
+                       VerticalTextAlignment="End"
+                       IsSpellCheckEnabled="False"
+                       IsTextPredictionEnabled="False"/>
+            </FlexLayout>
+
+            <Label Text="Swatches:"
+                   FontFamily="ComfortaaRegular" 
+                   FontSize="16"/>
+            <FlexLayout BindableLayout.ItemsSource="{Binding Swatches}"
+                        Wrap="Wrap"
+                        AlignItems="Center"
+                        JustifyContent="Start"
+                        AlignContent="Center"
+                        Margin="14,0">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="Color">
+                        <BoxView Color="{Binding .}"
+                                 WidthRequest="30"
+                                 HeightRequest="30">
+                            <BoxView.GestureRecognizers>
+                                <TapGestureRecognizer 
+                                    Command="{Binding SwatchTappedCommand, Source={x:RelativeSource AncestorType={x:Type viewModels:IColorPickerPopupViewModel}}}" 
+                                    CommandParameter="{Binding .}"/>
+                            </BoxView.GestureRecognizers>
+                        </BoxView>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </FlexLayout>
+            
+            <Label Text="From Image:"
+                   FontFamily="ComfortaaRegular" 
+                   FontSize="16"
+                   IsVisible="{Binding SwatchesFromImage, Converter={StaticResource ListNotNullOrEmpty}}"/>
+            <FlexLayout BindableLayout.ItemsSource="{Binding SwatchesFromImage}"
+                        Wrap="Wrap"
+                        AlignItems="Center"
+                        JustifyContent="Start"
+                        AlignContent="Center"
+                        Margin="14,0"
+                        IsVisible="{Binding SwatchesFromImage, Converter={StaticResource ListNotNullOrEmpty}}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="Color">
+                        <BoxView Color="{Binding .}"
+                                 WidthRequest="30"
+                                 HeightRequest="30">
+                            <BoxView.GestureRecognizers>
+                                <TapGestureRecognizer 
+                                    Command="{Binding SwatchTappedCommand, Source={x:RelativeSource AncestorType={x:Type viewModels:IColorPickerPopupViewModel}}}" 
+                                    CommandParameter="{Binding .}"/>
+                            </BoxView.GestureRecognizers>
+                        </BoxView>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </FlexLayout>
+
+            <HorizontalStackLayout HorizontalOptions="End"
+                                   Spacing="10">
+                <Button Text="Cancel" 
+                        HorizontalOptions="Center"
+                        Command="{Binding CancelCommand}"/>
+                <Button Text="Confirm" 
+                        HorizontalOptions="Center"
+                        Command="{Binding ConfirmCommand}" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </Border>
+</popups:BasePopup>
