@@ -1,10 +1,10 @@
 # How to Add a New Image Generation Backend
 
-This guide explains how to add support for a new image generation backend (e.g., ComfyUI, Local Diffusion service) to MobileDiffusion.
+This guide explains how to add support for a new image generation backend (e.g., ComfyUI, Local Diffusion service) to Mogri.
 
 ## Architecture
 
-MobileDiffusion uses a plugin-style architecture:
+Mogri uses a plugin-style architecture:
 1.  **IImageGenerationBackend**: The interface all backends must implement.
 2.  **BackendRegistry**: A service that holds all registered backends.
 3.  **ProxyImageGenerationService**: The main service consumed by the app, which delegates to the user-selected backend.
@@ -13,14 +13,14 @@ MobileDiffusion uses a plugin-style architecture:
 
 ### 1. Implement the Interface
 
-Create a new service class in `MobileDiffusion/Services/` that implements `MobileDiffusion.Interfaces.Services.IImageGenerationBackend`.
+Create a new service class in `Mogri/Services/` that implements `Mogri.Interfaces.Services.IImageGenerationBackend`.
 
 ```csharp
-using MobileDiffusion.Interfaces.Services;
-using MobileDiffusion.Interfaces.ViewModels;
-using MobileDiffusion.Models;
+using Mogri.Interfaces.Services;
+using Mogri.Interfaces.ViewModels;
+using Mogri.Models;
 
-namespace MobileDiffusion.Services
+namespace Mogri.Services
 {
     public class MyNewBackendService : IImageGenerationBackend
     {
@@ -44,7 +44,7 @@ namespace MobileDiffusion.Services
 
 ### 2. Register in MauiProgram.cs
 
-Open `MobileDiffusion/Registrations/ServiceRegistrations.cs` (or `MauiProgram.cs` if registered directly) and add your service to the DI container **as an `IImageGenerationBackend`**.
+Open `Mogri/Registrations/ServiceRegistrations.cs` (or `MauiProgram.cs` if registered directly) and add your service to the DI container **as an `IImageGenerationBackend`**.
 
 ```csharp
 // In ServiceRegistrations.cs inside RegisterServices method:

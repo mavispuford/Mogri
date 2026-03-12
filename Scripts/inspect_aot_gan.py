@@ -30,6 +30,6 @@ def inspect_model(model_path):
 if __name__ == "__main__":
     # Default to the expected path in the repo
     default_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 
-                               "MobileDiffusion", "Resources", "Raw", "aot_gan.onnx")
+                               "Mogri", "Resources", "Raw", "aot_gan.onnx")
     
     inspect_model(default_path)
