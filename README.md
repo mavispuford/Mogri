@@ -1,6 +1,6 @@
-# Mobile Diffusion
+# Mogri
 
-Mobile Diffusion is a .NET MAUI mobile application for image generation and editing. It combines a finger-friendly mobile UI with a mix of on-device processing and a remote server for heavy-duty generation tasks. While it is not a replacement for professional desktop image editors, Mobile Diffusion aims to bridge the gap for mobile workflows.
+Mogri is a .NET MAUI mobile application for image generation and editing. It combines a finger-friendly mobile UI with a mix of on-device processing and a remote server for heavy-duty generation tasks. While it is not a replacement for professional desktop image editors, Mogri aims to bridge the gap for mobile workflows.
 
 ## Overview
 

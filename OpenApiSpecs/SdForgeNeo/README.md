@@ -13,7 +13,7 @@ To update the generated client code (e.g. after downloading a new `openapi.json`
 
 2. **Generate the Client**:
    ```bash
-   kiota generate -l CSharp -c SdForgeNeoClient -n MobileDiffusion.Clients.SdForgeNeo -d OpenApiSpecs/SdForgeNeo/openapi-patched.json -o MobileDiffusion/Clients/SdForgeNeo
+   kiota generate -l CSharp -c SdForgeNeoClient -n Mogri.Clients.SdForgeNeo -d OpenApiSpecs/SdForgeNeo/openapi-patched.json -o Mogri/Clients/SdForgeNeo
    ```
 
    *Note: We use `kiota generate` instead of `kiota update` to ensure the lock file points to the patched JSON file.*

@@ -13,11 +13,11 @@ To regenerate the C# client code, follow these steps:
    ```
 3. **Generate Client**: Run Kiota to generate the C# code.
    ```bash
-   kiota generate -l CSharp -c ComfyUiClient -n MobileDiffusion.Clients.ComfyUi -d openapi-patched.json -o ../../MobileDiffusion/Clients/ComfyUi
+   kiota generate -l CSharp -c ComfyUiClient -n Mogri.Clients.ComfyUi -d openapi-patched.json -o ../../Mogri/Clients/ComfyUi
    ```
 
 ## Notes
 
-- The generated client is located in `MobileDiffusion/Clients/ComfyUi`.
+- The generated client is located in `Mogri/Clients/ComfyUi`.
 - The client uses `ApiKeyAuth` for authentication (X-API-Key header).
 - WebSocket communication is handled separately, as Kiota only generates REST clients.
