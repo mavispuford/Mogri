@@ -10,15 +10,31 @@
                 x:DataType="pages:IImageToImageSettingsPageViewModel"
                 Shell.PresentationMode="Animated"
                 Shell.NavBarIsVisible="True"
-                Shell.TabBarIsVisible="False"
-                Title="Image to Image Settings">
+                Shell.TabBarIsVisible="False">
     <views:BasePage.Resources>
         <ResourceDictionary>
             <toolkit:VariableMultiValueConverter x:Key="AnyTrueConverter" ConditionType="Any" />
             <toolkit:IsNullConverter x:Key="IsNullConverter" />
             <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+
+            <Style TargetType="Label" x:Key="SettingLabel" BasedOn="{StaticResource LabelHeader}">
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+            </Style>
         </ResourceDictionary>
     </views:BasePage.Resources>
+    <Shell.TitleView>
+        <Label Text="Image to Image Settings" Style="{StaticResource LabelTitleView}" />
+    </Shell.TitleView>
+
+    <views:BasePage.ToolbarItems>
+        <ToolbarItem Command="{Binding ResetValuesCommand}"
+                     Text="Reset">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Size="24" Color="{StaticResource MutedPeach}" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </views:BasePage.ToolbarItems>
+
     <Grid RowDefinitions="*,auto"
           Padding="0"
           Margin="0">
@@ -35,7 +51,7 @@
                         <FontImageSource Glyph="&#xe3e9;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="0" Grid.Column="1" Text="Strength:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+                <Label Grid.Row="0" Grid.Column="1" Text="Strength:" Style="{StaticResource SettingLabel}"/>
                 <Entry Grid.Row="0" Grid.Column="2" Placeholder="{Binding StrengthPlaceholder}" Text="{Binding Strength}" Keyboard="Numeric" FontSize="16" MaxLength="6" HorizontalTextAlignment="End" />
 
                 <Image Grid.Row="1" Grid.Column="0" WidthRequest="32">
@@ -43,7 +59,7 @@
                         <FontImageSource Glyph="&#xe3f4;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="1" Grid.Column="1" Text="Source Image:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+                <Label Grid.Row="1" Grid.Column="1" Text="Source Image:" Style="{StaticResource SettingLabel}"/>
 
                 <Border Grid.Row="2" Grid.ColumnSpan="3"
                         BackgroundColor="{StaticResource Gray300}"
@@ -53,7 +69,7 @@
                         HorizontalOptions="Center">
                     <Grid Grid.Row="2" Grid.ColumnSpan="3"
                       HeightRequest="140" WidthRequest="140"
-                      BackgroundColor="{StaticResource Gray300}">
+                      BackgroundColor="{AppThemeBinding Light={StaticResource MutedPeach}, Dark={StaticResource White}}">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ShowMediaPickerCommand}">
                                 <TapGestureRecognizer.CommandParameter>
@@ -61,8 +77,8 @@
                                 </TapGestureRecognizer.CommandParameter>
                             </TapGestureRecognizer>
                         </Grid.GestureRecognizers>
-                        <Label Text="Tap to set source image" HorizontalOptions="Fill" VerticalOptions="Fill" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Padding="20" TextColor="White"
-                           IsVisible="{Binding InitImageSource, Converter={StaticResource IsNullConverter}}"/>
+                        <Label Text="Tap to set source image" HorizontalOptions="Fill" VerticalOptions="Fill" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Padding="20" TextColor="{StaticResource Tertiary}"
+                           IsVisible="{Binding InitImageSource, Converter={StaticResource IsNullConverter}}" />
                         <Image x:Name="InitImage"
                            Source="{Binding InitImageSource}" Aspect="AspectFit" HorizontalOptions="Fill" VerticalOptions="Fill"
                            IsVisible="{Binding InitImageSource, Converter={StaticResource IsNotNullConverter}}"/>
@@ -82,10 +98,10 @@
                         <FontImageSource Glyph="&#xe72e;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="3" Grid.Column="1" Text="Mask Image:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+                <Label Grid.Row="3" Grid.Column="1" Text="Mask Image:" Style="{StaticResource SettingLabel}"/>
 
                 <Border Grid.Row="4" Grid.ColumnSpan="3"
-                        BackgroundColor="{StaticResource Gray300}"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource MutedPeach}, Dark={StaticResource White}}"
                         StrokeShape="RoundRectangle 10"
                         Stroke="Transparent"
                         StrokeThickness="0"
@@ -98,8 +114,8 @@
                                 </TapGestureRecognizer.CommandParameter>
                             </TapGestureRecognizer>
                         </Grid.GestureRecognizers>
-                        <Label Text="Tap to set the mask" HorizontalOptions="Fill" VerticalOptions="Fill" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Padding="20" TextColor="White"
-                           IsVisible="{Binding MaskImageSource, Converter={StaticResource IsNullConverter}}"/>
+                        <Label Text="Tap to set the mask" HorizontalOptions="Fill" VerticalOptions="Fill" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Padding="20" TextColor="{StaticResource Tertiary}"
+                           IsVisible="{Binding MaskImageSource, Converter={StaticResource IsNullConverter}}" />
                         <Image x:Name="MaskImage"
                            Source="{Binding MaskImageSource}" Aspect="AspectFit" HorizontalOptions="Fill" VerticalOptions="Fill"
                            IsVisible="{Binding MaskImageSource, Converter={StaticResource IsNotNullConverter}}"/>
@@ -119,7 +135,7 @@
                         <FontImageSource Glyph="&#xe434;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="5" Grid.Column="1" Text="Fit Image (on server):" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+                <Label Grid.Row="5" Grid.Column="1" Text="Fit Image (on server):" Style="{StaticResource SettingLabel}"/>
                 <Switch Grid.Row="5" Grid.Column="2" HorizontalOptions="End" IsToggled="{Binding FitImageServerSide}" />
 
                 <Image Grid.Row="6" Grid.Column="0" WidthRequest="32">
@@ -127,7 +143,7 @@
                         <FontImageSource Glyph="&#xe434;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="6" Grid.Column="1" Text="Fit Image (before sending):" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+                <Label Grid.Row="6" Grid.Column="1" Text="Fit Image (before sending):" Style="{StaticResource SettingLabel}"/>
                 <Switch Grid.Row="6" Grid.Column="2" HorizontalOptions="End" IsToggled="{Binding FitImageClientSide}" />
 
                 <Image Grid.Row="7" Grid.Column="0" WidthRequest="32">
@@ -135,17 +151,12 @@
                         <FontImageSource Glyph="&#xe3e9;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="7" Grid.Column="1" Text="Mask Blur:" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="16"/>
+                <Label Grid.Row="7" Grid.Column="1" Text="Mask Blur:" Style="{StaticResource SettingLabel}"/>
                 <Entry Grid.Row="7" Grid.Column="2" Placeholder="{Binding MaskBlurPlaceholder}" Text="{Binding MaskBlur}" Keyboard="Numeric" FontSize="16" MaxLength="3" HorizontalTextAlignment="End" />
             </Grid>
         </ScrollView>
 
         <HorizontalStackLayout Grid.Row="1" Spacing="10" HorizontalOptions="End" Padding="10">
-            <Button Command="{Binding ResetValuesCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}">
-                <Button.ImageSource>
-                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Color="{StaticResource Tertiary}" />
-                </Button.ImageSource>
-            </Button>
             <Button Text="Cancel" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
             <Button Text="Confirm" Command="{Binding ConfirmSettingsCommand}" />
         </HorizontalStackLayout>

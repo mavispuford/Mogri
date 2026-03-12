@@ -9,7 +9,7 @@
                   x:Class="MobileDiffusion.Views.Popups.ResolutionSelectPopup"
                   x:DataType="viewModels:IResolutionSelectPopupViewModel">
     <Border x:Name="MainBorder"
-            Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource IndependenceAccent}}"
+            Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Cadet}}"
             Stroke="Transparent"
             StrokeShape="RoundRectangle 10"
             HorizontalOptions="Fill"
@@ -52,7 +52,7 @@
                           HorizontalOptions="Fill"
                           VerticalOptions="Fill">
 
-                        <Rectangle Fill="{StaticResource IndependenceAccent}" HorizontalOptions="Fill" VerticalOptions="Fill" />
+                        <Rectangle Fill="{StaticResource Cadet}" HorizontalOptions="Fill" VerticalOptions="Fill" />
                         <Image Aspect="Fill" Source="{Binding InitImageSource}" HorizontalOptions="Fill" VerticalOptions="Fill" />
 
                     </Grid>
@@ -97,7 +97,7 @@
             </Grid>
 
             <Grid ColumnDefinitions="*,auto">
-                <Label Grid.Column="0" Text="Aspect Ratio:" FontAttributes="Bold" VerticalTextAlignment="Center" />
+                <Label Grid.Column="0" Text="Aspect Ratio:" Style="{StaticResource LabelHeader}" VerticalTextAlignment="Center" />
                 <Entry Grid.Column="1" x:Name="AspectRatioEntry" Text="{Binding AspectRatioEntryValue}" VerticalOptions="Center">
                     <Entry.Behaviors>
                         <toolkit:EventToCommandBehavior EventName="Unfocused" Command="{Binding UpdateAllValuesCommand}" />
@@ -106,12 +106,12 @@
             </Grid>
 
             <Grid ColumnDefinitions="*,auto">
-                <Label Grid.Column="0" Text="Preserve Aspect Ratio" FontAttributes="Bold" VerticalTextAlignment="Center" />
+                <Label Grid.Column="0" Text="Preserve Aspect Ratio:" Style="{StaticResource LabelHeader}" VerticalTextAlignment="Center" />
                 <Switch Grid.Column="1" VerticalOptions="Center" IsToggled="{Binding PreserveAspectRatio}" />
             </Grid>
 
             <Grid ColumnDefinitions="*,auto">
-                <Label Grid.Column="0" Text="Width (mult. of 8):" FontAttributes="Bold" VerticalTextAlignment="Center" />
+                <Label Grid.Column="0" Text="Width (mult. of 8):" Style="{StaticResource LabelHeader}" VerticalTextAlignment="Center" />
                 <Entry Grid.Column="1" x:Name="WidthEntry" Text="{Binding WidthEntryValue}" Keyboard="Numeric" VerticalOptions="Center">
                     <Entry.Behaviors>
                         <toolkit:EventToCommandBehavior EventName="Unfocused" Command="{Binding UpdateAllValuesCommand}" />
@@ -121,7 +121,7 @@
             <Slider Minimum="{Binding MinimumWidthHeight}" Maximum="{Binding MaximumWidthHeight}" Value="{Binding WidthSliderValue}" DragCompletedCommand="{Binding UpdateAllValuesCommand}" />
 
             <Grid ColumnDefinitions="*,auto">
-                <Label Grid.Column="0" Text="Height (mult. of 8):" FontAttributes="Bold" VerticalTextAlignment="Center" />
+                <Label Grid.Column="0" Text="Height (mult. of 8):" Style="{StaticResource LabelHeader}" VerticalTextAlignment="Center" />
                 <Entry Grid.Column="1" x:Name="HeightEntry" Text="{Binding HeightEntryValue}" Keyboard="Numeric" VerticalOptions="Center">
                     <Entry.Behaviors>
                         <toolkit:EventToCommandBehavior EventName="Unfocused" Command="{Binding UpdateAllValuesCommand}" />
