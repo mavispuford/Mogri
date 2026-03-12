@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<popups:BasePopup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                  xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+                  xmlns:controls="clr-namespace:Mogri.Controls;assembly=Mogri"
+                  xmlns:mopups="clr-namespace:Mopups.Pages;assembly=Mopups"
+                  xmlns:popups="clr-namespace:Mogri.Views.Popups"
+                  x:Class="Mogri.Views.Popups.LoadingPopup"
+                  x:DataType="popups:LoadingPopup"
+                  CloseWhenBackgroundIsClicked="False">
+    <Border Background="{AppThemeBinding Light={StaticResource CadetTwentyPercent}, Dark={StaticResource Cadet}}"
+            Stroke="Transparent"
+            StrokeShape="RoundRectangle 10"
+            VerticalOptions="Center"
+            HorizontalOptions="Center"
+            Padding="15"
+            WidthRequest="140"
+            HeightRequest="140">
+
+        <VerticalStackLayout VerticalOptions="Center"
+                             Spacing="8">
+            
+            <ActivityIndicator IsRunning="True"/>
+
+            <Label 
+                x:Name="MessageLabel" 
+                HorizontalTextAlignment="Center"
+                FontSize="16"/>
+            
+        </VerticalStackLayout>
+        
+    </Border>
+</popups:BasePopup>

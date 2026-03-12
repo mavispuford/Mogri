@@ -1,0 +1,58 @@
+using Mogri.Interfaces.Services;
+using Mogri.Services;
+using Polly;
+using System.Net;
+
+#if ANDROID
+using Mogri.Platforms.Android.Services;
+#endif
+
+namespace Mogri.Registrations;
+
+public static class ServiceRegistrations
+{
+    public static MauiAppBuilder RegisterServices(this MauiAppBuilder builder)
+    {
+        builder.Services.AddHttpClient(Microsoft.Extensions.Options.Options.DefaultName, client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(60);
+        }).AddTransientHttpErrorPolicy(p => p.WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(500), (message, timeSpan) =>
+        {
+
+        }))
+        .ConfigurePrimaryHttpMessageHandler(() =>
+        {
+#if ANDROID
+            return new SocketsHttpHandler
+            {
+                PooledConnectionLifetime = TimeSpan.FromMinutes(20),
+                PooledConnectionIdleTimeout = TimeSpan.FromMinutes(20),
+                // Proxy = new WebProxy() { Address = new Uri("http://192.168.68.52:9000") }
+            };
+#else
+            return new HttpClientHandler();
+#endif
+        });
+
+        builder.Services.AddSingleton<IImageGenerationBackend, SdForgeNeoService>();
+        builder.Services.AddSingleton<IImageGenerationBackend, ComfyUiService>();
+        builder.Services.AddSingleton<IBackendRegistry, BackendRegistry>();
+        builder.Services.AddSingleton<IImageGenerationService, ProxyImageGenerationService>();
+        builder.Services.AddSingleton<IPopupService, PopupService>();
+        builder.Services.AddSingleton<IImageService, ImageService>();
+        builder.Services.AddSingleton<ISegmentationService, SegmentationService>();
+        builder.Services.AddSingleton<ILoadingService, LoadingService>();
+        builder.Services.AddSingleton<IPresetService, PresetService>();
+        builder.Services.AddSingleton<IPatchService, AotGanPatchService>();
+        builder.Services.AddSingleton<IHistoryService, HistoryService>();
+
+#if ANDROID
+        builder.Services.AddSingleton<IGenerationTaskService, AndroidGenerationTaskService>();
+        builder.Services.AddSingleton<IFileService, FileService>();
+#else
+        builder.Services.AddSingleton<IGenerationTaskService, GenerationTaskService>();
+#endif
+
+        return builder;
+    }
+}

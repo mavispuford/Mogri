@@ -1,0 +1,50 @@
+using Mogri.Controls;
+
+namespace Mogri.Views;
+
+public partial class MainPage : BasePage
+{
+    public MainPage()
+    {
+        InitializeComponent();
+
+        ImageLayout.ChildAdded += ImageLayout_ChildAdded;
+    }
+
+    private async void ImageLayout_ChildAdded(object? sender, ElementEventArgs e)
+    {
+        if (e.Element is VisualElement visualElement)
+        {
+            await visualElement.ScaleToAsync(1, 250u, Easing.CubicInOut);
+
+            var imageLayoutWidth = MainGrid.Width - MainGrid.Padding.HorizontalThickness;
+
+            var imageWidth = ImageLayout.Children.Count switch
+            {
+                var x when x > 4 => imageLayoutWidth,
+                var x when x > 1 && x <= 4 => imageLayoutWidth / 2.5,
+                1 => imageLayoutWidth,
+                _ => imageLayoutWidth,
+            };
+
+            var ratio = (visualElement.Width > 0 && visualElement.Height > 0) 
+                ? visualElement.Width / visualElement.Height 
+                : 1.0;
+
+            var imageHeight = imageWidth / ratio;
+
+            foreach (ImageResultControl imageResult in ImageLayout.Children)
+            {
+                if (imageResult.Image != null)
+                {
+                    // Attempt to work around this bug: https://github.com/dotnet/maui/issues/9712
+                    imageResult.Image.WidthRequest = imageWidth;
+                    imageResult.Image.HeightRequest = imageHeight;
+                }
+
+                imageResult.WidthRequest = imageWidth;
+                imageResult.HeightRequest = imageHeight;
+            }
+        }
+    }
+}
