@@ -99,21 +99,21 @@
 	<ItemGroup>
 	  <PackageReference Include="ColorMinePortable" Version="2.0.4" />
 	  <PackageReference Include="LiteDB" Version="5.0.21" />
-	  <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.30" />
-	  <PackageReference Include="Microsoft.Maui.Essentials" Version="10.0.30" />
-	  <PackageReference Include="CommunityToolkit.Maui" Version="13.0.0" />
+	  <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.50" />
+	  <PackageReference Include="Microsoft.Maui.Essentials" Version="10.0.50" />
+	  <PackageReference Include="CommunityToolkit.Maui" Version="14.0.1" />
 	  <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-	  <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
-	  <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.1" />
-	  <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="10.0.1" />
-	  <PackageReference Include="Microsoft.Kiota.Abstractions" Version="1.16.0" />
-	  <PackageReference Include="Microsoft.Kiota.Http.HttpClientLibrary" Version="1.16.0" />
-	  <PackageReference Include="Microsoft.Kiota.Serialization.Json" Version="1.16.0" />
-	  <PackageReference Include="Microsoft.Kiota.Serialization.Form" Version="1.16.0" />
-	  <PackageReference Include="Microsoft.Kiota.Serialization.Multipart" Version="1.16.0" />
-	  <PackageReference Include="Microsoft.Kiota.Serialization.Text" Version="1.16.0" />
-	  <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.23.2" />
-	  <!-- <PackageReference Include="Microsoft.ML.OnnxRuntime.Managed" Version="1.23.2" /> -->
+	  <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.4" />
+	  <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.4" />
+	  <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="10.0.4" />
+	  <PackageReference Include="Microsoft.Kiota.Abstractions" Version="1.22.0" />
+	  <PackageReference Include="Microsoft.Kiota.Http.HttpClientLibrary" Version="1.22.0" />
+	  <PackageReference Include="Microsoft.Kiota.Serialization.Json" Version="1.22.0" />
+	  <PackageReference Include="Microsoft.Kiota.Serialization.Form" Version="1.22.0" />
+	  <PackageReference Include="Microsoft.Kiota.Serialization.Multipart" Version="1.22.0" />
+	  <PackageReference Include="Microsoft.Kiota.Serialization.Text" Version="1.22.0" />
+	  <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.24.3" />
+	  <PackageReference Include="Microsoft.ML.OnnxRuntime.Managed" Version="1.24.3" />
 	  <PackageReference Include="Mopups" Version="1.3.4" />
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 	  <PackageReference Include="Roslynator.Analyzers" Version="4.15.0">
@@ -124,9 +124,9 @@
 	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	    <PrivateAssets>all</PrivateAssets>
 	  </PackageReference>
-	  <PackageReference Include="SkiaSharp" Version="3.119.0" />
-	  <PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.119.0" />
-	  <PackageReference Include="SkiaSharp.Views.Maui.Core" Version="3.119.0" />
+	  <PackageReference Include="SkiaSharp" Version="3.119.2" />
+	  <PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.119.2" />
+	  <PackageReference Include="SkiaSharp.Views.Maui.Core" Version="3.119.2" />
 	</ItemGroup>
 
 </Project>
