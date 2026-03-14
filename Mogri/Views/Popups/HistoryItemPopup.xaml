@@ -35,6 +35,10 @@
                                    EnableSwipeCommandsWhenScaleIsOne="True"
                                    SwipeLeftCommand="{Binding NextItemCommand}"
                                    SwipeRightCommand="{Binding PreviousItemCommand}">
+            <controls:GestureContainer.GestureRecognizers>
+                <!-- Swallow single taps so they don't hit the MainGrid and close the popup -->
+                <TapGestureRecognizer />
+            </controls:GestureContainer.GestureRecognizers>
             
             <Image x:Name="ImageControl" 
                    Aspect="AspectFit" 

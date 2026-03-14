@@ -61,6 +61,21 @@ public static class MauiProgram
         {
             h.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Colors.Transparent.ToPlatform());
         });
+#elif IOS
+        EntryHandler.Mapper.AppendToMapping("NoUnderline", (h, v) =>
+        {
+            h.PlatformView.BorderStyle = UIKit.UITextBorderStyle.None;
+        });
+
+        EditorHandler.Mapper.AppendToMapping("NoUnderline", (h, v) =>
+        {
+            h.PlatformView.BackgroundColor = UIKit.UIColor.Clear;
+        });
+
+        PickerHandler.Mapper.AppendToMapping("NoUnderline", (h, v) =>
+        {
+            h.PlatformView.BorderStyle = UIKit.UITextBorderStyle.None;
+        });
 #endif
 
         return builder.Build();

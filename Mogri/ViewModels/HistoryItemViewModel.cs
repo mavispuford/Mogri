@@ -28,9 +28,9 @@ public partial class HistoryItemViewModel : BaseViewModel, IHistoryItemViewModel
         FileName = entity.ImageFileName;
 
         var filenameNoPath = Path.GetFileName(FileName);
-        var directoryOnly = FileName.Replace(filenameNoPath, string.Empty);
+        // On iOS the internal path changes per debug session, so always use the current CacheDirectory
         var thumbnailFilename = $"{Constants.ThumbnailPrefix}{filenameNoPath}";
-        ThumbnailFileName = Path.Combine(directoryOnly, thumbnailFilename);
+        ThumbnailFileName = Path.Combine(FileSystem.CacheDirectory, thumbnailFilename);
 
         if (!await fileService.FileExistsInInternalStorageAsync(ThumbnailFileName))
         {

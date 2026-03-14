@@ -28,5 +28,18 @@
 	</array>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/appicon.appiconset</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>The app requires local network access to connect to local diffusion backends (ComfyUI/SdForgeNeo).</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>The app requires access to your photo library to pick images for processing.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>The app requires access to save generated images to your photo gallery.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Allow camera access to capture references.</string>
 </dict>
 </plist>

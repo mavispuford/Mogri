@@ -5,6 +5,8 @@ using System.Net;
 
 #if ANDROID
 using Mogri.Platforms.Android.Services;
+#elif IOS
+using Mogri.Platforms.iOS.Services;
 #endif
 
 namespace Mogri.Registrations;
@@ -49,6 +51,9 @@ public static class ServiceRegistrations
 #if ANDROID
         builder.Services.AddSingleton<IGenerationTaskService, AndroidGenerationTaskService>();
         builder.Services.AddSingleton<IFileService, FileService>();
+#elif IOS
+        builder.Services.AddSingleton<IGenerationTaskService, IosGenerationTaskService>();
+        builder.Services.AddSingleton<IFileService, IosFileService>();
 #else
         builder.Services.AddSingleton<IGenerationTaskService, GenerationTaskService>();
 #endif
