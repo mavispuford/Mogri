@@ -25,7 +25,7 @@
         <ToolbarItem Command="{Binding ResetValuesCommand}"
                      Text="Reset">
             <ToolbarItem.IconImageSource>
-                <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Size="24" Color="{StaticResource MutedPeach}" />
+                <FontImageSource Glyph="&#xe872;" FontFamily="{StaticResource IconFontRegular}" Size="24" Color="{StaticResource MutedPeach}" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
     </views:BasePage.ToolbarItems>
@@ -48,7 +48,7 @@
 
                 <Image Grid.Row="0" WidthRequest="32" HeightRequest="32">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xf609;" FontFamily="MaterialIconsRound300" Size="30" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xf609;" FontFamily="{StaticResource IconFontLight}" Size="30" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="0" Grid.Column="1" Text="Batch Count:" Style="{StaticResource SettingLabel}" />
@@ -58,7 +58,7 @@
 
                 <Image Grid.Row="2" WidthRequest="32" HeightRequest="32">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xf088;" FontFamily="MaterialIconsRound300" Size="30" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xf088;" FontFamily="{StaticResource IconFontLight}" Size="30" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="2" Grid.Column="1" Text="Batch Size:" Style="{StaticResource SettingLabel}" />
@@ -68,7 +68,7 @@
 
                 <Image Grid.Row="4" WidthRequest="32">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe040;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe040;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="4" Grid.Column="1" Text="Steps:" Style="{StaticResource SettingLabel}"/>
@@ -76,7 +76,7 @@
 
                 <Image Grid.Row="5" WidthRequest="32">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xeb5f;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xeb5f;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="5" Grid.Column="1" Text="Cfg Scale:" Style="{StaticResource SettingLabel}"/>
@@ -84,7 +84,7 @@
 
                 <Image Grid.Row="6" WidthRequest="32" IsVisible="{Binding IsDistilledCfgScaleVisible}">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xeb5f;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xeb5f;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="6" Grid.Column="1" Text="Shift:" Style="{StaticResource SettingLabel}" IsVisible="{Binding IsDistilledCfgScaleVisible}"/>
@@ -92,7 +92,7 @@
 
                 <Image Grid.Row="7" WidthRequest="32">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe8e5;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe8e5;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="7" Grid.Column="1" Text="Type:" Style="{StaticResource SettingLabel}"/>
@@ -100,7 +100,7 @@
 
                 <Image Grid.Row="8" WidthRequest="32">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xf720;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xf720;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="8" Grid.Column="1" Text="Model:" Style="{StaticResource SettingLabel}"/>
@@ -118,7 +118,7 @@
 
                 <Image Grid.Row="9" WidthRequest="32" IsVisible="{Binding CurrentCapabilities.SupportsVaes}">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe3b8;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe3b8;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="9" Grid.Column="1" Text="VAE:" Style="{StaticResource SettingLabel}" IsVisible="{Binding CurrentCapabilities.SupportsVaes}"/>
@@ -137,7 +137,7 @@
 
                 <Image Grid.Row="10" WidthRequest="32" IsVisible="{Binding CurrentCapabilities.SupportsTextEncoders}">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe86f;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe86f;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="10" Grid.Column="1" Text="Text Encoder:" Style="{StaticResource SettingLabel}" IsVisible="{Binding CurrentCapabilities.SupportsTextEncoders}"/>
@@ -156,7 +156,7 @@
 
                 <Image Grid.Row="11" WidthRequest="32" IsVisible="{Binding CurrentCapabilities.SupportsSamplerList}">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe8f4;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe8f4;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="11" Grid.Column="1" Text="Sampler:" Style="{StaticResource SettingLabel}" IsVisible="{Binding CurrentCapabilities.SupportsSamplerList}"/>
@@ -164,7 +164,7 @@
 
                 <Image Grid.Row="12" WidthRequest="32" IsVisible="{Binding CurrentCapabilities.SupportsSchedulers}">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe924;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe924;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="12" Grid.Column="1" Text="Scheduler:" Style="{StaticResource SettingLabel}" IsVisible="{Binding CurrentCapabilities.SupportsSchedulers}"/>
@@ -172,7 +172,7 @@
 
                 <Image Grid.Row="13" WidthRequest="32">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe85b;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe85b;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="13" Grid.Column="1" Text="Width/Height:" Style="{StaticResource SettingLabel}">
@@ -195,7 +195,7 @@
                 
                 <Image Grid.Row="14" WidthRequest="32">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe3a5;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe3a5;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="14" Grid.Column="1" Text="Seed:" Style="{StaticResource SettingLabel}"/>
@@ -203,7 +203,7 @@
 
                 <Image Grid.Row="15" WidthRequest="32" IsVisible="{Binding CurrentCapabilities.SupportsUpscaling}">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe8c4;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe8c4;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="15" Grid.Column="1" Text="Upscaling:" Style="{StaticResource SettingLabel}" IsVisible="{Binding CurrentCapabilities.SupportsUpscaling}"/>
@@ -218,7 +218,7 @@
 
                 <Image Grid.Row="19" Grid.Column="0" WidthRequest="32" IsVisible="{Binding CurrentCapabilities.SupportsSeamless}">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe421;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe421;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="19" Grid.Column="1" Text="Make Tiled:" Style="{StaticResource SettingLabel}" IsVisible="{Binding CurrentCapabilities.SupportsSeamless}"/>

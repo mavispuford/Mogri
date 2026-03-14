@@ -30,7 +30,7 @@
         <ToolbarItem Command="{Binding ResetValuesCommand}"
                      Text="Reset">
             <ToolbarItem.IconImageSource>
-                <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Size="24" Color="{StaticResource MutedPeach}" />
+                <FontImageSource Glyph="&#xe872;" FontFamily="{StaticResource IconFontRegular}" Size="24" Color="{StaticResource MutedPeach}" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
     </views:BasePage.ToolbarItems>
@@ -48,7 +48,7 @@
 
                 <Image Grid.Row="0" Grid.Column="0" WidthRequest="32">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe3e9;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe3e9;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="0" Grid.Column="1" Text="Strength:" Style="{StaticResource SettingLabel}"/>
@@ -56,7 +56,7 @@
 
                 <Image Grid.Row="1" Grid.Column="0" WidthRequest="32">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe3f4;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe3f4;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="1" Grid.Column="1" Text="Source Image:" Style="{StaticResource SettingLabel}"/>
@@ -95,7 +95,7 @@
 
                 <Image Grid.Row="3" Grid.Column="0" WidthRequest="32">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe72e;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe72e;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="3" Grid.Column="1" Text="Mask Image:" Style="{StaticResource SettingLabel}"/>
@@ -132,7 +132,7 @@
 
                 <Image Grid.Row="5" Grid.Column="0" WidthRequest="32">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe434;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe434;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="5" Grid.Column="1" Text="Fit Image (on server):" Style="{StaticResource SettingLabel}"/>
@@ -140,7 +140,7 @@
 
                 <Image Grid.Row="6" Grid.Column="0" WidthRequest="32">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe434;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe434;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="6" Grid.Column="1" Text="Fit Image (before sending):" Style="{StaticResource SettingLabel}"/>
@@ -148,7 +148,7 @@
 
                 <Image Grid.Row="7" Grid.Column="0" WidthRequest="32">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe3e9;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe3e9;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="7" Grid.Column="1" Text="Mask Blur:" Style="{StaticResource SettingLabel}"/>

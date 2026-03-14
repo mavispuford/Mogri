@@ -23,18 +23,18 @@
             <toolkit:BoolToObjectConverter x:Key="BoolToShowMaskTextConverter" TrueObject="Hide Masks" FalseObject="Show Masks" />
             <toolkit:BoolToObjectConverter x:Key="BoolToEyeConverter">
                 <toolkit:BoolToObjectConverter.TrueObject>
-                    <FontImageSource Glyph="&#xe8f4;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
+                    <FontImageSource Glyph="&#xe8f4;" FontFamily="{StaticResource IconFontLight}" Size="32" Color="White" />
                 </toolkit:BoolToObjectConverter.TrueObject>
                 <toolkit:BoolToObjectConverter.FalseObject>
-                    <FontImageSource Glyph="&#xe8f5;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
+                    <FontImageSource Glyph="&#xe8f5;" FontFamily="{StaticResource IconFontLight}" Size="32" Color="White" />
                 </toolkit:BoolToObjectConverter.FalseObject>
             </toolkit:BoolToObjectConverter>
             <toolkit:BoolToObjectConverter x:Key="BoolToPlusMinusConverter">
                 <toolkit:BoolToObjectConverter.TrueObject>
-                    <FontImageSource Glyph="&#xe145;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
+                    <FontImageSource Glyph="&#xe145;" FontFamily="{StaticResource IconFontLight}" Size="32" Color="White" />
                 </toolkit:BoolToObjectConverter.TrueObject>
                 <toolkit:BoolToObjectConverter.FalseObject>
-                    <FontImageSource Glyph="&#xe15b;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
+                    <FontImageSource Glyph="&#xe15b;" FontFamily="{StaticResource IconFontLight}" Size="32" Color="White" />
                 </toolkit:BoolToObjectConverter.FalseObject>
             </toolkit:BoolToObjectConverter>
             <toolkit:EnumToBoolConverter x:Key="EnumToBool" />
@@ -67,7 +67,7 @@
                          HeightRequest="50"
                          Padding="10">
                 <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe43e;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
+                    <FontImageSource Glyph="&#xe43e;" FontFamily="{StaticResource IconFontLight}" Size="30" Color="White" />
                 </ImageButton.Source>
             </ImageButton>
         </HorizontalStackLayout>
@@ -76,12 +76,12 @@
     <views:BasePage.ToolbarItems>
         <ToolbarItem Text="Undo" Command="{Binding UndoCommand}" Order="Primary">
             <ToolbarItem.IconImageSource>
-                <FontImageSource Glyph="&#xe166;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
+                <FontImageSource Glyph="&#xe166;" FontFamily="{StaticResource IconFontLight}" Size="30" Color="White" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
         <ToolbarItem Text="Edit Masks" Order="Primary" Command="{Binding EditMasksCommand}">
             <ToolbarItem.IconImageSource>
-                <FontImageSource Glyph="&#xe155;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
+                <FontImageSource Glyph="&#xe155;" FontFamily="{StaticResource IconFontLight}" Size="30" Color="White" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
         <ToolbarItem Text="{Binding ShowMaskLayer, Converter={StaticResource BoolToShowMaskTextConverter}}" 
@@ -90,12 +90,12 @@
                      Order="Primary" />
         <ToolbarItem Text="Save" Command="{Binding SaveCommand}" Order="Secondary">
             <ToolbarItem.IconImageSource>
-                <FontImageSource Glyph="&#xe161;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
+                <FontImageSource Glyph="&#xe161;" FontFamily="{StaticResource IconFontLight}" Size="30" Color="White" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
         <ToolbarItem Text="Set Resolution" Command="{Binding SetResolutionCommand}" Order="Secondary">
             <ToolbarItem.IconImageSource>
-                <FontImageSource Glyph="&#xe85b;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
+                <FontImageSource Glyph="&#xe85b;" FontFamily="{StaticResource IconFontLight}" Size="30" Color="White" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
     </views:BasePage.ToolbarItems>
@@ -268,7 +268,7 @@
                         <Image HorizontalOptions="Center"
                            VerticalOptions="Center">
                             <Image.Source>
-                                <FontImageSource Glyph="&#xe91c;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
+                                <FontImageSource Glyph="&#xe91c;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="White" />
                             </Image.Source>
                         </Image>
                     </ContentView>
@@ -290,7 +290,7 @@
                         <Image HorizontalOptions="Center"
                            VerticalOptions="Center">
                             <Image.Source>
-                                <FontImageSource Glyph="&#xe40a;" FontFamily="MaterialIconsRound400" Size="30" Color="{Binding PaletteIconColor}" />
+                                <FontImageSource Glyph="&#xe40a;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="{Binding PaletteIconColor}" />
                             </Image.Source>
                         </Image>
 
@@ -315,7 +315,7 @@
                         <Image HorizontalOptions="Center"
                            VerticalOptions="Center">
                             <Image.Source>
-                                <FontImageSource Glyph="&#xe3ea;" FontFamily="MaterialIconsRound300" Size="30" Color="White" />
+                                <FontImageSource Glyph="&#xe3ea;" FontFamily="{StaticResource IconFontLight}" Size="30" Color="White" />
                             </Image.Source>
                         </Image>
                     </ContentView>
@@ -333,7 +333,7 @@
                         </Grid.GestureRecognizers>
                         <Image HorizontalOptions="Center" Margin="0,0,0,16">
                             <Image.Source>
-                                <FontImageSource Glyph="&#xe85b;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
+                                <FontImageSource Glyph="&#xe85b;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="White" />
                             </Image.Source>
                         </Image>
                         <Label Text="{Binding Path=BoundingBoxSize, StringFormat='{0:F0}'}"
@@ -372,7 +372,7 @@
                         </ContentView.GestureRecognizers>
                         <Image HorizontalOptions="Center" VerticalOptions="Center">
                             <Image.Source>
-                                <FontImageSource Glyph="&#xeb2d;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
+                                <FontImageSource Glyph="&#xeb2d;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="White" />
                             </Image.Source>
                         </Image>
                     </ContentView>
@@ -494,7 +494,7 @@
                 <HorizontalStackLayout>
                     <Image>
                         <Image.Source>
-                            <FontImageSource Glyph="&#xe94d;" FontFamily="MaterialIconsRound300" Size="24" />
+                            <FontImageSource Glyph="&#xe94d;" FontFamily="{StaticResource IconFontLight}" Size="24" />
                         </Image.Source>
                         <Image.Behaviors>
                             <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Primary}" />
@@ -512,7 +512,7 @@
                 <HorizontalStackLayout>
                     <Image>
                         <Image.Source>
-                            <FontImageSource Glyph="&#xe3f3;" FontFamily="MaterialIconsRound300" Size="24" />
+                            <FontImageSource Glyph="&#xe3f3;" FontFamily="{StaticResource IconFontLight}" Size="24" />
                         </Image.Source>
                         <Image.Behaviors>
                             <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Primary}" />
@@ -530,7 +530,7 @@
                 <HorizontalStackLayout>
                     <Image>
                         <Image.Source>
-                            <FontImageSource Glyph="&#xf08b;" FontFamily="MaterialIconsRound300" Size="24" />
+                            <FontImageSource Glyph="&#xf08b;" FontFamily="{StaticResource IconFontLight}" Size="24" />
                         </Image.Source>
                         <Image.Behaviors>
                             <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Primary}" />
@@ -548,7 +548,7 @@
                 <HorizontalStackLayout>
                     <Image>
                         <Image.Source>
-                            <FontImageSource Glyph="&#xf824;" FontFamily="MaterialIconsRound300" Size="24" />
+                            <FontImageSource Glyph="&#xf824;" FontFamily="{StaticResource IconFontLight}" Size="24" />
                         </Image.Source>
                         <Image.Behaviors>
                             <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Primary}" />
@@ -598,7 +598,7 @@
                         VerticalOptions="Fill"
                         Padding="10">
                     <ImageButton.Source>
-                        <FontImageSource Glyph="&#xf10a;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
+                        <FontImageSource Glyph="&#xf10a;" FontFamily="{StaticResource IconFontLight}" Size="32" Color="White" />
                     </ImageButton.Source>
                     <ImageButton.Behaviors>
                         <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource White}" />
@@ -630,7 +630,7 @@
                     VerticalOptions="Fill"
                     Padding="10">
                     <ImageButton.Source>
-                        <FontImageSource Glyph="&#xe5cd;" FontFamily="MaterialIconsRound300" Size="32" Color="White" />
+                        <FontImageSource Glyph="&#xe5cd;" FontFamily="{StaticResource IconFontLight}" Size="32" Color="White" />
                     </ImageButton.Source>
                     <ImageButton.Behaviors>
                         <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Secondary}" Dark="{StaticResource Primary}" />

@@ -21,15 +21,17 @@ public static class MauiProgram
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+
                 fonts.AddFont("Comfortaa-Light.ttf", "ComfortaaLight");
                 fonts.AddFont("Comfortaa-Regular.ttf", "ComfortaaRegular");
                 fonts.AddFont("Comfortaa-Medium.ttf", "ComfortaaMedium");
                 fonts.AddFont("Comfortaa-SemiBold.ttf", "ComfortaaSemiBold");
                 fonts.AddFont("Comfortaa-Bold.ttf", "ComfortaaBold");
-                fonts.AddFont("MaterialSymbolsRounded100.ttf", "MaterialIconsRound100");
-                fonts.AddFont("MaterialSymbolsRounded300.ttf", "MaterialIconsRound300");
-                fonts.AddFont("MaterialSymbolsRounded400.ttf", "MaterialIconsRound400");
-                fonts.AddFont("MaterialSymbolsRounded700.ttf", "MaterialIconsRound700");
+
+                fonts.AddFont("MaterialSymbolsRounded100.ttf", "MaterialSymbolsRounded-Thin");
+                fonts.AddFont("MaterialSymbolsRounded300.ttf", "MaterialSymbolsRounded-Light");
+                fonts.AddFont("MaterialSymbolsRounded400.ttf", "MaterialSymbolsRounded-Regular");
+                fonts.AddFont("MaterialSymbolsRounded700.ttf", "MaterialSymbolsRounded-Bold");
             })
             .UseMauiCommunityToolkit()
             .ConfigureMopups()

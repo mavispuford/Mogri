@@ -22,7 +22,7 @@
                 <Grid ColumnDefinitions="Auto, *">
                     <Image Grid.Column="0" VerticalOptions="Center" Margin="0,0,5,0">
                         <Image.Source>
-                            <FontImageSource Glyph="&#xe8b6;" FontFamily="MaterialIconsRound400" Size="20" Color="{AppThemeBinding Light={StaticResource Primary}, Dark=Gray}" />
+                            <FontImageSource Glyph="&#xe8b6;" FontFamily="{StaticResource IconFontRegular}" Size="20" Color="{AppThemeBinding Light={StaticResource Primary}, Dark=Gray}" />
                         </Image.Source>
                     </Image>
                     <Entry Grid.Column="1" HeightRequest="46" Placeholder="Search history..." VerticalTextAlignment="Center" Text="{Binding SearchText}" VerticalOptions="Fill" BackgroundColor="Transparent" FontSize="14" ClearButtonVisibility="WhileEditing" ReturnType="Search" FontFamily="ComfortaaBold" />
@@ -31,19 +31,19 @@
 
             <ImageButton Grid.Column="1" ToolTipProperties.Text="Select" Command="{Binding ToggleSelectionModeCommand}">
                 <ImageButton.Source>
-                    <FontImageSource Glyph="{Binding SelectionModeEnabled, Converter={StaticResource BoolToSelectionModeGlyph}}" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
+                    <FontImageSource Glyph="{Binding SelectionModeEnabled, Converter={StaticResource BoolToSelectionModeGlyph}}" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="White" />
                 </ImageButton.Source>
             </ImageButton>
 
             <ImageButton Grid.Column="2" ToolTipProperties.Text="Clear History" Command="{Binding ClearHistoryCommand}" IsVisible="{Binding SelectionModeEnabled, Converter={StaticResource InvertedBool}}">
                 <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe16c;" FontFamily="MaterialIconsRound400" Size="30" Color="{StaticResource MutedPeach}" />
+                    <FontImageSource Glyph="&#xe16c;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="{StaticResource MutedPeach}" />
                 </ImageButton.Source>
             </ImageButton>
 
             <ImageButton Grid.Column="2" ToolTipProperties.Text="Select All" Command="{Binding SelectAllResultsCommand}" IsVisible="{Binding SelectionModeEnabled}">
                 <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe162;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
+                    <FontImageSource Glyph="&#xe162;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="White" />
                 </ImageButton.Source>
             </ImageButton>
         </Grid>
@@ -186,7 +186,7 @@
                            VerticalOptions="Center"
                            InputTransparent="True">
                         <Image.Source>
-                            <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Size="64" Color="{StaticResource SteelRed}" />
+                            <FontImageSource Glyph="&#xe872;" FontFamily="{StaticResource IconFontRegular}" Size="64" Color="{StaticResource SteelRed}" />
                         </Image.Source>
                     </Image>
                 </ContentView>

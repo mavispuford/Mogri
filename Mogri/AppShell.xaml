@@ -10,14 +10,14 @@
         <Tab Title="Generate"
              Route="MainPageTab">
             <Tab.Icon>
-                <FontImageSource Glyph="&#xef42;" FontFamily="MaterialIconsRound400" />
+                <FontImageSource Glyph="&#xef42;" FontFamily="{StaticResource IconFontRegular}" />
             </Tab.Icon>
             <ShellContent ContentTemplate="{DataTemplate views:MainPage}" />
         </Tab>
         <Tab Title="Canvas"
              Route="CanvasPageTab">
             <Tab.Icon>
-                <FontImageSource Glyph="&#xe3f4;" FontFamily="MaterialIconsRound400" />
+                <FontImageSource Glyph="&#xe3f4;" FontFamily="{StaticResource IconFontRegular}" />
             </Tab.Icon>
             <ShellContent ContentTemplate="{DataTemplate views:CanvasPage}" />
         </Tab>
