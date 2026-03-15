@@ -22,7 +22,8 @@ public class BasePage : ContentPage
         {
             var statusBarBehavior = new StatusBarBehavior()
             {
-                StatusBarStyle = StatusBarStyle.LightContent
+                StatusBarStyle = StatusBarStyle.LightContent,
+                ApplyOn = StatusBarApplyOn.OnPageNavigatedTo
             };
 
             statusBarBehavior.SetAppThemeColor(StatusBarBehavior.StatusBarColorProperty, (Color)lightStatusBarColor, (Color)darkStatusBarColor);

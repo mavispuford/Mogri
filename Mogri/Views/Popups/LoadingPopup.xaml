@@ -7,7 +7,8 @@
                   xmlns:popups="clr-namespace:Mogri.Views.Popups"
                   x:Class="Mogri.Views.Popups.LoadingPopup"
                   x:DataType="popups:LoadingPopup"
-                  CloseWhenBackgroundIsClicked="False">
+                  CloseWhenBackgroundIsClicked="False"
+                  BackgroundColor="{StaticResource BlackTenPercent}">
     <Border Background="{AppThemeBinding Light={StaticResource CadetTwentyPercent}, Dark={StaticResource Cadet}}"
             Stroke="Transparent"
             StrokeShape="RoundRectangle 10"

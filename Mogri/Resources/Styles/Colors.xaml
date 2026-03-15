@@ -45,6 +45,7 @@
     <Color x:Key="Gray950">#141414</Color>
 
     <Color x:Key="BlackSeventyThreePercent">#BB000000</Color>
+    <Color x:Key="BlackTenPercent">#1A000000</Color>
     <Color x:Key="Gray200TwentySixPercent">#44C8C8C8</Color>
     <Color x:Key="WhiteTwentySixPercent">#44FFFFFF</Color>
     <Color x:Key="PrimaryEightyPercent">#80607B82</Color>
