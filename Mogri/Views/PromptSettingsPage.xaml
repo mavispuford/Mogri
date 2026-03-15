@@ -207,7 +207,7 @@
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="15" Grid.Column="1" Text="Upscaling:" Style="{StaticResource SettingLabel}" IsVisible="{Binding CurrentCapabilities.SupportsUpscaling}"/>
-                <Switch Grid.Row="15" Grid.Column="2" IsToggled="{Binding EnableUpscaling}" IsVisible="{Binding CurrentCapabilities.SupportsUpscaling}"/>
+                <Switch Grid.Row="15" Grid.Column="2" IsToggled="{Binding EnableUpscaling}" IsVisible="{Binding CurrentCapabilities.SupportsUpscaling}" HorizontalOptions="End" />
                 <Label Grid.Row="16" Grid.Column="1" Text="Upscaler:" Style="{StaticResource SettingLabel}" IsVisible="{Binding CurrentCapabilities.SupportsUpscaling}"/>
                 <Picker Grid.Row="16" Grid.Column="2" Title="Upscaler" ItemsSource="{Binding AvailableUpscalerValues}" SelectedItem="{Binding Upscaler}" FontSize="16" HorizontalTextAlignment="End" IsVisible="{Binding CurrentCapabilities.SupportsUpscaling}"/>
                 <Label Grid.Row="17" Grid.Column="1" Text="Upscale Lvl:" Style="{StaticResource SettingLabel}" IsVisible="{Binding CurrentCapabilities.SupportsUpscaling}"/>
@@ -222,7 +222,7 @@
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="19" Grid.Column="1" Text="Make Tiled:" Style="{StaticResource SettingLabel}" IsVisible="{Binding CurrentCapabilities.SupportsSeamless}"/>
-                <Switch Grid.Row="19" Grid.Column="2" IsToggled="{Binding EnableTiling}" IsVisible="{Binding CurrentCapabilities.SupportsSeamless}"/>
+                <Switch Grid.Row="19" Grid.Column="2" IsToggled="{Binding EnableTiling}" IsVisible="{Binding CurrentCapabilities.SupportsSeamless}" HorizontalOptions="End" />
 
             </Grid>
             </VerticalStackLayout>

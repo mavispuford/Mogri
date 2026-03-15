@@ -18,14 +18,14 @@
               ColumnSpacing="10"
               Padding="0,0,10,0">
             
-            <Border Grid.Column="0" StrokeShape="RoundRectangle 23" StrokeThickness="0" BackgroundColor="{AppThemeBinding Light=#F0F0F0, Dark=#303030}" Padding="10,0" HeightRequest="46" VerticalOptions="Center">
+            <Border Grid.Column="0" StrokeShape="RoundRectangle 23" StrokeThickness="0" BackgroundColor="{AppThemeBinding Light=#F0F0F0, Dark=#303030}" Padding="10,0" HeightRequest="{OnPlatform Android=46, iOS=36}" VerticalOptions="Center">
                 <Grid ColumnDefinitions="Auto, *">
                     <Image Grid.Column="0" VerticalOptions="Center" Margin="0,0,5,0">
                         <Image.Source>
                             <FontImageSource Glyph="&#xe8b6;" FontFamily="{StaticResource IconFontRegular}" Size="20" Color="{AppThemeBinding Light={StaticResource Primary}, Dark=Gray}" />
                         </Image.Source>
                     </Image>
-                    <Entry Grid.Column="1" HeightRequest="46" Placeholder="Search history..." VerticalTextAlignment="Center" Text="{Binding SearchText}" VerticalOptions="Fill" BackgroundColor="Transparent" FontSize="14" ClearButtonVisibility="WhileEditing" ReturnType="Search" FontFamily="ComfortaaBold" />
+                    <Entry Grid.Column="1" HeightRequest="{OnPlatform Android=46, iOS=36}" Placeholder="Search history..." VerticalTextAlignment="Center" Text="{Binding SearchText}" VerticalOptions="Fill" BackgroundColor="Transparent" FontSize="14" ClearButtonVisibility="WhileEditing" ReturnType="Search" FontFamily="ComfortaaBold" />
                 </Grid>
             </Border>
 
@@ -144,7 +144,7 @@
 
         <Border x:Name="BottomPanel"
                 VerticalOptions="End" 
-                HeightRequest="80" 
+                HeightRequest="100" 
                 Margin="-1"
                 BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}"
                 Stroke="Transparent"
@@ -154,12 +154,12 @@
                 <Shadow Brush="Black"
                         Offset="0,0"
                         Radius="50"
-                        Opacity="0.8" />
+                        Opacity="0.2" />
             </Border.Shadow>
             <Border.Behaviors>
                 <animations:CustomAnimationBehavior AnimateCommand="{Binding ShowBottomPanelCommand}">
                     <animations:CustomAnimationBehavior.AnimationType>
-                        <animations:TranslateToAnimation TranslationY="0" 
+                        <animations:TranslateToAnimation TranslationY="36" 
                                                          Length="200" Easing="{x:Static Easing.CubicInOut}" />
                     </animations:CustomAnimationBehavior.AnimationType>
                 </animations:CustomAnimationBehavior>
@@ -167,12 +167,12 @@
                 <animations:CustomAnimationBehavior AnimateCommand="{Binding HideBottomPanelCommand}"
                                                     EventName="Loaded">
                     <animations:CustomAnimationBehavior.AnimationType>
-                        <animations:TranslateToAnimation TranslationY="85"
+                        <animations:TranslateToAnimation TranslationY="110"
                                                          Length="200" Easing="{x:Static Easing.CubicInOut}"/>
                     </animations:CustomAnimationBehavior.AnimationType>
                 </animations:CustomAnimationBehavior>
             </Border.Behaviors>
-            <Grid ColumnDefinitions="*,auto">
+            <Grid ColumnDefinitions="*,auto" VerticalOptions="Start">
                 <Label Grid.Column="0" Margin="30,0,0,0" Text="{Binding SelectedItemsText}" FontSize="16" VerticalTextAlignment="Center"/>
 
                 <ContentView Grid.Column="1"
@@ -186,7 +186,7 @@
                            VerticalOptions="Center"
                            InputTransparent="True">
                         <Image.Source>
-                            <FontImageSource Glyph="&#xe872;" FontFamily="{StaticResource IconFontRegular}" Size="64" Color="{StaticResource SteelRed}" />
+                            <FontImageSource Glyph="&#xe872;" FontFamily="{StaticResource IconFontRegular}" Size="36" Color="{StaticResource SteelRed}" />
                         </Image.Source>
                     </Image>
                 </ContentView>
