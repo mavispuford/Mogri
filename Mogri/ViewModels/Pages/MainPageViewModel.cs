@@ -567,6 +567,15 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         await Shell.Current.GoToAsync("PromptSettingsPage", parameters);
     }
 
+
+    [RelayCommand]
+    private async Task ShowConnectivityStatus()
+    {
+        var message = ServerConnected ? "Server connected" : "No connection to server";
+        
+        await _popupService.DisplayAlertAsync("Connection", message, "OK");
+    }
+
     public override async void ApplyQueryAttributes(IDictionary<string, object>? query)
     {
         if (query == null) return;

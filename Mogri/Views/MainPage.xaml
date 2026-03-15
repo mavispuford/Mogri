@@ -19,10 +19,10 @@
             <toolkit:BoolToObjectConverter x:Key="BoolToOpacityConverter" TrueObject="1" FalseObject="0" />
             <toolkit:BoolToObjectConverter x:Key="ConnectivityBoolToImageSourceConverter">
                 <toolkit:BoolToObjectConverter.TrueObject>
-                    <FontImageSource Glyph="&#xe63e;" FontFamily="{StaticResource IconFontRegular}" Size="26" Color="White" />
+                    <FontImageSource Glyph="&#xe669;" FontFamily="{StaticResource IconFontRegular}" Size="26" Color="White" />
                 </toolkit:BoolToObjectConverter.TrueObject>
                 <toolkit:BoolToObjectConverter.FalseObject>
-                    <FontImageSource Glyph="&#xe648;" FontFamily="{StaticResource IconFontRegular}" Size="26" Color="{StaticResource WhiteTwentySixPercent}" />
+                    <FontImageSource Glyph="&#xf239;" FontFamily="{StaticResource IconFontRegular}" Size="26" Color="{StaticResource WhiteTwentySixPercent}" />
                 </toolkit:BoolToObjectConverter.FalseObject>
             </toolkit:BoolToObjectConverter>
             <toolkit:IsStringNotNullOrEmptyConverter x:Key="IsStringNotNullOrEmptyConverter" />
@@ -40,7 +40,8 @@
     </Shell.TitleView>
 
     <views:BasePage.ToolbarItems>
-        <ToolbarItem IconImageSource="{Binding ServerConnected, Converter={StaticResource ConnectivityBoolToImageSourceConverter}}" />
+        <ToolbarItem IconImageSource="{Binding ServerConnected, Converter={StaticResource ConnectivityBoolToImageSourceConverter}}"
+            Command="{Binding ShowConnectivityStatusCommand}" />
         <ToolbarItem Text="Settings"
                      Command="{Binding ShowAppSettingsCommand}">
             <ToolbarItem.IconImageSource>
