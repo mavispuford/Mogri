@@ -165,5 +165,21 @@ namespace Mogri.Services
         {
             return Shell.Current.Dispatcher.DispatchAsync(() => Shell.Current.DisplayActionSheetAsync(title, cancel, destruction, buttons));
         }
+
+        public async Task<FileResult?> PickSinglePhotoAsync()
+        {
+            var fileResult = await MediaPicker.PickPhotosAsync(new MediaPickerOptions { SelectionLimit = 1 });
+            var photo = fileResult?.FirstOrDefault();
+
+            // iOS requires a delay after the media picker is dismissed
+            // before presenting another view, otherwise it attempts to present
+            // on a view controller that is no longer in the window hierarchy.
+            if (DeviceInfo.Platform == DevicePlatform.iOS)
+            {
+                await Task.Delay(1000);
+            }
+
+            return photo;
+        }
     }
 }

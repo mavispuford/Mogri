@@ -190,8 +190,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
     {
         try
         {
-            var fileResult = await MediaPicker.PickPhotosAsync(new MediaPickerOptions { SelectionLimit = 1 });
-            var photo = fileResult?.FirstOrDefault();
+            var photo = await _popupService.PickSinglePhotoAsync();
 
             if (photo == null || _settings == null)
             {

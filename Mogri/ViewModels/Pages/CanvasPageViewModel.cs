@@ -10,6 +10,7 @@ using Mogri.Interfaces.ViewModels.Pages;
 using SkiaSharp;
 using System.Collections.ObjectModel;
 using Mogri.Models;
+using CommunityToolkit.Maui.Services;
 
 namespace Mogri.ViewModels;
 
@@ -821,9 +822,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     {
         try
         {
-            var fileResult = await MediaPicker.PickPhotosAsync(new MediaPickerOptions { SelectionLimit = 1 });
-            var photo = fileResult?.FirstOrDefault();
-
+            var photo = await _popupService.PickSinglePhotoAsync();
+            
             if (photo == null)
             {
                 return;
@@ -840,7 +840,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 actions.Add(scaleImageToBoundingBoxOption);
             }
 
-            var action = await Shell.Current.DisplayActionSheetAsync("Set Image", "Cancel", null, actions.ToArray());
+            var action = await _popupService.DisplayActionSheetAsync("Set Image", "Cancel", null, actions.ToArray());
 
             if (action == "Cancel" || action == null)
             {
