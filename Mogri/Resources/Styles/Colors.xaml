@@ -7,6 +7,7 @@
     <!-- Foundational colors - Large surfaces, standard text -->
     <Color x:Key="Primary">#607B82</Color>
     <Color x:Key="Primary075">#BF607B82</Color>
+    <Color x:Key="Primary050">#80607B82</Color>
     <Color x:Key="Secondary">#DFE9EA</Color>
     <Color x:Key="Tertiary">#345E67</Color>
     <Color x:Key="CaribbeanBlue">#FF529AAC</Color>
