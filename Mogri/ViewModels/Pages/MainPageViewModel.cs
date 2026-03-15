@@ -19,6 +19,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     private readonly IGenerationTaskService _generationTaskService;
     private readonly IServiceProvider _serviceProvider;
     private readonly IImageService _imageService;
+    private readonly IPopupService _popupService;
 
     private PromptSettings _settings = new();
     private string? _resizedInitImage;
@@ -62,6 +63,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         IGenerationTaskService generationTaskService,
         IServiceProvider serviceProvider,
         IImageService imageService,
+        IPopupService popupService,
         ILoadingService loadingService) : base(loadingService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
@@ -69,6 +71,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         _generationTaskService = generationTaskService ?? throw new ArgumentNullException(nameof(generationTaskService));
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
+        _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
 
         _generationTaskService.ProgressChanged += onGenerationProgressChanged;
         _generationTaskService.Completed += onGenerationCompleted;
@@ -174,7 +177,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         }
         catch
         {
-            await Shell.Current.CurrentPage.DisplayAlertAsync(
+            await _popupService.DisplayAlertAsync(
                 "Connection problems",
                 "Unable to connect to the configured server URL. Please double check your app settings/connectivity and try again.",
                 "OK");
@@ -197,7 +200,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     {
         if (_generationTaskService.IsRunning)
         {
-            await Shell.Current.CurrentPage.DisplayAlertAsync(
+            await _popupService.DisplayAlertAsync(
                 "Generation in progress",
                 "An image generation is already running. Please wait for it to finish or cancel it.",
                 "OK");
@@ -228,7 +231,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                         if (status != PermissionStatus.Granted)
                         {
                             Preferences.Default.Set("NotificationPermissionDenied", true);
-                            await Shell.Current.CurrentPage.DisplayAlertAsync(
+                            await _popupService.DisplayAlertAsync(
                                 "Notification Permission Denied",
                                 "Background generation notifications will not appear.",
                                 "OK");
@@ -245,7 +248,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
         if (!Preferences.Default.ContainsKey(Constants.PreferenceKeys.ServerUrl))
         {
-            await Shell.Current.CurrentPage.DisplayAlertAsync(
+            await _popupService.DisplayAlertAsync(
                 "No server URL",
                 "There is no server URL configured. Please set the server URL in app settings and try again.",
                 "OK");
@@ -260,7 +263,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
         if (!await _stableDiffusionService.CheckServerAsync())
         {
-            await Shell.Current.CurrentPage.DisplayAlertAsync(
+            await _popupService.DisplayAlertAsync(
                 "Connection Problems",
                 "Unable to connect to the server. Please verify your connectivity and try again.",
                 "OK");
@@ -342,7 +345,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         }
         catch (Exception e)
         {
-            await Shell.Current.CurrentPage.DisplayAlertAsync("Error", $"An unexpected error occurred: {e.Message}", "OK");
+            await _popupService.DisplayAlertAsync("Error", $"An unexpected error occurred: {e.Message}", "OK");
             IsGenerating = false;
             DeviceDisplay.Current.KeepScreenOn = false;
         }
@@ -393,16 +396,16 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                 if (result.ErrorMessage?.Contains("network error", StringComparison.OrdinalIgnoreCase) == true ||
                     result.ErrorMessage?.Contains("SocketException", StringComparison.OrdinalIgnoreCase) == true)
                 {
-                    await Shell.Current.CurrentPage.DisplayAlertAsync("Connection Error", $"A network error occurred: {result.ErrorMessage}", "OK");
+                    await _popupService.DisplayAlertAsync("Connection Error", $"A network error occurred: {result.ErrorMessage}", "OK");
                 }
                 else if (result.ErrorMessage?.Contains("web error", StringComparison.OrdinalIgnoreCase) == true ||
                          result.ErrorMessage?.Contains("WebException", StringComparison.OrdinalIgnoreCase) == true)
                 {
-                    await Shell.Current.CurrentPage.DisplayAlertAsync("Web Error", $"A web error occurred: {result.ErrorMessage}", "OK");
+                    await _popupService.DisplayAlertAsync("Web Error", $"A web error occurred: {result.ErrorMessage}", "OK");
                 }
                 else if (result.ErrorMessage != "Generation cancelled.")
                 {
-                    await Shell.Current.CurrentPage.DisplayAlertAsync("Error", $"An unexpected error occurred: {result.ErrorMessage}", "OK");
+                    await _popupService.DisplayAlertAsync("Error", $"An unexpected error occurred: {result.ErrorMessage}", "OK");
                 }
             }
 
@@ -664,7 +667,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                 requestedHeight.Value != _settings.Height)
             {
                 var resChangeMessage = $"Would you like keep the resolution at {_settings.Width}x{_settings.Height} or CHANGE it to {requestedWidth.Value}x{requestedHeight.Value}?";
-                var resChangeResult = await Shell.Current.DisplayAlertAsync("Confirm Resolution Change", resChangeMessage, "CHANGE", "Keep");
+                var resChangeResult = await _popupService.DisplayAlertAsync("Confirm Resolution Change", resChangeMessage, "CHANGE", "Keep");
 
                 if (resChangeResult)
                 {
@@ -732,7 +735,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             if (messages.Any())
             {
                 var list = string.Join("\n", messages);
-                await Shell.Current.DisplayAlertAsync("Missing Resources", 
+                await _popupService.DisplayAlertAsync("Missing Resources", 
                     $"The following resources are missing from the current backend:\n\n{list}\n\nGeneration may look different or fail.", 
                     "OK");
             }
@@ -745,7 +748,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
     private async Task LoadSharedImage(string imageUri, string contentType)
     {
-        var useAsSourceImage = !await Shell.Current.DisplayAlertAsync(
+        var useAsSourceImage = !await _popupService.DisplayAlertAsync(
                 "Where to?",
                 "Would you like to use the image as a source image or put it in the canvas for masking?",
                 "Canvas",

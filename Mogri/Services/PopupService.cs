@@ -5,6 +5,7 @@ using Mogri.Interfaces.Services;
 using Mogri.Interfaces.ViewModels;
 using Mogri.Interfaces.ViewModels.Popups;
 using Mogri.Registrations;
+using Mogri.Views.Popups;
 using Mopups.Pages;
 using Mopups.Services;
 using System.Linq;
@@ -148,7 +149,7 @@ namespace Mogri.Services
 
         private Page GetActivePage()
         {
-            return MopupService.Instance.PopupStack.LastOrDefault() as Page 
+            return MopupService.Instance.PopupStack.LastOrDefault(p => p is not LoadingPopup) as Page 
                    ?? Shell.Current?.CurrentPage 
                    ?? Application.Current?.MainPage!;
         }

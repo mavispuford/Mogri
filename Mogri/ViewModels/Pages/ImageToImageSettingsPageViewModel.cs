@@ -81,7 +81,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
             return;
         }
 
-        var result = await Shell.Current.DisplayAlertAsync("Confirm Reset", "Are you sure you would like to reset back to defaults?", "RESET", "Cancel");
+        var result = await _popupService.DisplayAlertAsync("Confirm Reset", "Are you sure you would like to reset back to defaults?", "RESET", "Cancel");
 
         if (!result)
         {
