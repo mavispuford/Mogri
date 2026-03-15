@@ -108,7 +108,7 @@ public partial class EditMasksPopupViewModel : PopupBaseViewModel, IEditMasksPop
     [RelayCommand]
     private async Task ClearAll()
     {
-        var result = await Shell.Current.DisplayAlertAsync("Clear mask?", "Are you sure you would like to clear all items?", "YES", "Cancel");
+        var result = await _popupService.DisplayAlertAsync("Clear mask?", "Are you sure you would like to clear all items?", "YES", "Cancel");
         if (result)
         {
             if (_sourceActions == null || !_sourceActions.Any()) return;

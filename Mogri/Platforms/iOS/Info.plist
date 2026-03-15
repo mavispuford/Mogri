@@ -39,7 +39,5 @@
 	<string>The app requires access to your photo library to pick images for processing.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>The app requires access to save generated images to your photo gallery.</string>
-	<key>NSCameraUsageDescription</key>
-	<string>Allow camera access to capture references.</string>
 </dict>
 </plist>

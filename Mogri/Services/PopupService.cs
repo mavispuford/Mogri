@@ -146,24 +146,31 @@ namespace Mogri.Services
             activePopups.Remove(popup.Key);
         }
 
+        private Page GetActivePage()
+        {
+            return MopupService.Instance.PopupStack.LastOrDefault() as Page 
+                   ?? Shell.Current?.CurrentPage 
+                   ?? Application.Current?.MainPage!;
+        }
+
         public Task DisplayAlertAsync(string title, string message, string cancel)
         {
-            return Shell.Current.Dispatcher.DispatchAsync(() => Shell.Current.DisplayAlertAsync(title, message, cancel));
+            return Shell.Current.Dispatcher.DispatchAsync(() => GetActivePage().DisplayAlertAsync(title, message, cancel));
         }
 
         public Task<bool> DisplayAlertAsync(string title, string message, string accept, string cancel)
         {
-            return Shell.Current.Dispatcher.DispatchAsync(() => Shell.Current.DisplayAlertAsync(title, message, accept, cancel));
+            return Shell.Current.Dispatcher.DispatchAsync(() => GetActivePage().DisplayAlertAsync(title, message, accept, cancel));
         }
 
         public Task<string?> DisplayPromptAsync(string title, string message, string accept = "OK", string cancel = "Cancel", string? placeholder = null, int maxLength = -1, Keyboard? keyboard = null, string initialValue = "")
         {
-            return Shell.Current.Dispatcher.DispatchAsync(() => Shell.Current.DisplayPromptAsync(title, message, accept, cancel, placeholder, maxLength, keyboard, initialValue));
+            return Shell.Current.Dispatcher.DispatchAsync(() => GetActivePage().DisplayPromptAsync(title, message, accept, cancel, placeholder, maxLength, keyboard, initialValue));
         }
 
         public Task<string> DisplayActionSheetAsync(string title, string cancel, string? destruction, params string[] buttons)
         {
-            return Shell.Current.Dispatcher.DispatchAsync(() => Shell.Current.DisplayActionSheetAsync(title, cancel, destruction, buttons));
+            return Shell.Current.Dispatcher.DispatchAsync(() => GetActivePage().DisplayActionSheetAsync(title, cancel, destruction, buttons));
         }
 
         public async Task<FileResult?> PickSinglePhotoAsync()
