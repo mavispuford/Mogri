@@ -50,10 +50,8 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
     [RelayCommand]
     private async Task ConfirmSettings()
     {
-        if (!string.IsNullOrEmpty(ServerUrl))
-        {
-            Preferences.Default.Set(Constants.PreferenceKeys.ServerUrl, ServerUrl);
-        }
+        // Allow empty URL
+        Preferences.Default.Set(Constants.PreferenceKeys.ServerUrl, ServerUrl);
 
         if (!string.IsNullOrEmpty(ComfyUiApiKey))
         {

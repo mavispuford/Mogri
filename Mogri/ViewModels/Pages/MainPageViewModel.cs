@@ -258,6 +258,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
         if (!await initializeStableDiffusionService())
         {
+            await ShowConnectivityStatus();
             return;
         }
 
@@ -553,6 +554,8 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             {
                 if (!await initializeStableDiffusionService())
                 {
+                    await ShowConnectivityStatus();
+                    
                     return;
                 }
             }
