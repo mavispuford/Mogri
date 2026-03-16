@@ -555,7 +555,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                 if (!await initializeStableDiffusionService())
                 {
                     await ShowConnectivityStatus();
-                    
+
                     return;
                 }
             }
@@ -576,7 +576,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     {
         var message = ServerConnected ? "Server connected" : "No connection to server";
         
-        await _popupService.DisplayAlertAsync("Connection", message, "OK");
+        await _popupService.DisplayAlertAsync("Connection Status", message, "OK");
     }
 
     public override async void ApplyQueryAttributes(IDictionary<string, object>? query)
