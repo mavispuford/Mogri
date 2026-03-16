@@ -180,15 +180,57 @@ namespace Mogri.Services
 
             var photo = fileResult?.FirstOrDefault();
 
-            // iOS requires a delay after the media picker is dismissed
-            // before presenting another view, otherwise it attempts to present
-            // on a view controller that is no longer in the window hierarchy.
-            if (DeviceInfo.Platform == DevicePlatform.iOS)
-            {
-                await Task.Delay(1000);
-            }
+#if IOS
+            // Poll the view controller hierarchy until the photo picker has fully
+            // dismissed. A fixed delay is unreliable due to variable animation timing.
+            await waitForPresentedViewControllerDismissalAsync();
+#endif
 
             return photo;
         }
+
+#if IOS
+        /// <summary>
+        /// Polls until the key window's root view controller has no presented view controller,
+        /// indicating that the iOS photo picker has fully dismissed.
+        /// </summary>
+        private static async Task waitForPresentedViewControllerDismissalAsync(int timeoutMs = 3000)
+        {
+            const int interval = 50;
+            var elapsed = 0;
+
+            while (elapsed < timeoutMs)
+            {
+                var dismissed = await MainThread.InvokeOnMainThreadAsync(() =>
+                {
+                    var rootVc = getKeyWindowRootViewController();
+                    return rootVc?.PresentedViewController == null;
+                });
+
+                if (dismissed)
+                    return;
+
+                await Task.Delay(interval);
+                elapsed += interval;
+            }
+        }
+
+        private static UIKit.UIViewController? getKeyWindowRootViewController()
+        {
+            foreach (var scene in UIKit.UIApplication.SharedApplication.ConnectedScenes)
+            {
+                if (scene is UIKit.UIWindowScene windowScene)
+                {
+                    foreach (var window in windowScene.Windows)
+                    {
+                        if (window.IsKeyWindow)
+                            return window.RootViewController;
+                    }
+                }
+            }
+
+            return null;
+        }
+#endif
     }
 }
