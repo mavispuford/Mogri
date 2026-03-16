@@ -46,7 +46,7 @@
                 </ImageButton.Triggers>
             </ImageButton>
 
-            <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center" IsRunning="{Binding IsLoading}" InputTransparent="True"/>
+            <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center" IsRunning="{Binding IsLoading}" InputTransparent="True" Scale="{OnPlatform Android=1, iOS=1.5}"/>
         </Grid>
 
 </ContentView>

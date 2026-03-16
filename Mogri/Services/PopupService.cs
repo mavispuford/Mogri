@@ -176,7 +176,8 @@ namespace Mogri.Services
 
         public async Task<FileResult?> PickSinglePhotoAsync()
         {
-            var fileResult = await MediaPicker.PickPhotosAsync(new MediaPickerOptions { SelectionLimit = 1 });
+            var fileResult = await Shell.Current.Dispatcher.DispatchAsync(() => MediaPicker.PickPhotosAsync(new MediaPickerOptions { SelectionLimit = 1 }));
+
             var photo = fileResult?.FirstOrDefault();
 
             // iOS requires a delay after the media picker is dismissed

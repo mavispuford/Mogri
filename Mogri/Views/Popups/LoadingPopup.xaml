@@ -19,9 +19,9 @@
             HeightRequest="140">
 
         <VerticalStackLayout VerticalOptions="Center"
-                             Spacing="8">
+                             Spacing="12">
             
-            <ActivityIndicator IsRunning="True"/>
+            <ActivityIndicator IsRunning="True" Scale="{OnPlatform Android=1, iOS=1.5}" />
 
             <Label 
                 x:Name="MessageLabel" 

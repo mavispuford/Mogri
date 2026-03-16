@@ -153,7 +153,8 @@
                            HorizontalOptions="Center" 
                            VerticalOptions="Center"
                            IsRunning="{Binding IsBusy}"
-                           InputTransparent="True"/>
+                           InputTransparent="True"
+                           Scale="{OnPlatform Android=1, iOS=1.5}"/>
 
         <Border Grid.Row="0"
                 BackgroundColor="{StaticResource CadetSixtyPercent}"
@@ -297,7 +298,8 @@
                         <ActivityIndicator HorizontalOptions="Center" 
                                        VerticalOptions="Center"
                                        IsRunning="{Binding GettingColorPalette}"
-                                       InputTransparent="True"/>
+                                       InputTransparent="True"
+                                       Scale="{OnPlatform Android=1, iOS=1.5}"/>
                     </Grid>
 
                 </Border>

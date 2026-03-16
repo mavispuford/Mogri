@@ -82,7 +82,7 @@
                         <Image x:Name="InitImage"
                            Source="{Binding InitImageSource}" Aspect="AspectFit" HorizontalOptions="Fill" VerticalOptions="Fill"
                            IsVisible="{Binding InitImageSource, Converter={StaticResource IsNotNullConverter}}"/>
-                        <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center">
+                        <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center" Scale="{OnPlatform Android=1, iOS=1.5}">
                             <ActivityIndicator.IsRunning>
                                 <MultiBinding Converter="{StaticResource AnyTrueConverter}" >
                                     <Binding Source="{x:Reference InitImage}" Path="IsLoading" />
@@ -119,7 +119,7 @@
                         <Image x:Name="MaskImage"
                            Source="{Binding MaskImageSource}" Aspect="AspectFit" HorizontalOptions="Fill" VerticalOptions="Fill"
                            IsVisible="{Binding MaskImageSource, Converter={StaticResource IsNotNullConverter}}"/>
-                        <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center">
+                        <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center" Scale="{OnPlatform Android=1, iOS=1.5}">
                             <ActivityIndicator.IsRunning>
                                 <MultiBinding Converter="{StaticResource AnyTrueConverter}" >
                                     <Binding Source="{x:Reference MaskImage}" Path="IsLoading" />

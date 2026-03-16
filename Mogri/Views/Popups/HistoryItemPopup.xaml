@@ -51,9 +51,10 @@
         <ActivityIndicator Grid.Row="0" Grid.Column="1"
                            HorizontalOptions="Center"
                            VerticalOptions="End"
-                           Margin="0,0,0,10"
+                           Margin="0,0,0,26"
                            IsVisible="{Binding HistoryItem.Settings, Converter={StaticResource IsNullConverter}}"
-                           IsRunning="{Binding HistoryItem.Settings, Converter={StaticResource IsNullConverter}}" />
+                           IsRunning="{Binding HistoryItem.Settings, Converter={StaticResource IsNullConverter}}"
+                           Scale="{OnPlatform Android=1, iOS=1.5}" />
 
         <Button Grid.Row="0" Grid.Column="1" Text="Info" Command="{Binding ImageInfoCommand}" 
                 Style="{DynamicResource LargeIconButtonStyle}"
@@ -68,7 +69,8 @@
                            HorizontalOptions="Center"
                            VerticalOptions="Center"
                            IsVisible="{Binding HistoryItem.Settings, Converter={StaticResource IsNullConverter}}"
-                           IsRunning="{Binding HistoryItem.Settings, Converter={StaticResource IsNullConverter}}" />
+                           IsRunning="{Binding HistoryItem.Settings, Converter={StaticResource IsNullConverter}}"
+                           Scale="{OnPlatform Android=1, iOS=1.5}" />
 
         <Button Grid.Row="1" Grid.Column="0" Text="Use Settings" Command="{Binding UseSettingsCommand}" 
                 Style="{DynamicResource LargeIconButtonStyle}"
