@@ -65,7 +65,7 @@ public class BasePage : ContentPage
     {
         try
         {
-            base.OnAppearing();
+            base.OnDisappearing();
 
             if (BindingContext is IPageViewModel pageViewModel)
             {
