@@ -36,7 +36,7 @@
         <ToolbarItem Command="{Binding ResetPageCommand}"
                      Text="Reset">
             <ToolbarItem.IconImageSource>
-                <FontImageSource Glyph="&#xe872;" FontFamily="{StaticResource IconFontRegular}" Size="24" Color="{StaticResource MutedPeach}" />
+                <FontImageSource Glyph="&#xe872;" FontFamily="{StaticResource IconFontRegular}" Size="24" Color="{OnPlatform Android={StaticResource MutedPeach}}" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
     </views:BasePage.ToolbarItems>
