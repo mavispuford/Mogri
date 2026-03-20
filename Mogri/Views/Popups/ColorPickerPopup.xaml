@@ -107,7 +107,9 @@
                                    Spacing="10">
                 <Button Text="Cancel" 
                         HorizontalOptions="Center"
-                        Command="{Binding CancelCommand}"/>
+                        Command="{Binding CancelCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}"/>
                 <Button Text="Confirm" 
                         HorizontalOptions="Center"
                         Command="{Binding ConfirmCommand}" />

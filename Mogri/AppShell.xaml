@@ -6,9 +6,7 @@
     xmlns:views="clr-namespace:Mogri.Views"
     Shell.FlyoutBehavior="Disabled">
 
-    <TabBar Shell.TabBarUnselectedColor="{StaticResource Primary050}"
-            Shell.TabBarForegroundColor="{StaticResource Primary}"
-            Shell.TabBarTitleColor="{StaticResource Primary}">
+    <TabBar>
         <Tab Title="Generate"
              Route="MainPageTab">
             <Tab.Icon>

@@ -157,7 +157,7 @@
                            Scale="{OnPlatform Android=1, iOS=1.5}"/>
 
         <Border Grid.Row="0"
-                BackgroundColor="{StaticResource MutedPeach}"
+                BackgroundColor="{AppThemeBinding Light={StaticResource MutedPeach}, Dark={StaticResource Cadet}}"
                 HorizontalOptions="Center"
                 VerticalOptions="Start"
                 Stroke="Transparent"
@@ -189,7 +189,7 @@
                                     <VisualState x:Name="Normal">
                                         <VisualState.Setters>
                                             <Setter Property="BackgroundColor" Value="Transparent" />
-                                            <Setter Property="IconColor" Value="{StaticResource White}" />
+                                            <Setter Property="IconColor" Value="{AppThemeBinding Light={StaticResource CadetSixtyPercent}, Dark={StaticResource Secondary}}" />
                                             <Setter Property="animations:AnimationProperties.Animations">
                                                 <animations:ScaleToAnimation Scale=".75" Easing="{x:Static Easing.CubicInOut}" Length="200" />
                                             </Setter>
@@ -198,7 +198,7 @@
 
                                     <VisualState x:Name="Selected">
                                         <VisualState.Setters>
-                                            <Setter Property="BackgroundColor" Value="{StaticResource LivingCoral}" />
+                                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource LivingCoral}, Dark={StaticResource Primary}}" />
                                             <Setter Property="IconColor" Value="{StaticResource White}" />
                                             <Setter Property="animations:AnimationProperties.Animations">
                                                 <animations:ScaleToAnimation Scale="1" Easing="{x:Static Easing.CubicInOut}" Length="200" />
@@ -466,7 +466,7 @@
                              Opacity="0">
             <VerticalStackLayout.Resources>
                 <Style TargetType="Border">
-                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource MutedPeach}, Dark={StaticResource Secondary}}"/>
+                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource MutedPeach}, Dark={StaticResource MutedPeach}}"/>
                     <Setter Property="HeightRequest" Value="56"/>
                     <Setter Property="StrokeShape" Value="RoundRectangle 28"/>
                     <Setter Property="Stroke" Value="Transparent"/>
@@ -580,7 +580,7 @@
 
             <Border x:Name="ShowActionsButton"
                     Grid.Column="1"
-                    BackgroundColor="{AppThemeBinding Light={StaticResource LivingCoral}, Dark={StaticResource CaribbeanBlue}}"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource LivingCoral}, Dark={StaticResource LivingCoral}}"
                     Stroke="Transparent"
                     HorizontalOptions="End"
                     VerticalOptions="Center"

@@ -29,7 +29,7 @@
     </Style>
 
     <Style TargetType="Button">
-        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Primary}}" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource LivingCoral}}" />
         <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource LivingCoral}, Dark={StaticResource White}}" />
         <Setter Property="FontFamily" Value="ComfortaaBold"/>
         <Setter Property="FontSize" Value="14"/>
@@ -294,7 +294,7 @@
     <Style TargetType="Slider">
         <Setter Property="MinimumTrackColor" Value="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource White}}" />
         <Setter Property="MaximumTrackColor" Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray500}}" />
-        <Setter Property="ThumbColor" Value="{AppThemeBinding Light={StaticResource LivingCoral}, Dark={StaticResource White}}" />
+        <Setter Property="ThumbColor" Value="{AppThemeBinding Light={StaticResource LivingCoral}, Dark={StaticResource LivingCoral}}" />
         <Setter Property="VisualStateManager.VisualStateGroups">
             <VisualStateGroupList>
                 <VisualStateGroup x:Name="CommonStates">
@@ -328,8 +328,8 @@
                     </VisualState>
                     <VisualState x:Name="On">
                         <VisualState.Setters>
-                            <Setter Property="OnColor" Value="{AppThemeBinding Light={StaticResource MutedPeach}, Dark={StaticResource Gray200}}" />
-                            <Setter Property="ThumbColor" Value="{AppThemeBinding Light={StaticResource LivingCoral}, Dark={StaticResource White}}" />
+                            <Setter Property="OnColor" Value="{AppThemeBinding Light={StaticResource MutedPeach}, Dark={StaticResource MutedPeach}}" />
+                            <Setter Property="ThumbColor" Value="{AppThemeBinding Light={StaticResource LivingCoral}, Dark={StaticResource LivingCoral}}" />
                         </VisualState.Setters>
                     </VisualState>
                     <VisualState x:Name="Off">
@@ -369,15 +369,21 @@
 
     <Style TargetType="Shell" ApplyToDerivedTypes="True">
         <Setter Property="Shell.BackgroundColor" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource CadetDark}}" />
-        <Setter Property="Shell.ForegroundColor" Value="{OnPlatform WinUI={StaticResource Primary}, Default={StaticResource White}}" />
+        <Setter Property="Shell.ForegroundColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource White}}" />
         <Setter Property="Shell.TitleColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource White}}" />
         <Setter Property="Shell.DisabledColor" Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Cadet}}" />
         <Setter Property="Shell.UnselectedColor" Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray200}}" />
         <Setter Property="Shell.NavBarHasShadow" Value="False" />
         <Setter Property="Shell.TabBarBackgroundColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}" />
-        <Setter Property="Shell.TabBarForegroundColor" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
-        <Setter Property="Shell.TabBarTitleColor" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
+        <Setter Property="Shell.TabBarForegroundColor" Value="{AppThemeBinding Light={StaticResource LivingCoral}, Dark={StaticResource White}}" />
+        <Setter Property="Shell.TabBarTitleColor" Value="{AppThemeBinding Light={StaticResource LivingCoral}, Dark={StaticResource White}}" />
         <Setter Property="Shell.TabBarUnselectedColor" Value="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray200}}" />
+    </Style>
+
+    <Style TargetType="TabBar" ApplyToDerivedTypes="True">
+        <Setter Property="Shell.TabBarUnselectedColor" Value="{AppThemeBinding Light={StaticResource CadetSixtyPercent}, Dark={StaticResource Cadet}}" />
+        <Setter Property="Shell.TabBarForegroundColor" Value="{AppThemeBinding Light={StaticResource LivingCoral}, Dark={StaticResource LivingCoral}}" />
+        <Setter Property="Shell.TabBarTitleColor" Value="{AppThemeBinding Light={StaticResource LivingCoral}, Dark={StaticResource LivingCoral}}" />
     </Style>
 
     <Style TargetType="NavigationPage">
