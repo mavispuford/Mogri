@@ -19,7 +19,7 @@
             <toolkit:BoolToObjectConverter x:Key="BoolToOpacityConverter" TrueObject="1" FalseObject="0" />
             <toolkit:BoolToObjectConverter x:Key="ConnectivityBoolToImageSourceConverter">
                 <toolkit:BoolToObjectConverter.TrueObject>
-                    <FontImageSource Glyph="&#xe669;" FontFamily="{StaticResource IconFontRegular}" Size="26" Color="White" />
+                    <FontImageSource Glyph="&#xe669;" FontFamily="{StaticResource IconFontRegular}" Size="26" />
                 </toolkit:BoolToObjectConverter.TrueObject>
                 <toolkit:BoolToObjectConverter.FalseObject>
                     <FontImageSource Glyph="&#xf239;" FontFamily="{StaticResource IconFontRegular}" Size="26" Color="{StaticResource WhiteTwentySixPercent}" />
@@ -45,7 +45,7 @@
         <ToolbarItem Text="Settings"
                      Command="{Binding ShowAppSettingsCommand}">
             <ToolbarItem.IconImageSource>
-                <FontImageSource Glyph="&#xe8b8;" FontFamily="{StaticResource IconFontRegular}" Size="26" Color="White" />
+                <FontImageSource Glyph="&#xe8b8;" FontFamily="{StaticResource IconFontRegular}" Size="26" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
     </views:BasePage.ToolbarItems>

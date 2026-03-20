@@ -23,10 +23,10 @@
             <toolkit:BoolToObjectConverter x:Key="BoolToShowMaskTextConverter" TrueObject="Hide Masks" FalseObject="Show Masks" />
             <toolkit:BoolToObjectConverter x:Key="BoolToEyeConverter">
                 <toolkit:BoolToObjectConverter.TrueObject>
-                    <FontImageSource Glyph="&#xe8f4;" FontFamily="{StaticResource IconFontLight}" Size="32" Color="White" />
+                    <FontImageSource Glyph="&#xe8f4;" FontFamily="{StaticResource IconFontLight}" Size="32" />
                 </toolkit:BoolToObjectConverter.TrueObject>
                 <toolkit:BoolToObjectConverter.FalseObject>
-                    <FontImageSource Glyph="&#xe8f5;" FontFamily="{StaticResource IconFontLight}" Size="32" Color="White" />
+                    <FontImageSource Glyph="&#xe8f5;" FontFamily="{StaticResource IconFontLight}" Size="32" />
                 </toolkit:BoolToObjectConverter.FalseObject>
             </toolkit:BoolToObjectConverter>
             <toolkit:BoolToObjectConverter x:Key="BoolToPlusMinusConverter">
@@ -76,12 +76,12 @@
     <views:BasePage.ToolbarItems>
         <ToolbarItem Text="Undo" Command="{Binding UndoCommand}" Order="Primary">
             <ToolbarItem.IconImageSource>
-                <FontImageSource Glyph="&#xe166;" FontFamily="{StaticResource IconFontLight}" Size="30" Color="White" />
+                <FontImageSource Glyph="&#xe166;" FontFamily="{StaticResource IconFontLight}" Size="30" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
         <ToolbarItem Text="Edit Masks" Order="Primary" Command="{Binding EditMasksCommand}">
             <ToolbarItem.IconImageSource>
-                <FontImageSource Glyph="&#xe155;" FontFamily="{StaticResource IconFontLight}" Size="30" Color="White" />
+                <FontImageSource Glyph="&#xe155;" FontFamily="{StaticResource IconFontLight}" Size="30" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
         <ToolbarItem Text="{Binding ShowMaskLayer, Converter={StaticResource BoolToShowMaskTextConverter}}" 
@@ -90,12 +90,12 @@
                      Order="Primary" />
         <ToolbarItem Text="Save" Command="{Binding SaveCommand}" Order="Secondary">
             <ToolbarItem.IconImageSource>
-                <FontImageSource Glyph="&#xe161;" FontFamily="{StaticResource IconFontLight}" Size="30" Color="White" />
+                <FontImageSource Glyph="&#xe161;" FontFamily="{StaticResource IconFontLight}" Size="30" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
         <ToolbarItem Text="Set Resolution" Command="{Binding SetResolutionCommand}" Order="Secondary">
             <ToolbarItem.IconImageSource>
-                <FontImageSource Glyph="&#xe85b;" FontFamily="{StaticResource IconFontLight}" Size="30" Color="White" />
+                <FontImageSource Glyph="&#xe85b;" FontFamily="{StaticResource IconFontLight}" Size="30" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
     </views:BasePage.ToolbarItems>
