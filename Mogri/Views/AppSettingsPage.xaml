@@ -12,6 +12,16 @@
     <Shell.TitleView>
         <Label Text="Application Settings" Style="{StaticResource LabelTitleView}" />
     </Shell.TitleView>
+
+    <views:BasePage.ToolbarItems>
+        <ToolbarItem Command="{Binding ResetValuesCommand}"
+                     Text="Reset">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource Glyph="&#xe872;" FontFamily="{StaticResource IconFontRegular}" Size="24" Color="{OnPlatform Android={StaticResource MutedPeach}}" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </views:BasePage.ToolbarItems>
+
     <Grid RowDefinitions="*,auto"
           Padding="0"
           Margin="0">
@@ -52,11 +62,6 @@
         </ScrollView>
 
         <HorizontalStackLayout Grid.Row="1" Spacing="10" HorizontalOptions="End" Padding="10">
-            <Button Command="{Binding ResetValuesCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}">
-                <Button.ImageSource>
-                    <FontImageSource Glyph="&#xe872;" FontFamily="{StaticResource IconFontRegular}" Color="{StaticResource Tertiary}" />
-                </Button.ImageSource>
-            </Button>
             <Button Text="Cancel" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
             <Button Text="Apply" Command="{Binding ConfirmSettingsCommand}" WidthRequest="100" />
         </HorizontalStackLayout>

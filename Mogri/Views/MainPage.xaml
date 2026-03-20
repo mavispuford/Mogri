@@ -79,10 +79,10 @@
 
                 <Label 
                     Text="{Binding Prompt}"
-                    TextColor="{StaticResource Cadet}"/>
+                    TextColor="{AppThemeBinding Light={StaticResource CadetDark}, Dark={StaticResource Primary}}"/>
 
                 <Label Text="{Binding NegativePrompt}"
-                       TextColor="{StaticResource Primary}"
+                       TextColor="{AppThemeBinding Light={StaticResource Cadet}, Dark={StaticResource Secondary}}"
                        IsVisible="{Binding NegativePrompt, Converter={StaticResource IsStringNotNullOrEmptyConverter}}"/>
             </VerticalStackLayout>
 
@@ -99,7 +99,7 @@
                         HeightRequest="44"
                         IsVisible="{Binding IsGenerating, Converter={StaticResource InvertedBoolConverter}}">
                         <Button.Behaviors>
-                            <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource White}" Dark="{StaticResource Primary}" />
+                            <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource White}" Dark="{StaticResource LivingCoral}" />
                         </Button.Behaviors>
                 </Button>
 

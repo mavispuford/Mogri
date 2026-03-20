@@ -22,6 +22,7 @@
 
     <!-- Primary interaction - Buttons, FABs, switches etc. -->
     <Color x:Key="LivingCoral">#FFE07A5F</Color>
+    <Color x:Key="LivingCoralDark">#FF8E4E3C</Color>
     <Color x:Key="MutedPeach">#FFF4D6CC</Color>
 
     <!-- Attention & Status -->
