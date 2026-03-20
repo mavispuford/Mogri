@@ -9,7 +9,7 @@
                   x:DataType="popups:LoadingPopup"
                   CloseWhenBackgroundIsClicked="False"
                   BackgroundColor="{StaticResource BlackTenPercent}">
-    <Border Background="{AppThemeBinding Light={StaticResource CadetTwentyPercent}, Dark={StaticResource Cadet}}"
+    <Border Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Cadet}}"
             Stroke="Transparent"
             StrokeShape="RoundRectangle 10"
             VerticalOptions="Center"
