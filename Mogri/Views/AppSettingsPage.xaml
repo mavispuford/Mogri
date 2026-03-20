@@ -26,7 +26,7 @@
 
                 <Image Grid.Row="0" Grid.Column="0" WidthRequest="32">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe30a;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe30a;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="0" Grid.Column="1" Text="Server URL:" VerticalTextAlignment="Center" Style="{StaticResource LabelHeader}" />
@@ -34,7 +34,7 @@
 
                 <Image Grid.Row="2" Grid.Column="0" WidthRequest="32">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xeb3f;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xeb3f;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="2" Grid.Column="1" Text="Backend:" VerticalTextAlignment="Center" Style="{StaticResource LabelHeader}" />
@@ -43,7 +43,7 @@
                 <!-- ComfyUI API Key Section -->
                 <Image Grid.Row="3" Grid.Column="0" WidthRequest="32" IsVisible="{Binding IsComfyUiSelected}">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe897;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe897;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="3" Grid.Column="1" Text="ComfyUI API Key:" VerticalTextAlignment="Center" Style="{StaticResource LabelHeader}" IsVisible="{Binding IsComfyUiSelected}"/>
@@ -54,7 +54,7 @@
         <HorizontalStackLayout Grid.Row="1" Spacing="10" HorizontalOptions="End" Padding="10">
             <Button Command="{Binding ResetValuesCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}">
                 <Button.ImageSource>
-                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Color="{StaticResource Tertiary}" />
+                    <FontImageSource Glyph="&#xe872;" FontFamily="{StaticResource IconFontRegular}" Color="{StaticResource Tertiary}" />
                 </Button.ImageSource>
             </Button>
             <Button Text="Cancel" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />

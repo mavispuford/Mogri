@@ -132,7 +132,13 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
 
                 var imageInfoSettings = await _stableDiffusionService.GetImageInfoAsync(formattedImageString);
 
-                currentItem.Settings = imageInfoSettings;
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    currentItem.Settings = imageInfoSettings;
+                    
+                    // On iOS, we have to manually call this for the binding to pick up the change
+                    OnPropertyChanged(nameof(HistoryItem));
+                });
             });
         }
     }

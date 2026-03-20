@@ -35,9 +35,36 @@ public class GestureContainer : ContentView
         set => SetValue(EnableZoomingProperty, value);
     }
 
-    public static readonly BindableProperty EnablePanningProperty = BindableProperty.Create(nameof(EnablePanning), typeof(bool), typeof(GestureContainer), true);
+    public static readonly BindableProperty EnablePanningProperty = BindableProperty.Create(nameof(EnablePanning), typeof(bool), typeof(GestureContainer), true, propertyChanged: OnGesturesChanged);
 
-    public static readonly BindableProperty EnableZoomingProperty = BindableProperty.Create(nameof(EnableZooming), typeof(bool), typeof(GestureContainer), true);
+    public static readonly BindableProperty EnableZoomingProperty = BindableProperty.Create(nameof(EnableZooming), typeof(bool), typeof(GestureContainer), true, propertyChanged: OnGesturesChanged);
+
+    private static void OnGesturesChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        if (bindable is GestureContainer container)
+        {
+            container.UpdateGestureRecognizers();
+        }
+    }
+
+    private void UpdateGestureRecognizers()
+    {
+        if (_panGesture != null)
+        {
+            if (EnablePanning && !GestureRecognizers.Contains(_panGesture))
+                GestureRecognizers.Add(_panGesture);
+            else if (!EnablePanning && GestureRecognizers.Contains(_panGesture))
+                GestureRecognizers.Remove(_panGesture);
+        }
+
+        if (_pinchGesture != null)
+        {
+            if (EnableZooming && !GestureRecognizers.Contains(_pinchGesture))
+                GestureRecognizers.Add(_pinchGesture);
+            else if (!EnableZooming && GestureRecognizers.Contains(_pinchGesture))
+                GestureRecognizers.Remove(_pinchGesture);
+        }
+    }
 
     public static readonly BindableProperty EnableSwipeCommandsWhenScaleIsOneProperty = BindableProperty.Create(nameof(EnableSwipeCommandsWhenScaleIsOne), typeof(bool), typeof(GestureContainer), false);
 
@@ -85,20 +112,24 @@ public class GestureContainer : ContentView
         }
     }
 
+    private PanGestureRecognizer _panGesture;
+    private PinchGestureRecognizer _pinchGesture;
+    private TapGestureRecognizer _doubleTapGesture;
+
     public GestureContainer()
     {
-        var panGesture = new PanGestureRecognizer();
-        panGesture.PanUpdated += PanGesture_PanUpdated;
+        _panGesture = new PanGestureRecognizer();
+        _panGesture.PanUpdated += PanGesture_PanUpdated;
 
-        var pinchGesture = new PinchGestureRecognizer();
-        pinchGesture.PinchUpdated += OnPinchUpdated;
+        _pinchGesture = new PinchGestureRecognizer();
+        _pinchGesture.PinchUpdated += OnPinchUpdated;
 
-        var doubleTapGesture = new TapGestureRecognizer { NumberOfTapsRequired = 2 };
-        doubleTapGesture.Tapped += OnDoubleTapped;
+        _doubleTapGesture = new TapGestureRecognizer { NumberOfTapsRequired = 2 };
+        _doubleTapGesture.Tapped += OnDoubleTapped;
 
-        GestureRecognizers.Add(panGesture);
-        GestureRecognizers.Add(pinchGesture);
-        GestureRecognizers.Add(doubleTapGesture);
+        GestureRecognizers.Add(_panGesture);
+        GestureRecognizers.Add(_pinchGesture);
+        GestureRecognizers.Add(_doubleTapGesture);
     }
 
     private async void OnDoubleTapped(object? sender, TappedEventArgs e)

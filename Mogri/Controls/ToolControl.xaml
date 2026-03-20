@@ -39,14 +39,14 @@
                     <DataTrigger TargetType="ImageButton" Binding="{Binding IconImagePath, Converter={toolkit:IsStringNotNullOrEmptyConverter}}" Value="False">
                         <Setter Property="Source">
                             <Setter.Value>
-                                <FontImageSource Glyph="{Binding IconCode}" FontFamily="MaterialIconsRound400" Size="50" />
+                                <FontImageSource Glyph="{Binding IconCode}" FontFamily="{StaticResource IconFontRegular}" Size="50" />
                             </Setter.Value>
                         </Setter>
                     </DataTrigger>
                 </ImageButton.Triggers>
             </ImageButton>
 
-            <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center" IsRunning="{Binding IsLoading}" InputTransparent="True"/>
+            <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center" IsRunning="{Binding IsLoading}" InputTransparent="True" Scale="{OnPlatform Android=1, iOS=1.5}"/>
         </Grid>
 
 </ContentView>

@@ -81,7 +81,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
             return;
         }
 
-        var result = await Shell.Current.DisplayAlertAsync("Confirm Reset", "Are you sure you would like to reset back to defaults?", "RESET", "Cancel");
+        var result = await _popupService.DisplayAlertAsync("Confirm Reset", "Are you sure you would like to reset back to defaults?", "RESET", "Cancel");
 
         if (!result)
         {
@@ -190,8 +190,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
     {
         try
         {
-            var fileResult = await MediaPicker.PickPhotosAsync(new MediaPickerOptions { SelectionLimit = 1 });
-            var photo = fileResult?.FirstOrDefault();
+            var photo = await _popupService.PickSinglePhotoAsync();
 
             if (photo == null || _settings == null)
             {

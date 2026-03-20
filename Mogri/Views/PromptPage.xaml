@@ -36,7 +36,7 @@
         <ToolbarItem Command="{Binding ResetPageCommand}"
                      Text="Reset">
             <ToolbarItem.IconImageSource>
-                <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Size="24" Color="{StaticResource MutedPeach}" />
+                <FontImageSource Glyph="&#xe872;" FontFamily="{StaticResource IconFontRegular}" Size="24" Color="{OnPlatform Android={StaticResource MutedPeach}}" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
     </views:BasePage.ToolbarItems>
@@ -85,7 +85,7 @@
                              VerticalOptions="Center"
                              ToolTipProperties.Text="Select a style to add">
                     <ImageButton.Source>
-                        <FontImageSource Glyph="&#xe03b;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe03b;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </ImageButton.Source>
                 </ImageButton>
 
@@ -94,7 +94,7 @@
                              VerticalOptions="Center"
                              ToolTipProperties.Text="Extract the prompt(s) from the selected styles">
                     <ImageButton.Source>
-                        <FontImageSource Glyph="&#xe5d8;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe5d8;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </ImageButton.Source>
                 </ImageButton>
             </Grid>
@@ -131,7 +131,7 @@
                              VerticalOptions="Center"
                              ToolTipProperties.Text="Select a LoRA to add">
                     <ImageButton.Source>
-                        <FontImageSource Glyph="&#xe03b;" FontFamily="MaterialIconsRound400" Size="32" Color="{StaticResource Tertiary}" />
+                        <FontImageSource Glyph="&#xe03b;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </ImageButton.Source>
                 </ImageButton>
             </Grid>

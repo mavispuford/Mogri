@@ -9,6 +9,7 @@ namespace Mogri.ViewModels;
 internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPageViewModel
 {
     private readonly IBackendRegistry _backendRegistry;
+    private readonly IPopupService _popupService;
 
     [ObservableProperty]
     public partial string ServerUrl { get; set; }
@@ -27,9 +28,11 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
 
     public AppSettingsPageViewModel(
         ILoadingService loadingService,
-        IBackendRegistry backendRegistry) : base(loadingService)
+        IBackendRegistry backendRegistry,
+        IPopupService popupService) : base(loadingService)
     {
         _backendRegistry = backendRegistry;
+        _popupService = popupService;
         
         ServerUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
         ComfyUiApiKey = Preferences.Default.Get(Constants.PreferenceKeys.ComfyUiApiKey, string.Empty);
@@ -47,10 +50,8 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
     [RelayCommand]
     private async Task ConfirmSettings()
     {
-        if (!string.IsNullOrEmpty(ServerUrl))
-        {
-            Preferences.Default.Set(Constants.PreferenceKeys.ServerUrl, ServerUrl);
-        }
+        // Allow empty URL
+        Preferences.Default.Set(Constants.PreferenceKeys.ServerUrl, ServerUrl);
 
         if (!string.IsNullOrEmpty(ComfyUiApiKey))
         {
@@ -70,7 +71,7 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
     [RelayCommand]
     private async Task ResetValues()
     {
-        var result = await Shell.Current.DisplayAlertAsync("Confirm Reset", "Are you sure you would like to reset back to defaults?", "RESET", "Cancel");
+        var result = await _popupService.DisplayAlertAsync("Confirm Reset", "Are you sure you would like to reset back to defaults?", "RESET", "Cancel");
 
         if (!result)
         {
