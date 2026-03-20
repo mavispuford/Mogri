@@ -18,6 +18,7 @@
     <Color x:Key="CadetFortyPercent">#66546B75</Color>
     <Color x:Key="CadetSixtyPercent">#99546B75</Color>
     <Color x:Key="CadetEightyPercent">#CC546B75</Color>
+    <Color x:Key="CadetDark">#FF161D20</Color>
 
     <!-- Primary interaction - Buttons, FABs, switches etc. -->
     <Color x:Key="LivingCoral">#FFE07A5F</Color>
