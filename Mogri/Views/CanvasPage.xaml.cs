@@ -227,6 +227,23 @@ public partial class CanvasPage : BasePage
         ResetZoomCommand = new RelayCommand(() => ZoomContainer.Reset(true));
 
         TemporaryCanvasView.SizeChanged += TemporaryCanvasView_SizeChanged;
+
+        if (DeviceInfo.Platform == DevicePlatform.iOS && DeviceInfo.Version.Major >= 26)
+        {
+            SecondaryContextButtonsLayout.TranslationY = 76;
+        }
+
+        ActionsContainer.SizeChanged += ActionsContainer_SizeChanged;
+    }
+
+    private void ActionsContainer_SizeChanged(object? sender, EventArgs e)
+    {
+        if (ActionsContainer.Height < 0)
+        {
+            return;
+        }
+
+        AnimateActionsContainer(ShowActions, false);
     }
 
     private void TemporaryCanvasView_SizeChanged(object? sender, EventArgs e)
@@ -238,19 +255,40 @@ public partial class CanvasPage : BasePage
         }
     }
 
-    private async void AnimateActionsContainer(bool show)
+    private async void AnimateActionsContainer(bool show, bool animate = true)
     {
+        var modTranslationY = 0;
+
+        if (DeviceInfo.Platform == DevicePlatform.iOS && DeviceInfo.Version.Major >= 26)
+        {
+            modTranslationY = 76;
+        }
+
         if (show)
         {
-            await ActionsContainer.TranslateToAsync(0, 0, 200, Easing.CubicInOut);
+            if (animate)
+            {
+                await ActionsContainer.TranslateToAsync(0, modTranslationY, 200, Easing.CubicInOut);
+            }
+            else
+            {
+                ActionsContainer.TranslationY = modTranslationY;
+            }
         }
         else
         {
             // Calculate height dynamically
-            double translation = ActionsContainer.Height / 4;
+            double translation = (ActionsContainer.Height / 4) + modTranslationY;
             if (translation <= 0) translation = 200; // fallback if not measured
 
-            await ActionsContainer.TranslateToAsync(0, translation, 200, Easing.CubicInOut);
+            if (animate)
+            {
+                await ActionsContainer.TranslateToAsync(0, translation, 200, Easing.CubicInOut);
+            }
+            else
+            {
+                ActionsContainer.TranslationY = translation;
+            }
         }
     }
 
