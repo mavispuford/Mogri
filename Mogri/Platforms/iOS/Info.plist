@@ -34,7 +34,9 @@
 		<true/>
 	</dict>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<true/>
+	<false/>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleLightContent</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>The app requires local network access to connect to local diffusion backends (ComfyUI/SdForgeNeo).</string>
 	<key>NSPhotoLibraryUsageDescription</key>
