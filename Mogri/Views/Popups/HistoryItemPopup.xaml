@@ -35,6 +35,10 @@
                                    EnableSwipeCommandsWhenScaleIsOne="True"
                                    SwipeLeftCommand="{Binding NextItemCommand}"
                                    SwipeRightCommand="{Binding PreviousItemCommand}">
+            <controls:GestureContainer.GestureRecognizers>
+                <!-- Swallow single taps so they don't hit the MainGrid and close the popup -->
+                <TapGestureRecognizer />
+            </controls:GestureContainer.GestureRecognizers>
             
             <Image x:Name="ImageControl" 
                    Aspect="AspectFit" 
@@ -47,16 +51,17 @@
         <ActivityIndicator Grid.Row="0" Grid.Column="1"
                            HorizontalOptions="Center"
                            VerticalOptions="End"
-                           Margin="0,0,0,10"
+                           Margin="0,0,0,26"
                            IsVisible="{Binding HistoryItem.Settings, Converter={StaticResource IsNullConverter}}"
-                           IsRunning="{Binding HistoryItem.Settings, Converter={StaticResource IsNullConverter}}" />
+                           IsRunning="{Binding HistoryItem.Settings, Converter={StaticResource IsNullConverter}}"
+                           Scale="{OnPlatform Android=1, iOS=1.5}" />
 
         <Button Grid.Row="0" Grid.Column="1" Text="Info" Command="{Binding ImageInfoCommand}" 
                 Style="{DynamicResource LargeIconButtonStyle}"
                 VerticalOptions="End"
                 IsVisible="{Binding HistoryItem.Settings, Converter={StaticResource IsNotNullConverter}}">
             <Button.ImageSource>
-                <FontImageSource Glyph="&#xe88e;" FontFamily="MaterialIconsRound400" Color="{StaticResource White}" />
+                <FontImageSource Glyph="&#xe88e;" FontFamily="{StaticResource IconFontRegular}" Color="{StaticResource White}" />
             </Button.ImageSource>
         </Button>
 
@@ -64,43 +69,44 @@
                            HorizontalOptions="Center"
                            VerticalOptions="Center"
                            IsVisible="{Binding HistoryItem.Settings, Converter={StaticResource IsNullConverter}}"
-                           IsRunning="{Binding HistoryItem.Settings, Converter={StaticResource IsNullConverter}}" />
+                           IsRunning="{Binding HistoryItem.Settings, Converter={StaticResource IsNullConverter}}"
+                           Scale="{OnPlatform Android=1, iOS=1.5}" />
 
         <Button Grid.Row="1" Grid.Column="0" Text="Use Settings" Command="{Binding UseSettingsCommand}" 
                 Style="{DynamicResource LargeIconButtonStyle}"
                 IsVisible="{Binding HistoryItem.Settings, Converter={StaticResource IsNotNullConverter}}">
             <Button.ImageSource>
-                <FontImageSource Glyph="&#xe429;" FontFamily="MaterialIconsRound400" Color="{StaticResource White}" />
+                <FontImageSource Glyph="&#xe429;" FontFamily="{StaticResource IconFontRegular}" Color="{StaticResource White}" />
             </Button.ImageSource>
         </Button>
         <Button Grid.Row="1" Grid.Column="1" Text="Delete" Command="{Binding DeleteCommand}" 
                 Style="{DynamicResource LargeIconButtonStyle}">
             <Button.ImageSource>
-                <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Color="{StaticResource White}" />
+                <FontImageSource Glyph="&#xe872;" FontFamily="{StaticResource IconFontRegular}" Color="{StaticResource White}" />
             </Button.ImageSource>
         </Button>
         <Button Grid.Row="1" Grid.Column="2" Text="As Source" Command="{Binding ImageToImageCommand}"
                 Style="{DynamicResource LargeIconButtonStyle}">
             <Button.ImageSource>
-                <FontImageSource Glyph="&#xe3f4;" FontFamily="MaterialIconsRound400" Color="{StaticResource White}" />
+                <FontImageSource Glyph="&#xe3f4;" FontFamily="{StaticResource IconFontRegular}" Color="{StaticResource White}" />
             </Button.ImageSource>
         </Button>
         <Button Grid.Row="2" Grid.Column="0" Text="Save" Command="{Binding SaveCommand}" 
                 Style="{DynamicResource LargeIconButtonStyle}">
             <Button.ImageSource>
-                <FontImageSource Glyph="&#xe161;" FontFamily="MaterialIconsRound400" Color="{StaticResource White}" />
+                <FontImageSource Glyph="&#xe161;" FontFamily="{StaticResource IconFontRegular}" Color="{StaticResource White}" />
             </Button.ImageSource>
         </Button>
         <Button Grid.Row="2" Grid.Column="1" Text="To Canvas" Command="{Binding SendToCanvasCommand}" 
                 Style="{DynamicResource LargeIconButtonStyle}">
             <Button.ImageSource>
-                <FontImageSource Glyph="&#xe3c6;" FontFamily="MaterialIconsRound400" Color="{StaticResource White}" />
+                <FontImageSource Glyph="&#xe3c6;" FontFamily="{StaticResource IconFontRegular}" Color="{StaticResource White}" />
             </Button.ImageSource>
         </Button>
         <Button Grid.Row="2" Grid.Column="2" Text="Close" Command="{Binding CloseCommand}"
                 Style="{DynamicResource LargeIconButtonStyle}">
             <Button.ImageSource>
-                <FontImageSource Glyph="&#xe5cd;" FontFamily="MaterialIconsRound400" Color="{StaticResource White}" />
+                <FontImageSource Glyph="&#xe5cd;" FontFamily="{StaticResource IconFontRegular}" Color="{StaticResource White}" />
             </Button.ImageSource>
         </Button>
     </Grid>

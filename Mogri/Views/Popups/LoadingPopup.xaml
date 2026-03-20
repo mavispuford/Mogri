@@ -7,8 +7,9 @@
                   xmlns:popups="clr-namespace:Mogri.Views.Popups"
                   x:Class="Mogri.Views.Popups.LoadingPopup"
                   x:DataType="popups:LoadingPopup"
-                  CloseWhenBackgroundIsClicked="False">
-    <Border Background="{AppThemeBinding Light={StaticResource CadetTwentyPercent}, Dark={StaticResource Cadet}}"
+                  CloseWhenBackgroundIsClicked="False"
+                  BackgroundColor="{StaticResource BlackTenPercent}">
+    <Border Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Cadet}}"
             Stroke="Transparent"
             StrokeShape="RoundRectangle 10"
             VerticalOptions="Center"
@@ -18,9 +19,9 @@
             HeightRequest="140">
 
         <VerticalStackLayout VerticalOptions="Center"
-                             Spacing="8">
+                             Spacing="12">
             
-            <ActivityIndicator IsRunning="True"/>
+            <ActivityIndicator IsRunning="True" Scale="{OnPlatform Android=1, iOS=1.5}" />
 
             <Label 
                 x:Name="MessageLabel" 

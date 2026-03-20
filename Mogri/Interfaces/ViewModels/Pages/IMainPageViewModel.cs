@@ -22,4 +22,5 @@ public interface IMainPageViewModel : IPageViewModel
     IAsyncRelayCommand ShowAppSettingsCommand { get; }
     IAsyncRelayCommand ShowPromptPageCommand { get; }
     IAsyncRelayCommand ShowHistoryCommand { get; }
+    IAsyncRelayCommand ShowConnectivityStatusCommand { get; }
 }

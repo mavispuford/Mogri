@@ -42,7 +42,7 @@
         <Image Grid.Column="0"
                Grid.Row="0">
             <Image.Source>
-                <FontImageSource Glyph="&#xe8b6;" FontFamily="MaterialIconsRound400" Color="{StaticResource Cadet}" />
+                <FontImageSource Glyph="&#xe8b6;" FontFamily="{StaticResource IconFontRegular}" Color="{StaticResource Cadet}" />
             </Image.Source>
         </Image>
 
@@ -89,7 +89,7 @@
                                      Command="{Binding ShowPromptStyleInfoCommand, Source={RelativeSource AncestorType={x:Type pages:IPromptStyleSelectionPageViewModel}}}"
                                      CommandParameter="{Binding .}">
                             <ImageButton.Source>
-                                <FontImageSource Glyph="&#xe88e;" FontFamily="MaterialIconsRound400" Size="30" Color="{StaticResource Cadet}" />
+                                <FontImageSource Glyph="&#xe88e;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="{StaticResource Cadet}" />
                             </ImageButton.Source>
                         </ImageButton>
                     </Grid>
@@ -105,7 +105,7 @@
                                Padding="10">
             <Button Command="{Binding ResetCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}">
                 <Button.ImageSource>
-                    <FontImageSource Glyph="&#xe872;" FontFamily="MaterialIconsRound400" Color="{StaticResource Tertiary}" />
+                    <FontImageSource Glyph="&#xe872;" FontFamily="{StaticResource IconFontRegular}" Color="{StaticResource Tertiary}" />
                 </Button.ImageSource>
             </Button>
             <Button Text="Cancel" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />

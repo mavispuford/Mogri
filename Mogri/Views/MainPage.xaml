@@ -15,14 +15,14 @@
         <ResourceDictionary>
             <toolkit:IsListNotNullOrEmptyConverter x:Key="IsListNotNullOrEmptyConverter" />
             <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
-            <toolkit:BoolToObjectConverter x:Key="BoolToColorConverter" TrueObject="{StaticResource Tertiary}" FalseObject="{StaticResource Cadet}" />
+            <toolkit:BoolToObjectConverter x:Key="BoolToColorConverter" TrueObject="{StaticResource LivingCoral}" FalseObject="{StaticResource Cadet}" />
             <toolkit:BoolToObjectConverter x:Key="BoolToOpacityConverter" TrueObject="1" FalseObject="0" />
             <toolkit:BoolToObjectConverter x:Key="ConnectivityBoolToImageSourceConverter">
                 <toolkit:BoolToObjectConverter.TrueObject>
-                    <FontImageSource Glyph="&#xe63e;" FontFamily="MaterialIconsRound400" Size="26" Color="White" />
+                    <FontImageSource Glyph="&#xe669;" FontFamily="{StaticResource IconFontRegular}" Size="26" />
                 </toolkit:BoolToObjectConverter.TrueObject>
                 <toolkit:BoolToObjectConverter.FalseObject>
-                    <FontImageSource Glyph="&#xe648;" FontFamily="MaterialIconsRound400" Size="26" Color="{StaticResource WhiteTwentySixPercent}" />
+                    <FontImageSource Glyph="&#xf239;" FontFamily="{StaticResource IconFontRegular}" Size="26" Color="{StaticResource WhiteTwentySixPercent}" />
                 </toolkit:BoolToObjectConverter.FalseObject>
             </toolkit:BoolToObjectConverter>
             <toolkit:IsStringNotNullOrEmptyConverter x:Key="IsStringNotNullOrEmptyConverter" />
@@ -30,8 +30,8 @@
     </views:BasePage.Resources>
 
     <Shell.TitleView>
-        <Grid HorizontalOptions="Start" Padding="0,0">
-            <Image HorizontalOptions="Start" Source="logo_small.png" Aspect="AspectFit" HeightRequest="40" >
+        <Grid HorizontalOptions="Start" Padding="0,5">
+            <Image HorizontalOptions="Start" Source="logo_small.png" Aspect="AspectFit" >
                 <Image.Behaviors>
                     <behaviors:ThemeAwareIconTintColorBehavior Light="White" Dark="{StaticResource Secondary}" />
                 </Image.Behaviors>
@@ -40,11 +40,12 @@
     </Shell.TitleView>
 
     <views:BasePage.ToolbarItems>
-        <ToolbarItem IconImageSource="{Binding ServerConnected, Converter={StaticResource ConnectivityBoolToImageSourceConverter}}" />
+        <ToolbarItem IconImageSource="{Binding ServerConnected, Converter={StaticResource ConnectivityBoolToImageSourceConverter}}"
+            Command="{Binding ShowConnectivityStatusCommand}" />
         <ToolbarItem Text="Settings"
                      Command="{Binding ShowAppSettingsCommand}">
             <ToolbarItem.IconImageSource>
-                <FontImageSource Glyph="&#xe8b8;" FontFamily="MaterialIconsRound400" Size="26" Color="White" />
+                <FontImageSource Glyph="&#xe8b8;" FontFamily="{StaticResource IconFontRegular}" Size="26" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
     </views:BasePage.ToolbarItems>
@@ -116,7 +117,7 @@
                              Command="{Binding ShowPromptSettingsCommand}"
                              Margin="4">
                     <ImageButton.Source>
-                        <FontImageSource Glyph="&#xe429;" FontFamily="MaterialIconsRound400" Color="{StaticResource Cadet}" />
+                        <FontImageSource Glyph="&#xe429;" FontFamily="{StaticResource IconFontRegular}" Color="{StaticResource Cadet}" />
                     </ImageButton.Source>
                 </ImageButton>
 
@@ -127,7 +128,7 @@
                              Command="{Binding ShowImageToImageSettingsCommand}"
                              Margin="4">
                     <ImageButton.Source>
-                        <FontImageSource Glyph="&#xe3f4;" FontFamily="MaterialIconsRound400" Color="{Binding HasInitImage, Converter={StaticResource BoolToColorConverter}}" />
+                        <FontImageSource Glyph="&#xe3f4;" FontFamily="{StaticResource IconFontRegular}" Color="{Binding HasInitImage, Converter={StaticResource BoolToColorConverter}}" />
                     </ImageButton.Source>
                 </ImageButton>
 
@@ -138,7 +139,7 @@
                              Command="{Binding ShowHistoryCommand}"
                              Margin="4">
                     <ImageButton.Source>
-                        <FontImageSource Glyph="&#xe889;" FontFamily="MaterialIconsRound400" Color="{StaticResource Cadet}" />
+                        <FontImageSource Glyph="&#xe889;" FontFamily="{StaticResource IconFontRegular}" Color="{StaticResource Cadet}" />
                     </ImageButton.Source>
                 </ImageButton>
             </Grid>

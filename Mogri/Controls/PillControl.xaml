@@ -25,7 +25,7 @@
                          Command="{Binding Command, Source={x:Reference ThisControl}}"
                          CommandParameter="{Binding CommandParameter, Source={x:Reference ThisControl}}">
                 <ImageButton.Source>
-                    <FontImageSource Glyph="&#xe5cd;" FontFamily="MaterialIconsRound400" Size="30" Color="White" />
+                    <FontImageSource Glyph="&#xe5cd;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="White" />
                 </ImageButton.Source>
             </ImageButton>
         </HorizontalStackLayout>

@@ -10,6 +10,7 @@ using Mogri.Interfaces.ViewModels.Pages;
 using SkiaSharp;
 using System.Collections.ObjectModel;
 using Mogri.Models;
+using CommunityToolkit.Maui.Services;
 
 namespace Mogri.ViewModels;
 
@@ -254,7 +255,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     [RelayCommand]
     private async Task Clear()
     {
-        var result = await Shell.Current.DisplayAlertAsync("Clear mask?", "Are you sure you would like to clear the mask?", "YES", "Cancel");
+        var result = await _popupService.DisplayAlertAsync("Clear mask?", "Are you sure you would like to clear the mask?", "YES", "Cancel");
 
         if (!result)
         {
@@ -340,12 +341,12 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         {
             await dispatcher.DispatchAsync(async () =>
             {
-                selection = await Shell.Current.DisplayActionSheetAsync("Save?", "Cancel", null, maskChoice, imageChoice);
+                selection = await _popupService.DisplayActionSheetAsync("Save?", "Cancel", null, maskChoice, imageChoice);
             });
         }
         else
         {
-            selection = await Shell.Current.DisplayActionSheetAsync("Save?", "Cancel", null, maskChoice, imageChoice);
+            selection = await _popupService.DisplayActionSheetAsync("Save?", "Cancel", null, maskChoice, imageChoice);
         }
 
         switch (selection)
@@ -422,7 +423,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         const string maskOnly = "Mask only (NO Paint)";
         const string imageOnly = "Image only";
 
-        var selection = await Shell.Current.DisplayActionSheetAsync("Image Mode", "Cancel", null, inpaint, paintOnly, maskOnly, imageOnly);
+        var selection = await _popupService.DisplayActionSheetAsync("Image Mode", "Cancel", null, inpaint, paintOnly, maskOnly, imageOnly);
 
         if (selection == inpaint) _currentCanvasUseMode = CanvasUseMode.Inpaint;
         else if (selection == paintOnly) _currentCanvasUseMode = CanvasUseMode.PaintOnly;
@@ -657,7 +658,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             return;
         }
 
-        var result = await Shell.Current.DisplayAlertAsync("Flatten Canvas?",
+        var result = await _popupService.DisplayAlertAsync("Flatten Canvas?",
             "This will permanently apply the paint/masks and replace the current canvas image.\n\nContinue?",
             "YES",
             "NO");
@@ -821,9 +822,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     {
         try
         {
-            var fileResult = await MediaPicker.PickPhotosAsync(new MediaPickerOptions { SelectionLimit = 1 });
-            var photo = fileResult?.FirstOrDefault();
-
+            var photo = await _popupService.PickSinglePhotoAsync();
+            
             if (photo == null)
             {
                 return;
@@ -840,7 +840,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 actions.Add(scaleImageToBoundingBoxOption);
             }
 
-            var action = await Shell.Current.DisplayActionSheetAsync("Set Image", "Cancel", null, actions.ToArray());
+            var action = await _popupService.DisplayActionSheetAsync("Set Image", "Cancel", null, actions.ToArray());
 
             if (action == "Cancel" || action == null)
             {
@@ -922,7 +922,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
         if (SourceBitmap == null)
         {
-            await Shell.Current.DisplayAlertAsync("No image", "There is no image on the canvas. Add an image and try again.", "OK");
+            await _popupService.DisplayAlertAsync("No image", "There is no image on the canvas. Add an image and try again.", "OK");
 
             return;
         }
@@ -931,11 +931,11 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         {
             if (SettingSegmentationImage)
             {
-                await Shell.Current.DisplayAlertAsync("Processing...", "The current image is still processing. Please try again.", "OK");
+                await _popupService.DisplayAlertAsync("Processing...", "The current image is still processing. Please try again.", "OK");
             }
             else
             {
-                await Shell.Current.DisplayAlertAsync("Problem", "There was a problem processing the current image. Please add an image and try again.", "OK");
+                await _popupService.DisplayAlertAsync("Problem", "There was a problem processing the current image. Please add an image and try again.", "OK");
             }
 
             return;

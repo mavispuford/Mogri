@@ -23,13 +23,19 @@ public class BasePopup : PopupPage
 
         CloseWhenBackgroundIsClicked = false;
 
-        if (Application.Current != null && Application.Current.Resources.TryGetValue("Gray950", out var statusBarColor))
+        if (Application.Current != null &&
+            Application.Current.Resources.TryGetValue("Primary", out var lightStatusBarColor) &&
+            Application.Current.Resources.TryGetValue("Black", out var darkStatusBarColor))
         {
-            Behaviors.Add(new StatusBarBehavior()
+            var statusBarBehavior = new StatusBarBehavior()
             {
-                StatusBarColor = (Color)statusBarColor,
-                StatusBarStyle = StatusBarStyle.LightContent
-            });
+                StatusBarStyle = StatusBarStyle.LightContent,
+                ApplyOn = StatusBarApplyOn.OnPageNavigatedTo
+            };
+
+            statusBarBehavior.SetAppThemeColor(StatusBarBehavior.StatusBarColorProperty, (Color)lightStatusBarColor, (Color)darkStatusBarColor);
+
+            Behaviors.Add(statusBarBehavior);
         }
 
         this.SetBinding(BackgroundColorProperty, nameof(IPopupBaseViewModel.PopupBackgroundColor));

@@ -130,7 +130,7 @@ internal partial class PromptStyleSelectionPageViewModel : PageViewModel, IPromp
         if (promptStyleViewModel == null ||
             (string.IsNullOrEmpty(promptStyleViewModel.Prompt) && string.IsNullOrEmpty(promptStyleViewModel.NegativePrompt)))
         {
-            await Shell.Current.DisplayAlertAsync("No Style Info", "This style has no prompts.", "OK");
+            await _popupService.DisplayAlertAsync("No Style Info", "This style has no prompts.", "OK");
 
             return;
         }

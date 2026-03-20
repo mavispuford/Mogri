@@ -30,7 +30,7 @@
                                  BackgroundColor="Transparent">
                         <ImageButton.Source>
                             <FontImageSource Glyph="&#xe16c;" 
-                                             FontFamily="MaterialIconsRound300"
+                                             FontFamily="{StaticResource IconFontLight}"
                                              Size="40"
                                              Color="{AppThemeBinding Light={StaticResource SteelRed}, Dark={StaticResource Eva}}" />
                         </ImageButton.Source>
@@ -50,7 +50,7 @@
                                 
                                 <Label Grid.Column="0"
                                        Text="{Binding Icon}" 
-                                       FontFamily="MaterialIconsRound400" 
+                                       FontFamily="{StaticResource IconFontRegular}" 
                                        FontSize="24" 
                                        VerticalOptions="Center"
                                        TextColor="{AppThemeBinding Light={StaticResource NeutralDarkGray}, Dark={StaticResource SoftCream}}"/>
@@ -68,7 +68,7 @@
                                            HorizontalOptions="Center"
                                            VerticalOptions="Center">
                                         <Image.Source>
-                                            <FontImageSource Glyph="&#xe91c;" FontFamily="MaterialIconsRound400" Size="32" Color="{Binding DisplayColor}" />
+                                            <FontImageSource Glyph="&#xe91c;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{Binding DisplayColor}" />
                                         </Image.Source>
                                     </Image>
                                 </Border>
@@ -88,7 +88,7 @@
                                              WidthRequest="40">
                                     <ImageButton.Source>
                                         <FontImageSource Glyph="&#xe3c9;"
-                                                         FontFamily="MaterialIconsRound400"
+                                                         FontFamily="{StaticResource IconFontRegular}"
                                                          Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}"
                                                          Size="24"/>
                                     </ImageButton.Source>
@@ -103,7 +103,7 @@
                                              WidthRequest="40">
                                     <ImageButton.Source>
                                         <FontImageSource Glyph="&#xe14d;"
-                                                         FontFamily="MaterialIconsRound400"
+                                                         FontFamily="{StaticResource IconFontRegular}"
                                                          Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}"
                                                          Size="24"/>
                                     </ImageButton.Source>
@@ -118,7 +118,7 @@
                                              WidthRequest="40">
                                     <ImageButton.Source>
                                         <FontImageSource Glyph="&#xe872;"
-                                                         FontFamily="MaterialIconsRound400"
+                                                         FontFamily="{StaticResource IconFontRegular}"
                                                          Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}"
                                                          Size="24"/>
                                     </ImageButton.Source>

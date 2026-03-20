@@ -7,6 +7,10 @@ namespace Mogri.Views;
 
 public class BasePage : ContentPage
 {
+    private readonly StatusBarBehavior _statusBarBehavior;
+    private readonly Color _lightStatusBarColor;
+    private readonly Color _darkStatusBarColor;
+
     public BasePage()
     {
         // For some reason, the back button behavior occasionally breaks when setting it from the XAML.  
@@ -18,16 +22,29 @@ public class BasePage : ContentPage
 
         if (Application.Current != null &&
             Application.Current.Resources.TryGetValue("Primary", out var lightStatusBarColor) &&
-            Application.Current.Resources.TryGetValue("Black", out var darkStatusBarColor))
+            Application.Current.Resources.TryGetValue("CadetDark", out var darkStatusBarColor))
         {
-            var statusBarBehavior = new StatusBarBehavior()
+            _lightStatusBarColor = (Color)lightStatusBarColor;
+            _darkStatusBarColor = (Color)darkStatusBarColor;
+
+            _statusBarBehavior = new StatusBarBehavior()
             {
-                StatusBarStyle = StatusBarStyle.LightContent
+                StatusBarStyle = StatusBarStyle.LightContent,
+                ApplyOn = StatusBarApplyOn.OnBehaviorAttachedTo
             };
 
-            statusBarBehavior.SetAppThemeColor(StatusBarBehavior.StatusBarColorProperty, (Color)lightStatusBarColor, (Color)darkStatusBarColor);
+            _statusBarBehavior.SetAppThemeColor(StatusBarBehavior.StatusBarColorProperty, _lightStatusBarColor, _darkStatusBarColor);
 
-            Behaviors.Add(statusBarBehavior);
+            Behaviors.Add(_statusBarBehavior);
+        }
+    }
+
+    private void OnRequestedThemeChanged(object sender, AppThemeChangedEventArgs e)
+    {
+        if (_statusBarBehavior != null)
+        {
+            _statusBarBehavior.StatusBarStyle = StatusBarStyle.LightContent;
+            _statusBarBehavior.StatusBarColor = e.RequestedTheme == AppTheme.Dark ? _darkStatusBarColor : _lightStatusBarColor;
         }
     }
 
@@ -49,6 +66,11 @@ public class BasePage : ContentPage
         {
             base.OnAppearing();
 
+            if (Application.Current != null)
+            {
+                Application.Current.RequestedThemeChanged += OnRequestedThemeChanged;
+            }
+
             if (BindingContext is IPageViewModel pageViewModel)
             {
                 await pageViewModel.OnAppearingAsync();
@@ -64,7 +86,12 @@ public class BasePage : ContentPage
     {
         try
         {
-            base.OnAppearing();
+            base.OnDisappearing();
+
+            if (Application.Current != null)
+            {
+                Application.Current.RequestedThemeChanged -= OnRequestedThemeChanged;
+            }
 
             if (BindingContext is IPageViewModel pageViewModel)
             {

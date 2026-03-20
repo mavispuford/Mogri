@@ -30,7 +30,8 @@
                                HeightRequest="50"
                                BackgroundColor="Transparent"
                                IsVisible="{Binding IsLoading}"
-                               IsRunning="{Binding IsLoading}"/>
+                               IsRunning="{Binding IsLoading}"
+                               Scale="{OnPlatform Android=1, iOS=1.5}"/>
         </Grid>
     </Border>
     
