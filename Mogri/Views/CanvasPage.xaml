@@ -157,7 +157,7 @@
                            Scale="{OnPlatform Android=1, iOS=1.5}"/>
 
         <Border Grid.Row="0"
-                BackgroundColor="{StaticResource CadetSixtyPercent}"
+                BackgroundColor="{StaticResource MutedPeach}"
                 HorizontalOptions="Center"
                 VerticalOptions="Start"
                 Stroke="Transparent"
@@ -198,7 +198,7 @@
 
                                     <VisualState x:Name="Selected">
                                         <VisualState.Setters>
-                                            <Setter Property="BackgroundColor" Value="{StaticResource CadetFortyPercent}" />
+                                            <Setter Property="BackgroundColor" Value="{StaticResource LivingCoral}" />
                                             <Setter Property="IconColor" Value="{StaticResource White}" />
                                             <Setter Property="animations:AnimationProperties.Animations">
                                                 <animations:ScaleToAnimation Scale="1" Easing="{x:Static Easing.CubicInOut}" Length="200" />
