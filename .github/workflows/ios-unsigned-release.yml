@@ -1,0 +1,51 @@
+name: iOS Unsigned Release Build
+
+on:
+  push:
+    tags:
+      - 'v*' # Triggers on any tag starting with v (e.g. v1.0.0)
+  workflow_dispatch: # Allows manual triggering from the GitHub Actions tab
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 10
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Install MAUI Workloads
+      run: dotnet workload install maui-ios
+
+    - name: Publish iOS app (Unsigned)
+      run: |
+        dotnet publish Mogri/Mogri.csproj -f net10.0-ios -c Release -p:RuntimeIdentifier=ios-arm64 -p:EnableCodeSigning=false
+
+    - name: Package IPA and Zip
+      run: |
+        cd Mogri/bin/Release/net10.0-ios/ios-arm64/
+        # Create Payload directory structure required for an IPA
+        mkdir Payload
+        # Move the built .app package into the Payload directory
+        mv Mogri.app Payload/
+        # Zip it up (this creates the standard IPA structure)
+        zip -r Payload.zip Payload
+        # Duplicate/rename to create the final .ipa file
+        cp Payload.zip Mogri-Unsigned.ipa
+
+    - name: Upload Unsigned IPA Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Mogri-iOS-Unsigned-IPA
+        path: Mogri/bin/Release/net10.0-ios/ios-arm64/Mogri-Unsigned.ipa
+
+    - name: Upload Payload Zip Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Mogri-iOS-Payload-Zip
+        path: Mogri/bin/Release/net10.0-ios/ios-arm64/Payload.zip

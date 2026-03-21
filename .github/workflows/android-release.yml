@@ -1,0 +1,53 @@
+name: Android Release Build
+
+on:
+  push:
+    tags:
+      - 'v*' # Triggers on any tag starting with v (e.g. v1.0.0)
+  workflow_dispatch: # Allows manual triggering from the GitHub Actions tab
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 10
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Install MAUI Workloads
+      run: dotnet workload install maui-android
+
+    - name: Decode Keystore
+      env:
+        KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+      run: |
+        $keystoreBytes = [System.Convert]::FromBase64String($env:KEYSTORE_BASE64)
+        [IO.File]::WriteAllBytes("$env:GITHUB_WORKSPACE\mogri.keystore", $keystoreBytes)
+      shell: pwsh
+
+    - name: Publish Android APK and AAB
+      run: >
+        dotnet publish Mogri/Mogri.csproj -f net10.0-android -c Release
+        -p:AndroidKeyStore=true
+        -p:AndroidSigningKeyStore="$env:GITHUB_WORKSPACE\mogri.keystore"
+        -p:AndroidSigningKeyAlias="${{ secrets.KEY_ALIAS }}"
+        -p:AndroidSigningKeyPass="${{ secrets.KEY_PASSWORD }}"
+        -p:AndroidSigningStorePass="${{ secrets.KEYSTORE_PASSWORD }}"
+        -p:AndroidPackageFormats="aab;apk"
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Mogri-Android-APK
+        path: Mogri/bin/Release/net10.0-android/**/*-Signed.apk
+
+    - name: Upload AAB Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Mogri-Android-AAB
+        path: Mogri/bin/Release/net10.0-android/**/*.aab
