@@ -16,6 +16,10 @@ public interface IImageToImageSettingsPageViewModel : IPageViewModel
 
     string? StrengthPlaceholder { get; set; }
 
+    string? MaskBlur { get; set; }
+
+    string? MaskBlurPlaceholder { get; set; }
+
     ImageSource? InitImageSource { get; set; }
 
     ImageSource? MaskImageSource { get; set; }

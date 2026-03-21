@@ -10,6 +10,10 @@ internal interface IAppSettingsPageViewModel : IPageViewModel
 
     string SelectedBackend { get; set; }
 
+    bool IsComfyUiSelected { get; }
+
+    string ComfyUiApiKey { get; set; }
+
     IAsyncRelayCommand ResetValuesCommand { get; }
 
     IAsyncRelayCommand CancelCommand { get; }

@@ -130,8 +130,11 @@
                                      InputTransparent="{Binding SelectionModeEnabled, Source={RelativeSource AncestorType={x:Type pages:IHistoryPageViewModel}}}">
 
                             <ImageButton.Behaviors>
-                                <toolkit:TouchBehavior LongPressCommand="{Binding BindingContext.ItemLongPressedCommand, Source={x:Reference HistoryPageRoot}}"
-                                                       LongPressCommandParameter="{Binding BindingContext, Source={x:Reference ItemImageButton}}"
+                                <!-- x:DataType disabled: TouchBehavior is not an Element, so RelativeSource
+                                     bindings are unsupported. Using x:Reference with BindingContext path instead. -->
+                                <toolkit:TouchBehavior x:DataType="{x:Null}"
+                                                       LongPressCommand="{Binding BindingContext.ItemLongPressedCommand, Source={x:Reference HistoryPageRoot}}"
+                                                       LongPressCommandParameter="{Binding .}"
                                                        LongPressDuration="500" />
                             </ImageButton.Behaviors>
 

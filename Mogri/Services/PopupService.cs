@@ -151,7 +151,7 @@ namespace Mogri.Services
         {
             return MopupService.Instance.PopupStack.LastOrDefault(p => p is not LoadingPopup) as Page 
                    ?? Shell.Current?.CurrentPage 
-                   ?? Application.Current?.MainPage!;
+                   ?? Application.Current?.Windows.FirstOrDefault()?.Page!;
         }
 
         public Task DisplayAlertAsync(string title, string message, string cancel)

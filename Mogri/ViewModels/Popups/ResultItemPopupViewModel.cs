@@ -10,7 +10,7 @@ namespace Mogri.ViewModels;
 public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemPopupViewModel
 {
     private readonly IFileService _fileService;
-    private IList<IResultItemViewModel> _resultItems;
+    private IList<IResultItemViewModel> _resultItems = [];
 
     [ObservableProperty]
     public partial IResultItemViewModel ResultItem { get; set; }

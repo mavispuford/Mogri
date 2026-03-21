@@ -27,6 +27,9 @@ public class BasePopup : PopupPage
             Application.Current.Resources.TryGetValue("Primary", out var lightStatusBarColor) &&
             Application.Current.Resources.TryGetValue("Black", out var darkStatusBarColor))
         {
+            // CA1416: StatusBarBehavior is supported on iOS and Android, but the analyzer incorrectly flags
+            // macCatalyst (which this app does not target) as an unsupported reachable platform within the iOS TFM.
+#pragma warning disable CA1416
             var statusBarBehavior = new StatusBarBehavior()
             {
                 StatusBarStyle = StatusBarStyle.LightContent,
@@ -34,6 +37,7 @@ public class BasePopup : PopupPage
             };
 
             statusBarBehavior.SetAppThemeColor(StatusBarBehavior.StatusBarColorProperty, (Color)lightStatusBarColor, (Color)darkStatusBarColor);
+#pragma warning restore CA1416
 
             Behaviors.Add(statusBarBehavior);
         }

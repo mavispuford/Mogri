@@ -18,4 +18,5 @@ public interface IEditMaskItemPopupViewModel : IPopupBaseViewModel
     IRelayCommand DragStartedCommand { get; }
     IRelayCommand DragCompletedCommand { get; }
     IAsyncRelayCommand ChangeColorCommand { get; }
+    IAsyncRelayCommand CloseCommand { get; }
 }

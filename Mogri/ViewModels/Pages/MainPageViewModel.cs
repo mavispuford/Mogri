@@ -27,7 +27,9 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     private bool _initImageNeedsResize = true;
     private bool _forceReinitialize;
     private float _targetProgress = 0;
+#if ANDROID
     private static bool _notificationPermissionRequested;
+#endif
 
     [ObservableProperty]
     public partial bool HasInitImage { get; set; }

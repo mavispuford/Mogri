@@ -85,7 +85,7 @@
                         <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center" Scale="{OnPlatform Android=1, iOS=1.5}">
                             <ActivityIndicator.IsRunning>
                                 <MultiBinding Converter="{StaticResource AnyTrueConverter}" >
-                                    <Binding Source="{x:Reference InitImage}" Path="IsLoading" />
+                                    <Binding Source="{x:Reference InitImage}" Path="IsLoading" x:DataType="Image" />
                                     <Binding Path="IsLoadingInitImage" />
                                 </MultiBinding>
                             </ActivityIndicator.IsRunning>
@@ -122,7 +122,7 @@
                         <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center" Scale="{OnPlatform Android=1, iOS=1.5}">
                             <ActivityIndicator.IsRunning>
                                 <MultiBinding Converter="{StaticResource AnyTrueConverter}" >
-                                    <Binding Source="{x:Reference MaskImage}" Path="IsLoading" />
+                                    <Binding Source="{x:Reference MaskImage}" Path="IsLoading" x:DataType="Image" />
                                     <Binding Path="IsLoadingMaskImage" />
                                 </MultiBinding>
                             </ActivityIndicator.IsRunning>
