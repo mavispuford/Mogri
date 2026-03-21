@@ -59,8 +59,11 @@
                 <Entry.Behaviors>
                     <toolkit:EventToCommandBehavior
                         EventName="TextChanged"
-                        Command="{Binding FilterCommand}"
-                        CommandParameter="{Binding Source={x:Reference FilterBar}, Path=Text}"/>
+                        Command="{Binding FilterCommand}">
+                        <toolkit:EventToCommandBehavior.CommandParameter>
+                            <Binding Source="{x:Reference FilterBar}" Path="Text" x:DataType="Entry" />
+                        </toolkit:EventToCommandBehavior.CommandParameter>
+                    </toolkit:EventToCommandBehavior>
                 </Entry.Behaviors>
             </Entry>
         </Border>

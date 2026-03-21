@@ -179,11 +179,11 @@ namespace Mogri.Platforms.iOS.Services
         {
             try
             {
-                var authorizationStatus = PHPhotoLibrary.AuthorizationStatus;
+                var authorizationStatus = PHPhotoLibrary.GetAuthorizationStatus(PHAccessLevel.ReadWrite);
                 
                 if (authorizationStatus != PHAuthorizationStatus.Authorized)
                 {
-                    authorizationStatus = await PHPhotoLibrary.RequestAuthorizationAsync();
+                    authorizationStatus = await PHPhotoLibrary.RequestAuthorizationAsync(PHAccessLevel.ReadWrite);
                 }
 
                 if (authorizationStatus == PHAuthorizationStatus.Authorized)

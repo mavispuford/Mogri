@@ -34,24 +34,24 @@ namespace Mogri.Platforms.Android.Services
             
             var pendingIntent = CreatePendingIntent();
 
-            // Builder for the ongoing progress notification
-            _progressNotificationBuilder = new NotificationCompat.Builder(this, ProgressChannelId)
-                .SetSmallIcon(Mogri.Resource.Mipmap.appicon)
-                .SetContentTitle("Generating Image…")
-                .SetContentText("0% complete")
-                .SetProgress(100, 0, true)
-                .SetContentIntent(pendingIntent)
-                .SetOngoing(true)
-                .SetPriority(NotificationCompat.PriorityLow) // Low priority helps prevent sound/vibration for progress
-                .SetForegroundServiceBehavior(NotificationCompat.ForegroundServiceImmediate);
+            // Calls are unchained to avoid CS8602; the Android binding setters return nullable Builder
+            _progressNotificationBuilder = new NotificationCompat.Builder(this, ProgressChannelId);
+            _progressNotificationBuilder.SetSmallIcon(Mogri.Resource.Mipmap.appicon);
+            _progressNotificationBuilder.SetContentTitle("Generating Image…");
+            _progressNotificationBuilder.SetContentText("0% complete");
+            _progressNotificationBuilder.SetProgress(100, 0, true);
+            _progressNotificationBuilder.SetContentIntent(pendingIntent);
+            _progressNotificationBuilder.SetOngoing(true);
+            _progressNotificationBuilder.SetPriority(NotificationCompat.PriorityLow); // Low priority helps prevent sound/vibration for progress
+            _progressNotificationBuilder.SetForegroundServiceBehavior(NotificationCompat.ForegroundServiceImmediate);
 
             // Builder for the completion/failure notification
-            _completionNotificationBuilder = new NotificationCompat.Builder(this, CompletionChannelId)
-                .SetSmallIcon(Mogri.Resource.Mipmap.appicon)
-                .SetContentIntent(pendingIntent)
-                .SetOngoing(false)
-                .SetAutoCancel(true)
-                .SetPriority(NotificationCompat.PriorityHigh); // High priority allows for sound/vibration
+            _completionNotificationBuilder = new NotificationCompat.Builder(this, CompletionChannelId);
+            _completionNotificationBuilder.SetSmallIcon(Mogri.Resource.Mipmap.appicon);
+            _completionNotificationBuilder.SetContentIntent(pendingIntent);
+            _completionNotificationBuilder.SetOngoing(false);
+            _completionNotificationBuilder.SetAutoCancel(true);
+            _completionNotificationBuilder.SetPriority(NotificationCompat.PriorityHigh); // High priority allows for sound/vibration
         }
 
         public override StartCommandResult OnStartCommand(Intent? intent, StartCommandFlags flags, int startId)

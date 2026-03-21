@@ -7,9 +7,9 @@ namespace Mogri.Views;
 
 public class BasePage : ContentPage
 {
-    private readonly StatusBarBehavior _statusBarBehavior;
-    private readonly Color _lightStatusBarColor;
-    private readonly Color _darkStatusBarColor;
+    private readonly StatusBarBehavior? _statusBarBehavior;
+    private readonly Color _lightStatusBarColor = Colors.Transparent;
+    private readonly Color _darkStatusBarColor = Colors.Transparent;
 
     public BasePage()
     {
@@ -27,6 +27,9 @@ public class BasePage : ContentPage
             _lightStatusBarColor = (Color)lightStatusBarColor;
             _darkStatusBarColor = (Color)darkStatusBarColor;
 
+            // CA1416: StatusBarBehavior is supported on iOS and Android, but the analyzer incorrectly flags
+            // macCatalyst (which this app does not target) as an unsupported reachable platform within the iOS TFM.
+#pragma warning disable CA1416
             _statusBarBehavior = new StatusBarBehavior()
             {
                 StatusBarStyle = StatusBarStyle.LightContent,
@@ -34,17 +37,20 @@ public class BasePage : ContentPage
             };
 
             _statusBarBehavior.SetAppThemeColor(StatusBarBehavior.StatusBarColorProperty, _lightStatusBarColor, _darkStatusBarColor);
+#pragma warning restore CA1416
 
             Behaviors.Add(_statusBarBehavior);
         }
     }
 
-    private void OnRequestedThemeChanged(object sender, AppThemeChangedEventArgs e)
+    private void OnRequestedThemeChanged(object? sender, AppThemeChangedEventArgs e)
     {
         if (_statusBarBehavior != null)
         {
+#pragma warning disable CA1416
             _statusBarBehavior.StatusBarStyle = StatusBarStyle.LightContent;
             _statusBarBehavior.StatusBarColor = e.RequestedTheme == AppTheme.Dark ? _darkStatusBarColor : _lightStatusBarColor;
+#pragma warning restore CA1416
         }
     }
 

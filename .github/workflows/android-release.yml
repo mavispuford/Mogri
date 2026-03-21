@@ -6,6 +6,9 @@ on:
       - 'v*' # Triggers on any tag starting with v (e.g. v1.0.0)
   workflow_dispatch: # Allows manual triggering from the GitHub Actions tab
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: windows-latest

@@ -94,4 +94,14 @@ public interface ICanvasPageViewModel : IPageViewModel
     IRelayCommand ToggleActionsVisibilityCommand { get; }
 
     IRelayCommand? ResetZoomCommand { get; set; }
+
+    bool IsZoomMode { get; }
+
+    IAsyncRelayCommand SetResolutionCommand { get; }
+
+    IAsyncRelayCommand EditMasksCommand { get; }
+
+    IAsyncRelayCommand ApplyPaintAndMasksCommand { get; }
+
+    IAsyncRelayCommand PatchCommand { get; }
 }

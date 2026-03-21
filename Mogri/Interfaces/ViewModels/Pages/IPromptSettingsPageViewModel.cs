@@ -77,5 +77,13 @@ public interface IPromptSettingsPageViewModel : IPageViewModel
 
     List<string> AvailablePresets { get; set; }
 
-    Mogri.Models.BackendCapabilities CurrentCapabilities { get; }
+    Models.BackendCapabilities CurrentCapabilities { get; }
+
+    List<string> AvailableVaes { get; set; }
+
+    string? Vae { get; set; }
+
+    List<string> AvailableTextEncoders { get; set; }
+
+    string? TextEncoder { get; set; }
 }

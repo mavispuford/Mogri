@@ -25,5 +25,8 @@ public partial class PaintingToolViewModel : BaseViewModel, IPaintingToolViewMod
     public partial bool IsLoading { get; set; }
 
     [ObservableProperty]
+    public partial Color IconColor { get; set; }
+
+    [ObservableProperty]
     public partial List<ContextButtonType> ContextButtons { get; set; }
 }

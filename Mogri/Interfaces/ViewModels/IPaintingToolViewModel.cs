@@ -16,5 +16,7 @@ public interface IPaintingToolViewModel : IBaseViewModel
 
     bool IsLoading { get; set; }
 
+    Color IconColor { get; set; }
+
     List<ContextButtonType> ContextButtons { get; set; }
 }
