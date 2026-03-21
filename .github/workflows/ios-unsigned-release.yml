@@ -24,7 +24,7 @@ jobs:
 
     - name: Publish iOS app (Unsigned)
       run: |
-        dotnet publish Mogri/Mogri.csproj -f net10.0-ios -c Release -p:RuntimeIdentifier=ios-arm64 -p:EnableCodeSigning=false
+        dotnet publish Mogri/Mogri.csproj -f net10.0-ios -c Release -p:TargetFrameworks=net10.0-ios -p:RuntimeIdentifier=ios-arm64 -p:EnableCodeSigning=false
 
     - name: Package IPA and Zip
       run: |
