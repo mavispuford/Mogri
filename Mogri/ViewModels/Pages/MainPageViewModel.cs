@@ -177,11 +177,18 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
             _settings.Model = await _stableDiffusionService.GetSelectedModelAsync();
         }
-        catch
+        catch (Exception ex)
         {
+            var message = "Unable to connect to the configured server. Please double check your app settings/connectivity and try again.";
+
+            if (!string.IsNullOrEmpty(ex.Message))
+            {
+                message += $"\n\nMessage: {ex.Message}";
+            }
+
             await _popupService.DisplayAlertAsync(
-                "Connection problems",
-                "Unable to connect to the configured server URL. Please double check your app settings/connectivity and try again.",
+                "Connection problem",
+                message,
                 "OK");
 
             ServerConnected = false;

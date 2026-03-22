@@ -18,13 +18,15 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
     public partial IReadOnlyList<string> AvailableBackends { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsComfyUiSelected))]
+    [NotifyPropertyChangedFor(nameof(IsComfyUiCloudSelected))]
+    [NotifyPropertyChangedFor(nameof(IsServerUrlVisible))]
     public partial string SelectedBackend { get; set; }
 
     [ObservableProperty]
     public partial string ComfyUiApiKey { get; set; }
 
-    public bool IsComfyUiSelected => SelectedBackend == "ComfyUI";
+    public bool IsComfyUiCloudSelected => SelectedBackend == "ComfyUI Cloud";
+    public bool IsServerUrlVisible => SelectedBackend != "ComfyUI Cloud";
 
     public AppSettingsPageViewModel(
         ILoadingService loadingService,
@@ -53,10 +55,13 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
         // Allow empty URL
         Preferences.Default.Set(Constants.PreferenceKeys.ServerUrl, ServerUrl);
 
-        if (!string.IsNullOrEmpty(ComfyUiApiKey))
+        if (!IsComfyUiCloudSelected)
         {
-            Preferences.Default.Set(Constants.PreferenceKeys.ComfyUiApiKey, ComfyUiApiKey);
+            ComfyUiApiKey = string.Empty;
         }
+
+        // Allow empty ComfyUIApiKey
+        Preferences.Default.Set(Constants.PreferenceKeys.ComfyUiApiKey, ComfyUiApiKey);
 
         if (!string.IsNullOrEmpty(SelectedBackend))
         {

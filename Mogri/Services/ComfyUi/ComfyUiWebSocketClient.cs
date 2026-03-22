@@ -27,7 +27,6 @@ public class ComfyUiWebSocketClient
         
         if (!string.IsNullOrEmpty(_apiKey))
         {
-            _ws.Options.SetRequestHeader("Authorization", $"Bearer {_apiKey}");
             _ws.Options.SetRequestHeader("X-API-Key", _apiKey);
         }
 

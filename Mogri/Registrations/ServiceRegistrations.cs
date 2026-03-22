@@ -38,6 +38,7 @@ public static class ServiceRegistrations
 
         builder.Services.AddSingleton<IImageGenerationBackend, SdForgeNeoService>();
         builder.Services.AddSingleton<IImageGenerationBackend, ComfyUiService>();
+        builder.Services.AddSingleton<IImageGenerationBackend, ComfyUiCloudService>();
         builder.Services.AddSingleton<IBackendRegistry, BackendRegistry>();
         builder.Services.AddSingleton<IImageGenerationService, ProxyImageGenerationService>();
         builder.Services.AddSingleton<IPopupService, PopupService>();
