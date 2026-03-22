@@ -178,7 +178,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
     {
         if (HistoryItem == null) return;
 
-        var result = await Shell.Current.DisplayAlertAsync("Confirm", "Are you sure you would like to delete this image?", "DELETE", "Cancel");
+        var result = await _popupService.DisplayAlertAsync("Confirm", "Are you sure you would like to delete this image?", "DELETE", "Cancel");
 
         if (!result)
         {
@@ -190,7 +190,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
 
         var parameters = new Dictionary<string, object>
         {
-            { NavigationParams.DeletedHistoryItem, true }
+            { NavigationParams.DeletedHistoryItem, HistoryItem }
         };
 
         await ClosePopupAsync(parameters);
@@ -234,7 +234,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
     {
         if (HistoryItem?.Settings == null)
         {
-            await Shell.Current.DisplayAlertAsync("No Image Info", "Unable to retrieve image info. Please try again later.", "Close");
+            await _popupService.DisplayAlertAsync("No Image Info", "Unable to retrieve image info. Please try again later.", "Close");
 
             return;
         }
@@ -268,7 +268,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
                 $"Upscale Steps: {HistoryItem.Settings.UpscaleSteps}\n";
         }
 
-        var result = await Shell.Current.DisplayAlertAsync("Image Info", message, "Copy to clipboard", "Close");
+        var result = await _popupService.DisplayAlertAsync("Image Info", message, "Copy to clipboard", "Close");
 
         if (result)
         {

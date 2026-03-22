@@ -15,6 +15,8 @@ This .NET MAUI application follows the MVVM pattern. It consists mainly of these
 - `Views` should always use `x:DataType` (compiled bindings) that point to the `Interface` of the view model, not the implementation
 - **Controls**: Reusable UI components (like `ToolControl`) live in the `Controls` namespace. They inherit from `ContentView`, use `BindableProperty` for data input, and generally do not have their own ViewModels.
 - **Behaviors**: Complex view interactions (especially animations) are handled via Behaviors (e.g., `CustomAnimationBehavior`) to keep view logic declarative and reusable.
+- Popup pages are shown via the `IPopupService`
+- Instead of using `Shell.Current` for `DisplayAlertAsync`, `DisplayPromptAsync`, and `DisplayActionSheetAsync`, use `IPopupService`, because its implementation adds additional logic around detecting the topmost page or popup to prevent alert dialogs etc. from displaying underneath popups.
 
 ### View Models 
 - Exposed via interfaces (ie. `IMainPageViewModel`) and registered in a dependency container in `ViewModelRegistrations.cs`
