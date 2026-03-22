@@ -28,11 +28,7 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
-		<!-- Tells the iOS linker to ignore the missing OnnxRuntime custom ops symbol -->
-		<MtouchExtraArgs>$(MtouchExtraArgs) -gcc_flags "-Wl,-U,_RegisterCustomOps"</MtouchExtraArgs>
-	</PropertyGroup>
-
+	<!-- libdummy.xcframework provides a stub RegisterCustomOps to satisfy the OnnxRuntime linker reference -->
 	<ItemGroup Condition="$(TargetFramework.Contains('-ios'))">
 		<NativeReference Include="Platforms\iOS\NativeBuild\libdummy.xcframework">
 			<Kind>Framework</Kind>
