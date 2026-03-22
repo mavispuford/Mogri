@@ -38,7 +38,7 @@ public class ComfyUiService : IImageGenerationBackend
     private List<string> _schedulers = new();
     private List<ILoraViewModel> _loras = new();
 
-    public string Name => "ComfyUI";
+    public virtual string Name => "ComfyUI";
     public bool Initialized { get; private set; }
     
     public BackendCapabilities Capabilities => new()
@@ -64,17 +64,27 @@ public class ComfyUiService : IImageGenerationBackend
 
         try
         {
-            _baseUrl = Preferences.Get(Constants.PreferenceKeys.ServerUrl, "https://cloud.comfy.org");
-            _apiKey = Preferences.Get(Constants.PreferenceKeys.ApiKey, string.Empty);
+            if (Name == "ComfyUI Cloud")
+            {
+                _baseUrl = "https://cloud.comfy.org";
+            }
+            else
+            {
+                _baseUrl = Preferences.Get(Constants.PreferenceKeys.ServerUrl, "http://127.0.0.1:8188");
+            }
+            
+            _apiKey = Preferences.Get(Constants.PreferenceKeys.ComfyUiApiKey, string.Empty);
 
             // 1. Create wrapper HttpClient
             _httpClient = _httpClientFactory.CreateClient();
             _httpClient.BaseAddress = new Uri(_baseUrl);
+
+            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("MogriApp/1.0");
+            _httpClient.DefaultRequestHeaders.Accept.ParseAdd("application/json");
             
             if (!string.IsNullOrEmpty(_apiKey))
             {
                 _httpClient.DefaultRequestHeaders.Add("X-API-Key", _apiKey);
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
             }
 
             // 2. Create Kiota Client
@@ -107,8 +117,29 @@ public class ComfyUiService : IImageGenerationBackend
         {
             // Fetch object info directly to parse dynamic JSON structure
             // GET /api/object_info
-            var response = await _httpClient.GetStringAsync("/api/object_info", cancellationToken);
-            var json = JObject.Parse(response);
+            var response = await _httpClient.GetAsync("/api/object_info", cancellationToken);
+            var content = await response.Content.ReadAsStringAsync(cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorMessage = $"Failed to get object info ({(int)response.StatusCode}).";
+                try
+                {
+                    var errorJson = JObject.Parse(content);
+                    if (errorJson["message"] != null)
+                    {
+                        errorMessage = $"ComfyUI Error: {errorJson["message"]}";
+                    }
+                }
+                catch
+                {
+                    errorMessage += $" Response: {content}";
+                }
+                
+                throw new Exception(errorMessage);
+            }
+
+            var json = JObject.Parse(content);
 
             // Models (CheckpointLoaderSimple)
             _models.Clear();

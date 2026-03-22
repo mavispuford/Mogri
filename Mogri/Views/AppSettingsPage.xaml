@@ -36,28 +36,29 @@
 
                 <Image Grid.Row="0" Grid.Column="0" WidthRequest="32">
                     <Image.Source>
-                        <FontImageSource Glyph="&#xe30a;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
-                    </Image.Source>
-                </Image>
-                <Label Grid.Row="0" Grid.Column="1" Text="Server URL:" VerticalTextAlignment="Center" Style="{StaticResource LabelHeader}" />
-                <Entry Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding ServerUrl}" Placeholder="Ex. http://192.168.0.1" Keyboard="Url" HorizontalOptions="Fill" />
-
-                <Image Grid.Row="2" Grid.Column="0" WidthRequest="32">
-                    <Image.Source>
                         <FontImageSource Glyph="&#xeb3f;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="2" Grid.Column="1" Text="Backend:" VerticalTextAlignment="Center" Style="{StaticResource LabelHeader}" />
-                <Picker Grid.Row="2" Grid.Column="2" ItemsSource="{Binding AvailableBackends}" SelectedItem="{Binding SelectedBackend}" HorizontalOptions="End" />
+                <Label Grid.Row="0" Grid.Column="1" Text="Backend:" VerticalTextAlignment="Center" Style="{StaticResource LabelHeader}" />
+                <Picker Grid.Row="0" Grid.Column="2" ItemsSource="{Binding AvailableBackends}" SelectedItem="{Binding SelectedBackend}" HorizontalOptions="End" />
+
+                <!-- Server URL Section -->
+                <Image Grid.Row="1" Grid.Column="0" WidthRequest="32" IsVisible="{Binding IsServerUrlVisible}">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xe30a;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
+                    </Image.Source>
+                </Image>
+                <Label Grid.Row="1" Grid.Column="1" Text="Server URL:" VerticalTextAlignment="Center" Style="{StaticResource LabelHeader}" IsVisible="{Binding IsServerUrlVisible}"/>
+                <Entry Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding ServerUrl}" Placeholder="Ex. http://192.168.0.1" Keyboard="Url" HorizontalOptions="Fill" IsVisible="{Binding IsServerUrlVisible}" />
 
                 <!-- ComfyUI API Key Section -->
-                <Image Grid.Row="3" Grid.Column="0" WidthRequest="32" IsVisible="{Binding IsComfyUiSelected}">
+                <Image Grid.Row="3" Grid.Column="0" WidthRequest="32" IsVisible="{Binding IsComfyUiCloudSelected}">
                     <Image.Source>
                         <FontImageSource Glyph="&#xe897;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="3" Grid.Column="1" Text="ComfyUI API Key:" VerticalTextAlignment="Center" Style="{StaticResource LabelHeader}" IsVisible="{Binding IsComfyUiSelected}"/>
-                <Entry Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding ComfyUiApiKey}" Placeholder="Optional (for cloud)" IsPassword="True" HorizontalOptions="Fill" IsVisible="{Binding IsComfyUiSelected}"/>
+                <Label Grid.Row="3" Grid.Column="1" Text="ComfyUI API Key:" VerticalTextAlignment="Center" Style="{StaticResource LabelHeader}" IsVisible="{Binding IsComfyUiCloudSelected}"/>
+                <Entry Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding ComfyUiApiKey}" Placeholder="Required for Cloud" IsPassword="True" HorizontalOptions="Fill" IsVisible="{Binding IsComfyUiCloudSelected}"/>
             </Grid>
         </ScrollView>
 
