@@ -137,7 +137,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     [RelayCommand]
     private async Task ClearHistory()
     {
-        var result = await Shell.Current.DisplayAlertAsync("Confirm", "Are you sure you would like to clear all of your history?\n\n**This cannot be undone.**", "CLEAR ALL", "Cancel");
+        var result = await _popupService.DisplayAlertAsync("Confirm", "Are you sure you would like to clear all of your history?\n\n**This cannot be undone.**", "CLEAR ALL", "Cancel");
 
         if (!result)
         {
@@ -174,9 +174,9 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
             await Shell.Current.GoToAsync("..", result);
         }
 
-        if (result.ContainsKey(NavigationParams.DeletedHistoryItem))
+        if (result.TryGetValue(NavigationParams.DeletedHistoryItem, out var deletedItem) && deletedItem is IHistoryItemViewModel deletedHistoryItem)
         {
-            HistoryItems.Remove(item);
+            HistoryItems.Remove(deletedHistoryItem);
         }
     }
 
@@ -300,7 +300,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         var pluralityString = SelectedItems.Count != 1 ? "s" : string.Empty;
         SelectedItemsText = $"{SelectedItems.Count} item{pluralityString} selected";
 
-        var result = await Shell.Current.DisplayAlertAsync("Confirm", $"Delete {SelectedItems.Count} item{pluralityString}?", "DELETE", "Cancel");
+        var result = await _popupService.DisplayAlertAsync("Confirm", $"Delete {SelectedItems.Count} item{pluralityString}?", "DELETE", "Cancel");
 
         if (!result)
         {
