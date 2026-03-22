@@ -34,8 +34,8 @@
 	</PropertyGroup>
 
 	<ItemGroup Condition="$(TargetFramework.Contains('-ios'))">
-		<NativeReference Include="Platforms\iOS\NativeBuild\libdummy.a">
-			<Kind>Static</Kind>
+		<NativeReference Include="Platforms\iOS\NativeBuild\libdummy.xcframework">
+			<Kind>Framework</Kind>
 			<ForceLoad>True</ForceLoad>
 		</NativeReference>
 	</ItemGroup>
