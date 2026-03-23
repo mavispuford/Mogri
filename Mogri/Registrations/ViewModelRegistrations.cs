@@ -3,6 +3,7 @@ using Mogri.Interfaces.ViewModels.Popups;
 using Mogri.Interfaces.ViewModels.Pages;
 using Mogri.ViewModels;
 using Mogri.Views.Popups;
+using Mogri.ViewModels.Pages;
 
 namespace Mogri.Registrations;
 
@@ -33,6 +34,7 @@ public static class ViewModelRegistrations
         builder.Services.AddTransient<IModelViewModel, ModelViewModel>();
         builder.Services.AddTransient<IUpscalerViewModel, UpscalerViewModel>();
         builder.Services.AddTransient<IPromptStyleViewModel, PromptStyleViewModel>();
+        builder.Services.AddTransient<IAboutPageViewModel, AboutPageViewModel>();
 
         return builder;
     }
