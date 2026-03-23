@@ -588,6 +588,12 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         await _popupService.DisplayAlertAsync("Connection Status", message, "OK");
     }
 
+    [RelayCommand]
+    private Task NavigateToAboutPage()
+    {
+        return Shell.Current.GoToAsync("AboutPage");
+    }
+
     public override async void ApplyQueryAttributes(IDictionary<string, object>? query)
     {
         if (query == null) return;

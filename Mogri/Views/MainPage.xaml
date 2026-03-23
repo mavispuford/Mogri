@@ -32,6 +32,9 @@
     <Shell.TitleView>
         <Grid HorizontalOptions="Start" Padding="0,5">
             <Image HorizontalOptions="Start" Source="logo_small.png" Aspect="AspectFit" >
+                <Image.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NavigateToAboutPageCommand}"/>
+                </Image.GestureRecognizers>
                 <Image.Behaviors>
                     <behaviors:ThemeAwareIconTintColorBehavior Light="White" Dark="{StaticResource Secondary}" />
                 </Image.Behaviors>

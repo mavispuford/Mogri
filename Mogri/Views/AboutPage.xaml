@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                xmlns:behaviors="clr-namespace:Mogri.Behaviors"
+                xmlns:viewModels="clr-namespace:Mogri.Interfaces.ViewModels.Pages"
+                xmlns:views="clr-namespace:Mogri.Views;assembly=Mogri"
+                x:Class="Mogri.Views.AboutPage"
+                Background="{StaticResource Secondary}"
+                x:DataType="viewModels:IAboutPageViewModel"
+                Shell.PresentationMode="ModalAnimated"
+                Shell.NavBarIsVisible="False">
+    <Grid RowDefinitions="*,auto" Padding="0,16">
+
+        <VerticalStackLayout Grid.Row="0" VerticalOptions="Center" Spacing="22">
+            <Image 
+                x:Name="LogoImage"
+                Source="logo_large.png"
+                HorizontalOptions="Center"
+                ZIndex="99">
+                <Image.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="Logo_Tapped" />
+                    <PanGestureRecognizer PanUpdated="Logo_PanUpdated" />
+                </Image.GestureRecognizers>
+            </Image>
+
+            <BoxView HeightRequest="120" Color="Transparent" />
+
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="12" Padding="64,0">
+                <HorizontalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NavigateToGitHubPageCommand}" />
+                </HorizontalStackLayout.GestureRecognizers>
+                <Image Source="github_invertocat_black.png" WidthRequest="40">
+                    <Image.Behaviors>
+                            <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Primary}" Dark="{StaticResource LivingCoral}" />
+                    </Image.Behaviors>
+                </Image>
+                <Label VerticalOptions="Center" Text="GitHub" FontFamily="ComfortaaRegular" FontSize="18" TextColor="{StaticResource NeutralDarkGray}"  />
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="12" Padding="64,0">
+                <HorizontalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NavigateToLicensesPageCommand}" />
+                </HorizontalStackLayout.GestureRecognizers>
+                
+                <ImageButton ToolTipProperties.Text="Close">
+                    <ImageButton.Source>
+                        <FontImageSource Glyph="&#xf5a0;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="{StaticResource Primary}" />
+                    </ImageButton.Source>
+                </ImageButton>
+                <Label VerticalOptions="Center" Text="Open Source Licenses" TranslationY="-2" FontFamily="ComfortaaRegular" FontSize="18" TextColor="{StaticResource NeutralDarkGray}" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+
+        <ImageButton Grid.Row="2" ToolTipProperties.Text="Close" HorizontalOptions="Center" Command="{Binding BackButtonCommand}">
+                <ImageButton.Source>
+                    <FontImageSource Glyph="&#xe5cd;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="{StaticResource Primary}" />
+                </ImageButton.Source>
+        </ImageButton>
+    </Grid>
+</views:BasePage>
