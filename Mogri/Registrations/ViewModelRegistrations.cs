@@ -35,6 +35,8 @@ public static class ViewModelRegistrations
         builder.Services.AddTransient<IUpscalerViewModel, UpscalerViewModel>();
         builder.Services.AddTransient<IPromptStyleViewModel, PromptStyleViewModel>();
         builder.Services.AddTransient<IAboutPageViewModel, AboutPageViewModel>();
+        builder.Services.AddTransient<ILicenseItemViewModel, LicenseItemViewModel>();
+        builder.Services.AddTransient<ILicensesPageViewModel, LicensesPageViewModel>();
 
         return builder;
     }
