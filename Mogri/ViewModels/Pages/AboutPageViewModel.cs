@@ -23,6 +23,6 @@ public partial class AboutPageViewModel : PageViewModel, IAboutPageViewModel
     [RelayCommand]
     private Task NavigateToLicensesPage()
     {
-        return Task.CompletedTask;
+        return Shell.Current.GoToAsync("LicensesPage");
     }
 }

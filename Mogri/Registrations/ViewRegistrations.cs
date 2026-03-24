@@ -18,6 +18,7 @@ public static class ViewRegistrations
         registerPage<IHistoryPageViewModel, HistoryPage>(builder.Services, () => new HistoryPage());
         registerPage<ILoraSelectionPageViewModel, LoraSelectionPage>(builder.Services, () => new LoraSelectionPage());
         registerPage<IAboutPageViewModel, AboutPage>(builder.Services, () => new AboutPage());
+        registerPage<ILicensesPageViewModel, LicensesPage>(builder.Services, () => new LicensesPage());
 
         return builder;
     }
