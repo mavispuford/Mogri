@@ -154,24 +154,54 @@ namespace Mogri.Services
                    ?? Application.Current?.Windows.FirstOrDefault()?.Page!;
         }
 
-        public Task DisplayAlertAsync(string title, string message, string cancel)
+        /// <summary>
+        /// Temporarily removes the LoadingPopup (if shown) so that native iOS dialogs
+        /// are not hidden behind it, then restores it after the action completes.
+        /// </summary>
+        private async Task<T> withLoadingPopupHiddenAsync<T>(Func<Task<T>> action)
         {
-            return Shell.Current.Dispatcher.DispatchAsync(() => GetActivePage().DisplayAlertAsync(title, message, cancel));
+            var loadingPopup = MopupService.Instance.PopupStack
+                .FirstOrDefault(p => p is LoadingPopup) as LoadingPopup;
+
+            if (loadingPopup != null)
+                await MopupService.Instance.RemovePageAsync(loadingPopup);
+
+            try
+            {
+                return await action();
+            }
+            finally
+            {
+                if (loadingPopup != null)
+                    await MopupService.Instance.PushAsync(loadingPopup);
+            }
+        }
+
+        public async Task DisplayAlertAsync(string title, string message, string cancel)
+        {
+            await withLoadingPopupHiddenAsync(async () =>
+            {
+                await Shell.Current.Dispatcher.DispatchAsync(() => GetActivePage().DisplayAlertAsync(title, message, cancel));
+                return (object?)null;
+            });
         }
 
         public Task<bool> DisplayAlertAsync(string title, string message, string accept, string cancel)
         {
-            return Shell.Current.Dispatcher.DispatchAsync(() => GetActivePage().DisplayAlertAsync(title, message, accept, cancel));
+            return withLoadingPopupHiddenAsync(() =>
+                Shell.Current.Dispatcher.DispatchAsync(() => GetActivePage().DisplayAlertAsync(title, message, accept, cancel)));
         }
 
         public Task<string?> DisplayPromptAsync(string title, string message, string accept = "OK", string cancel = "Cancel", string? placeholder = null, int maxLength = -1, Keyboard? keyboard = null, string initialValue = "")
         {
-            return Shell.Current.Dispatcher.DispatchAsync(() => GetActivePage().DisplayPromptAsync(title, message, accept, cancel, placeholder, maxLength, keyboard, initialValue));
+            return withLoadingPopupHiddenAsync(() =>
+                Shell.Current.Dispatcher.DispatchAsync(() => GetActivePage().DisplayPromptAsync(title, message, accept, cancel, placeholder, maxLength, keyboard, initialValue)));
         }
 
         public Task<string> DisplayActionSheetAsync(string title, string cancel, string? destruction, params string[] buttons)
         {
-            return Shell.Current.Dispatcher.DispatchAsync(() => GetActivePage().DisplayActionSheetAsync(title, cancel, destruction, buttons));
+            return withLoadingPopupHiddenAsync(() =>
+                Shell.Current.Dispatcher.DispatchAsync(() => GetActivePage().DisplayActionSheetAsync(title, cancel, destruction, buttons)));
         }
 
         public async Task<FileResult?> PickSinglePhotoAsync()
