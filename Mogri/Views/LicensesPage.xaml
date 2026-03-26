@@ -5,7 +5,7 @@
                 xmlns:itemViewModels="clr-namespace:Mogri.Interfaces.ViewModels"
                 xmlns:views="clr-namespace:Mogri.Views;assembly=Mogri"
                 x:Class="Mogri.Views.LicensesPage"
-                Background="{StaticResource Secondary}"
+                Background="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource CadetDark}}"
                 x:DataType="viewModels:ILicensesPageViewModel"
                 Shell.PresentationMode="ModalAnimated"
                 Shell.NavBarIsVisible="False">
@@ -15,29 +15,29 @@
                Text="Open Source Licenses" 
                FontFamily="ComfortaaBold" 
                FontSize="24" 
-               TextColor="{StaticResource NeutralDarkGray}" 
+               TextColor="{AppThemeBinding Light={StaticResource NeutralDarkGray}, Dark={StaticResource Secondary}}" 
                HorizontalOptions="Center" 
                Margin="0,16,0,24" />
 
         <CollectionView Grid.Row="1" ItemsSource="{Binding Licenses}" HorizontalOptions="Fill" Margin="0,0">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="itemViewModels:ILicenseItemViewModel">
-                    <Border Padding="12" Margin="12,0,12,12" Background="{StaticResource Gray100}" Stroke="{StaticResource Cadet}" StrokeShape="RoundRectangle 8">
+                    <Border Padding="12" Margin="12,0,12,12" Background="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Black}}" Stroke="{StaticResource Cadet}" StrokeShape="RoundRectangle 8">
                         <StackLayout Spacing="8">
                             <StackLayout.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding ToggleExpandedCommand}" />
                             </StackLayout.GestureRecognizers>
                             
                             <Label Text="{Binding Name}" FontFamily="ComfortaaBold" FontSize="18" TextColor="{StaticResource Primary}" />
-                            <Label Text="{Binding LicenseType}" FontFamily="ComfortaaRegular" FontSize="12" TextColor="{StaticResource NeutralDarkGray}" />
-                            <Label Text="{Binding Description}" FontFamily="ComfortaaRegular" FontSize="14" TextColor="{StaticResource NeutralDarkGray}" />
+                            <Label Text="{Binding LicenseType}" FontFamily="ComfortaaRegular" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource NeutralDarkGray}, Dark={StaticResource Secondary}}" />
+                            <Label Text="{Binding Description}" FontFamily="ComfortaaRegular" FontSize="14" TextColor="{AppThemeBinding Light={StaticResource NeutralDarkGray}, Dark={StaticResource Secondary}}" />
                             
                             <Label Text="{Binding LicenseText}" 
                                    FontFamily="OpenSansRegular" 
                                    FontSize="12" 
                                    LineBreakMode="WordWrap"
                                    IsVisible="{Binding IsExpanded}" 
-                                   TextColor="{StaticResource NeutralDarkGray}" 
+                                   TextColor="{AppThemeBinding Light={StaticResource NeutralDarkGray}, Dark={StaticResource Secondary}}" 
                                    Margin="0,12,0,0" />
 
                             <Label Text="{Binding Url}" 
@@ -56,7 +56,7 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <ImageButton Grid.Row="2" ToolTipProperties.Text="Close" HorizontalOptions="Center" Command="{Binding BackButtonCommand}" Margin="0,16,0,0">
+        <ImageButton Grid.Row="2" ToolTipProperties.Text="Close" HorizontalOptions="Center" Command="{Binding BackButtonCommand}" Margin="0,16,0,0" WidthRequest="40" Aspect="Center">
             <ImageButton.Source>
                 <FontImageSource Glyph="&#xe5cd;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="{StaticResource Primary}" />
             </ImageButton.Source>
