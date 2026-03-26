@@ -40,7 +40,7 @@
                     </Image.Source>
                 </Image>
                 <Label Grid.Row="0" Grid.Column="1" Text="Backend:" VerticalTextAlignment="Center" Style="{StaticResource LabelHeader}" />
-                <Picker Grid.Row="0" Grid.Column="2" ItemsSource="{Binding AvailableBackends}" SelectedItem="{Binding SelectedBackend}" HorizontalOptions="End" />
+                <Picker Grid.Row="0" Grid.Column="2" ItemsSource="{Binding AvailableBackends}" SelectedItem="{Binding SelectedBackend}" HorizontalOptions="Fill" HorizontalTextAlignment="End" />
 
                 <!-- Server URL Section -->
                 <Image Grid.Row="1" Grid.Column="0" WidthRequest="32" IsVisible="{Binding IsServerUrlVisible}">
