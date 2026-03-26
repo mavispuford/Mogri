@@ -9,7 +9,7 @@ public partial class AboutPage : BasePage
 		InitializeComponent();
 	}
 
-    private async void Logo_Tapped(object sender, TappedEventArgs e)
+    private async void Logo_Tapped(object? sender, TappedEventArgs e)
 	{
 		var shrinkSizeX = double.Clamp(_random.NextDouble(), .6, .8);
 		var growTimeX = int.Clamp(_random.Next(), 200, 400);
@@ -33,7 +33,7 @@ public partial class AboutPage : BasePage
 		await Task.WhenAll(animateX(), animateY());
 	}
 
-    private async void Logo_PanUpdated(object sender, PanUpdatedEventArgs e)
+    private async void Logo_PanUpdated(object? sender, PanUpdatedEventArgs e)
 	{
 		switch (e.StatusType)
 		{
