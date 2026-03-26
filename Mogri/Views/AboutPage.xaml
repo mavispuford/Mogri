@@ -5,7 +5,7 @@
                 xmlns:viewModels="clr-namespace:Mogri.Interfaces.ViewModels.Pages"
                 xmlns:views="clr-namespace:Mogri.Views;assembly=Mogri"
                 x:Class="Mogri.Views.AboutPage"
-                Background="{StaticResource Secondary}"
+                Background="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource CadetDark}}"
                 x:DataType="viewModels:IAboutPageViewModel"
                 Shell.PresentationMode="ModalAnimated"
                 Shell.NavBarIsVisible="False">
@@ -31,10 +31,10 @@
                 </HorizontalStackLayout.GestureRecognizers>
                 <Image Source="github_invertocat_black.png" WidthRequest="40">
                     <Image.Behaviors>
-                            <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Primary}" Dark="{StaticResource LivingCoral}" />
+                            <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Primary}" Dark="{StaticResource Primary}" />
                     </Image.Behaviors>
                 </Image>
-                <Label VerticalOptions="Center" Text="GitHub" FontFamily="ComfortaaRegular" FontSize="18" TextColor="{StaticResource NeutralDarkGray}"  />
+                <Label VerticalOptions="Center" Text="GitHub" FontFamily="ComfortaaRegular" FontSize="18" TextColor="{AppThemeBinding Light={StaticResource NeutralDarkGray}, Dark={StaticResource Secondary}}" />
             </HorizontalStackLayout>
 
             <HorizontalStackLayout HorizontalOptions="Center" Spacing="12" Padding="64,0">
@@ -47,11 +47,11 @@
                         <FontImageSource Glyph="&#xf5a0;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="{StaticResource Primary}" />
                     </ImageButton.Source>
                 </ImageButton>
-                <Label VerticalOptions="Center" Text="Open Source Licenses" TranslationY="-2" FontFamily="ComfortaaRegular" FontSize="18" TextColor="{StaticResource NeutralDarkGray}" />
+                <Label VerticalOptions="Center" Text="Open Source Licenses" TranslationY="-2" FontFamily="ComfortaaRegular" FontSize="18" TextColor="{AppThemeBinding Light={StaticResource NeutralDarkGray}, Dark={StaticResource Secondary}}" />
             </HorizontalStackLayout>
         </VerticalStackLayout>
 
-        <ImageButton Grid.Row="2" ToolTipProperties.Text="Close" HorizontalOptions="Center" Command="{Binding BackButtonCommand}">
+        <ImageButton Grid.Row="2" ToolTipProperties.Text="Close" HorizontalOptions="Center" Command="{Binding BackButtonCommand}" WidthRequest="40" Aspect="Center">
                 <ImageButton.Source>
                     <FontImageSource Glyph="&#xe5cd;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="{StaticResource Primary}" />
                 </ImageButton.Source>
