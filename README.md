@@ -1,38 +1,69 @@
 # Mogri
 
-Mogri is a .NET MAUI mobile application for image generation and editing. It combines a finger-friendly mobile UI with a mix of on-device processing and a remote server for heavy-duty generation tasks. While it is not a replacement for professional desktop image editors, Mogri aims to bridge the gap for mobile workflows.
+Mogri is a .NET MAUI mobile application for image generation and editing. It combines a finger-friendly mobile UI with a mix of on-device processing (masking/patching, etc.) and a user-provided remote server for heavy-duty generation tasks. While it is not a replacement for professional desktop image editors, Mogri aims to bridge that gap a bit for simple mobile workflows.
 
 ## Overview
 
 There are two main tabs in the app:
 
-- **Generate**: The user's main entry point to view generation results and edit settings. Image generation can continue in the background via a persistent notification (Android only).
-- **Canvas**: A workspace to mask/paint on generated images (or images from the file system) or draw freehand sketches to use as a base for generation.
+- **Generate**: Your main entry point to view generation results and edit settings. Image generation can continue in the background (when backgrounded, Android will show a notification with progress).
+- **Canvas**: A workspace to mask/paint on images or draw freehand sketches to use as a base for generation.
 
-### Example Workflow
+### Example Workflows
+
+#### Touch-ups
+
+1. In the `Canvas` tab, add a photo from your device.
+2. Mask an unwanted object/blemish using the magic wand or brush tool.
+3. Send the canvas image to the `Generate` tab, and give it a prompt (e.g. "a field of grass", "clear skin, close up"), and tap the `Generate` button.
+4. If results aren't to your liking, you can play with the denoising strength in the Image to Image Settings page.
+
+#### Image generation
 
 1.  Generate one or more "photo of a cat" images.
-2.  Send a selected image to the **Canvas**.
-3.  Mask the area above the cat and send the updated canvas image back to the **Generate** tab.
-4.  Generate with a new prompt (e.g., "a top hat"), resulting in a cat wearing a top hat etc.
-
-## Architecture
-
-The application follows the MVVM pattern and utilizes standard .NET MAUI features along with the CommunityToolkit.
-
-For a detailed breakdown of the application structure, including Views, ViewModels, and Services, please see [Architecture.md](docs/Architecture.md).
+2.  Send one of the images to the `Canvas` tab.
+3.  Mask the area above the cat and send the updated canvas image back to the `Generate` tab.
+4.  Generate with a new prompt (e.g., "a top hat"), resulting in the cat now wearing a top hat.
 
 ## Getting Started
 
 ### Prerequisites
 
-- .NET 10.0 SDK (or later) for Android/iOS workloads.
-- A running instance of **Stable Diffusion WebUI Forge** (or compatible Neo-supported backend).
+- An Android or iOS phone
+  - **Android** - Install the latest APK
+  - **iOS** - Currently, sideloading is required for iOS as well
+- A running instance of **SD Forge Neo**/**ComfyUI** or a **Comfy Cloud** API key.
 
 ### Configuration
 
-1.  Build and deploy the application to your device.
-2.  Navigate to the **Settings** page.
-3.  Select your backend (**SD Forge Neo** or **ComfyUI**) from the dropdown.
-4.  Enter your backend server URL (e.g., `http://192.168.1.x:7860` for Forge, `http://192.168.1.x:8188` for ComfyUI).
-5.  If using Comfy Cloud, enter your API Key.
+1.  After launching Mogri, navigate to the **Settings** page.
+2.  Select your backend (**SD Forge Neo**/**ComfyUI**/**Comfy Cloud**) from the dropdown.
+3.  Enter your backend server URL (e.g., `http://192.168.1.x:7860`), or if using Comfy Cloud, enter your API Key.
+
+## Architecture
+
+Mogri follows the MVVM pattern and utilizes standard .NET MAUI features along with the CommunityToolkit. It also uses ML.NET and ONNX to run on-device machine-learning models for image segmentation and patching.
+
+For a detailed breakdown of the application structure, including Views, ViewModels, and Services, please see [Architecture.md](docs/Architecture.md).
+
+### FAQ (or *Possibly* Asked Questions)
+
+#### Why make this? Aren't there better image editing/generation UIs out there?
+
+This whole thing started as a fun learning exercise for me.  Also, I've found that most of the current image generation UIs (as of early 2026) aren't mobile friendly. The Gradio-based ones tend to break as soon as you leave the browser tab, and ComfyUI has a lot of complexity that is hard to adapt to mobile form factors.
+
+The main goal for this project was to create a finger-friendly, simplified image editing/generation workflow that also exposes *some* of the more advanced settings that users might care about *(steps, samplers, denoising strength, LoRAs, etc.)*.
+
+#### But I hate AI "art". Why contribute to that software space?
+
+I hear you. Image generation is a complicated, controversial topic. I personally don't condone creating AI "art" for commercial purposes, particularly when models are trained on artists' work without their permission. That said, I also love the technology behind it. Since the early days of image generation (VQGAN-CLIP, Craiyon), I've looked at this tech as more of a toy/tool.  I love to tinker, and this is a fun way to do that.
+
+Mogri doesn't provide any models and instead leaves it up to the user to figure that part out. I think if any person is serious about creating and selling AI "art", they'll gravitate toward something else in the PC space, like ComfyUI etc.
+
+#### Can you add a feature that I want?
+
+I'm happy to entertain feature requests if they align with my vision of simplicity and user-friendliness.
+
+#### Can you add support for X backend?
+
+You're welcome to submit an issue and I'll consider it. Keep in mind that I'm just trying to support the most popular backends.
