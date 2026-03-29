@@ -119,6 +119,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     public bool IsZoomMode => CurrentTool?.Type == ToolType.Zoom;
 
     [ObservableProperty]
+    public partial bool PreserveZoomOnNextBitmapChange { get; set; }
+
+    [ObservableProperty]
     private IAsyncRelayCommand? _prepareForSavingCommand;
 
     public CanvasPageViewModel(
@@ -1658,6 +1661,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
                 if (result != null)
                 {
+                    PreserveZoomOnNextBitmapChange = true;
                     SourceBitmap = result;
                 }
             }
