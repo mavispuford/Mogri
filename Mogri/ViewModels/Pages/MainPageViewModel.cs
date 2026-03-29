@@ -12,7 +12,7 @@ namespace Mogri.ViewModels;
 
 public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 {
-    const string _defaultPrompt = "An astronaut floating in space, detailed digital drawing, octane render, trending on artstation";
+    const string _defaultPrompt = "Photo of a lone tree on a hill, golden hour";
 
     private readonly IFileService _fileService;
     private readonly IImageGenerationService _stableDiffusionService;

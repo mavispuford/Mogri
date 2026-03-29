@@ -994,7 +994,18 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     [RelayCommand]
     private async Task InvertSegmentationMask()
     {
-        if (SegmentationBitmap == null) return;
+        if (SegmentationBitmap == null)
+        {
+            if (SourceBitmap == null) return;
+            
+            // If no existing segmentation mask, the inverted state is simply a completely filled mask
+            var fullMask = new SKBitmap(SourceBitmap.Info);
+            using var canvas = new SKCanvas(fullMask);
+            canvas.Clear(_segmentationService.MaskColor);
+            
+            SegmentationBitmap = fullMask;
+            return;
+        }
 
         try
         {
