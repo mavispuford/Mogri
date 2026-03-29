@@ -1,11 +1,14 @@
-# Mogri
+![alt text](Media/ReadmeImages/MogriLogo.png)
 
-Mogri is a .NET MAUI mobile application for image generation and editing. It combines a finger-friendly mobile UI with a mix of on-device processing (masking/patching, etc.) and a user-provided remote server for heavy-duty generation tasks. While it is not a replacement for professional desktop image editors, Mogri aims to bridge that gap a bit for simple mobile workflows.
+Mogri is a .NET MAUI mobile application for image generation and editing. It combines a finger-friendly mobile UI with a mix of on-device processing (masking/patching, etc.) and a user-provided remote server for heavy-duty generation tasks. While it is not a replacement for professional desktop image editors, Mogri aims to bridge that gap a bit with simple (but powerful) mobile workflows.
 
 ## Overview
 
 There are two main tabs in the app:
 
+| **Generate** | **Canvas** |
+| --- | --- |
+| ![Generate Tab Screenshot](Media/ReadmeImages/Generate-Tab.png) | ![Canvas Tab Screenshot](Media/ReadmeImages/Canvas-Tab.png) |
 - **Generate**: Your main entry point to view generation results and edit settings. Image generation can continue in the background (when backgrounded, Android will show a notification with progress).
 - **Canvas**: A workspace to mask/paint on images or draw freehand sketches to use as a base for generation.
 
@@ -15,15 +18,23 @@ There are two main tabs in the app:
 
 1. In the `Canvas` tab, add a photo from your device.
 2. Mask an unwanted object/blemish using the magic wand or brush tool.
-3. Send the canvas image to the `Generate` tab, and give it a prompt (e.g. "a field of grass", "clear skin, close up"), and tap the `Generate` button.
+3. Send the canvas image to the `Generate` tab, and give it a prompt (e.g. "a field of grass", "clear skin, close up"), and tap the `Create` button.
 4. If results aren't to your liking, you can play with the denoising strength in the Image to Image Settings page.
 
 #### Image generation
 
-1.  Generate one or more "photo of a cat" images.
-2.  Send one of the images to the `Canvas` tab.
-3.  Mask the area above the cat and send the updated canvas image back to the `Generate` tab.
-4.  Generate with a new prompt (e.g., "a top hat"), resulting in the cat now wearing a top hat.
+1. Generate one or more "photo of a cat" images.
+2. Send one of the images to the `Canvas` tab.
+3. Mask the area above the cat and send the updated canvas image back to the `Generate` tab.
+4. Generate with a new prompt (e.g., "a top hat"), resulting in the cat now wearing a top hat.
+
+#### Sketch to Image
+
+1. Make a sketch on the `Canvas` page
+2. Send it to the `Generate` tab as paint only (no masks)
+3. Describe your sketch (or rather, what you want it to be)
+
+&nbsp;&nbsp;&nbsp; ![Doodle of a tree](Media/ReadmeImages/Doodle-Tree.png) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ![Generated image of a tree](Media/ReadmeImages/Generated-Tree.png)
 
 ## Getting Started
 
@@ -62,7 +73,7 @@ Mogri doesn't provide any models and instead leaves it up to the user to figure 
 
 #### Can you add a feature that I want?
 
-I'm happy to entertain feature requests if they align with my vision of simplicity and user-friendliness.
+I'm happy to entertain feature requests if they align with the Mogri vision of simplicity and user-friendliness.
 
 #### Can you add support for X backend?
 
