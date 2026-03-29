@@ -851,7 +851,14 @@ public partial class CanvasPage : BasePage
 
         UpdateCanvasSizes();
 
-        ZoomContainer.Reset();
+        if (BindingContext is ICanvasPageViewModel vm && vm.PreserveZoomOnNextBitmapChange)
+        {
+            vm.PreserveZoomOnNextBitmapChange = false;
+        }
+        else
+        {
+            ZoomContainer.Reset();
+        }
     }
 
     private void UpdateCanvasSizes()

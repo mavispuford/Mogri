@@ -104,4 +104,6 @@ public interface ICanvasPageViewModel : IPageViewModel
     IAsyncRelayCommand ApplyPaintAndMasksCommand { get; }
 
     IAsyncRelayCommand PatchCommand { get; }
+
+    bool PreserveZoomOnNextBitmapChange { get; set; }
 }
