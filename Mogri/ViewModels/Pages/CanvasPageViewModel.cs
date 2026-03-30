@@ -1771,6 +1771,11 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             IsBusy = true;
             await Task.Delay(100);
 
+            while (SettingSegmentationImage)
+            {
+                await Task.Delay(100);
+            }
+
             // Unload Segmentation Service to free resource
             _segmentationService.UnloadModel();
 
