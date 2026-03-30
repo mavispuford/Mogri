@@ -1,18 +1,24 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Maui.Graphics;
 using Mogri.Enums;
 using Mogri.Interfaces.Services;
 using Mogri.Interfaces.ViewModels;
-using Mogri.Models;
-using Mogri;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Mogri.ViewModels;
 
-public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemViewModel
+/// <summary>
+/// Represents a single row in the canvas history popup, handling display
+/// and interaction for mask strokes, segmentation masks, and snapshot checkpoints.
+/// </summary>
+public partial class HistoryItemActionViewModel : ObservableObject, IHistoryItemActionViewModel
 {
     private readonly IPopupService _popupService;
-    private Action<IEditMaskItemViewModel>? _deleteAction;
-    private Action<IEditMaskItemViewModel>? _duplicateAction;
+    private Action<IHistoryItemActionViewModel>? _deleteAction;
+    private Action<IHistoryItemActionViewModel>? _duplicateAction;
 
     [ObservableProperty]
     private CanvasActionViewModel? _canvasAction;
@@ -35,12 +41,24 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
     [ObservableProperty]
     private string _description = string.Empty;
 
-    public EditMaskItemViewModel(IPopupService popupService)
+    [ObservableProperty]
+    private bool _isSnapshot;
+
+    [ObservableProperty]
+    private bool _isEditable;
+
+    [ObservableProperty]
+    private bool _isDuplicable;
+
+    [ObservableProperty]
+    private bool _isDeletable;
+
+    public HistoryItemActionViewModel(IPopupService popupService)
     {
         _popupService = popupService;
     }
 
-    public void InitWith(CanvasActionViewModel canvasAction, Action<IEditMaskItemViewModel> deleteAction, Action<IEditMaskItemViewModel> duplicateAction)
+    public void InitWith(CanvasActionViewModel canvasAction, Action<IHistoryItemActionViewModel> deleteAction, Action<IHistoryItemActionViewModel> duplicateAction)
     {
         _deleteAction = deleteAction;
         _duplicateAction = duplicateAction;
@@ -51,13 +69,31 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
 
     private void initialize()
     {
-        if (CanvasAction is MaskLineViewModel maskLine)
+        if (CanvasAction is SnapshotCanvasActionViewModel snapshotAction)
         {
+            Icon = "\ue411"; // History icon
+            IsColorVisible = false;
+            DisplayColor = Colors.Transparent;
+            Alpha = 1.0;
+            IsSnapshot = true;
+            IsEditable = false;
+            IsDuplicable = false;
+            // Deletable is set by the parent popup for only the top-most snapshot
+            IsDeletable = false;
+            Description = snapshotAction.Description;
+        }
+        else if (CanvasAction is MaskLineViewModel maskLine)
+        {
+            IsSnapshot = false;
+            IsEditable = true;
+            IsDuplicable = true;
+            IsDeletable = true;
+
             if (maskLine.MaskEffect == MaskEffect.Erase)
             {
                 Icon = "\ue6d0"; // Erase
                 IsColorVisible = false;
-                DisplayColor = Colors.Transparent; // Or generic color since not visible
+                DisplayColor = Colors.Transparent;
                 Alpha = 1.0;
             }
             else
@@ -70,16 +106,25 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
         }
         else if (CanvasAction is SegmentationMaskViewModel segMask)
         {
+            IsSnapshot = false;
+            IsEditable = true;
+            IsDuplicable = true;
+            IsDeletable = true;
+
             Icon = "\ue997"; // Paint Bucket
             IsColorVisible = true;
             DisplayColor = segMask.Color;
             Alpha = segMask.Alpha;
         }
 
-        updateDescription();
+        if (!IsSnapshot)
+        {
+            updateDescription();
+        }
+        
         updateColorWithAlpha();
 
-        if (CanvasAction != null)
+        if (CanvasAction != null && !IsSnapshot)
         {
             CanvasAction.PropertyChanged += action_PropertyChanged;
         }
@@ -138,7 +183,7 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
     [RelayCommand]
     private async Task EditAsync()
     {
-        if (CanvasAction == null) return;
+        if (CanvasAction == null || !IsEditable) return;
 
         var parameters = new Dictionary<string, object>
         {
@@ -151,12 +196,14 @@ public partial class EditMaskItemViewModel : ObservableObject, IEditMaskItemView
     [RelayCommand]
     private void Delete()
     {
+        if (!IsDeletable) return;
         _deleteAction?.Invoke(this);
     }
 
     [RelayCommand]
     private void Duplicate()
     {
+        if (!IsDuplicable) return;
         _duplicateAction?.Invoke(this);
     }
 

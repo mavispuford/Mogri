@@ -3,8 +3,9 @@
                   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                   xmlns:popups="clr-namespace:Mogri.Views.Popups"
                   xmlns:viewModels="clr-namespace:Mogri.Interfaces.ViewModels.Popups"
-                  x:Class="Mogri.Views.Popups.EditMasksPopup"
-                  x:DataType="viewModels:IEditMasksPopupViewModel">
+                  xmlns:itemViewModels="clr-namespace:Mogri.Interfaces.ViewModels"
+                  x:Class="Mogri.Views.Popups.CanvasHistoryPopup"
+                  x:DataType="viewModels:ICanvasHistoryPopupViewModel">
 
      <Border HorizontalOptions="Fill"
              VerticalOptions="Center"
@@ -17,17 +18,35 @@
             <Grid RowSpacing="15"
                   RowDefinitions="auto,*,auto"
                   HeightRequest="500">
-                <Grid Grid.Row="0">
-                    <Label Text="Edit Masks"
+                <Grid Grid.Row="0" ColumnDefinitions="*,auto,auto">
+                    <Label Grid.Column="0"
+                           Text="Canvas History"
                            FontSize="16"
                            FontFamily="ComfortaaBold"
-                           HorizontalOptions="Center"
+                           HorizontalOptions="Start"
                            VerticalOptions="Center" />
 
-                    <ImageButton Command="{Binding ClearAllCommand}"
+                    <ImageButton Grid.Column="1"
+                                 Command="{Binding ClearMasksCommand}"
                                  HorizontalOptions="End"
                                  VerticalOptions="Center"
-                                 BackgroundColor="Transparent">
+                                 BackgroundColor="Transparent"
+                                 Margin="0,0,10,0"
+                                 ToolTipProperties.Text="Clear Masks">
+                        <ImageButton.Source>
+                            <FontImageSource Glyph="&#xe155;" 
+                                             FontFamily="{StaticResource IconFontLight}"
+                                             Size="30"
+                                             Color="{AppThemeBinding Light={StaticResource SteelRed}, Dark={StaticResource Eva}}" />
+                        </ImageButton.Source>
+                    </ImageButton>
+
+                    <ImageButton Grid.Column="2" 
+                                 Command="{Binding ClearAllCommand}"
+                                 HorizontalOptions="End"
+                                 VerticalOptions="Center"
+                                 BackgroundColor="Transparent"
+                                 ToolTipProperties.Text="Clear All History">
                         <ImageButton.Source>
                             <FontImageSource Glyph="&#xe16c;" 
                                              FontFamily="{StaticResource IconFontLight}"
@@ -40,10 +59,10 @@
                 <CollectionView Grid.Row="1"
                                 ItemsSource="{Binding Items}">
                     <CollectionView.EmptyView>
-                        <Label Text="No Masks" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                        <Label Text="No History" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
                     </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="viewModels:IEditMaskItemViewModel">
+                        <DataTemplate x:DataType="itemViewModels:IHistoryItemActionViewModel">
                             <Grid ColumnDefinitions="Auto, 40, *, Auto, Auto, Auto" 
                                   Padding="0,5" 
                                   ColumnSpacing="10">
@@ -85,7 +104,8 @@
                                              HorizontalOptions="End"
                                              BackgroundColor="Transparent"
                                              HeightRequest="40"
-                                             WidthRequest="40">
+                                             WidthRequest="40"
+                                             IsVisible="{Binding IsEditable}">
                                     <ImageButton.Source>
                                         <FontImageSource Glyph="&#xe3c9;"
                                                          FontFamily="{StaticResource IconFontRegular}"
@@ -100,7 +120,8 @@
                                              HorizontalOptions="End"
                                              BackgroundColor="Transparent"
                                              HeightRequest="40"
-                                             WidthRequest="40">
+                                             WidthRequest="40"
+                                             IsVisible="{Binding IsDuplicable}">
                                     <ImageButton.Source>
                                         <FontImageSource Glyph="&#xe14d;"
                                                          FontFamily="{StaticResource IconFontRegular}"
@@ -115,7 +136,8 @@
                                              HorizontalOptions="End"
                                              BackgroundColor="Transparent"
                                              HeightRequest="40"
-                                             WidthRequest="40">
+                                             WidthRequest="40"
+                                             IsVisible="{Binding IsDeletable}">
                                     <ImageButton.Source>
                                         <FontImageSource Glyph="&#xe872;"
                                                          FontFamily="{StaticResource IconFontRegular}"
@@ -130,8 +152,7 @@
 
                 <Button Grid.Row="2"
                         Text="Close"
-                        Clicked="OnCloseClicked" />
+                        Command="{Binding CloseCommand}" />
             </Grid>
         </Border>
-    
 </popups:BasePopup>

@@ -124,12 +124,15 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     [ObservableProperty]
     private IAsyncRelayCommand? _prepareForSavingCommand;
 
+    private readonly ICanvasHistoryService _canvasHistoryService;
+
     public CanvasPageViewModel(
         IFileService fileService,
         IPopupService popupService,
         IImageService imageService,
         ISegmentationService segmentationService,
         IPatchService patchService,
+        ICanvasHistoryService canvasHistoryService,
         ILoadingService loadingService) : base(loadingService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
@@ -137,6 +140,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
         _segmentationService = segmentationService ?? throw new ArgumentNullException(nameof(segmentationService));
         _patchService = patchService ?? throw new ArgumentNullException(nameof(patchService));
+        _canvasHistoryService = canvasHistoryService ?? throw new ArgumentNullException(nameof(canvasHistoryService));
 
         // Precompute the noise bitmap on a background thread so the first stroke is smooth
         NoiseShaderHelper.Initialize();
@@ -245,20 +249,52 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     }
 
     [RelayCommand]
-    private void Undo()
+    private async Task Undo()
     {
         if (CanvasActions == null || !CanvasActions.Any())
         {
             return;
         }
 
-        CanvasActions.Remove(CanvasActions.Last());
+        var lastAction = CanvasActions.Last();
+
+        if (lastAction is SnapshotCanvasActionViewModel snapshot)
+        {
+            CanvasActions.Remove(lastAction);
+
+            var (bitmap, actions) = await _canvasHistoryService.RestoreSnapshotAsync(snapshot.SnapshotId);
+
+            if (bitmap != null)
+            {
+                PreserveZoomOnNextBitmapChange = true;
+                SourceBitmap = bitmap;
+            }
+
+            if (snapshot.IncludesCanvasActions && actions != null)
+            {
+                CanvasActions.Clear();
+                foreach (var action in actions)
+                {
+                    CanvasActions.Add(action);
+                }
+            }
+        }
+        else
+        {
+            CanvasActions.Remove(lastAction);
+        }
+    }
+
+    private async Task clearAllActionsAndHistoryAsync()
+    {
+        await _canvasHistoryService.ClearAllAsync();
+        CanvasActions.Clear();
     }
 
     [RelayCommand]
     private async Task Clear()
     {
-        var result = await _popupService.DisplayAlertAsync("Clear mask?", "Are you sure you would like to clear the mask?", "YES", "Cancel");
+        var result = await _popupService.DisplayAlertAsync("Clear masks?", "Are you sure you would like to clear the masks?", "YES", "Cancel");
 
         if (!result)
         {
@@ -270,7 +306,11 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             return;
         }
 
-        CanvasActions.Clear();
+        var actionsToRemove = CanvasActions.Where(a => a is not SnapshotCanvasActionViewModel).ToList();
+        foreach (var a in actionsToRemove)
+        {
+            CanvasActions.Remove(a);
+        }
     }
 
     partial void OnSourceBitmapChanged(SKBitmap? value)
@@ -662,7 +702,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         }
 
         var result = await _popupService.DisplayAlertAsync("Flatten Canvas?",
-            "This will permanently apply the paint/masks and replace the current canvas image.\n\nContinue?",
+            "This will apply the paint/masks and replace the current canvas image. This can be undone from the Canvas History.\n\nContinue?",
             "YES",
             "NO");
 
@@ -686,6 +726,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             return;
         }
 
+        var snapshotId = await pushSnapshotAsync("Flatten", true);
+
         await Task.Run(async () =>
         {
             using var rawMaskBitmap = GenerateRenderedLayer(sourceBitmap.Width, sourceBitmap.Height);
@@ -703,6 +745,11 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
                     CanvasActions.Clear();
                     ClearSegmentationMask();
+
+                    if (snapshotId != null)
+                    {
+                        insertSnapshotMarker(snapshotId, "Flatten", true);
+                    }
 
                     await Toast.Make("Paint and Masks applied.").Show();
                 }) ?? Task.CompletedTask);
@@ -854,6 +901,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
             if (action == newCanvasWithImageOption)
             {
+                await _canvasHistoryService.ClearAllAsync();
                 ClearSegmentationMask();
                 await LoadSourceBitmapUsingStream(fileStream, photo.FileName);
             }
@@ -876,7 +924,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                         _sourceFileName = null;
 
                         ClearSegmentationMask();
-                        CanvasActions.Clear();
+                        await clearAllActionsAndHistoryAsync();
                     }
                 }
                 finally
@@ -890,6 +938,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 {
                     IsBusy = true;
 
+                    var snapshotId = await pushSnapshotAsync("Insert Image", false);
+
                     var loadedBitmap = LoadBitmapFromStream(fileStream);
 
                     if (loadedBitmap != null)
@@ -897,6 +947,11 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                         var stitchedBitmap = StitchBitmapIntoSource(SourceBitmap, loadedBitmap, BoundingBox);
 
                         loadedBitmap.Dispose();
+
+                        if (snapshotId != null)
+                        {
+                            insertSnapshotMarker(snapshotId, "Insert Image", false);
+                        }
 
                         SourceBitmap = stitchedBitmap;
                     }
@@ -1132,7 +1187,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             }
 
             _sourceFileName = fileName;
-            CanvasActions.Clear();
+            await clearAllActionsAndHistoryAsync();
 
             var mask = await _fileService.GetMaskFileFromAppDataAsync(_sourceFileName);
 
@@ -1174,19 +1229,49 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     }
 
     [RelayCommand]
-    private async Task EditMasks()
+    private async Task ShowHistory()
     {
         try
         {
             var parameters = new Dictionary<string, object> {
-                { "Actions", CanvasActions }
+                { "Actions", CanvasActions },
+                { "OnSnapshotDelete", new Func<SnapshotCanvasActionViewModel, Task>(async snapshot => {
+                    CanvasActions.Remove(snapshot);
+                    var (bitmap, actions) = await _canvasHistoryService.RestoreSnapshotAsync(snapshot.SnapshotId);
+                    if (bitmap != null)
+                    {
+                        PreserveZoomOnNextBitmapChange = true;
+                        SourceBitmap = bitmap;
+                    }
+                    if (snapshot.IncludesCanvasActions && actions != null)
+                    {
+                        CanvasActions.Clear();
+                        foreach (var action in actions)
+                        {
+                            CanvasActions.Add(action);
+                        }
+                    }
+                }) },
+                { "OnClearAll", new Func<Task>(async () => {
+                    var firstSnapshot = CanvasActions.OfType<SnapshotCanvasActionViewModel>().FirstOrDefault();
+                    if (firstSnapshot != null)
+                    {
+                        var (bitmap, _) = await _canvasHistoryService.RestoreSnapshotAsync(firstSnapshot.SnapshotId);
+                        if (bitmap != null)
+                        {
+                            PreserveZoomOnNextBitmapChange = true;
+                            SourceBitmap = bitmap;
+                        }
+                    }
+                    await clearAllActionsAndHistoryAsync();
+                }) }
             };
 
-            await _popupService.ShowPopupAsync("EditMasksPopup", parameters);
+            await _popupService.ShowPopupAsync("CanvasHistoryPopup", parameters);
         }
         catch (Exception ex)
         {
-            await _popupService.DisplayAlertAsync("Error", $"Unable to open edit masks popup: {ex.Message}", "OK");
+            await _popupService.DisplayAlertAsync("Error", $"Unable to open history popup: {ex.Message}", "OK");
         }
     }
 
@@ -1282,6 +1367,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
     private async Task BeginStitchingAsync(string byteString)
     {
+        var snapshotId = await pushSnapshotAsync("Stitch", false);
+
         var tokenSource = new CancellationTokenSource();
 
         using var stream = await _imageService.GetStreamFromContentTypeStringAsync(byteString, tokenSource.Token);
@@ -1289,6 +1376,11 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         var stitchBitmap = SKBitmap.Decode(stream);
 
         var finalBitmap = StitchBitmapIntoSource(SourceBitmap, stitchBitmap, BoundingBox);
+
+        if (snapshotId != null)
+        {
+            insertSnapshotMarker(snapshotId, "Stitch", false);
+        }
 
         SourceBitmap = finalBitmap;
     }
@@ -1623,6 +1715,27 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         OnPropertyChanged(nameof(IsZoomMode));
     }
 
+    private async Task<string?> pushSnapshotAsync(string description, bool includeCanvasActions)
+    {
+        var sourceBitmap = SourceBitmap;
+        if (sourceBitmap == null) return null;
+
+        var actionsToSave = includeCanvasActions ? CanvasActions.ToList() : null;
+        var snapshotId = await _canvasHistoryService.SaveSnapshotAsync(sourceBitmap, actionsToSave);
+
+        return snapshotId;
+    }
+
+    private void insertSnapshotMarker(string snapshotId, string description, bool includeCanvasActions)
+    {
+        CanvasActions.Add(new SnapshotCanvasActionViewModel
+        {
+            SnapshotId = snapshotId,
+            Description = description,
+            IncludesCanvasActions = includeCanvasActions
+        });
+    }
+
     [RelayCommand]
     private async Task PatchAsync()
     {
@@ -1635,15 +1748,23 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             return;
         }
 
-        const string useLastMaskOnlyOption = "Use Last Mask Only";
-        const string useAllMasksOption = "Use All Masks";
+        bool useLastOnly = false;
+        var maskCount = CanvasActions.Count(ca => ca.CanvasActionType == CanvasActionType.Mask);
 
-        var action = await _popupService.DisplayActionSheetAsync("Patch", "Cancel", null, useLastMaskOnlyOption, useAllMasksOption);
+        if (maskCount > 1)
+        {
+            const string useLastMaskOnlyOption = "Use Last Mask Only";
+            const string useAllMasksOption = "Use All Masks";
 
-        if (action == "Cancel" || string.IsNullOrEmpty(action))
-            return;
+            var action = await _popupService.DisplayActionSheetAsync("Patch", "Cancel", null, useLastMaskOnlyOption, useAllMasksOption);
 
-        bool useLastOnly = action == useLastMaskOnlyOption;
+            if (action == "Cancel" || string.IsNullOrEmpty(action))
+                return;
+
+            useLastOnly = action == useLastMaskOnlyOption;
+        }
+
+        var snapshotId = await pushSnapshotAsync("Patch", false);
 
         try
         {
@@ -1661,6 +1782,10 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
                 if (result != null)
                 {
+                    if (snapshotId != null)
+                    {
+                        insertSnapshotMarker(snapshotId, "Patch", false);
+                    }
                     PreserveZoomOnNextBitmapChange = true;
                     SourceBitmap = result;
                 }
@@ -1802,7 +1927,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                     double.TryParse(heightParam.ToString(), out var height))
                 {
                     ClearSegmentationMask();
-                    CanvasActions.Clear();
+                    await clearAllActionsAndHistoryAsync();
 
                     SourceBitmap?.Dispose();
                     SourceBitmap = new SKBitmap((int)width, (int)height);
@@ -1833,7 +1958,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                     double.TryParse(heightParam.ToString(), out var height))
                 {
                     ClearSegmentationMask();
-                    CanvasActions.Clear();
+                    await clearAllActionsAndHistoryAsync();
 
                     var resized = sourceBitmap.Resize(new SKImageInfo((int)width, (int)height), new SKSamplingOptions(SKCubicResampler.Mitchell));
                     SourceBitmap?.Dispose();
