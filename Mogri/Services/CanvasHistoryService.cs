@@ -60,13 +60,17 @@ public class CanvasHistoryService : ICanvasHistoryService
         {
             actionsFilePath = Path.Combine(_snapshotDirectory, $"{snapshotId}.actions.json");
             
-            var maskLineViewModels = canvasActions.OfType<MaskLineViewModel>().ToList();
-            var segmentationMaskViewModels = canvasActions.OfType<SegmentationMaskViewModel>().ToList();
+            // Stamp Order so we can restore the correct interleaving on deserialization
+            for (int i = 0; i < canvasActions.Count; i++)
+            {
+                canvasActions[i].Order = i;
+            }
 
             var wrapper = new MaskViewModel
             {
-                Lines = maskLineViewModels,
-                SegmentationMasks = segmentationMaskViewModels
+                Lines = canvasActions.OfType<MaskLineViewModel>().ToList(),
+                SegmentationMasks = canvasActions.OfType<SegmentationMaskViewModel>().ToList(),
+                Snapshots = canvasActions.OfType<SnapshotCanvasActionViewModel>().ToList()
             };
 
             string json = JsonSerializer.Serialize(wrapper, _jsonOptions);
@@ -123,14 +127,23 @@ public class CanvasHistoryService : ICanvasHistoryService
             if (wrapper != null)
             {
                 actions = new List<CanvasActionViewModel>();
+
                 if (wrapper.Lines != null)
                 {
                     actions.AddRange(wrapper.Lines);
                 }
+
                 if (wrapper.SegmentationMasks != null)
                 {
                     actions.AddRange(wrapper.SegmentationMasks);
                 }
+
+                if (wrapper.Snapshots != null)
+                {
+                    actions.AddRange(wrapper.Snapshots);
+                }
+                
+                actions.Sort((a, b) => a.Order.CompareTo(b.Order));
             }
         }
 
