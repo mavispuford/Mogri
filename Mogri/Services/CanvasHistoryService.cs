@@ -28,10 +28,14 @@ public class CanvasHistoryService : ICanvasHistoryService
     public CanvasHistoryService()
     {
         _snapshotDirectory = Path.Combine(FileSystem.CacheDirectory, "canvas_history");
-        if (!Directory.Exists(_snapshotDirectory))
+
+        // Clear orphaned snapshots from previous sessions since in-memory state is empty on launch
+        if (Directory.Exists(_snapshotDirectory))
         {
-            Directory.CreateDirectory(_snapshotDirectory);
+            Directory.Delete(_snapshotDirectory, true);
         }
+
+        Directory.CreateDirectory(_snapshotDirectory);
 
         _jsonOptions = new JsonSerializerOptions
         {
