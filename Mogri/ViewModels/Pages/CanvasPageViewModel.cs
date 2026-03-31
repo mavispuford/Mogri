@@ -2,11 +2,13 @@ using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core.Extensions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Mogri.Enums;
 using Mogri.Helpers;
 using Mogri.Interfaces.Services;
 using Mogri.Interfaces.ViewModels;
 using Mogri.Interfaces.ViewModels.Pages;
+using Mogri.Messages;
 using SkiaSharp;
 using System.Collections.ObjectModel;
 using Mogri.Models;
@@ -17,6 +19,7 @@ namespace Mogri.ViewModels;
 public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 {
     private readonly object _setSegmentationImageLock = new();
+    private readonly SemaphoreSlim _autoMaskSaveLock = new(1, 1);
     private readonly IFileService _fileService;
     private readonly IImageService _imageService;
     private readonly IPopupService _popupService;
@@ -36,14 +39,6 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private bool _doingSegmentation = false;
     private CancellationTokenSource? _setSegmentationImageCancellationTokenSource;
     private int _setSegmentationImageRequestCount = 0;
-
-    private enum CanvasUseMode
-    {
-        Inpaint,
-        PaintOnly,
-        MaskOnly,
-        ImageOnly
-    }
 
     private CanvasUseMode _currentCanvasUseMode = CanvasUseMode.Inpaint;
 
@@ -238,6 +233,11 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         {
             canvas.Clear(SKColors.WhiteSmoke);
         }
+
+        WeakReferenceMessenger.Default.Register<AppStoppedMessage>(this, (r, m) =>
+        {
+            _ = ((CanvasPageViewModel)r).autoSaveOrDeleteMaskAsync();
+        });
     }
 
     partial void OnCurrentColorChanged(Color value)
@@ -373,72 +373,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     [RelayCommand]
     private async Task Save()
     {
-        const string maskChoice = "Mask";
-        const string imageChoice = "Image";
-
-        var selection = string.Empty;
-
-        var dispatcher = Shell.Current.CurrentPage?.Dispatcher;
-
-        if (dispatcher != null)
-        {
-            await dispatcher.DispatchAsync(async () =>
-            {
-                selection = await _popupService.DisplayActionSheetAsync("Save?", "Cancel", null, maskChoice, imageChoice);
-            });
-        }
-        else
-        {
-            selection = await _popupService.DisplayActionSheetAsync("Save?", "Cancel", null, maskChoice, imageChoice);
-        }
-
-        switch (selection)
-        {
-            case maskChoice:
-                await saveMask();
-                break;
-            case imageChoice:
-                await saveImage();
-                break;
-        }
-    }
-
-    private async Task saveMask()
-    {
-        if (string.IsNullOrEmpty(_sourceFileName))
-        {
-            await Toast.Make("There is no image loaded to associate with this mask.").Show();
-
-            return;
-        }
-
-        if (CanvasActions == null)
-        {
-            return;
-        }
-
-        try
-        {
-            var maskActions = CanvasActions.Where(ca => ca.CanvasActionType == CanvasActionType.Mask).ToList();
-
-            for (var i = 0; i < maskActions.Count; i++)
-            {
-                maskActions[i].Order = i;
-            }
-
-            var maskUri = await _fileService.WriteMaskFileToAppDataAsync(_sourceFileName,
-                new MaskViewModel
-                {
-                    Lines = maskActions.OfType<MaskLineViewModel>().ToList(),
-                    SegmentationMasks = maskActions.OfType<SegmentationMaskViewModel>().ToList()
-                });
-
-            await Toast.Make("Mask saved.").Show();
-        }
-        catch (Exception)
-        {
-            await Toast.Make("Failed to save mask file. Please try again.").Show();
-        }
+        await saveImage();
     }
 
     private async Task saveImage()
@@ -1334,6 +1269,12 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         return base.OnNavigatedToAsync();
     }
 
+    public override async Task OnDisappearingAsync()
+    {
+        await autoSaveOrDeleteMaskAsync();
+        await base.OnDisappearingAsync();
+    }
+
     public override async void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         base.ApplyQueryAttributes(query);
@@ -1971,6 +1912,51 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                     OnPropertyChanged(nameof(SourceBitmap));
                 }
             }
+        }
+    }
+
+    /// <summary>
+    /// Persists mask data to disk when the source image is from the filesystem,
+    /// or deletes a stale mask file if no mask actions remain.
+    /// </summary>
+    private async Task autoSaveOrDeleteMaskAsync()
+    {
+        if (string.IsNullOrEmpty(_sourceFileName))
+        {
+            return;
+        }
+
+        if (!await _autoMaskSaveLock.WaitAsync(0))
+        {
+            return;
+        }
+
+        try
+        {
+            var maskActions = CanvasActions?.Where(ca => ca.CanvasActionType == CanvasActionType.Mask).ToList();
+
+            if (maskActions != null && maskActions.Count > 0)
+            {
+                for (var i = 0; i < maskActions.Count; i++)
+                {
+                    maskActions[i].Order = i;
+                }
+
+                await _fileService.WriteMaskFileToAppDataAsync(_sourceFileName,
+                    new MaskViewModel
+                    {
+                        Lines = maskActions.OfType<MaskLineViewModel>().ToList(),
+                        SegmentationMasks = maskActions.OfType<SegmentationMaskViewModel>().ToList()
+                    });
+            }
+            else
+            {
+                await _fileService.DeleteMaskFileFromAppDataAsync(_sourceFileName);
+            }
+        }
+        finally
+        {
+            _autoMaskSaveLock.Release();
         }
     }
 

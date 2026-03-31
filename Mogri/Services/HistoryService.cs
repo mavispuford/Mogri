@@ -218,8 +218,8 @@ public class HistoryService : IHistoryService
         {
             if (_fileService != null)
             {
-                await _fileService.DeleteFileFromInternalStorage(item.ImageFileName);
-                await _fileService.DeleteFileFromInternalStorage(item.ThumbnailFileName);
+                await _fileService.DeleteFileFromInternalStorageAsync(item.ImageFileName);
+                await _fileService.DeleteFileFromInternalStorageAsync(item.ThumbnailFileName);
             }
         }
 

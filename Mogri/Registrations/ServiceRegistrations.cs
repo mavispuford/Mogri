@@ -53,7 +53,7 @@ public static class ServiceRegistrations
 
 #if ANDROID
         builder.Services.AddSingleton<IGenerationTaskService, AndroidGenerationTaskService>();
-        builder.Services.AddSingleton<IFileService, FileService>();
+        builder.Services.AddSingleton<IFileService, AndroidFileService>();
 #elif IOS
         builder.Services.AddSingleton<IGenerationTaskService, IosGenerationTaskService>();
         builder.Services.AddSingleton<IFileService, IosFileService>();
