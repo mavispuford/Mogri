@@ -9,16 +9,19 @@ using AndroidNet = Android.Net;
 
 namespace Mogri.Platforms.Android.Services;
 
-public class FileService : IFileService
+/// <summary>
+/// Android-specific file service handling media storage, mask persistence, and permissions.
+/// </summary>
+public class AndroidFileService : IFileService
 {
-    private const string extFolderName = "Pictures/Mogri/";
+    private const string ExtFolderName = "Pictures/Mogri/";
 
-    private const string extFolderNameMasks = "Pictures/Mogri/Masks/";
+    private const string ExtFolderNameMasks = "Pictures/Mogri/Masks/";
 
-    private readonly ILogger<FileService> _logger;
+    private readonly ILogger<AndroidFileService> _logger;
     private readonly IPopupService _popupService;
 
-    public FileService(ILogger<FileService> logger, IPopupService popupService)
+    public AndroidFileService(ILogger<AndroidFileService> logger, IPopupService popupService)
     {
         _logger = logger;
         _popupService = popupService;
@@ -55,7 +58,7 @@ public class FileService : IFileService
 
         return await getFileStreamFromStorageUsingBaseUri(fileName, MediaStore.Images.Media.ExternalContentUri);
 
-        //return await getFileStreamFromStorageUsingBaseUri(fileName, AndroidNet.Uri.WithAppendedPath(MediaStore.Images.Media.ExternalContentUri, extFolderName));
+        //return await getFileStreamFromStorageUsingBaseUri(fileName, AndroidNet.Uri.WithAppendedPath(MediaStore.Images.Media.ExternalContentUri, ExtFolderName));
     }
 
     public Task<Stream?> GetFileStreamFromInternalStorageAsync(string fileName)
@@ -172,7 +175,7 @@ public class FileService : IFileService
         contentValues.Put(MediaStore.IMediaColumns.Title, fileName);
         contentValues.Put(MediaStore.IMediaColumns.MimeType, "image/png");
         contentValues.Put(MediaStore.Images.Media.InterfaceConsts.DisplayName, fileName);
-        contentValues.Put(MediaStore.Images.Media.InterfaceConsts.RelativePath, isMask ? extFolderNameMasks : extFolderName);
+        contentValues.Put(MediaStore.Images.Media.InterfaceConsts.RelativePath, isMask ? ExtFolderNameMasks : ExtFolderName);
 
 #if ANDROID30_0_OR_GREATER
         contentValues.Put(MediaStore.Images.Media.InterfaceConsts.IsPending, 1);
@@ -246,9 +249,34 @@ public class FileService : IFileService
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unable to read requested file {maskFileName} from {fullPath}");
+
+            // Remove corrupt mask file so it doesn't block future reads
+            try { File.Delete(fullPath); } catch { /* best effort */ }
         }
 
         return null;
+    }
+
+    public Task<bool> DeleteMaskFileFromAppDataAsync(string imageFileName)
+    {
+        var fileNameNoExtension = Path.GetFileNameWithoutExtension(imageFileName);
+        var maskFileName = $"{fileNameNoExtension}.mask";
+        var fullPath = Path.Combine(FileSystem.Current.AppDataDirectory, maskFileName);
+
+        try
+        {
+            if (File.Exists(fullPath))
+            {
+                File.Delete(fullPath);
+                return Task.FromResult(true);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unable to delete mask file {maskFileName} from {fullPath}");
+        }
+
+        return Task.FromResult(false);
     }
 
     public async Task<string> WriteMaskFileToAppDataAsync(string imageFileName, MaskViewModel mask)
@@ -266,22 +294,17 @@ public class FileService : IFileService
 
             var maskJson = JsonSerializer.Serialize(mask, options);
 
-            if (File.Exists(fullPath))
-            {
-                File.Delete(fullPath);
-            }
-
-            using var fileStream = File.OpenWrite(fullPath);
-            using var writer = new StreamWriter(fileStream);
-
-            await writer.WriteAsync(maskJson);
+            // Write to a temp file first, then atomically move into place to
+            // prevent corruption if the process is killed mid-write.
+            var tempPath = fullPath + ".tmp";
+            await File.WriteAllTextAsync(tempPath, maskJson);
+            File.Move(tempPath, fullPath, overwrite: true);
 
             return fullPath;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Error writing requested file {maskFileName} to {fullPath}");
-            await _popupService.DisplayAlertAsync("Error", "Failed to save mask data.", "OK");
         }
 
         return string.Empty;
@@ -358,7 +381,7 @@ public class FileService : IFileService
         return Task.FromResult(File.Exists(fullPath));
     }
 
-    public Task<bool> DeleteFileFromInternalStorage(string filePath)
+    public Task<bool> DeleteFileFromInternalStorageAsync(string filePath)
     {
         var fullPath = filePath.Contains(FileSystem.CacheDirectory) ? filePath : Path.Combine(FileSystem.CacheDirectory, filePath);
 

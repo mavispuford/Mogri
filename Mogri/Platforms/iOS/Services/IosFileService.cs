@@ -11,6 +11,9 @@ using UIKit;
 
 namespace Mogri.Platforms.iOS.Services
 {
+    /// <summary>
+    /// iOS-specific file service handling photo library access, mask persistence, and file I/O.
+    /// </summary>
     public class IosFileService : IFileService
     {
         private readonly ILogger<IosFileService> _logger;
@@ -22,7 +25,7 @@ namespace Mogri.Platforms.iOS.Services
             _popupService = popupService;
         }
 
-        public Task<bool> DeleteFileFromInternalStorage(string filePath)
+        public Task<bool> DeleteFileFromInternalStorageAsync(string filePath)
         {
             try
             {
@@ -117,6 +120,9 @@ namespace Mogri.Platforms.iOS.Services
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error reading mask file from AppData");
+
+                    // Remove corrupt mask file so it doesn't block future reads
+                    try { File.Delete(maskFilePath); } catch { /* best effort */ }
                 }
             }
             return null;
@@ -157,6 +163,27 @@ namespace Mogri.Platforms.iOS.Services
             }
         }
 
+        public Task<bool> DeleteMaskFileFromAppDataAsync(string imageFileName)
+        {
+            var maskFileName = Path.ChangeExtension(Path.GetFileName(imageFileName), ".json");
+            var maskFilePath = Path.Combine(FileSystem.AppDataDirectory, maskFileName);
+
+            try
+            {
+                if (File.Exists(maskFilePath))
+                {
+                    File.Delete(maskFilePath);
+                    return Task.FromResult(true);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unable to delete mask file from AppData");
+            }
+
+            return Task.FromResult(false);
+        }
+
         public async Task<string> WriteMaskFileToAppDataAsync(string imageFileName, MaskViewModel mask)
         {
             var maskFileName = Path.ChangeExtension(Path.GetFileName(imageFileName), ".json");
@@ -165,7 +192,13 @@ namespace Mogri.Platforms.iOS.Services
             try
             {
                 var json = JsonSerializer.Serialize(mask);
-                await File.WriteAllTextAsync(maskFilePath, json);
+
+                // Write to a temp file first, then atomically move into place to
+                // prevent corruption if the process is killed mid-write.
+                var tempPath = maskFilePath + ".tmp";
+                await File.WriteAllTextAsync(tempPath, json);
+                File.Move(tempPath, maskFilePath, overwrite: true);
+
                 return maskFilePath;
             }
             catch (Exception ex)

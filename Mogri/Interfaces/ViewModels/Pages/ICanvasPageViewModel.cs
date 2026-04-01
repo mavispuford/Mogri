@@ -47,7 +47,7 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     bool HasSegmentationImage { get; set; }
 
-    IRelayCommand UndoCommand { get; }
+    IAsyncRelayCommand UndoCommand { get; }
 
     IAsyncRelayCommand ClearCommand { get; }
 
@@ -99,7 +99,7 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     IAsyncRelayCommand SetResolutionCommand { get; }
 
-    IAsyncRelayCommand EditMasksCommand { get; }
+    IAsyncRelayCommand ShowHistoryCommand { get; }
 
     IAsyncRelayCommand ApplyPaintAndMasksCommand { get; }
 

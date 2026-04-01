@@ -185,8 +185,8 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
             return;
         }
 
-        await _fileService.DeleteFileFromInternalStorage(HistoryItem.FileName);
-        await _fileService.DeleteFileFromInternalStorage(HistoryItem.ThumbnailFileName);
+        await _fileService.DeleteFileFromInternalStorageAsync(HistoryItem.FileName);
+        await _fileService.DeleteFileFromInternalStorageAsync(HistoryItem.ThumbnailFileName);
 
         var parameters = new Dictionary<string, object>
         {

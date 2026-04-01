@@ -48,11 +48,12 @@ public static class ServiceRegistrations
         builder.Services.AddSingleton<IPresetService, PresetService>();
         builder.Services.AddSingleton<IPatchService, AotGanPatchService>();
         builder.Services.AddSingleton<IHistoryService, HistoryService>();
+        builder.Services.AddSingleton<ICanvasHistoryService, CanvasHistoryService>();
         builder.Services.AddSingleton<ILicenseService, LicenseService>();
 
 #if ANDROID
         builder.Services.AddSingleton<IGenerationTaskService, AndroidGenerationTaskService>();
-        builder.Services.AddSingleton<IFileService, FileService>();
+        builder.Services.AddSingleton<IFileService, AndroidFileService>();
 #elif IOS
         builder.Services.AddSingleton<IGenerationTaskService, IosGenerationTaskService>();
         builder.Services.AddSingleton<IFileService, IosFileService>();

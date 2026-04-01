@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-03-29
+
+*This update adds full undo support for destructive canvas operations by persisting bitmap snapshots to disk, and replaces the Edit Masks popup with a unified Canvas History popup.*
+
+### Added
+- **Canvas Undo System**: Destructive operations (Flatten, Stitch, Patch) now save a bitmap snapshot to disk before executing, enabling full undo up to 15 steps deep.
+  - Snapshots are stored as PNGs in `CacheDirectory` via `CanvasHistoryService`, keeping memory usage low.
+  - Flatten snapshots also preserve the canvas actions list, so undoing a flatten restores both the bitmap and all mask strokes.
+- **Canvas History Popup**: Replaced `EditMasksPopup` with `CanvasHistoryPopup`, showing the full action timeline (mask strokes, segmentation masks, and snapshot checkpoints).
+  - Added "Clear Masks" button (removes only mask/segmentation actions) alongside the existing "Clear All" (removes everything including snapshots).
+  - Snapshot entries display with a distinct icon and are read-only; only the topmost snapshot can be deleted (which triggers undo/restoration).
+
+### Changed
+- Flattening masks is no longer permanent and can be undone from the Canvas History.
+- Updated the Flatten confirmation dialog to indicate the operation is reversible.
+- Patch now skips the "Use Last Mask Only / Use All Masks" action sheet when only one mask exists.
+- The Clear command on the canvas now preserves snapshot checkpoints (only clears mask strokes).
+
+### Removed
+- Removed `EditMasksPopup`, `EditMasksPopupViewModel`, `EditMaskItemViewModel`, and their interfaces.
+
 ## 2026-02-27
 
 *This update significantly improves the user experience during long-running generation tasks by introducing a native Android Foreground Service. Users can now safely navigate away from the app without interrupting the generation process, and track progress directly from their device's notification drawer.*
