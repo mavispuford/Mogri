@@ -1,6 +1,5 @@
 using Mogri.Interfaces.Services;
 using Mogri.Services;
-using Polly;
 using System.Net;
 
 #if ANDROID
@@ -18,10 +17,7 @@ public static class ServiceRegistrations
         builder.Services.AddHttpClient(Microsoft.Extensions.Options.Options.DefaultName, client =>
         {
             client.Timeout = TimeSpan.FromSeconds(60);
-        }).AddTransientHttpErrorPolicy(p => p.WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(500), (message, timeSpan) =>
-        {
-
-        }))
+        })
         .ConfigurePrimaryHttpMessageHandler(() =>
         {
 #if ANDROID
@@ -29,7 +25,11 @@ public static class ServiceRegistrations
             {
                 PooledConnectionLifetime = TimeSpan.FromMinutes(20),
                 PooledConnectionIdleTimeout = TimeSpan.FromMinutes(20),
-                // Proxy = new WebProxy() { Address = new Uri("http://192.168.68.52:9000") }
+
+                // Keep around for local HTTP capture when debugging
+// #if DEBUG
+//                 Proxy = new WebProxy() { Address = new Uri("http://192.168.68.52:9000") }
+// #endif
             };
 #else
             return new HttpClientHandler();
