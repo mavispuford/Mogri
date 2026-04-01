@@ -30,7 +30,7 @@ public partial class CanvasHistoryPopupViewModel : PopupBaseViewModel, ICanvasHi
     private Func<Task>? _onClearAllCallback;
 
     [ObservableProperty]
-    private ObservableCollection<IHistoryItemActionViewModel> _items = new();
+    private ObservableCollection<ICanvasHistoryItemViewModel> _items = new();
 
     public CanvasHistoryPopupViewModel(IPopupService popupService, IServiceProvider serviceProvider, ICanvasHistoryService canvasHistoryService) : base(popupService)
     {
@@ -93,7 +93,7 @@ public partial class CanvasHistoryPopupViewModel : PopupBaseViewModel, ICanvasHi
 
         foreach (var action in filtered)
         {
-            var item = _serviceProvider.GetRequiredService<IHistoryItemActionViewModel>();
+            var item = _serviceProvider.GetRequiredService<ICanvasHistoryItemViewModel>();
             item.InitWith(action, OnDeleteItem, OnDuplicateItem);
             
             if (item.IsSnapshot)
@@ -117,7 +117,7 @@ public partial class CanvasHistoryPopupViewModel : PopupBaseViewModel, ICanvasHi
         }
     }
 
-    private void OnDuplicateItem(IHistoryItemActionViewModel item)
+    private void OnDuplicateItem(ICanvasHistoryItemViewModel item)
     {
         if (item.CanvasAction == null || _sourceActions == null || item.IsSnapshot) return;
 
@@ -127,7 +127,7 @@ public partial class CanvasHistoryPopupViewModel : PopupBaseViewModel, ICanvasHi
             var result = item.CanvasAction.Clone();
             _sourceActions.Insert(index + 1, result);
 
-            var newItem = _serviceProvider.GetRequiredService<IHistoryItemActionViewModel>();
+            var newItem = _serviceProvider.GetRequiredService<ICanvasHistoryItemViewModel>();
             newItem.InitWith(result, OnDeleteItem, OnDuplicateItem);
 
             var itemIndex = Items.IndexOf(item);
@@ -139,7 +139,7 @@ public partial class CanvasHistoryPopupViewModel : PopupBaseViewModel, ICanvasHi
         }
     }
 
-    private async void OnDeleteItem(IHistoryItemActionViewModel item)
+    private async void OnDeleteItem(ICanvasHistoryItemViewModel item)
     {
         if (item.CanvasAction != null && _sourceActions != null)
         {

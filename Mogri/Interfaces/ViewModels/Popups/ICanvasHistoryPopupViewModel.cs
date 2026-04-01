@@ -10,7 +10,7 @@ namespace Mogri.Interfaces.ViewModels.Popups;
 /// </summary>
 public interface ICanvasHistoryPopupViewModel : IPopupBaseViewModel
 {
-    ObservableCollection<IHistoryItemActionViewModel> Items { get; }
+    ObservableCollection<ICanvasHistoryItemViewModel> Items { get; }
     IAsyncRelayCommand ClearAllCommand { get; }
     IAsyncRelayCommand ClearMasksCommand { get; }
     IAsyncRelayCommand CloseCommand { get; }

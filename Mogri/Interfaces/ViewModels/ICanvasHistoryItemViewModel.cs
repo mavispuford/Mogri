@@ -9,7 +9,7 @@ namespace Mogri.Interfaces.ViewModels;
 /// Represents a single row in the canvas history popup.
 /// Can be a mask stroke, segmentation mask, or snapshot checkpoint.
 /// </summary>
-public interface IHistoryItemActionViewModel
+public interface ICanvasHistoryItemViewModel
 {
     string Icon { get; set; }
     bool IsColorVisible { get; }
@@ -25,5 +25,5 @@ public interface IHistoryItemActionViewModel
     IAsyncRelayCommand EditCommand { get; }
     IRelayCommand DeleteCommand { get; }
     IRelayCommand DuplicateCommand { get; }
-    void InitWith(CanvasActionViewModel canvasAction, Action<IHistoryItemActionViewModel> deleteAction, Action<IHistoryItemActionViewModel> duplicateAction);
+    void InitWith(CanvasActionViewModel canvasAction, Action<ICanvasHistoryItemViewModel> deleteAction, Action<ICanvasHistoryItemViewModel> duplicateAction);
 }

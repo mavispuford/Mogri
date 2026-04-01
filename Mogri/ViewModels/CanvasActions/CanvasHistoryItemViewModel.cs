@@ -14,11 +14,11 @@ namespace Mogri.ViewModels;
 /// Represents a single row in the canvas history popup, handling display
 /// and interaction for mask strokes, segmentation masks, and snapshot checkpoints.
 /// </summary>
-public partial class HistoryItemActionViewModel : ObservableObject, IHistoryItemActionViewModel
+public partial class CanvasHistoryItemViewModel : ObservableObject, ICanvasHistoryItemViewModel
 {
     private readonly IPopupService _popupService;
-    private Action<IHistoryItemActionViewModel>? _deleteAction;
-    private Action<IHistoryItemActionViewModel>? _duplicateAction;
+    private Action<ICanvasHistoryItemViewModel>? _deleteAction;
+    private Action<ICanvasHistoryItemViewModel>? _duplicateAction;
 
     [ObservableProperty]
     private CanvasActionViewModel? _canvasAction;
@@ -53,12 +53,12 @@ public partial class HistoryItemActionViewModel : ObservableObject, IHistoryItem
     [ObservableProperty]
     private bool _isDeletable;
 
-    public HistoryItemActionViewModel(IPopupService popupService)
+    public CanvasHistoryItemViewModel(IPopupService popupService)
     {
         _popupService = popupService;
     }
 
-    public void InitWith(CanvasActionViewModel canvasAction, Action<IHistoryItemActionViewModel> deleteAction, Action<IHistoryItemActionViewModel> duplicateAction)
+    public void InitWith(CanvasActionViewModel canvasAction, Action<ICanvasHistoryItemViewModel> deleteAction, Action<ICanvasHistoryItemViewModel> duplicateAction)
     {
         _deleteAction = deleteAction;
         _duplicateAction = duplicateAction;

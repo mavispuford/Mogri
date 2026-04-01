@@ -62,7 +62,7 @@
                         <Label Text="No History" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
                     </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="itemViewModels:IHistoryItemActionViewModel">
+                        <DataTemplate x:DataType="itemViewModels:ICanvasHistoryItemViewModel">
                             <Grid ColumnDefinitions="Auto, 40, *, Auto, Auto, Auto" 
                                   Padding="0,5" 
                                   ColumnSpacing="10">

@@ -14,7 +14,7 @@ public static class ViewModelRegistrations
         builder.Services.AddTransient<IColorPickerPopupViewModel, ColorPickerPopupViewModel>();
         builder.Services.AddTransient<ICanvasHistoryPopupViewModel, CanvasHistoryPopupViewModel>();
         builder.Services.AddTransient<IEditMaskItemPopupViewModel, EditMaskItemPopupViewModel>();
-        builder.Services.AddTransient<IHistoryItemActionViewModel, HistoryItemActionViewModel>();
+        builder.Services.AddTransient<ICanvasHistoryItemViewModel, CanvasHistoryItemViewModel>();
         builder.Services.AddTransient<IImageToImageSettingsPageViewModel, ImageToImageSettingsPageViewModel>();
         builder.Services.AddTransient<IMainPageViewModel, MainPageViewModel>();
         builder.Services.AddTransient<ICanvasPageViewModel, CanvasPageViewModel>();
