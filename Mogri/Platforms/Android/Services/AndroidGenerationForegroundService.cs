@@ -12,9 +12,9 @@ namespace Mogri.Platforms.Android.Services
     /// from killing the app process when it is sent to the background.
     /// </summary>
     [Service(ForegroundServiceType = ForegroundService.TypeDataSync)]
-    public class GenerationForegroundService : Service
+    public class AndroidGenerationForegroundService : Service
     {
-        public static GenerationForegroundService? Instance { get; private set; }
+        public static AndroidGenerationForegroundService? Instance { get; private set; }
 
         private const string ProgressChannelId = "image_generation_progress";
         private const string CompletionChannelId = "image_generation_completion";

@@ -41,8 +41,8 @@ There are two main tabs in the app:
 ### Prerequisites
 
 - An Android or iOS phone
-  - **Android** - Install the latest APK
-  - **iOS** - Currently, sideloading is required for iOS as well
+  - **Android** - Just install the latest APK
+  - **iOS** - Currently, sideloading is required for iOS as well (SideStore, etc.)
 - A running instance of **SD Forge Neo**/**ComfyUI** or a **Comfy Cloud** API key.
 
 ### Configuration
@@ -53,7 +53,9 @@ There are two main tabs in the app:
 
 ## Architecture
 
-Mogri follows the MVVM pattern and utilizes standard .NET MAUI features along with the CommunityToolkit. It also uses ML.NET and ONNX to run on-device machine-learning models for image segmentation and patching.
+Mogri follows the MVVM pattern and utilizes standard `.NET MAUI` features along with the `MVVM Toolkit`.
+
+Notable libraries include `.NET MAUI Community Toolkit`, `SkiaSharp` for image operations and drawing, `LiteDB`, `Mopups`, `ColorMinePortable`, and `Microsoft.Kiota` for generating the OpenAPI backend clients. Additionally, it leverages `ML.NET` and the `ONNX Runtime` to run on-device machine-learning models for image segmentation and patching.
 
 For a detailed breakdown of the application structure, including Views, ViewModels, and Services, please see [Architecture.md](docs/Architecture.md).
 
@@ -63,11 +65,11 @@ For a detailed breakdown of the application structure, including Views, ViewMode
 
 This whole thing started as a fun learning exercise for me.  Also, I've found that most of the current image generation UIs (as of early 2026) aren't mobile friendly. The Gradio-based ones tend to break as soon as you leave the browser tab, and ComfyUI has a lot of complexity that is hard to adapt to mobile form factors.
 
-The main goal for this project was to create a finger-friendly, simplified image editing/generation workflow that also exposes *some* of the more advanced settings that users might care about *(steps, samplers, denoising strength, LoRAs, etc.)*.
+The main goal for this project was to create a finger-friendly, simplified image editing/generation workflow that also exposes *some* of the more advanced settings that users might care about *(steps, samplers, denoising strength, model, LoRAs, etc.)*.
 
 #### But I hate AI "art". Why contribute to that software space?
 
-I hear you. Image generation is a complicated, controversial topic. I personally don't condone creating AI "art" for commercial purposes, particularly when models are trained on artists' work without their permission. That said, I also love the technology behind it. Since the early days of image generation (VQGAN-CLIP, Craiyon), I've looked at this tech as more of a toy/tool.  I love to tinker, and this is a fun way to do that.
+I hear you. Image generation is a complicated, controversial topic. I personally don't condone creating AI "art" for commercial purposes, particularly when models are trained on artists' work without their permission. That said, I also love the technology behind it, and it has other uses besides imitating art. Since the early days of image generation (VQGAN-CLIP, Craiyon), I've looked at this tech as more of a toy/tool. I love to tinker, and this is a fun visual way to do it.
 
 Mogri doesn't provide any models and instead leaves it up to the user to figure that part out. I think if any person is serious about creating and selling AI "art", they'll gravitate toward something else in the PC space, like ComfyUI etc.
 

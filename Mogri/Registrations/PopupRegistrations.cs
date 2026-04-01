@@ -14,7 +14,7 @@ public static class PopupRegistrations
     {
         registerPopup<IResultItemPopupViewModel, ResultItemPopup>(builder.Services, () => new ResultItemPopup());
         registerPopup<IColorPickerPopupViewModel, ColorPickerPopup>(builder.Services, () => new ColorPickerPopup());
-        registerPopup<IEditMasksPopupViewModel, EditMasksPopup>(builder.Services, () => new EditMasksPopup());
+        registerPopup<ICanvasHistoryPopupViewModel, CanvasHistoryPopup>(builder.Services, () => new CanvasHistoryPopup());
         registerPopup<IEditMaskItemPopupViewModel, EditMaskItemPopup>(builder.Services, () => new EditMaskItemPopup());
         registerPopup<IPromptStyleInfoPopupViewModel, PromptStyleInfoPopup>(builder.Services, () => new PromptStyleInfoPopup());
         registerPopup<IHistoryItemPopupViewModel, HistoryItemPopup>(builder.Services, () => new HistoryItemPopup());

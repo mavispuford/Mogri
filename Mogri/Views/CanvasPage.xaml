@@ -79,16 +79,16 @@
                 <FontImageSource Glyph="&#xe166;" FontFamily="{StaticResource IconFontLight}" Size="30" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
-        <ToolbarItem Text="Edit Masks" Order="Primary" Command="{Binding EditMasksCommand}">
+        <ToolbarItem Text="History" Order="Primary" Command="{Binding ShowHistoryCommand}">
             <ToolbarItem.IconImageSource>
-                <FontImageSource Glyph="&#xe155;" FontFamily="{StaticResource IconFontLight}" Size="30" />
+                <FontImageSource Glyph="&#xe241;" FontFamily="{StaticResource IconFontLight}" Size="30" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
         <ToolbarItem Text="{Binding ShowMaskLayer, Converter={StaticResource BoolToShowMaskTextConverter}}" 
                      IconImageSource="{Binding ShowMaskLayer, Converter={StaticResource BoolToEyeConverter}}"
                      Command="{Binding ToggleMaskLayerVisibilityCommand}" 
                      Order="Primary" />
-        <ToolbarItem Text="Save" Command="{Binding SaveCommand}" Order="Secondary">
+        <ToolbarItem Text="Save Image" Command="{Binding SaveCommand}" Order="Secondary">
             <ToolbarItem.IconImageSource>
                 <FontImageSource Glyph="&#xe161;" FontFamily="{StaticResource IconFontLight}" Size="30" />
             </ToolbarItem.IconImageSource>

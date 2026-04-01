@@ -52,7 +52,7 @@ namespace Mogri.Platforms.Android.Services
                 {
                     if (_isAppInForeground)
                     {
-                        GenerationForegroundService.Instance?.StopForegroundService(true);
+                        AndroidGenerationForegroundService.Instance?.StopForegroundService(true);
                     }
                     else
                     {
@@ -74,7 +74,7 @@ namespace Mogri.Platforms.Android.Services
 
             if (hasNotificationPermission)
             {
-                var intent = new Intent(Application.Context, typeof(GenerationForegroundService));
+                var intent = new Intent(Application.Context, typeof(AndroidGenerationForegroundService));
                 if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
                 {
                     Application.Context.StartForegroundService(intent);
@@ -87,21 +87,21 @@ namespace Mogri.Platforms.Android.Services
                 // The Foreground Service takes a moment to start and set its Instance property.
                 // We poll briefly to ensure we can update its state immediately if needed.
                 var retries = 0;
-                while (GenerationForegroundService.Instance == null && retries < 10)
+                while (AndroidGenerationForegroundService.Instance == null && retries < 10)
                 {
                     await Task.Delay(100);
                     retries++;
                 }
 
-                if (GenerationForegroundService.Instance != null)
+                if (AndroidGenerationForegroundService.Instance != null)
                 {
                     if (_isAppInForeground || !IsRunning)
                     {
-                        GenerationForegroundService.Instance.StopForegroundService(true);
+                        AndroidGenerationForegroundService.Instance.StopForegroundService(true);
                     }
                     else
                     {
-                        GenerationForegroundService.Instance.UpdateProgress(_currentProgress);
+                        AndroidGenerationForegroundService.Instance.UpdateProgress(_currentProgress);
                     }
                 }
             }
@@ -193,7 +193,7 @@ namespace Mogri.Platforms.Android.Services
                     }
                 }
 
-                var service = GenerationForegroundService.Instance;
+                var service = AndroidGenerationForegroundService.Instance;
                 if (service != null)
                 {
                     service.ShowCompleted(result.Images.Count);
@@ -210,7 +210,7 @@ namespace Mogri.Platforms.Android.Services
                 result.Success = false;
                 result.ErrorMessage = ex.Message;
                 
-                var service = GenerationForegroundService.Instance;
+                var service = AndroidGenerationForegroundService.Instance;
                 if (service != null)
                 {
                     service.ShowFailed(ex.Message);
@@ -228,7 +228,7 @@ namespace Mogri.Platforms.Android.Services
                 
                 // If cancelled, remove notification. If completed/failed, keep it (it will auto-dismiss).
                 var removeNotification = result.ErrorMessage == "Generation cancelled.";
-                GenerationForegroundService.Instance?.StopForegroundService(removeNotification);
+                AndroidGenerationForegroundService.Instance?.StopForegroundService(removeNotification);
                 
                 _cts?.Dispose();
                 _cts = null;
@@ -244,7 +244,7 @@ namespace Mogri.Platforms.Android.Services
 
         private void UpdateNotificationProgress(float progress)
         {
-            var service = GenerationForegroundService.Instance;
+            var service = AndroidGenerationForegroundService.Instance;
             if (service == null) return;
 
             // Rate limit notification updates to ~500ms
