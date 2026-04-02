@@ -51,6 +51,16 @@ There are two main tabs in the app:
 2.  Select your backend (**SD Forge Neo**/**ComfyUI**/**Comfy Cloud**) from the dropdown.
 3.  Enter your backend server URL (e.g., `http://192.168.1.x:7860`), or if using Comfy Cloud, enter your API Key.
 
+### Backend Configuration
+
+#### SD Forge Neo
+
+To listen for connections on the local network with SD Forge Neo, launch with the `--listen` argument.  You can also set the port using the `--port` argument. These arguments can be added to `set COMMANDLINE_ARGS=` line in your `webui-user.bat` file.
+
+#### ComfyUI
+
+To listen for connectins on the local network in ComfyUI, [follow their official guide here](https://comfyui-wiki.com/en/faq/how-to-access-comfyui-on-lan).
+
 ## Architecture
 
 Mogri follows the MVVM pattern and utilizes standard `.NET MAUI` features along with the `MVVM Toolkit`.
