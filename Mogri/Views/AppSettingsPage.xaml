@@ -28,10 +28,10 @@
         <ScrollView Grid.Row="0" Orientation="Vertical">
             <Grid x:Name="MainGrid"
               Padding="30"
-              RowDefinitions="auto, auto, auto, auto, auto"
+              RowDefinitions="auto, auto, auto, auto, auto, auto, auto, auto, auto"
               RowSpacing="10"
               ColumnSpacing="16"
-              ColumnDefinitions="32,auto,*"
+              ColumnDefinitions="32,*,auto"
               HorizontalOptions="Fill">
 
                 <Image Grid.Row="0" Grid.Column="0" WidthRequest="32">
@@ -51,14 +51,32 @@
                 <Label Grid.Row="1" Grid.Column="1" Text="Server URL:" VerticalTextAlignment="Center" Style="{StaticResource LabelHeader}" IsVisible="{Binding IsServerUrlVisible}"/>
                 <Entry Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding ServerUrl}" Placeholder="Ex. http://192.168.0.1" Keyboard="Url" HorizontalOptions="Fill" IsVisible="{Binding IsServerUrlVisible}" />
 
-                <!-- Comfy Cloud API Key Section -->
-                <Image Grid.Row="3" Grid.Column="0" WidthRequest="32" IsVisible="{Binding IsComfyCloudSelected}">
+                <!-- Auth Header Name Section -->
+                <Image Grid.Row="3" Grid.Column="0" WidthRequest="32" IsVisible="{Binding IsServerUrlVisible}">
                     <Image.Source>
                         <FontImageSource Glyph="&#xe897;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="3" Grid.Column="1" Text="Comfy Cloud API Key:" VerticalTextAlignment="Center" Style="{StaticResource LabelHeader}" IsVisible="{Binding IsComfyCloudSelected}"/>
-                <Entry Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding ComfyCloudApiKey}" Placeholder="Required for Comfy Cloud" IsPassword="True" HorizontalOptions="Fill" IsVisible="{Binding IsComfyCloudSelected}"/>
+                <Label Grid.Row="3" Grid.Column="1" Text="Auth Header Name (optional):" VerticalTextAlignment="Center" Style="{StaticResource LabelHeader}" IsVisible="{Binding IsServerUrlVisible}"/>
+                <Entry Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding CustomAuthHeaderName}" Placeholder="Ex. Authorization" HorizontalOptions="Fill" IsVisible="{Binding IsServerUrlVisible}" />
+
+                <!-- Auth Header Value Section -->
+                <Image Grid.Row="5" Grid.Column="0" WidthRequest="32" IsVisible="{Binding IsServerUrlVisible}">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xe897;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
+                    </Image.Source>
+                </Image>
+                <Label Grid.Row="5" Grid.Column="1" Text="Auth Header Value (optional):" VerticalTextAlignment="Center" Style="{StaticResource LabelHeader}" IsVisible="{Binding IsServerUrlVisible}"/>
+                <Entry Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding CustomAuthHeaderValue}" Placeholder="Ex. Bearer custom-token" IsPassword="True" HorizontalOptions="Fill" IsVisible="{Binding IsServerUrlVisible}" />
+
+                <!-- Comfy Cloud API Key Section -->
+                <Image Grid.Row="7" Grid.Column="0" WidthRequest="32" IsVisible="{Binding IsComfyCloudSelected}">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xe897;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
+                    </Image.Source>
+                </Image>
+                <Label Grid.Row="7" Grid.Column="1" Text="Comfy Cloud API Key:" VerticalTextAlignment="Center" Style="{StaticResource LabelHeader}" IsVisible="{Binding IsComfyCloudSelected}"/>
+                <Entry Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding ComfyCloudApiKey}" Placeholder="Required for Comfy Cloud" IsPassword="True" HorizontalOptions="Fill" IsVisible="{Binding IsComfyCloudSelected}"/>
             </Grid>
         </ScrollView>
 

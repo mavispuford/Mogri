@@ -25,6 +25,12 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
     [ObservableProperty]
     public partial string ComfyCloudApiKey { get; set; }
 
+    [ObservableProperty]
+    public partial string CustomAuthHeaderName { get; set; }
+
+    [ObservableProperty]
+    public partial string CustomAuthHeaderValue { get; set; }
+
     public bool IsComfyCloudSelected => SelectedBackend == "Comfy Cloud";
     public bool IsServerUrlVisible => SelectedBackend != "Comfy Cloud";
 
@@ -38,6 +44,8 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
         
         ServerUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
         ComfyCloudApiKey = Preferences.Default.Get(Constants.PreferenceKeys.ComfyCloudApiKey, string.Empty);
+        CustomAuthHeaderName = Preferences.Default.Get(Constants.PreferenceKeys.AuthHeaderName, string.Empty);
+        CustomAuthHeaderValue = Preferences.Default.Get(Constants.PreferenceKeys.AuthHeaderValue, string.Empty);
 
         AvailableBackends = _backendRegistry.GetAllBackends().Select(b => b.Name).ToList();
         SelectedBackend = Preferences.Default.Get(Constants.PreferenceKeys.SelectedBackend, AvailableBackends.FirstOrDefault() ?? "SD Forge Neo");
@@ -60,8 +68,16 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
             ComfyCloudApiKey = string.Empty;
         }
 
+        if (!IsServerUrlVisible)
+        {
+            CustomAuthHeaderName = string.Empty;
+            CustomAuthHeaderValue = string.Empty;
+        }
+
         // Allow empty ComfyCloudApiKey
         Preferences.Default.Set(Constants.PreferenceKeys.ComfyCloudApiKey, ComfyCloudApiKey);
+        Preferences.Default.Set(Constants.PreferenceKeys.AuthHeaderName, CustomAuthHeaderName);
+        Preferences.Default.Set(Constants.PreferenceKeys.AuthHeaderValue, CustomAuthHeaderValue);
 
         if (!string.IsNullOrEmpty(SelectedBackend))
         {
@@ -85,6 +101,8 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
 
         ServerUrl = string.Empty;
         ComfyCloudApiKey = string.Empty;
+        CustomAuthHeaderName = string.Empty;
+        CustomAuthHeaderValue = string.Empty;
 
         SelectedBackend = AvailableBackends.FirstOrDefault() ?? "SD Forge Neo";
     }

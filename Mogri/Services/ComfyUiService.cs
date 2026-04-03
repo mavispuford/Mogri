@@ -87,6 +87,14 @@ public class ComfyUiService : IImageGenerationBackend
                 _httpClient.DefaultRequestHeaders.Add("X-API-Key", _apiKey);
             }
 
+            var customAuthName = Preferences.Default.Get(Constants.PreferenceKeys.AuthHeaderName, string.Empty);
+            var customAuthValue = Preferences.Default.Get(Constants.PreferenceKeys.AuthHeaderValue, string.Empty);
+
+            if (!string.IsNullOrWhiteSpace(customAuthName) && !string.IsNullOrWhiteSpace(customAuthValue))
+            {
+                _httpClient.DefaultRequestHeaders.Add(customAuthName, customAuthValue);
+            }
+
             // 2. Create Kiota Client
             // Since we need custom headers/base url, we can use the HttpClientAdapter
             var authProvider = new AnonymousAuthenticationProvider(); // We handle auth in HttpClient or manual headers
