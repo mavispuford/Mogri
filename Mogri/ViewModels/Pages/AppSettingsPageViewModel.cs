@@ -18,15 +18,15 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
     public partial IReadOnlyList<string> AvailableBackends { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsComfyUiCloudSelected))]
+    [NotifyPropertyChangedFor(nameof(IsComfyCloudSelected))]
     [NotifyPropertyChangedFor(nameof(IsServerUrlVisible))]
     public partial string SelectedBackend { get; set; }
 
     [ObservableProperty]
-    public partial string ComfyUiApiKey { get; set; }
+    public partial string ComfyCloudApiKey { get; set; }
 
-    public bool IsComfyUiCloudSelected => SelectedBackend == "ComfyUI Cloud";
-    public bool IsServerUrlVisible => SelectedBackend != "ComfyUI Cloud";
+    public bool IsComfyCloudSelected => SelectedBackend == "Comfy Cloud";
+    public bool IsServerUrlVisible => SelectedBackend != "Comfy Cloud";
 
     public AppSettingsPageViewModel(
         ILoadingService loadingService,
@@ -37,7 +37,7 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
         _popupService = popupService;
         
         ServerUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
-        ComfyUiApiKey = Preferences.Default.Get(Constants.PreferenceKeys.ComfyUiApiKey, string.Empty);
+        ComfyCloudApiKey = Preferences.Default.Get(Constants.PreferenceKeys.ComfyCloudApiKey, string.Empty);
 
         AvailableBackends = _backendRegistry.GetAllBackends().Select(b => b.Name).ToList();
         SelectedBackend = Preferences.Default.Get(Constants.PreferenceKeys.SelectedBackend, AvailableBackends.FirstOrDefault() ?? "SD Forge Neo");
@@ -55,13 +55,13 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
         // Allow empty URL
         Preferences.Default.Set(Constants.PreferenceKeys.ServerUrl, ServerUrl);
 
-        if (!IsComfyUiCloudSelected)
+        if (!IsComfyCloudSelected)
         {
-            ComfyUiApiKey = string.Empty;
+            ComfyCloudApiKey = string.Empty;
         }
 
-        // Allow empty ComfyUIApiKey
-        Preferences.Default.Set(Constants.PreferenceKeys.ComfyUiApiKey, ComfyUiApiKey);
+        // Allow empty ComfyCloudApiKey
+        Preferences.Default.Set(Constants.PreferenceKeys.ComfyCloudApiKey, ComfyCloudApiKey);
 
         if (!string.IsNullOrEmpty(SelectedBackend))
         {
@@ -84,7 +84,7 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
         }
 
         ServerUrl = string.Empty;
-        ComfyUiApiKey = string.Empty;
+        ComfyCloudApiKey = string.Empty;
 
         SelectedBackend = AvailableBackends.FirstOrDefault() ?? "SD Forge Neo";
     }

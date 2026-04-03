@@ -64,7 +64,7 @@ public class ComfyUiService : IImageGenerationBackend
 
         try
         {
-            if (Name == "ComfyUI Cloud")
+            if (Name == "Comfy Cloud")
             {
                 _baseUrl = "https://cloud.comfy.org";
             }
@@ -73,7 +73,7 @@ public class ComfyUiService : IImageGenerationBackend
                 _baseUrl = Preferences.Get(Constants.PreferenceKeys.ServerUrl, "http://127.0.0.1:8188");
             }
             
-            _apiKey = Preferences.Get(Constants.PreferenceKeys.ComfyUiApiKey, string.Empty);
+            _apiKey = Preferences.Get(Constants.PreferenceKeys.ComfyCloudApiKey, string.Empty);
 
             // 1. Create wrapper HttpClient
             _httpClient = _httpClientFactory.CreateClient();

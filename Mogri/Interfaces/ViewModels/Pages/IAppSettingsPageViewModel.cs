@@ -10,11 +10,11 @@ internal interface IAppSettingsPageViewModel : IPageViewModel
 
     string SelectedBackend { get; set; }
 
-    bool IsComfyUiCloudSelected { get; }
+    bool IsComfyCloudSelected { get; }
     
     bool IsServerUrlVisible { get; }
 
-    string ComfyUiApiKey { get; set; }
+    string ComfyCloudApiKey { get; set; }
 
     IAsyncRelayCommand ResetValuesCommand { get; }
 
