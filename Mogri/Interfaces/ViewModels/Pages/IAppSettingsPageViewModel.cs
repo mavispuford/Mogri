@@ -15,6 +15,10 @@ internal interface IAppSettingsPageViewModel : IPageViewModel
     bool IsServerUrlVisible { get; }
 
     string ComfyCloudApiKey { get; set; }
+    
+    string CustomAuthHeaderName { get; set; }
+    
+    string CustomAuthHeaderValue { get; set; }
 
     IAsyncRelayCommand ResetValuesCommand { get; }
 

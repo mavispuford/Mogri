@@ -77,6 +77,14 @@ namespace Mogri.Services
             httpClient.BaseAddress = baseUri;
             httpClient.Timeout = TimeSpan.FromMinutes(15);
 
+            var customAuthName = Preferences.Default.Get(Constants.PreferenceKeys.AuthHeaderName, string.Empty);
+            var customAuthValue = Preferences.Default.Get(Constants.PreferenceKeys.AuthHeaderValue, string.Empty);
+
+            if (!string.IsNullOrWhiteSpace(customAuthName) && !string.IsNullOrWhiteSpace(customAuthValue))
+            {
+                httpClient.DefaultRequestHeaders.Add(customAuthName, customAuthValue);
+            }
+
             // Kiota setup
             var authProvider = new AnonymousAuthenticationProvider();
             var adapter = new HttpClientRequestAdapter(authProvider, httpClient: httpClient);
@@ -87,6 +95,11 @@ namespace Mogri.Services
             var progressHttpClient = _httpClientFactory.CreateClient();
             progressHttpClient.BaseAddress = baseUri;
             progressHttpClient.Timeout = TimeSpan.FromSeconds(10);
+
+            if (!string.IsNullOrWhiteSpace(customAuthName) && !string.IsNullOrWhiteSpace(customAuthValue))
+            {
+                progressHttpClient.DefaultRequestHeaders.Add(customAuthName, customAuthValue);
+            }
 
             var progressAdapter = new HttpClientRequestAdapter(authProvider, httpClient: progressHttpClient);
             progressAdapter.BaseUrl = _baseUrl;
