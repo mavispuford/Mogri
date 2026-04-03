@@ -6,6 +6,9 @@
                 xmlns:views="clr-namespace:Mogri.Views;assembly=Mogri"
                 x:Class="Mogri.Views.AboutPage"
                 Background="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource CadetDark}}"
+                LightStatusBarColor="{StaticResource Secondary}"
+                DarkStatusBarColor="{StaticResource CadetDark}"
+                StatusBarStyle="{AppThemeBinding Light=DarkContent, Dark=LightContent}"
                 x:DataType="viewModels:IAboutPageViewModel"
                 Shell.PresentationMode="ModalAnimated"
                 Shell.NavBarIsVisible="False">

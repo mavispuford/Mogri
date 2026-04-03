@@ -7,9 +7,34 @@ namespace Mogri.Views;
 
 public class BasePage : ContentPage
 {
+    public static readonly BindableProperty LightStatusBarColorProperty =
+        BindableProperty.Create(nameof(LightStatusBarColor), typeof(Color), typeof(BasePage), Colors.Transparent, propertyChanged: OnStatusBarColorChanged);
+
+    public static readonly BindableProperty DarkStatusBarColorProperty =
+        BindableProperty.Create(nameof(DarkStatusBarColor), typeof(Color), typeof(BasePage), Colors.Transparent, propertyChanged: OnStatusBarColorChanged);
+
+    public static readonly BindableProperty StatusBarStyleProperty =
+        BindableProperty.Create(nameof(StatusBarStyle), typeof(StatusBarStyle), typeof(BasePage), StatusBarStyle.LightContent, propertyChanged: OnStatusBarStyleChanged);
+
+    public Color LightStatusBarColor
+    {
+        get => (Color)GetValue(LightStatusBarColorProperty);
+        set => SetValue(LightStatusBarColorProperty, value);
+    }
+
+    public Color DarkStatusBarColor
+    {
+        get => (Color)GetValue(DarkStatusBarColorProperty);
+        set => SetValue(DarkStatusBarColorProperty, value);
+    }
+
+    public StatusBarStyle StatusBarStyle
+    {
+        get => (StatusBarStyle)GetValue(StatusBarStyleProperty);
+        set => SetValue(StatusBarStyleProperty, value);
+    }
+
     private readonly StatusBarBehavior? _statusBarBehavior;
-    private readonly Color _lightStatusBarColor = Colors.Transparent;
-    private readonly Color _darkStatusBarColor = Colors.Transparent;
 
     public BasePage()
     {
@@ -24,22 +49,47 @@ public class BasePage : ContentPage
             Application.Current.Resources.TryGetValue("Primary", out var lightStatusBarColor) &&
             Application.Current.Resources.TryGetValue("CadetDark", out var darkStatusBarColor))
         {
-            _lightStatusBarColor = (Color)lightStatusBarColor;
-            _darkStatusBarColor = (Color)darkStatusBarColor;
+            LightStatusBarColor = (Color)lightStatusBarColor;
+            DarkStatusBarColor = (Color)darkStatusBarColor;
 
             // CA1416: StatusBarBehavior is supported on iOS and Android, but the analyzer incorrectly flags
             // macCatalyst (which this app does not target) as an unsupported reachable platform within the iOS TFM.
 #pragma warning disable CA1416
             _statusBarBehavior = new StatusBarBehavior()
             {
-                StatusBarStyle = StatusBarStyle.LightContent,
+                StatusBarStyle = this.StatusBarStyle,
                 ApplyOn = StatusBarApplyOn.OnBehaviorAttachedTo
             };
 
-            _statusBarBehavior.SetAppThemeColor(StatusBarBehavior.StatusBarColorProperty, _lightStatusBarColor, _darkStatusBarColor);
+            _statusBarBehavior.SetAppThemeColor(StatusBarBehavior.StatusBarColorProperty, LightStatusBarColor, DarkStatusBarColor);
 #pragma warning restore CA1416
 
             Behaviors.Add(_statusBarBehavior);
+        }
+    }
+
+    private static void OnStatusBarStyleChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        if (bindable is BasePage page && page._statusBarBehavior != null)
+        {
+#pragma warning disable CA1416
+            page._statusBarBehavior.StatusBarStyle = page.StatusBarStyle;
+#pragma warning restore CA1416
+        }
+    }
+
+    private static void OnStatusBarColorChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        if (bindable is BasePage page && page._statusBarBehavior != null)
+        {
+#pragma warning disable CA1416
+            page._statusBarBehavior.SetAppThemeColor(StatusBarBehavior.StatusBarColorProperty, page.LightStatusBarColor, page.DarkStatusBarColor);
+            
+            if (Application.Current != null)
+            {
+                page._statusBarBehavior.StatusBarColor = Application.Current.RequestedTheme == AppTheme.Dark ? page.DarkStatusBarColor : page.LightStatusBarColor;
+            }
+#pragma warning restore CA1416
         }
     }
 
@@ -48,8 +98,8 @@ public class BasePage : ContentPage
         if (_statusBarBehavior != null)
         {
 #pragma warning disable CA1416
-            _statusBarBehavior.StatusBarStyle = StatusBarStyle.LightContent;
-            _statusBarBehavior.StatusBarColor = e.RequestedTheme == AppTheme.Dark ? _darkStatusBarColor : _lightStatusBarColor;
+            _statusBarBehavior.StatusBarStyle = StatusBarStyle;
+            _statusBarBehavior.StatusBarColor = e.RequestedTheme == AppTheme.Dark ? DarkStatusBarColor : LightStatusBarColor;
 #pragma warning restore CA1416
         }
     }
