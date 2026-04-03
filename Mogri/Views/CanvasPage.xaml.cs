@@ -228,11 +228,6 @@ public partial class CanvasPage : BasePage
 
         TemporaryCanvasView.SizeChanged += TemporaryCanvasView_SizeChanged;
 
-        if (DeviceInfo.Platform == DevicePlatform.iOS && DeviceInfo.Version.Major >= 26)
-        {
-            SecondaryContextButtonsLayout.TranslationY = 76;
-        }
-
         ActionsContainer.SizeChanged += ActionsContainer_SizeChanged;
     }
 
@@ -257,28 +252,21 @@ public partial class CanvasPage : BasePage
 
     private async void AnimateActionsContainer(bool show, bool animate = true)
     {
-        var modTranslationY = 0;
-
-        if (DeviceInfo.Platform == DevicePlatform.iOS && DeviceInfo.Version.Major >= 26)
-        {
-            modTranslationY = 76;
-        }
-
         if (show)
         {
             if (animate)
             {
-                await ActionsContainer.TranslateToAsync(0, modTranslationY, 200, Easing.CubicInOut);
+                await ActionsContainer.TranslateToAsync(0, 0, 200, Easing.CubicInOut);
             }
             else
             {
-                ActionsContainer.TranslationY = modTranslationY;
+                ActionsContainer.TranslationY = 0;
             }
         }
         else
         {
             // Calculate height dynamically
-            double translation = (ActionsContainer.Height / 4) + modTranslationY;
+            double translation = (ActionsContainer.Height / 4);
             if (translation <= 0) translation = 200; // fallback if not measured
 
             if (animate)
