@@ -206,11 +206,6 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
         await _semaphore.WaitAsync();
 
-        if (SelectionModeEnabled)
-        {
-            ToggleSelectionMode();
-        }
-
         try
         {
             var results = await _historyService.SearchAsync(SearchText ?? string.Empty, itemIndex, itemTakeCount);
