@@ -1426,7 +1426,13 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         return resultBitmap;
     }
 
-    private unsafe SKBitmap? CreateMaskedBitmap(SKBitmap? srcBitmap, SKBitmap? maskBitmapOrig, bool randomizeMaskPixels = true)
+    /// <summary>
+    /// Composites the rendered mask layer over the source bitmap using standard alpha blending.
+    /// This delegates to SkiaSharp's canvas compositing (SrcOver) so that premultiplied alpha
+    /// from GenerateRenderedLayer is handled correctly — matching how the canvas view renders
+    /// mask strokes on screen.
+    /// </summary>
+    private SKBitmap? CreateMaskedBitmap(SKBitmap? srcBitmap, SKBitmap? maskBitmapOrig)
     {
         if (srcBitmap == null ||
             maskBitmapOrig == null)
@@ -1434,95 +1440,18 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             return null;
         }
 
-        var maskBitmap = (maskBitmapOrig.Width == srcBitmap.Width && maskBitmapOrig.Height == srcBitmap.Height) ? maskBitmapOrig : maskBitmapOrig.Resize(srcBitmap.Info, new SKSamplingOptions(SKCubicResampler.Mitchell));
+        var maskBitmap = (maskBitmapOrig.Width == srcBitmap.Width && maskBitmapOrig.Height == srcBitmap.Height)
+            ? maskBitmapOrig
+            : maskBitmapOrig.Resize(new SKImageInfo(srcBitmap.Width, srcBitmap.Height), new SKSamplingOptions(SKCubicResampler.Mitchell));
 
         if (maskBitmap == null) return null;
 
-        byte* srcPtr = (byte*)srcBitmap.GetPixels().ToPointer();
-        byte* mskPtr = (byte*)maskBitmap.GetPixels().ToPointer();
+        var resultBitmap = new SKBitmap(srcBitmap.Width, srcBitmap.Height, SKColorType.Rgba8888, SKAlphaType.Premul);
 
-        var width = srcBitmap.Width;       // same for both bitmaps
-        var height = srcBitmap.Height;
-
-        SKColorType typeSrc = srcBitmap.ColorType;
-        SKColorType typeMsk = maskBitmap.ColorType;
-
-        var resultBitmap = new SKBitmap(width, height, typeSrc, SKAlphaType.Unpremul);
-
-        byte* resultPtr = (byte*)resultBitmap.GetPixels().ToPointer();
-
-        for (int row = 0; row < height; row++)
+        using (var canvas = new SKCanvas(resultBitmap))
         {
-            for (int col = 0; col < width; col++)
-            {
-                // Get color from source bitmap
-                byte srcByte1 = *srcPtr++;         // red or blue
-                byte srcByte2 = *srcPtr++;         // green
-                byte srcByte3 = *srcPtr++;         // blue or red
-                byte srcByte4 = *srcPtr++;         // alpha
-
-                // Get color from mask bitmap
-                byte mskByte1 = *mskPtr++;         // red or blue
-                byte mskByte2 = *mskPtr++;         // green
-                byte mskByte3 = *mskPtr++;         // blue or red
-                byte mskByte4 = *mskPtr++;         // alpha
-
-                if (mskByte4 != 0)
-                {
-                    var sourceColor = new Color();
-
-                    if (typeSrc == SKColorType.Rgba8888)
-                    {
-                        sourceColor = Color.FromRgba(srcByte1, srcByte2, srcByte3, srcByte4);
-                    }
-                    else if (typeSrc == SKColorType.Bgra8888)
-                    {
-                        sourceColor = Color.FromRgba(srcByte3, srcByte2, srcByte1, srcByte4);
-                    }
-
-                    var maskColor = new Color();
-
-                    // Mask color is derived directly from the mask bitmap. Noise is now applied when drawing
-                    // so we don't add per-pixel CPU-based noise here.
-
-                    if (typeMsk == SKColorType.Rgba8888)
-                    {
-                        maskColor = Color.FromRgba(mskByte1, mskByte2, mskByte3, mskByte4);
-                    }
-                    else if (typeMsk == SKColorType.Bgra8888)
-                    {
-                        maskColor = Color.FromRgba(mskByte3, mskByte2, mskByte1, mskByte4);
-                    }
-
-                    // Limit the strength to preserve some of the pixel data from the underlying image
-                    //float strength = Math.Min(mskByte4, (byte)204) / 255f;
-
-                    float strength = mskByte4 / 255f;
-
-                    // Interpolate between the source and mask colors using the strength
-                    var newColor = Color.FromRgba(
-                        sourceColor.Red + strength * (maskColor.Red - sourceColor.Red),
-                        sourceColor.Green + strength * (maskColor.Green - sourceColor.Green),
-                        sourceColor.Blue + strength * (maskColor.Blue - sourceColor.Blue),
-                        1f);
-
-                    *resultPtr++ = typeMsk == SKColorType.Rgba8888 ? newColor.GetByteRed() : newColor.GetByteBlue();
-                    *resultPtr++ = newColor.GetByteGreen();
-                    *resultPtr++ = typeMsk == SKColorType.Rgba8888 ? newColor.GetByteBlue() : newColor.GetByteRed();
-                    *resultPtr++ = newColor.GetByteAlpha();
-
-                    // Some server implementations expect a near-zero alpha; keep example here for reference
-                    //*resultPtr++ = 3;
-                }
-                else
-                {
-                    *resultPtr++ = srcByte1;
-                    *resultPtr++ = srcByte2;
-                    *resultPtr++ = srcByte3;
-                    *resultPtr++ = srcByte4;
-                }
-
-            }
+            canvas.DrawBitmap(srcBitmap, 0, 0);
+            canvas.DrawBitmap(maskBitmap, 0, 0);
         }
 
         return resultBitmap;
