@@ -161,6 +161,7 @@
                 HorizontalOptions="Center"
                 VerticalOptions="Start"
                 Stroke="Transparent"
+                StrokeThickness="0"
                 StrokeShape="RoundRectangle 25">
                 <!-- <Border.Shadow>
                 <Shadow Radius="5" Offset="5,5" Opacity=".2"></Shadow>
