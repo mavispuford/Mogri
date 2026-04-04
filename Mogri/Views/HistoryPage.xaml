@@ -120,25 +120,27 @@
                                 </VisualStateGroup>
                             </VisualStateGroupList>
                         </VisualStateManager.VisualStateGroups>
-                        <ImageButton x:Name="ItemImageButton"
-                                     Source="{Binding ThumbnailImageSource}"
-                                     Aspect="AspectFill"
-                                     WidthRequest="200"
-                                     HeightRequest="200"
-                                     Command="{Binding ItemTappedCommand, Source={RelativeSource AncestorType={x:Type pages:IHistoryPageViewModel}}}"
-                                     CommandParameter="{Binding .}"
-                                     InputTransparent="{Binding SelectionModeEnabled, Source={RelativeSource AncestorType={x:Type pages:IHistoryPageViewModel}}}">
+                        <Image x:Name="ItemImage"
+                               Source="{Binding ThumbnailImageSource}"
+                               Aspect="AspectFill"
+                               WidthRequest="200"
+                               HeightRequest="200"
+                               InputTransparent="{Binding SelectionModeEnabled, Source={RelativeSource AncestorType={x:Type pages:IHistoryPageViewModel}}}">
 
-                            <ImageButton.Behaviors>
+                            <Image.Behaviors>
                                 <!-- x:DataType disabled: TouchBehavior is not an Element, so RelativeSource
-                                     bindings are unsupported. Using x:Reference with BindingContext path instead. -->
+                                     bindings are unsupported. Using x:Reference with BindingContext path instead.
+                                     CommandParameters explicitly reference the Image's BindingContext because
+                                     PlatformBehavior does not reliably propagate BindingContext for {Binding .}. -->
                                 <toolkit:TouchBehavior x:DataType="{x:Null}"
+                                                       Command="{Binding BindingContext.ItemTappedCommand, Source={x:Reference HistoryPageRoot}}"
+                                                       CommandParameter="{Binding BindingContext, Source={x:Reference ItemImage}}"
                                                        LongPressCommand="{Binding BindingContext.ItemLongPressedCommand, Source={x:Reference HistoryPageRoot}}"
-                                                       LongPressCommandParameter="{Binding .}"
+                                                       LongPressCommandParameter="{Binding BindingContext, Source={x:Reference ItemImage}}"
                                                        LongPressDuration="500" />
-                            </ImageButton.Behaviors>
+                            </Image.Behaviors>
 
-                        </ImageButton>
+                        </Image>
                     </Border>
 
                 </DataTemplate>
