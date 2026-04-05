@@ -16,6 +16,24 @@ public class BasePage : ContentPage
     public static readonly BindableProperty StatusBarStyleProperty =
         BindableProperty.Create(nameof(StatusBarStyle), typeof(StatusBarStyle), typeof(BasePage), StatusBarStyle.LightContent, propertyChanged: OnStatusBarStyleChanged);
 
+    public static readonly BindableProperty LightToolBarColorProperty =
+        BindableProperty.Create(nameof(LightToolBarColor), typeof(Color), typeof(BasePage), Colors.Transparent, propertyChanged: OnToolBarColorChanged);
+
+    public static readonly BindableProperty DarkToolBarColorProperty =
+        BindableProperty.Create(nameof(DarkToolBarColor), typeof(Color), typeof(BasePage), Colors.Transparent, propertyChanged: OnToolBarColorChanged);
+
+    public Color LightToolBarColor
+    {
+        get => (Color)GetValue(LightToolBarColorProperty);
+        set => SetValue(LightToolBarColorProperty, value);
+    }
+
+    public Color DarkToolBarColor
+    {
+        get => (Color)GetValue(DarkToolBarColorProperty);
+        set => SetValue(DarkToolBarColorProperty, value);
+    }
+
     public Color LightStatusBarColor
     {
         get => (Color)GetValue(LightStatusBarColorProperty);
@@ -46,60 +64,86 @@ public class BasePage : ContentPage
         Shell.SetBackButtonBehavior(this, backButtonBehavior);
 
         if (Application.Current != null &&
-            Application.Current.Resources.TryGetValue("Primary", out var lightStatusBarColor) &&
-            Application.Current.Resources.TryGetValue("CadetDark", out var darkStatusBarColor))
+            Application.Current.Resources.TryGetValue("Primary", out var lightColor) &&
+            Application.Current.Resources.TryGetValue("CadetDark", out var darkColor))
         {
-            LightStatusBarColor = (Color)lightStatusBarColor;
-            DarkStatusBarColor = (Color)darkStatusBarColor;
+            LightToolBarColor = (Color)lightColor;
+            DarkToolBarColor = (Color)darkColor;
 
-            // CA1416: StatusBarBehavior is supported on iOS and Android, but the analyzer incorrectly flags
-            // macCatalyst (which this app does not target) as an unsupported reachable platform within the iOS TFM.
+            LightStatusBarColor = (Color)lightColor;
+            DarkStatusBarColor = (Color)darkColor;
+        }
+
+        // Let MAUI's binding engine keep the toolbar color in sync with the theme automatically,
+        // avoiding a flash of stale color when switching tabs after a theme change.
+        this.SetAppThemeColor(Shell.BackgroundColorProperty, LightToolBarColor, DarkToolBarColor);
+
+        // CA1416: StatusBarBehavior is supported on iOS and Android, but the analyzer incorrectly flags
+        // macCatalyst (which this app does not target) as an unsupported reachable platform within the iOS TFM.
 #pragma warning disable CA1416
-            _statusBarBehavior = new StatusBarBehavior()
-            {
-                StatusBarStyle = this.StatusBarStyle,
-                ApplyOn = StatusBarApplyOn.OnBehaviorAttachedTo
-            };
+        _statusBarBehavior = new StatusBarBehavior()
+        {
+            StatusBarStyle = StatusBarStyle,
+            ApplyOn = StatusBarApplyOn.OnBehaviorAttachedTo // Start on AttachedTo to apply instantly, then switch in OnDisappearing to ensure that navigating back will also set the right colors
+        };
 
-            _statusBarBehavior.SetAppThemeColor(StatusBarBehavior.StatusBarColorProperty, LightStatusBarColor, DarkStatusBarColor);
+        _statusBarBehavior.SetAppThemeColor(StatusBarBehavior.StatusBarColorProperty, LightStatusBarColor, DarkStatusBarColor);
 #pragma warning restore CA1416
 
-            Behaviors.Add(_statusBarBehavior);
-        }
+        Behaviors.Add(_statusBarBehavior);
     }
 
     private static void OnStatusBarStyleChanged(BindableObject bindable, object oldValue, object newValue)
     {
-        if (bindable is BasePage page && page._statusBarBehavior != null)
+        if (bindable is BasePage page && Application.Current != null)
         {
-#pragma warning disable CA1416
-            page._statusBarBehavior.StatusBarStyle = page.StatusBarStyle;
-#pragma warning restore CA1416
+            page.updateStatusBarBehavior(Application.Current.RequestedTheme);
         }
     }
 
     private static void OnStatusBarColorChanged(BindableObject bindable, object oldValue, object newValue)
     {
-        if (bindable is BasePage page && page._statusBarBehavior != null)
+        if (bindable is BasePage page && Application.Current != null)
         {
-#pragma warning disable CA1416
-            page._statusBarBehavior.SetAppThemeColor(StatusBarBehavior.StatusBarColorProperty, page.LightStatusBarColor, page.DarkStatusBarColor);
-            
-            if (Application.Current != null)
-            {
-                page._statusBarBehavior.StatusBarColor = Application.Current.RequestedTheme == AppTheme.Dark ? page.DarkStatusBarColor : page.LightStatusBarColor;
-            }
-#pragma warning restore CA1416
+            page.updateStatusBarBehavior(Application.Current.RequestedTheme);
+        }
+    }
+
+    private static void OnToolBarColorChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        if (bindable is BasePage page)
+        {
+            page.updateToolBarColor();
         }
     }
 
     private void OnRequestedThemeChanged(object? sender, AppThemeChangedEventArgs e)
     {
+        updateToolBarColor();
+        updateStatusBarBehavior(e.RequestedTheme);
+    }
+
+    private void updateToolBarColor()
+    {
+        if (Application.Current != null)
+        {
+            var toolBarColor = Application.Current.RequestedTheme == AppTheme.Light ? LightToolBarColor : DarkToolBarColor;
+
+            // Manually set the color because in some cases, each platform doesn't update with just AppThemeBinding
+            Shell.SetBackgroundColor(this, toolBarColor);
+        }
+
+        // Skipping AppThemeBinding because it doesn't work when a modal is shown and light/dark theme changes, then the modal is popped off the stack
+        // this.SetAppThemeColor(Shell.BackgroundColorProperty, LightToolBarColor, DarkToolBarColor);
+    }
+
+    private void updateStatusBarBehavior(AppTheme appTheme)
+    {
         if (_statusBarBehavior != null)
         {
 #pragma warning disable CA1416
             _statusBarBehavior.StatusBarStyle = StatusBarStyle;
-            _statusBarBehavior.StatusBarColor = e.RequestedTheme == AppTheme.Dark ? DarkStatusBarColor : LightStatusBarColor;
+            _statusBarBehavior.StatusBarColor = appTheme == AppTheme.Dark ? DarkStatusBarColor : LightStatusBarColor;
 #pragma warning restore CA1416
         }
     }
@@ -124,6 +168,8 @@ public class BasePage : ContentPage
 
             if (Application.Current != null)
             {
+                updateToolBarColor();
+                updateStatusBarBehavior(Application.Current.RequestedTheme);
                 Application.Current.RequestedThemeChanged += OnRequestedThemeChanged;
             }
 
@@ -143,6 +189,14 @@ public class BasePage : ContentPage
         try
         {
             base.OnDisappearing();
+
+            if (_statusBarBehavior != null)
+            {
+                // This ensures that navigating back to the page will trigger status bar color changes
+#pragma warning disable CA1416
+                _statusBarBehavior.ApplyOn = StatusBarApplyOn.OnPageNavigatedTo;
+#pragma warning restore CA1416
+            }
 
             if (Application.Current != null)
             {
