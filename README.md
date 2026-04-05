@@ -14,6 +14,14 @@ There are two main tabs in the app:
 
 ### Example Workflows
 
+#### Sketch to Image
+
+1. Make a sketch on the `Canvas` page
+2. Send it to the `Generate` tab as paint only (no masks)
+3. Describe your sketch (or rather, what you want it to be)
+
+&nbsp;&nbsp;&nbsp; ![Doodle of a tree](Media/ReadmeImages/Doodle-Tree.png) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ![Generated image of a tree](Media/ReadmeImages/Generated-Tree.png)
+
 #### Image generation and Inpainting
 
 1. Generate a "photo of a cat".
@@ -22,14 +30,6 @@ There are two main tabs in the app:
 4. Generate with a new prompt (e.g., "wearing a top hat"), resulting in the cat now wearing a top hat.
 
 &nbsp;&nbsp;&nbsp; ![alt text](Media/ReadmeImages/CatWithTopHatFastSmall.gif)
-
-#### Sketch to Image
-
-1. Make a sketch on the `Canvas` page
-2. Send it to the `Generate` tab as paint only (no masks)
-3. Describe your sketch (or rather, what you want it to be)
-
-&nbsp;&nbsp;&nbsp; ![Doodle of a tree](Media/ReadmeImages/Doodle-Tree.png) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ![Generated image of a tree](Media/ReadmeImages/Generated-Tree.png)
 
 #### Touch-ups
 
