@@ -32,7 +32,8 @@
                 <HorizontalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding NavigateToGitHubPageCommand}" />
                 </HorizontalStackLayout.GestureRecognizers>
-                <Image Source="github_invertocat_black.png" WidthRequest="40">
+
+                <Image Source="github_invertocat_black.png" WidthRequest="30">
                     <Image.Behaviors>
                             <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Primary}" Dark="{StaticResource Primary}" />
                     </Image.Behaviors>
@@ -45,12 +46,25 @@
                     <TapGestureRecognizer Command="{Binding NavigateToLicensesPageCommand}" />
                 </HorizontalStackLayout.GestureRecognizers>
                 
-                <ImageButton ToolTipProperties.Text="Close">
-                    <ImageButton.Source>
+                <Image>
+                    <Image.Source>
                         <FontImageSource Glyph="&#xf5a0;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="{StaticResource Primary}" />
-                    </ImageButton.Source>
-                </ImageButton>
+                    </Image.Source>
+                </Image>
                 <Label VerticalOptions="Center" Text="Open Source Licenses" TranslationY="-2" FontFamily="ComfortaaRegular" FontSize="18" TextColor="{AppThemeBinding Light={StaticResource NeutralDarkGray}, Dark={StaticResource Secondary}}" />
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="12" Padding="64,0">
+                <HorizontalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding CopyVersionToClipboardCommand}" />
+                </HorizontalStackLayout.GestureRecognizers>
+                
+                <Image>
+                    <Image.Source>
+                        <FontImageSource Glyph="&#xe88e;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="{StaticResource Primary}" />
+                    </Image.Source>
+                </Image>
+                <Label VerticalOptions="Center" Text="{Binding AppVersion}" TranslationY="-2" FontFamily="ComfortaaRegular" FontSize="18" TextColor="{AppThemeBinding Light={StaticResource NeutralDarkGray}, Dark={StaticResource Secondary}}" />
             </HorizontalStackLayout>
         </VerticalStackLayout>
 
