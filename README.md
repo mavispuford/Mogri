@@ -14,19 +14,14 @@ There are two main tabs in the app:
 
 ### Example Workflows
 
-#### Touch-ups
+#### Image generation and Inpainting
 
-1. In the `Canvas` tab, add a photo from your device.
-2. Mask an unwanted object/blemish using the magic wand or brush tool.
-3. Send the canvas image to the `Generate` tab, and give it a prompt (e.g. "a field of grass", "clear skin, close up"), and tap the `Create` button.
-4. If results aren't to your liking, you can play with the denoising strength in the Image to Image Settings page.
+1. Generate a "photo of a cat".
+2. Send the image to the `Canvas` tab.
+3. Mask the area above the cat and send the updated canvas image back to the `Generate` tab by choosing the Inpainting option.
+4. Generate with a new prompt (e.g., "wearing a top hat"), resulting in the cat now wearing a top hat.
 
-#### Image generation
-
-1. Generate one or more "photo of a cat" images.
-2. Send one of the images to the `Canvas` tab.
-3. Mask the area above the cat and send the updated canvas image back to the `Generate` tab.
-4. Generate with a new prompt (e.g., "a top hat"), resulting in the cat now wearing a top hat.
+&nbsp;&nbsp;&nbsp; ![alt text](Media/ReadmeImages/CatWithTopHatFastSmall.gif)
 
 #### Sketch to Image
 
@@ -35,6 +30,17 @@ There are two main tabs in the app:
 3. Describe your sketch (or rather, what you want it to be)
 
 &nbsp;&nbsp;&nbsp; ![Doodle of a tree](Media/ReadmeImages/Doodle-Tree.png) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ![Generated image of a tree](Media/ReadmeImages/Generated-Tree.png)
+
+#### Touch-ups
+
+1. In the `Canvas` tab, add a photo from your device.
+2. Mask an unwanted object/blemish using the magic wand or brush tool.
+3. After masking, you can approach it a few different ways:
+   - Send the canvas image to the `Generate` tab, and give it a prompt (e.g. "a field of grass", "clear skin, close up"), and tap the `Create` button.
+   - Use the Patch tool to fill in the masked space
+   - A combination of the Patch tool *and* inpainting
+
+> The Patch tool can be useful for filling in a space with contrasting colors (e.g. A red fire hydrant in a field of green grass), making it easier to follow up with inpainting for a better blend
 
 ## Getting Started
 
@@ -79,7 +85,7 @@ The main goal for this project was to create a finger-friendly, simplified image
 
 #### But I hate AI "art". Why contribute to that software space?
 
-I hear you. Image generation is a complicated, controversial topic. I personally don't condone creating AI "art" for commercial purposes, particularly when models are trained on artists' work without their permission. That said, I also love the technology behind it, and it has other uses besides imitating art. Since the early days of image generation (VQGAN-CLIP, Craiyon), I've looked at this tech as more of a toy/tool. I love to tinker, and this is a fun visual way to do it.
+I hear you. Image generation is a complicated, controversial topic. I personally don't condone creating AI "art" for commercial purposes, particularly when models are trained on artists' work without their permission. That said, I also love the technology behind it, and it **does** have other uses besides imitating art. Since the early days of image generation (VQGAN-CLIP, Craiyon), I've looked at this tech as more of a toy/tool. I love to tinker, and this is a fun visual way to do it.
 
 Mogri doesn't provide any models and instead leaves it up to the user to figure that part out. I think if any person is serious about creating and selling AI "art", they'll gravitate toward something else in the PC space, like ComfyUI etc.
 
