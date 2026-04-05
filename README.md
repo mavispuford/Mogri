@@ -40,7 +40,7 @@ There are two main tabs in the app:
    - Use the Patch tool to fill in the masked space
    - A combination of the Patch tool *and* inpainting
 
-> The Patch tool can be useful for filling in a space with contrasting colors (e.g. A red fire hydrant in a field of green grass), making it easier to follow up with inpainting for a better blend
+> The Patch tool can be useful for filling in a space that has contrasting colors (e.g. A red fire hydrant in a field of green grass), making it easier to follow up with inpainting.
 
 ## Getting Started
 
@@ -56,6 +56,7 @@ There are two main tabs in the app:
 1.  After launching Mogri, navigate to the **Settings** page.
 2.  Select your backend (**SD Forge Neo**/**ComfyUI**/**Comfy Cloud**) from the dropdown.
 3.  Enter your backend server URL (e.g., `http://192.168.1.x:7860`), or if using Comfy Cloud, enter your API Key.
+4.  *(Optional)* Add authentication header info, if necessary
 
 ### Backend Configuration
 
@@ -65,7 +66,7 @@ To listen for connections on the local network with SD Forge Neo, launch with th
 
 #### ComfyUI
 
-To listen for connectins on the local network in ComfyUI, [follow their official guide here](https://comfyui-wiki.com/en/faq/how-to-access-comfyui-on-lan).
+To listen for connections on the local network in ComfyUI, [follow their official guide here](https://comfyui-wiki.com/en/faq/how-to-access-comfyui-on-lan).
 
 ## Architecture
 
