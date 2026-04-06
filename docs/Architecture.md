@@ -130,3 +130,19 @@ The following naming conventions are used in this application:
 - Use `var` in all cases where it makes sense
 - Avoid conversational comments. Comments should be useful, explaining why a change was made in a succinct way.
 - Add Summary XML comments to classes, interfaces, enums, etc., explaining their purpose at a high level and any caveats to be aware of.
+
+## Branching & Releases
+
+This project follows **GitHub Flow**:
+
+1. **Feature branches** are created from `main` for all changes (e.g., `feature/version-display`, `fix/clipboard-crash`)
+2. **Pull Requests** target `main` and are merged via **Squash & Merge** to keep history clean
+3. **Releases** are created by tagging `main` with a semver tag (e.g., `v1.2.3`)
+   - Tags trigger CI builds that produce versioned Android (signed APK/AAB) and iOS (unsigned IPA) artifacts
+   - The tag version is injected into the app binary at build time
+
+### Versioning
+
+- **Display version** (`ApplicationDisplayVersion`): Semantic version matching the git tag (e.g., `1.2.3`). Defaults to `1.0.0-local` for local dev builds.
+- **Build number** (`ApplicationVersion`): Auto-incremented by CI using `github.run_number`. Defaults to `1` locally.
+- Both are overridable via MSBuild properties: `-p:ApplicationDisplayVersion=x.y.z -p:ApplicationVersion=N`

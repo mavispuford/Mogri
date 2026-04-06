@@ -1,4 +1,5 @@
 using System;
+using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Mvvm.Input;
 using Mogri.Interfaces.Services;
 using Mogri.Interfaces.ViewModels.Pages;
@@ -12,6 +13,15 @@ public partial class AboutPageViewModel : PageViewModel, IAboutPageViewModel
     public AboutPageViewModel(
         ILoadingService loadingService) : base(loadingService)
     {
+    }
+
+    public string AppVersion => $"v{AppInfo.Current.VersionString} ({AppInfo.Current.BuildString})";
+
+    [RelayCommand]
+    private async Task CopyVersionToClipboard()
+    {
+        await Clipboard.Default.SetTextAsync(AppVersion);
+        await Toast.Make("Copied to clipboard").Show();
     }
 
     [RelayCommand]

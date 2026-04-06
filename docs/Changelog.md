@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-04-05
+
+*This update automates app versioning via CI and exposes the version on the About page.*
+
+### Added
+- **Automated Versioning**: App version is now injected at build time by GitHub Actions from git tags. Local builds display `1.0.0-local`.
+- **Version Display**: The About page now shows the app version below the logo. Tapping it copies the version to the clipboard.
+
+### Changed
+- **GitHub Actions**: Android and iOS workflows now inject `ApplicationDisplayVersion` and `ApplicationVersion` into builds. Artifacts are named with the version.
+- **Mogri.csproj**: Version properties are now overridable via MSBuild, with safe local defaults.
+
 ## 2026-03-29
 
 *This update adds full undo support for destructive canvas operations by persisting bitmap snapshots to disk, and replaces the Edit Masks popup with a unified Canvas History popup.*
