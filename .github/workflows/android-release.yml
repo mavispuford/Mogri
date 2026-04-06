@@ -17,6 +17,21 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
+    - name: Determine Version
+      run: |
+        if ("${{ github.ref_type }}" -eq "tag") {
+          $tag = "${{ github.ref_name }}"
+          if ($tag.StartsWith("v")) {
+            $version = $tag.Substring(1)
+          } else {
+            $version = $tag
+          }
+          echo "APP_DISPLAY_VERSION=$version" >> $env:GITHUB_ENV
+        } else {
+          echo "APP_DISPLAY_VERSION=0.0.0-dev" >> $env:GITHUB_ENV
+        }
+        echo "APP_BUILD_NUMBER=${{ github.run_number }}" >> $env:GITHUB_ENV
+
     - name: Setup .NET 10
       uses: actions/setup-dotnet@v4
       with:
@@ -41,15 +56,17 @@ jobs:
         -p:AndroidSigningKeyAlias="${{ secrets.KEY_ALIAS }}"
         -p:AndroidSigningKeyPass="${{ secrets.KEY_PASSWORD }}"
         -p:AndroidSigningStorePass="${{ secrets.KEYSTORE_PASSWORD }}"
+        -p:ApplicationDisplayVersion=$env:APP_DISPLAY_VERSION
+        -p:ApplicationVersion=$env:APP_BUILD_NUMBER
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: Mogri-Android-APK
+        name: Mogri-Android-APK-v${{ env.APP_DISPLAY_VERSION }}
         path: Mogri/bin/Release/net10.0-android/**/publish/*-Signed.apk
 
     - name: Upload AAB Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: Mogri-Android-AAB
+        name: Mogri-Android-AAB-v${{ env.APP_DISPLAY_VERSION }}
         path: Mogri/bin/Release/net10.0-android/**/publish/*-Signed.aab

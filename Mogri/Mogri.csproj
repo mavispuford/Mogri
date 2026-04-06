@@ -19,9 +19,9 @@
 		<ApplicationId>com.mavispuford.mogri</ApplicationId>
 		<ApplicationIdGuid>95046DF2-A0B6-4A07-9ED5-3CA03F6DBA54</ApplicationIdGuid>
 
-		<!-- Versions -->
-		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
-		<ApplicationVersion>1</ApplicationVersion>
+		<!-- Versions: overridable from CLI via -p:ApplicationDisplayVersion=x.y.z -->
+		<ApplicationDisplayVersion Condition="'$(ApplicationDisplayVersion)' == ''">1.0.0-local</ApplicationDisplayVersion>
+		<ApplicationVersion Condition="'$(ApplicationVersion)' == ''">1</ApplicationVersion>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">30.0</SupportedOSPlatformVersion>
