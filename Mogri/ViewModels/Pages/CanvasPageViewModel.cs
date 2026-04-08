@@ -87,8 +87,6 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     [ObservableProperty]
     public partial SKBitmap? SegmentationBitmap { get; set; }
 
-    [ObservableProperty]
-    public partial ImageSource? SavedImageSource { get; set; }
 
     [ObservableProperty]
     public partial SKRect BoundingBox { get; set; }

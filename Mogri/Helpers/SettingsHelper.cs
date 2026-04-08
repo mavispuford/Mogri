@@ -32,7 +32,7 @@ public static class SettingsHelper
                 }
                 else
                 {
-                    if (!prompt.EndsWith(", ") || !prompt.EndsWith(","))
+                    if (!prompt.EndsWith(", ") && !prompt.EndsWith(","))
                     {
                         prompt += ", ";
                     }
@@ -51,7 +51,7 @@ public static class SettingsHelper
                 }
                 else
                 {
-                    if (!negativePrompt.EndsWith(", ") || !negativePrompt.EndsWith(","))
+                    if (!negativePrompt.EndsWith(", ") && !negativePrompt.EndsWith(","))
                     {
                         negativePrompt += ", ";
                     }

@@ -88,11 +88,6 @@ public partial class CanvasPage : BasePage
         set => SetValue(PrepareForSavingCommandProperty, value);
     }
 
-    public IAsyncRelayCommand<SKBitmap> SegmentationCallbackCommand
-    {
-        get => (IAsyncRelayCommand<SKBitmap>)GetValue(SegmentationCallbackCommandProperty);
-        set => SetValue(SegmentationCallbackCommandProperty, value);
-    }
 
     public IAsyncRelayCommand<SKPoint[]> DoSegmentationCommand
     {
@@ -175,7 +170,6 @@ public partial class CanvasPage : BasePage
 
     public static BindableProperty PrepareForSavingCommandProperty = BindableProperty.Create(nameof(PrepareForSavingCommand), typeof(IAsyncRelayCommand), typeof(CanvasPage), default(IAsyncRelayCommand));
 
-    public static BindableProperty SegmentationCallbackCommandProperty = BindableProperty.Create(nameof(SegmentationCallbackCommand), typeof(IAsyncRelayCommand<SKBitmap>), typeof(CanvasPage), default(IAsyncRelayCommand<SKBitmap>));
 
     public static BindableProperty DoSegmentationCommandProperty = BindableProperty.Create(nameof(DoSegmentationCommand), typeof(IAsyncRelayCommand<SKPoint[]>), typeof(CanvasPage), default(IAsyncRelayCommand<SKPoint[]>));
 
@@ -292,10 +286,6 @@ public partial class CanvasPage : BasePage
         });
     }
 
-    private void SourceImageCanvasView_SizeChanged(object? sender, EventArgs e)
-    {
-        UpdateCanvasSizes();
-    }
 
 
     private void OnTouchTemporarySurface(object? sender, SKTouchEventArgs e)
@@ -463,7 +453,6 @@ public partial class CanvasPage : BasePage
         e.Handled = true;
     }
 
-    private SKPoint getPixelPoint(SKPoint location) => new SKPoint(location.X * (float)BoundingBoxScale, location.Y * (float)BoundingBoxScale);
 
     private void OnPaintSourceImageSurface(object? sender, SKPaintSurfaceEventArgs e)
     {
@@ -472,15 +461,6 @@ public partial class CanvasPage : BasePage
 
         if (Bitmap != null)
         {
-            //float scale = Math.Min((float)info.Width / Bitmap.Width,
-            //           (float)info.Height / Bitmap.Height);
-            //float x = (info.Width - scale * Bitmap.Width) / 2;
-            //float y = (info.Height - scale * Bitmap.Height) / 2;
-            //SKRect destRect = new SKRect(x, y, x + scale * Bitmap.Width,
-            //                                   y + scale * Bitmap.Height);
-
-            //canvas.DrawBitmap(Bitmap, destRect);
-
             canvas.DrawBitmap(Bitmap, Bitmap.Info.Rect, e.Info.Rect);
         }
     }

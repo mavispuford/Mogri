@@ -29,8 +29,6 @@ public interface IPromptPageViewModel : IPageViewModel
 
     IAsyncRelayCommand ShowLoraSelectionPageCommand { get; }
 
-    IAsyncRelayCommand ShowPromptStyleCreationPromptCommand { get; }
-
     IAsyncRelayCommand ShowPromptStyleExtractionPromptCommand { get; }
 
     IAsyncRelayCommand ShowPromptStyleSelectionPageCommand { get; }

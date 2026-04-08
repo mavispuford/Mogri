@@ -53,7 +53,7 @@ public static class PngMetadataHelper
     public static async Task<PromptSettings?> ReadSettingsFromStreamAsync(Stream stream)
     {
         var buffer = new byte[8];
-        if (await stream.ReadAsync(buffer, 0, 8) != 8 || !UnsafeCompare(buffer, PngSignature))
+        if (await stream.ReadAsync(buffer, 0, 8) != 8 || !buffer.AsSpan().SequenceEqual(PngSignature))
         {
             return null;
         }
@@ -140,130 +140,6 @@ public static class PngMetadataHelper
         return null;
     }
 
-    public static async Task<(string? Positive, string? Negative, string? Raw)> ReadParametersAsync(string filePath)
-    {
-        if (!File.Exists(filePath))
-            return (null, null, null);
-
-        try
-        {
-            using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            return await ReadParametersFromStreamAsync(stream);
-        }
-        catch (Exception)
-        {
-            // Log or handle exception as needed
-            return (null, null, null);
-        }
-    }
-
-    public static async Task<(string? Positive, string? Negative, string? Raw)> ReadParametersFromStreamAsync(Stream stream)
-    {
-        var buffer = new byte[8];
-        if (await stream.ReadAsync(buffer, 0, 8) != 8 || !UnsafeCompare(buffer, PngSignature))
-        {
-            return (null, null, null);
-        }
-
-        while (stream.Position < stream.Length)
-        {
-            // Read Length (4 bytes)
-            if (await stream.ReadAsync(buffer, 0, 4) != 4) break;
-            var length = BinaryPrimitives.ReadUInt32BigEndian(buffer);
-
-            // Read Type (4 bytes)
-            if (await stream.ReadAsync(buffer, 0, 4) != 4) break;
-            var type = Encoding.ASCII.GetString(buffer, 0, 4);
-
-            if (type == "tEXt")
-            {
-                // Read Data
-                var data = new byte[length];
-                if (await stream.ReadAsync(data, 0, (int)length) != length) break;
-
-                // tEXt format: Keyword + null + Text
-                var dataStr = Encoding.Latin1.GetString(data);
-                var nullIndex = dataStr.IndexOf('\0');
-                if (nullIndex > 0)
-                {
-                    var keyword = dataStr.Substring(0, nullIndex);
-                    if (keyword == "parameters")
-                    {
-                        var text = dataStr.Substring(nullIndex + 1);
-                        return ParseStableDiffusionParameters(text);
-                    }
-                }
-            }
-            else
-            {
-                // Skip data
-                stream.Seek(length, SeekOrigin.Current);
-            }
-
-            // Skip CRC (4 bytes)
-            stream.Seek(4, SeekOrigin.Current);
-        }
-
-        return (null, null, null);
-    }
-
-    private static (string? Positive, string? Negative, string? Raw) ParseStableDiffusionParameters(string parameters)
-    {
-        if (string.IsNullOrWhiteSpace(parameters))
-            return (null, null, parameters);
-
-        string? positive = null;
-        string? negative = null;
-
-        var parts = parameters.Split(new[] { "Negative prompt:" }, StringSplitOptions.None);
-        if (parts.Length > 0)
-        {
-            positive = parts[0].Trim();
-        }
-
-        if (parts.Length > 1)
-        {
-            // The negative prompt section often ends with "Steps:" or other generation params
-            var negativeSection = parts[1];
-            var stepsIndex = negativeSection.IndexOf("\nSteps:", StringComparison.Ordinal);
-
-            if (stepsIndex == -1)
-            {
-                // Try searching for just "Steps:" without newline if formatting varies
-                stepsIndex = negativeSection.IndexOf("Steps:", StringComparison.Ordinal);
-            }
-
-            if (stepsIndex != -1)
-            {
-                negative = negativeSection.Substring(0, stepsIndex).Trim();
-            }
-            else
-            {
-                negative = negativeSection.Trim();
-            }
-        }
-
-        // Clean up weird trailing stuff on positive prompt if negative prompt wasn't found but steps were
-        if (negative == null && positive != null)
-        {
-            var stepsIndex = positive.IndexOf("\nSteps:", StringComparison.Ordinal);
-            if (stepsIndex != -1)
-            {
-                positive = positive.Substring(0, stepsIndex).Trim();
-            }
-        }
-
-        return (positive, negative, parameters);
-    }
-
-    private static bool UnsafeCompare(byte[] a1, byte[] a2)
-    {
-        if (a1 == null || a2 == null || a1.Length != a2.Length)
-            return false;
-        for (int i = 0; i < a1.Length; i++)
-            if (a1[i] != a2[i]) return false;
-        return true;
-    }
 
     /// <summary>
     /// Writes PromptSettings as a JSON "md_settings" chunk into the PNG image.
@@ -288,7 +164,7 @@ public static class PngMetadataHelper
     private static byte[] InsertTextChunk(byte[] originalImage, string keyword, string text)
     {
         // Simple check for valid PNG
-        if (originalImage == null || originalImage.Length < 33 || !UnsafeCompare(originalImage[0..8], PngSignature))
+        if (originalImage == null || originalImage.Length < 33 || !originalImage.AsSpan(0, 8).SequenceEqual(PngSignature))
         {
             return originalImage ?? Array.Empty<byte>();
         }
@@ -314,7 +190,7 @@ public static class PngMetadataHelper
         Array.Copy(textBytes, 0, chunk, 8 + keywordBytes.Length + 1, textBytes.Length);
         
         // Calculate CRC on Type + Data
-        var crc = Crc32.Calculate(chunk.AsSpan(4, 4 + dataLength));
+        var crc = System.IO.Hashing.Crc32.HashToUInt32(chunk.AsSpan(4, 4 + dataLength));
         BinaryPrimitives.WriteUInt32BigEndian(chunk.AsSpan(chunkLength - 4, 4), crc);
 
         // Insert after IHDR (assumed to be at index 33)
@@ -327,36 +203,4 @@ public static class PngMetadataHelper
         return result;
     }
 
-    private static class Crc32
-    {
-        private static readonly uint[] Table;
-
-        static Crc32()
-        {
-            Table = new uint[256];
-            for (uint i = 0; i < 256; i++)
-            {
-                uint crc = i;
-                for (int j = 0; j < 8; j++)
-                {
-                    if ((crc & 1) == 1)
-                        crc = (crc >> 1) ^ 0xEDB88320;
-                    else
-                        crc >>= 1;
-                }
-                Table[i] = crc;
-            }
-        }
-
-        public static uint Calculate(ReadOnlySpan<byte> data)
-        {
-            uint crc = 0xFFFFFFFF;
-            foreach (byte b in data)
-            {
-                byte index = (byte)((crc ^ b) & 0xFF);
-                crc = (crc >> 8) ^ Table[index];
-            }
-            return ~crc;
-        }
-    }
 }

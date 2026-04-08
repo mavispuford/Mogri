@@ -18,7 +18,6 @@ namespace Mogri.Animations;
 /// <code>
 ///     &lt;x:Array Type="{x:Type toolkit:BaseAnimation}"&gt;
 ///         &lt;ScaleToAnimation Scale = "1" Easing="{x:Static Easing.CubicInOut}" Length="200" /&gt;
-///         &lt;ColorToAnimation FromColor = "Black" ToColor="Red" BindableProperty="{x:Static VisualElement.BackgroundColorProperty}" /&gt;
 ///     &lt;/x:Array&gt;
 /// </code>
 /// </remarks>
@@ -65,7 +64,6 @@ public static class AnimationProperties
             foreach (var animation in animations)
             {
                 animation.BindingContext = element.BindingContext;
-                animation.PropertyChanged -= (s, e) => OnAnimationPropertyChanged(s, e, element);
                 animation.PropertyChanged += (s, e) => OnAnimationPropertyChanged(s, e, element);
                 animation.Animate(element);
             }
@@ -73,7 +71,6 @@ public static class AnimationProperties
         else if (newValue is BaseAnimation animation)
         {
             animation.BindingContext = element.BindingContext;
-            animation.PropertyChanged -= (s, e) => OnAnimationPropertyChanged(s, e, element);
             animation.PropertyChanged += (s, e) => OnAnimationPropertyChanged(s, e, element);
             animation.Animate(element);
         }
