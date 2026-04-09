@@ -983,8 +983,8 @@ namespace Mogri.Services
 
             if (_options == null || _models == null) return Task.FromResult<IModelViewModel?>(result);
 
-            var checkpointHash = GetOptionValue(_options.SdCheckpointHash);
-            var selectedModel = _models.FirstOrDefault(m => m.Sha256 == checkpointHash);
+            var currentModelTitle = GetOptionValue(_options.SdModelCheckpoint);
+            var selectedModel = _models.FirstOrDefault(m => m.Title == currentModelTitle);
 
             if (selectedModel != null && result != null)
             {
