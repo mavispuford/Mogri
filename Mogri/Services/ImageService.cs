@@ -64,7 +64,16 @@ public class ImageService : IImageService
             return null;
         }
 
-        return ImageSource.FromStream(() => stream);
+        var bitmap = GetSkBitmapFromStream(stream);
+        if (bitmap != null)
+        {
+            return new SkiaSharp.Views.Maui.Controls.SKBitmapImageSource
+            {
+                Bitmap = bitmap
+            };
+        }
+
+        return null;
     }
 
     public SKBitmap? GetSkBitmapFromStream(Stream? stream)

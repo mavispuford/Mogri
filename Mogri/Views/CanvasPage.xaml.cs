@@ -219,9 +219,12 @@ public partial class CanvasPage : BasePage
 
         PrepareForSavingCommand = new AsyncRelayCommand<IAsyncRelayCommand>(PrepareForSaving);
         ResetZoomCommand = new RelayCommand(() => ZoomContainer.Reset(true));
+    }
 
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
         TemporaryCanvasView.SizeChanged += TemporaryCanvasView_SizeChanged;
-
         ActionsContainer.SizeChanged += ActionsContainer_SizeChanged;
     }
 
@@ -999,5 +1002,24 @@ public partial class CanvasPage : BasePage
             }
         }
     }
-}
 
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        TemporaryCanvasView.SizeChanged -= TemporaryCanvasView_SizeChanged;
+        ActionsContainer.SizeChanged -= ActionsContainer_SizeChanged;
+        disposeTimers();
+    }
+
+    private void disposeTimers()
+    {
+        _brushSizeTimer?.Dispose();
+        _brushSizeTimer = null;
+
+        _alphaTimer?.Dispose();
+        _alphaTimer = null;
+
+        _noiseTimer?.Dispose();
+        _noiseTimer = null;
+    }
+}

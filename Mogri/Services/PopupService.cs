@@ -47,7 +47,15 @@ namespace Mogri.Services
 
             activePopups.Add(popup, tcs);
 
-            await MopupService.Instance.PushAsync(popup);
+            try
+            {
+                await MopupService.Instance.PushAsync(popup);
+            }
+            catch
+            {
+                activePopups.Remove(popup);
+                throw;
+            }
 
             // It takes a bit of time for the popup to show...
             for (var i = 0; i < 5; i++)
@@ -81,7 +89,15 @@ namespace Mogri.Services
 
             activePopups.Add(popup, tcs);
 
-            await MopupService.Instance.PushAsync(popup);
+            try
+            {
+                await MopupService.Instance.PushAsync(popup);
+            }
+            catch
+            {
+                activePopups.Remove(popup);
+                throw;
+            }
 
             var result = await tcs.Task;
 
@@ -95,37 +111,49 @@ namespace Mogri.Services
                 return;
             }
 
-            var popup = activePopups.First(p => p.Key.BindingContext == viewModel);
+            var entry = activePopups.First(p => p.Key.BindingContext == viewModel);
+            var popupPage = entry.Key;
 
-            if (MopupService.Instance.PopupStack.Contains(popup.Key))
+            // Remove from tracking before RemovePageAsync to prevent the
+            // Disappearing safety-net handler from racing with this method.
+            entry.Value.TrySetResult(result);
+            activePopups.Remove(popupPage);
+
+            if (MopupService.Instance.PopupStack.Contains(popupPage))
             {
-                await MopupService.Instance.RemovePageAsync(popup.Key);
+                await MopupService.Instance.RemovePageAsync(popupPage);
             }
-
-            popup.Value.SetResult(result);
-
-            activePopups.Remove(popup.Key);
         }
 
         public async Task ClosePopupAsync(string name, object? result)
         {
             var popupType = PopupRegistrations.GetPopupTypeByName(name);
 
-            var popup = activePopups.Keys.FirstOrDefault(p => p.GetType().Name == popupType.Name);
+            var popupPage = activePopups.Keys.FirstOrDefault(p => p.GetType().Name == popupType.Name);
 
-            if (popup == null)
+            // If not tracked in activePopups, fall back to the Mopups stack directly.
+            // This handles cases where the Disappearing safety-net already cleaned up
+            // the dictionary entry but the popup is still visually present.
+            if (popupPage == null)
             {
+                popupPage = MopupService.Instance.PopupStack
+                    .FirstOrDefault(p => p.GetType().Name == popupType.Name);
+
+                if (popupPage != null)
+                {
+                    await MopupService.Instance.RemovePageAsync(popupPage);
+                }
+
                 return;
             }
 
-            if (MopupService.Instance.PopupStack.Contains(popup))
+            activePopups[popupPage].TrySetResult(result);
+            activePopups.Remove(popupPage);
+
+            if (MopupService.Instance.PopupStack.Contains(popupPage))
             {
-                await MopupService.Instance.RemovePageAsync(popup);
+                await MopupService.Instance.RemovePageAsync(popupPage);
             }
-
-            activePopups[popup].SetResult(result);
-
-            activePopups.Remove(popup);
         }
 
         public async Task ClosePopupAsync(object? result)
@@ -135,16 +163,25 @@ namespace Mogri.Services
                 return;
             }
 
-            var popup = activePopups.Last();
+            var entry = activePopups.Last();
+            var popupPage = entry.Key;
 
-            if (MopupService.Instance.PopupStack.Contains(popup.Key))
+            entry.Value.TrySetResult(result);
+            activePopups.Remove(popupPage);
+
+            if (MopupService.Instance.PopupStack.Contains(popupPage))
             {
-                await MopupService.Instance.RemovePageAsync(popup.Key);
+                await MopupService.Instance.RemovePageAsync(popupPage);
             }
+        }
 
-            popup.Value.SetResult(result);
-
-            activePopups.Remove(popup.Key);
+        public void ClearAllPopups()
+        {
+            foreach (var kvp in activePopups)
+            {
+                kvp.Value.TrySetCanceled();
+            }
+            activePopups.Clear();
         }
 
         private Page GetActivePage()

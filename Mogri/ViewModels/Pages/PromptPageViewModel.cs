@@ -261,4 +261,5 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
         Prompt = _settings.Prompt != PromptPlaceholder ? _settings.Prompt : string.Empty;
         NegativePrompt = _settings.NegativePrompt;
     }
+
 }

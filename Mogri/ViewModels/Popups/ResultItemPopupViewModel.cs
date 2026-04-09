@@ -152,4 +152,5 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
             ResultItem = _resultItems[index - 1];
         }
     }
+
 }

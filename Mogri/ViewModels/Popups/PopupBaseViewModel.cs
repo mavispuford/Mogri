@@ -75,4 +75,5 @@ public partial class PopupBaseViewModel : BaseViewModel, IPopupBaseViewModel
             Console.WriteLine($"Failed to close popup on back button: {ex}");
         }
     }
+
 }

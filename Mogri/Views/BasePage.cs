@@ -91,6 +91,11 @@ public class BasePage : ContentPage
 #pragma warning restore CA1416
 
         Behaviors.Add(_statusBarBehavior);
+
+#if DEBUG
+        MemoryToolkit.Maui.LeakMonitorBehavior.SetCascade(this, true);
+#endif
+        MemoryToolkit.Maui.TearDownBehavior.SetCascade(this, true);
     }
 
     private static void OnStatusBarStyleChanged(BindableObject bindable, object oldValue, object newValue)

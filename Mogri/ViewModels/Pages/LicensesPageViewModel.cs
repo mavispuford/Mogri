@@ -55,4 +55,5 @@ public partial class LicensesPageViewModel : PageViewModel, ILicensesPageViewMod
             System.Diagnostics.Debug.WriteLine($"Failed to load licenses in ViewModel: {ex.Message}");
         }
     }
+
 }

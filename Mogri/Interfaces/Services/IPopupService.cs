@@ -11,6 +11,8 @@ public interface IPopupService
 
     Task<object?> ShowPopupForResultAsync(string name, IDictionary<string, object>? parameters);
 
+    void ClearAllPopups();
+
     Task ClosePopupAsync(IPopupBaseViewModel viewModel, object? result);
 
     Task ClosePopupAsync(string name, object? result);

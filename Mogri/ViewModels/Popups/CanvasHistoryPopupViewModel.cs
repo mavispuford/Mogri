@@ -207,4 +207,5 @@ public partial class CanvasHistoryPopupViewModel : PopupBaseViewModel, ICanvasHi
     {
         await ClosePopupAsync();
     }
+
 }

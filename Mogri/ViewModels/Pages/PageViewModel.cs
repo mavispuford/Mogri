@@ -57,4 +57,5 @@ public partial class PageViewModel : BaseViewModel, IPageViewModel
     {
         await Shell.Current.GoToAsync("..");
     }
+
 }

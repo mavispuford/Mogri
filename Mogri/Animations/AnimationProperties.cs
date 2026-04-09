@@ -1,3 +1,5 @@
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using CommunityToolkit.Maui.Animations;
 
 namespace Mogri.Animations;
@@ -23,11 +25,15 @@ namespace Mogri.Animations;
 /// </remarks>
 public static class AnimationProperties
 {
+    private static readonly ConditionalWeakTable<BaseAnimation, PropertyChangedEventHandler> _handlers = new();
+
     public static readonly BindableProperty AnimationsProperty =
         BindableProperty.CreateAttached("Animations", typeof(object), typeof(VisualElement), null, propertyChanged: (bindable, oldValue, newValue) =>
         {
             if (bindable is VisualElement element)
             {
+                DetachAnimations(oldValue);
+
                 element.BindingContextChanged -= OnBindingContextChanged;
                 element.BindingContextChanged += OnBindingContextChanged;
 
@@ -64,15 +70,44 @@ public static class AnimationProperties
             foreach (var animation in animations)
             {
                 animation.BindingContext = element.BindingContext;
-                animation.PropertyChanged += (s, e) => OnAnimationPropertyChanged(s, e, element);
+                AttachHandler(animation, element);
                 animation.Animate(element);
             }
         }
         else if (newValue is BaseAnimation animation)
         {
             animation.BindingContext = element.BindingContext;
-            animation.PropertyChanged += (s, e) => OnAnimationPropertyChanged(s, e, element);
+            AttachHandler(animation, element);
             animation.Animate(element);
+        }
+    }
+
+    private static void AttachHandler(BaseAnimation animation, VisualElement element)
+    {
+        PropertyChangedEventHandler handler = (s, e) => OnAnimationPropertyChanged(s, e, element);
+        animation.PropertyChanged += handler;
+        _handlers.AddOrUpdate(animation, handler);
+    }
+
+    private static void DetachAnimations(object? value)
+    {
+        if (value is BaseAnimation[] animations)
+        {
+            foreach (var animation in animations)
+                DetachHandler(animation);
+        }
+        else if (value is BaseAnimation animation)
+        {
+            DetachHandler(animation);
+        }
+    }
+
+    private static void DetachHandler(BaseAnimation animation)
+    {
+        if (_handlers.TryGetValue(animation, out var handler))
+        {
+            animation.PropertyChanged -= handler;
+            _handlers.Remove(animation);
         }
     }
 

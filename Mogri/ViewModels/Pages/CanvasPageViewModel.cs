@@ -344,9 +344,13 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                     }
                 }
 
-                if (_setSegmentationImageCancellationTokenSource != null && !_setSegmentationImageCancellationTokenSource.IsCancellationRequested)
+                if (_setSegmentationImageCancellationTokenSource != null)
                 {
-                    _setSegmentationImageCancellationTokenSource.Cancel();
+                    if (!_setSegmentationImageCancellationTokenSource.IsCancellationRequested)
+                    {
+                        _setSegmentationImageCancellationTokenSource.Cancel();
+                    }
+                    _setSegmentationImageCancellationTokenSource.Dispose();
                 }
 
                 _setSegmentationImageCancellationTokenSource = new CancellationTokenSource();
@@ -1286,7 +1290,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             }
             else
             {
-                using var stream = await _imageService.GetStreamFromContentTypeStringAsync(byteString, new CancellationTokenSource().Token);
+                using var stream = await _imageService.GetStreamFromContentTypeStringAsync(byteString, CancellationToken.None);
 
                 SourceBitmap = SKBitmap.Decode(stream);
             }
@@ -1308,9 +1312,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     {
         var snapshotId = await pushSnapshotAsync("Stitch", false);
 
-        var tokenSource = new CancellationTokenSource();
-
-        using var stream = await _imageService.GetStreamFromContentTypeStringAsync(byteString, tokenSource.Token);
+        using var stream = await _imageService.GetStreamFromContentTypeStringAsync(byteString, CancellationToken.None);
 
         var stitchBitmap = SKBitmap.Decode(stream);
 
@@ -1894,4 +1896,5 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             HapticFeedback.Default.Perform(type);
         }
     }
+
 }

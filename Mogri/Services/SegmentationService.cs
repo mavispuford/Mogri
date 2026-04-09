@@ -33,8 +33,22 @@ public class SegmentationService : ISegmentationService, IDisposable
 
     public void Dispose()
     {
-        _encoderSession?.Dispose();
-        _decoderSession?.Dispose();
+        Console.WriteLine("[SegmentationService] Disposing...");
+        try
+        {
+            _encoderSession?.Dispose();
+            _decoderSession?.Dispose();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[SegmentationService] Error disposing sessions: {ex}");
+        }
+        finally
+        {
+            _encoderSession = null;
+            _decoderSession = null;
+            _initTask = null;
+        }
     }
 
     public void Reset()
@@ -79,22 +93,8 @@ public class SegmentationService : ISegmentationService, IDisposable
     public void UnloadModel()
     {
         Console.WriteLine("[SegmentationService] Unloading models to free memory...");
-        try
-        {
-            _encoderSession?.Dispose();
-            _decoderSession?.Dispose();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[SegmentationService] Error disposing sessions: {ex}");
-        }
-        finally
-        {
-            _encoderSession = null;
-            _decoderSession = null;
-            _initTask = null;
-            GC.Collect();
-        }
+        Dispose();
+        GC.Collect();
     }
 
     Task InitAsync()
