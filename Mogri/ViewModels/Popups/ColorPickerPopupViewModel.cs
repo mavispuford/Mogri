@@ -99,4 +99,5 @@ public partial class ColorPickerPopupViewModel : PopupBaseViewModel, IColorPicke
         CurrentColor = color;
         CurrentColorHexString = CurrentColor.ToHex();
     }
+
 }

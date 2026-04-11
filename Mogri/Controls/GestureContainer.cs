@@ -130,6 +130,8 @@ public class GestureContainer : ContentView
         GestureRecognizers.Add(_panGesture);
         GestureRecognizers.Add(_pinchGesture);
         GestureRecognizers.Add(_doubleTapGesture);
+
+        Unloaded += (s, e) => pinchTimer?.Dispose();
     }
 
     private async void OnDoubleTapped(object? sender, TappedEventArgs e)

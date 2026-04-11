@@ -3,9 +3,11 @@ namespace Mogri.Views.Popups;
 
 public partial class LoadingPopup : BasePopup, IQueryAttributable
 {
-    public LoadingPopup()
+    public LoadingPopup() : base()
     {
         InitializeComponent();
+
+        MemoryToolkit.Maui.TearDownBehavior.SetCascade(this, false); // Seems to prevent the LoadingPopup from showing when enabled
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)

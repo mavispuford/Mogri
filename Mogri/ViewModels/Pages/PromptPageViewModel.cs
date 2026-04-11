@@ -169,16 +169,6 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
         }
     }
 
-    [RelayCommand]
-    private async Task ShowPromptStyleCreationPrompt()
-    {
-        var accepted = await _popupService.DisplayAlertAsync("Create Style?", "Would you like to create a style using the existing prompts?", "OK", "Cancel");
-
-        if (accepted)
-        {
-            //await _stableDiffusionService.CreatePromptStyleAsync();
-        }
-    }
 
     [RelayCommand]
     private async Task ShowPromptStyleExtractionPrompt()
@@ -271,4 +261,5 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
         Prompt = _settings.Prompt != PromptPlaceholder ? _settings.Prompt : string.Empty;
         NegativePrompt = _settings.NegativePrompt;
     }
+
 }

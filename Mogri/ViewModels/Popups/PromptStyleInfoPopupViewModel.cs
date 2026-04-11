@@ -48,4 +48,5 @@ public partial class PromptStyleInfoPopupViewModel : PopupBaseViewModel, IPrompt
     {
         await ClosePopupAsync();
     }
+
 }

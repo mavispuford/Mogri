@@ -35,4 +35,5 @@ public partial class AboutPageViewModel : PageViewModel, IAboutPageViewModel
     {
         return Shell.Current.GoToAsync("LicensesPage");
     }
+
 }

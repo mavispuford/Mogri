@@ -74,13 +74,13 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
-
-        _generationTaskService.ProgressChanged += onGenerationProgressChanged;
-        _generationTaskService.Completed += onGenerationCompleted;
     }
 
     public override async Task OnNavigatedToAsync()
     {
+        _generationTaskService.ProgressChanged += onGenerationProgressChanged;
+        _generationTaskService.Completed += onGenerationCompleted;
+
         await base.OnNavigatedToAsync();
 
         if (_generationTaskService.IsRunning)
@@ -94,6 +94,14 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         }
 
         await initializeStableDiffusionService();
+    }
+
+    public override async Task OnNavigatedFromAsync()
+    {
+        _generationTaskService.ProgressChanged -= onGenerationProgressChanged;
+        _generationTaskService.Completed -= onGenerationCompleted;
+
+        await base.OnNavigatedFromAsync();
     }
 
     private async Task<bool> initializeStableDiffusionService()
@@ -471,11 +479,9 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             return Task.FromResult((string.Empty, 0, 0));
         }
 
-        var tokenSource = new CancellationTokenSource();
-
         return Task.Run(async () =>
         {
-            var stream = await _imageService.GetStreamFromContentTypeStringAsync(sourceImageString, tokenSource.Token);
+            var stream = await _imageService.GetStreamFromContentTypeStringAsync(sourceImageString, CancellationToken.None);
 
             var result = _imageService.GetResizedImageStreamBytes(stream, width, height, forceExactSize, filterImage);
 
@@ -488,7 +494,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             var imageString = Convert.ToBase64String(result.Bytes);
 
             return (string.Format(Constants.ImageDataFormat, "image/png", imageString), result.ActualWidth, result.ActualHeight);
-        }, tokenSource.Token);
+        });
     }
 
     private async Task retrieveResultImageAsync(IResultItemViewModel result, string internalUri)
@@ -851,4 +857,5 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             HapticFeedback.Default.Perform(type);
         }
     }
+
 }

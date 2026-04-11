@@ -316,4 +316,5 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
             await _popupService.DisplayAlertAsync("Error", "Failed to process image", "OK");
         }
     }
+
 }

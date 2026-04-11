@@ -186,4 +186,5 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
     {
         await ClosePopupAsync();
     }
+
 }

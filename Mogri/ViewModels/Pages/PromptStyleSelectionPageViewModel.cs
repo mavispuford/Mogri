@@ -149,4 +149,5 @@ internal partial class PromptStyleSelectionPageViewModel : PageViewModel, IPromp
 
         return true;
     }
+
 }

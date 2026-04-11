@@ -106,4 +106,5 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
 
         SelectedBackend = AvailableBackends.FirstOrDefault() ?? "SD Forge Neo";
     }
+
 }

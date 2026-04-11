@@ -47,7 +47,11 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
     partial void OnSearchTextChanged(string? value)
     {
-        _searchDebounceCts?.Cancel();
+        if (_searchDebounceCts != null)
+        {
+            _searchDebounceCts.Cancel();
+            _searchDebounceCts.Dispose();
+        }
         var cts = new CancellationTokenSource();
         _searchDebounceCts = cts;
         var token = cts.Token;
@@ -338,4 +342,5 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
         return base.OnBackButtonPressed();
     }
+
 }

@@ -42,6 +42,11 @@ public class BasePopup : PopupPage
             Behaviors.Add(statusBarBehavior);
         }
 
+#if DEBUG
+        MemoryToolkit.Maui.LeakMonitorBehavior.SetCascade(this, true);
+#endif
+        MemoryToolkit.Maui.TearDownBehavior.SetCascade(this, true); // Seems to prevent the LoadingPopup from showing
+
         this.SetBinding(BackgroundColorProperty, nameof(IPopupBaseViewModel.PopupBackgroundColor));
     }
 

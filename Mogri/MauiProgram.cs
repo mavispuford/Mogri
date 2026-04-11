@@ -5,6 +5,7 @@ using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
 using Mopups.Hosting;
 using Microsoft.Extensions.Logging;
+using MemoryToolkit.Maui;
 
 namespace Mogri;
 
@@ -43,7 +44,7 @@ public static class MauiProgram
         builder.Services.AddSingleton(DeviceDisplay.Current);
 
 #if DEBUG
-
+        builder.UseLeakDetection();
         builder.Logging.AddDebug();
 
 #endif

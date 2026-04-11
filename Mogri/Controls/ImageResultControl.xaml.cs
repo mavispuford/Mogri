@@ -52,6 +52,10 @@ public partial class ImageResultControl : ContentView
 
     private async void OnImageSourceChanged()
     {
+        var oldSource = ImageControl.Source;
+        ImageControl.Source = null;
+        (oldSource as IDisposable)?.Dispose();
+
         if (Source != null)
         {
             ImageControl.Source = Source;

@@ -145,6 +145,20 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
         FitImageServerSide = _settings.EnableFitServerSide;
         FitImageClientSide = _settings.FitClientSide;
 
+        if (_initCancellationTokenSource != null)
+        {
+            if (!_initCancellationTokenSource.IsCancellationRequested)
+                _initCancellationTokenSource.Cancel();
+            _initCancellationTokenSource.Dispose();
+        }
+
+        if (_maskCancellationTokenSource != null)
+        {
+            if (!_maskCancellationTokenSource.IsCancellationRequested)
+                _maskCancellationTokenSource.Cancel();
+            _maskCancellationTokenSource.Dispose();
+        }
+
         _initCancellationTokenSource = new CancellationTokenSource();
         _maskCancellationTokenSource = new CancellationTokenSource();
 
@@ -246,7 +260,16 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
 
                 _settings.Mask = formattedImageString;
 
-                MaskImageSource = ImageSource.FromStream(() => memoryStream);
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                var maskBitmap = _imageService.GetSkBitmapFromStream(memoryStream);
+
+                if (maskBitmap != null)
+                {
+                    MaskImageSource = new SKBitmapImageSource
+                    {
+                        Bitmap = maskBitmap
+                    };
+                }
             }
         }
         catch (Exception)
@@ -282,4 +305,5 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
             _maskCancellationTokenSource.Cancel();
         }
     }
+
 }

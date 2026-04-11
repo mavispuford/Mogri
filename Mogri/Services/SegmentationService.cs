@@ -33,8 +33,22 @@ public class SegmentationService : ISegmentationService, IDisposable
 
     public void Dispose()
     {
-        _encoderSession?.Dispose();
-        _decoderSession?.Dispose();
+        Console.WriteLine("[SegmentationService] Disposing...");
+        try
+        {
+            _encoderSession?.Dispose();
+            _decoderSession?.Dispose();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[SegmentationService] Error disposing sessions: {ex}");
+        }
+        finally
+        {
+            _encoderSession = null;
+            _decoderSession = null;
+            _initTask = null;
+        }
     }
 
     public void Reset()
@@ -79,22 +93,8 @@ public class SegmentationService : ISegmentationService, IDisposable
     public void UnloadModel()
     {
         Console.WriteLine("[SegmentationService] Unloading models to free memory...");
-        try
-        {
-            _encoderSession?.Dispose();
-            _decoderSession?.Dispose();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[SegmentationService] Error disposing sessions: {ex}");
-        }
-        finally
-        {
-            _encoderSession = null;
-            _decoderSession = null;
-            _initTask = null;
-            GC.Collect();
-        }
+        Dispose();
+        GC.Collect();
     }
 
     Task InitAsync()
@@ -405,34 +405,6 @@ public class SegmentationService : ISegmentationService, IDisposable
         return imageDataTensor;
     }
 
-    private SKBitmap GetImageFromMaskTensor(Tensor<float> tensor)
-    {
-        _stopwatch.Restart();
-
-        var maskArray = tensor.ToArray();
-        var pixelIndex = 0;
-        var result = new SKBitmap(_imageWidth, _imageHeight, SKColorType.Rgba8888, SKAlphaType.Premul);
-
-        for (var y = 0; y < _imageHeight; y++)
-        {
-            for (var x = 0; x < _imageWidth; x++)
-            {
-                var arrayValue = maskArray[pixelIndex++];
-
-                var transformed = (byte)(arrayValue * 255f);
-
-                if (transformed > 0.0)
-                {
-                    result.SetPixel(x, y, MaskColor);
-                }
-            }
-        }
-
-        _stopwatch.Stop();
-        Console.WriteLine($"GetImageFromMaskTensor: {_stopwatch.Elapsed.TotalMilliseconds}ms");
-
-        return result;
-    }
 
     private unsafe SKBitmap GetImageFromMaskTensorPointer(Tensor<float> tensor)
     {

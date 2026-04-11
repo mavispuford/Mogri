@@ -33,7 +33,6 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     Color PaletteIconColor { get; set; }
 
-    ImageSource? SavedImageSource { get; set; }
 
     bool ShowMaskLayer { get; set; }
 
