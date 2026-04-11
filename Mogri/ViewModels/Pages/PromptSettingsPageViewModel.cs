@@ -664,4 +664,5 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         _settings.Vae = Vae;
         _settings.TextEncoder = TextEncoder;
     }
+
 }

@@ -15,6 +15,15 @@ namespace Mogri.Helpers
             Task.Run(() => GenerateNoiseBitmap());
         }
 
+        public static void Cleanup()
+        {
+            lock (_lock)
+            {
+                _baseNoiseBitmap?.Dispose();
+                _baseNoiseBitmap = null;
+            }
+        }
+
         /// <summary>
         /// Generates a cached 256x256 bitmap with RGB Gaussian noise.
         /// </summary>

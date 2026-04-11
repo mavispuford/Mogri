@@ -46,6 +46,17 @@ public partial class App : Application
         window.Deactivated += (s, e) => CommunityToolkit.Mvvm.Messaging.WeakReferenceMessenger.Default.Send(new Messages.AppLifecycleMessage(false));
         window.Stopped += (s, e) => CommunityToolkit.Mvvm.Messaging.WeakReferenceMessenger.Default.Send(new Messages.AppStoppedMessage());
         
+        window.Destroying += (s, e) =>
+        {
+            Mogri.Helpers.NoiseShaderHelper.Cleanup();
+
+            if (Handler?.MauiContext?.Services is IServiceProvider sp)
+            {
+                (sp.GetService<Mogri.Interfaces.Services.IPatchService>() as IDisposable)?.Dispose();
+                (sp.GetService<Mogri.Interfaces.Services.ISegmentationService>() as IDisposable)?.Dispose();
+            }
+        };
+
         return window;
     }
 }

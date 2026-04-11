@@ -64,7 +64,16 @@ public class ImageService : IImageService
             return null;
         }
 
-        return ImageSource.FromStream(() => stream);
+        var bitmap = GetSkBitmapFromStream(stream);
+        if (bitmap != null)
+        {
+            return new SkiaSharp.Views.Maui.Controls.SKBitmapImageSource
+            {
+                Bitmap = bitmap
+            };
+        }
+
+        return null;
     }
 
     public SKBitmap? GetSkBitmapFromStream(Stream? stream)
@@ -282,7 +291,7 @@ public class ImageService : IImageService
         return result;
     }
 
-    unsafe public List<Color>? ExtractColorPalette(SKBitmap? bitmap, int targetNumber = 30)
+    public List<Color>? ExtractColorPalette(SKBitmap? bitmap, int targetNumber = 30)
     {
         if (bitmap == null)
         {
@@ -298,43 +307,22 @@ public class ImageService : IImageService
             return null;
         }
 
-        SKColorType colorType = smallBitmap.ColorType;
-
         var width = smallBitmap.Width;
         var height = smallBitmap.Height;
 
         var allColors = new HashSet<Rgb>();
 
-        byte* bitmapPtr = (byte*)smallBitmap.GetPixels().ToPointer();
-
         for (int row = 0; row < height; row++)
         {
             for (int col = 0; col < width; col++)
             {
-                // Get color from bitmap
-                byte byte1 = *bitmapPtr++;         // red or blue
-                byte byte2 = *bitmapPtr++;         // green
-                byte byte3 = *bitmapPtr++;         // blue or red
-                byte byte4 = *bitmapPtr++;         // alpha
-
-                if (colorType == SKColorType.Rgba8888)
+                var color = smallBitmap.GetPixel(col, row);
+                allColors.Add(new Rgb
                 {
-                    allColors.Add(new Rgb
-                    {
-                        R = byte1,
-                        G = byte2,
-                        B = byte3
-                    });
-                }
-                else if (colorType == SKColorType.Bgra8888)
-                {
-                    allColors.Add(new Rgb
-                    {
-                        R = byte3,
-                        G = byte2,
-                        B = byte1
-                    });
-                }
+                    R = color.Red,
+                    G = color.Green,
+                    B = color.Blue
+                });
             }
         }
 
@@ -375,8 +363,6 @@ public class ImageService : IImageService
 
     private static (int h2, double lum, int v2) ClusteredHueLumValueStep(Rgb color, int repetitions = 1)
     {
-        double lumTest = Math.Sqrt(0.241 * color.R + 0.691 * color.G + 0.068 * color.B);
-
         var hsv = color.To<Hsv>();
         var hsl = hsv.To<Hsl>();
         var lum = hsl.L;

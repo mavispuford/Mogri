@@ -5,7 +5,7 @@ using SkiaSharp;
 
 namespace Mogri.Services
 {
-    public class AotGanPatchService : IPatchService
+    public class AotGanPatchService : IPatchService, IDisposable
     {
         private InferenceSession? _session;
         private const int ModelInputSize = 512;
@@ -99,9 +99,9 @@ namespace Mogri.Services
             }
         }
 
-        public void UnloadModel()
+        public void Dispose()
         {
-            Console.WriteLine("[AotGanPatchService] Unloading model...");
+            Console.WriteLine("[AotGanPatchService] Disposing...");
             try
             {
                 _session?.Dispose();
@@ -113,8 +113,14 @@ namespace Mogri.Services
             finally
             {
                 _session = null;
-                GC.Collect();
             }
+        }
+
+        public void UnloadModel()
+        {
+            Console.WriteLine("[AotGanPatchService] Unloading model...");
+            Dispose();
+            GC.Collect();
         }
 
         public async Task<SKBitmap> PatchImageAsync(SKBitmap image, SKBitmap mask)
@@ -547,5 +553,6 @@ namespace Mogri.Services
                 }
             }
         }
+
     }
 }

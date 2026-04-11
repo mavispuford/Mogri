@@ -146,3 +146,30 @@ This project follows **GitHub Flow**:
 - **Display version** (`ApplicationDisplayVersion`): Semantic version matching the git tag (e.g., `1.2.3`). Defaults to `1.0.0-local` for local dev builds.
 - **Build number** (`ApplicationVersion`): Auto-incremented by CI using `github.run_number`. Defaults to `1` locally.
 - Both are overridable via MSBuild properties: `-p:ApplicationDisplayVersion=x.y.z -p:ApplicationVersion=N`
+
+## Memory Management
+
+### MemoryToolkit.Maui
+This project uses [MemoryToolkit.Maui](https://github.com/AdamEssenmacher/MemoryToolkit.Maui) for automated view lifecycle management:
+- **`TearDownBehavior.Cascade`** (all builds): Applied in `BasePage`. Automatically clears `BindingContext`, disconnects handlers, and compartmentalizes leaks when pages are popped.
+- **`LeakMonitorBehavior.Cascade`** (debug builds only): Applied in `BasePage` under `#if DEBUG`. Detects leaked views at runtime and logs warnings.
+- **`UseLeakDetection()`** (debug builds only): Configured in `MauiProgram.cs`. Shows in-app alerts when leaks are detected.
+- For Shell tab pages, TearDownBehavior is naturally suppressed around tab switching, allowing tabs to remain alive without premature teardown.
+
+### Event Subscriptions
+- Subscribe to singleton service events in lifecycle methods (`OnNavigatedToAsync`), not constructors
+- Always unsubscribe in the corresponding teardown method (`OnNavigatedFromAsync`)
+- Avoid lambda event handlers on long-lived objects — use named methods so they can be unsubscribed
+
+### IDisposable Resources
+- Services holding unmanaged resources (ONNX sessions, native memory) must implement `IDisposable`
+- Singleton service disposal happens in `App.xaml.cs` via `Window.Destroying`
+- `SkiaSharp` objects (`SKBitmap`, `SKImage`, `SKCanvas`, `SKPaint`) must be disposed — use `using` statements
+
+### Timers
+- `System.Threading.Timer` instances must be disposed in page/control lifecycle (`OnDisappearing` or `Unloaded`)
+- Always null-check and null-out timer fields after disposal
+
+### CancellationTokenSource
+- Always dispose a CTS after cancelling it: `cts.Cancel(); cts.Dispose();`
+

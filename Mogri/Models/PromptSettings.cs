@@ -47,12 +47,6 @@ public class PromptSettings
     /// Base64 encoded thumbnail of the initial image for UI display.
     /// </summary>
     public string? InitImageThumbnail { get; set; }
-
-    /// <summary>
-    /// Whether to invert the mask (paint outside vs inside).
-    /// </summary>
-    public OnOff InvertMask { get; set; }
-
     /// <summary>
     /// Base64 encoded string of the mask image for inpainting.
     /// </summary>
@@ -148,22 +142,10 @@ public class PromptSettings
     /// Number of steps specific to the High-Res fix pass.
     /// </summary>
     public int UpscaleSteps { get; set; } = 10;
-
-    /// <summary>
-    /// Strength of variation when using variation seeds.
-    /// </summary>
-    public double VariationAmount { get; set; } = .1;
-
     /// <summary>
     /// Target image width in pixels.
     /// </summary>
     public double Width { get; set; } = 1024;
-
-    /// <summary>
-    /// Whether to enable variation seeds.
-    /// </summary>
-    public OnOff WithVariations { get; set; }
-
     /// <summary>
     /// List of LoRA networks to apply.
     /// </summary>
@@ -173,13 +155,6 @@ public class PromptSettings
     /// List of predefined prompt styles to apply.
     /// </summary>
     public List<IPromptStyleViewModel> PromptStyles { get; set; } = new();
-
-    /// <summary>
-    /// Stores backend-specific parameters that don't fit into the standard schema.
-    /// Use this for backend-specific settings like ComfyUI workflow IDs, specific node overrides, or extension parameters.
-    /// </summary>
-    public Dictionary<string, object> BackendParameters { get; set; } = new();
-
     public PromptSettings Clone()
     {
         return new PromptSettings
@@ -192,7 +167,6 @@ public class PromptSettings
             Height = Height,
             InitImage = InitImage,
             InitImageThumbnail = InitImageThumbnail,
-            InvertMask = InvertMask,
             Mask = Mask,
             MaskBlur = MaskBlur,
             ModelType = ModelType,
@@ -212,14 +186,9 @@ public class PromptSettings
             Upscaler = Upscaler,
             UpscaleLevel = UpscaleLevel,
             UpscaleSteps = UpscaleSteps,
-            VariationAmount = VariationAmount,
             Width = Width,
-            WithVariations = WithVariations,
             Loras = new List<ILoraViewModel>(Loras),
             PromptStyles = new List<IPromptStyleViewModel>(PromptStyles),
-            BackendParameters = BackendParameters.ToDictionary(
-                kvp => kvp.Key,
-                kvp => kvp.Value is ICloneable c ? c.Clone() : kvp.Value)
         };
     }
 }

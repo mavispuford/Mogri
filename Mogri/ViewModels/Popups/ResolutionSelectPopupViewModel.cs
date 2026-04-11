@@ -129,9 +129,7 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
 
         if (InitImageSource == null && !string.IsNullOrEmpty(_initImgString))
         {
-            var initCancellationTokenSource = new CancellationTokenSource();
-
-            InitImageSource = await _imageService.GetImageSourceFromContentTypeStringAsync(_initImgString, initCancellationTokenSource.Token);
+            InitImageSource = await _imageService.GetImageSourceFromContentTypeStringAsync(_initImgString, CancellationToken.None);
         }
     }
 
@@ -370,4 +368,5 @@ public partial class ResolutionSelectPopupViewModel : PopupBaseViewModel, IResol
         OnPropertyChanged(nameof(ExampleRectangleWidth));
         OnPropertyChanged(nameof(ExampleRectangleHeight));
     }
+
 }
