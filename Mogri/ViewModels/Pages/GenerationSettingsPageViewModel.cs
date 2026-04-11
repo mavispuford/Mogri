@@ -8,7 +8,7 @@ using Mogri.Models;
 
 namespace Mogri.ViewModels;
 
-public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSettingsPageViewModel
+public partial class GenerationSettingsPageViewModel : PageViewModel, IGenerationSettingsPageViewModel
 {
     private readonly IImageGenerationService _stableDiffusionService;
     private readonly IPopupService _popupService;
@@ -218,7 +218,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         }
     }
 
-    public PromptSettingsPageViewModel(
+    public GenerationSettingsPageViewModel(
         IImageGenerationService stableDiffusionService,
         IPopupService popupService,
         ILoadingService loadingService,

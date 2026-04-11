@@ -582,7 +582,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
         var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings } };
 
-        await Shell.Current.GoToAsync("PromptSettingsPage", parameters);
+        await Shell.Current.GoToAsync("GenerationSettingsPage", parameters);
     }
 
 

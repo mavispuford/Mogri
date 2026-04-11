@@ -3,7 +3,7 @@ using Mogri.Enums;
 
 namespace Mogri.Interfaces.ViewModels.Pages;
 
-public interface IPromptSettingsPageViewModel : IPageViewModel
+public interface IGenerationSettingsPageViewModel : IPageViewModel
 {
     ModelType SelectedModelType { get; set; }
 
