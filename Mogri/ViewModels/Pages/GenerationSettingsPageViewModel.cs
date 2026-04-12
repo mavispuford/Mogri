@@ -92,6 +92,9 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
     public partial bool EnableTiling { get; set; }
 
     [ObservableProperty]
+    public partial bool IsSeamlessVisible { get; set; }
+
+    [ObservableProperty]
     public partial ModelType SelectedModelType { get; set; }
 
     [ObservableProperty]
@@ -174,6 +177,7 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
             }
 
             IsDistilledCfgScaleVisible = value == ModelType.ZImageTurbo || value == ModelType.Flux;
+            IsSeamlessVisible = CurrentCapabilities.SupportsSeamless && value == ModelType.SDXL;
         }
         catch (Exception ex)
         {
@@ -496,6 +500,7 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
             Width = _settings.Width.ToString();
 
             IsDistilledCfgScaleVisible = SelectedModelType == ModelType.ZImageTurbo || SelectedModelType == ModelType.Flux;
+            IsSeamlessVisible = CurrentCapabilities.SupportsSeamless && SelectedModelType == ModelType.SDXL;
         }
         finally
         {

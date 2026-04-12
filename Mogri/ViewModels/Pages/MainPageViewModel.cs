@@ -249,7 +249,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         {
             var message = "Unable to connect to the configured server. Please double check your app settings/connectivity and try again.";
 
-            if (!string.IsNullOrEmpty(ex.Message))
+            if (ex is not TaskCanceledException && !string.IsNullOrEmpty(ex.Message))
             {
                 message += $"\n\nMessage: {ex.Message}";
             }

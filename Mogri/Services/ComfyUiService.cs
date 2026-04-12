@@ -44,7 +44,7 @@ public class ComfyUiService : IImageGenerationBackend
     public BackendCapabilities Capabilities => new()
     {
         SupportsSeamless = false,
-        SupportsUpscaling = false, // Can add later
+        SupportsUpscaling = false,
         SupportsSamplerList = true,
         SupportsCancellation = true,
         SupportsLoras = true,

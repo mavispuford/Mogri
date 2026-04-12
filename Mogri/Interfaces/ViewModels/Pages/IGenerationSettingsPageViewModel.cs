@@ -63,6 +63,8 @@ public interface IGenerationSettingsPageViewModel : IPageViewModel
 
     bool EnableTiling { get; set; }
 
+    bool IsSeamlessVisible { get; set; }
+
     IAsyncRelayCommand ResetValuesCommand { get; }
 
     IAsyncRelayCommand CancelCommand { get; }

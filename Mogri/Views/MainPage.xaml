@@ -22,7 +22,7 @@
                     <FontImageSource Glyph="&#xe669;" FontFamily="{StaticResource IconFontRegular}" Size="26" />
                 </toolkit:BoolToObjectConverter.TrueObject>
                 <toolkit:BoolToObjectConverter.FalseObject>
-                    <FontImageSource Glyph="&#xf239;" FontFamily="{StaticResource IconFontRegular}" Size="26" Color="{StaticResource WhiteTwentySixPercent}" />
+                    <FontImageSource Glyph="&#xf239;" FontFamily="{StaticResource IconFontRegular}" Size="26" Color="{OnPlatform Android={StaticResource WhiteTwentySixPercent}}" />
                 </toolkit:BoolToObjectConverter.FalseObject>
             </toolkit:BoolToObjectConverter>
             <toolkit:IsStringNotNullOrEmptyConverter x:Key="IsStringNotNullOrEmptyConverter" />
