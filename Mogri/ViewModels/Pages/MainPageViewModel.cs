@@ -20,6 +20,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     private readonly IServiceProvider _serviceProvider;
     private readonly IImageService _imageService;
     private readonly IPopupService _popupService;
+    private readonly ICheckpointSettingsService _checkpointSettingsService;
 
     private PromptSettings _settings = new();
     private string? _resizedInitImage;
@@ -66,6 +67,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         IServiceProvider serviceProvider,
         IImageService imageService,
         IPopupService popupService,
+        ICheckpointSettingsService checkpointSettingsService,
         ILoadingService loadingService) : base(loadingService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
@@ -74,6 +76,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
+        _checkpointSettingsService = checkpointSettingsService ?? throw new ArgumentNullException(nameof(checkpointSettingsService));
     }
 
     public override async Task OnNavigatedToAsync()
@@ -130,18 +133,36 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             _settings.ModelType = currentModelType;
             var profile = GenerationProfile.GetDefault(currentModelType);
 
+            var selectedModel = await _stableDiffusionService.GetSelectedModelAsync();
+            _settings.Model = selectedModel;
+
+            CheckpointSettings? persisted = null;
+            if (selectedModel != null && !string.IsNullOrEmpty(selectedModel.Key))
+            {
+                persisted = _checkpointSettingsService.Load(selectedModel.Key);
+            }
+
+            if (persisted != null)
+            {
+                persisted.ApplyTo(_settings);
+            }
+            else
+            {
+                _settings.Steps = profile.DefaultSteps;
+                _settings.GuidanceScale = profile.DefaultCfg;
+                _settings.DistilledCfgScale = profile.DefaultDistilledCfg;
+                _settings.Width = profile.DefaultWidth;
+                _settings.Height = profile.DefaultHeight;
+                _settings.Sampler = profile.DefaultSampler;
+                _settings.Scheduler = profile.DefaultScheduler;
+                _settings.Vae = profile.DefaultVae;
+                _settings.TextEncoder = profile.DefaultTextEncoder;
+            }
+
             var samplers = await _stableDiffusionService.GetSamplersAsync();
-
-            // Preserve current sampler if it exists in the new list (e.g. switching backends)
             var currentSampler = _settings.Sampler;
-            var currentScheduler = _settings.Scheduler;
-            
-            _settings.Steps = profile.DefaultSteps;
-            _settings.GuidanceScale = profile.DefaultCfg;
-            _settings.Width = profile.DefaultWidth;
-            _settings.Height = profile.DefaultHeight;
 
-            if (samplers != null)
+            if (samplers != null && samplers.Any())
             {
                 if (!string.IsNullOrEmpty(currentSampler) && samplers.ContainsKey(currentSampler))
                 {
@@ -162,6 +183,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             }
 
             var schedulers = await _stableDiffusionService.GetSchedulersAsync();
+            var currentScheduler = _settings.Scheduler;
 
             if (schedulers != null && schedulers.Any())
             {
@@ -183,7 +205,45 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                 _settings.Scheduler = profile.DefaultScheduler;
             }
 
-            _settings.Model = await _stableDiffusionService.GetSelectedModelAsync();
+            var vaes = await _stableDiffusionService.GetVaesAsync();
+            var currentVae = _settings.Vae;
+
+            if (vaes != null && vaes.Any())
+            {
+                if (!string.IsNullOrEmpty(currentVae) && vaes.Contains(currentVae))
+                {
+                    _settings.Vae = currentVae;
+                }
+                else if (!string.IsNullOrEmpty(profile.DefaultVae))
+                {
+                    _settings.Vae = vaes.FirstOrDefault(v => v.Contains(profile.DefaultVae, StringComparison.OrdinalIgnoreCase))
+                        ?? vaes.FirstOrDefault();
+                }
+                else
+                {
+                    _settings.Vae = vaes.FirstOrDefault();
+                }
+            }
+
+            var textEncoders = await _stableDiffusionService.GetTextEncodersAsync();
+            var currentTextEncoder = _settings.TextEncoder;
+
+            if (textEncoders != null && textEncoders.Any())
+            {
+                if (!string.IsNullOrEmpty(currentTextEncoder) && textEncoders.Contains(currentTextEncoder))
+                {
+                    _settings.TextEncoder = currentTextEncoder;
+                }
+                else if (!string.IsNullOrEmpty(profile.DefaultTextEncoder))
+                {
+                    _settings.TextEncoder = textEncoders.FirstOrDefault(v => v.Contains(profile.DefaultTextEncoder, StringComparison.OrdinalIgnoreCase))
+                        ?? textEncoders.FirstOrDefault();
+                }
+                else
+                {
+                    _settings.TextEncoder = textEncoders.FirstOrDefault();
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -358,6 +418,12 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                 TotalExpectedImages = settings.BatchCount * settings.BatchSize,
                 SanitizedPrompt = sanitizedPrompt[..length]
             };
+
+            if (_settings.Model != null && !string.IsNullOrEmpty(_settings.Model.Key))
+            {
+                var checkpointSettings = CheckpointSettings.FromPromptSettings(_settings);
+                _checkpointSettingsService.Save(_settings.Model.Key, checkpointSettings);
+            }
 
             await _generationTaskService.StartAsync(request);
         }
@@ -616,6 +682,12 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             _ = validateSettingsResourcesAsync(settings);
 
             _settings = settings;
+
+            if (_settings.Model != null && !string.IsNullOrEmpty(_settings.Model.Key))
+            {
+                var checkpointSettings = CheckpointSettings.FromPromptSettings(_settings);
+                _checkpointSettingsService.Save(_settings.Model.Key, checkpointSettings);
+            }
 
             Prompt = string.IsNullOrEmpty(settings.Prompt) ? _defaultPrompt : settings.Prompt;
             NegativePrompt = settings.NegativePrompt;

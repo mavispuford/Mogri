@@ -1131,6 +1131,36 @@ namespace Mogri.Services
             return null;
         }
 
+        private static string? StripModelHash(string? model)
+        {
+            if (string.IsNullOrEmpty(model))
+            {
+                return model;
+            }
+
+            var hashStartIndex = model.LastIndexOf(" [", StringComparison.Ordinal);
+            if (hashStartIndex < 0 || !model.EndsWith("]", StringComparison.Ordinal))
+            {
+                return model;
+            }
+
+            var hashLength = model.Length - hashStartIndex - 3;
+            if (hashLength <= 0)
+            {
+                return model;
+            }
+
+            for (var i = hashStartIndex + 2; i < model.Length - 1; i++)
+            {
+                if (!Uri.IsHexDigit(model[i]))
+                {
+                    return model;
+                }
+            }
+
+            return model[..hashStartIndex];
+        }
+
         public Task<ModelType> GetCurrentModelTypeAsync(CancellationToken cancellationToken = default)
         {
             if (_options == null)
@@ -1144,19 +1174,21 @@ namespace Mogri.Services
                 return Task.FromResult(ModelType.SDXL);
             }
 
-            if (currentModel == GetOptionValue(_options.ForgeCheckpointSd))
+            var normalizedCurrentModel = StripModelHash(currentModel);
+
+            if (normalizedCurrentModel == StripModelHash(GetOptionValue(_options.ForgeCheckpointSd)))
             {
                 return Task.FromResult(ModelType.SD15);
             }
-            if (currentModel == GetOptionValue(_options.ForgeCheckpointXl))
+            if (normalizedCurrentModel == StripModelHash(GetOptionValue(_options.ForgeCheckpointXl)))
             {
                 return Task.FromResult(ModelType.SDXL);
             }
-            if (currentModel == GetOptionValue(_options.ForgeCheckpointZit))
+            if (normalizedCurrentModel == StripModelHash(GetOptionValue(_options.ForgeCheckpointZit)))
             {
                 return Task.FromResult(ModelType.ZImageTurbo);
             }
-            if (currentModel == GetOptionValue(_options.ForgeCheckpointFlux))
+            if (normalizedCurrentModel == StripModelHash(GetOptionValue(_options.ForgeCheckpointFlux)))
             {
                 return Task.FromResult(ModelType.Flux);
             }

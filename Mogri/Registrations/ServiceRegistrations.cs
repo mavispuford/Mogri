@@ -51,6 +51,7 @@ public static class ServiceRegistrations
         builder.Services.AddSingleton<IPromptStyleService, PromptStyleService>();
         builder.Services.AddSingleton<ICanvasHistoryService, CanvasHistoryService>();
         builder.Services.AddSingleton<ILicenseService, LicenseService>();
+        builder.Services.AddSingleton<ICheckpointSettingsService, CheckpointSettingsService>();
 
 #if ANDROID
         builder.Services.AddSingleton<IGenerationTaskService, AndroidGenerationTaskService>();
