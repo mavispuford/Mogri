@@ -48,7 +48,6 @@ public class ComfyUiService : IImageGenerationBackend
         SupportsSamplerList = true,
         SupportsCancellation = true,
         SupportsLoras = true,
-        SupportsStyles = false,
         SupportsSchedulers = true
     };
 
@@ -519,9 +518,6 @@ public class ComfyUiService : IImageGenerationBackend
 
     public Task<List<IUpscalerViewModel>> GetUpscalersAsync(CancellationToken cancellationToken = default) 
         => Task.FromResult(new List<IUpscalerViewModel>());
-
-    public Task<List<IPromptStyleViewModel>> GetPromptStylesAsync(CancellationToken cancellationToken = default) 
-        => Task.FromResult(new List<IPromptStyleViewModel>());
 
     public async Task<IModelViewModel?> GetSelectedModelAsync(CancellationToken cancellationToken = default)
     {

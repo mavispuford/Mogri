@@ -35,7 +35,6 @@ namespace Mogri.Services
 
         private List<SamplerItem>? _samplers;
         private List<SchedulerItem>? _schedulers;
-        private List<PromptStyleItem>? _promptStyles;
         private List<SDModelItem>? _models;
         private List<LoraItem>? _loras;
         private List<UpscalerItem>? _upscalers;
@@ -694,14 +693,6 @@ namespace Mogri.Services
                     }
                     catch { /* Ignore if endpoint doesn't exist */ }
                 }, cancellationToken),
-                Task.Run(async () =>
-                {
-                    try
-                    {
-                        _promptStyles = await _client.Sdapi.V1.PromptStyles.GetAsync(cancellationToken: cts.Token);
-                    }
-                    catch { /* Ignore if endpoint doesn't exist */ }
-                }, cancellationToken),
                 Task.Run(async () => _models = await _client.Sdapi.V1.SdModels.GetAsync(cancellationToken: cts.Token), cancellationToken),
                 Task.Run(async () =>
                 {
@@ -851,28 +842,6 @@ namespace Mogri.Services
                 {
                     result.Add(scheduler.Name);
                 }
-            }
-
-            return Task.FromResult(result);
-        }
-
-        public Task<List<IPromptStyleViewModel>> GetPromptStylesAsync(CancellationToken cancellationToken = default)
-        {
-            var result = new List<IPromptStyleViewModel>();
-
-            if (_promptStyles == null)
-            {
-                return Task.FromResult(result);
-            }
-
-            foreach (var item in _promptStyles)
-            {
-                result.Add(new PromptStyleViewModel
-                {
-                    Name = item.Name ?? string.Empty,
-                    Prompt = item.Prompt ?? string.Empty,
-                    NegativePrompt = item.NegativePrompt ?? string.Empty
-                });
             }
 
             return Task.FromResult(result);

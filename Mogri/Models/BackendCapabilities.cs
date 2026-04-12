@@ -32,11 +32,6 @@ public record BackendCapabilities
     public bool SupportsLoras { get; init; }
 
     /// <summary>
-    /// Gets whether the backend supports predefined prompt styles.
-    /// </summary>
-    public bool SupportsStyles { get; init; }
-
-    /// <summary>
     /// Gets whether the backend supports explicit scheduler selection (separate from samplers).
     /// </summary>
     public bool SupportsSchedulers { get; init; }
@@ -60,7 +55,6 @@ public record BackendCapabilities
         SupportsSamplerList = true,
         SupportsCancellation = true,
         SupportsLoras = true,
-        SupportsStyles = true,
         SupportsSchedulers = true,
         SupportsVaes = true,
         SupportsTextEncoders = true

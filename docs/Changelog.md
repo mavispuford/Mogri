@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-04-11
+
+*This update moves Prompt Styles to fully local, backend-agnostic storage and completes in-app style management.*
+
+### Added
+- **Default Prompt Style Seeding**: On startup, the app now seeds five default prompt styles when no local styles exist: Coloring Book, Professional Photo, Cinematic, Watercolor, and 1980s Cartoon.
+- **Local Prompt Style Persistence Service**: Added a dedicated LiteDB-backed prompt style service with CRUD and first-run default seeding.
+
+### Changed
+- **Prompt Styles Are Backend-Agnostic**: Prompt styles no longer depend on backend APIs and are now always available regardless of selected backend.
+- **Prompt Style Management UI**: Users can create, edit, and delete prompt styles directly from the Prompt Style selection flow.
+
+### Removed
+- Removed backend prompt style API plumbing (`GetPromptStylesAsync`) and the obsolete backend capability flag for styles.
+
 ## 2026-04-05
 
 *This update automates app versioning via CI and exposes the version on the About page.*

@@ -24,8 +24,6 @@ public interface IImageGenerationService
 
     Task<Dictionary<string, string>> GetSamplersAsync(CancellationToken cancellationToken = default);
 
-    Task<List<IPromptStyleViewModel>> GetPromptStylesAsync(CancellationToken cancellationToken = default);
-
     Task<List<IModelViewModel>> GetModelsAsync(CancellationToken cancellationToken = default);
 
     Task<List<ILoraViewModel>> GetLorasAsync(CancellationToken cancellationToken = default);
