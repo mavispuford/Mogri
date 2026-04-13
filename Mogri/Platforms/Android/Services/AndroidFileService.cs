@@ -1,6 +1,7 @@
 using Android.Content;
 using Android.Provider;
 using Microsoft.Extensions.Logging;
+using Mogri.Helpers;
 using Mogri.Interfaces.Services;
 using Mogri.Models;
 using Mogri.ViewModels;
@@ -8,6 +9,9 @@ using System.Text.Json;
 using AndroidNet = Android.Net;
 using AndroidBitmap = global::Android.Graphics.Bitmap;
 using AndroidBitmapFactory = global::Android.Graphics.BitmapFactory;
+using AndroidExifInterface = Android.Media.ExifInterface;
+using AndroidMatrix = Android.Graphics.Matrix;
+using AndroidOrientation = Android.Media.Orientation;
 
 namespace Mogri.Platforms.Android.Services;
 
@@ -318,7 +322,9 @@ public class AndroidFileService : IFileService
 
         if (!isHeic)
         {
-            return (await photo.OpenReadAsync(), photo.ContentType);
+            using var stream = await photo.OpenReadAsync();
+            var (correctedStream, wasRotated) = ImageOrientationHelper.ApplyExifOrientation(stream);
+            return (correctedStream, wasRotated ? "image/jpeg" : photo.ContentType);
         }
 
         try
@@ -330,6 +336,9 @@ public class AndroidFileService : IFileService
             {
                 return (null, photo.ContentType);
             }
+
+            // BitmapFactory does not apply EXIF orientation; read and apply it manually.
+            bitmap = applyAndroidExifOrientation(photo.FullPath, bitmap);
 
             var ms = new MemoryStream();
             await bitmap.CompressAsync(AndroidBitmap.CompressFormat.Jpeg!, 100, ms);
@@ -343,6 +352,57 @@ public class AndroidFileService : IFileService
             _logger.LogError(ex, "Failed to convert HEIC to JPEG on Android");
             return (null, photo.ContentType);
         }
+    }
+
+    /// <summary>
+    /// Reads EXIF orientation from the file and applies the corresponding rotation
+    /// to the Android Bitmap. Returns the original bitmap if no rotation is needed.
+    /// </summary>
+    private static AndroidBitmap applyAndroidExifOrientation(string filePath, AndroidBitmap bitmap)
+    {
+        using var exif = new AndroidExifInterface(filePath);
+        var orientation = (AndroidOrientation)exif.GetAttributeInt(
+            AndroidExifInterface.TagOrientation, (int)AndroidOrientation.Normal);
+
+        if (orientation is AndroidOrientation.Normal or AndroidOrientation.Undefined)
+        {
+            return bitmap;
+        }
+
+        using var matrix = new AndroidMatrix();
+
+        switch (orientation)
+        {
+            case AndroidOrientation.Rotate90:
+                matrix.PostRotate(90);
+                break;
+            case AndroidOrientation.Rotate180:
+                matrix.PostRotate(180);
+                break;
+            case AndroidOrientation.Rotate270:
+                matrix.PostRotate(270);
+                break;
+            case AndroidOrientation.FlipHorizontal:
+                matrix.PostScale(-1, 1);
+                break;
+            case AndroidOrientation.FlipVertical:
+                matrix.PostRotate(180);
+                matrix.PostScale(-1, 1);
+                break;
+            case AndroidOrientation.Transpose:
+                matrix.PostRotate(90);
+                matrix.PostScale(-1, 1);
+                break;
+            case AndroidOrientation.Transverse:
+                matrix.PostRotate(-90);
+                matrix.PostScale(-1, 1);
+                break;
+        }
+
+        var rotated = AndroidBitmap.CreateBitmap(bitmap, 0, 0, bitmap.Width, bitmap.Height, matrix, true)!;
+        bitmap.Recycle();
+        bitmap.Dispose();
+        return rotated;
     }
 
     private static bool isHeicFile(FileResult photo)
