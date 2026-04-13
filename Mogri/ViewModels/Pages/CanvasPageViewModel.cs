@@ -834,7 +834,13 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 return;
             }
 
-            using var fileStream = await photo.OpenReadAsync();
+            using var fileStream = (await _fileService.OpenNormalizedPhotoStreamAsync(photo)).Stream;
+
+            if (fileStream == null)
+            {
+                await _popupService.DisplayAlertAsync("Error", "Could not load the selected image.", "OK");
+                return;
+            }
 
             if (action == newCanvasWithImageOption)
             {

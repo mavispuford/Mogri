@@ -11,6 +11,7 @@ namespace Mogri.ViewModels;
 
 public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageToImageSettingsPageViewModel
 {
+    private readonly IFileService _fileService;
     private readonly IImageService _imageService;
     private readonly IPopupService _popupService;
 
@@ -51,10 +52,12 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
     public partial ImageSource? MaskImageSource { get; set; }
 
     public ImageToImageSettingsPageViewModel(
+        IFileService fileService,
         IImageService imageService,
         IPopupService popupService,
         ILoadingService loadingService) : base(loadingService)
     {
+        _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
     }
@@ -220,14 +223,22 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
                 IsLoadingMaskImage = true;
             }
 
-            using var fileStream = await photo.OpenReadAsync();
+            var (normalizedStream, contentType) = await _fileService.OpenNormalizedPhotoStreamAsync(photo);
+            using var fileStream = normalizedStream;
+
+            if (fileStream == null)
+            {
+                await _popupService.DisplayAlertAsync("Error", "Could not load the selected image.", "OK");
+                return;
+            }
+
             using var memoryStream = new MemoryStream();
             await fileStream.CopyToAsync(memoryStream);
             var imageBytes = memoryStream.ToArray();
             var imageString = Convert.ToBase64String(imageBytes);
             memoryStream.Seek(0, SeekOrigin.Begin);
 
-            var formattedImageString = string.Format(Constants.ImageDataFormat, photo.ContentType, imageString);
+            var formattedImageString = string.Format(Constants.ImageDataFormat, contentType, imageString);
 
             if (forInitImage)
             {
@@ -240,7 +251,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
 
                 if (bitmap != null)
                 {
-                    _settings.InitImageThumbnail = _imageService.GetThumbnailString(bitmap, photo.ContentType);
+                    _settings.InitImageThumbnail = _imageService.GetThumbnailString(bitmap, contentType);
 
                     // Attempt to match the aspect ratio of the image within the resolution constraints
                     var constrainedDimensions = MathHelper.GetAspectCorrectConstrainedDimensions(bitmap.Width, bitmap.Height, 0, 0, MathHelper.DimensionConstraint.ClosestMatch);

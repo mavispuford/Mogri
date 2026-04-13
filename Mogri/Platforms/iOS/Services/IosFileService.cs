@@ -2,8 +2,10 @@ using System;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
+using CoreGraphics;
 using Foundation;
 using Microsoft.Extensions.Logging;
+using Mogri.Helpers;
 using Mogri.Interfaces.Services;
 using Mogri.ViewModels;
 using Photos;
@@ -263,6 +265,87 @@ namespace Mogri.Platforms.iOS.Services
             }
             
             return string.Empty;
+        }
+
+        public async Task<(Stream? Stream, string ContentType)> OpenNormalizedPhotoStreamAsync(FileResult photo)
+        {
+            var isHeic = isHeicFile(photo);
+
+            if (!isHeic)
+            {
+                using var stream = await photo.OpenReadAsync();
+                var (correctedStream, wasRotated) = ImageOrientationHelper.ApplyExifOrientation(stream);
+                return (correctedStream, wasRotated ? "image/jpeg" : photo.ContentType);
+            }
+
+            try
+            {
+                // UIImage can decode HEIC natively on iOS; re-encode as JPEG for SkiaSharp compatibility.
+                using var nsData = NSData.FromFile(photo.FullPath);
+
+                if (nsData == null)
+                {
+                    return (null, photo.ContentType);
+                }
+
+                var image = UIImage.LoadFromData(nsData);
+
+                if (image == null)
+                {
+                    return (null, photo.ContentType);
+                }
+
+                // UIImage.AsJPEG preserves the EXIF orientation tag but does not bake
+                // it into pixel data. Draw into a new context to normalize orientation.
+                if (image.Orientation != UIImageOrientation.Up)
+                {
+                    var normalized = normalizeImageOrientation(image);
+                    image.Dispose();
+                    image = normalized;
+                }
+
+                var jpegData = image.AsJPEG(1.0f);
+                image.Dispose();
+
+                if (jpegData == null)
+                {
+                    return (null, photo.ContentType);
+                }
+
+                var ms = new MemoryStream(jpegData.ToArray());
+                jpegData.Dispose();
+                return (ms, "image/jpeg");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to convert HEIC to JPEG on iOS");
+                return (null, photo.ContentType);
+            }
+        }
+
+        /// <summary>
+        /// Draws the UIImage into a new graphics context, baking EXIF orientation
+        /// into the pixel data so the resulting image has UIImageOrientation.Up.
+        /// </summary>
+        private static UIImage normalizeImageOrientation(UIImage image)
+        {
+            var renderer = new UIGraphicsImageRenderer(image.Size);
+            return renderer.CreateImage(context =>
+            {
+                image.Draw(new CGRect(0, 0, image.Size.Width, image.Size.Height));
+            });
+        }
+
+        private static bool isHeicFile(FileResult photo)
+        {
+            var contentType = photo.ContentType?.ToLowerInvariant();
+            if (contentType is "image/heic" or "image/heif")
+            {
+                return true;
+            }
+
+            var ext = Path.GetExtension(photo.FileName)?.ToLowerInvariant();
+            return ext is ".heic" or ".heif";
         }
     }
 }
