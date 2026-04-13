@@ -42,7 +42,7 @@
     </views:BasePage.ToolbarItems>
 
     <ScrollView>
-        <VerticalStackLayout Spacing="15" Padding="30">
+        <VerticalStackLayout Spacing="15" Padding="16">
             
             <!-- Positive Prompt -->
             <Label Text="Prompt:"

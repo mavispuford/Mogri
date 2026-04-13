@@ -70,8 +70,6 @@ public class ProxyImageGenerationService : IImageGenerationService
 
     public Task<Dictionary<string, string>> GetSamplersAsync(CancellationToken cancellationToken = default) => ActiveBackend.GetSamplersAsync(cancellationToken);
 
-    public Task<List<IPromptStyleViewModel>> GetPromptStylesAsync(CancellationToken cancellationToken = default) => ActiveBackend.GetPromptStylesAsync(cancellationToken);
-
     public Task<List<IModelViewModel>> GetModelsAsync(CancellationToken cancellationToken = default) => ActiveBackend.GetModelsAsync(cancellationToken);
 
     public Task<List<ILoraViewModel>> GetLorasAsync(CancellationToken cancellationToken = default) => ActiveBackend.GetLorasAsync(cancellationToken);

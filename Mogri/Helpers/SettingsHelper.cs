@@ -32,12 +32,12 @@ public static class SettingsHelper
                 }
                 else
                 {
-                    if (!prompt.EndsWith(", ") && !prompt.EndsWith(","))
+                    if (!string.IsNullOrEmpty(prompt) && !prompt.EndsWith(", ") && !prompt.EndsWith(","))
                     {
                         prompt += ", ";
                     }
 
-                    prompt += style.Prompt;
+                    prompt += style.Prompt.TrimStart(',', ' ');
                 }
             }
 
@@ -51,12 +51,12 @@ public static class SettingsHelper
                 }
                 else
                 {
-                    if (!negativePrompt.EndsWith(", ") && !negativePrompt.EndsWith(","))
+                    if (!string.IsNullOrEmpty(negativePrompt) && !negativePrompt.EndsWith(", ") && !negativePrompt.EndsWith(","))
                     {
                         negativePrompt += ", ";
                     }
 
-                    negativePrompt += style.NegativePrompt;
+                    negativePrompt += style.NegativePrompt.TrimStart(',', ' ');
                 }
             }
         }

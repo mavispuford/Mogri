@@ -48,8 +48,10 @@ public static class ServiceRegistrations
         builder.Services.AddSingleton<IPresetService, PresetService>();
         builder.Services.AddSingleton<IPatchService, AotGanPatchService>();
         builder.Services.AddSingleton<IHistoryService, HistoryService>();
+        builder.Services.AddSingleton<IPromptStyleService, PromptStyleService>();
         builder.Services.AddSingleton<ICanvasHistoryService, CanvasHistoryService>();
         builder.Services.AddSingleton<ILicenseService, LicenseService>();
+        builder.Services.AddSingleton<ICheckpointSettingsService, CheckpointSettingsService>();
 
 #if ANDROID
         builder.Services.AddSingleton<IGenerationTaskService, AndroidGenerationTaskService>();

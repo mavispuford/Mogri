@@ -2,7 +2,6 @@
 <views:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                 xmlns:models="clr-namespace:Mogri.Models"
-                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                 xmlns:pages="clr-namespace:Mogri.Interfaces.ViewModels.Pages"
                 xmlns:viewModels="clr-namespace:Mogri.Interfaces.ViewModels"
                 xmlns:views="clr-namespace:Mogri.Views"
@@ -12,11 +11,20 @@
                 Shell.NavBarIsVisible="True"
                 Shell.TabBarIsVisible="False">
     <views:BasePage.Resources>
-        <Style TargetType="Grid">
+        <!--
+            CollectionView applies selection visual state to the root element of the DataTemplate.
+            This keyed style is applied explicitly to the item Grid so it does not bleed to other Grids.
+        -->
+        <Style x:Key="SelectableItemStyle" TargetType="Grid">
             <Setter Property="VisualStateManager.VisualStateGroups">
                 <VisualStateGroupList>
                     <VisualStateGroup x:Name="CommonStates">
-                        <VisualState x:Name="Normal" />
+                        <VisualState x:Name="Normal">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor"
+                                        Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}" />
+                            </VisualState.Setters>
+                        </VisualState>
                         <VisualState x:Name="Selected">
                             <VisualState.Setters>
                                 <Setter Property="BackgroundColor"
@@ -32,15 +40,31 @@
         <Label Text="Prompt Styles" Style="{StaticResource LabelTitleView}" />
     </Shell.TitleView>
 
+    <views:BasePage.ToolbarItems>
+        <ToolbarItem Command="{Binding CreatePromptStyleCommand}"
+                     Text="Add">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource Glyph="&#xe145;" FontFamily="{StaticResource IconFontRegular}" Size="24" Color="{OnPlatform Android={StaticResource White}}" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+        <ToolbarItem Command="{Binding ResetCommand}"
+                     Text="Reset">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource Glyph="&#xebb6;" FontFamily="{StaticResource IconFontRegular}" Size="24" Color="{OnPlatform Android={StaticResource White}}" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </views:BasePage.ToolbarItems>
+
     <Grid ColumnDefinitions="auto,*"
           RowDefinitions="auto,*,auto"
           ColumnSpacing="10"
           RowSpacing="10"
-          Padding="10"
+          Padding="0,16"
           Margin="0">
 
         <Image Grid.Column="0"
-               Grid.Row="0">
+               Grid.Row="0"
+               Margin="16,0,0,0">
             <Image.Source>
                 <FontImageSource Glyph="&#xe8b6;" FontFamily="{StaticResource IconFontRegular}" Color="{StaticResource Cadet}" />
             </Image.Source>
@@ -49,22 +73,14 @@
         <Border Grid.Row="0"
                 Grid.Column="1"
                 BackgroundColor="White"
-                StrokeShape="RoundRectangle 10">
-            <Entry x:Name="FilterBar" 
-                   HorizontalOptions="Fill"
-                   Margin="10,0">
+                StrokeShape="RoundRectangle 10"
+                Margin="0,0,16,0">
+            <Entry HorizontalOptions="Fill"
+                   Margin="10,0"
+                   Text="{Binding FilterText}">
                 <Entry.Background>
                     <SolidColorBrush Color="Transparent"/>
                 </Entry.Background>
-                <Entry.Behaviors>
-                    <toolkit:EventToCommandBehavior
-                        EventName="TextChanged"
-                        Command="{Binding FilterCommand}">
-                        <toolkit:EventToCommandBehavior.CommandParameter>
-                            <Binding Source="{x:Reference FilterBar}" Path="Text" x:DataType="Entry" />
-                        </toolkit:EventToCommandBehavior.CommandParameter>
-                    </toolkit:EventToCommandBehavior>
-                </Entry.Behaviors>
             </Entry>
         </Border>
 
@@ -74,25 +90,48 @@
                         Grid.ColumnSpan="2"
                         SelectionMode="Multiple"
                         ItemsSource="{Binding AvailablePromptStyles}"
-                        SelectedItems="{Binding SelectedPromptStyles}"
+                        SelectedItems="{Binding SelectedPromptStyles, Mode=TwoWay}"
+                        HorizontalOptions="Fill"
                         VerticalOptions="Fill">
+            <CollectionView.EmptyView>
+                <Grid Padding="24">
+                    <Label Text="No prompt styles yet. Tap + to create one."
+                           HorizontalTextAlignment="Center"
+                           VerticalTextAlignment="Center"
+                           FontSize="16"
+                           TextColor="{StaticResource Cadet}" />
+                </Grid>
+            </CollectionView.EmptyView>
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="viewModels:IPromptStyleViewModel">
-                    <Grid ColumnDefinitions="*,auto"
-                          Padding="10"
-                          HeightRequest="54">
+                <DataTemplate x:DataType="viewModels:IPromptStyleViewModel" >
+                    <Grid ColumnDefinitions="*,auto,auto"
+                          ColumnSpacing="12"
+                          Padding="16,0,8,0"
+                          HeightRequest="54"
+                          HorizontalOptions="Fill"
+                          Style="{StaticResource SelectableItemStyle}">
                         <Label Grid.Column="0"
                                Text="{Binding Name}"
                                VerticalOptions="Center"
                                FontSize="16"/>
                         <ImageButton Grid.Column="1"
-                                     ToolTipProperties.Text="Info"
+                                     ToolTipProperties.Text="Edit"
                                      HorizontalOptions="End"
                                      VerticalOptions="Fill"
-                                     Command="{Binding ShowPromptStyleInfoCommand, Source={RelativeSource AncestorType={x:Type pages:IPromptStyleSelectionPageViewModel}}}"
+                                     Command="{Binding Source={x:Reference StyleCollectionView}, Path=BindingContext.EditPromptStyleCommand}"
                                      CommandParameter="{Binding .}">
                             <ImageButton.Source>
-                                <FontImageSource Glyph="&#xe88e;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="{StaticResource Cadet}" />
+                                <FontImageSource Glyph="&#xe3c9;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="{StaticResource Cadet}" />
+                            </ImageButton.Source>
+                        </ImageButton>
+                        <ImageButton Grid.Column="2"
+                                     ToolTipProperties.Text="Delete"
+                                     HorizontalOptions="End"
+                                     VerticalOptions="Fill"
+                                     Command="{Binding Source={x:Reference StyleCollectionView}, Path=BindingContext.DeletePromptStyleCommand}"
+                                     CommandParameter="{Binding .}">
+                            <ImageButton.Source>
+                                <FontImageSource Glyph="&#xe872;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
                             </ImageButton.Source>
                         </ImageButton>
                     </Grid>
@@ -106,11 +145,6 @@
                                Spacing="10"
                                HorizontalOptions="End" 
                                Padding="10">
-            <Button Command="{Binding ResetCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}">
-                <Button.ImageSource>
-                    <FontImageSource Glyph="&#xe872;" FontFamily="{StaticResource IconFontRegular}" Color="{StaticResource Tertiary}" />
-                </Button.ImageSource>
-            </Button>
             <Button Text="Cancel" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
             <Button Text="Apply" Command="{Binding ConfirmCommand}" WidthRequest="100" />
         </HorizontalStackLayout>

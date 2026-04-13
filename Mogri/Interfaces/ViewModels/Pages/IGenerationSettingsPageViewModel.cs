@@ -3,7 +3,7 @@ using Mogri.Enums;
 
 namespace Mogri.Interfaces.ViewModels.Pages;
 
-public interface IPromptSettingsPageViewModel : IPageViewModel
+public interface IGenerationSettingsPageViewModel : IPageViewModel
 {
     ModelType SelectedModelType { get; set; }
 
@@ -62,6 +62,8 @@ public interface IPromptSettingsPageViewModel : IPageViewModel
     string? UpscaleStepsPlaceholder { get; set; }
 
     bool EnableTiling { get; set; }
+
+    bool IsSeamlessVisible { get; set; }
 
     IAsyncRelayCommand ResetValuesCommand { get; }
 

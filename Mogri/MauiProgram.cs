@@ -5,7 +5,9 @@ using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
 using Mopups.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using MemoryToolkit.Maui;
+using Mogri.Interfaces.Services;
 
 namespace Mogri;
 
@@ -81,7 +83,19 @@ public static class MauiProgram
         });
 #endif
 
-        return builder.Build();
+        var app = builder.Build();
+
+        try
+        {
+            var promptStyleService = app.Services.GetRequiredService<IPromptStyleService>();
+            promptStyleService.SeedDefaultsIfEmptyAsync().GetAwaiter().GetResult();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PROMPT STYLE SEED] Failed to seed default prompt styles: {ex}");
+        }
+
+        return app;
     }
 
 }
