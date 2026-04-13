@@ -35,7 +35,6 @@ namespace Mogri.Services
 
         private List<SamplerItem>? _samplers;
         private List<SchedulerItem>? _schedulers;
-        private List<PromptStyleItem>? _promptStyles;
         private List<SDModelItem>? _models;
         private List<LoraItem>? _loras;
         private List<UpscalerItem>? _upscalers;
@@ -694,14 +693,6 @@ namespace Mogri.Services
                     }
                     catch { /* Ignore if endpoint doesn't exist */ }
                 }, cancellationToken),
-                Task.Run(async () =>
-                {
-                    try
-                    {
-                        _promptStyles = await _client.Sdapi.V1.PromptStyles.GetAsync(cancellationToken: cts.Token);
-                    }
-                    catch { /* Ignore if endpoint doesn't exist */ }
-                }, cancellationToken),
                 Task.Run(async () => _models = await _client.Sdapi.V1.SdModels.GetAsync(cancellationToken: cts.Token), cancellationToken),
                 Task.Run(async () =>
                 {
@@ -851,28 +842,6 @@ namespace Mogri.Services
                 {
                     result.Add(scheduler.Name);
                 }
-            }
-
-            return Task.FromResult(result);
-        }
-
-        public Task<List<IPromptStyleViewModel>> GetPromptStylesAsync(CancellationToken cancellationToken = default)
-        {
-            var result = new List<IPromptStyleViewModel>();
-
-            if (_promptStyles == null)
-            {
-                return Task.FromResult(result);
-            }
-
-            foreach (var item in _promptStyles)
-            {
-                result.Add(new PromptStyleViewModel
-                {
-                    Name = item.Name ?? string.Empty,
-                    Prompt = item.Prompt ?? string.Empty,
-                    NegativePrompt = item.NegativePrompt ?? string.Empty
-                });
             }
 
             return Task.FromResult(result);
@@ -1162,6 +1131,36 @@ namespace Mogri.Services
             return null;
         }
 
+        private static string? StripModelHash(string? model)
+        {
+            if (string.IsNullOrEmpty(model))
+            {
+                return model;
+            }
+
+            var hashStartIndex = model.LastIndexOf(" [", StringComparison.Ordinal);
+            if (hashStartIndex < 0 || !model.EndsWith("]", StringComparison.Ordinal))
+            {
+                return model;
+            }
+
+            var hashLength = model.Length - hashStartIndex - 3;
+            if (hashLength <= 0)
+            {
+                return model;
+            }
+
+            for (var i = hashStartIndex + 2; i < model.Length - 1; i++)
+            {
+                if (!Uri.IsHexDigit(model[i]))
+                {
+                    return model;
+                }
+            }
+
+            return model[..hashStartIndex];
+        }
+
         public Task<ModelType> GetCurrentModelTypeAsync(CancellationToken cancellationToken = default)
         {
             if (_options == null)
@@ -1175,19 +1174,21 @@ namespace Mogri.Services
                 return Task.FromResult(ModelType.SDXL);
             }
 
-            if (currentModel == GetOptionValue(_options.ForgeCheckpointSd))
+            var normalizedCurrentModel = StripModelHash(currentModel);
+
+            if (normalizedCurrentModel == StripModelHash(GetOptionValue(_options.ForgeCheckpointSd)))
             {
                 return Task.FromResult(ModelType.SD15);
             }
-            if (currentModel == GetOptionValue(_options.ForgeCheckpointXl))
+            if (normalizedCurrentModel == StripModelHash(GetOptionValue(_options.ForgeCheckpointXl)))
             {
                 return Task.FromResult(ModelType.SDXL);
             }
-            if (currentModel == GetOptionValue(_options.ForgeCheckpointZit))
+            if (normalizedCurrentModel == StripModelHash(GetOptionValue(_options.ForgeCheckpointZit)))
             {
                 return Task.FromResult(ModelType.ZImageTurbo);
             }
-            if (currentModel == GetOptionValue(_options.ForgeCheckpointFlux))
+            if (normalizedCurrentModel == StripModelHash(GetOptionValue(_options.ForgeCheckpointFlux)))
             {
                 return Task.FromResult(ModelType.Flux);
             }

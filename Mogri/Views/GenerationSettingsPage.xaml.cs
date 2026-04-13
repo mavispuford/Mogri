@@ -1,8 +1,8 @@
 namespace Mogri.Views;
 
-public partial class PromptSettingsPage : BasePage
+public partial class GenerationSettingsPage : BasePage
 {
-    public PromptSettingsPage()
+    public GenerationSettingsPage()
     {
         InitializeComponent();
     }

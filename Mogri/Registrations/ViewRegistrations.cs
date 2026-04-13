@@ -9,7 +9,7 @@ public static class ViewRegistrations
     public static MauiAppBuilder RegisterViews(this MauiAppBuilder builder)
     {
         registerPage<IMainPageViewModel, MainPage>(builder.Services, () => new MainPage());
-        registerPage<IPromptSettingsPageViewModel, PromptSettingsPage>(builder.Services, () => new PromptSettingsPage());
+        registerPage<IGenerationSettingsPageViewModel, GenerationSettingsPage>(builder.Services, () => new GenerationSettingsPage());
         registerPage<IImageToImageSettingsPageViewModel, ImageToImageSettingsPage>(builder.Services, () => new ImageToImageSettingsPage());
         registerPage<ICanvasPageViewModel, CanvasPage>(builder.Services, () => new CanvasPage());
         registerPage<IAppSettingsPageViewModel, AppSettingsPage>(builder.Services, () => new AppSettingsPage());

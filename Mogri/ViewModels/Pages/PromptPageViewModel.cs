@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using Mogri.Interfaces.Services;
 using Mogri.Interfaces.ViewModels;
 using Mogri.Interfaces.ViewModels.Pages;
@@ -12,7 +13,9 @@ namespace Mogri.ViewModels;
 public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
 {
     private readonly IImageGenerationService _stableDiffusionService;
+    private readonly IPromptStyleService _promptStyleService;
     private readonly IPopupService _popupService;
+    private readonly IServiceProvider _serviceProvider;
 
     private PromptSettings? _settings;
 
@@ -40,10 +43,14 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
     public PromptPageViewModel(
         IImageGenerationService stableDiffusionService,
         ILoadingService loadingService,
-        IPopupService popupService) : base(loadingService)
+        IPopupService popupService,
+        IPromptStyleService promptStyleService,
+        IServiceProvider serviceProvider) : base(loadingService)
     {
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
+        _promptStyleService = promptStyleService ?? throw new ArgumentNullException(nameof(promptStyleService));
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
     }
 
     [RelayCommand]
@@ -92,11 +99,20 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
             await Task.WhenAll(
                 Task.Run(async () =>
                 {
-                    AvailablePromptStyles = await _stableDiffusionService.GetPromptStylesAsync();
+                    var promptStyleEntities = await _promptStyleService.GetAllAsync();
+                    AvailablePromptStyles = promptStyleEntities.Select(entity =>
+                    {
+                        var promptStyle = _serviceProvider.GetRequiredService<IPromptStyleViewModel>();
+                        promptStyle.EntityId = entity.Id;
+                        promptStyle.Name = entity.Name;
+                        promptStyle.Prompt = entity.Prompt;
+                        promptStyle.NegativePrompt = entity.NegativePrompt;
+                        return promptStyle;
+                    }).ToList();
 
                     if (_settings.PromptStyles?.Any() == true)
                     {
-                        var matchingStyles = AvailablePromptStyles.SelectMany(a => _settings.PromptStyles.Where(p => p.Name.Equals(a.Name, StringComparison.Ordinal)));
+                        var matchingStyles = AvailablePromptStyles.Where(a => _settings.PromptStyles.Any(p => p.Name.Equals(a.Name, StringComparison.Ordinal)));
 
                         foreach (var style in SelectedPromptStyles.Where(l => !matchingStyles.Any(ms => ms.Name == l.Name)))
                         {

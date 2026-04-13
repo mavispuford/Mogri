@@ -44,11 +44,10 @@ public class ComfyUiService : IImageGenerationBackend
     public BackendCapabilities Capabilities => new()
     {
         SupportsSeamless = false,
-        SupportsUpscaling = false, // Can add later
+        SupportsUpscaling = false,
         SupportsSamplerList = true,
         SupportsCancellation = true,
         SupportsLoras = true,
-        SupportsStyles = false,
         SupportsSchedulers = true
     };
 
@@ -520,12 +519,25 @@ public class ComfyUiService : IImageGenerationBackend
     public Task<List<IUpscalerViewModel>> GetUpscalersAsync(CancellationToken cancellationToken = default) 
         => Task.FromResult(new List<IUpscalerViewModel>());
 
-    public Task<List<IPromptStyleViewModel>> GetPromptStylesAsync(CancellationToken cancellationToken = default) 
-        => Task.FromResult(new List<IPromptStyleViewModel>());
-
     public async Task<IModelViewModel?> GetSelectedModelAsync(CancellationToken cancellationToken = default)
     {
-        // No server-side selection concept, so just return first model or null
+        if (_models.Count == 0)
+        {
+            return null;
+        }
+
+        var selectedModelKey = Preferences.Default.Get(GetSelectedModelPreferenceKey(), string.Empty);
+        if (!string.IsNullOrWhiteSpace(selectedModelKey))
+        {
+            var selectedModel = _models.FirstOrDefault(m => m.Key == selectedModelKey);
+            if (selectedModel != null)
+            {
+                return selectedModel;
+            }
+        }
+
+        // Comfy backends do not expose an active server-side model selection endpoint.
+        // Fall back to first known model when no persisted local selection exists.
         return _models.FirstOrDefault();
     }
 
@@ -537,7 +549,20 @@ public class ComfyUiService : IImageGenerationBackend
     public Task SaveSettingsAsync(PromptSettings settings, CancellationToken cancellationToken = default)
     {
         Preferences.Default.Set(Constants.PreferenceKeys.ComfyUiModelType, (int)settings.ModelType);
+
+        if (settings.Model != null && !string.IsNullOrWhiteSpace(settings.Model.Key))
+        {
+            Preferences.Default.Set(GetSelectedModelPreferenceKey(), settings.Model.Key);
+        }
+
         return Task.CompletedTask;
+    }
+
+    private string GetSelectedModelPreferenceKey()
+    {
+        return Name == "Comfy Cloud"
+            ? Constants.PreferenceKeys.ComfyCloudSelectedModel
+            : Constants.PreferenceKeys.ComfyUiSelectedModel;
     }
 
     public async Task<bool> CancelAsync(CancellationToken cancellationToken = default)

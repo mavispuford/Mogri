@@ -19,6 +19,8 @@ public static class Constants
         public const string ServerUrl = nameof(ServerUrl);
         public const string ComfyCloudApiKey = nameof(ComfyCloudApiKey);
         public const string ComfyUiModelType = nameof(ComfyUiModelType);
+        public const string ComfyUiSelectedModel = nameof(ComfyUiSelectedModel);
+        public const string ComfyCloudSelectedModel = nameof(ComfyCloudSelectedModel);
         public const string SelectedBackend = nameof(SelectedBackend);
         public const string AuthHeaderName = nameof(AuthHeaderName);
         public const string AuthHeaderValue = nameof(AuthHeaderValue);

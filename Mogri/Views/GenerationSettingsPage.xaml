@@ -5,8 +5,8 @@
                 xmlns:pages="clr-namespace:Mogri.Interfaces.ViewModels.Pages"
                 xmlns:viewModels="clr-namespace:Mogri.Interfaces.ViewModels"
                 xmlns:views="clr-namespace:Mogri.Views"
-                x:Class="Mogri.Views.PromptSettingsPage"
-                x:DataType="pages:IPromptSettingsPageViewModel"
+                x:Class="Mogri.Views.GenerationSettingsPage"
+                x:DataType="pages:IGenerationSettingsPageViewModel"
                 Shell.PresentationMode="Animated"
                 Shell.NavBarIsVisible="True"
                 Shell.TabBarIsVisible="False">
@@ -18,7 +18,7 @@
         </ResourceDictionary>
     </views:BasePage.Resources>
     <Shell.TitleView>
-        <Label Text="Prompt Settings" Style="{StaticResource LabelTitleView}" />
+        <Label Text="Generation Settings" Style="{StaticResource LabelTitleView}" />
     </Shell.TitleView>
 
     <views:BasePage.ToolbarItems>
@@ -216,13 +216,13 @@
                 <Label Grid.Row="18" Grid.Column="1" Text="Steps:" Style="{StaticResource SettingLabel}" IsVisible="{Binding CurrentCapabilities.SupportsUpscaling}"/>
                 <Entry Grid.Row="18" Grid.Column="2" Placeholder="{Binding UpscaleStepsPlaceholder}" Text="{Binding UpscaleSteps}" Keyboard="Numeric" FontSize="16" HorizontalTextAlignment="End" IsVisible="{Binding CurrentCapabilities.SupportsUpscaling}"/>
 
-                <Image Grid.Row="19" Grid.Column="0" WidthRequest="32" IsVisible="{Binding CurrentCapabilities.SupportsSeamless}">
+                <Image Grid.Row="19" Grid.Column="0" WidthRequest="32" IsVisible="{Binding IsSeamlessVisible}">
                     <Image.Source>
                         <FontImageSource Glyph="&#xe421;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                     </Image.Source>
                 </Image>
-                <Label Grid.Row="19" Grid.Column="1" Text="Make Tiled:" Style="{StaticResource SettingLabel}" IsVisible="{Binding CurrentCapabilities.SupportsSeamless}"/>
-                <Switch Grid.Row="19" Grid.Column="2" IsToggled="{Binding EnableTiling}" IsVisible="{Binding CurrentCapabilities.SupportsSeamless}" HorizontalOptions="End" />
+                <Label Grid.Row="19" Grid.Column="1" Text="Make Tiled:" Style="{StaticResource SettingLabel}" IsVisible="{Binding IsSeamlessVisible}"/>
+                <Switch Grid.Row="19" Grid.Column="2" IsToggled="{Binding EnableTiling}" IsVisible="{Binding IsSeamlessVisible}" HorizontalOptions="End" />
 
             </Grid>
             </VerticalStackLayout>

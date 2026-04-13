@@ -8,7 +8,7 @@ using Mogri.Models;
 
 namespace Mogri.ViewModels;
 
-public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSettingsPageViewModel
+public partial class GenerationSettingsPageViewModel : PageViewModel, IGenerationSettingsPageViewModel
 {
     private readonly IImageGenerationService _stableDiffusionService;
     private readonly IPopupService _popupService;
@@ -90,6 +90,9 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
 
     [ObservableProperty]
     public partial bool EnableTiling { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsSeamlessVisible { get; set; }
 
     [ObservableProperty]
     public partial ModelType SelectedModelType { get; set; }
@@ -174,6 +177,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             }
 
             IsDistilledCfgScaleVisible = value == ModelType.ZImageTurbo || value == ModelType.Flux;
+            IsSeamlessVisible = CurrentCapabilities.SupportsSeamless && value == ModelType.SDXL;
         }
         catch (Exception ex)
         {
@@ -218,7 +222,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
         }
     }
 
-    public PromptSettingsPageViewModel(
+    public GenerationSettingsPageViewModel(
         IImageGenerationService stableDiffusionService,
         IPopupService popupService,
         ILoadingService loadingService,
@@ -496,6 +500,7 @@ public partial class PromptSettingsPageViewModel : PageViewModel, IPromptSetting
             Width = _settings.Width.ToString();
 
             IsDistilledCfgScaleVisible = SelectedModelType == ModelType.ZImageTurbo || SelectedModelType == ModelType.Flux;
+            IsSeamlessVisible = CurrentCapabilities.SupportsSeamless && SelectedModelType == ModelType.SDXL;
         }
         finally
         {

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<popups:BasePopup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                  xmlns:viewModels="clr-namespace:Mogri.Interfaces.ViewModels.Popups"
+                  xmlns:popups="clr-namespace:Mogri.Views.Popups"
+                  x:Class="Mogri.Views.Popups.PromptStyleEditPopup"
+                  x:DataType="viewModels:IPromptStyleEditPopupViewModel">
+    <Border Padding="15"
+            Margin="15"
+            Stroke="Transparent"
+            StrokeShape="RoundRectangle 10"
+            Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Cadet}}"
+            HorizontalOptions="Center"
+            VerticalOptions="Center">
+        <VerticalStackLayout>
+            <ScrollView Orientation="Vertical">
+                <VerticalStackLayout x:Name="MainLayout">
+                    <Label Text="Name:" Style="{StaticResource LabelHeader}" />
+                    <Entry Text="{Binding EditName}" Placeholder="Prompt style name" />
+
+                    <Label Text="Prompt:" Style="{StaticResource LabelHeader}" />
+                    <Editor Text="{Binding EditPrompt}" AutoSize="TextChanges" Placeholder="Positive prompt additions" />
+
+                    <Label Text="Negative Prompt:" Style="{StaticResource LabelHeader}" />
+                    <Editor Text="{Binding EditNegativePrompt}" AutoSize="TextChanges" Placeholder="Negative prompt additions" />
+                </VerticalStackLayout>
+            </ScrollView>
+            <HorizontalStackLayout HorizontalOptions="End" Spacing="10">
+                <Button Text="Close" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" Command="{Binding CloseCommand}" />
+                <Button Text="Save" Command="{Binding SaveCommand}" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </Border>
+        
+</popups:BasePopup>
