@@ -33,4 +33,10 @@ public interface IFileService
     Task<string> WriteMaskFileToAppDataAsync(string imageFileName, MaskViewModel mask);
 
     Task<string> WriteImageFileToExternalStorageAsync(string fileName, Stream stream, bool isMask = false);
+
+    /// <summary>
+    /// Opens a readable stream for the given photo, converting HEIC/HEIF files to JPEG so
+    /// SkiaSharp can decode them. Returns the stream and the effective MIME content type.
+    /// </summary>
+    Task<(Stream? Stream, string ContentType)> OpenNormalizedPhotoStreamAsync(FileResult photo);
 }

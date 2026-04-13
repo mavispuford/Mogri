@@ -6,6 +6,8 @@ using Mogri.Models;
 using Mogri.ViewModels;
 using System.Text.Json;
 using AndroidNet = Android.Net;
+using AndroidBitmap = global::Android.Graphics.Bitmap;
+using AndroidBitmapFactory = global::Android.Graphics.BitmapFactory;
 
 namespace Mogri.Platforms.Android.Services;
 
@@ -308,6 +310,51 @@ public class AndroidFileService : IFileService
         }
 
         return string.Empty;
+    }
+
+    public async Task<(Stream? Stream, string ContentType)> OpenNormalizedPhotoStreamAsync(FileResult photo)
+    {
+        var isHeic = isHeicFile(photo);
+
+        if (!isHeic)
+        {
+            return (await photo.OpenReadAsync(), photo.ContentType);
+        }
+
+        try
+        {
+            // Android's BitmapFactory can decode HEIC; re-encode as JPEG for SkiaSharp compatibility.
+            var bitmap = await AndroidBitmapFactory.DecodeFileAsync(photo.FullPath);
+
+            if (bitmap == null)
+            {
+                return (null, photo.ContentType);
+            }
+
+            var ms = new MemoryStream();
+            await bitmap.CompressAsync(AndroidBitmap.CompressFormat.Jpeg!, 100, ms);
+            bitmap.Recycle();
+            bitmap.Dispose();
+            ms.Seek(0, SeekOrigin.Begin);
+            return (ms, "image/jpeg");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to convert HEIC to JPEG on Android");
+            return (null, photo.ContentType);
+        }
+    }
+
+    private static bool isHeicFile(FileResult photo)
+    {
+        var contentType = photo.ContentType?.ToLowerInvariant();
+        if (contentType is "image/heic" or "image/heif")
+        {
+            return true;
+        }
+
+        var ext = Path.GetExtension(photo.FileName)?.ToLowerInvariant();
+        return ext is ".heic" or ".heif";
     }
 
     private async Task checkForReadPermission()

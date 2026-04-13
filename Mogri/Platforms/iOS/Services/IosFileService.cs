@@ -264,5 +264,62 @@ namespace Mogri.Platforms.iOS.Services
             
             return string.Empty;
         }
+
+        public async Task<(Stream? Stream, string ContentType)> OpenNormalizedPhotoStreamAsync(FileResult photo)
+        {
+            var isHeic = isHeicFile(photo);
+
+            if (!isHeic)
+            {
+                return (await photo.OpenReadAsync(), photo.ContentType);
+            }
+
+            try
+            {
+                // UIImage can decode HEIC natively on iOS; re-encode as JPEG for SkiaSharp compatibility.
+                using var nsData = NSData.FromFile(photo.FullPath);
+
+                if (nsData == null)
+                {
+                    return (null, photo.ContentType);
+                }
+
+                var image = UIImage.LoadFromData(nsData);
+
+                if (image == null)
+                {
+                    return (null, photo.ContentType);
+                }
+
+                var jpegData = image.AsJPEG(1.0f);
+                image.Dispose();
+
+                if (jpegData == null)
+                {
+                    return (null, photo.ContentType);
+                }
+
+                var ms = new MemoryStream(jpegData.ToArray());
+                jpegData.Dispose();
+                return (ms, "image/jpeg");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to convert HEIC to JPEG on iOS");
+                return (null, photo.ContentType);
+            }
+        }
+
+        private static bool isHeicFile(FileResult photo)
+        {
+            var contentType = photo.ContentType?.ToLowerInvariant();
+            if (contentType is "image/heic" or "image/heif")
+            {
+                return true;
+            }
+
+            var ext = Path.GetExtension(photo.FileName)?.ToLowerInvariant();
+            return ext is ".heic" or ".heif";
+        }
     }
 }
