@@ -377,4 +377,3 @@ local.properties
 Directory.Build.Override.props
 
 .private-journal/*
-.github/prompts
