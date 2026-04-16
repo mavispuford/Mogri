@@ -76,3 +76,26 @@ jobs:
         -p:EnableCodeSigning=false
         -p:ApplicationDisplayVersion=0.0.0
         -p:ApplicationVersion=${{ github.run_number }}
+
+  run-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 10
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Run Unit Tests
+      run: dotnet test Mogri.Tests/Mogri.Tests.csproj -c Debug --logger "trx;LogFileName=test-results.trx"
+
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: Mogri.Tests/TestResults/test-results.trx
+        retention-days: 3
