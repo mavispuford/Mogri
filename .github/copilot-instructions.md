@@ -6,14 +6,14 @@ description: 'General work with the Mogri project context'
 
 A .NET MAUI mobile app for image generation and editing. Combines on-device processing (masking/patching via ONNX Runtime) with remote server generation (SD Forge Neo / ComfyUI / Comfy Cloud).
 
-For full architecture details, see `docs/Architecture.md`.
+For full architecture details, see `Docs/Architecture.md`.
 
 ## Project Structure
 
 - `Mogri/` — Main MAUI app (Views, ViewModels, Services, Clients, Controls, Models, Registrations)
 - `Mogri.Core/` — Shared core library (platform-independent services, interfaces, models, helpers)
 - `Mogri.Tests/` — Unit tests (xUnit + Moq)
-- `docs/` — Architecture docs, changelog, how-to guides
+- `Docs/` — Architecture docs, changelog, how-to guides
 - `OpenApiSpecs/` — OpenAPI specs for backend APIs (SD Forge Neo, ComfyUI)
 
 ## Architecture (MVVM)

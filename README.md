@@ -74,7 +74,7 @@ Mogri follows the MVVM pattern and utilizes standard `.NET MAUI` features along 
 
 Notable libraries include `.NET MAUI Community Toolkit`, `SkiaSharp` for image operations and drawing, `LiteDB`, `Mopups`, `ColorMinePortable`, and `Microsoft.Kiota` for generating the OpenAPI backend clients. Additionally, it leverages `ML.NET` and the `ONNX Runtime` to run on-device machine-learning models for image segmentation and patching.
 
-For a detailed breakdown of the application structure, including Views, ViewModels, and Services, please see [Architecture.md](docs/Architecture.md).
+For a detailed breakdown of the application structure, including Views, ViewModels, and Services, please see [Architecture.md](Docs/Architecture.md).
 
 ### FAQ (or *Possibly* Asked Questions)
 

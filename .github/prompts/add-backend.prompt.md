@@ -4,7 +4,7 @@ description: 'Add a new image generation backend to Mogri'
 
 # Add a New Image Generation Backend
 
-Follow the detailed guide in [docs/HowToAddBackend.md](../../docs/HowToAddBackend.md).
+Follow the detailed guide in [Docs/HowToAddBackend.md](../../Docs/HowToAddBackend.md).
 
 ## Quick Summary
 
