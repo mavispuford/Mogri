@@ -116,4 +116,8 @@
 	  <PackageReference Include="System.IO.Hashing" Version="10.0.5" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\Mogri.Core\Mogri.Core.csproj" />
+	</ItemGroup>
+
 </Project>
