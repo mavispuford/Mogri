@@ -25,9 +25,9 @@ namespace Mogri.Services
             {
                 var cacheDir = FileSystem.CacheDirectory;
                 var modelPath = Path.Combine(cacheDir, "aot_gan.onnx");
-                var dataPath = Path.Combine(cacheDir, "aot_aot_model.data");
+                var dataPath = Path.Combine(cacheDir, "aot_model.data");
 
-                // Ensure aot_aot_model.data is present
+                // Ensure aot_model.data is present
                 if (!File.Exists(dataPath))
                 {
                     Console.WriteLine("[AotGanPatchService] Extracting aot_model.data to cache...");
