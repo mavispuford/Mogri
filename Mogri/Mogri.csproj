@@ -41,7 +41,12 @@
 	     net10.0-android NuGet skips the package's .targets file and falls back to the linux-arm64
 	     native libs (glibc), which fail on Android (Bionic) with "libdl.so.2 not found".
 	     Fix: (1) ExcludeAssets="native" on the PackageReference below to block the wrong .so files,
-	          (2) manually include the correct Android AAR from the NuGet package cache here. -->
+	          (2) manually include the correct Android AAR from the NuGet package cache here.
+	     XA4301 is suppressed because the manual AAR causes benign duplicate-entry warnings during
+	     APK packaging (the correct lib wins; the duplicate is harmlessly ignored). -->
+	<PropertyGroup Condition="$(TargetFramework.Contains('-android'))">
+		<NoWarn>$(NoWarn);XA4301</NoWarn>
+	</PropertyGroup>
 	<ItemGroup Condition="$(TargetFramework.Contains('-android'))">
 		<AndroidLibrary Bind="false"
 		                Include="$(NuGetPackageRoot)microsoft.ml.onnxruntime\1.24.3\runtimes\android\native\onnxruntime.aar">
