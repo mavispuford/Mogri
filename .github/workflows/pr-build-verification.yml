@@ -32,7 +32,9 @@ jobs:
         dotnet-version: '10.0.x'
 
     - name: Install MAUI Workloads
-      run: dotnet workload restore
+      run: >
+        dotnet workload restore
+        dotnet workload list
 
     - name: Build Android (Debug, No Signing)
       run: >
@@ -65,7 +67,9 @@ jobs:
         dotnet-version: '10.0.x'
 
     - name: Install MAUI Workloads
-      run: dotnet workload restore
+      run: >
+        dotnet workload restore
+        dotnet workload list
 
     - name: Build iOS (Debug, No Signing)
       run: >
