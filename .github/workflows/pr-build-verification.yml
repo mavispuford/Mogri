@@ -32,11 +32,12 @@ jobs:
         dotnet-version: '10.0.x'
 
     - name: Install MAUI Workloads
-      run: dotnet workload install maui-android
+      run: dotnet workload restore
 
     - name: Build Android (Debug, No Signing)
       run: >
         dotnet build Mogri/Mogri.csproj -f net10.0-android -c Debug
+        -p:TargetFrameworks=net10.0-android
         -p:ApplicationDisplayVersion=0.0.0
         -p:ApplicationVersion=${{ github.run_number }}
 
@@ -65,11 +66,12 @@ jobs:
         dotnet-version: '10.0.x'
 
     - name: Install MAUI Workloads
-      run: dotnet workload install maui-ios
+      run: dotnet workload restore
 
     - name: Build iOS (Debug, No Signing)
       run: >
         dotnet build Mogri/Mogri.csproj -f net10.0-ios -c Debug
+        -p:TargetFrameworks=net10.0-ios
         -p:RuntimeIdentifier=ios-arm64
         -p:EnableCodeSigning=false
         -p:ApplicationDisplayVersion=0.0.0
