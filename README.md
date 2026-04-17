@@ -101,3 +101,7 @@ You're welcome to submit an issue and I'll consider it. Keep in mind that I'm ju
 #### How do I find my app version?
 
 Tap the **Mogri logo** on the **Generate** tab to bring up the **About** page — the version is displayed near the bottom (e.g., `v1.2.3 (42)`). Tap the version text to copy it to your clipboard, then include it in any bug report or issue.
+
+#### Why do I sometimes see faces when using the Patch tool?
+
+That's just what `AOT-GAN`, the model used for patching, likes to do sometimes 🙃. Try playing with the shape of your masks.
