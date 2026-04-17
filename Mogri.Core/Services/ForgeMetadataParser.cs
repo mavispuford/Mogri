@@ -1,6 +1,5 @@
 using System.Text.RegularExpressions;
 using Mogri.Models;
-using Mogri.Clients.SdForgeNeo.Models;
 using Mogri.Interfaces.ViewModels;
 using Mogri.ViewModels;
 using Mogri.Enums;
@@ -38,10 +37,7 @@ public static class ForgeMetadataParser
 
     private static readonly Regex _loraRegex = new Regex("<lora:([^:]*):([^>]*)>", RegexOptions.Compiled);
 
-    public static PromptSettings? Parse(
-        string info,
-        List<SDModelItem>? availableModels = null,
-        Func<SDModelItem, IModelViewModel?>? modelConverter = null)
+    public static PromptSettings? Parse(string info)
     {
         if (string.IsNullOrEmpty(info))
         {
@@ -158,23 +154,39 @@ public static class ForgeMetadataParser
                         if (double.TryParse(property.Value, out var distCfg)) settings.DistilledCfgScale = distCfg;
                         break;
                     case PngInfoProperties.Model:
-                        if (settings.Model == null && availableModels != null && modelConverter != null)
+                        if (!string.IsNullOrWhiteSpace(property.Value))
                         {
-                            var matchingModel = availableModels.FirstOrDefault(m => m.ModelName == property.Value);
-                            if (matchingModel != null)
+                            if (settings.Model == null)
                             {
-                                settings.Model = modelConverter(matchingModel);
+                                settings.Model = new ModelViewModel
+                                {
+                                    DisplayName = string.Empty,
+                                    Key = string.Empty,
+                                };
+                            }
+
+                            settings.Model.DisplayName = property.Value;
+
+                            // Preserve a usable key even when hash is missing.
+                            if (string.IsNullOrWhiteSpace(settings.Model.Key))
+                            {
+                                settings.Model.Key = property.Value;
                             }
                         }
                         break;
                     case PngInfoProperties.ModelHash:
-                        if (settings.Model == null && availableModels != null && modelConverter != null)
+                        if (!string.IsNullOrWhiteSpace(property.Value))
                         {
-                            var matchingModel = availableModels.FirstOrDefault(m => m.Hash == property.Value);
-                            if (matchingModel != null)
+                            if (settings.Model == null)
                             {
-                                settings.Model = modelConverter(matchingModel);
+                                settings.Model = new ModelViewModel
+                                {
+                                    DisplayName = string.Empty,
+                                    Key = string.Empty,
+                                };
                             }
+
+                            settings.Model.Key = property.Value;
                         }
                         break;
                     default:

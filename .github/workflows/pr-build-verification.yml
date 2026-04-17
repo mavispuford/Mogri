@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [ main ]
     paths-ignore:
-      - 'docs/**'
+      - 'Docs/**'
       - '**.md'
       - 'LICENSE'
       - 'Licenses/**'
@@ -32,12 +32,13 @@ jobs:
         dotnet-version: '10.0.x'
 
     - name: Install MAUI Workloads
-      run: dotnet workload install maui-android
+      run: |
+        dotnet workload restore
+        dotnet workload list
 
     - name: Build Android (Debug, No Signing)
       run: >
         dotnet build Mogri/Mogri.csproj -f net10.0-android -c Debug
-        -p:TargetFrameworks=net10.0-android
         -p:ApplicationDisplayVersion=0.0.0
         -p:ApplicationVersion=${{ github.run_number }}
 
@@ -58,7 +59,7 @@ jobs:
     - name: Setup Xcode
       uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: '26.2'
+        xcode-version: '26.3'
 
     - name: Setup .NET 10
       uses: actions/setup-dotnet@v4
@@ -66,13 +67,37 @@ jobs:
         dotnet-version: '10.0.x'
 
     - name: Install MAUI Workloads
-      run: dotnet workload install maui-ios
+      run: | 
+        dotnet workload restore
+        dotnet workload list
 
     - name: Build iOS (Debug, No Signing)
       run: >
         dotnet build Mogri/Mogri.csproj -f net10.0-ios -c Debug
-        -p:TargetFrameworks=net10.0-ios
         -p:RuntimeIdentifier=ios-arm64
         -p:EnableCodeSigning=false
         -p:ApplicationDisplayVersion=0.0.0
         -p:ApplicationVersion=${{ github.run_number }}
+
+  run-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 10
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Run Unit Tests
+      run: dotnet test Mogri.Tests/Mogri.Tests.csproj -c Debug --logger "trx;LogFileName=test-results.trx"
+
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: Mogri.Tests/TestResults/test-results.trx
+        retention-days: 3
