@@ -57,7 +57,7 @@ jobs:
     - name: Setup Xcode
       uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: '26.2'
+        xcode-version: '26.3'
 
     - name: Setup .NET 10
       uses: actions/setup-dotnet@v4
