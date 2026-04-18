@@ -57,13 +57,13 @@ jobs:
         # Zip it up (this creates the standard IPA structure)
         zip -r Payload.zip Payload
         # Duplicate/rename to create the final .ipa file
-        cp Payload.zip Mogri-Unsigned.ipa
+        cp Payload.zip Mogri-v${APP_DISPLAY_VERSION}-iOS-Unsigned.ipa
 
     - name: Upload Unsigned IPA Artifact
       uses: actions/upload-artifact@v4
       with:
         name: Mogri-iOS-Unsigned-IPA-v${{ env.APP_DISPLAY_VERSION }}
-        path: Mogri/bin/Release/net10.0-ios/ios-arm64/Mogri-Unsigned.ipa
+        path: Mogri/bin/Release/net10.0-ios/ios-arm64/Mogri-v${{ env.APP_DISPLAY_VERSION }}-iOS-Unsigned.ipa
 
     - name: Upload Payload Zip Artifact
       uses: actions/upload-artifact@v4
