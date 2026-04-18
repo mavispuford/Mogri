@@ -25,16 +25,18 @@ namespace Mogri.Services
             {
                 var cacheDir = FileSystem.CacheDirectory;
                 var modelPath = Path.Combine(cacheDir, "aot_gan.onnx");
-                var dataPath = Path.Combine(cacheDir, "aot_model.data");
+                // The .onnx file internally references external data as "model.data",
+                // so the cached copy must use that exact filename.
+                var dataPath = Path.Combine(cacheDir, "model.data");
 
-                // Ensure aot_model.data is present
+                // Ensure model.data is present
                 if (!File.Exists(dataPath))
                 {
                     Console.WriteLine("[AotGanPatchService] Extracting aot_model.data to cache...");
                     using var stream = await FileSystem.OpenAppPackageFileAsync("aot_model.data");
                     using var fileStream = File.Create(dataPath);
                     await stream.CopyToAsync(fileStream);
-                    Console.WriteLine($"[AotGanPatchService] aot_model.data extracted to: {dataPath}");
+                    Console.WriteLine($"[AotGanPatchService] model.data extracted to: {dataPath}");
                 }
 
                 // Ensure main model is present
