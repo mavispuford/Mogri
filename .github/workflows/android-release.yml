@@ -50,7 +50,7 @@ jobs:
 
     - name: Publish Android APK and AAB
       run: >
-        dotnet publish Mogri/Mogri.csproj -f net10.0-android -c Release -p:TargetFrameworks=net10.0-android
+        dotnet publish Mogri/Mogri.csproj -f net10.0-android -c Release
         -p:AndroidKeyStore=true
         -p:AndroidSigningKeyStore="$env:GITHUB_WORKSPACE\mogri.keystore"
         -p:AndroidSigningKeyAlias="${{ secrets.KEY_ALIAS }}"
