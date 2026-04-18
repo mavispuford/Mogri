@@ -79,10 +79,10 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Mogri-Android-APK-v${{ env.APP_DISPLAY_VERSION }}
-        path: Mogri/bin/Release/net10.0-android/**/publish/Mogri-v${{ env.APP_DISPLAY_VERSION }}-Android-Signed.apk
+        path: Mogri/bin/Release/net10.0-android/**/publish/*-Signed.apk
 
     - name: Upload AAB Artifact
       uses: actions/upload-artifact@v4
       with:
         name: Mogri-Android-AAB-v${{ env.APP_DISPLAY_VERSION }}
-        path: Mogri/bin/Release/net10.0-android/**/publish/Mogri-v${{ env.APP_DISPLAY_VERSION }}-Android-Signed.aab
+        path: Mogri/bin/Release/net10.0-android/**/publish/*-Signed.aab
