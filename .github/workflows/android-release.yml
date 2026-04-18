@@ -16,6 +16,8 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
+      with:
+        lfs: true
 
     - name: Determine Version
       run: |
@@ -38,7 +40,7 @@ jobs:
         dotnet-version: '10.0.x'
 
     - name: Install MAUI Workloads
-      run: dotnet workload install maui-android
+      run: dotnet workload restore
 
     - name: Decode Keystore
       env:
@@ -50,7 +52,7 @@ jobs:
 
     - name: Publish Android APK and AAB
       run: >
-        dotnet publish Mogri/Mogri.csproj -f net10.0-android -c Release -p:TargetFrameworks=net10.0-android
+        dotnet publish Mogri/Mogri.csproj -f net10.0-android -c Release
         -p:AndroidKeyStore=true
         -p:AndroidSigningKeyStore="$env:GITHUB_WORKSPACE\mogri.keystore"
         -p:AndroidSigningKeyAlias="${{ secrets.KEY_ALIAS }}"
