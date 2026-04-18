@@ -31,7 +31,7 @@ jobs:
     - name: Setup Xcode
       uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: '26.2'
+        xcode-version: '26.3'
 
     - name: Setup .NET 10
       uses: actions/setup-dotnet@v4
@@ -39,7 +39,7 @@ jobs:
         dotnet-version: '10.0.x'
 
     - name: Install MAUI Workloads
-      run: dotnet workload install maui-ios
+      run: dotnet workload restore
 
     - name: Publish iOS app (Unsigned)
       run: |

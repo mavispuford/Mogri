@@ -38,7 +38,7 @@ jobs:
         dotnet-version: '10.0.x'
 
     - name: Install MAUI Workloads
-      run: dotnet workload install maui-android
+      run: dotnet workload restore
 
     - name: Decode Keystore
       env:
