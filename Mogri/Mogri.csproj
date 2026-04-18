@@ -70,6 +70,14 @@
 	  <ApplicationId>com.mavispuford.mogri</ApplicationId>
 	</PropertyGroup>
 
+	<!-- iOS Simulator Release builds: AOT compiler cannot target simulator; use interpreter instead -->
+	<PropertyGroup Condition="'$(Configuration)' == 'Release' And $(RuntimeIdentifier.Contains('iossimulator'))">
+	  <RunAOTCompilation>false</RunAOTCompilation>
+	  <MtouchUseLlvm>false</MtouchUseLlvm>
+	  <UseInterpreter>true</UseInterpreter>
+	  <MtouchInterpreter>all</MtouchInterpreter>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<!-- App Icon -->
 		<MauiIcon Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'" Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#BCCBD1" ForegroundScale="0.975" />
