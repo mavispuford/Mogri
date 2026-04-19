@@ -63,26 +63,29 @@ jobs:
 
     - name: Rename Artifacts
       run: |
-        $apk = Get-ChildItem -Path "Mogri/bin/Release/net10.0-android" -Recurse -Filter "*-Signed.apk" | Select-Object -First 1
-        $aab = Get-ChildItem -Path "Mogri/bin/Release/net10.0-android" -Recurse -Filter "*-Signed.aab" | Select-Object -First 1
+        $publishDir = "Mogri/bin/Release/net10.0-android/publish"
+        $apk = Get-ChildItem -Path $publishDir -Recurse -Filter "*-Signed.apk" | Select-Object -First 1
+        $aab = Get-ChildItem -Path $publishDir -Recurse -Filter "*-Signed.aab" | Select-Object -First 1
         if ($apk) {
           $dest = Join-Path $apk.DirectoryName "Mogri-v$env:APP_DISPLAY_VERSION-Android-Signed.apk"
           Move-Item $apk.FullName $dest
+          echo "APK_PATH=$dest" >> $env:GITHUB_ENV
         }
         if ($aab) {
           $dest = Join-Path $aab.DirectoryName "Mogri-v$env:APP_DISPLAY_VERSION-Android-Signed.aab"
           Move-Item $aab.FullName $dest
+          echo "AAB_PATH=$dest" >> $env:GITHUB_ENV
         }
       shell: pwsh
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: Mogri-Android-APK-v${{ env.APP_DISPLAY_VERSION }}
-        path: Mogri/bin/Release/net10.0-android/**/publish/Mogri-v${{ env.APP_DISPLAY_VERSION }}-Android-Signed.apk
+        name: Mogri-v${{ env.APP_DISPLAY_VERSION }}-Android-APK
+        path: ${{ env.APK_PATH }}
 
     - name: Upload AAB Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: Mogri-Android-AAB-v${{ env.APP_DISPLAY_VERSION }}
-        path: Mogri/bin/Release/net10.0-android/**/publish/Mogri-v${{ env.APP_DISPLAY_VERSION }}-Android-Signed.aab
+        name: Mogri-v${{ env.APP_DISPLAY_VERSION }}-Android-AAB
+        path: ${{ env.AAB_PATH }}
