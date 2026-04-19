@@ -81,11 +81,11 @@ jobs:
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: Mogri-Android-APK-v${{ env.APP_DISPLAY_VERSION }}
+        name: Mogri-v${{ env.APP_DISPLAY_VERSION }}-Android-APK
         path: ${{ env.APK_PATH }}
 
     - name: Upload AAB Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: Mogri-Android-AAB-v${{ env.APP_DISPLAY_VERSION }}
+        name: Mogri-v${{ env.APP_DISPLAY_VERSION }}-Android-AAB
         path: ${{ env.AAB_PATH }}
