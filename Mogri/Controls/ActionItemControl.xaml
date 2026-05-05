@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:behaviors="clr-namespace:Mogri.Behaviors"
+             xmlns:controls="clr-namespace:Mogri.Controls"
+             x:Class="Mogri.Controls.ActionItemControl"
+             x:DataType="controls:ActionItemControl"
+             x:Name="ThisControl">
+    <ContentView.Resources>
+        <Style TargetType="Label">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontFamily" Value="ComfortaaBold"/>
+            <Setter Property="TextColor" Value="{StaticResource Tertiary}"/>
+            <Setter Property="VerticalTextAlignment" Value="Center"/>
+        </Style>
+    </ContentView.Resources>
+
+    <Border BackgroundColor="{AppThemeBinding Light={StaticResource MutedPeach}, Dark={StaticResource MutedPeach}}"
+            HeightRequest="56"
+            StrokeShape="RoundRectangle 28"
+            Stroke="Transparent"
+            Padding="24,0"
+            HorizontalOptions="End">
+        <Border.GestureRecognizers>
+            <TapGestureRecognizer Command="{Binding Command, Source={x:Reference ThisControl}}" />
+        </Border.GestureRecognizers>
+        <HorizontalStackLayout Spacing="8">
+
+            <Image>
+                <Image.Source>
+                    <FontImageSource Glyph="{Binding Glyph, Source={x:Reference ThisControl}}" FontFamily="{StaticResource IconFontLight}" Size="24" />
+                </Image.Source>
+                <Image.Behaviors>
+                    <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Primary}" />
+                </Image.Behaviors>
+                
+            </Image>
+            <Label Text="{Binding Text, Source={x:Reference ThisControl}}" />
+
+        </HorizontalStackLayout>
+    </Border>
+</ContentView>

@@ -52,7 +52,7 @@ jobs:
         retention-days: 3
 
   verify-ios:
-    runs-on: macos-latest
+    runs-on: macos-26
 
     steps:
     - name: Checkout Code
@@ -63,7 +63,7 @@ jobs:
     - name: Setup Xcode
       uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: '26.3'
+        xcode-version: '26.4.1'
 
     - name: Setup .NET 10
       uses: actions/setup-dotnet@v4

@@ -38,8 +38,10 @@
     <Grid RowDefinitions="*,auto"
           Padding="0"
           Margin="0">
+
         <ScrollView Grid.Row="0" Orientation="Vertical">
-            <Grid Padding="30"
+
+            <Grid Padding="16"
                   RowDefinitions="auto, auto, auto, auto, auto, auto, auto, auto"
                   RowSpacing="10"
                   ColumnSpacing="16"
@@ -67,6 +69,7 @@
                         Stroke="Transparent"
                         StrokeThickness="0"
                         HorizontalOptions="Center">
+
                     <Grid Grid.Row="2" Grid.ColumnSpan="3"
                       HeightRequest="140" WidthRequest="140"
                       BackgroundColor="{AppThemeBinding Light={StaticResource MutedPeach}, Dark={StaticResource White}}">
@@ -77,11 +80,14 @@
                                 </TapGestureRecognizer.CommandParameter>
                             </TapGestureRecognizer>
                         </Grid.GestureRecognizers>
+
                         <Label Text="Tap to set source image" HorizontalOptions="Fill" VerticalOptions="Fill" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Padding="20" TextColor="{AppThemeBinding Light={StaticResource Tertiary}, Dark={StaticResource LivingCoral}}"
                            FontAttributes="Bold" IsVisible="{Binding InitImageSource, Converter={StaticResource IsNullConverter}}" />
+
                         <Image x:Name="InitImage"
                            Source="{Binding InitImageSource}" Aspect="AspectFit" HorizontalOptions="Fill" VerticalOptions="Fill"
                            IsVisible="{Binding InitImageSource, Converter={StaticResource IsNotNullConverter}}"/>
+
                         <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center" Scale="{OnPlatform Android=1, iOS=1.5}">
                             <ActivityIndicator.IsRunning>
                                 <MultiBinding Converter="{StaticResource AnyTrueConverter}" >
@@ -89,8 +95,16 @@
                                     <Binding Path="IsLoadingInitImage" />
                                 </MultiBinding>
                             </ActivityIndicator.IsRunning>
+                            <ActivityIndicator.IsVisible>
+                                <MultiBinding Converter="{StaticResource AnyTrueConverter}" >
+                                    <Binding Source="{x:Reference InitImage}" Path="IsLoading" x:DataType="Image" />
+                                    <Binding Path="IsLoadingInitImage" />
+                                </MultiBinding>
+                            </ActivityIndicator.IsVisible>
                         </ActivityIndicator>
+
                     </Grid>
+
                 </Border>
 
                 <Image Grid.Row="3" Grid.Column="0" WidthRequest="32">
@@ -106,6 +120,7 @@
                         Stroke="Transparent"
                         StrokeThickness="0"
                         HorizontalOptions="Center">
+
                     <Grid HeightRequest="140" WidthRequest="140">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ShowMediaPickerCommand}">
@@ -114,11 +129,14 @@
                                 </TapGestureRecognizer.CommandParameter>
                             </TapGestureRecognizer>
                         </Grid.GestureRecognizers>
+
                         <Label Text="Tap to set the mask" HorizontalOptions="Fill" VerticalOptions="Fill" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Padding="20" TextColor="{AppThemeBinding Light={StaticResource Tertiary}, Dark={StaticResource LivingCoral}}"
                            FontAttributes="Bold" IsVisible="{Binding MaskImageSource, Converter={StaticResource IsNullConverter}}" />
+
                         <Image x:Name="MaskImage"
                            Source="{Binding MaskImageSource}" Aspect="AspectFit" HorizontalOptions="Fill" VerticalOptions="Fill"
                            IsVisible="{Binding MaskImageSource, Converter={StaticResource IsNotNullConverter}}"/>
+
                         <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center" Scale="{OnPlatform Android=1, iOS=1.5}">
                             <ActivityIndicator.IsRunning>
                                 <MultiBinding Converter="{StaticResource AnyTrueConverter}" >
@@ -126,8 +144,16 @@
                                     <Binding Path="IsLoadingMaskImage" />
                                 </MultiBinding>
                             </ActivityIndicator.IsRunning>
+                            <ActivityIndicator.IsVisible>
+                                <MultiBinding Converter="{StaticResource AnyTrueConverter}" >
+                                    <Binding Source="{x:Reference MaskImage}" Path="IsLoading" x:DataType="Image" />
+                                    <Binding Path="IsLoadingMaskImage" />
+                                </MultiBinding>
+                            </ActivityIndicator.IsVisible>
                         </ActivityIndicator>
+
                     </Grid>
+
                 </Border>
 
                 <Image Grid.Row="5" Grid.Column="0" WidthRequest="32">
@@ -153,12 +179,15 @@
                 </Image>
                 <Label Grid.Row="7" Grid.Column="1" Text="Mask Blur:" Style="{StaticResource SettingLabel}"/>
                 <Entry Grid.Row="7" Grid.Column="2" Placeholder="{Binding MaskBlurPlaceholder}" Text="{Binding MaskBlur}" Keyboard="Numeric" FontSize="16" MaxLength="3" HorizontalTextAlignment="End" />
+
             </Grid>
+
         </ScrollView>
 
         <HorizontalStackLayout Grid.Row="1" Spacing="10" HorizontalOptions="End" Padding="10">
             <Button Text="Cancel" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
             <Button Text="Confirm" Command="{Binding ConfirmSettingsCommand}" />
         </HorizontalStackLayout>
+
     </Grid>
 </views:BasePage>

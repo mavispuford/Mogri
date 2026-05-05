@@ -46,6 +46,16 @@ public class MainActivity : MauiAppCompatActivity
         checkForSharedImageIntent(intent);
     }
 
+    protected override void OnResume()
+    {
+        base.OnResume();
+
+        // Dismiss the generation-complete notification when the user returns to the app,
+        // whether via multitasking or by tapping the notification itself.
+        // Uses a static method so it works even after the service has been destroyed.
+        Mogri.Platforms.Android.Services.AndroidGenerationForegroundService.DismissCompletionNotification(this);
+    }
+
     protected override void OnNewIntent(Intent? intent)
     {
         checkForSharedImageIntent(intent);

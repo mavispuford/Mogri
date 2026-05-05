@@ -103,7 +103,12 @@ namespace Mogri.Platforms.Android.Services
 
             _completionNotificationBuilder.SetContentTitle("Generation Complete");
             _completionNotificationBuilder.SetContentText($"{imageCount} image{(imageCount == 1 ? "" : "s")} generated");
-            _completionNotificationBuilder.SetTimeoutAfter(5000); // Auto-dismiss after 5 seconds
+        }
+
+        public static void DismissCompletionNotification(Context context)
+        {
+            var notificationManager = (NotificationManager?)context.GetSystemService(NotificationService);
+            notificationManager?.Cancel(CompletionNotificationId);
         }
 
         public void ShowFailed(string message)

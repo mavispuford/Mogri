@@ -14,6 +14,10 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 {
     const string _defaultPrompt = "Photo of a lone tree on a hill, golden hour";
 
+#if ANDROID
+    private static bool _notificationPermissionRequested;
+#endif
+
     private readonly IFileService _fileService;
     private readonly IImageGenerationService _stableDiffusionService;
     private readonly IGenerationTaskService _generationTaskService;
@@ -28,9 +32,6 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     private bool _initImageNeedsResize = true;
     private bool _forceReinitialize;
     private float _targetProgress = 0;
-#if ANDROID
-    private static bool _notificationPermissionRequested;
-#endif
 
     [ObservableProperty]
     public partial bool HasInitImage { get; set; }
@@ -136,15 +137,15 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             var selectedModel = await _stableDiffusionService.GetSelectedModelAsync();
             _settings.Model = selectedModel;
 
-            CheckpointSettings? persisted = null;
+            CheckpointSettings? persistedSettings = null;
             if (selectedModel != null && !string.IsNullOrEmpty(selectedModel.Key))
             {
-                persisted = _checkpointSettingsService.Load(selectedModel.Key);
+                persistedSettings = _checkpointSettingsService.Load(selectedModel.Key);
             }
 
-            if (persisted != null)
+            if (persistedSettings != null)
             {
-                persisted.ApplyTo(_settings);
+                persistedSettings.ApplyTo(_settings);
             }
             else
             {
@@ -288,6 +289,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         if (OperatingSystem.IsAndroidVersionAtLeast(33) && !_notificationPermissionRequested)
         {
             _notificationPermissionRequested = true;
+
             try
             {
                 var status = await Permissions.CheckStatusAsync<Permissions.PostNotifications>();
@@ -355,18 +357,21 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         {
             IsGenerating = true;
             Progress = 0;
-
-            Results = new();
+            Results = [];
 
             var settings = _settings.Clone();
-
-            if (settings == null) return;
+            if (settings == null)
+            {
+                return;
+            }
 
             for (var i = 0; i < settings.BatchCount * settings.BatchSize; i++)
             {
                 var resultItem = _serviceProvider.GetService<IResultItemViewModel>();
-
-                if (resultItem == null) continue;
+                if (resultItem == null)
+                {
+                    continue;
+                }
 
                 resultItem.ParentCollection = Results;
                 resultItem.ApplyQueryParamsFromResultItemCommand = new RelayCommand<IDictionary<string, object>>(ApplyQueryAttributes);
@@ -379,7 +384,6 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                 if (_initImageNeedsResize)
                 {
                     var initImageResult = await GetResizedImageStringFromSettingsAsync(settings, settings.InitImage ?? string.Empty, filterImage: true);
-
                     if (!string.IsNullOrEmpty(initImageResult.ImageString))
                     {
                         settings.InitImage = initImageResult.ImageString;
@@ -391,7 +395,6 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                     if (!string.IsNullOrEmpty(settings.Mask))
                     {
                         var maskImageResult = await GetResizedImageStringFromWidthAndHeightAsync(initImageResult.ActualWidth, initImageResult.ActualHeight, settings.Mask, true, true);
-
                         if (!string.IsNullOrEmpty(maskImageResult.ImageString))
                         {
                             settings.Mask = maskImageResult.ImageString;
@@ -411,7 +414,6 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
             var sanitizedPrompt = settings.Prompt.Replace(" ", "_").ToLower();
             var length = Math.Min(sanitizedPrompt.Length, 90);
-
             var request = new GenerationTaskRequest
             {
                 Settings = settings,
@@ -464,7 +466,6 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                 foreach (var image in result.Images)
                 {
                     var resultItem = Results.FirstOrDefault(r => r.ApiResponse == null);
-
                     if (resultItem != null)
                     {
                         resultItem.ApiResponse = image.Response;
@@ -548,9 +549,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         return Task.Run(async () =>
         {
             var stream = await _imageService.GetStreamFromContentTypeStringAsync(sourceImageString, CancellationToken.None);
-
             var result = _imageService.GetResizedImageStreamBytes(stream, width, height, forceExactSize, filterImage);
-
             if (result.Bytes == null ||
                 result.Bytes.Length == 0)
             {
@@ -570,13 +569,10 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         var bitmap = _imageService.GetSkBitmapFromStream(fileStream);
         bitmap = _imageService.GetResizedSKBitmap(bitmap, (int)Constants.MaximumDisplayWidthHeight, (int)Constants.MaximumDisplayWidthHeight, filterImage: true, onlyIfLarger: true);
 
-        // Use SkiaSharp's SKBitmapImageSource image source instead
-        var imageSource = new SKBitmapImageSource
+        result.ImageSource = new SKBitmapImageSource
         {
             Bitmap = bitmap
         };
-        result.ImageSource = imageSource;
-
         result.IsLoading = false;
     }
 
@@ -668,7 +664,10 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
     public override async void ApplyQueryAttributes(IDictionary<string, object>? query)
     {
-        if (query == null) return;
+        if (query == null)
+        {
+            return;
+        }
 
         if (query.ContainsKey(NavigationParams.ForceReinitialize))
         {
@@ -682,7 +681,6 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             _ = validateSettingsResourcesAsync(settings);
 
             _settings = settings;
-
             if (_settings.Model != null && !string.IsNullOrEmpty(_settings.Model.Key))
             {
                 var checkpointSettings = CheckpointSettings.FromPromptSettings(_settings);
@@ -724,7 +722,6 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         if (query.TryGetValue(NavigationParams.CanvasImageString, out var canvasImageParam))
         {
             var imageString = canvasImageParam as string;
-
             if (imageString != null)
             {
                 var parameters = new Dictionary<string, object>

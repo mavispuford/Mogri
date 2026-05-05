@@ -27,7 +27,7 @@
           Margin="0">
         <ScrollView Grid.Row="0" Orientation="Vertical">
             <Grid x:Name="MainGrid"
-              Padding="30"
+              Padding="16"
               RowDefinitions="auto, auto, auto, auto, auto, auto, auto, auto, auto"
               RowSpacing="10"
               ColumnSpacing="16"

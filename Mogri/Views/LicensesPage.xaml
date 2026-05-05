@@ -64,5 +64,6 @@
                 <FontImageSource Glyph="&#xe5cd;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="{StaticResource Primary}" />
             </ImageButton.Source>
         </ImageButton>
+        
     </Grid>
 </views:BasePage>

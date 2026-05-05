@@ -55,6 +55,33 @@
                     <x:Double>1</x:Double>
                 </toolkit:BoolToObjectConverter.FalseObject>
             </toolkit:BoolToObjectConverter>
+
+            <Style x:Key="ContextButtonStyle" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{StaticResource CadetFortyPercent}" />
+                <Setter Property="StrokeThickness" Value="0" />
+                <Setter Property="WidthRequest" Value="50" />
+                <Setter Property="HeightRequest" Value="50" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 25" />
+            </Style>
+
+            <Style x:Key="SliderContainerStyle" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{StaticResource CadetEightyPercent}" />
+                <Setter Property="Stroke" Value="Transparent" />
+                <Setter Property="IsVisible" Value="False" />
+                <Setter Property="VerticalOptions" Value="End" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 15" />
+            </Style>
+
+            <Style x:Key="ContextSliderLabelStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="FontFamily" Value="ComfortaaBold" />
+                <Setter Property="HorizontalOptions" Value="Center" />
+            </Style>
+
+            <Style x:Key="ContextSliderStyle" TargetType="Slider">
+                <Setter Property="WidthRequest" Value="200" />
+                <Setter Property="HeightRequest" Value="40" />
+            </Style>
         </ResourceDictionary>
     </views:BasePage.Resources>
 
@@ -79,20 +106,24 @@
                 <FontImageSource Glyph="&#xe166;" FontFamily="{StaticResource IconFontLight}" Size="30" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
+
         <ToolbarItem Text="History" Order="Primary" Command="{Binding ShowHistoryCommand}">
             <ToolbarItem.IconImageSource>
                 <FontImageSource Glyph="&#xe241;" FontFamily="{StaticResource IconFontLight}" Size="30" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
+
         <ToolbarItem Text="{Binding ShowMaskLayer, Converter={StaticResource BoolToShowMaskTextConverter}}" 
                      IconImageSource="{Binding ShowMaskLayer, Converter={StaticResource BoolToEyeConverter}}"
                      Command="{Binding ToggleMaskLayerVisibilityCommand}" 
                      Order="Primary" />
+
         <ToolbarItem Text="Save Image" Command="{Binding SaveCommand}" Order="Secondary">
             <ToolbarItem.IconImageSource>
                 <FontImageSource Glyph="&#xe161;" FontFamily="{StaticResource IconFontLight}" Size="30" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
+
         <ToolbarItem Text="Set Resolution" Command="{Binding SetResolutionCommand}" Order="Secondary">
             <ToolbarItem.IconImageSource>
                 <FontImageSource Glyph="&#xe85b;" FontFamily="{StaticResource IconFontLight}" Size="30" />
@@ -153,6 +184,7 @@
                            HorizontalOptions="Center" 
                            VerticalOptions="Center"
                            IsRunning="{Binding IsBusy}"
+                           IsVisible="{Binding IsBusy}"
                            InputTransparent="True"
                            Scale="{OnPlatform Android=1, iOS=1.5}"/>
 
@@ -166,54 +198,54 @@
                 <!-- <Border.Shadow>
                 <Shadow Radius="5" Offset="5,5" Opacity=".2"></Shadow>
                 </Border.Shadow> -->
-        <CollectionView SelectedItem="{Binding CurrentTool}"
-                        ItemsSource="{Binding AvailableTools}"
-                        HorizontalOptions="Center"
-                        VerticalOptions="Center"
-                        HeightRequest="50"
-                        SelectionChanged="ToolCollectionView_SelectedItemChanged"
-                        SelectionMode="Single"
-                        HorizontalScrollBarVisibility="Never"
-                        VerticalScrollBarVisibility="Never">
-            <CollectionView.ItemsLayout>
-                <LinearItemsLayout Orientation="Horizontal"
-                                SnapPointsAlignment="Center"
-                                SnapPointsType="MandatorySingle"
-                                ItemSpacing="4"/>
-            </CollectionView.ItemsLayout>
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="viewModels:IPaintingToolViewModel">
-                    <controls:ToolControl>
-                        <VisualStateManager.VisualStateGroups>
-                            <VisualStateGroupList>
-                                <VisualStateGroup x:Name="CommonStates">
-                                    <VisualState x:Name="Normal">
-                                        <VisualState.Setters>
-                                            <Setter Property="BackgroundColor" Value="Transparent" />
-                                            <Setter Property="IconColor" Value="{AppThemeBinding Light={StaticResource CadetSixtyPercent}, Dark={StaticResource Secondary}}" />
-                                            <Setter Property="animations:AnimationProperties.Animations">
-                                                <animations:ScaleToAnimation Scale=".75" Easing="{x:Static Easing.CubicInOut}" Length="200" />
-                                            </Setter>
-                                        </VisualState.Setters>
-                                    </VisualState>
+            <CollectionView SelectedItem="{Binding CurrentTool}"
+                            ItemsSource="{Binding AvailableTools}"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            HeightRequest="50"
+                            SelectionChanged="ToolCollectionView_SelectedItemChanged"
+                            SelectionMode="Single"
+                            HorizontalScrollBarVisibility="Never"
+                            VerticalScrollBarVisibility="Never">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Horizontal"
+                                    SnapPointsAlignment="Center"
+                                    SnapPointsType="MandatorySingle"
+                                    ItemSpacing="4"/>
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="viewModels:IPaintingToolViewModel">
+                        <controls:ToolControl>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroupList>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal">
+                                            <VisualState.Setters>
+                                                <Setter Property="BackgroundColor" Value="Transparent" />
+                                                <Setter Property="IconColor" Value="{AppThemeBinding Light={StaticResource CadetSixtyPercent}, Dark={StaticResource Secondary}}" />
+                                                <Setter Property="animations:AnimationProperties.Animations">
+                                                    <animations:ScaleToAnimation Scale=".75" Easing="{x:Static Easing.CubicInOut}" Length="200" />
+                                                </Setter>
+                                            </VisualState.Setters>
+                                        </VisualState>
 
-                                    <VisualState x:Name="Selected">
-                                        <VisualState.Setters>
-                                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource LivingCoral}, Dark={StaticResource Primary}}" />
-                                            <Setter Property="IconColor" Value="{StaticResource White}" />
-                                            <Setter Property="animations:AnimationProperties.Animations">
-                                                <animations:ScaleToAnimation Scale="1" Easing="{x:Static Easing.CubicInOut}" Length="200" />
-                                            </Setter>
-                                        </VisualState.Setters>
-                                    </VisualState>
-                                </VisualStateGroup>
-                            </VisualStateGroupList>
-                        </VisualStateManager.VisualStateGroups>
-                    </controls:ToolControl>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-    </Border>
+                                        <VisualState x:Name="Selected">
+                                            <VisualState.Setters>
+                                                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource LivingCoral}, Dark={StaticResource Primary}}" />
+                                                <Setter Property="IconColor" Value="{StaticResource White}" />
+                                                <Setter Property="animations:AnimationProperties.Animations">
+                                                    <animations:ScaleToAnimation Scale="1" Easing="{x:Static Easing.CubicInOut}" Length="200" />
+                                                </Setter>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateGroupList>
+                            </VisualStateManager.VisualStateGroups>
+                        </controls:ToolControl>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Border>
 
         <VerticalStackLayout Grid.Row="1"
                              Grid.RowSpan="2"
@@ -225,12 +257,8 @@
                                    HorizontalOptions="Center"
                                    Spacing="20">
 
-                <Border x:Name="BrushSizeButton" 
-                        BackgroundColor="{StaticResource CadetFortyPercent}"
-                        HeightRequest="50"
-                        WidthRequest="50"
-                        StrokeThickness="0"
-                        StrokeShape="RoundRectangle 25">
+                <Border x:Name="BrushSizeButton"
+                        Style="{StaticResource ContextButtonStyle}">
                     <ContentView>
                         <ContentView.GestureRecognizers>
                             <TapGestureRecognizer Tapped="Brush_Size_Button_Clicked" />
@@ -252,17 +280,11 @@
                                  StrokeThickness="1"/>
 
                         </Grid>
-
-
                     </ContentView>
                 </Border>
 
                 <Border x:Name="AlphaButton"
-                        BackgroundColor="{StaticResource CadetFortyPercent}"
-                        StrokeThickness="0"
-                        WidthRequest="50"
-                        HeightRequest="50"
-                        StrokeShape="RoundRectangle 25">
+                        Style="{StaticResource ContextButtonStyle}">
                     <ContentView>
                         <ContentView.GestureRecognizers>
                             <TapGestureRecognizer Tapped="Alpha_Button_Clicked" />
@@ -277,13 +299,10 @@
                 </Border>
 
                 <Border x:Name="ColorPaletteButton"
-                        BackgroundColor="{StaticResource CadetFortyPercent}"
+                        Style="{StaticResource ContextButtonStyle}"
                         StrokeThickness="1"
                         Stroke="{StaticResource CadetSixtyPercent}"
-                        IsEnabled="{Binding GettingColorPalette, Converter={StaticResource InvertedBool}}"
-                        WidthRequest="50"
-                        HeightRequest="50"
-                        StrokeShape="RoundRectangle 25">
+                        IsEnabled="{Binding GettingColorPalette, Converter={StaticResource InvertedBool}}">
                     <Grid BackgroundColor="{Binding CurrentColor}">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ShowColorPickerCommand}" />
@@ -299,85 +318,79 @@
                         <ActivityIndicator HorizontalOptions="Center" 
                                        VerticalOptions="Center"
                                        IsRunning="{Binding GettingColorPalette}"
+                                       IsVisible="{Binding GettingColorPalette}"
                                        InputTransparent="True"
                                        Scale="{OnPlatform Android=1, iOS=1.5}"/>
-                    </Grid>
 
+                    </Grid>
                 </Border>
 
                 <Border x:Name="NoiseButton"
-                        BackgroundColor="{StaticResource CadetFortyPercent}"
-                        StrokeThickness="0"
-                        WidthRequest="50"
-                        HeightRequest="50"
-                        StrokeShape="RoundRectangle 25">
+                        Style="{StaticResource ContextButtonStyle}">
                     <ContentView>
                         <ContentView.GestureRecognizers>
                             <TapGestureRecognizer Tapped="Noise_Button_Clicked" />
                         </ContentView.GestureRecognizers>
+
                         <Image HorizontalOptions="Center"
                            VerticalOptions="Center">
                             <Image.Source>
                                 <FontImageSource Glyph="&#xe3ea;" FontFamily="{StaticResource IconFontLight}" Size="30" Color="White" />
                             </Image.Source>
                         </Image>
+
                     </ContentView>
                 </Border>
 
                 <Border x:Name="BoundingBoxSizeButton"
-                        BackgroundColor="{StaticResource CadetFortyPercent}"
-                        StrokeThickness="0"
-                        WidthRequest="50"
-                        HeightRequest="50"
-                        StrokeShape="RoundRectangle 25">
+                        Style="{StaticResource ContextButtonStyle}">
                     <Grid>
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ChangeBoundingBoxSizeCommand}" Tapped="Vibrate_Button_Tapped" />
                         </Grid.GestureRecognizers>
+
                         <Image HorizontalOptions="Center" Margin="0,0,0,16">
                             <Image.Source>
                                 <FontImageSource Glyph="&#xe85b;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="White" />
                             </Image.Source>
                         </Image>
+
                         <Label Text="{Binding Path=BoundingBoxSize, StringFormat='{0:F0}'}"
                                HorizontalTextAlignment="Center"
                                VerticalTextAlignment="End"
                                TextColor="White"
                                Margin="0,0,0,6"/>
+
                     </Grid>
                 </Border>
 
                 <Border x:Name="AddRemoveButton"
-                        BackgroundColor="{StaticResource CadetFortyPercent}"
-                        StrokeThickness="0"
-                        WidthRequest="50"
-                        HeightRequest="50"
-                        StrokeShape="RoundRectangle 25">
+                        Style="{StaticResource ContextButtonStyle}">
                     <ContentView>
                         <ContentView.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ToggleSegmentationAddCommand}" Tapped="Vibrate_Button_Tapped" />
                         </ContentView.GestureRecognizers>
+
                         <Image HorizontalOptions="Center"
                                VerticalOptions="Center"
                                Source="{Binding SegmentationAdd, Converter={StaticResource BoolToPlusMinusConverter}}"/>
+
                     </ContentView>
                 </Border>
 
                 <Border x:Name="ResetZoomButton"
-                        BackgroundColor="{StaticResource CadetFortyPercent}"
-                        StrokeThickness="0"
-                        WidthRequest="50"
-                        HeightRequest="50"
-                        StrokeShape="RoundRectangle 25">
+                        Style="{StaticResource ContextButtonStyle}">
                     <ContentView>
                         <ContentView.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ResetZoomCommand}" Tapped="Vibrate_Button_Tapped" />
                         </ContentView.GestureRecognizers>
+
                         <Image HorizontalOptions="Center" VerticalOptions="Center">
                             <Image.Source>
                                 <FontImageSource Glyph="&#xeb2d;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="White" />
                             </Image.Source>
                         </Image>
+
                     </ContentView>
                 </Border>
 
@@ -385,21 +398,14 @@
 
             <Grid x:Name="SecondaryButtonsLayout">
                 <Border x:Name="BrushSizeSliderContainer"
-                        BackgroundColor="{StaticResource CadetEightyPercent}"
-                        Stroke="Transparent"
-                        IsVisible="False"
-                        HorizontalOptions="Start"
-                        VerticalOptions="End"
-                        StrokeShape="RoundRectangle 15">
+                        Style="{StaticResource SliderContainerStyle}"
+                        HorizontalOptions="Start">
                     <VerticalStackLayout Spacing="0" Padding="15">
 
-                        <Label Text="{Binding CurrentBrushSize, StringFormat='Size: {0:F0}'}"
-                               TextColor="White"
-                               FontFamily="ComfortaaBold"
-                               HorizontalOptions="Center"/>
+                        <Label Style="{StaticResource ContextSliderLabelStyle}"
+                               Text="{Binding CurrentBrushSize, StringFormat='Size: {0:F0}'}" />
 
-                        <Slider WidthRequest="200"
-                                HeightRequest="40"
+                        <Slider Style="{StaticResource ContextSliderStyle}"
                                 Minimum="1"
                                 Maximum="50"
                                 Value="{Binding CurrentBrushSize}" />
@@ -408,21 +414,14 @@
                 </Border>
 
                 <Border x:Name="AlphaSliderContainer"
-                        BackgroundColor="{StaticResource CadetEightyPercent}"
-                        Stroke="Transparent"
-                        IsVisible="False"
-                        HorizontalOptions="Center"
-                        VerticalOptions="End"
-                        StrokeShape="RoundRectangle 15">
+                        Style="{StaticResource SliderContainerStyle}"
+                        HorizontalOptions="Center">
                     <VerticalStackLayout Spacing="0" Padding="15">
 
-                        <Label Text="{Binding CurrentAlpha, StringFormat='Alpha: {0:F2}'}"
-                               TextColor="White"
-                               FontFamily="ComfortaaBold"
-                               HorizontalOptions="Center"/>
+                        <Label Style="{StaticResource ContextSliderLabelStyle}"
+                               Text="{Binding CurrentAlpha, StringFormat='Alpha: {0:F2}'}" />
 
-                        <Slider WidthRequest="200"
-                                HeightRequest="40"
+                        <Slider Style="{StaticResource ContextSliderStyle}"
                                 Minimum="0.01"
                                 Maximum="1.0"
                                 Value="{Binding CurrentAlpha}" />
@@ -431,21 +430,14 @@
                 </Border>
 
                 <Border x:Name="NoiseSliderContainer"
-                        BackgroundColor="{StaticResource CadetEightyPercent}"
-                        Stroke="Transparent"
-                        IsVisible="False"
-                        HorizontalOptions="End"
-                        VerticalOptions="End"
-                        StrokeShape="RoundRectangle 15">
+                        Style="{StaticResource SliderContainerStyle}"
+                        HorizontalOptions="End">
                     <VerticalStackLayout Spacing="0" Padding="15">
 
-                        <Label Text="{Binding CurrentNoise, StringFormat='Noise: {0:P0}'}"
-                               TextColor="White"
-                               FontFamily="ComfortaaBold"
-                               HorizontalOptions="Center"/>
+                        <Label Style="{StaticResource ContextSliderLabelStyle}"
+                               Text="{Binding CurrentNoise, StringFormat='Noise: {0:P0}'}" />
 
-                        <Slider WidthRequest="200"
-                                HeightRequest="40"
+                        <Slider Style="{StaticResource ContextSliderStyle}"
                                 Minimum="0"
                                 Maximum="1"
                                 Value="{Binding CurrentNoise}" />
@@ -465,102 +457,15 @@
                              CascadeInputTransparent="True"
                              Spacing="4"
                              Opacity="0">
-            <VerticalStackLayout.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource MutedPeach}, Dark={StaticResource MutedPeach}}"/>
-                    <Setter Property="HeightRequest" Value="56"/>
-                    <Setter Property="StrokeShape" Value="RoundRectangle 28"/>
-                    <Setter Property="Stroke" Value="Transparent"/>
-                    <Setter Property="Padding" Value="24,0"/>
-                    <Setter Property="HorizontalOptions" Value="End"/>
-                </Style>
-
-                <Style TargetType="Label">
-                    <Setter Property="FontSize" Value="14"/>
-                    <Setter Property="FontFamily" Value="ComfortaaBold"/>
-                    <Setter Property="TextColor" Value="{StaticResource Tertiary}"/>
-                    <Setter Property="VerticalTextAlignment" Value="Center"/>
-                </Style>
-
-                <Style TargetType="HorizontalStackLayout">
-                    <Setter Property="Spacing" Value="8"/>
-                </Style>
-            </VerticalStackLayout.Resources>
             <animations:AnimationProperties.Animations>
                 <animations:FadeToAnimation Opacity="{Binding ShowActions, Converter={StaticResource BoolToScaleInDoubleConverter}}" Easing="{x:Static Easing.CubicInOut}" Length="200" />
             </animations:AnimationProperties.Animations>
 
-            <Border>
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding ApplyPaintAndMasksCommand}" />
-                </Border.GestureRecognizers>
-                <HorizontalStackLayout>
-                    <Image>
-                        <Image.Source>
-                            <FontImageSource Glyph="&#xe94d;" FontFamily="{StaticResource IconFontLight}" Size="24" />
-                        </Image.Source>
-                        <Image.Behaviors>
-                            <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Primary}" />
-                        </Image.Behaviors>
-                    </Image>
-
-                    <Label Text="Flatten" />
-                </HorizontalStackLayout>
-            </Border>
-
-            <Border>
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding PatchCommand}" />
-                </Border.GestureRecognizers>
-                <HorizontalStackLayout>
-                    <Image>
-                        <Image.Source>
-                            <FontImageSource Glyph="&#xe3f3;" FontFamily="{StaticResource IconFontLight}" Size="24" />
-                        </Image.Source>
-                        <Image.Behaviors>
-                            <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Primary}" />
-                        </Image.Behaviors>
-                    </Image>
-
-                    <Label Text="Patch" />
-                </HorizontalStackLayout>
-            </Border>
-
-            <Border IsVisible="{Binding CurrentTool.Type, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:ToolType.BoundingBox}}">
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding BeginCropImageRectCommand}" />
-                </Border.GestureRecognizers>
-                <HorizontalStackLayout>
-                    <Image>
-                        <Image.Source>
-                            <FontImageSource Glyph="&#xf08b;" FontFamily="{StaticResource IconFontLight}" Size="24" />
-                        </Image.Source>
-                        <Image.Behaviors>
-                            <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Primary}" />
-                        </Image.Behaviors>
-                    </Image>
-
-                    <Label Text="Snip Selection" />
-                </HorizontalStackLayout>
-            </Border>
-
-            <Border>
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding SendToImageToImageCommand}" />
-                </Border.GestureRecognizers>
-                <HorizontalStackLayout>
-                    <Image>
-                        <Image.Source>
-                            <FontImageSource Glyph="&#xf824;" FontFamily="{StaticResource IconFontLight}" Size="24" />
-                        </Image.Source>
-                        <Image.Behaviors>
-                            <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Primary}" />
-                        </Image.Behaviors>
-                    </Image>
-
-                    <Label Text="Use Canvas" />
-                </HorizontalStackLayout>
-            </Border>
+            <controls:ActionItemControl Glyph="&#xe94d;" Text="Flatten" Command="{Binding ApplyPaintAndMasksCommand}" />
+            <controls:ActionItemControl Glyph="&#xe3f3;" Text="Patch" Command="{Binding PatchCommand}" />
+            <controls:ActionItemControl Glyph="&#xf08b;" Text="Snip Selection" Command="{Binding BeginCropImageRectCommand}"
+                                        IsVisible="{Binding CurrentTool.Type, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:ToolType.BoundingBox}}" />
+            <controls:ActionItemControl Glyph="&#xf824;" Text="Use Canvas" Command="{Binding SendToImageToImageCommand}" />
 
         </VerticalStackLayout>
 
@@ -574,9 +479,11 @@
                         AlignItems="Center"
                         JustifyContent="SpaceEvenly"
                         IsVisible="{Binding CurrentTool.Type, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:ToolType.MagicWand}}">
+
                 <Button Text="Fill" Command="{Binding ApplySegmentationMaskCommand}" WidthRequest="70"/>
                 <Button Text="Invert" BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark=Transparent}" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark=White}" BorderColor="{AppThemeBinding Light=Transparent, Dark={StaticResource CadetFortyPercent}}" BorderWidth="1" Command="{Binding InvertSegmentationMaskCommand}" />
                 <Button Text="Clear" BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark=Transparent}" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark=White}" BorderColor="{AppThemeBinding Light=Transparent, Dark={StaticResource CadetFortyPercent}}" BorderWidth="1" Command="{Binding ClearSegmentationMaskCommand}" />
+
             </FlexLayout>
 
             <Border x:Name="ShowActionsButton"
@@ -607,6 +514,7 @@
                         <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource White}" />
                     </ImageButton.Behaviors>
                 </ImageButton>
+
             </Border>
 
             <Border x:Name="CloseActionsButton"
@@ -639,9 +547,8 @@
                         <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Secondary}" Dark="{StaticResource Primary}" />
                     </ImageButton.Behaviors>
                 </ImageButton>
+
             </Border>
-
         </Grid>
-
     </Grid>
 </views:BasePage>

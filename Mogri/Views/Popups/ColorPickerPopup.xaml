@@ -24,6 +24,7 @@
                              Spacing="10"
                              HorizontalOptions="Center"
                              VerticalOptions="Center">
+
             <Label Text="Current Color:"
                    FontFamily="ComfortaaRegular" 
                    FontSize="16"/>
@@ -42,6 +43,7 @@
                        FontSize="16"
                        VerticalTextAlignment="Center"
                        HorizontalOptions="Fill"/>
+
                 <Entry FlexLayout.Grow="2"
                        Text="{Binding CurrentColorHexString}"
                        FontSize="16"

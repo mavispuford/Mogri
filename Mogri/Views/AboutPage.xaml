@@ -13,8 +13,8 @@
                 Shell.PresentationMode="ModalAnimated"
                 Shell.NavBarIsVisible="False">
     <Grid RowDefinitions="*,auto" Padding="0,16">
-
         <VerticalStackLayout Grid.Row="0" VerticalOptions="Center" Spacing="22">
+
             <Image 
                 x:Name="LogoImage"
                 Source="logo_large.png"
@@ -65,6 +65,7 @@
                     </Image.Source>
                 </Image>
                 <Label VerticalOptions="Center" Text="{Binding AppVersion}" TranslationY="-2" FontFamily="ComfortaaRegular" FontSize="18" TextColor="{AppThemeBinding Light={StaticResource NeutralDarkGray}, Dark={StaticResource Secondary}}" />
+
             </HorizontalStackLayout>
         </VerticalStackLayout>
 
@@ -73,5 +74,6 @@
                     <FontImageSource Glyph="&#xe5cd;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="{StaticResource Primary}" />
                 </ImageButton.Source>
         </ImageButton>
+        
     </Grid>
 </views:BasePage>

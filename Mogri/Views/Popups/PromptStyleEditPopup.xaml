@@ -15,6 +15,7 @@
         <VerticalStackLayout>
             <ScrollView Orientation="Vertical">
                 <VerticalStackLayout x:Name="MainLayout">
+
                     <Label Text="Name:" Style="{StaticResource LabelHeader}" />
                     <Entry Text="{Binding EditName}" Placeholder="Prompt style name" />
 
@@ -23,11 +24,15 @@
 
                     <Label Text="Negative Prompt:" Style="{StaticResource LabelHeader}" />
                     <Editor Text="{Binding EditNegativePrompt}" AutoSize="TextChanges" Placeholder="Negative prompt additions" />
+
                 </VerticalStackLayout>
             </ScrollView>
+
             <HorizontalStackLayout HorizontalOptions="End" Spacing="10">
+
                 <Button Text="Close" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" Command="{Binding CloseCommand}" />
                 <Button Text="Save" Command="{Binding SaveCommand}" />
+                
             </HorizontalStackLayout>
         </VerticalStackLayout>
     </Border>
