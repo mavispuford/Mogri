@@ -13,12 +13,14 @@
             Padding="20,6,16,6"
             HeightRequest="50">
         <HorizontalStackLayout Spacing="6">
+            
             <Label Text="{Binding Text, Source={x:Reference ThisControl}}" 
                    TextColor="White" 
                    HorizontalOptions="Start"
                    VerticalTextAlignment="Center" 
                    VerticalOptions="Center"
                    FontAttributes="Bold" />
+
             <ImageButton ToolTipProperties.Text="{Binding TooltipText, Source={x:Reference ThisControl}}"
                          VerticalOptions="Center"
                          HorizontalOptions="End"
@@ -28,6 +30,7 @@
                     <FontImageSource Glyph="&#xe5cd;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="White" />
                 </ImageButton.Source>
             </ImageButton>
+
         </HorizontalStackLayout>
     </Border>
 </ContentView>

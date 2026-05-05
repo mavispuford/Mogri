@@ -25,6 +25,7 @@
             <TapGestureRecognizer Command="{Binding Command, Source={x:Reference ThisControl}}" />
         </Border.GestureRecognizers>
         <HorizontalStackLayout Spacing="8">
+
             <Image>
                 <Image.Source>
                     <FontImageSource Glyph="{Binding Glyph, Source={x:Reference ThisControl}}" FontFamily="{StaticResource IconFontLight}" Size="24" />
@@ -32,8 +33,10 @@
                 <Image.Behaviors>
                     <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Primary}" />
                 </Image.Behaviors>
+                
             </Image>
             <Label Text="{Binding Text, Source={x:Reference ThisControl}}" />
+
         </HorizontalStackLayout>
     </Border>
 </ContentView>

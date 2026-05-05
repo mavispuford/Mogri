@@ -17,36 +17,35 @@
         </ResourceDictionary>
     </ContentView.Resources>
     
-        <Grid>
+    <Grid>
+        <ImageButton WidthRequest="50" 
+                        HeightRequest="50" 
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center"
+                        Command="{Binding SelectToolCommand, Source={RelativeSource AncestorType={x:Type pages:ICanvasPageViewModel}}}"
+                        CommandParameter="{Binding .}"
+                        Opacity="{Binding IsLoading, Converter={StaticResource BoolToHalfOpacityConverter}}"
+                        ToolTipProperties.Text="{Binding Name}"
+                        Padding="4">
+            <ImageButton.Behaviors>
+                <toolkit:IconTintColorBehavior TintColor="{Binding IconColor, Source={x:Reference ThisControl}}" />
+            </ImageButton.Behaviors>
 
-            <ImageButton WidthRequest="50" 
-                         HeightRequest="50" 
-                         HorizontalOptions="Center"
-                         VerticalOptions="Center"
-                         Command="{Binding SelectToolCommand, Source={RelativeSource AncestorType={x:Type pages:ICanvasPageViewModel}}}"
-                         CommandParameter="{Binding .}"
-                         Opacity="{Binding IsLoading, Converter={StaticResource BoolToHalfOpacityConverter}}"
-                         ToolTipProperties.Text="{Binding Name}"
-                         Padding="4">
-                <ImageButton.Behaviors>
-                    <toolkit:IconTintColorBehavior TintColor="{Binding IconColor, Source={x:Reference ThisControl}}" />
-                </ImageButton.Behaviors>
+            <ImageButton.Triggers>
+                <DataTrigger TargetType="ImageButton" Binding="{Binding IconImagePath, Converter={toolkit:IsStringNotNullOrEmptyConverter}}" Value="True">
+                    <Setter Property="Source" Value="{Binding IconImagePath}" />
+                </DataTrigger>
+                <DataTrigger TargetType="ImageButton" Binding="{Binding IconImagePath, Converter={toolkit:IsStringNotNullOrEmptyConverter}}" Value="False">
+                    <Setter Property="Source">
+                        <Setter.Value>
+                            <FontImageSource Glyph="{Binding IconCode}" FontFamily="{StaticResource IconFontRegular}" Size="50" />
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </ImageButton.Triggers>
+        </ImageButton>
 
-                <ImageButton.Triggers>
-                    <DataTrigger TargetType="ImageButton" Binding="{Binding IconImagePath, Converter={toolkit:IsStringNotNullOrEmptyConverter}}" Value="True">
-                        <Setter Property="Source" Value="{Binding IconImagePath}" />
-                    </DataTrigger>
-                    <DataTrigger TargetType="ImageButton" Binding="{Binding IconImagePath, Converter={toolkit:IsStringNotNullOrEmptyConverter}}" Value="False">
-                        <Setter Property="Source">
-                            <Setter.Value>
-                                <FontImageSource Glyph="{Binding IconCode}" FontFamily="{StaticResource IconFontRegular}" Size="50" />
-                            </Setter.Value>
-                        </Setter>
-                    </DataTrigger>
-                </ImageButton.Triggers>
-            </ImageButton>
-
-            <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center" IsRunning="{Binding IsLoading}" InputTransparent="True" Scale="{OnPlatform Android=1, iOS=1.5}"/>
-        </Grid>
+        <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center" IsRunning="{Binding IsLoading}" InputTransparent="True" Scale="{OnPlatform Android=1, iOS=1.5}"/>
+    </Grid>
 
 </ContentView>

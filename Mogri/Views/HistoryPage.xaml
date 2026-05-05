@@ -46,8 +46,10 @@
                     <FontImageSource Glyph="&#xe162;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="White" />
                 </ImageButton.Source>
             </ImageButton>
+
         </Grid>
     </Shell.TitleView>
+
     <views:BasePage.Resources>
         <ResourceDictionary>
             <toolkit:InvertedBoolConverter x:Key="InvertedBool" />
@@ -120,6 +122,7 @@
                                 </VisualStateGroup>
                             </VisualStateGroupList>
                         </VisualStateManager.VisualStateGroups>
+
                         <Image x:Name="ItemImage"
                                Source="{Binding ThumbnailImageSource}"
                                Aspect="AspectFill"
@@ -141,8 +144,8 @@
                             </Image.Behaviors>
 
                         </Image>
-                    </Border>
 
+                    </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
@@ -177,6 +180,7 @@
                     </animations:CustomAnimationBehavior.AnimationType>
                 </animations:CustomAnimationBehavior>
             </Border.Behaviors>
+
             <Grid ColumnDefinitions="*,auto" VerticalOptions="Start">
                 <Label Grid.Column="0" Margin="30,0,0,0" Text="{Binding SelectedItemsText}" FontSize="16" VerticalTextAlignment="Center"/>
 
@@ -195,7 +199,6 @@
                         </Image.Source>
                     </Image>
                 </ContentView>
-
             </Grid>
         </Border>
     </Grid>

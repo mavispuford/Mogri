@@ -19,6 +19,7 @@
                   RowDefinitions="auto,*,auto"
                   HeightRequest="500">
                 <Grid Grid.Row="0" ColumnDefinitions="*,auto,auto">
+
                     <Label Grid.Column="0"
                            Text="Canvas History"
                            FontSize="16"
@@ -54,6 +55,7 @@
                                              Color="{AppThemeBinding Light={StaticResource SteelRed}, Dark={StaticResource Eva}}" />
                         </ImageButton.Source>
                     </ImageButton>
+
                 </Grid>
 
                 <CollectionView Grid.Row="1"
@@ -145,6 +147,7 @@
                                                          Size="24"/>
                                     </ImageButton.Source>
                                 </ImageButton>
+                                
                             </Grid>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>

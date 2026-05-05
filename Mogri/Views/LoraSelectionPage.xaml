@@ -13,6 +13,7 @@
         <Label Text="LoRA Settings" Style="{StaticResource LabelTitleView}" />
     </Shell.TitleView>
     <Grid RowDefinitions="*, auto, auto">
+
         <Grid RowDefinitions="auto, *" 
               ColumnDefinitions="auto,*"
               RowSpacing="12"
@@ -24,6 +25,7 @@
                    Text="Lora: "
                    Style="{StaticResource LabelHeader}"
                    VerticalTextAlignment="Center"/>
+
             <Picker x:Name="LoraPicker"
                     Grid.Row="0" 
                     Title="Tap to select"
@@ -75,7 +77,6 @@
                     </BindableLayout.ItemTemplate>
                 </VerticalStackLayout>
             </ScrollView>
-
             
         </Grid>
 
@@ -93,6 +94,7 @@
             <Button Text="Cancel" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
             <Button Text="Apply" Command="{Binding ConfirmCommand}" WidthRequest="100" />
         </HorizontalStackLayout>
+        
     </Grid>
     
 </views:BasePage>

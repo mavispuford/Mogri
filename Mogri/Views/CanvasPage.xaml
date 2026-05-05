@@ -106,20 +106,24 @@
                 <FontImageSource Glyph="&#xe166;" FontFamily="{StaticResource IconFontLight}" Size="30" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
+
         <ToolbarItem Text="History" Order="Primary" Command="{Binding ShowHistoryCommand}">
             <ToolbarItem.IconImageSource>
                 <FontImageSource Glyph="&#xe241;" FontFamily="{StaticResource IconFontLight}" Size="30" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
+
         <ToolbarItem Text="{Binding ShowMaskLayer, Converter={StaticResource BoolToShowMaskTextConverter}}" 
                      IconImageSource="{Binding ShowMaskLayer, Converter={StaticResource BoolToEyeConverter}}"
                      Command="{Binding ToggleMaskLayerVisibilityCommand}" 
                      Order="Primary" />
+
         <ToolbarItem Text="Save Image" Command="{Binding SaveCommand}" Order="Secondary">
             <ToolbarItem.IconImageSource>
                 <FontImageSource Glyph="&#xe161;" FontFamily="{StaticResource IconFontLight}" Size="30" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
+
         <ToolbarItem Text="Set Resolution" Command="{Binding SetResolutionCommand}" Order="Secondary">
             <ToolbarItem.IconImageSource>
                 <FontImageSource Glyph="&#xe85b;" FontFamily="{StaticResource IconFontLight}" Size="30" />
@@ -193,54 +197,54 @@
                 <!-- <Border.Shadow>
                 <Shadow Radius="5" Offset="5,5" Opacity=".2"></Shadow>
                 </Border.Shadow> -->
-        <CollectionView SelectedItem="{Binding CurrentTool}"
-                        ItemsSource="{Binding AvailableTools}"
-                        HorizontalOptions="Center"
-                        VerticalOptions="Center"
-                        HeightRequest="50"
-                        SelectionChanged="ToolCollectionView_SelectedItemChanged"
-                        SelectionMode="Single"
-                        HorizontalScrollBarVisibility="Never"
-                        VerticalScrollBarVisibility="Never">
-            <CollectionView.ItemsLayout>
-                <LinearItemsLayout Orientation="Horizontal"
-                                SnapPointsAlignment="Center"
-                                SnapPointsType="MandatorySingle"
-                                ItemSpacing="4"/>
-            </CollectionView.ItemsLayout>
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="viewModels:IPaintingToolViewModel">
-                    <controls:ToolControl>
-                        <VisualStateManager.VisualStateGroups>
-                            <VisualStateGroupList>
-                                <VisualStateGroup x:Name="CommonStates">
-                                    <VisualState x:Name="Normal">
-                                        <VisualState.Setters>
-                                            <Setter Property="BackgroundColor" Value="Transparent" />
-                                            <Setter Property="IconColor" Value="{AppThemeBinding Light={StaticResource CadetSixtyPercent}, Dark={StaticResource Secondary}}" />
-                                            <Setter Property="animations:AnimationProperties.Animations">
-                                                <animations:ScaleToAnimation Scale=".75" Easing="{x:Static Easing.CubicInOut}" Length="200" />
-                                            </Setter>
-                                        </VisualState.Setters>
-                                    </VisualState>
+            <CollectionView SelectedItem="{Binding CurrentTool}"
+                            ItemsSource="{Binding AvailableTools}"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            HeightRequest="50"
+                            SelectionChanged="ToolCollectionView_SelectedItemChanged"
+                            SelectionMode="Single"
+                            HorizontalScrollBarVisibility="Never"
+                            VerticalScrollBarVisibility="Never">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Horizontal"
+                                    SnapPointsAlignment="Center"
+                                    SnapPointsType="MandatorySingle"
+                                    ItemSpacing="4"/>
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="viewModels:IPaintingToolViewModel">
+                        <controls:ToolControl>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroupList>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal">
+                                            <VisualState.Setters>
+                                                <Setter Property="BackgroundColor" Value="Transparent" />
+                                                <Setter Property="IconColor" Value="{AppThemeBinding Light={StaticResource CadetSixtyPercent}, Dark={StaticResource Secondary}}" />
+                                                <Setter Property="animations:AnimationProperties.Animations">
+                                                    <animations:ScaleToAnimation Scale=".75" Easing="{x:Static Easing.CubicInOut}" Length="200" />
+                                                </Setter>
+                                            </VisualState.Setters>
+                                        </VisualState>
 
-                                    <VisualState x:Name="Selected">
-                                        <VisualState.Setters>
-                                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource LivingCoral}, Dark={StaticResource Primary}}" />
-                                            <Setter Property="IconColor" Value="{StaticResource White}" />
-                                            <Setter Property="animations:AnimationProperties.Animations">
-                                                <animations:ScaleToAnimation Scale="1" Easing="{x:Static Easing.CubicInOut}" Length="200" />
-                                            </Setter>
-                                        </VisualState.Setters>
-                                    </VisualState>
-                                </VisualStateGroup>
-                            </VisualStateGroupList>
-                        </VisualStateManager.VisualStateGroups>
-                    </controls:ToolControl>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-    </Border>
+                                        <VisualState x:Name="Selected">
+                                            <VisualState.Setters>
+                                                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource LivingCoral}, Dark={StaticResource Primary}}" />
+                                                <Setter Property="IconColor" Value="{StaticResource White}" />
+                                                <Setter Property="animations:AnimationProperties.Animations">
+                                                    <animations:ScaleToAnimation Scale="1" Easing="{x:Static Easing.CubicInOut}" Length="200" />
+                                                </Setter>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateGroupList>
+                            </VisualStateManager.VisualStateGroups>
+                        </controls:ToolControl>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Border>
 
         <VerticalStackLayout Grid.Row="1"
                              Grid.RowSpan="2"
@@ -275,8 +279,6 @@
                                  StrokeThickness="1"/>
 
                         </Grid>
-
-
                     </ContentView>
                 </Border>
 
@@ -317,8 +319,8 @@
                                        IsRunning="{Binding GettingColorPalette}"
                                        InputTransparent="True"
                                        Scale="{OnPlatform Android=1, iOS=1.5}"/>
-                    </Grid>
 
+                    </Grid>
                 </Border>
 
                 <Border x:Name="NoiseButton"
@@ -327,12 +329,14 @@
                         <ContentView.GestureRecognizers>
                             <TapGestureRecognizer Tapped="Noise_Button_Clicked" />
                         </ContentView.GestureRecognizers>
+
                         <Image HorizontalOptions="Center"
                            VerticalOptions="Center">
                             <Image.Source>
                                 <FontImageSource Glyph="&#xe3ea;" FontFamily="{StaticResource IconFontLight}" Size="30" Color="White" />
                             </Image.Source>
                         </Image>
+
                     </ContentView>
                 </Border>
 
@@ -342,16 +346,19 @@
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ChangeBoundingBoxSizeCommand}" Tapped="Vibrate_Button_Tapped" />
                         </Grid.GestureRecognizers>
+
                         <Image HorizontalOptions="Center" Margin="0,0,0,16">
                             <Image.Source>
                                 <FontImageSource Glyph="&#xe85b;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="White" />
                             </Image.Source>
                         </Image>
+
                         <Label Text="{Binding Path=BoundingBoxSize, StringFormat='{0:F0}'}"
                                HorizontalTextAlignment="Center"
                                VerticalTextAlignment="End"
                                TextColor="White"
                                Margin="0,0,0,6"/>
+
                     </Grid>
                 </Border>
 
@@ -361,9 +368,11 @@
                         <ContentView.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ToggleSegmentationAddCommand}" Tapped="Vibrate_Button_Tapped" />
                         </ContentView.GestureRecognizers>
+
                         <Image HorizontalOptions="Center"
                                VerticalOptions="Center"
                                Source="{Binding SegmentationAdd, Converter={StaticResource BoolToPlusMinusConverter}}"/>
+
                     </ContentView>
                 </Border>
 
@@ -373,11 +382,13 @@
                         <ContentView.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ResetZoomCommand}" Tapped="Vibrate_Button_Tapped" />
                         </ContentView.GestureRecognizers>
+
                         <Image HorizontalOptions="Center" VerticalOptions="Center">
                             <Image.Source>
                                 <FontImageSource Glyph="&#xeb2d;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="White" />
                             </Image.Source>
                         </Image>
+
                     </ContentView>
                 </Border>
 
@@ -466,9 +477,11 @@
                         AlignItems="Center"
                         JustifyContent="SpaceEvenly"
                         IsVisible="{Binding CurrentTool.Type, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:ToolType.MagicWand}}">
+
                 <Button Text="Fill" Command="{Binding ApplySegmentationMaskCommand}" WidthRequest="70"/>
                 <Button Text="Invert" BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark=Transparent}" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark=White}" BorderColor="{AppThemeBinding Light=Transparent, Dark={StaticResource CadetFortyPercent}}" BorderWidth="1" Command="{Binding InvertSegmentationMaskCommand}" />
                 <Button Text="Clear" BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark=Transparent}" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark=White}" BorderColor="{AppThemeBinding Light=Transparent, Dark={StaticResource CadetFortyPercent}}" BorderWidth="1" Command="{Binding ClearSegmentationMaskCommand}" />
+
             </FlexLayout>
 
             <Border x:Name="ShowActionsButton"
@@ -499,6 +512,7 @@
                         <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource White}" />
                     </ImageButton.Behaviors>
                 </ImageButton>
+
             </Border>
 
             <Border x:Name="CloseActionsButton"
@@ -531,9 +545,8 @@
                         <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Secondary}" Dark="{StaticResource Primary}" />
                     </ImageButton.Behaviors>
                 </ImageButton>
+
             </Border>
-
         </Grid>
-
     </Grid>
 </views:BasePage>

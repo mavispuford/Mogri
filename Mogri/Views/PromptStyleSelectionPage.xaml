@@ -47,6 +47,7 @@
                 <FontImageSource Glyph="&#xe145;" FontFamily="{StaticResource IconFontRegular}" Size="24" Color="{OnPlatform Android={StaticResource White}}" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
+
         <ToolbarItem Command="{Binding ResetCommand}"
                      Text="Reset">
             <ToolbarItem.IconImageSource>
@@ -110,10 +111,12 @@
                           HeightRequest="54"
                           HorizontalOptions="Fill"
                           Style="{StaticResource SelectableItemStyle}">
+
                         <Label Grid.Column="0"
                                Text="{Binding Name}"
                                VerticalOptions="Center"
                                FontSize="16"/>
+
                         <ImageButton Grid.Column="1"
                                      ToolTipProperties.Text="Edit"
                                      HorizontalOptions="End"
@@ -124,6 +127,7 @@
                                 <FontImageSource Glyph="&#xe3c9;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="{StaticResource Cadet}" />
                             </ImageButton.Source>
                         </ImageButton>
+
                         <ImageButton Grid.Column="2"
                                      ToolTipProperties.Text="Delete"
                                      HorizontalOptions="End"
@@ -134,6 +138,7 @@
                                 <FontImageSource Glyph="&#xe872;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
                             </ImageButton.Source>
                         </ImageButton>
+
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
@@ -145,8 +150,10 @@
                                Spacing="10"
                                HorizontalOptions="End" 
                                Padding="10">
+                               
             <Button Text="Cancel" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
             <Button Text="Apply" Command="{Binding ConfirmCommand}" WidthRequest="100" />
+
         </HorizontalStackLayout>
     </Grid>
 

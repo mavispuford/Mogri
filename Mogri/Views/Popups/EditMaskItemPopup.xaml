@@ -12,6 +12,7 @@
             </Style>
         </ResourceDictionary>
     </popups:BasePopup.Resources>
+
     <Grid>
         <Border HorizontalOptions="Fill"
                  VerticalOptions="Center"
@@ -36,6 +37,7 @@
                     <Grid Grid.Row="1" ColumnDefinitions="*, Auto" ColumnSpacing="16" IsVisible="{Binding IsColorVisible}">
                         <Label Text="Color" 
                                Style="{StaticResource SettingLabel}" />
+
                         <Border Grid.Column="1"
                                 HeightRequest="44"
                                 WidthRequest="80"   
@@ -55,6 +57,7 @@
                             <Label Text="Opacity" Style="{StaticResource SettingLabel}" />
                             <Label Grid.Column="1" Text="{Binding Alpha, StringFormat='{0:P0}'}" FontSize="14" FontAttributes="Bold"/>
                         </Grid>
+
                         <Slider Minimum="0.01" 
                                 Maximum="1.0" 
                                 Value="{Binding Alpha}"
@@ -68,6 +71,7 @@
                             <Label Text="Noise" Style="{StaticResource SettingLabel}" />
                             <Label Grid.Column="1" Text="{Binding Noise, StringFormat='{0:P0}'}" FontSize="14" FontAttributes="Bold"/>
                         </Grid>
+
                         <Slider Minimum="0" 
                                 Maximum="1.0" 
                                 Value="{Binding Noise}"
@@ -81,6 +85,7 @@
                             <Label Text="Brush Size" Style="{StaticResource SettingLabel}" />
                             <Label Grid.Column="1" Text="{Binding BrushSize, StringFormat='{0:F0}'}" FontSize="14" FontAttributes="Bold"/>
                         </Grid>
+                        
                         <Slider Minimum="1" 
                                 Maximum="50"
                                 Value="{Binding BrushSize}" 
@@ -112,6 +117,7 @@
                    FontSize="18"
                    HorizontalTextAlignment="Center"
                    VerticalTextAlignment="Center"/>
+                   
          </Border>
     </Grid>
 </popups:BasePopup>
