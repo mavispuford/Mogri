@@ -30,7 +30,7 @@
     </views:BasePage.Resources>
 
     <Shell.TitleView>
-        <Grid HorizontalOptions="Start" Padding="0,5">
+        <Grid HorizontalOptions="Start" Padding="{OnPlatform Android='16,5', iOS='0,5'}">
             <Image HorizontalOptions="Start" Source="logo_small.png" Aspect="AspectFit" >
                 <Image.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding NavigateToAboutPageCommand}"/>

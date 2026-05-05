@@ -18,7 +18,7 @@
               ColumnDefinitions="auto,*"
               RowSpacing="12"
               ColumnSpacing="6"
-              Padding="30">
+              Padding="16">
 
             <Label Grid.Row="0"
                    Grid.Column="0"
@@ -94,7 +94,7 @@
             <Button Text="Cancel" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
             <Button Text="Apply" Command="{Binding ConfirmCommand}" WidthRequest="100" />
         </HorizontalStackLayout>
-        
+
     </Grid>
     
 </views:BasePage>

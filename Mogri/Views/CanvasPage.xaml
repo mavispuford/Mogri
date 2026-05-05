@@ -184,6 +184,7 @@
                            HorizontalOptions="Center" 
                            VerticalOptions="Center"
                            IsRunning="{Binding IsBusy}"
+                           IsVisible="{Binding IsBusy}"
                            InputTransparent="True"
                            Scale="{OnPlatform Android=1, iOS=1.5}"/>
 
@@ -317,6 +318,7 @@
                         <ActivityIndicator HorizontalOptions="Center" 
                                        VerticalOptions="Center"
                                        IsRunning="{Binding GettingColorPalette}"
+                                       IsVisible="{Binding GettingColorPalette}"
                                        InputTransparent="True"
                                        Scale="{OnPlatform Android=1, iOS=1.5}"/>
 

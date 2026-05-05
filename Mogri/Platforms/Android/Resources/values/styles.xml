@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<!-- This entire style is used to opt out of edge to edge since it's currently broken in .NET MAUI 10.0.20 when using Shell
+<!-- This entire style was used to opt out of edge to edge since was broken in .NET MAUI 10.0.20 when using Shell
      The extra properties exist to match the .NET MAUI MainTheme.Base
  -->
      <!-- <style name="Mogri.MainTheme.Base" parent="Theme.MaterialComponents.DayNight">

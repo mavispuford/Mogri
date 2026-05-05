@@ -41,7 +41,7 @@
 
         <ScrollView Grid.Row="0" Orientation="Vertical">
 
-            <Grid Padding="30"
+            <Grid Padding="16"
                   RowDefinitions="auto, auto, auto, auto, auto, auto, auto, auto"
                   RowSpacing="10"
                   ColumnSpacing="16"
@@ -95,6 +95,12 @@
                                     <Binding Path="IsLoadingInitImage" />
                                 </MultiBinding>
                             </ActivityIndicator.IsRunning>
+                            <ActivityIndicator.IsVisible>
+                                <MultiBinding Converter="{StaticResource AnyTrueConverter}" >
+                                    <Binding Source="{x:Reference InitImage}" Path="IsLoading" x:DataType="Image" />
+                                    <Binding Path="IsLoadingInitImage" />
+                                </MultiBinding>
+                            </ActivityIndicator.IsVisible>
                         </ActivityIndicator>
 
                     </Grid>
@@ -138,6 +144,12 @@
                                     <Binding Path="IsLoadingMaskImage" />
                                 </MultiBinding>
                             </ActivityIndicator.IsRunning>
+                            <ActivityIndicator.IsVisible>
+                                <MultiBinding Converter="{StaticResource AnyTrueConverter}" >
+                                    <Binding Source="{x:Reference MaskImage}" Path="IsLoading" x:DataType="Image" />
+                                    <Binding Path="IsLoadingMaskImage" />
+                                </MultiBinding>
+                            </ActivityIndicator.IsVisible>
                         </ActivityIndicator>
 
                     </Grid>
@@ -167,7 +179,7 @@
                 </Image>
                 <Label Grid.Row="7" Grid.Column="1" Text="Mask Blur:" Style="{StaticResource SettingLabel}"/>
                 <Entry Grid.Row="7" Grid.Column="2" Placeholder="{Binding MaskBlurPlaceholder}" Text="{Binding MaskBlur}" Keyboard="Numeric" FontSize="16" MaxLength="3" HorizontalTextAlignment="End" />
-                
+
             </Grid>
 
         </ScrollView>
