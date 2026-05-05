@@ -55,6 +55,33 @@
                     <x:Double>1</x:Double>
                 </toolkit:BoolToObjectConverter.FalseObject>
             </toolkit:BoolToObjectConverter>
+
+            <Style x:Key="ContextButtonStyle" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{StaticResource CadetFortyPercent}" />
+                <Setter Property="StrokeThickness" Value="0" />
+                <Setter Property="WidthRequest" Value="50" />
+                <Setter Property="HeightRequest" Value="50" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 25" />
+            </Style>
+
+            <Style x:Key="SliderContainerStyle" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{StaticResource CadetEightyPercent}" />
+                <Setter Property="Stroke" Value="Transparent" />
+                <Setter Property="IsVisible" Value="False" />
+                <Setter Property="VerticalOptions" Value="End" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 15" />
+            </Style>
+
+            <Style x:Key="ContextSliderLabelStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="FontFamily" Value="ComfortaaBold" />
+                <Setter Property="HorizontalOptions" Value="Center" />
+            </Style>
+
+            <Style x:Key="ContextSliderStyle" TargetType="Slider">
+                <Setter Property="WidthRequest" Value="200" />
+                <Setter Property="HeightRequest" Value="40" />
+            </Style>
         </ResourceDictionary>
     </views:BasePage.Resources>
 
@@ -225,12 +252,8 @@
                                    HorizontalOptions="Center"
                                    Spacing="20">
 
-                <Border x:Name="BrushSizeButton" 
-                        BackgroundColor="{StaticResource CadetFortyPercent}"
-                        HeightRequest="50"
-                        WidthRequest="50"
-                        StrokeThickness="0"
-                        StrokeShape="RoundRectangle 25">
+                <Border x:Name="BrushSizeButton"
+                        Style="{StaticResource ContextButtonStyle}">
                     <ContentView>
                         <ContentView.GestureRecognizers>
                             <TapGestureRecognizer Tapped="Brush_Size_Button_Clicked" />
@@ -258,11 +281,7 @@
                 </Border>
 
                 <Border x:Name="AlphaButton"
-                        BackgroundColor="{StaticResource CadetFortyPercent}"
-                        StrokeThickness="0"
-                        WidthRequest="50"
-                        HeightRequest="50"
-                        StrokeShape="RoundRectangle 25">
+                        Style="{StaticResource ContextButtonStyle}">
                     <ContentView>
                         <ContentView.GestureRecognizers>
                             <TapGestureRecognizer Tapped="Alpha_Button_Clicked" />
@@ -277,13 +296,10 @@
                 </Border>
 
                 <Border x:Name="ColorPaletteButton"
-                        BackgroundColor="{StaticResource CadetFortyPercent}"
+                        Style="{StaticResource ContextButtonStyle}"
                         StrokeThickness="1"
                         Stroke="{StaticResource CadetSixtyPercent}"
-                        IsEnabled="{Binding GettingColorPalette, Converter={StaticResource InvertedBool}}"
-                        WidthRequest="50"
-                        HeightRequest="50"
-                        StrokeShape="RoundRectangle 25">
+                        IsEnabled="{Binding GettingColorPalette, Converter={StaticResource InvertedBool}}">
                     <Grid BackgroundColor="{Binding CurrentColor}">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ShowColorPickerCommand}" />
@@ -306,11 +322,7 @@
                 </Border>
 
                 <Border x:Name="NoiseButton"
-                        BackgroundColor="{StaticResource CadetFortyPercent}"
-                        StrokeThickness="0"
-                        WidthRequest="50"
-                        HeightRequest="50"
-                        StrokeShape="RoundRectangle 25">
+                        Style="{StaticResource ContextButtonStyle}">
                     <ContentView>
                         <ContentView.GestureRecognizers>
                             <TapGestureRecognizer Tapped="Noise_Button_Clicked" />
@@ -325,11 +337,7 @@
                 </Border>
 
                 <Border x:Name="BoundingBoxSizeButton"
-                        BackgroundColor="{StaticResource CadetFortyPercent}"
-                        StrokeThickness="0"
-                        WidthRequest="50"
-                        HeightRequest="50"
-                        StrokeShape="RoundRectangle 25">
+                        Style="{StaticResource ContextButtonStyle}">
                     <Grid>
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ChangeBoundingBoxSizeCommand}" Tapped="Vibrate_Button_Tapped" />
@@ -348,11 +356,7 @@
                 </Border>
 
                 <Border x:Name="AddRemoveButton"
-                        BackgroundColor="{StaticResource CadetFortyPercent}"
-                        StrokeThickness="0"
-                        WidthRequest="50"
-                        HeightRequest="50"
-                        StrokeShape="RoundRectangle 25">
+                        Style="{StaticResource ContextButtonStyle}">
                     <ContentView>
                         <ContentView.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ToggleSegmentationAddCommand}" Tapped="Vibrate_Button_Tapped" />
@@ -364,11 +368,7 @@
                 </Border>
 
                 <Border x:Name="ResetZoomButton"
-                        BackgroundColor="{StaticResource CadetFortyPercent}"
-                        StrokeThickness="0"
-                        WidthRequest="50"
-                        HeightRequest="50"
-                        StrokeShape="RoundRectangle 25">
+                        Style="{StaticResource ContextButtonStyle}">
                     <ContentView>
                         <ContentView.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ResetZoomCommand}" Tapped="Vibrate_Button_Tapped" />
@@ -385,21 +385,14 @@
 
             <Grid x:Name="SecondaryButtonsLayout">
                 <Border x:Name="BrushSizeSliderContainer"
-                        BackgroundColor="{StaticResource CadetEightyPercent}"
-                        Stroke="Transparent"
-                        IsVisible="False"
-                        HorizontalOptions="Start"
-                        VerticalOptions="End"
-                        StrokeShape="RoundRectangle 15">
+                        Style="{StaticResource SliderContainerStyle}"
+                        HorizontalOptions="Start">
                     <VerticalStackLayout Spacing="0" Padding="15">
 
-                        <Label Text="{Binding CurrentBrushSize, StringFormat='Size: {0:F0}'}"
-                               TextColor="White"
-                               FontFamily="ComfortaaBold"
-                               HorizontalOptions="Center"/>
+                        <Label Style="{StaticResource ContextSliderLabelStyle}"
+                               Text="{Binding CurrentBrushSize, StringFormat='Size: {0:F0}'}" />
 
-                        <Slider WidthRequest="200"
-                                HeightRequest="40"
+                        <Slider Style="{StaticResource ContextSliderStyle}"
                                 Minimum="1"
                                 Maximum="50"
                                 Value="{Binding CurrentBrushSize}" />
@@ -408,21 +401,14 @@
                 </Border>
 
                 <Border x:Name="AlphaSliderContainer"
-                        BackgroundColor="{StaticResource CadetEightyPercent}"
-                        Stroke="Transparent"
-                        IsVisible="False"
-                        HorizontalOptions="Center"
-                        VerticalOptions="End"
-                        StrokeShape="RoundRectangle 15">
+                        Style="{StaticResource SliderContainerStyle}"
+                        HorizontalOptions="Center">
                     <VerticalStackLayout Spacing="0" Padding="15">
 
-                        <Label Text="{Binding CurrentAlpha, StringFormat='Alpha: {0:F2}'}"
-                               TextColor="White"
-                               FontFamily="ComfortaaBold"
-                               HorizontalOptions="Center"/>
+                        <Label Style="{StaticResource ContextSliderLabelStyle}"
+                               Text="{Binding CurrentAlpha, StringFormat='Alpha: {0:F2}'}" />
 
-                        <Slider WidthRequest="200"
-                                HeightRequest="40"
+                        <Slider Style="{StaticResource ContextSliderStyle}"
                                 Minimum="0.01"
                                 Maximum="1.0"
                                 Value="{Binding CurrentAlpha}" />
@@ -431,21 +417,14 @@
                 </Border>
 
                 <Border x:Name="NoiseSliderContainer"
-                        BackgroundColor="{StaticResource CadetEightyPercent}"
-                        Stroke="Transparent"
-                        IsVisible="False"
-                        HorizontalOptions="End"
-                        VerticalOptions="End"
-                        StrokeShape="RoundRectangle 15">
+                        Style="{StaticResource SliderContainerStyle}"
+                        HorizontalOptions="End">
                     <VerticalStackLayout Spacing="0" Padding="15">
 
-                        <Label Text="{Binding CurrentNoise, StringFormat='Noise: {0:P0}'}"
-                               TextColor="White"
-                               FontFamily="ComfortaaBold"
-                               HorizontalOptions="Center"/>
+                        <Label Style="{StaticResource ContextSliderLabelStyle}"
+                               Text="{Binding CurrentNoise, StringFormat='Noise: {0:P0}'}" />
 
-                        <Slider WidthRequest="200"
-                                HeightRequest="40"
+                        <Slider Style="{StaticResource ContextSliderStyle}"
                                 Minimum="0"
                                 Maximum="1"
                                 Value="{Binding CurrentNoise}" />
