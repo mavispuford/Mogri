@@ -465,102 +465,15 @@
                              CascadeInputTransparent="True"
                              Spacing="4"
                              Opacity="0">
-            <VerticalStackLayout.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource MutedPeach}, Dark={StaticResource MutedPeach}}"/>
-                    <Setter Property="HeightRequest" Value="56"/>
-                    <Setter Property="StrokeShape" Value="RoundRectangle 28"/>
-                    <Setter Property="Stroke" Value="Transparent"/>
-                    <Setter Property="Padding" Value="24,0"/>
-                    <Setter Property="HorizontalOptions" Value="End"/>
-                </Style>
-
-                <Style TargetType="Label">
-                    <Setter Property="FontSize" Value="14"/>
-                    <Setter Property="FontFamily" Value="ComfortaaBold"/>
-                    <Setter Property="TextColor" Value="{StaticResource Tertiary}"/>
-                    <Setter Property="VerticalTextAlignment" Value="Center"/>
-                </Style>
-
-                <Style TargetType="HorizontalStackLayout">
-                    <Setter Property="Spacing" Value="8"/>
-                </Style>
-            </VerticalStackLayout.Resources>
             <animations:AnimationProperties.Animations>
                 <animations:FadeToAnimation Opacity="{Binding ShowActions, Converter={StaticResource BoolToScaleInDoubleConverter}}" Easing="{x:Static Easing.CubicInOut}" Length="200" />
             </animations:AnimationProperties.Animations>
 
-            <Border>
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding ApplyPaintAndMasksCommand}" />
-                </Border.GestureRecognizers>
-                <HorizontalStackLayout>
-                    <Image>
-                        <Image.Source>
-                            <FontImageSource Glyph="&#xe94d;" FontFamily="{StaticResource IconFontLight}" Size="24" />
-                        </Image.Source>
-                        <Image.Behaviors>
-                            <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Primary}" />
-                        </Image.Behaviors>
-                    </Image>
-
-                    <Label Text="Flatten" />
-                </HorizontalStackLayout>
-            </Border>
-
-            <Border>
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding PatchCommand}" />
-                </Border.GestureRecognizers>
-                <HorizontalStackLayout>
-                    <Image>
-                        <Image.Source>
-                            <FontImageSource Glyph="&#xe3f3;" FontFamily="{StaticResource IconFontLight}" Size="24" />
-                        </Image.Source>
-                        <Image.Behaviors>
-                            <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Primary}" />
-                        </Image.Behaviors>
-                    </Image>
-
-                    <Label Text="Patch" />
-                </HorizontalStackLayout>
-            </Border>
-
-            <Border IsVisible="{Binding CurrentTool.Type, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:ToolType.BoundingBox}}">
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding BeginCropImageRectCommand}" />
-                </Border.GestureRecognizers>
-                <HorizontalStackLayout>
-                    <Image>
-                        <Image.Source>
-                            <FontImageSource Glyph="&#xf08b;" FontFamily="{StaticResource IconFontLight}" Size="24" />
-                        </Image.Source>
-                        <Image.Behaviors>
-                            <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Primary}" />
-                        </Image.Behaviors>
-                    </Image>
-
-                    <Label Text="Snip Selection" />
-                </HorizontalStackLayout>
-            </Border>
-
-            <Border>
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding SendToImageToImageCommand}" />
-                </Border.GestureRecognizers>
-                <HorizontalStackLayout>
-                    <Image>
-                        <Image.Source>
-                            <FontImageSource Glyph="&#xf824;" FontFamily="{StaticResource IconFontLight}" Size="24" />
-                        </Image.Source>
-                        <Image.Behaviors>
-                            <behaviors:ThemeAwareIconTintColorBehavior Light="{StaticResource Primary}" />
-                        </Image.Behaviors>
-                    </Image>
-
-                    <Label Text="Use Canvas" />
-                </HorizontalStackLayout>
-            </Border>
+            <controls:ActionItemControl Glyph="&#xe94d;" Text="Flatten" Command="{Binding ApplyPaintAndMasksCommand}" />
+            <controls:ActionItemControl Glyph="&#xe3f3;" Text="Patch" Command="{Binding PatchCommand}" />
+            <controls:ActionItemControl Glyph="&#xf08b;" Text="Snip Selection" Command="{Binding BeginCropImageRectCommand}"
+                                        IsVisible="{Binding CurrentTool.Type, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:ToolType.BoundingBox}}" />
+            <controls:ActionItemControl Glyph="&#xf824;" Text="Use Canvas" Command="{Binding SendToImageToImageCommand}" />
 
         </VerticalStackLayout>
 
