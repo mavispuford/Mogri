@@ -23,7 +23,6 @@ public class CanvasHistoryService : ICanvasHistoryService
     private readonly string _snapshotDirectory;
     private readonly Dictionary<string, CanvasSnapshot> _snapshots = new();
     private readonly List<string> _insertionOrder = new();
-    private readonly JsonSerializerOptions _jsonOptions;
 
     public CanvasHistoryService()
     {
@@ -36,12 +35,6 @@ public class CanvasHistoryService : ICanvasHistoryService
         }
 
         Directory.CreateDirectory(_snapshotDirectory);
-
-        _jsonOptions = new JsonSerializerOptions
-        {
-            WriteIndented = false,
-        };
-        _jsonOptions.Converters.Add(new ColorJsonConverter());
     }
 
     public int Count => _snapshots.Count;
@@ -77,7 +70,7 @@ public class CanvasHistoryService : ICanvasHistoryService
                 Snapshots = canvasActions.OfType<SnapshotCanvasActionViewModel>().ToList()
             };
 
-            string json = JsonSerializer.Serialize(wrapper, _jsonOptions);
+            string json = JsonSerializer.Serialize(wrapper, MogriJsonSerializer.Options);
             await File.WriteAllTextAsync(actionsFilePath, json);
         }
 
@@ -126,7 +119,7 @@ public class CanvasHistoryService : ICanvasHistoryService
         if (snapshot.ActionsFilePath != null && File.Exists(snapshot.ActionsFilePath))
         {
             string json = await File.ReadAllTextAsync(snapshot.ActionsFilePath);
-            var wrapper = JsonSerializer.Deserialize<MaskViewModel>(json, _jsonOptions);
+            var wrapper = JsonSerializer.Deserialize<MaskViewModel>(json, MogriJsonSerializer.Options);
             
             if (wrapper != null)
             {

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
 using Microsoft.Extensions.Logging;
+using Mogri.Json;
 using Mogri.Helpers;
 using Mogri.Interfaces.Services;
 using Mogri.ViewModels;
@@ -117,7 +118,7 @@ namespace Mogri.Platforms.iOS.Services
                 try
                 {
                     var json = await File.ReadAllTextAsync(maskFilePath);
-                    return JsonSerializer.Deserialize<MaskViewModel>(json);
+                    return JsonSerializer.Deserialize<MaskViewModel>(json, MogriJsonSerializer.Options);
                 }
                 catch (Exception ex)
                 {
@@ -193,7 +194,7 @@ namespace Mogri.Platforms.iOS.Services
 
             try
             {
-                var json = JsonSerializer.Serialize(mask);
+                var json = JsonSerializer.Serialize(mask, MogriJsonSerializer.Options);
 
                 // Write to a temp file first, then atomically move into place to
                 // prevent corruption if the process is killed mid-write.
