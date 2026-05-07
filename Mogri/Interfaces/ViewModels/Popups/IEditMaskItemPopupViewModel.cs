@@ -5,6 +5,7 @@ namespace Mogri.Interfaces.ViewModels.Popups;
 
 public interface IEditMaskItemPopupViewModel : IPopupBaseViewModel
 {
+    string Title { get; set; }
     bool IsDragging { get; set; }
     string DragInfoText { get; set; }
     double BrushSize { get; set; }

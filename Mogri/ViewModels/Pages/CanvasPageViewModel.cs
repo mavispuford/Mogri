@@ -1319,6 +1319,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         {
             var parameters = new Dictionary<string, object> {
                 { "Actions", CanvasActions },
+                { "TextElements", TextElements },
                 { "OnSnapshotDelete", new Func<SnapshotCanvasActionViewModel, Task>(async snapshot => {
                     CanvasActions.Remove(snapshot);
                     var (bitmap, actions, textElements) = await _canvasHistoryService.RestoreSnapshotAsync(snapshot.SnapshotId);
@@ -1332,6 +1333,10 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                     {
                         restoreCanvasActions(actions);
                     }
+                }) },
+                { "OnTextDelete", new Func<TextElementViewModel, Task>(textElement => {
+                    DeleteTextCommand.Execute(textElement);
+                    return Task.CompletedTask;
                 }) },
                 { "OnClearAll", new Func<Task>(async () => {
                     var firstSnapshot = CanvasActions.OfType<SnapshotCanvasActionViewModel>().FirstOrDefault();

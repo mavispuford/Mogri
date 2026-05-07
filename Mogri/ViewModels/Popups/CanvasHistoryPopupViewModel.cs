@@ -26,7 +26,9 @@ public partial class CanvasHistoryPopupViewModel : PopupBaseViewModel, ICanvasHi
     private readonly IServiceProvider _serviceProvider;
     private readonly ICanvasHistoryService _canvasHistoryService;
     private ObservableCollection<CanvasActionViewModel>? _sourceActions;
+    private ObservableCollection<TextElementViewModel>? _sourceTextElements;
     private Func<SnapshotCanvasActionViewModel, Task>? _onSnapshotDeleteCallback;
+    private Func<TextElementViewModel, Task>? _onTextDeleteCallback;
     private Func<Task>? _onClearAllCallback;
 
     [ObservableProperty]
@@ -68,10 +70,20 @@ public partial class CanvasHistoryPopupViewModel : PopupBaseViewModel, ICanvasHi
         {
             _sourceActions = actions;
         }
+
+        if (query.TryGetValue("TextElements", out var textElementsObj) && textElementsObj is ObservableCollection<TextElementViewModel> textElements)
+        {
+            _sourceTextElements = textElements;
+        }
         
         if (query.TryGetValue("OnSnapshotDelete", out var callbackObj) && callbackObj is Func<SnapshotCanvasActionViewModel, Task> callback)
         {
             _onSnapshotDeleteCallback = callback;
+        }
+
+        if (query.TryGetValue("OnTextDelete", out var textDeleteObj) && textDeleteObj is Func<TextElementViewModel, Task> textDeleteCallback)
+        {
+            _onTextDeleteCallback = textDeleteCallback;
         }
 
         if (query.TryGetValue("OnClearAll", out var clearAllObj) && clearAllObj is Func<Task> clearAllCallback)
@@ -85,16 +97,41 @@ public partial class CanvasHistoryPopupViewModel : PopupBaseViewModel, ICanvasHi
     private void LoadActions()
     {
         Items.Clear();
-        if (_sourceActions == null) return;
+        if (_sourceActions == null && _sourceTextElements == null) return;
 
-        var filtered = _sourceActions.Reverse().ToList();
-        
+        var orderedItems = new List<(long Order, CanvasActionViewModel? CanvasAction, TextElementViewModel? TextElement)>();
+
+        if (_sourceActions != null)
+        {
+            orderedItems.AddRange(_sourceActions
+                .Where(action => action is not TextSnapshotCanvasActionViewModel)
+                .Select(action => (Order: (long)action.Order, CanvasAction: (CanvasActionViewModel?)action, TextElement: (TextElementViewModel?)null)));
+        }
+
+        if (_sourceTextElements != null)
+        {
+            orderedItems.AddRange(_sourceTextElements
+                .Select(textElement => (Order: textElement.Order, CanvasAction: (CanvasActionViewModel?)null, TextElement: (TextElementViewModel?)textElement)));
+        }
+
         bool foundTopSnapshot = false;
 
-        foreach (var action in filtered)
+        foreach (var entry in orderedItems.OrderByDescending(entry => entry.Order))
         {
             var item = _serviceProvider.GetRequiredService<ICanvasHistoryItemViewModel>();
-            item.InitWith(action, OnDeleteItem, OnDuplicateItem);
+
+            if (entry.CanvasAction != null)
+            {
+                item.InitWith(entry.CanvasAction, OnDeleteItem, OnDuplicateItem);
+            }
+            else if (entry.TextElement != null)
+            {
+                item.InitWith(entry.TextElement, OnDeleteItem);
+            }
+            else
+            {
+                continue;
+            }
             
             if (item.IsSnapshot)
             {
@@ -141,6 +178,21 @@ public partial class CanvasHistoryPopupViewModel : PopupBaseViewModel, ICanvasHi
 
     private async void OnDeleteItem(ICanvasHistoryItemViewModel item)
     {
+        if (item.TextElement != null)
+        {
+            if (_onTextDeleteCallback != null)
+            {
+                await _onTextDeleteCallback.Invoke(item.TextElement);
+            }
+            else
+            {
+                _sourceTextElements?.Remove(item.TextElement);
+            }
+
+            LoadActions();
+            return;
+        }
+
         if (item.CanvasAction != null && _sourceActions != null)
         {
             if (item.IsSnapshot && item.CanvasAction is SnapshotCanvasActionViewModel snapshotAction)
@@ -192,7 +244,7 @@ public partial class CanvasHistoryPopupViewModel : PopupBaseViewModel, ICanvasHi
         {
             if (_sourceActions == null) return;
 
-            var toRemove = _sourceActions.Where(a => a is not SnapshotCanvasActionViewModel).ToList();
+            var toRemove = _sourceActions.Where(action => action is MaskLineViewModel or SegmentationMaskViewModel).ToList();
             foreach (var a in toRemove)
             {
                 _sourceActions.Remove(a);

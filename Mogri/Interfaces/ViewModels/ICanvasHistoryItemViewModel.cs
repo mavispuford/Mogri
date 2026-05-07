@@ -18,6 +18,7 @@ public interface ICanvasHistoryItemViewModel
     double Alpha { get; set; }
     string Description { get; set; }
     CanvasActionViewModel? CanvasAction { get; set; }
+    TextElementViewModel? TextElement { get; set; }
     bool IsSnapshot { get; }
     bool IsEditable { get; }
     bool IsDuplicable { get; }
@@ -26,4 +27,5 @@ public interface ICanvasHistoryItemViewModel
     IRelayCommand DeleteCommand { get; }
     IRelayCommand DuplicateCommand { get; }
     void InitWith(CanvasActionViewModel canvasAction, Action<ICanvasHistoryItemViewModel> deleteAction, Action<ICanvasHistoryItemViewModel> duplicateAction);
+    void InitWith(TextElementViewModel textElement, Action<ICanvasHistoryItemViewModel> deleteAction);
 }

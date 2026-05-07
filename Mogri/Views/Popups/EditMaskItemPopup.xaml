@@ -28,7 +28,7 @@
 
                     <!-- Header -->
                     <Label Grid.Row="0"
-                           Text="Edit Mask"
+                              Text="{Binding Title}"
                            FontSize="18"
                            FontFamily="ComfortaaBold"
                            HorizontalOptions="Center" />
