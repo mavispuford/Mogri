@@ -1,6 +1,7 @@
+using System.Text.Json;
+using Mogri.Json;
 using Mogri.Interfaces.Services;
 using Mogri.Models;
-using Newtonsoft.Json;
 
 namespace Mogri.Services;
 
@@ -28,7 +29,7 @@ public class LicenseService : ILicenseService
             using var reader = new StreamReader(stream);
             var json = await reader.ReadToEndAsync();
             
-            var entries = JsonConvert.DeserializeObject<List<LicenseEntry>>(json);
+            var entries = JsonSerializer.Deserialize<List<LicenseEntry>>(json, MogriJsonSerializer.Options);
             _cachedLicenses = entries ?? new List<LicenseEntry>();
         }
         catch (Exception ex)

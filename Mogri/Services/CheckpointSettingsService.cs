@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Mogri.Json;
 using Mogri.Interfaces.Services;
 using Mogri.Models;
 
@@ -18,7 +19,7 @@ public class CheckpointSettingsService : ICheckpointSettingsService
         ArgumentNullException.ThrowIfNull(settings);
 
         var key = BuildPreferenceKey(checkpointKey);
-        var json = JsonSerializer.Serialize(settings);
+        var json = JsonSerializer.Serialize(settings, MogriJsonSerializer.Options);
 
         Preferences.Default.Set(key, json);
     }
@@ -40,7 +41,7 @@ public class CheckpointSettingsService : ICheckpointSettingsService
 
         try
         {
-            return JsonSerializer.Deserialize<CheckpointSettings>(json);
+            return JsonSerializer.Deserialize<CheckpointSettings>(json, MogriJsonSerializer.Options);
         }
         catch (JsonException)
         {

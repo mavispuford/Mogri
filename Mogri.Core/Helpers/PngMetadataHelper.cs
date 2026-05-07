@@ -3,7 +3,7 @@ using System.Buffers.Binary;
 using System.IO;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
+using Mogri.Json;
 using System.Threading.Tasks;
 using Mogri.Models;
 using Mogri.Services;
@@ -18,13 +18,6 @@ namespace Mogri.Helpers;
 public static class PngMetadataHelper
 {
     private static readonly byte[] PngSignature = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
-    
-    private static readonly JsonSerializerOptions _jsonOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        WriteIndented = false,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-    };
 
     /// <summary>
     /// Reads prompt settings from a PNG file, prioritizing the JSON "md_settings" chunk
@@ -114,7 +107,7 @@ public static class PngMetadataHelper
         {
             try
             {
-                var dto = JsonSerializer.Deserialize<PngMetadataDto>(jsonSettings, _jsonOptions);
+                var dto = JsonSerializer.Deserialize(jsonSettings, PngMetadataJsonSerializerContext.Default.PngMetadataDto);
                 if (dto != null)
                 {
                     return dto.ToPromptSettings();
@@ -151,7 +144,7 @@ public static class PngMetadataHelper
             var dto = PngMetadataDto.FromPromptSettings(settings);
             // System.Text.Json default escapes non-ASCII characters to \uXXXX, 
             // which is safe for Latin-1 encoding (see https://www.w3.org/TR/PNG/#11tEXt)
-            var json = JsonSerializer.Serialize(dto, _jsonOptions);
+            var json = JsonSerializer.Serialize(dto, PngMetadataJsonSerializerContext.Default.PngMetadataDto);
             return InsertTextChunk(originalImage, "md_settings", json);
         }
         catch (Exception ex)

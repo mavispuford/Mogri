@@ -1,6 +1,7 @@
 using Android.Content;
 using Android.Provider;
 using Microsoft.Extensions.Logging;
+using Mogri.Json;
 using Mogri.Helpers;
 using Mogri.Interfaces.Services;
 using Mogri.Models;
@@ -244,10 +245,7 @@ public class AndroidFileService : IFileService
             using var reader = File.OpenText(fullPath);
             var contents = await reader.ReadToEndAsync();
 
-            var options = new JsonSerializerOptions();
-            options.Converters.Add(new ColorJsonConverter());
-
-            var mask = JsonSerializer.Deserialize<MaskViewModel>(contents, options);
+            var mask = JsonSerializer.Deserialize<MaskViewModel>(contents, MogriJsonSerializer.Options);
 
             return mask;
 
@@ -295,10 +293,7 @@ public class AndroidFileService : IFileService
 
         try
         {
-            var options = new JsonSerializerOptions();
-            options.Converters.Add(new ColorJsonConverter());
-
-            var maskJson = JsonSerializer.Serialize(mask, options);
+            var maskJson = JsonSerializer.Serialize(mask, MogriJsonSerializer.Options);
 
             // Write to a temp file first, then atomically move into place to
             // prevent corruption if the process is killed mid-write.

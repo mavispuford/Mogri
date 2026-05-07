@@ -39,6 +39,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private bool _doingSegmentation = false;
     private CancellationTokenSource? _setSegmentationImageCancellationTokenSource;
     private int _setSegmentationImageRequestCount = 0;
+    private int _setSegmentationImageVersion = 0;
 
     private CanvasUseMode _currentCanvasUseMode = CanvasUseMode.Inpaint;
 
@@ -331,40 +332,84 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 GettingColorPalette = false;
             }), Task.Run(async () =>
             {
+                // Latest-wins guard for SourceBitmap changes. A canceled older request can still finish later,
+                // so only the newest version is allowed to publish its result.
+
                 var magicWandTool = AvailableTools.FirstOrDefault(t => t.Type == ToolType.MagicWand);
+                CancellationTokenSource? previousSetSegmentationImageCancellationTokenSource;
+                CancellationTokenSource currentSetSegmentationImageCancellationTokenSource;
+                int currentSetSegmentationImageVersion;
 
-                if (magicWandTool != null)
+                lock (_setSegmentationImageLock)
                 {
-                    lock (_setSegmentationImageLock)
-                    {
-                        _setSegmentationImageRequestCount++;
+                    _setSegmentationImageRequestCount++;
+                    _setSegmentationImageVersion++;
+                    currentSetSegmentationImageVersion = _setSegmentationImageVersion;
 
+                    // Swap in a new token source under the lock so the previous request can be canceled
+                    // after the new request is fully registered as the current one.
+                    previousSetSegmentationImageCancellationTokenSource = _setSegmentationImageCancellationTokenSource;
+                    currentSetSegmentationImageCancellationTokenSource = new CancellationTokenSource();
+                    _setSegmentationImageCancellationTokenSource = currentSetSegmentationImageCancellationTokenSource;
+
+                    HasSegmentationImage = false;
+
+                    if (magicWandTool != null)
+                    {
                         magicWandTool.IsLoading = true;
-                        SettingSegmentationImage = true;
                     }
+
+                    SettingSegmentationImage = true;
                 }
 
-                if (_setSegmentationImageCancellationTokenSource != null)
+                if (previousSetSegmentationImageCancellationTokenSource != null)
                 {
-                    if (!_setSegmentationImageCancellationTokenSource.IsCancellationRequested)
+                    if (!previousSetSegmentationImageCancellationTokenSource.IsCancellationRequested)
                     {
-                        _setSegmentationImageCancellationTokenSource.Cancel();
+                        previousSetSegmentationImageCancellationTokenSource.Cancel();
                     }
-                    _setSegmentationImageCancellationTokenSource.Dispose();
+
+                    previousSetSegmentationImageCancellationTokenSource.Dispose();
                 }
 
-                _setSegmentationImageCancellationTokenSource = new CancellationTokenSource();
+                var hasSegmentationImage = false;
 
-                HasSegmentationImage = await _segmentationService.SetImage(bitmap, _setSegmentationImageCancellationTokenSource?.Token ?? CancellationToken.None);
-
-                if (magicWandTool != null)
+                try
                 {
+                    hasSegmentationImage = await _segmentationService.SetImage(bitmap, currentSetSegmentationImageCancellationTokenSource.Token);
+                }
+                finally
+                {
+                    var shouldDisposeCurrentSetSegmentationImageCancellationTokenSource = false;
+
                     lock (_setSegmentationImageLock)
                     {
+                        // A stale request may still complete after cancellation, but it must not change the
+                        // UI flags if a newer SourceBitmap has already started processing.
+                        if (currentSetSegmentationImageVersion == _setSegmentationImageVersion)
+                        {
+                            HasSegmentationImage = hasSegmentationImage;
+                        }
+
                         _setSegmentationImageRequestCount--;
 
-                        magicWandTool.IsLoading = _setSegmentationImageRequestCount > 0;
                         SettingSegmentationImage = _setSegmentationImageRequestCount > 0;
+
+                        if (magicWandTool != null)
+                        {
+                            magicWandTool.IsLoading = _setSegmentationImageRequestCount > 0;
+                        }
+
+                        if (ReferenceEquals(_setSegmentationImageCancellationTokenSource, currentSetSegmentationImageCancellationTokenSource))
+                        {
+                            _setSegmentationImageCancellationTokenSource = null;
+                            shouldDisposeCurrentSetSegmentationImageCancellationTokenSource = true;
+                        }
+                    }
+
+                    if (shouldDisposeCurrentSetSegmentationImageCancellationTokenSource)
+                    {
+                        currentSetSegmentationImageCancellationTokenSource.Dispose();
                     }
                 }
 

@@ -109,6 +109,14 @@ foreach (var item in items)
 - App settings (like Server URL) are persisted using native `Preferences`
 - `SettingsHelper` provides a strongly-typed wrapper around these preferences
 
+## Serialization & Release Compatibility
+- Persisted app-owned state should prefer source-generated `System.Text.Json` metadata over default reflection-based serialization.
+- This is especially important for Release builds, where trimming and other Release optimizations can remove metadata that reflection-based serializers expect to discover at runtime.
+- High-risk cases include interface-typed properties or collections, runtime type dispatch, and external framework types such as `SkiaSharp.SKPoint`.
+- Prefer flattened DTOs for persistence formats when possible instead of serializing ViewModel graphs or interface-heavy object graphs directly.
+- When a shared persistence path must serialize interface-typed members, keep the supported concrete types explicit and centralized.
+- Persistence changes should be validated in a Release build on the target platform when feasible, because Debug builds and emulators can mask trim-sensitive serialization issues.
+
 ## Builds
 - When building, the goal is always to have 0 Warnings and (obviously) 0 Errors.
 

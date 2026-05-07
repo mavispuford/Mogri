@@ -1,9 +1,7 @@
 using System.Text.Json;
 using Mogri.Interfaces.Services;
-using Mogri.Interfaces.ViewModels;
 using Mogri.Json;
 using Mogri.Models;
-using Mogri.ViewModels;
 
 namespace Mogri.Services
 {
@@ -13,16 +11,6 @@ namespace Mogri.Services
         private string _filePath;
         private Dictionary<string, PromptSettings> _presets = new();
         private bool _isInitialized;
-
-        private static readonly JsonSerializerOptions _jsonOptions = new()
-        {
-            Converters =
-            {
-                new InterfaceConverter<IModelViewModel, ModelViewModel>(),
-                new InterfaceListConverter<ILoraViewModel, LoraViewModel>(),
-                new InterfaceListConverter<IPromptStyleViewModel, PromptStyleViewModel>(),
-            }
-        };
 
         public PresetService()
         {
@@ -38,7 +26,7 @@ namespace Mogri.Services
                 try
                 {
                     using var stream = File.OpenRead(_filePath);
-                    var loaded = await JsonSerializer.DeserializeAsync<Dictionary<string, PromptSettings>>(stream, _jsonOptions);
+                    var loaded = await JsonSerializer.DeserializeAsync<Dictionary<string, PromptSettings>>(stream, MogriJsonSerializer.Options);
                     if (loaded != null)
                         _presets = loaded;
                 }
@@ -54,7 +42,7 @@ namespace Mogri.Services
         private async Task SaveToFileAsync()
         {
             using var stream = File.Create(_filePath);
-            await JsonSerializer.SerializeAsync(stream, _presets, _jsonOptions);
+            await JsonSerializer.SerializeAsync(stream, _presets, MogriJsonSerializer.Options);
         }
 
         public async Task<List<string>> GetPresetsAsync()

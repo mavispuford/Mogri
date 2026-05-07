@@ -165,7 +165,8 @@ public class SegmentationService : ISegmentationService, IDisposable
 
             Console.WriteLine($"Original image size: {bitmap.Width}x{bitmap.Height} pixels");
 
-            var processedBitmap = PreprocessImage(bitmap);
+            // Keep derived values local until the request survives the final cancellation check.
+            var (processedBitmap, scaleX, scaleY) = PreprocessImage(bitmap);
 
             token.ThrowIfCancellationRequested();
 
@@ -199,17 +200,33 @@ public class SegmentationService : ISegmentationService, IDisposable
                 _stopwatch.Stop();
                 Console.WriteLine($"Encoder: {_stopwatch.Elapsed.TotalMilliseconds}ms");
 
+                // Run is synchronous, so this is the first point where a canceled older request can bail out
+                // without overwriting embeddings for a newer image.
+                token.ThrowIfCancellationRequested();
+
                 _imageEmbeddings = encoderResult.First().AsTensor<float>();
                 _imageWidth = bitmap.Width;
                 _imageHeight = bitmap.Height;
+                _scaleX = scaleX;
+                _scaleY = scaleY;
                 _lowResMasks = null; // Reset mask state for new image
             }
+        }
+        catch (OperationCanceledException)
+        {
+            return false;
+        }
+        catch (Exception) when (token.IsCancellationRequested)
+        {
+            return false;
         }
         catch (Exception)
         {
             _imageEmbeddings = null;
             _imageWidth = 0;
             _imageHeight = 0;
+            _scaleX = 0;
+            _scaleY = 0;
             _lowResMasks = null;
             return false;
         }
@@ -323,7 +340,7 @@ public class SegmentationService : ISegmentationService, IDisposable
         });
     }
 
-    private SKBitmap PreprocessImage(SKBitmap bitmap)
+    private (SKBitmap ProcessedBitmap, float ScaleX, float ScaleY) PreprocessImage(SKBitmap bitmap)
     {
         int targetWidth = 1024;
         int targetHeight = 1024;
@@ -334,13 +351,13 @@ public class SegmentationService : ISegmentationService, IDisposable
             throw new Exception("Failed to resize image");
         }
 
-        _scaleX = resized.Width / (float)bitmap.Width;
-        _scaleY = resized.Height / (float)bitmap.Height;
+        var scaleX = resized.Width / (float)bitmap.Width;
+        var scaleY = resized.Height / (float)bitmap.Height;
 
         // Convert the color format if necessary
         resized = ConvertColorFormat(resized); // Convert to RGB if needed
 
-        return resized;
+        return (resized, scaleX, scaleY);
     }
 
     private SKBitmap ConvertColorFormat(SKBitmap image)
