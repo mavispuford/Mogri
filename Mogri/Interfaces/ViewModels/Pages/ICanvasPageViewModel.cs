@@ -48,6 +48,8 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     bool HasSegmentationImage { get; set; }
 
+    bool TextAddMode { get; set; }
+
     IAsyncRelayCommand UndoCommand { get; }
 
     IAsyncRelayCommand ClearCommand { get; }
@@ -92,6 +94,8 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     IRelayCommand ToggleSegmentationAddCommand { get; }
 
+    IRelayCommand ToggleTextAddModeCommand { get; }
+
     IRelayCommand ToggleActionsVisibilityCommand { get; }
 
     IRelayCommand? ResetZoomCommand { get; set; }
@@ -103,6 +107,8 @@ public interface ICanvasPageViewModel : IPageViewModel
     IAsyncRelayCommand ShowHistoryCommand { get; }
 
     IAsyncRelayCommand ApplyPaintAndMasksCommand { get; }
+
+    IAsyncRelayCommand<SKPoint> AddTextCommand { get; }
 
     IAsyncRelayCommand PatchCommand { get; }
 

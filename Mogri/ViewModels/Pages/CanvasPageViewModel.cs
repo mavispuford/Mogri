@@ -105,6 +105,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     public partial bool HasSegmentationImage { get; set; } = false;
 
     [ObservableProperty]
+    public partial bool TextAddMode { get; set; } = true;
+
+    [ObservableProperty]
     public partial bool ShowActions { get; set; }
 
     [ObservableProperty]
@@ -213,6 +216,20 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             ContextButtons =
             [
                 ContextButtonType.ColorPicker
+            ]
+        });
+
+        AvailableTools.Add(new PaintingToolViewModel
+        {
+            Name = "Text",
+            IconCode = "\uea1e",
+            Effect = MaskEffect.None,
+            Type = ToolType.Text,
+            ContextButtons =
+            [
+                ContextButtonType.Alpha,
+                ContextButtonType.ColorPicker,
+                ContextButtonType.TextMode
             ]
         });
 
@@ -1635,8 +1652,19 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             return;
         }
 
+        if (value.Type != ToolType.Text)
+        {
+            TextAddMode = true;
+        }
+
         ShowContextMenu = value.Type == ToolType.MagicWand;
         OnPropertyChanged(nameof(IsZoomMode));
+    }
+
+    [RelayCommand]
+    private void ToggleTextAddMode()
+    {
+        TextAddMode = !TextAddMode;
     }
 
     private async Task<string?> pushSnapshotAsync(string description, bool includeCanvasActions)
@@ -1739,6 +1767,59 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         SegmentationAdd = !SegmentationAdd;
 
         _segmentationService.Reset();
+    }
+
+    [RelayCommand]
+    private async Task AddText(SKPoint location)
+    {
+        var text = await _popupService.DisplayPromptAsync("Add Text", "Enter text or emoji:", placeholder: "Hello 👋");
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return;
+        }
+
+        var nextOrder = getNextCanvasOrder();
+        CanvasActions.Add(new TextSnapshotCanvasActionViewModel
+        {
+            Order = nextOrder,
+            TextElementsSnapshot = TextElements
+                .Select(cloneTextElement)
+                .ToList()
+        });
+
+        TextElements.Add(new TextElementViewModel(nextOrder)
+        {
+            Text = text.Trim(),
+            X = location.X,
+            Y = location.Y,
+            Color = CurrentColor,
+            Alpha = (float)CurrentAlpha,
+            Scale = 1f,
+            Rotation = 0f
+        });
+    }
+
+    private int getNextCanvasOrder()
+    {
+        var nextCanvasActionOrder = CanvasActions.Count == 0 ? 0 : CanvasActions.Max(canvasAction => canvasAction.Order) + 1;
+        var nextTextOrder = TextElements.Count == 0 ? 0 : checked((int)(TextElements.Max(textElement => textElement.Order) + 1));
+
+        return Math.Max(nextCanvasActionOrder, nextTextOrder);
+    }
+
+    private static TextElementViewModel cloneTextElement(TextElementViewModel textElement)
+    {
+        return new TextElementViewModel(textElement.Id, textElement.Order, textElement.BaseFontSize)
+        {
+            Text = textElement.Text,
+            X = textElement.X,
+            Y = textElement.Y,
+            Scale = textElement.Scale,
+            Rotation = textElement.Rotation,
+            Color = textElement.Color,
+            Alpha = textElement.Alpha,
+            IsSelected = textElement.IsSelected
+        };
     }
 
     private SKBitmap? GenerateMask(bool useLastOnly)

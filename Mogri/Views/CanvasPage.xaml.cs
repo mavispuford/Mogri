@@ -73,6 +73,12 @@ public partial class CanvasPage : BasePage
         set => SetValue(TextElementsProperty, value);
     }
 
+    public bool TextAddMode
+    {
+        get => (bool)GetValue(TextAddModeProperty);
+        set => SetValue(TextAddModeProperty, value);
+    }
+
     public SKRect BoundingBox
     {
         get => (SKRect)GetValue(BoundingBoxProperty);
@@ -182,6 +188,8 @@ public partial class CanvasPage : BasePage
         ((CanvasPage)bindable).OnTextElementsChanged(oldValue as ObservableCollection<TextElementViewModel>, newValue as ObservableCollection<TextElementViewModel>);
     });
 
+    public static BindableProperty TextAddModeProperty = BindableProperty.Create(nameof(TextAddMode), typeof(bool), typeof(CanvasPage), true);
+
     public static BindableProperty PrepareForSavingCommandProperty = BindableProperty.Create(nameof(PrepareForSavingCommand), typeof(IAsyncRelayCommand), typeof(CanvasPage), default(IAsyncRelayCommand));
 
 
@@ -222,6 +230,7 @@ public partial class CanvasPage : BasePage
         this.SetBinding(CurrentToolProperty, nameof(ICanvasPageViewModel.CurrentTool));
         this.SetBinding(CanvasActionsProperty, nameof(ICanvasPageViewModel.CanvasActions), BindingMode.TwoWay);
         this.SetBinding(TextElementsProperty, nameof(ICanvasPageViewModel.TextElements), BindingMode.TwoWay);
+        this.SetBinding(TextAddModeProperty, nameof(ICanvasPageViewModel.TextAddMode), BindingMode.OneWay);
         this.SetBinding(BoundingBoxProperty, nameof(ICanvasPageViewModel.BoundingBox), BindingMode.OneWayToSource);
         this.SetBinding(PrepareForSavingCommandProperty, nameof(ICanvasPageViewModel.PrepareForSavingCommand), BindingMode.OneWayToSource);
         this.SetBinding(BoundingBoxScaleProperty, nameof(ICanvasPageViewModel.BoundingBoxScale), BindingMode.OneWayToSource);
@@ -431,37 +440,42 @@ public partial class CanvasPage : BasePage
                     MaskCanvasView.InvalidateSurface();
                 }
 
-                if (CurrentTool.Type == ToolType.MagicWand)
+                switch (CurrentTool.Type)
                 {
-                    if (_segmentationLine != null &&
-                        _segmentationLine.Path.Count > 1)
-                    {
-                        var left = _segmentationLine.Path.Min(p => p.X);
-                        var right = _segmentationLine.Path.Max(p => p.X);
-                        var top = _segmentationLine.Path.Min(p => p.Y);
-                        var bottom = _segmentationLine.Path.Max(p => p.Y);
-
-                        var bounds = new SKRect(left, top, right, bottom);
-
-                        if (bounds.Size.Width < (10 * scale) &&
-                            bounds.Size.Height < (10 * scale))
+                    case ToolType.MagicWand:
+                        if (_segmentationLine != null &&
+                            _segmentationLine.Path.Count > 1)
                         {
-                            DoSegmentationCommand?.Execute([imageLocation]);
+                            var left = _segmentationLine.Path.Min(p => p.X);
+                            var right = _segmentationLine.Path.Max(p => p.X);
+                            var top = _segmentationLine.Path.Min(p => p.Y);
+                            var bottom = _segmentationLine.Path.Max(p => p.Y);
+
+                            var bounds = new SKRect(left, top, right, bottom);
+
+                            if (bounds.Size.Width < (10 * scale) &&
+                                bounds.Size.Height < (10 * scale))
+                            {
+                                DoSegmentationCommand?.Execute([imageLocation]);
+                            }
+                            else
+                            {
+                                var topLeft = new SKPoint(left, top);
+                                var bottomRight = new SKPoint(right, bottom);
+
+                                DoSegmentationCommand?.Execute([topLeft, bottomRight]);
+                            }
                         }
                         else
                         {
-                            var topLeft = new SKPoint(left, top);
-                            var bottomRight = new SKPoint(right, bottom);
-
-                            DoSegmentationCommand?.Execute([topLeft, bottomRight]);
+                            DoSegmentationCommand?.Execute([imageLocation]);
                         }
-                    }
-                    else
-                    {
-                        DoSegmentationCommand?.Execute([imageLocation]);
-                    }
 
-                    _segmentationLine = null;
+                        _segmentationLine = null;
+                        break;
+                    case ToolType.Text when TextAddMode:
+                        _ = PlaceTextAtPointAsync(imageLocation);
+                        break;
                 }
             }
         }
@@ -1328,12 +1342,25 @@ public partial class CanvasPage : BasePage
         SegmentationMaskCanvasView.InvalidateSurface();
     }
 
+    private async Task PlaceTextAtPointAsync(SKPoint imageLocation)
+    {
+        if (BindingContext is ICanvasPageViewModel viewModel)
+        {
+            await viewModel.AddTextCommand.ExecuteAsync(imageLocation);
+        }
+    }
+
     private void OnCurrentToolChanged()
     {
         if (CurrentTool?.ContextButtons == null)
         {
             ShowBoundingBox = false;
             return;
+        }
+
+        if (CurrentTool.Type != ToolType.Text && BindingContext is ICanvasPageViewModel viewModel && !viewModel.TextAddMode)
+        {
+            viewModel.TextAddMode = true;
         }
 
         ShowBoundingBox = CurrentTool.Type == ToolType.BoundingBox;
@@ -1358,6 +1385,7 @@ public partial class CanvasPage : BasePage
         AddRemoveButton.IsVisible = false;
         ResetZoomButton.IsVisible = false;
         NoiseButton.IsVisible = false;
+        TextModeButton.IsVisible = false;
 
         foreach (var contextButton in CurrentTool.ContextButtons)
         {
@@ -1383,6 +1411,9 @@ public partial class CanvasPage : BasePage
                     break;
                 case ContextButtonType.Noise:
                     NoiseButton.IsVisible = true;
+                    break;
+                case ContextButtonType.TextMode:
+                    TextModeButton.IsVisible = true;
                     break;
                 default:
                     break;
