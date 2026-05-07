@@ -31,6 +31,8 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     ObservableCollection<CanvasActionViewModel> CanvasActions { get; set; }
 
+    ObservableCollection<TextElementViewModel> TextElements { get; set; }
+
     Color PaletteIconColor { get; set; }
 
 

@@ -80,6 +80,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     public partial ObservableCollection<CanvasActionViewModel> CanvasActions { get; set; } = new();
 
     [ObservableProperty]
+    public partial ObservableCollection<TextElementViewModel> TextElements { get; set; } = new();
+
+    [ObservableProperty]
     public partial SKBitmap? SourceBitmap { get; set; }
 
     [ObservableProperty]

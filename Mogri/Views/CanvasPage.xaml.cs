@@ -4,9 +4,12 @@ using Mogri.Interfaces.ViewModels;
 using Mogri.Interfaces.ViewModels.Pages;
 using Mogri.ViewModels;
 using SkiaSharp;
+using SkiaSharp.HarfBuzz;
 using SkiaSharp.Views.Maui;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Globalization;
+using System.Text;
 using Mogri.Models;
 
 namespace Mogri.Views;
@@ -62,6 +65,12 @@ public partial class CanvasPage : BasePage
     {
         get => (ObservableCollection<CanvasActionViewModel>)GetValue(CanvasActionsProperty);
         set => SetValue(CanvasActionsProperty, value);
+    }
+
+    public ObservableCollection<TextElementViewModel> TextElements
+    {
+        get => (ObservableCollection<TextElementViewModel>)GetValue(TextElementsProperty);
+        set => SetValue(TextElementsProperty, value);
     }
 
     public SKRect BoundingBox
@@ -168,6 +177,11 @@ public partial class CanvasPage : BasePage
         ((CanvasPage)bindable).OnCanvasActionsChanged(oldValue as ObservableCollection<CanvasActionViewModel>, newValue as ObservableCollection<CanvasActionViewModel>);
     });
 
+    public static BindableProperty TextElementsProperty = BindableProperty.Create(nameof(TextElements), typeof(ObservableCollection<TextElementViewModel>), typeof(CanvasPage), default(ObservableCollection<TextElementViewModel>), propertyChanged: (bindable, oldValue, newValue) =>
+    {
+        ((CanvasPage)bindable).OnTextElementsChanged(oldValue as ObservableCollection<TextElementViewModel>, newValue as ObservableCollection<TextElementViewModel>);
+    });
+
     public static BindableProperty PrepareForSavingCommandProperty = BindableProperty.Create(nameof(PrepareForSavingCommand), typeof(IAsyncRelayCommand), typeof(CanvasPage), default(IAsyncRelayCommand));
 
 
@@ -207,6 +221,7 @@ public partial class CanvasPage : BasePage
         this.SetBinding(CurrentColorProperty, nameof(ICanvasPageViewModel.CurrentColor), BindingMode.TwoWay);
         this.SetBinding(CurrentToolProperty, nameof(ICanvasPageViewModel.CurrentTool));
         this.SetBinding(CanvasActionsProperty, nameof(ICanvasPageViewModel.CanvasActions), BindingMode.TwoWay);
+        this.SetBinding(TextElementsProperty, nameof(ICanvasPageViewModel.TextElements), BindingMode.TwoWay);
         this.SetBinding(BoundingBoxProperty, nameof(ICanvasPageViewModel.BoundingBox), BindingMode.OneWayToSource);
         this.SetBinding(PrepareForSavingCommandProperty, nameof(ICanvasPageViewModel.PrepareForSavingCommand), BindingMode.OneWayToSource);
         this.SetBinding(BoundingBoxScaleProperty, nameof(ICanvasPageViewModel.BoundingBoxScale), BindingMode.OneWayToSource);
@@ -473,29 +488,61 @@ public partial class CanvasPage : BasePage
         var canvas = e.Surface.Canvas;
         canvas.Clear(SKColors.Transparent);
 
-        // Calculate scale to transform Image Coords -> View Coords
-        float scale = 1f;
-        if (Bitmap != null)
+        if (Bitmap == null)
         {
-            // e.Info.Width is ViewPixels. Bitmap.Width is ImagePixels.
-            // Scale = View / Image.
-            scale = (float)e.Info.Width / Bitmap.Width;
+            return;
         }
 
-        if (CanvasActions != null && Bitmap != null)
+        // Calculate scale to transform Image Coords -> View Coords
+        // e.Info.Width is ViewPixels. Bitmap.Width is ImagePixels.
+        // Scale = View / Image.
+        var scale = (float)e.Info.Width / Bitmap.Width;
+
+        if (CanvasActions != null || TextElements != null)
         {
-            foreach (var canvasAction in CanvasActions.Where(ca => ca.CanvasActionType == CanvasActionType.Mask))
+            var overlayItems = new List<(long Order, CanvasActionViewModel? CanvasAction, TextElementViewModel? TextElement)>();
+
+            if (CanvasActions != null)
             {
-                // Scale the canvas so all mask actions render in "Image Space".
-                // We pass the Source Bitmap's Info (Virtual Image Space) to the action.
-                canvas.Save();
-                canvas.Scale(scale);
+                overlayItems.AddRange(CanvasActions
+                    .Where(canvasAction => canvasAction.CanvasActionType == CanvasActionType.Mask)
+                    .Select(canvasAction => (Order: (long)canvasAction.Order, CanvasAction: (CanvasActionViewModel?)canvasAction, TextElement: (TextElementViewModel?)null)));
+            }
 
-                // Construct info representing the full Source Image dimensions
-                var virtualInfo = new SKImageInfo(Bitmap.Width, Bitmap.Height, e.Info.ColorType, e.Info.AlphaType);
-                canvasAction.Execute(canvas, virtualInfo, _isSaving);
+            if (TextElements != null)
+            {
+                overlayItems.AddRange(TextElements
+                    .Select(textElement => (Order: textElement.Order, CanvasAction: (CanvasActionViewModel?)null, TextElement: (TextElementViewModel?)textElement)));
+            }
 
-                canvas.Restore();
+            foreach (var overlayItem in overlayItems.OrderBy(overlayItem => overlayItem.Order))
+            {
+                if (overlayItem.CanvasAction != null)
+                {
+                    // Scale the canvas so all mask actions render in "Image Space".
+                    // We pass the Source Bitmap's Info (Virtual Image Space) to the action.
+                    canvas.Save();
+                    canvas.Scale(scale);
+
+                    var virtualInfo = new SKImageInfo(Bitmap.Width, Bitmap.Height, e.Info.ColorType, e.Info.AlphaType);
+                    overlayItem.CanvasAction.Execute(canvas, virtualInfo, _isSaving);
+
+                    canvas.Restore();
+                }
+                else if (overlayItem.TextElement != null)
+                {
+                    var textElement = overlayItem.TextElement;
+                    var bounds = GetTextBoundsWithFallback(textElement.Text, textElement.BaseFontSize);
+
+                    canvas.Save();
+                    canvas.Scale(scale);
+                    canvas.Translate(textElement.X, textElement.Y);
+                    canvas.RotateDegrees(textElement.Rotation);
+                    canvas.Scale(textElement.Scale);
+                    canvas.Translate(-bounds.MidX, -bounds.MidY);
+                    DrawTextWithFallback(canvas, textElement.Text, textElement.Color, textElement.Alpha, textElement.BaseFontSize);
+                    canvas.Restore();
+                }
             }
         }
 
@@ -816,6 +863,65 @@ public partial class CanvasPage : BasePage
         MaskCanvasView.InvalidateSurface();
     }
 
+    private void OnTextElementsChanged(ObservableCollection<TextElementViewModel>? oldValue, ObservableCollection<TextElementViewModel>? newValue)
+    {
+        if (oldValue != null)
+        {
+            oldValue.CollectionChanged -= TextElements_CollectionChanged;
+            foreach (var item in oldValue)
+            {
+                item.PropertyChanged -= OnTextElementPropertyChanged;
+            }
+        }
+
+        if (newValue != null)
+        {
+            newValue.CollectionChanged += TextElements_CollectionChanged;
+            foreach (var item in newValue)
+            {
+                item.PropertyChanged += OnTextElementPropertyChanged;
+            }
+        }
+
+        MaskCanvasView.InvalidateSurface();
+        TemporaryCanvasView.InvalidateSurface();
+    }
+
+    private void TextElements_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.OldItems != null)
+        {
+            foreach (TextElementViewModel item in e.OldItems)
+            {
+                item.PropertyChanged -= OnTextElementPropertyChanged;
+            }
+        }
+
+        if (e.NewItems != null)
+        {
+            foreach (TextElementViewModel item in e.NewItems)
+            {
+                item.PropertyChanged += OnTextElementPropertyChanged;
+            }
+        }
+
+        MaskCanvasView.InvalidateSurface();
+        TemporaryCanvasView.InvalidateSurface();
+    }
+
+    private void OnTextElementPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (isTextElementRenderProperty(e.PropertyName))
+        {
+            MaskCanvasView.InvalidateSurface();
+        }
+
+        if (sender is TextElementViewModel textElement && shouldInvalidateTemporaryCanvas(textElement, e.PropertyName))
+        {
+            TemporaryCanvasView.InvalidateSurface();
+        }
+    }
+
     private void OnSourceBitmapChanged()
     {
         SegmentationBitmap = null;
@@ -866,6 +972,287 @@ public partial class CanvasPage : BasePage
         TemporaryCanvasView.InvalidateSurface();
 
         BoundingBoxScale = Bitmap.Width / width;
+    }
+
+    private static bool isTextElementRenderProperty(string? propertyName)
+    {
+        return propertyName is nameof(TextElementViewModel.Text)
+            or nameof(TextElementViewModel.X)
+            or nameof(TextElementViewModel.Y)
+            or nameof(TextElementViewModel.Scale)
+            or nameof(TextElementViewModel.Rotation)
+            or nameof(TextElementViewModel.Color)
+            or nameof(TextElementViewModel.Alpha)
+            or nameof(TextElementViewModel.IsSelected);
+    }
+
+    private static bool shouldInvalidateTemporaryCanvas(TextElementViewModel textElement, string? propertyName)
+    {
+        return propertyName == nameof(TextElementViewModel.IsSelected)
+            || (textElement.IsSelected && isTextElementRenderProperty(propertyName));
+    }
+
+    private SKRect GetTextBoundsWithFallback(string text, float baseFontSize)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return SKRect.Empty;
+        }
+
+        var combinedBounds = SKRect.Empty;
+        var hasBounds = false;
+
+        ProcessTextRunsWithFallback(text, baseFontSize, SKColors.White, (_, _, _, _, runBounds, _) =>
+        {
+            if (!hasBounds)
+            {
+                combinedBounds = runBounds;
+                hasBounds = true;
+                return;
+            }
+
+            combinedBounds = unionRects(combinedBounds, runBounds);
+        });
+
+        return combinedBounds;
+    }
+
+    private void DrawTextWithFallback(SKCanvas canvas, string text, Color color, float alpha, float baseFontSize)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return;
+        }
+
+        var skColor = color.ToSKColor().WithAlpha((byte)Math.Clamp((int)Math.Round(alpha * 255f), 0, 255));
+
+        ProcessTextRunsWithFallback(text, baseFontSize, skColor, (runText, font, paint, shaper, _, originX) =>
+        {
+            canvas.DrawShapedText(shaper, runText, originX, 0f, font, paint);
+        });
+    }
+
+    private void ProcessTextRunsWithFallback(
+        string text,
+        float baseFontSize,
+        SKColor color,
+        Action<string, SKFont, SKPaint, SKShaper, SKRect, float> processRun)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return;
+        }
+
+        var textRuns = BuildTextRunsWithFallback(text);
+
+        try
+        {
+            var currentX = 0f;
+
+            foreach (var textRun in textRuns)
+            {
+                using var font = new SKFont(textRun.Typeface, baseFontSize)
+                {
+                    Edging = SKFontEdging.Antialias,
+                    LinearMetrics = true,
+                    Subpixel = true
+                };
+                using var paint = new SKPaint
+                {
+                    Color = color,
+                    IsAntialias = true,
+                    Style = SKPaintStyle.Fill
+                };
+                using var shaper = new SKShaper(textRun.Typeface);
+
+                var shapedText = shaper.Shape(textRun.Text, currentX, 0f, font);
+                var glyphs = shapedText.Codepoints.Select(static codepoint => (ushort)codepoint).ToArray();
+                var glyphWidths = new float[glyphs.Length];
+                var glyphBounds = new SKRect[glyphs.Length];
+
+                if (glyphs.Length > 0)
+                {
+                    font.GetGlyphWidths(glyphs, glyphWidths, glyphBounds, paint);
+                }
+
+                var runBounds = getRunBounds(font, shapedText.Points, glyphBounds, glyphWidths, currentX);
+                processRun(textRun.Text, font, paint, shaper, runBounds, currentX);
+
+                currentX += getRunAdvance(shapedText.Points, glyphWidths, currentX);
+            }
+        }
+        finally
+        {
+            foreach (var textRun in textRuns)
+            {
+                textRun.Dispose();
+            }
+        }
+    }
+
+    private static List<TextRun> BuildTextRunsWithFallback(string text)
+    {
+        var textRuns = new List<TextRun>();
+        if (string.IsNullOrEmpty(text))
+        {
+            return textRuns;
+        }
+
+        var primaryTypeface = SKTypeface.Default;
+        var currentText = new StringBuilder();
+        SKTypeface? currentTypeface = null;
+        var currentOwnsTypeface = false;
+
+        var textElementEnumerator = StringInfo.GetTextElementEnumerator(text);
+        while (textElementEnumerator.MoveNext())
+        {
+            var textElement = textElementEnumerator.GetTextElement();
+            var (typeface, ownsTypeface) = getTypefaceForTextElement(primaryTypeface, textElement);
+
+            if (currentTypeface == null)
+            {
+                currentText.Append(textElement);
+                currentTypeface = typeface;
+                currentOwnsTypeface = ownsTypeface;
+                continue;
+            }
+
+            if (areEquivalentTypefaces(currentTypeface, typeface))
+            {
+                currentText.Append(textElement);
+
+                if (ownsTypeface && !ReferenceEquals(typeface, currentTypeface))
+                {
+                    typeface.Dispose();
+                }
+
+                continue;
+            }
+
+            textRuns.Add(new TextRun(currentText.ToString(), currentTypeface, currentOwnsTypeface));
+            currentText.Clear();
+            currentText.Append(textElement);
+            currentTypeface = typeface;
+            currentOwnsTypeface = ownsTypeface;
+        }
+
+        if (currentTypeface != null && currentText.Length > 0)
+        {
+            textRuns.Add(new TextRun(currentText.ToString(), currentTypeface, currentOwnsTypeface));
+        }
+
+        return textRuns;
+    }
+
+    private static (SKTypeface Typeface, bool OwnsTypeface) getTypefaceForTextElement(SKTypeface primaryTypeface, string textElement)
+    {
+        using var primaryFont = new SKFont(primaryTypeface, 12f);
+        if (primaryFont.ContainsGlyphs(textElement))
+        {
+            return (primaryTypeface, false);
+        }
+
+        var firstCodePoint = Rune.GetRuneAt(textElement, 0).Value;
+        var fallbackTypeface = SKFontManager.Default.MatchCharacter(primaryTypeface.FamilyName, primaryTypeface.FontStyle, Array.Empty<string>(), firstCodePoint);
+
+        if (fallbackTypeface == null)
+        {
+            return (primaryTypeface, false);
+        }
+
+        return (fallbackTypeface, !ReferenceEquals(fallbackTypeface, primaryTypeface));
+    }
+
+    private static bool areEquivalentTypefaces(SKTypeface left, SKTypeface right)
+    {
+        return left.FamilyName == right.FamilyName && left.FontStyle == right.FontStyle;
+    }
+
+    private static SKRect getRunBounds(SKFont font, SKPoint[] glyphPoints, SKRect[] glyphBounds, float[] glyphWidths, float originX)
+    {
+        var hasBounds = false;
+        var runBounds = SKRect.Empty;
+
+        for (var i = 0; i < glyphBounds.Length; i++)
+        {
+            var positionedBounds = glyphBounds[i];
+            if (i < glyphPoints.Length)
+            {
+                positionedBounds.Offset(glyphPoints[i]);
+            }
+            else
+            {
+                positionedBounds.Offset(originX, 0f);
+            }
+
+            if (!hasBounds)
+            {
+                runBounds = positionedBounds;
+                hasBounds = true;
+                continue;
+            }
+
+            runBounds = unionRects(runBounds, positionedBounds);
+        }
+
+        if (hasBounds)
+        {
+            return runBounds;
+        }
+
+        var advance = getRunAdvance(glyphPoints, glyphWidths, originX);
+        var metrics = font.Metrics;
+        return new SKRect(originX, metrics.Ascent, originX + advance, metrics.Descent);
+    }
+
+    private static float getRunAdvance(SKPoint[] glyphPoints, float[] glyphWidths, float originX)
+    {
+        var rightMost = originX;
+
+        for (var i = 0; i < glyphWidths.Length; i++)
+        {
+            var pointX = i < glyphPoints.Length ? glyphPoints[i].X : originX;
+            var candidateRight = pointX + glyphWidths[i];
+            if (candidateRight > rightMost)
+            {
+                rightMost = candidateRight;
+            }
+        }
+
+        return Math.Max(0f, rightMost - originX);
+    }
+
+    private static SKRect unionRects(SKRect left, SKRect right)
+    {
+        return new SKRect(
+            Math.Min(left.Left, right.Left),
+            Math.Min(left.Top, right.Top),
+            Math.Max(left.Right, right.Right),
+            Math.Max(left.Bottom, right.Bottom));
+    }
+
+    private sealed class TextRun : IDisposable
+    {
+        private readonly bool _ownsTypeface;
+
+        public TextRun(string text, SKTypeface typeface, bool ownsTypeface)
+        {
+            Text = text;
+            Typeface = typeface;
+            _ownsTypeface = ownsTypeface;
+        }
+
+        public string Text { get; }
+
+        public SKTypeface Typeface { get; }
+
+        public void Dispose()
+        {
+            if (_ownsTypeface)
+            {
+                Typeface.Dispose();
+            }
+        }
     }
 
     private async Task PrepareForSaving(IAsyncRelayCommand? callbackCommand)
