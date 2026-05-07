@@ -277,11 +277,18 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
         var lastAction = CanvasActions.Last();
 
+        if (lastAction is TextSnapshotCanvasActionViewModel textSnapshot)
+        {
+            CanvasActions.Remove(lastAction);
+            restoreTextElements(textSnapshot.TextElementsSnapshot.Select(cloneTextElement));
+            return;
+        }
+
         if (lastAction is SnapshotCanvasActionViewModel snapshot)
         {
             CanvasActions.Remove(lastAction);
 
-            var (bitmap, actions) = await _canvasHistoryService.RestoreSnapshotAsync(snapshot.SnapshotId);
+            var (bitmap, actions, textElements) = await _canvasHistoryService.RestoreSnapshotAsync(snapshot.SnapshotId);
 
             if (bitmap != null)
             {
@@ -289,13 +296,11 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 SourceBitmap = bitmap;
             }
 
-            if (snapshot.IncludesCanvasActions && actions != null)
+            restoreTextElements(textElements);
+
+            if (snapshot.IncludesCanvasActions)
             {
-                CanvasActions.Clear();
-                foreach (var action in actions)
-                {
-                    CanvasActions.Add(action);
-                }
+                restoreCanvasActions(actions);
             }
         }
         else
@@ -308,6 +313,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     {
         await _canvasHistoryService.ClearAllAsync();
         CanvasActions.Clear();
+        TextElements.Clear();
     }
 
     [RelayCommand]
@@ -1177,6 +1183,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             var segmentationMask = new SegmentationMaskViewModel
             {
                 CanvasActionType = CanvasActionType.Mask,
+                Order = getNextCanvasOrder(),
                 Color = CurrentColor,
                 Alpha = (float)CurrentAlpha,
                 Noise = CurrentNoise,
@@ -1256,27 +1263,39 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
             var mask = await _fileService.GetMaskFileFromAppDataAsync(_sourceFileName);
 
+            void restorePersistedCanvasState()
+            {
+                if (mask == null)
+                {
+                    return;
+                }
+
+                var allActions = new List<CanvasActionViewModel>();
+
+                if (mask.Lines != null)
+                {
+                    allActions.AddRange(mask.Lines);
+                }
+
+                if (mask.SegmentationMasks != null)
+                {
+                    allActions.AddRange(mask.SegmentationMasks);
+                }
+
+                restoreCanvasActions(allActions);
+                restoreTextElements(mask.TextElements);
+            }
+
             if (dispatcher != null)
             {
                 await dispatcher.DispatchAsync(() =>
                 {
-                    if (mask != null)
-                    {
-                        var allActions = new List<CanvasActionViewModel>();
-
-                        if (mask.Lines != null)
-                        {
-                            allActions.AddRange(mask.Lines);
-                        }
-
-                        if (mask.SegmentationMasks != null)
-                        {
-                            allActions.AddRange(mask.SegmentationMasks);
-                        }
-
-                        CanvasActions = new ObservableCollection<CanvasActionViewModel>(allActions.OrderBy(a => a.Order));
-                    }
+                    restorePersistedCanvasState();
                 });
+            }
+            else
+            {
+                restorePersistedCanvasState();
             }
         }
         catch (Exception ex)
@@ -1302,26 +1321,23 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 { "Actions", CanvasActions },
                 { "OnSnapshotDelete", new Func<SnapshotCanvasActionViewModel, Task>(async snapshot => {
                     CanvasActions.Remove(snapshot);
-                    var (bitmap, actions) = await _canvasHistoryService.RestoreSnapshotAsync(snapshot.SnapshotId);
+                    var (bitmap, actions, textElements) = await _canvasHistoryService.RestoreSnapshotAsync(snapshot.SnapshotId);
                     if (bitmap != null)
                     {
                         PreserveZoomOnNextBitmapChange = true;
                         SourceBitmap = bitmap;
                     }
-                    if (snapshot.IncludesCanvasActions && actions != null)
+                    restoreTextElements(textElements);
+                    if (snapshot.IncludesCanvasActions)
                     {
-                        CanvasActions.Clear();
-                        foreach (var action in actions)
-                        {
-                            CanvasActions.Add(action);
-                        }
+                        restoreCanvasActions(actions);
                     }
                 }) },
                 { "OnClearAll", new Func<Task>(async () => {
                     var firstSnapshot = CanvasActions.OfType<SnapshotCanvasActionViewModel>().FirstOrDefault();
                     if (firstSnapshot != null)
                     {
-                        var (bitmap, _) = await _canvasHistoryService.RestoreSnapshotAsync(firstSnapshot.SnapshotId);
+                        var (bitmap, _, _) = await _canvasHistoryService.RestoreSnapshotAsync(firstSnapshot.SnapshotId);
                         if (bitmap != null)
                         {
                             PreserveZoomOnNextBitmapChange = true;
@@ -1730,7 +1746,10 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         if (sourceBitmap == null) return null;
 
         var actionsToSave = includeCanvasActions ? CanvasActions.ToList() : null;
-        var snapshotId = await _canvasHistoryService.SaveSnapshotAsync(sourceBitmap, actionsToSave);
+        var textElementsToSave = TextElements.Count > 0
+            ? TextElements.Select(cloneTextElement).ToList()
+            : null;
+        var snapshotId = await _canvasHistoryService.SaveSnapshotAsync(sourceBitmap, actionsToSave, textElementsToSave);
 
         return snapshotId;
     }
@@ -1739,6 +1758,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     {
         CanvasActions.Add(new SnapshotCanvasActionViewModel
         {
+            Order = getNextCanvasOrder(),
             SnapshotId = snapshotId,
             Description = description,
             IncludesCanvasActions = includeCanvasActions
@@ -1835,14 +1855,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             return;
         }
 
-        var nextOrder = getNextCanvasOrder();
-        CanvasActions.Add(new TextSnapshotCanvasActionViewModel
-        {
-            Order = nextOrder,
-            TextElementsSnapshot = TextElements
-                .Select(cloneTextElement)
-                .ToList()
-        });
+        var nextOrder = PushTextSnapshot();
 
         TextElements.Add(new TextElementViewModel(nextOrder)
         {
@@ -1854,6 +1867,54 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             Scale = 1f,
             Rotation = 0f
         });
+    }
+
+    [RelayCommand]
+    private void DeleteText(TextElementViewModel element)
+    {
+        if (element == null || !TextElements.Contains(element))
+        {
+            return;
+        }
+
+        PushTextSnapshot();
+        TextElements.Remove(element);
+    }
+
+    [RelayCommand]
+    private async Task EditText(TextElementViewModel element)
+    {
+        if (element == null || !TextElements.Contains(element))
+        {
+            return;
+        }
+
+        var updatedText = await _popupService.DisplayPromptAsync(
+            "Edit Text",
+            "Update text or emoji:",
+            placeholder: "Hello 👋",
+            initialValue: element.Text);
+
+        if (string.IsNullOrWhiteSpace(updatedText))
+        {
+            return;
+        }
+
+        element.Text = updatedText.Trim();
+    }
+
+    private int PushTextSnapshot()
+    {
+        var nextOrder = getNextCanvasOrder();
+        CanvasActions.Add(new TextSnapshotCanvasActionViewModel
+        {
+            Order = nextOrder,
+            TextElementsSnapshot = TextElements
+                .Select(cloneTextElement)
+                .ToList()
+        });
+
+        return nextOrder;
     }
 
     private int getNextCanvasOrder()
@@ -1877,6 +1938,36 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             Alpha = textElement.Alpha,
             IsSelected = textElement.IsSelected
         };
+    }
+
+    private void restoreCanvasActions(IEnumerable<CanvasActionViewModel>? actions)
+    {
+        CanvasActions.Clear();
+
+        if (actions == null)
+        {
+            return;
+        }
+
+        foreach (var action in actions.OrderBy(action => action.Order))
+        {
+            CanvasActions.Add(action);
+        }
+    }
+
+    private void restoreTextElements(IEnumerable<TextElementViewModel>? textElements)
+    {
+        TextElements.Clear();
+
+        if (textElements == null)
+        {
+            return;
+        }
+
+        foreach (var textElement in textElements.OrderBy(textElement => textElement.Order))
+        {
+            TextElements.Add(textElement);
+        }
     }
 
     private SKBitmap? GenerateMask(bool useLastOnly)
@@ -2037,8 +2128,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     }
 
     /// <summary>
-    /// Persists mask data to disk when the source image is from the filesystem,
-    /// or deletes a stale mask file if no mask actions remain.
+    /// Persists canvas overlay state to disk when the source image is from the filesystem,
+    /// or deletes the stale state file if no masks or text elements remain.
     /// </summary>
     private async Task autoSaveOrDeleteMaskAsync()
     {
@@ -2054,20 +2145,17 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
         try
         {
-            var maskActions = CanvasActions?.Where(ca => ca.CanvasActionType == CanvasActionType.Mask).ToList();
+            var maskActions = CanvasActions?.Where(ca => ca.CanvasActionType == CanvasActionType.Mask).ToList() ?? new();
+            var textElements = TextElements.Select(cloneTextElement).ToList();
 
-            if (maskActions != null && maskActions.Count > 0)
+            if (maskActions.Count > 0 || textElements.Count > 0)
             {
-                for (var i = 0; i < maskActions.Count; i++)
-                {
-                    maskActions[i].Order = i;
-                }
-
                 await _fileService.WriteMaskFileToAppDataAsync(_sourceFileName,
                     new MaskViewModel
                     {
                         Lines = maskActions.OfType<MaskLineViewModel>().ToList(),
-                        SegmentationMasks = maskActions.OfType<SegmentationMaskViewModel>().ToList()
+                        SegmentationMasks = maskActions.OfType<SegmentationMaskViewModel>().ToList(),
+                        TextElements = textElements
                     });
             }
             else

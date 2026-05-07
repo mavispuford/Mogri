@@ -110,6 +110,10 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     IAsyncRelayCommand<SKPoint> AddTextCommand { get; }
 
+    IRelayCommand<TextElementViewModel> DeleteTextCommand { get; }
+
+    IAsyncRelayCommand<TextElementViewModel> EditTextCommand { get; }
+
     IAsyncRelayCommand PatchCommand { get; }
 
     bool PreserveZoomOnNextBitmapChange { get; set; }

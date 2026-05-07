@@ -39,7 +39,7 @@ public class CanvasHistoryService : ICanvasHistoryService
 
     public int Count => _snapshots.Count;
 
-    public async Task<string> SaveSnapshotAsync(SKBitmap bitmap, IList<CanvasActionViewModel>? canvasActions = null)
+    public async Task<string> SaveSnapshotAsync(SKBitmap bitmap, IList<CanvasActionViewModel>? canvasActions = null, IList<TextElementViewModel>? textElements = null)
     {
         string snapshotId = Guid.NewGuid().ToString();
         string bitmapFilePath = Path.Combine(_snapshotDirectory, $"{snapshotId}.png");
@@ -53,21 +53,17 @@ public class CanvasHistoryService : ICanvasHistoryService
             data.SaveTo(stream);
         });
 
-        if (canvasActions != null && canvasActions.Count > 0)
+        if ((canvasActions != null && canvasActions.Count > 0) || (textElements != null && textElements.Count > 0))
         {
             actionsFilePath = Path.Combine(_snapshotDirectory, $"{snapshotId}.actions.json");
-            
-            // Stamp Order so we can restore the correct interleaving on deserialization
-            for (int i = 0; i < canvasActions.Count; i++)
-            {
-                canvasActions[i].Order = i;
-            }
 
             var wrapper = new MaskViewModel
             {
-                Lines = canvasActions.OfType<MaskLineViewModel>().ToList(),
-                SegmentationMasks = canvasActions.OfType<SegmentationMaskViewModel>().ToList(),
-                Snapshots = canvasActions.OfType<SnapshotCanvasActionViewModel>().ToList()
+                Lines = canvasActions?.OfType<MaskLineViewModel>().ToList() ?? new(),
+                SegmentationMasks = canvasActions?.OfType<SegmentationMaskViewModel>().ToList() ?? new(),
+                Snapshots = canvasActions?.OfType<SnapshotCanvasActionViewModel>().ToList() ?? new(),
+                TextSnapshots = canvasActions?.OfType<TextSnapshotCanvasActionViewModel>().ToList() ?? new(),
+                TextElements = textElements?.ToList() ?? new()
             };
 
             string json = JsonSerializer.Serialize(wrapper, MogriJsonSerializer.Options);
@@ -88,15 +84,16 @@ public class CanvasHistoryService : ICanvasHistoryService
         return snapshotId;
     }
 
-    public async Task<(SKBitmap? Bitmap, List<CanvasActionViewModel>? CanvasActions)> RestoreSnapshotAsync(string snapshotId)
+    public async Task<(SKBitmap? Bitmap, List<CanvasActionViewModel>? CanvasActions, List<TextElementViewModel>? TextElements)> RestoreSnapshotAsync(string snapshotId)
     {
         if (!_snapshots.TryGetValue(snapshotId, out var snapshot))
         {
-            return (null, null);
+            return (null, null, null);
         }
 
         SKBitmap? bitmap = null;
         List<CanvasActionViewModel>? actions = null;
+        List<TextElementViewModel>? textElements = null;
 
         if (File.Exists(snapshot.BitmapFilePath))
         {
@@ -139,14 +136,20 @@ public class CanvasHistoryService : ICanvasHistoryService
                 {
                     actions.AddRange(wrapper.Snapshots);
                 }
+
+                if (wrapper.TextSnapshots != null)
+                {
+                    actions.AddRange(wrapper.TextSnapshots);
+                }
                 
                 actions.Sort((a, b) => a.Order.CompareTo(b.Order));
+                textElements = wrapper.TextElements?.OrderBy(textElement => textElement.Order).ToList();
             }
         }
 
         await DeleteSnapshotAsync(snapshotId);
 
-        return (bitmap, actions);
+        return (bitmap, actions, textElements);
     }
 
     public Task DeleteSnapshotAsync(string snapshotId)

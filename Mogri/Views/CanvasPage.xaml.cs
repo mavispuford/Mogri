@@ -434,6 +434,7 @@ public partial class CanvasPage : BasePage
 
                 if (_currentLine != null)
                 {
+                    _currentLine.Order = GetNextCanvasOrder();
                     CanvasActions?.Add(_currentLine);
                     _currentLine = null;
 
@@ -1376,6 +1377,18 @@ public partial class CanvasPage : BasePage
     private void OnSegmentationBitmapChanged()
     {
         SegmentationMaskCanvasView.InvalidateSurface();
+    }
+
+    private int GetNextCanvasOrder()
+    {
+        var nextCanvasActionOrder = CanvasActions?.Count > 0
+            ? CanvasActions.Max(canvasAction => canvasAction.Order) + 1
+            : 0;
+        var nextTextOrder = TextElements?.Count > 0
+            ? checked((int)(TextElements.Max(textElement => textElement.Order) + 1))
+            : 0;
+
+        return Math.Max(nextCanvasActionOrder, nextTextOrder);
     }
 
     private async Task PlaceTextAtPointAsync(SKPoint imageLocation)
