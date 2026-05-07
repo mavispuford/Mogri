@@ -17,14 +17,12 @@ public class InterfaceConverter<TInterface, TConcrete> : JsonConverter<TInterfac
 
     public override void Write(Utf8JsonWriter writer, TInterface value, JsonSerializerOptions options)
     {
-        if (value is TConcrete concrete)
+        if (value is not TConcrete concrete)
         {
-            JsonSerializer.Serialize(writer, concrete, options);
+            throw new NotSupportedException($"{typeof(TInterface).Name} must serialize as {typeof(TConcrete).Name}.");
         }
-        else
-        {
-            JsonSerializer.Serialize(writer, value, value!.GetType(), options);
-        }
+
+        JsonSerializer.Serialize(writer, concrete, options);
     }
 }
 
@@ -43,7 +41,18 @@ public class InterfaceListConverter<TInterface, TConcrete> : JsonConverter<List<
 
     public override void Write(Utf8JsonWriter writer, List<TInterface> value, JsonSerializerOptions options)
     {
-        var concreteList = value.OfType<TConcrete>().ToList();
+        var concreteList = new List<TConcrete>(value.Count);
+
+        foreach (var item in value)
+        {
+            if (item is not TConcrete concrete)
+            {
+                throw new NotSupportedException($"{typeof(TInterface).Name} items must serialize as {typeof(TConcrete).Name}.");
+            }
+
+            concreteList.Add(concrete);
+        }
+
         JsonSerializer.Serialize(writer, concreteList, options);
     }
 }

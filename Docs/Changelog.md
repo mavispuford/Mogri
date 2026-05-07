@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-05-06
+
+*This update fixes a Release-only canvas undo bug caused by trim-sensitive persistence code and hardens related local serialization paths.*
+
+### Fixed
+- **Flatten Undo Positioning in Release Builds**: Undoing a Flatten action on the canvas now restores previously flattened masks with the correct coordinates in Android Release builds.
+
+### Changed
+- **Trim-Safe Canvas Snapshot Persistence**: Canvas snapshot and mask persistence now use centralized source-generated `System.Text.Json` metadata, including explicit handling for `SkiaSharp.SKPoint`.
+- **Broader Local Persistence Hardening**: Additional app-owned JSON persistence paths, including presets, checkpoint settings, packaged license data, and PNG metadata storage, were updated to avoid trim-sensitive runtime metadata discovery.
+- **Release Validation Guidance**: This bug reinforced that persistence and serialization changes should be validated in Release builds on target devices, not only in Debug emulators.
+
 ## 2026-04-11
 
 *This update moves Prompt Styles to fully local, backend-agnostic storage and completes in-app style management.*

@@ -1,7 +1,9 @@
+using System.ComponentModel;
 using System.Buffers.Binary;
 using System.Text;
 using Mogri.Enums;
 using Mogri.Helpers;
+using Mogri.Interfaces.ViewModels;
 using Mogri.Models;
 using Mogri.ViewModels;
 using Xunit;
@@ -147,6 +149,56 @@ public class PngMetadataHelperTests
         Assert.Equal(1024, result.Width);
         Assert.Equal(1024, result.Height);
         Assert.Equal(0.5, result.DenoisingStrength);
+    }
+
+    [Fact]
+    public async Task WriteSettings_WithLorasAndPromptStyles_SerializesNestedCollections()
+    {
+        // Arrange
+        var original = CreateMinimalPng();
+        var settings = new PromptSettings
+        {
+            Prompt = "a fox",
+            Loras =
+            [
+                new LoraViewModel { Name = "detail", Alias = "Detail", Strength = 0.8 }
+            ],
+            PromptStyles =
+            [
+                new TestPromptStyleViewModel { Name = "Cinematic", Prompt = "cinematic lighting", NegativePrompt = "flat" }
+            ]
+        };
+
+        // Act
+        var written = PngMetadataHelper.WriteSettings(original, settings);
+        await using var stream = new MemoryStream(written);
+        var result = await PngMetadataHelper.ReadSettingsFromStreamAsync(stream);
+        var serializedPng = Encoding.Latin1.GetString(written);
+
+        // Assert
+        Assert.NotNull(result);
+        var lora = Assert.Single(result.Loras);
+        Assert.Equal("detail", lora.Name);
+        Assert.Equal("Detail", lora.Alias);
+        Assert.Equal(0.8, lora.Strength);
+        Assert.Contains("\"styles\":[\"Cinematic\"]", serializedPng);
+    }
+
+    private sealed class TestPromptStyleViewModel : IPromptStyleViewModel
+    {
+        public object? EntityId { get; set; }
+
+        public string Name { get; set; } = string.Empty;
+
+        public string Prompt { get; set; } = string.Empty;
+
+        public string NegativePrompt { get; set; } = string.Empty;
+
+        public event PropertyChangedEventHandler? PropertyChanged
+        {
+            add { }
+            remove { }
+        }
     }
 
     private static byte[] CreateMinimalPng(params (string Keyword, string Text)[] textChunks)
