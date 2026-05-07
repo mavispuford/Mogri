@@ -524,41 +524,50 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     {
         IsBusy = true;
 
-        var sourceBitmap = SourceBitmap;
+        var preparedSourceBitmap = result.PreparedSourceBitmap;
+        var sourceBitmap = preparedSourceBitmap ?? SourceBitmap;
         if (sourceBitmap == null)
         {
+            preparedSourceBitmap?.Dispose();
             IsBusy = false;
             return;
         }
 
-        await Task.Run(async () =>
+        try
         {
-            var dispatcher = Shell.Current.CurrentPage.Dispatcher;
-
-            try
+            await Task.Run(async () =>
             {
-                using var memStream = new MemoryStream();
-                using var skiaStream = new SKManagedWStream(memStream);
+                var dispatcher = Shell.Current.CurrentPage.Dispatcher;
 
-                sourceBitmap.Encode(skiaStream, SKEncodedImageFormat.Png, 100);
-
-                var fileName = $"CanvasImage-{DateTime.Now.Ticks}.png";
-                memStream.Seek(0, SeekOrigin.Begin);
-                var uri = await _fileService.WriteImageFileToExternalStorageAsync(fileName, memStream, false);
-
-                await (dispatcher?.DispatchAsync(async () =>
+                try
                 {
-                    await Toast.Make($"{fileName} saved.").Show();
-                }) ?? Task.CompletedTask);
-            }
-            catch (Exception)
-            {
-                await (dispatcher?.DispatchAsync(async () =>
+                    using var memStream = new MemoryStream();
+                    using var skiaStream = new SKManagedWStream(memStream);
+
+                    sourceBitmap.Encode(skiaStream, SKEncodedImageFormat.Png, 100);
+
+                    var fileName = $"CanvasImage-{DateTime.Now.Ticks}.png";
+                    memStream.Seek(0, SeekOrigin.Begin);
+                    await _fileService.WriteImageFileToExternalStorageAsync(fileName, memStream, false);
+
+                    await (dispatcher?.DispatchAsync(async () =>
+                    {
+                        await Toast.Make($"{fileName} saved.").Show();
+                    }) ?? Task.CompletedTask);
+                }
+                catch (Exception)
                 {
-                    await Toast.Make("Failed to save image. Please try again.").Show();
-                }) ?? Task.CompletedTask);
-            }
-        });
+                    await (dispatcher?.DispatchAsync(async () =>
+                    {
+                        await Toast.Make("Failed to save image. Please try again.").Show();
+                    }) ?? Task.CompletedTask);
+                }
+            });
+        }
+        finally
+        {
+            preparedSourceBitmap?.Dispose();
+        }
 
         IsBusy = false;
     }
@@ -590,104 +599,113 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     {
         IsBusy = true;
 
-        var sourceBitmap = SourceBitmap;
+        var preparedSourceBitmap = result.PreparedSourceBitmap;
+        var sourceBitmap = preparedSourceBitmap ?? SourceBitmap;
 
         if (sourceBitmap == null)
         {
+            preparedSourceBitmap?.Dispose();
             IsBusy = false;
             return;
         }
 
-        await Task.Run(async () =>
+        try
         {
-            // Instead of using the Screen Capture (result.MaskBitmap) which might contain
-            // UI-only artifacts or be at the wrong resolution/aspect ratio, we re-render the
-            // layer internally using the SourceBitmap's dimensions. This ensures 1:1 alignment.
-            using var rawMaskBitmap = GenerateRenderedLayer(sourceBitmap.Width, sourceBitmap.Height);
-
-            var sameSizeMaskBitmap = rawMaskBitmap; // Already same size, no resize needed.
-
-            try
+            await Task.Run(async () =>
             {
-                // Colorize the source bitmap using the mask, then create a black and white mask
-                SKBitmap? colorizedBitmap;
+                // Instead of using the Screen Capture (result.MaskBitmap) which might contain
+                // UI-only artifacts or be at the wrong resolution/aspect ratio, we re-render the
+                // layer internally using the SourceBitmap's dimensions. This ensures 1:1 alignment.
+                using var rawMaskBitmap = GenerateRenderedLayer(sourceBitmap.Width, sourceBitmap.Height);
 
-                if (_currentCanvasUseMode == CanvasUseMode.Inpaint || _currentCanvasUseMode == CanvasUseMode.PaintOnly)
+                var sameSizeMaskBitmap = rawMaskBitmap; // Already same size, no resize needed.
+
+                try
                 {
-                    // Update: Pass opaque=false because our mask layer uses alpha modulation
-                    colorizedBitmap = CreateMaskedBitmap(sourceBitmap, sameSizeMaskBitmap);
-                }
-                else
-                {
-                    colorizedBitmap = sourceBitmap;
-                }
+                    SKBitmap? colorizedBitmap;
 
-                if (colorizedBitmap == null)
-                {
-                    return;
-                }
-
-                using var colorizedMemStream = new MemoryStream();
-                using var colorizedSkiaStream = new SKManagedWStream(colorizedMemStream);
-                colorizedBitmap.Encode(colorizedSkiaStream, SKEncodedImageFormat.Png, 100);
-                colorizedMemStream.Seek(0, SeekOrigin.Begin);
-                var colorizedImageBytes = colorizedMemStream.ToArray();
-                var colorizedImageString = Convert.ToBase64String(colorizedImageBytes);
-
-                var colorizedImgContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", colorizedImageString);
-
-                // Attempt to match the aspect ratio of the image within the resolution constraints
-                var constrainedDimensions = MathHelper.GetAspectCorrectConstrainedDimensions(colorizedBitmap.Width, colorizedBitmap.Height, 0, 0, MathHelper.DimensionConstraint.ClosestMatch);
-
-                var thumbnailString = _imageService.GetThumbnailString(colorizedBitmap, "image/png");
-
-                var parameters = new Dictionary<string, object?>
-                {
-                    { NavigationParams.ImageWidth, constrainedDimensions.Width },
-                    { NavigationParams.ImageHeight, constrainedDimensions.Height },
-                    { NavigationParams.InitImgString, colorizedImgContentTypeString },
-                    { NavigationParams.InitImgThumbnail, thumbnailString }
-                };
-
-                var maskImgContentTypeString = string.Empty;
-
-                if ((_currentCanvasUseMode == CanvasUseMode.Inpaint || _currentCanvasUseMode == CanvasUseMode.MaskOnly) &&
-                    CanvasActions != null &&
-                    CanvasActions.Any(c => c.CanvasActionType == CanvasActionType.Mask))
-                {
-                    // Check if any visible mask exists
-                    if (rawMaskBitmap.Pixels.Any(p => p.Alpha > 0))
+                    if (_currentCanvasUseMode == CanvasUseMode.Inpaint || _currentCanvasUseMode == CanvasUseMode.PaintOnly)
                     {
-                        using var blackAndWhiteMaskBitmap = CreateBlackAndWhiteMask(sameSizeMaskBitmap);
-                        if (blackAndWhiteMaskBitmap != null)
-                        {
-                            using var maskMemStream = new MemoryStream();
-                            using var maskSkiaStream = new SKManagedWStream(maskMemStream);
-                            blackAndWhiteMaskBitmap.Encode(maskSkiaStream, SKEncodedImageFormat.Png, 100);
-                            maskMemStream.Seek(0, SeekOrigin.Begin);
-                            var maskImageBytes = maskMemStream.ToArray();
-                            var maskImageString = Convert.ToBase64String(maskImageBytes);
+                        colorizedBitmap = CreateMaskedBitmap(sourceBitmap, sameSizeMaskBitmap);
+                    }
+                    else
+                    {
+                        colorizedBitmap = sourceBitmap;
+                    }
 
-                            maskImgContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", maskImageString);
+                    using var ownedColorizedBitmap = colorizedBitmap != null && !ReferenceEquals(colorizedBitmap, sourceBitmap)
+                        ? colorizedBitmap
+                        : null;
+
+                    if (colorizedBitmap == null)
+                    {
+                        return;
+                    }
+
+                    using var colorizedMemStream = new MemoryStream();
+                    using var colorizedSkiaStream = new SKManagedWStream(colorizedMemStream);
+                    colorizedBitmap.Encode(colorizedSkiaStream, SKEncodedImageFormat.Png, 100);
+                    colorizedMemStream.Seek(0, SeekOrigin.Begin);
+                    var colorizedImageBytes = colorizedMemStream.ToArray();
+                    var colorizedImageString = Convert.ToBase64String(colorizedImageBytes);
+
+                    var colorizedImgContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", colorizedImageString);
+
+                    // Attempt to match the aspect ratio of the image within the resolution constraints
+                    var constrainedDimensions = MathHelper.GetAspectCorrectConstrainedDimensions(colorizedBitmap.Width, colorizedBitmap.Height, 0, 0, MathHelper.DimensionConstraint.ClosestMatch);
+
+                    var thumbnailString = _imageService.GetThumbnailString(colorizedBitmap, "image/png");
+
+                    var parameters = new Dictionary<string, object?>
+                    {
+                        { NavigationParams.ImageWidth, constrainedDimensions.Width },
+                        { NavigationParams.ImageHeight, constrainedDimensions.Height },
+                        { NavigationParams.InitImgString, colorizedImgContentTypeString },
+                        { NavigationParams.InitImgThumbnail, thumbnailString }
+                    };
+
+                    var maskImgContentTypeString = string.Empty;
+
+                    if ((_currentCanvasUseMode == CanvasUseMode.Inpaint || _currentCanvasUseMode == CanvasUseMode.MaskOnly) &&
+                        CanvasActions != null &&
+                        CanvasActions.Any(c => c.CanvasActionType == CanvasActionType.Mask))
+                    {
+                        // Check if any visible mask exists
+                        if (rawMaskBitmap.Pixels.Any(p => p.Alpha > 0))
+                        {
+                            using var blackAndWhiteMaskBitmap = CreateBlackAndWhiteMask(sameSizeMaskBitmap);
+                            if (blackAndWhiteMaskBitmap != null)
+                            {
+                                using var maskMemStream = new MemoryStream();
+                                using var maskSkiaStream = new SKManagedWStream(maskMemStream);
+                                blackAndWhiteMaskBitmap.Encode(maskSkiaStream, SKEncodedImageFormat.Png, 100);
+                                maskMemStream.Seek(0, SeekOrigin.Begin);
+                                var maskImageBytes = maskMemStream.ToArray();
+                                var maskImageString = Convert.ToBase64String(maskImageBytes);
+
+                                maskImgContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", maskImageString);
+                            }
                         }
                     }
+
+                    parameters.Add(NavigationParams.MaskImgString, maskImgContentTypeString);
+
+                    var dispatcher = Shell.Current.CurrentPage?.Dispatcher;
+                    await (dispatcher?.DispatchAsync(async () =>
+                    {
+                        await Shell.Current.GoToAsync("///MainPageTab", parameters);
+                    }) ?? Task.CompletedTask);
                 }
-
-
-                // Add the mask if it is empty or not so it can be cleared if there is no data
-                parameters.Add(NavigationParams.MaskImgString, maskImgContentTypeString);
-
-                var dispatcher = Shell.Current.CurrentPage?.Dispatcher;
-                await (dispatcher?.DispatchAsync(async () =>
+                catch
                 {
-                    await Shell.Current.GoToAsync("///MainPageTab", parameters);
-                }) ?? Task.CompletedTask);
-            }
-            catch
-            {
-                // Ignored
-            }
-        });
+                    // Ignored
+                }
+            });
+        }
+        finally
+        {
+            preparedSourceBitmap?.Dispose();
+        }
 
         IsBusy = false;
     }
@@ -721,42 +739,64 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     {
         IsBusy = true;
 
-        var sourceBitmap = SourceBitmap;
+        var preparedSourceBitmap = result.PreparedSourceBitmap;
+        var sourceBitmap = preparedSourceBitmap ?? SourceBitmap;
         if (sourceBitmap == null)
         {
+            preparedSourceBitmap?.Dispose();
             IsBusy = false;
             return;
         }
 
         var snapshotId = await pushSnapshotAsync("Flatten", true);
+        var transferredPreparedSourceBitmapOwnership = false;
 
-        await Task.Run(async () =>
+        try
         {
-            using var rawMaskBitmap = GenerateRenderedLayer(sourceBitmap.Width, sourceBitmap.Height);
-
-            var mergedBitmap = CreateMaskedBitmap(sourceBitmap, rawMaskBitmap);
-
-            if (mergedBitmap != null)
+            await Task.Run(async () =>
             {
-                var dispatcher = Shell.Current.CurrentPage?.Dispatcher;
-                await (dispatcher?.DispatchAsync(async () =>
+                using var rawMaskBitmap = GenerateRenderedLayer(sourceBitmap.Width, sourceBitmap.Height);
+
+                var hasMaskActions = CanvasActions.Any(canvasAction => canvasAction.CanvasActionType == CanvasActionType.Mask);
+                var mergedBitmap = hasMaskActions
+                    ? CreateMaskedBitmap(sourceBitmap, rawMaskBitmap)
+                    : preparedSourceBitmap;
+
+                if (mergedBitmap != null)
                 {
-                    var oldBitmap = SourceBitmap;
-                    SourceBitmap = mergedBitmap;
-                    oldBitmap?.Dispose();
-
-                    CanvasActions.Clear();
-                    ClearSegmentationMask();
-
-                    if (snapshotId != null)
+                    var dispatcher = Shell.Current.CurrentPage?.Dispatcher;
+                    await (dispatcher?.DispatchAsync(async () =>
                     {
-                        insertSnapshotMarker(snapshotId, "Flatten", true);
-                    }
+                        var oldBitmap = SourceBitmap;
+                        SourceBitmap = mergedBitmap;
+                        oldBitmap?.Dispose();
 
-                    await Toast.Make("Paint and Masks applied.").Show();
-                }) ?? Task.CompletedTask);
+                        CanvasActions.Clear();
+                        TextElements.Clear();
+                        ClearSegmentationMask();
+
+                        if (ReferenceEquals(mergedBitmap, preparedSourceBitmap))
+                        {
+                            transferredPreparedSourceBitmapOwnership = true;
+                        }
+
+                        if (snapshotId != null)
+                        {
+                            insertSnapshotMarker(snapshotId, "Flatten", true);
+                        }
+
+                        await Toast.Make("Paint and Masks applied.").Show();
+                    }) ?? Task.CompletedTask);
+                }
+            });
+        }
+        finally
+        {
+            if (!transferredPreparedSourceBitmapOwnership)
+            {
+                preparedSourceBitmap?.Dispose();
             }
-        });
+        }
 
         IsBusy = false;
     }
@@ -766,105 +806,122 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     {
         IsBusy = true;
 
-        var sourceBitmap = SourceBitmap;
+        var preparedSourceBitmap = result.PreparedSourceBitmap;
+        var sourceBitmap = preparedSourceBitmap ?? SourceBitmap;
 
         if (sourceBitmap == null)
         {
+            preparedSourceBitmap?.Dispose();
             IsBusy = false;
             return;
         }
 
-        await Task.Run(async () =>
+        try
         {
-            // Re-render layer at SourceBitmap dimensions to ensure correct alignment of masks.
-            // Using result.MaskBitmap (screen capture) dimensions causes scaling mismatches.
-            using var rawMaskBitmap = GenerateRenderedLayer(sourceBitmap.Width, sourceBitmap.Height);
-
-            var sameSizeMaskBitmap = rawMaskBitmap; // Already same size.
-
-            try
+            await Task.Run(async () =>
             {
-                // Colorize the source bitmap using the mask, then create a black and white mask
-                SKBitmap? colorizedBitmap;
+                // Re-render layer at SourceBitmap dimensions to ensure correct alignment of masks.
+                // Using result.MaskBitmap (screen capture) dimensions causes scaling mismatches.
+                using var rawMaskBitmap = GenerateRenderedLayer(sourceBitmap.Width, sourceBitmap.Height);
 
-                if (_currentCanvasUseMode == CanvasUseMode.Inpaint || _currentCanvasUseMode == CanvasUseMode.PaintOnly)
+                var sameSizeMaskBitmap = rawMaskBitmap; // Already same size.
+
+                try
                 {
-                    colorizedBitmap = CreateMaskedBitmap(sourceBitmap, sameSizeMaskBitmap);
-                }
-                else
-                {
-                    colorizedBitmap = sourceBitmap;
-                }
+                    SKBitmap? colorizedBitmap;
 
-                if (colorizedBitmap == null) return;
-
-                var croppedBitmap = GetCroppedBitmap(colorizedBitmap, BoundingBox);
-
-                if (croppedBitmap == null) return;
-
-                using var croppedBitmapMemStream = new MemoryStream();
-                using var croppedBitmapSkiaStream = new SKManagedWStream(croppedBitmapMemStream);
-
-                croppedBitmap.Encode(croppedBitmapSkiaStream, SKEncodedImageFormat.Png, 100);
-                croppedBitmapMemStream.Seek(0, SeekOrigin.Begin);
-                var croppedBitmapImageBytes = croppedBitmapMemStream.ToArray();
-                var croppedBitmapImageString = Convert.ToBase64String(croppedBitmapImageBytes);
-                var croppedBitmapContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", croppedBitmapImageString);
-
-                var thumbnailString = _imageService.GetThumbnailString(croppedBitmap, "image/png");
-
-                var parameters = new Dictionary<string, object?>
-                {
-                    { NavigationParams.ImageWidth, BoundingBoxSize },
-                    { NavigationParams.ImageHeight, BoundingBoxSize },
-                    { NavigationParams.InitImgString, croppedBitmapContentTypeString },
-                    { NavigationParams.InitImgThumbnail, thumbnailString }
-                };
-
-                var croppedMaskContentTypeString = string.Empty;
-
-                if ((_currentCanvasUseMode == CanvasUseMode.Inpaint || _currentCanvasUseMode == CanvasUseMode.MaskOnly) &&
-                    CanvasActions.Any(c => c.CanvasActionType == CanvasActionType.Mask))
-                {
-                    using var blackAndWhiteMaskBitmap = CreateBlackAndWhiteMask(sameSizeMaskBitmap);
-                    if (blackAndWhiteMaskBitmap != null)
+                    if (_currentCanvasUseMode == CanvasUseMode.Inpaint || _currentCanvasUseMode == CanvasUseMode.PaintOnly)
                     {
-                        var croppedMask = GetCroppedBitmap(blackAndWhiteMaskBitmap, BoundingBox);
+                        colorizedBitmap = CreateMaskedBitmap(sourceBitmap, sameSizeMaskBitmap);
+                    }
+                    else
+                    {
+                        colorizedBitmap = sourceBitmap;
+                    }
 
-                        if (croppedMask != null)
+                    using var ownedColorizedBitmap = colorizedBitmap != null && !ReferenceEquals(colorizedBitmap, sourceBitmap)
+                        ? colorizedBitmap
+                        : null;
+
+                    if (colorizedBitmap == null) return;
+
+                    var croppedBitmap = GetCroppedBitmap(colorizedBitmap, BoundingBox);
+                    using var ownedCroppedBitmap = croppedBitmap != null && !ReferenceEquals(croppedBitmap, colorizedBitmap)
+                        ? croppedBitmap
+                        : null;
+
+                    if (croppedBitmap == null) return;
+
+                    using var croppedBitmapMemStream = new MemoryStream();
+                    using var croppedBitmapSkiaStream = new SKManagedWStream(croppedBitmapMemStream);
+
+                    croppedBitmap.Encode(croppedBitmapSkiaStream, SKEncodedImageFormat.Png, 100);
+                    croppedBitmapMemStream.Seek(0, SeekOrigin.Begin);
+                    var croppedBitmapImageBytes = croppedBitmapMemStream.ToArray();
+                    var croppedBitmapImageString = Convert.ToBase64String(croppedBitmapImageBytes);
+                    var croppedBitmapContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", croppedBitmapImageString);
+
+                    var thumbnailString = _imageService.GetThumbnailString(croppedBitmap, "image/png");
+
+                    var parameters = new Dictionary<string, object?>
+                    {
+                        { NavigationParams.ImageWidth, BoundingBoxSize },
+                        { NavigationParams.ImageHeight, BoundingBoxSize },
+                        { NavigationParams.InitImgString, croppedBitmapContentTypeString },
+                        { NavigationParams.InitImgThumbnail, thumbnailString }
+                    };
+
+                    var croppedMaskContentTypeString = string.Empty;
+
+                    if ((_currentCanvasUseMode == CanvasUseMode.Inpaint || _currentCanvasUseMode == CanvasUseMode.MaskOnly) &&
+                        CanvasActions.Any(c => c.CanvasActionType == CanvasActionType.Mask))
+                    {
+                        using var blackAndWhiteMaskBitmap = CreateBlackAndWhiteMask(sameSizeMaskBitmap);
+                        if (blackAndWhiteMaskBitmap != null)
                         {
-                            // Verify that the cropped mask contains anything useful
-                            if (croppedMask.Pixels.Any(p => p.Alpha > 0))
-                            {
-                                using var croppedMaskMemStream = new MemoryStream();
-                                using var croppedMaskSkiaStream = new SKManagedWStream(croppedMaskMemStream);
+                            var croppedMask = GetCroppedBitmap(blackAndWhiteMaskBitmap, BoundingBox);
+                            using var ownedCroppedMask = croppedMask != null && !ReferenceEquals(croppedMask, blackAndWhiteMaskBitmap)
+                                ? croppedMask
+                                : null;
 
-                                croppedMask.Encode(croppedMaskSkiaStream, SKEncodedImageFormat.Png, 100);
-                                croppedMaskMemStream.Seek(0, SeekOrigin.Begin);
-                                var croppedMaskImageBytes = croppedMaskMemStream.ToArray();
-                                var croppedMaskImageString = Convert.ToBase64String(croppedMaskImageBytes);
-                                croppedMaskContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", croppedMaskImageString);
+                            if (croppedMask != null)
+                            {
+                                // Verify that the cropped mask contains anything useful
+                                if (croppedMask.Pixels.Any(p => p.Alpha > 0))
+                                {
+                                    using var croppedMaskMemStream = new MemoryStream();
+                                    using var croppedMaskSkiaStream = new SKManagedWStream(croppedMaskMemStream);
+
+                                    croppedMask.Encode(croppedMaskSkiaStream, SKEncodedImageFormat.Png, 100);
+                                    croppedMaskMemStream.Seek(0, SeekOrigin.Begin);
+                                    var croppedMaskImageBytes = croppedMaskMemStream.ToArray();
+                                    var croppedMaskImageString = Convert.ToBase64String(croppedMaskImageBytes);
+                                    croppedMaskContentTypeString = string.Format(Constants.ImageDataFormat, "image/png", croppedMaskImageString);
+                                }
                             }
                         }
                     }
+
+                    parameters.Add(NavigationParams.MaskImgString, croppedMaskContentTypeString);
+
+                    var dispatcher = Shell.Current.CurrentPage?.Dispatcher;
+                    await (dispatcher?.DispatchAsync(async () =>
+                    {
+                        await Shell.Current.GoToAsync("///MainPageTab", parameters);
+
+                        await Toast.Make("Section has been cropped and set as source image.").Show();
+                    }) ?? Task.CompletedTask);
                 }
-
-                // Add the mask if it is empty or not so it can be cleared if there is no data
-                parameters.Add(NavigationParams.MaskImgString, croppedMaskContentTypeString);
-
-                var dispatcher = Shell.Current.CurrentPage?.Dispatcher;
-                await (dispatcher?.DispatchAsync(async () =>
+                catch
                 {
-                    await Shell.Current.GoToAsync("///MainPageTab", parameters);
-
-                    await Toast.Make("Section has been cropped and set as source image.").Show();
-                }) ?? Task.CompletedTask);
-            }
-            catch
-            {
-                // Ignored
-            }
-        });
+                    // Ignored
+                }
+            });
+        }
+        finally
+        {
+            preparedSourceBitmap?.Dispose();
+        }
 
         IsBusy = false;
     }

@@ -545,17 +545,7 @@ public partial class CanvasPage : BasePage
                 }
                 else if (overlayItem.TextElement != null)
                 {
-                    var textElement = overlayItem.TextElement;
-                    var bounds = GetTextBoundsWithFallback(textElement.Text, textElement.BaseFontSize);
-
-                    canvas.Save();
-                    canvas.Scale(scale);
-                    canvas.Translate(textElement.X, textElement.Y);
-                    canvas.RotateDegrees(textElement.Rotation);
-                    canvas.Scale(textElement.Scale);
-                    canvas.Translate(-bounds.MidX, -bounds.MidY);
-                    DrawTextWithFallback(canvas, textElement.Text, textElement.Color, textElement.Alpha, textElement.BaseFontSize);
-                    canvas.Restore();
+                    DrawTextElement(canvas, overlayItem.TextElement, scale);
                 }
             }
         }
@@ -1046,6 +1036,47 @@ public partial class CanvasPage : BasePage
         });
     }
 
+    private void DrawTextElement(SKCanvas canvas, TextElementViewModel textElement, float canvasScale = 1f)
+    {
+        if (string.IsNullOrEmpty(textElement.Text))
+        {
+            return;
+        }
+
+        var bounds = GetTextBoundsWithFallback(textElement.Text, textElement.BaseFontSize);
+
+        canvas.Save();
+
+        if (canvasScale != 1f)
+        {
+            canvas.Scale(canvasScale);
+        }
+
+        canvas.Translate(textElement.X, textElement.Y);
+        canvas.RotateDegrees(textElement.Rotation);
+        canvas.Scale(textElement.Scale);
+        canvas.Translate(-bounds.MidX, -bounds.MidY);
+        DrawTextWithFallback(canvas, textElement.Text, textElement.Color, textElement.Alpha, textElement.BaseFontSize);
+
+        canvas.Restore();
+    }
+
+    private SKBitmap PrepareSourceBitmapWithText(SKBitmap sourceBitmap)
+    {
+        var info = new SKImageInfo(sourceBitmap.Width, sourceBitmap.Height, sourceBitmap.ColorType, sourceBitmap.AlphaType, sourceBitmap.ColorSpace);
+        var preparedBitmap = new SKBitmap(info);
+
+        using var canvas = new SKCanvas(preparedBitmap);
+        canvas.DrawBitmap(sourceBitmap, 0, 0);
+
+        foreach (var textElement in TextElements.OrderBy(textElement => textElement.Order))
+        {
+            DrawTextElement(canvas, textElement);
+        }
+
+        return preparedBitmap;
+    }
+
     private void ProcessTextRunsWithFallback(
         string text,
         float baseFontSize,
@@ -1299,6 +1330,11 @@ public partial class CanvasPage : BasePage
         {
             MaskBitmap = maskBitmap
         };
+
+        if (Bitmap != null && TextElements is { Count: > 0 })
+        {
+            result.PreparedSourceBitmap = PrepareSourceBitmapWithText(Bitmap);
+        }
 
         await callbackCommand.ExecuteAsync(result);
 
