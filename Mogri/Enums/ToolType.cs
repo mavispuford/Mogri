@@ -7,5 +7,6 @@ public enum ToolType
     MagicWand,
     Eyedropper,
     BoundingBox,
-    Zoom
+    Zoom,
+    Text
 }

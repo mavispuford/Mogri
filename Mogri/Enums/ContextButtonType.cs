@@ -8,5 +8,6 @@ public enum ContextButtonType
     BoundingBoxSize,
     AddRemove,
     ResetZoom,
-    Noise
+    Noise,
+    TextMode
 }
