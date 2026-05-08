@@ -16,6 +16,15 @@ namespace Mogri.Views;
 
 public partial class CanvasPage : BasePage
 {
+    private const float MinTextScale = 0.35f;
+    private const float MaxTextScale = 6f;
+    private const float TextSelectionPadding = 12f;
+    private const float TextSelectionCornerRadius = 18f;
+    private const float TextSelectionShadowStroke = 6f;
+    private const float TextSelectionStroke = 3f;
+    private const float DoubleTapThresholdMilliseconds = 350f;
+    private const float MaxTapMovementInViewPixels = 12f;
+
     private MaskLineViewModel? _currentLine;
     private MaskLineViewModel? _segmentationLine;
     private Timer? _brushSizeTimer;
@@ -24,6 +33,7 @@ public partial class CanvasPage : BasePage
     private bool _hasCreatedBoundingBox;
     private bool _isSaving;
     private bool _hapticsEnabled = false;
+    private readonly CanvasPageTextInteractionState _textInteraction = new();
 
     public SKBitmap Bitmap
     {
@@ -188,7 +198,10 @@ public partial class CanvasPage : BasePage
         ((CanvasPage)bindable).OnTextElementsChanged(oldValue as ObservableCollection<TextElementViewModel>, newValue as ObservableCollection<TextElementViewModel>);
     });
 
-    public static BindableProperty TextAddModeProperty = BindableProperty.Create(nameof(TextAddMode), typeof(bool), typeof(CanvasPage), true);
+    public static BindableProperty TextAddModeProperty = BindableProperty.Create(nameof(TextAddMode), typeof(bool), typeof(CanvasPage), true, propertyChanged: (bindable, oldValue, newValue) =>
+    {
+        ((CanvasPage)bindable).OnTextAddModeChanged((bool)newValue);
+    });
 
     public static BindableProperty PrepareForSavingCommandProperty = BindableProperty.Create(nameof(PrepareForSavingCommand), typeof(IAsyncRelayCommand), typeof(CanvasPage), default(IAsyncRelayCommand));
 
@@ -330,6 +343,14 @@ public partial class CanvasPage : BasePage
             }
 
             var imageLocation = new SKPoint(location.X * scale, location.Y * scale);
+
+            if (CurrentTool.Type == ToolType.Text && !TextAddMode)
+            {
+                handleTextMoveModeTouch(e, location, imageLocation);
+                TemporaryCanvasView.InvalidateSurface();
+                e.Handled = true;
+                return;
+            }
 
             // InContact == Finger currently touching down
             if (e.InContact)
@@ -486,6 +507,372 @@ public partial class CanvasPage : BasePage
         e.Handled = true;
     }
 
+    private void handleTextMoveModeTouch(SKTouchEventArgs e, SKPoint viewLocation, SKPoint imageLocation)
+    {
+        switch (e.ActionType)
+        {
+            case SKTouchAction.Pressed:
+                _textInteraction.ActiveTouches[e.Id] = imageLocation;
+                _textInteraction.ActiveTouchStartViewPoints[e.Id] = viewLocation;
+
+                if (_textInteraction.ActiveTouches.Count == 1)
+                {
+                    var hitTextElement = getHitTextElement(imageLocation);
+                    setSelectedTextElement(hitTextElement);
+
+                    if (hitTextElement != null)
+                    {
+                        beginTextDragGesture(e.Id, imageLocation, hitTextElement);
+                    }
+                    else
+                    {
+                        _textInteraction.PrimaryTouchId = null;
+                    }
+                }
+                else if (_textInteraction.SelectedTextElement != null && _textInteraction.ActiveTouches.Count >= 2)
+                {
+                    beginTextTransformGesture();
+                }
+
+                break;
+            case SKTouchAction.Moved:
+                if (_textInteraction.ActiveTouches.ContainsKey(e.Id))
+                {
+                    _textInteraction.ActiveTouches[e.Id] = imageLocation;
+                }
+
+                if (_textInteraction.SelectedTextElement == null)
+                {
+                    break;
+                }
+
+                if (_textInteraction.ActiveTouches.Count >= 2)
+                {
+                    if (!_textInteraction.IsTransformGesture)
+                    {
+                        beginTextTransformGesture();
+                    }
+
+                    updateTextTransformGesture();
+                }
+                else if (!_textInteraction.SuppressSingleTouchUntilRelease
+                    && !_textInteraction.IsTransformGesture
+                    && _textInteraction.PrimaryTouchId == e.Id)
+                {
+                    updateTextDragGesture(imageLocation);
+                }
+
+                break;
+            case SKTouchAction.Released:
+            case SKTouchAction.Cancelled:
+            case SKTouchAction.Exited:
+                completeTextMoveModeTouch(e.Id, viewLocation, imageLocation, e.ActionType == SKTouchAction.Released);
+                break;
+        }
+    }
+
+    private void beginTextDragGesture(long touchId, SKPoint imageLocation, TextElementViewModel textElement)
+    {
+        _textInteraction.PrimaryTouchId = touchId;
+        _textInteraction.DragGestureStartTouchPoint = imageLocation;
+        _textInteraction.DragGestureStartElementCenter = new SKPoint(textElement.X, textElement.Y);
+        _textInteraction.IsTransformGesture = false;
+        _textInteraction.SuppressSingleTouchUntilRelease = false;
+    }
+
+    private void updateTextDragGesture(SKPoint imageLocation)
+    {
+        var selectedTextElement = _textInteraction.SelectedTextElement;
+        if (selectedTextElement == null)
+        {
+            return;
+        }
+
+        var deltaX = imageLocation.X - _textInteraction.DragGestureStartTouchPoint.X;
+        var deltaY = imageLocation.Y - _textInteraction.DragGestureStartTouchPoint.Y;
+
+        selectedTextElement.X = _textInteraction.DragGestureStartElementCenter.X + deltaX;
+        selectedTextElement.Y = _textInteraction.DragGestureStartElementCenter.Y + deltaY;
+    }
+
+    private void beginTextTransformGesture()
+    {
+        var selectedTextElement = _textInteraction.SelectedTextElement;
+        if (selectedTextElement == null || !tryGetActiveTransformPoints(out var firstPoint, out var secondPoint))
+        {
+            return;
+        }
+
+        _textInteraction.TransformGestureStartDistance = Math.Max(1f, getPointDistance(firstPoint, secondPoint));
+        _textInteraction.TransformGestureStartAngle = getAngleDegrees(firstPoint, secondPoint);
+        _textInteraction.TransformGestureStartScale = selectedTextElement.Scale;
+        _textInteraction.TransformGestureStartRotation = selectedTextElement.Rotation;
+        _textInteraction.IsTransformGesture = true;
+        _textInteraction.PrimaryTouchId = null;
+    }
+
+    private void updateTextTransformGesture()
+    {
+        var selectedTextElement = _textInteraction.SelectedTextElement;
+        if (selectedTextElement == null || !tryGetActiveTransformPoints(out var firstPoint, out var secondPoint))
+        {
+            return;
+        }
+
+        var currentDistance = Math.Max(1f, getPointDistance(firstPoint, secondPoint));
+        var scaleFactor = currentDistance / _textInteraction.TransformGestureStartDistance;
+        var currentAngle = getAngleDegrees(firstPoint, secondPoint);
+        var angleDelta = normalizeDegrees(currentAngle - _textInteraction.TransformGestureStartAngle);
+
+        selectedTextElement.Scale = Math.Clamp(_textInteraction.TransformGestureStartScale * scaleFactor, MinTextScale, MaxTextScale);
+        selectedTextElement.Rotation = normalizeDegrees(_textInteraction.TransformGestureStartRotation + angleDelta);
+    }
+
+    private void completeTextMoveModeTouch(long touchId, SKPoint viewLocation, SKPoint imageLocation, bool isRelease)
+    {
+        var hadMultipleTouches = _textInteraction.ActiveTouches.Count > 1;
+        var wasTransformGesture = _textInteraction.IsTransformGesture;
+        var isTapCandidate = isRelease
+            && !hadMultipleTouches
+            && !wasTransformGesture
+            && !_textInteraction.SuppressSingleTouchUntilRelease
+            && isTapGesture(touchId, viewLocation);
+        var tappedTextElement = isTapCandidate ? getHitTextElement(imageLocation) : null;
+
+        _textInteraction.ActiveTouches.Remove(touchId);
+        _textInteraction.ActiveTouchStartViewPoints.Remove(touchId);
+
+        if (_textInteraction.ActiveTouches.Count >= 2 && _textInteraction.SelectedTextElement != null)
+        {
+            beginTextTransformGesture();
+        }
+        else if (wasTransformGesture && _textInteraction.ActiveTouches.Count == 1)
+        {
+            _textInteraction.IsTransformGesture = false;
+            _textInteraction.PrimaryTouchId = _textInteraction.ActiveTouches.Keys.First();
+            _textInteraction.SuppressSingleTouchUntilRelease = true;
+        }
+        else if (_textInteraction.ActiveTouches.Count == 1 && !wasTransformGesture)
+        {
+            _textInteraction.PrimaryTouchId = _textInteraction.ActiveTouches.Keys.First();
+
+            if (_textInteraction.SelectedTextElement != null && _textInteraction.PrimaryTouchId.HasValue)
+            {
+                _textInteraction.DragGestureStartTouchPoint = _textInteraction.ActiveTouches[_textInteraction.PrimaryTouchId.Value];
+                _textInteraction.DragGestureStartElementCenter = new SKPoint(_textInteraction.SelectedTextElement.X, _textInteraction.SelectedTextElement.Y);
+            }
+        }
+        else if (_textInteraction.ActiveTouches.Count == 0)
+        {
+            _textInteraction.PrimaryTouchId = null;
+            _textInteraction.IsTransformGesture = false;
+            _textInteraction.SuppressSingleTouchUntilRelease = false;
+        }
+
+        if (isTapCandidate)
+        {
+            handleTextTapGesture(tappedTextElement, viewLocation);
+        }
+        else if (_textInteraction.ActiveTouches.Count == 0)
+        {
+            clearLastTextTap();
+        }
+    }
+
+    private void handleTextTapGesture(TextElementViewModel? tappedTextElement, SKPoint viewLocation)
+    {
+        if (tappedTextElement == null)
+        {
+            setSelectedTextElement(null);
+            clearLastTextTap();
+            return;
+        }
+
+        setSelectedTextElement(tappedTextElement);
+
+        var now = DateTime.UtcNow;
+        var isDoubleTap = _textInteraction.LastTapElementId == tappedTextElement.Id
+            && (now - _textInteraction.LastTapTimestampUtc).TotalMilliseconds <= DoubleTapThresholdMilliseconds
+            && getPointDistance(_textInteraction.LastTapViewLocation, viewLocation) <= MaxTapMovementInViewPixels;
+
+        if (isDoubleTap)
+        {
+            clearLastTextTap();
+            _ = editSelectedTextAsync(tappedTextElement);
+            return;
+        }
+
+        _textInteraction.LastTapElementId = tappedTextElement.Id;
+        _textInteraction.LastTapTimestampUtc = now;
+        _textInteraction.LastTapViewLocation = viewLocation;
+    }
+
+    private async Task editSelectedTextAsync(TextElementViewModel textElement)
+    {
+        if (BindingContext is not ICanvasPageViewModel viewModel)
+        {
+            return;
+        }
+
+        resetTextInteractionState(clearSelection: false, clearTapState: true);
+        await viewModel.EditTextCommand.ExecuteAsync(textElement);
+    }
+
+    private TextElementViewModel? getHitTextElement(SKPoint imageLocation)
+    {
+        if (TextElements == null)
+        {
+            return null;
+        }
+
+        foreach (var textElement in TextElements.OrderByDescending(textElement => textElement.Order))
+        {
+            if (string.IsNullOrWhiteSpace(textElement.Text))
+            {
+                continue;
+            }
+
+            var bounds = GetTextBoundsWithFallback(textElement.Text, textElement.BaseFontSize);
+            if (bounds.IsEmpty)
+            {
+                continue;
+            }
+
+            var localPoint = getLocalTextPoint(imageLocation, textElement, bounds);
+            var hitBounds = bounds;
+            hitBounds.Inflate(TextSelectionPadding, TextSelectionPadding);
+
+            if (hitBounds.Contains(localPoint))
+            {
+                return textElement;
+            }
+        }
+
+        return null;
+    }
+
+    private static SKPoint getLocalTextPoint(SKPoint imageLocation, TextElementViewModel textElement, SKRect bounds)
+    {
+        var translatedPoint = new SKPoint(imageLocation.X - textElement.X, imageLocation.Y - textElement.Y);
+        var rotationRadians = -textElement.Rotation * (MathF.PI / 180f);
+        var cos = MathF.Cos(rotationRadians);
+        var sin = MathF.Sin(rotationRadians);
+        var rotatedPoint = new SKPoint(
+            translatedPoint.X * cos - translatedPoint.Y * sin,
+            translatedPoint.X * sin + translatedPoint.Y * cos);
+        var safeScale = Math.Max(textElement.Scale, MinTextScale);
+        var unscaledPoint = new SKPoint(rotatedPoint.X / safeScale, rotatedPoint.Y / safeScale);
+
+        return new SKPoint(unscaledPoint.X + bounds.MidX, unscaledPoint.Y + bounds.MidY);
+    }
+
+    private bool isTapGesture(long touchId, SKPoint viewLocation)
+    {
+        if (!_textInteraction.ActiveTouchStartViewPoints.TryGetValue(touchId, out var startPoint))
+        {
+            return false;
+        }
+
+        return getPointDistance(startPoint, viewLocation) <= MaxTapMovementInViewPixels;
+    }
+
+    private bool tryGetActiveTransformPoints(out SKPoint firstPoint, out SKPoint secondPoint)
+    {
+        firstPoint = default;
+        secondPoint = default;
+
+        if (_textInteraction.ActiveTouches.Count < 2)
+        {
+            return false;
+        }
+
+        var activePoints = _textInteraction.ActiveTouches.Values.Take(2).ToArray();
+        firstPoint = activePoints[0];
+        secondPoint = activePoints[1];
+        return true;
+    }
+
+    private void setSelectedTextElement(TextElementViewModel? textElement)
+    {
+        if (ReferenceEquals(_textInteraction.SelectedTextElement, textElement))
+        {
+            if (_textInteraction.SelectedTextElement != null && !_textInteraction.SelectedTextElement.IsSelected)
+            {
+                _textInteraction.SelectedTextElement.IsSelected = true;
+            }
+
+            return;
+        }
+
+        if (_textInteraction.SelectedTextElement != null)
+        {
+            _textInteraction.SelectedTextElement.IsSelected = false;
+        }
+
+        _textInteraction.SelectedTextElement = textElement;
+
+        if (_textInteraction.SelectedTextElement != null)
+        {
+            _textInteraction.SelectedTextElement.IsSelected = true;
+        }
+    }
+
+    private void resetTextInteractionState(bool clearSelection, bool clearTapState)
+    {
+        _textInteraction.ResetGestureState(clearTapState);
+
+        if (clearSelection)
+        {
+            setSelectedTextElement(null);
+        }
+
+        TemporaryCanvasView.InvalidateSurface();
+    }
+
+    private void clearLastTextTap()
+    {
+        _textInteraction.ClearTapState();
+    }
+
+    private void OnTextAddModeChanged(bool textAddMode)
+    {
+        if (textAddMode)
+        {
+            resetTextInteractionState(clearSelection: true, clearTapState: true);
+            return;
+        }
+
+        TemporaryCanvasView.InvalidateSurface();
+    }
+
+    private static float getPointDistance(SKPoint firstPoint, SKPoint secondPoint)
+    {
+        var deltaX = secondPoint.X - firstPoint.X;
+        var deltaY = secondPoint.Y - firstPoint.Y;
+
+        return MathF.Sqrt((deltaX * deltaX) + (deltaY * deltaY));
+    }
+
+    private static float getAngleDegrees(SKPoint firstPoint, SKPoint secondPoint)
+    {
+        return MathF.Atan2(secondPoint.Y - firstPoint.Y, secondPoint.X - firstPoint.X) * (180f / MathF.PI);
+    }
+
+    private static float normalizeDegrees(float angle)
+    {
+        while (angle > 180f)
+        {
+            angle -= 360f;
+        }
+
+        while (angle < -180f)
+        {
+            angle += 360f;
+        }
+
+        return angle;
+    }
+
 
     private void OnPaintSourceImageSurface(object? sender, SKPaintSurfaceEventArgs e)
     {
@@ -586,6 +973,8 @@ public partial class CanvasPage : BasePage
             _segmentationLine.Execute(canvas, e.Info, _isSaving);
             canvas.Restore();
         }
+
+        drawSelectedTextOutline(canvas, scale);
 
         if (ShowBoundingBox)
         {
@@ -910,6 +1299,11 @@ public partial class CanvasPage : BasePage
             }
         }
 
+        if (_textInteraction.SelectedTextElement != null && (TextElements == null || !TextElements.Contains(_textInteraction.SelectedTextElement)))
+        {
+            resetTextInteractionState(clearSelection: true, clearTapState: true);
+        }
+
         MaskCanvasView.InvalidateSurface();
         TemporaryCanvasView.InvalidateSurface();
     }
@@ -925,6 +1319,62 @@ public partial class CanvasPage : BasePage
         {
             TemporaryCanvasView.InvalidateSurface();
         }
+    }
+
+    private void drawSelectedTextOutline(SKCanvas canvas, float canvasScale)
+    {
+        var selectedTextElement = _textInteraction.SelectedTextElement;
+
+        if (selectedTextElement == null
+            || CurrentTool?.Type != ToolType.Text
+            || TextAddMode
+            || TextElements == null
+            || !TextElements.Contains(selectedTextElement)
+            || string.IsNullOrWhiteSpace(selectedTextElement.Text))
+        {
+            return;
+        }
+
+        var bounds = GetTextBoundsWithFallback(selectedTextElement.Text, selectedTextElement.BaseFontSize);
+        if (bounds.IsEmpty)
+        {
+            return;
+        }
+
+        var selectionBounds = bounds;
+        selectionBounds.Inflate(TextSelectionPadding, TextSelectionPadding);
+
+        canvas.Save();
+
+        if (canvasScale != 1f)
+        {
+            canvas.Scale(canvasScale);
+        }
+
+        canvas.Translate(selectedTextElement.X, selectedTextElement.Y);
+        canvas.RotateDegrees(selectedTextElement.Rotation);
+        canvas.Scale(selectedTextElement.Scale);
+        canvas.Translate(-bounds.MidX, -bounds.MidY);
+
+        using var shadowPaint = new SKPaint
+        {
+            Color = SKColors.Black.WithAlpha(96),
+            IsAntialias = true,
+            StrokeWidth = TextSelectionShadowStroke,
+            Style = SKPaintStyle.Stroke
+        };
+        using var outlinePaint = new SKPaint
+        {
+            Color = SKColors.White.WithAlpha(235),
+            IsAntialias = true,
+            StrokeWidth = TextSelectionStroke,
+            Style = SKPaintStyle.Stroke
+        };
+
+        canvas.DrawRoundRect(selectionBounds, TextSelectionCornerRadius, TextSelectionCornerRadius, shadowPaint);
+        canvas.DrawRoundRect(selectionBounds, TextSelectionCornerRadius, TextSelectionCornerRadius, outlinePaint);
+
+        canvas.Restore();
     }
 
     private void OnSourceBitmapChanged()
@@ -1403,13 +1853,19 @@ public partial class CanvasPage : BasePage
     {
         if (CurrentTool?.ContextButtons == null)
         {
+            resetTextInteractionState(clearSelection: true, clearTapState: true);
             ShowBoundingBox = false;
             return;
         }
 
-        if (CurrentTool.Type != ToolType.Text && BindingContext is ICanvasPageViewModel viewModel && !viewModel.TextAddMode)
+        if (CurrentTool.Type != ToolType.Text)
         {
-            viewModel.TextAddMode = true;
+            resetTextInteractionState(clearSelection: true, clearTapState: true);
+
+            if (BindingContext is ICanvasPageViewModel viewModel && !viewModel.TextAddMode)
+            {
+                viewModel.TextAddMode = true;
+            }
         }
 
         ShowBoundingBox = CurrentTool.Type == ToolType.BoundingBox;
@@ -1473,6 +1929,7 @@ public partial class CanvasPage : BasePage
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
+        resetTextInteractionState(clearSelection: true, clearTapState: true);
         TemporaryCanvasView.SizeChanged -= TemporaryCanvasView_SizeChanged;
         ActionsContainer.SizeChanged -= ActionsContainer_SizeChanged;
         disposeTimers();
