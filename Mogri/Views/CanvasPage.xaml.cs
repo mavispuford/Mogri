@@ -1871,11 +1871,6 @@ public partial class CanvasPage : BasePage
         if (CurrentTool.Type != ToolType.Text)
         {
             resetTextInteractionState(clearSelection: true, clearTapState: true);
-
-            if (BindingContext is ICanvasPageViewModel viewModel && !viewModel.TextAddMode)
-            {
-                viewModel.TextAddMode = true;
-            }
         }
 
         ShowBoundingBox = CurrentTool.Type == ToolType.BoundingBox;

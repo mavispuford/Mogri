@@ -18,6 +18,9 @@ namespace Mogri.ViewModels;
 
 public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 {
+    private const double DefaultMaskToolAlpha = 0.5d;
+    private const double DefaultTextToolAlpha = 1.0d;
+
     private readonly object _setSegmentationImageLock = new();
     private readonly SemaphoreSlim _autoMaskSaveLock = new(1, 1);
     private readonly IFileService _fileService;
@@ -40,6 +43,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private CancellationTokenSource? _setSegmentationImageCancellationTokenSource;
     private int _setSegmentationImageRequestCount = 0;
     private int _setSegmentationImageVersion = 0;
+    private double _maskToolAlpha = DefaultMaskToolAlpha;
+    private double _textToolAlpha = DefaultTextToolAlpha;
 
     private CanvasUseMode _currentCanvasUseMode = CanvasUseMode.Inpaint;
 
@@ -53,7 +58,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     public partial IPaintingToolViewModel CurrentTool { get; set; }
 
     [ObservableProperty]
-    public partial double CurrentAlpha { get; set; } = .5f;
+    public partial double CurrentAlpha { get; set; } = DefaultMaskToolAlpha;
 
     [ObservableProperty]
     public partial double CurrentBrushSize { get; set; } = 10d;
@@ -197,6 +202,20 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
         AvailableTools.Add(new PaintingToolViewModel
         {
+            Name = "Text",
+            IconCode = "\uea1e",
+            Effect = MaskEffect.None,
+            Type = ToolType.Text,
+            ContextButtons =
+            [
+                ContextButtonType.Alpha,
+                ContextButtonType.ColorPicker,
+                ContextButtonType.TextMode
+            ]
+        });
+
+        AvailableTools.Add(new PaintingToolViewModel
+        {
             Name = "Bounding Box",
             IconCode = "\ue3c6",
             Effect = MaskEffect.None,
@@ -216,20 +235,6 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             ContextButtons =
             [
                 ContextButtonType.ColorPicker
-            ]
-        });
-
-        AvailableTools.Add(new PaintingToolViewModel
-        {
-            Name = "Text",
-            IconCode = "\uea1e",
-            Effect = MaskEffect.None,
-            Type = ToolType.Text,
-            ContextButtons =
-            [
-                ContextButtonType.Alpha,
-                ContextButtonType.ColorPicker,
-                ContextButtonType.TextMode
             ]
         });
 
@@ -1730,19 +1735,58 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             return;
         }
 
-        if (value.Type != ToolType.Text)
-        {
-            TextAddMode = true;
-        }
+        applyStoredAlphaForTool(value.Type);
 
         ShowContextMenu = value.Type == ToolType.MagicWand;
         OnPropertyChanged(nameof(IsZoomMode));
+    }
+
+    partial void OnCurrentAlphaChanged(double value)
+    {
+        switch (CurrentTool?.Type)
+        {
+            case ToolType.Text:
+                _textToolAlpha = value;
+                break;
+            case ToolType.PaintBrush:
+            case ToolType.MagicWand:
+                _maskToolAlpha = value;
+                break;
+        }
     }
 
     [RelayCommand]
     private void ToggleTextAddMode()
     {
         TextAddMode = !TextAddMode;
+    }
+
+    private void applyStoredAlphaForTool(ToolType toolType)
+    {
+        if (!tryGetStoredAlphaForTool(toolType, out var storedAlpha)
+            || Math.Abs(CurrentAlpha - storedAlpha) < double.Epsilon)
+        {
+            return;
+        }
+
+        CurrentAlpha = storedAlpha;
+    }
+
+    private bool tryGetStoredAlphaForTool(ToolType toolType, out double alpha)
+    {
+        switch (toolType)
+        {
+            case ToolType.Text:
+                alpha = _textToolAlpha;
+                return true;
+            case ToolType.PaintBrush:
+            case ToolType.MagicWand:
+                alpha = _maskToolAlpha;
+                return true;
+            default:
+                alpha = 0d;
+                return false;
+        }
     }
 
     private async Task<string?> pushSnapshotAsync(string description, bool includeCanvasActions)
