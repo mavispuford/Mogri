@@ -8,14 +8,17 @@ namespace Mogri.Views;
 /// </summary>
 internal sealed class CanvasPageTextInteractionState
 {
+    // Active touch tracking.
     public Dictionary<long, SKPoint> ActiveTouches { get; } = new();
 
     public Dictionary<long, SKPoint> ActiveTouchStartViewPoints { get; } = new();
 
+    // Current text selection and primary gesture owner.
     public TextElementViewModel? SelectedTextElement { get; set; }
 
     public long? PrimaryTouchId { get; set; }
 
+    // Drag and transform gesture baselines.
     public SKPoint DragGestureStartTouchPoint { get; set; }
 
     public SKPoint DragGestureStartElementCenter { get; set; }
@@ -32,6 +35,7 @@ internal sealed class CanvasPageTextInteractionState
 
     public bool SuppressSingleTouchUntilRelease { get; set; }
 
+    // Double-tap detection.
     public DateTime LastTapTimestampUtc { get; set; } = DateTime.MinValue;
 
     public string? LastTapElementId { get; set; }

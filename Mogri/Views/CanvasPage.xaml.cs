@@ -16,6 +16,7 @@ namespace Mogri.Views;
 
 public partial class CanvasPage : BasePage
 {
+    // Text move-mode thresholds and selection chrome.
     private const float MinTextScale = 0.35f;
     private const float MaxTextScale = 6f;
     private const float TextSelectionPadding = 12f;
@@ -25,14 +26,21 @@ public partial class CanvasPage : BasePage
     private const float DoubleTapThresholdMilliseconds = 350f;
     private const float MaxTapMovementInViewPixels = 12f;
 
+    // Active canvas drawing state.
     private MaskLineViewModel? _currentLine;
     private MaskLineViewModel? _segmentationLine;
+
+    // Auto-hide UI chrome.
     private Timer? _brushSizeTimer;
     private Timer? _alphaTimer;
     private Timer? _noiseTimer;
+
+    // Page-level view state.
     private bool _hasCreatedBoundingBox;
     private bool _isSaving;
     private bool _hapticsEnabled = false;
+
+    // Transient text selection and gesture state.
     private readonly CanvasPageTextInteractionState _textInteraction = new();
 
     public SKBitmap Bitmap
@@ -507,6 +515,7 @@ public partial class CanvasPage : BasePage
         e.Handled = true;
     }
 
+    // Text move-mode interaction flow.
     private void handleTextMoveModeTouch(SKTouchEventArgs e, SKPoint viewLocation, SKPoint imageLocation)
     {
         switch (e.ActionType)
@@ -845,6 +854,7 @@ public partial class CanvasPage : BasePage
         TemporaryCanvasView.InvalidateSurface();
     }
 
+    // Text move-mode geometry helpers.
     private static float getPointDistance(SKPoint firstPoint, SKPoint secondPoint)
     {
         var deltaX = secondPoint.X - firstPoint.X;
