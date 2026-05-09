@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.Input;
 using Mogri.Enums;
+using Mogri.Helpers;
 using Mogri.Interfaces.ViewModels;
 using Mogri.Interfaces.ViewModels.Pages;
 using Mogri.ViewModels;
@@ -1465,27 +1466,7 @@ public partial class CanvasPage : BasePage
 
     private SKRect GetTextBoundsWithFallback(string text, float baseFontSize)
     {
-        if (string.IsNullOrEmpty(text))
-        {
-            return SKRect.Empty;
-        }
-
-        var combinedBounds = SKRect.Empty;
-        var hasBounds = false;
-
-        ProcessTextRunsWithFallback(text, baseFontSize, SKColors.White, (_, _, _, _, runBounds, _) =>
-        {
-            if (!hasBounds)
-            {
-                combinedBounds = runBounds;
-                hasBounds = true;
-                return;
-            }
-
-            combinedBounds = unionRects(combinedBounds, runBounds);
-        });
-
-        return combinedBounds;
+        return TextElementLayoutHelper.GetTextBoundsWithFallback(text, baseFontSize);
     }
 
     private void DrawTextWithFallback(SKCanvas canvas, string text, Color color, float alpha, float baseFontSize)
