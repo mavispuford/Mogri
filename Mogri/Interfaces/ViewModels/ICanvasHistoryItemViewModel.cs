@@ -27,5 +27,5 @@ public interface ICanvasHistoryItemViewModel
     IRelayCommand DeleteCommand { get; }
     IRelayCommand DuplicateCommand { get; }
     void InitWith(CanvasActionViewModel canvasAction, Action<ICanvasHistoryItemViewModel> deleteAction, Action<ICanvasHistoryItemViewModel> duplicateAction);
-    void InitWith(TextElementViewModel textElement, Action<ICanvasHistoryItemViewModel> deleteAction);
+    void InitWith(TextElementViewModel textElement, Action<ICanvasHistoryItemViewModel> deleteAction, Action<ICanvasHistoryItemViewModel> duplicateAction);
 }

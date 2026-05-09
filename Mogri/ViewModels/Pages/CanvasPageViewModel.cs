@@ -1349,6 +1349,9 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                     DeleteTextCommand.Execute(textElement);
                     return Task.CompletedTask;
                 }) },
+                { "OnTextDuplicate", new Action<TextElementViewModel>(textElement => {
+                    DuplicateTextCommand.Execute(textElement);
+                }) },
                 { "OnClearAll", new Func<Task>(async () => {
                     var firstSnapshot = CanvasActions.OfType<SnapshotCanvasActionViewModel>().FirstOrDefault();
                     if (firstSnapshot != null)
@@ -2048,6 +2051,28 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
         PushTextSnapshot();
         TextElements.Remove(element);
+    }
+
+    [RelayCommand]
+    private void DuplicateText(TextElementViewModel element)
+    {
+        if (element == null || !TextElements.Contains(element))
+        {
+            return;
+        }
+
+        var nextOrder = PushTextSnapshot();
+
+        TextElements.Add(new TextElementViewModel(Guid.NewGuid().ToString(), nextOrder, element.BaseFontSize)
+        {
+            Text = element.Text,
+            X = element.X,
+            Y = element.Y,
+            Scale = element.Scale,
+            Rotation = element.Rotation,
+            Color = element.Color,
+            Alpha = element.Alpha
+        });
     }
 
     [RelayCommand]

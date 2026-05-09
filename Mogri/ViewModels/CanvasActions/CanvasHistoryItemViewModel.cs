@@ -71,10 +71,10 @@ public partial class CanvasHistoryItemViewModel : ObservableObject, ICanvasHisto
         initialize();
     }
 
-    public void InitWith(TextElementViewModel textElement, Action<ICanvasHistoryItemViewModel> deleteAction)
+    public void InitWith(TextElementViewModel textElement, Action<ICanvasHistoryItemViewModel> deleteAction, Action<ICanvasHistoryItemViewModel> duplicateAction)
     {
         _deleteAction = deleteAction;
-        _duplicateAction = null;
+        _duplicateAction = duplicateAction;
         CanvasAction = null;
         TextElement = textElement;
 
@@ -134,7 +134,7 @@ public partial class CanvasHistoryItemViewModel : ObservableObject, ICanvasHisto
         {
             IsSnapshot = false;
             IsEditable = true;
-            IsDuplicable = false;
+            IsDuplicable = true;
             IsDeletable = true;
             Icon = "\uea1e"; // Text
             IsColorVisible = true;

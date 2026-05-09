@@ -29,6 +29,7 @@ public partial class CanvasHistoryPopupViewModel : PopupBaseViewModel, ICanvasHi
     private ObservableCollection<TextElementViewModel>? _sourceTextElements;
     private Func<SnapshotCanvasActionViewModel, Task>? _onSnapshotDeleteCallback;
     private Func<TextElementViewModel, Task>? _onTextDeleteCallback;
+    private Action<TextElementViewModel>? _onTextDuplicateCallback;
     private Func<Task>? _onClearAllCallback;
 
     [ObservableProperty]
@@ -86,6 +87,11 @@ public partial class CanvasHistoryPopupViewModel : PopupBaseViewModel, ICanvasHi
             _onTextDeleteCallback = textDeleteCallback;
         }
 
+        if (query.TryGetValue("OnTextDuplicate", out var textDuplicateObj) && textDuplicateObj is Action<TextElementViewModel> textDuplicateCallback)
+        {
+            _onTextDuplicateCallback = textDuplicateCallback;
+        }
+
         if (query.TryGetValue("OnClearAll", out var clearAllObj) && clearAllObj is Func<Task> clearAllCallback)
         {
             _onClearAllCallback = clearAllCallback;
@@ -126,7 +132,7 @@ public partial class CanvasHistoryPopupViewModel : PopupBaseViewModel, ICanvasHi
             }
             else if (entry.TextElement != null)
             {
-                item.InitWith(entry.TextElement, OnDeleteItem);
+                item.InitWith(entry.TextElement, OnDeleteItem, OnDuplicateItem);
             }
             else
             {
@@ -156,6 +162,31 @@ public partial class CanvasHistoryPopupViewModel : PopupBaseViewModel, ICanvasHi
 
     private void OnDuplicateItem(ICanvasHistoryItemViewModel item)
     {
+        if (item.TextElement != null)
+        {
+            if (_onTextDuplicateCallback != null)
+            {
+                _onTextDuplicateCallback.Invoke(item.TextElement);
+            }
+            else if (_sourceTextElements != null)
+            {
+                var nextOrder = getNextOrder();
+                _sourceTextElements.Add(new TextElementViewModel(Guid.NewGuid().ToString(), nextOrder, item.TextElement.BaseFontSize)
+                {
+                    Text = item.TextElement.Text,
+                    X = item.TextElement.X,
+                    Y = item.TextElement.Y,
+                    Scale = item.TextElement.Scale,
+                    Rotation = item.TextElement.Rotation,
+                    Color = item.TextElement.Color,
+                    Alpha = item.TextElement.Alpha
+                });
+            }
+
+            LoadActions();
+            return;
+        }
+
         if (item.CanvasAction == null || _sourceActions == null || item.IsSnapshot) return;
 
         var index = _sourceActions.IndexOf(item.CanvasAction);
@@ -174,6 +205,18 @@ public partial class CanvasHistoryPopupViewModel : PopupBaseViewModel, ICanvasHi
                 Items.Insert(itemIndex, newItem);
             }
         }
+    }
+
+    private long getNextOrder()
+    {
+        var nextCanvasActionOrder = _sourceActions?.Count > 0
+            ? _sourceActions.Max(canvasAction => canvasAction.Order) + 1L
+            : 0L;
+        var nextTextOrder = _sourceTextElements?.Count > 0
+            ? _sourceTextElements.Max(textElement => textElement.Order) + 1L
+            : 0L;
+
+        return Math.Max(nextCanvasActionOrder, nextTextOrder);
     }
 
     private async void OnDeleteItem(ICanvasHistoryItemViewModel item)
