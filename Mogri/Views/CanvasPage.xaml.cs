@@ -910,41 +910,19 @@ public partial class CanvasPage : BasePage
         // Scale = View / Image.
         var scale = (float)e.Info.Width / Bitmap.Width;
 
-        if (CanvasActions != null || TextElements != null)
+        if (CanvasActions != null)
         {
-            var overlayItems = new List<(long Order, CanvasActionViewModel? CanvasAction, TextElementViewModel? TextElement)>();
-
-            if (CanvasActions != null)
+            foreach (var canvasAction in CanvasActions
+                .Where(canvasAction => canvasAction.CanvasActionType == CanvasActionType.Mask)
+                .OrderBy(canvasAction => canvasAction.Order))
             {
-                overlayItems.AddRange(CanvasActions
-                    .Where(canvasAction => canvasAction.CanvasActionType == CanvasActionType.Mask)
-                    .Select(canvasAction => (Order: (long)canvasAction.Order, CanvasAction: (CanvasActionViewModel?)canvasAction, TextElement: (TextElementViewModel?)null)));
-            }
+                canvas.Save();
+                canvas.Scale(scale);
 
-            if (TextElements != null)
-            {
-                overlayItems.AddRange(TextElements
-                    .Select(textElement => (Order: textElement.Order, CanvasAction: (CanvasActionViewModel?)null, TextElement: (TextElementViewModel?)textElement)));
-            }
+                var virtualInfo = new SKImageInfo(Bitmap.Width, Bitmap.Height, e.Info.ColorType, e.Info.AlphaType);
+                canvasAction.Execute(canvas, virtualInfo, _isSaving);
 
-            foreach (var overlayItem in overlayItems.OrderBy(overlayItem => overlayItem.Order))
-            {
-                if (overlayItem.CanvasAction != null)
-                {
-                    // Scale the canvas so all mask actions render in "Image Space".
-                    // We pass the Source Bitmap's Info (Virtual Image Space) to the action.
-                    canvas.Save();
-                    canvas.Scale(scale);
-
-                    var virtualInfo = new SKImageInfo(Bitmap.Width, Bitmap.Height, e.Info.ColorType, e.Info.AlphaType);
-                    overlayItem.CanvasAction.Execute(canvas, virtualInfo, _isSaving);
-
-                    canvas.Restore();
-                }
-                else if (overlayItem.TextElement != null)
-                {
-                    DrawTextElement(canvas, overlayItem.TextElement, scale);
-                }
+                canvas.Restore();
             }
         }
 
@@ -954,6 +932,24 @@ public partial class CanvasPage : BasePage
             canvas.Scale(scale);
             _currentLine.Execute(canvas, e.Info, _isSaving);
             canvas.Restore();
+        }
+    }
+
+    private void OnPaintTextSurface(object? sender, SKPaintSurfaceEventArgs e)
+    {
+        var canvas = e.Surface.Canvas;
+        canvas.Clear(SKColors.Transparent);
+
+        if (Bitmap == null || TextElements == null)
+        {
+            return;
+        }
+
+        var scale = (float)e.Info.Width / Bitmap.Width;
+
+        foreach (var textElement in TextElements.OrderBy(textElement => textElement.Order))
+        {
+            DrawTextElement(canvas, textElement, scale);
         }
     }
 
@@ -1287,7 +1283,7 @@ public partial class CanvasPage : BasePage
             }
         }
 
-        MaskCanvasView.InvalidateSurface();
+        TextCanvasView.InvalidateSurface();
         TemporaryCanvasView.InvalidateSurface();
     }
 
@@ -1314,7 +1310,7 @@ public partial class CanvasPage : BasePage
             resetTextInteractionState(clearSelection: true, clearTapState: true);
         }
 
-        MaskCanvasView.InvalidateSurface();
+        TextCanvasView.InvalidateSurface();
         TemporaryCanvasView.InvalidateSurface();
     }
 
@@ -1322,7 +1318,7 @@ public partial class CanvasPage : BasePage
     {
         if (isTextElementRenderProperty(e.PropertyName))
         {
-            MaskCanvasView.InvalidateSurface();
+            TextCanvasView.InvalidateSurface();
         }
 
         if (sender is TextElementViewModel textElement && shouldInvalidateTemporaryCanvas(textElement, e.PropertyName))
@@ -1417,6 +1413,9 @@ public partial class CanvasPage : BasePage
         SourceImageCanvasView.WidthRequest = width;
         SourceImageCanvasView.HeightRequest = height;
 
+        TextCanvasView.WidthRequest = width;
+        TextCanvasView.HeightRequest = height;
+
         MaskCanvasView.WidthRequest = width;
         MaskCanvasView.HeightRequest = height;
 
@@ -1429,6 +1428,8 @@ public partial class CanvasPage : BasePage
         // Force a measure on both canvas views because setting width/height request doesn't seem to be enough
         SourceImageCanvasView.Measure(width, height);
         SourceImageCanvasView.InvalidateSurface();
+        TextCanvasView.Measure(width, height);
+        TextCanvasView.InvalidateSurface();
         MaskCanvasView.Measure(width, height);
         MaskCanvasView.InvalidateSurface();
         SegmentationMaskCanvasView.Measure(width, height);
@@ -1768,6 +1769,14 @@ public partial class CanvasPage : BasePage
             return;
         }
 
+        var originalMaskOpacity = MaskCanvasView.Opacity;
+
+        if (originalMaskOpacity < 1)
+        {
+            MaskCanvasView.AbortAnimation("FadeInOutMaskCanvasView");
+            MaskCanvasView.Opacity = 1;
+        }
+
         _isSaving = true;
 
         MaskCanvasView.InvalidateSurface();
@@ -1800,6 +1809,11 @@ public partial class CanvasPage : BasePage
         await callbackCommand.ExecuteAsync(result);
 
         _isSaving = false;
+
+        if (MaskCanvasView.Opacity != originalMaskOpacity)
+        {
+            MaskCanvasView.Opacity = originalMaskOpacity;
+        }
 
         MaskCanvasView.InvalidateSurface();
     }

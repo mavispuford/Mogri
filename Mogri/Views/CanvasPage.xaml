@@ -42,7 +42,7 @@
                     <FontImageSource Glyph="&#xe145;" FontFamily="{StaticResource IconFontLight}" Size="32" Color="White" />
                 </toolkit:BoolToObjectConverter.TrueObject>
                 <toolkit:BoolToObjectConverter.FalseObject>
-                    <FontImageSource Glyph="&#xe89f;" FontFamily="{StaticResource IconFontLight}" Size="32" Color="White" />
+                    <FontImageSource Glyph="&#xeb38;" FontFamily="{StaticResource IconFontLight}" Size="32" Color="White" />
                 </toolkit:BoolToObjectConverter.FalseObject>
             </toolkit:BoolToObjectConverter>
             <toolkit:EnumToBoolConverter x:Key="EnumToBool" />
@@ -162,6 +162,12 @@
                     HorizontalOptions="Center"
                     VerticalOptions="Center"
                     BackgroundColor="{StaticResource Gray200TwentySixPercent}"/>
+
+                <skia:SKCanvasView x:Name="TextCanvasView"
+                    PaintSurface="OnPaintTextSurface"
+                    IgnorePixelScaling="True"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"/>
 
                 <skia:SKCanvasView x:Name="SegmentationMaskCanvasView" 
                     PaintSurface="OnPaintSegmentationImageSurface"
