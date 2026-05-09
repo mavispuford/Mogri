@@ -116,13 +116,9 @@ namespace Mogri.Services
 
             // Remove from tracking before RemovePageAsync to prevent the
             // Disappearing safety-net handler from racing with this method.
-            entry.Value.TrySetResult(result);
             activePopups.Remove(popupPage);
 
-            if (MopupService.Instance.PopupStack.Contains(popupPage))
-            {
-                await MopupService.Instance.RemovePageAsync(popupPage);
-            }
+            await closePopupPageAsync(popupPage, entry.Value, result);
         }
 
         public async Task ClosePopupAsync(string name, object? result)
@@ -141,19 +137,16 @@ namespace Mogri.Services
 
                 if (popupPage != null)
                 {
-                    await MopupService.Instance.RemovePageAsync(popupPage);
+                    await closePopupPageAsync(popupPage, null, result);
                 }
 
                 return;
             }
 
-            activePopups[popupPage].TrySetResult(result);
+            var resultSource = activePopups[popupPage];
             activePopups.Remove(popupPage);
 
-            if (MopupService.Instance.PopupStack.Contains(popupPage))
-            {
-                await MopupService.Instance.RemovePageAsync(popupPage);
-            }
+            await closePopupPageAsync(popupPage, resultSource, result);
         }
 
         public async Task ClosePopupAsync(object? result)
@@ -166,13 +159,9 @@ namespace Mogri.Services
             var entry = activePopups.Last();
             var popupPage = entry.Key;
 
-            entry.Value.TrySetResult(result);
             activePopups.Remove(popupPage);
 
-            if (MopupService.Instance.PopupStack.Contains(popupPage))
-            {
-                await MopupService.Instance.RemovePageAsync(popupPage);
-            }
+            await closePopupPageAsync(popupPage, entry.Value, result);
         }
 
         public void ClearAllPopups()
@@ -221,6 +210,21 @@ namespace Mogri.Services
                 await Shell.Current.Dispatcher.DispatchAsync(() => GetActivePage().DisplayAlertAsync(title, message, cancel));
                 return (object?)null;
             });
+        }
+
+        private static async Task closePopupPageAsync(PopupPage popupPage, TaskCompletionSource<object?>? resultSource, object? result)
+        {
+            try
+            {
+                if (MopupService.Instance.PopupStack.Contains(popupPage))
+                {
+                    await MopupService.Instance.RemovePageAsync(popupPage);
+                }
+            }
+            finally
+            {
+                resultSource?.TrySetResult(result);
+            }
         }
 
         public Task<bool> DisplayAlertAsync(string title, string message, string accept, string cancel)
