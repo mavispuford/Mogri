@@ -1345,6 +1345,13 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                         restoreCanvasActions(actions);
                     }
                 }) },
+                { "OnActionDelete", new Func<CanvasActionViewModel, Task>(action => {
+                    DeleteCanvasAction(action);
+                    return Task.CompletedTask;
+                }) },
+                { "OnActionDuplicate", new Action<CanvasActionViewModel>(action => {
+                    DuplicateCanvasAction(action);
+                }) },
                 { "OnTextDelete", new Func<TextElementViewModel, Task>(textElement => {
                     DeleteTextCommand.Execute(textElement);
                     return Task.CompletedTask;
@@ -1546,15 +1553,15 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         }
 
         var resolveTextOption = isBoundingBoxReturn
-            ? "Apply Result and Remove Text in Area"
-            : "Apply Result and Remove Text";
+            ? "Remove Text/Emoji From Area"
+            : "Remove Text/Emoji";
 
         var action = await _popupService.DisplayActionSheetAsync(
-            "What should happen to text layers?",
+            "Text/Emoji is Present. Options:",
             "Cancel",
             null,
             resolveTextOption,
-            "Keep Text Editable");
+            "Keep Text/Emoji for Reuse");
 
         if (action == resolveTextOption)
         {
@@ -2051,6 +2058,33 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
         PushTextSnapshot();
         TextElements.Remove(element);
+    }
+
+    private void DeleteCanvasAction(CanvasActionViewModel action)
+    {
+        if (action == null
+            || action is SnapshotCanvasActionViewModel
+            || !CanvasActions.Contains(action))
+        {
+            return;
+        }
+
+        CanvasActions.Remove(action);
+    }
+
+    private void DuplicateCanvasAction(CanvasActionViewModel action)
+    {
+        if (action == null
+            || action is SnapshotCanvasActionViewModel
+            || !CanvasActions.Contains(action))
+        {
+            return;
+        }
+
+        var duplicatedAction = action.Clone();
+        duplicatedAction.Order = getNextCanvasOrder();
+
+        CanvasActions.Add(duplicatedAction);
     }
 
     [RelayCommand]
