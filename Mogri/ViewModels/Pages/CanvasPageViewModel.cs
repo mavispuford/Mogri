@@ -471,7 +471,10 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
     private async Task<bool> AskUseCanvasMode()
     {
-        if (CanvasActions == null || !CanvasActions.Any())
+        var hasMaskActions = CanvasActions != null
+            && CanvasActions.Any(canvasAction => canvasAction.CanvasActionType == CanvasActionType.Mask);
+
+        if (!hasMaskActions)
         {
             _currentCanvasUseMode = CanvasUseMode.ImageOnly;
             return true;
