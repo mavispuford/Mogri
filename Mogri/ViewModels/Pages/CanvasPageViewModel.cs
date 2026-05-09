@@ -110,9 +110,6 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     public partial bool HasSegmentationImage { get; set; } = false;
 
     [ObservableProperty]
-    public partial bool TextAddMode { get; set; } = true;
-
-    [ObservableProperty]
     public partial bool ShowActions { get; set; }
 
     [ObservableProperty]
@@ -209,8 +206,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             ContextButtons =
             [
                 ContextButtonType.Alpha,
-                ContextButtonType.ColorPicker,
-                ContextButtonType.TextMode
+                ContextButtonType.ColorPicker
             ]
         });
 
@@ -1753,12 +1749,6 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 _maskToolAlpha = value;
                 break;
         }
-    }
-
-    [RelayCommand]
-    private void ToggleTextAddMode()
-    {
-        TextAddMode = !TextAddMode;
     }
 
     private void applyStoredAlphaForTool(ToolType toolType)

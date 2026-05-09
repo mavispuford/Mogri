@@ -37,14 +37,6 @@
                     <FontImageSource Glyph="&#xe15b;" FontFamily="{StaticResource IconFontLight}" Size="32" Color="White" />
                 </toolkit:BoolToObjectConverter.FalseObject>
             </toolkit:BoolToObjectConverter>
-            <toolkit:BoolToObjectConverter x:Key="BoolToTextModeIconConverter">
-                <toolkit:BoolToObjectConverter.TrueObject>
-                    <FontImageSource Glyph="&#xe145;" FontFamily="{StaticResource IconFontLight}" Size="32" Color="White" />
-                </toolkit:BoolToObjectConverter.TrueObject>
-                <toolkit:BoolToObjectConverter.FalseObject>
-                    <FontImageSource Glyph="&#xeb38;" FontFamily="{StaticResource IconFontLight}" Size="32" Color="White" />
-                </toolkit:BoolToObjectConverter.FalseObject>
-            </toolkit:BoolToObjectConverter>
             <toolkit:EnumToBoolConverter x:Key="EnumToBool" />
             <toolkit:InvertedBoolConverter x:Key="InvertedBool" />
             <toolkit:BoolToObjectConverter x:Key="BoolToScaleInDoubleConverter">
@@ -404,20 +396,6 @@
                                 <FontImageSource Glyph="&#xeb2d;" FontFamily="{StaticResource IconFontRegular}" Size="30" Color="White" />
                             </Image.Source>
                         </Image>
-
-                    </ContentView>
-                </Border>
-
-                <Border x:Name="TextModeButton"
-                        Style="{StaticResource ContextButtonStyle}">
-                    <ContentView>
-                        <ContentView.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding ToggleTextAddModeCommand}" Tapped="Vibrate_Button_Tapped" />
-                        </ContentView.GestureRecognizers>
-
-                        <Image HorizontalOptions="Center"
-                               VerticalOptions="Center"
-                               Source="{Binding TextAddMode, Converter={StaticResource BoolToTextModeIconConverter}}"/>
 
                     </ContentView>
                 </Border>

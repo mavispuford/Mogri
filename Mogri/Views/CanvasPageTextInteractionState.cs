@@ -35,6 +35,10 @@ internal sealed class CanvasPageTextInteractionState
 
     public bool SuppressSingleTouchUntilRelease { get; set; }
 
+    public bool ShouldAddTextOnTapRelease { get; set; }
+
+    public bool ShouldDeselectTextOnTapRelease { get; set; }
+
     // Double-tap detection.
     public DateTime LastTapTimestampUtc { get; set; } = DateTime.MinValue;
 
@@ -55,6 +59,8 @@ internal sealed class CanvasPageTextInteractionState
         TransformGestureStartRotation = 0f;
         IsTransformGesture = false;
         SuppressSingleTouchUntilRelease = false;
+        ShouldAddTextOnTapRelease = false;
+        ShouldDeselectTextOnTapRelease = false;
 
         if (clearTapState)
         {

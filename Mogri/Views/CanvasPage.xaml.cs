@@ -91,12 +91,6 @@ public partial class CanvasPage : BasePage
         set => SetValue(TextElementsProperty, value);
     }
 
-    public bool TextAddMode
-    {
-        get => (bool)GetValue(TextAddModeProperty);
-        set => SetValue(TextAddModeProperty, value);
-    }
-
     public SKRect BoundingBox
     {
         get => (SKRect)GetValue(BoundingBoxProperty);
@@ -206,11 +200,6 @@ public partial class CanvasPage : BasePage
         ((CanvasPage)bindable).OnTextElementsChanged(oldValue as ObservableCollection<TextElementViewModel>, newValue as ObservableCollection<TextElementViewModel>);
     });
 
-    public static BindableProperty TextAddModeProperty = BindableProperty.Create(nameof(TextAddMode), typeof(bool), typeof(CanvasPage), true, propertyChanged: (bindable, oldValue, newValue) =>
-    {
-        ((CanvasPage)bindable).OnTextAddModeChanged((bool)newValue);
-    });
-
     public static BindableProperty PrepareForSavingCommandProperty = BindableProperty.Create(nameof(PrepareForSavingCommand), typeof(IAsyncRelayCommand), typeof(CanvasPage), default(IAsyncRelayCommand));
 
 
@@ -251,7 +240,6 @@ public partial class CanvasPage : BasePage
         this.SetBinding(CurrentToolProperty, nameof(ICanvasPageViewModel.CurrentTool));
         this.SetBinding(CanvasActionsProperty, nameof(ICanvasPageViewModel.CanvasActions), BindingMode.TwoWay);
         this.SetBinding(TextElementsProperty, nameof(ICanvasPageViewModel.TextElements), BindingMode.TwoWay);
-        this.SetBinding(TextAddModeProperty, nameof(ICanvasPageViewModel.TextAddMode), BindingMode.OneWay);
         this.SetBinding(BoundingBoxProperty, nameof(ICanvasPageViewModel.BoundingBox), BindingMode.OneWayToSource);
         this.SetBinding(PrepareForSavingCommandProperty, nameof(ICanvasPageViewModel.PrepareForSavingCommand), BindingMode.OneWayToSource);
         this.SetBinding(BoundingBoxScaleProperty, nameof(ICanvasPageViewModel.BoundingBoxScale), BindingMode.OneWayToSource);
@@ -352,9 +340,9 @@ public partial class CanvasPage : BasePage
 
             var imageLocation = new SKPoint(location.X * scale, location.Y * scale);
 
-            if (CurrentTool.Type == ToolType.Text && !TextAddMode)
+            if (CurrentTool.Type == ToolType.Text)
             {
-                handleTextMoveModeTouch(e, location, imageLocation);
+                handleTextToolTouch(e, location, imageLocation);
                 TemporaryCanvasView.InvalidateSurface();
                 e.Handled = true;
                 return;
@@ -503,9 +491,6 @@ public partial class CanvasPage : BasePage
 
                         _segmentationLine = null;
                         break;
-                    case ToolType.Text when TextAddMode:
-                        _ = PlaceTextAtPointAsync(imageLocation);
-                        break;
                 }
             }
         }
@@ -515,32 +500,43 @@ public partial class CanvasPage : BasePage
         e.Handled = true;
     }
 
-    // Text move-mode interaction flow.
-    private void handleTextMoveModeTouch(SKTouchEventArgs e, SKPoint viewLocation, SKPoint imageLocation)
+    // Text tool interaction flow.
+    private void handleTextToolTouch(SKTouchEventArgs e, SKPoint viewLocation, SKPoint imageLocation)
     {
         switch (e.ActionType)
         {
             case SKTouchAction.Pressed:
                 _textInteraction.ActiveTouches[e.Id] = imageLocation;
                 _textInteraction.ActiveTouchStartViewPoints[e.Id] = viewLocation;
+                _textInteraction.ShouldAddTextOnTapRelease = false;
+                _textInteraction.ShouldDeselectTextOnTapRelease = false;
 
                 if (_textInteraction.ActiveTouches.Count == 1)
                 {
                     var hitTextElement = getHitTextElement(imageLocation);
-                    setSelectedTextElement(hitTextElement);
+                    var hadSelection = _textInteraction.SelectedTextElement != null;
 
                     if (hitTextElement != null)
                     {
+                        setSelectedTextElement(hitTextElement);
                         beginTextDragGesture(e.Id, imageLocation, hitTextElement);
                     }
                     else
                     {
                         _textInteraction.PrimaryTouchId = null;
+                        _textInteraction.ShouldAddTextOnTapRelease = !hadSelection;
+                        _textInteraction.ShouldDeselectTextOnTapRelease = hadSelection;
                     }
                 }
-                else if (_textInteraction.SelectedTextElement != null && _textInteraction.ActiveTouches.Count >= 2)
+                else
                 {
-                    beginTextTransformGesture();
+                    _textInteraction.ShouldAddTextOnTapRelease = false;
+                    _textInteraction.ShouldDeselectTextOnTapRelease = false;
+
+                    if (_textInteraction.SelectedTextElement != null && _textInteraction.ActiveTouches.Count >= 2)
+                    {
+                        beginTextTransformGesture();
+                    }
                 }
 
                 break;
@@ -575,7 +571,7 @@ public partial class CanvasPage : BasePage
             case SKTouchAction.Released:
             case SKTouchAction.Cancelled:
             case SKTouchAction.Exited:
-                completeTextMoveModeTouch(e.Id, viewLocation, imageLocation, e.ActionType == SKTouchAction.Released);
+                completeTextToolTouch(e.Id, viewLocation, imageLocation, e.ActionType == SKTouchAction.Released);
                 break;
         }
     }
@@ -637,10 +633,12 @@ public partial class CanvasPage : BasePage
         selectedTextElement.Rotation = normalizeDegrees(_textInteraction.TransformGestureStartRotation + angleDelta);
     }
 
-    private void completeTextMoveModeTouch(long touchId, SKPoint viewLocation, SKPoint imageLocation, bool isRelease)
+    private void completeTextToolTouch(long touchId, SKPoint viewLocation, SKPoint imageLocation, bool isRelease)
     {
         var hadMultipleTouches = _textInteraction.ActiveTouches.Count > 1;
         var wasTransformGesture = _textInteraction.IsTransformGesture;
+        var shouldAddTextOnTapRelease = _textInteraction.ShouldAddTextOnTapRelease;
+        var shouldDeselectTextOnTapRelease = _textInteraction.ShouldDeselectTextOnTapRelease;
         var isTapCandidate = isRelease
             && !hadMultipleTouches
             && !wasTransformGesture
@@ -676,11 +674,30 @@ public partial class CanvasPage : BasePage
             _textInteraction.PrimaryTouchId = null;
             _textInteraction.IsTransformGesture = false;
             _textInteraction.SuppressSingleTouchUntilRelease = false;
+            _textInteraction.ShouldAddTextOnTapRelease = false;
+            _textInteraction.ShouldDeselectTextOnTapRelease = false;
         }
 
         if (isTapCandidate)
         {
-            handleTextTapGesture(tappedTextElement, viewLocation);
+            if (tappedTextElement != null)
+            {
+                handleTextTapGesture(tappedTextElement, viewLocation);
+            }
+            else if (shouldAddTextOnTapRelease)
+            {
+                clearLastTextTap();
+                _ = PlaceTextAtPointAsync(imageLocation);
+            }
+            else if (shouldDeselectTextOnTapRelease)
+            {
+                setSelectedTextElement(null);
+                clearLastTextTap();
+            }
+            else
+            {
+                clearLastTextTap();
+            }
         }
         else if (_textInteraction.ActiveTouches.Count == 0)
         {
@@ -841,17 +858,6 @@ public partial class CanvasPage : BasePage
     private void clearLastTextTap()
     {
         _textInteraction.ClearTapState();
-    }
-
-    private void OnTextAddModeChanged(bool textAddMode)
-    {
-        if (textAddMode)
-        {
-            resetTextInteractionState(clearSelection: true, clearTapState: true);
-            return;
-        }
-
-        TemporaryCanvasView.InvalidateSurface();
     }
 
     // Text move-mode geometry helpers.
@@ -1333,7 +1339,6 @@ public partial class CanvasPage : BasePage
 
         if (selectedTextElement == null
             || CurrentTool?.Type != ToolType.Text
-            || TextAddMode
             || TextElements == null
             || !TextElements.Contains(selectedTextElement)
             || string.IsNullOrWhiteSpace(selectedTextElement.Text))
@@ -1869,7 +1874,22 @@ public partial class CanvasPage : BasePage
     {
         if (BindingContext is ICanvasPageViewModel viewModel)
         {
+            var previousTextCount = TextElements?.Count ?? 0;
             await viewModel.AddTextCommand.ExecuteAsync(imageLocation);
+
+            if (TextElements != null && TextElements.Count > previousTextCount)
+            {
+                var newestTextElement = TextElements
+                    .OrderByDescending(textElement => textElement.Order)
+                    .FirstOrDefault();
+
+                if (newestTextElement != null)
+                {
+                    clearLastTextTap();
+                    setSelectedTextElement(newestTextElement);
+                    TemporaryCanvasView.InvalidateSurface();
+                }
+            }
         }
     }
 
@@ -1909,7 +1929,6 @@ public partial class CanvasPage : BasePage
         AddRemoveButton.IsVisible = false;
         ResetZoomButton.IsVisible = false;
         NoiseButton.IsVisible = false;
-        TextModeButton.IsVisible = false;
 
         foreach (var contextButton in CurrentTool.ContextButtons)
         {
@@ -1935,9 +1954,6 @@ public partial class CanvasPage : BasePage
                     break;
                 case ContextButtonType.Noise:
                     NoiseButton.IsVisible = true;
-                    break;
-                case ContextButtonType.TextMode:
-                    TextModeButton.IsVisible = true;
                     break;
                 default:
                     break;
