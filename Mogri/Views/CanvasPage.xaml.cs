@@ -19,7 +19,7 @@ public partial class CanvasPage : BasePage
 {
     // Text move-mode thresholds and selection chrome.
     private const float MinTextScale = 0.35f;
-    private const float MaxTextScale = 10f;
+    private const float MaxTextScale = 20f;
     private const float TextSelectionPadding = 12f;
     private const float TextSelectionCornerRadius = 18f;
     private const float TextSelectionShadowStroke = 6f;
