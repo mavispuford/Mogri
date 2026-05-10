@@ -1903,53 +1903,23 @@ public partial class CanvasPage : BasePage
             return;
         }
 
-        var originalMaskOpacity = MaskCanvasView.Opacity;
-
-        if (originalMaskOpacity < 1)
-        {
-            MaskCanvasView.AbortAnimation("FadeInOutMaskCanvasView");
-            MaskCanvasView.Opacity = 1;
-        }
-
         _isSaving = true;
 
-        MaskCanvasView.InvalidateSurface();
-
-        // Wait for canvas to redraw - hack - find a better solution (maybe the PaintSurface event?)
-        await Task.Delay(300);
-
-        var maskCapture = await MaskCanvasView.CaptureAsync();
-
-        SKBitmap? maskBitmap = null;
-
-        if (maskCapture != null)
+        try
         {
-            using var maskStream = await maskCapture.OpenReadAsync();
-            maskBitmap = SKBitmap.Decode(maskStream);
+            var result = new CanvasCaptureResult();
+
+            if (Bitmap != null && TextElements is { Count: > 0 })
+            {
+                result.PreparedSourceBitmap = PrepareSourceBitmapWithText(Bitmap);
+            }
+
+            await callbackCommand.ExecuteAsync(result);
         }
-
-        maskBitmap ??= new SKBitmap();
-
-        var result = new CanvasCaptureResult
+        finally
         {
-            MaskBitmap = maskBitmap
-        };
-
-        if (Bitmap != null && TextElements is { Count: > 0 })
-        {
-            result.PreparedSourceBitmap = PrepareSourceBitmapWithText(Bitmap);
+            _isSaving = false;
         }
-
-        await callbackCommand.ExecuteAsync(result);
-
-        _isSaving = false;
-
-        if (MaskCanvasView.Opacity != originalMaskOpacity)
-        {
-            MaskCanvasView.Opacity = originalMaskOpacity;
-        }
-
-        MaskCanvasView.InvalidateSurface();
     }
 
     private void MaskGrid_SizeChanged(object? sender, EventArgs e)

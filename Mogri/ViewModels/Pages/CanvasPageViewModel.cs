@@ -47,7 +47,6 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private List<Color> _colorPalette = new();
     private Color _paletteIconDarkColor = Colors.Black;
     private string? _sourceFileName;
-    private Random _random = new Random();
     private bool _doingSegmentation = false;
     private CancellationTokenSource? _setSegmentationImageCancellationTokenSource;
     private int _setSegmentationImageRequestCount = 0;
@@ -635,9 +634,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         {
             await Task.Run(async () =>
             {
-                // Instead of using the Screen Capture (result.MaskBitmap) which might contain
-                // UI-only artifacts or be at the wrong resolution/aspect ratio, we re-render the
-                // layer internally using the SourceBitmap's dimensions. This ensures 1:1 alignment.
+                // Re-render the layer using the source bitmap dimensions so masks stay aligned 1:1.
                 using var rawMaskBitmap = GenerateRenderedLayer(sourceBitmap.Width, sourceBitmap.Height);
 
                 var sameSizeMaskBitmap = rawMaskBitmap; // Already same size, no resize needed.
@@ -842,8 +839,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         {
             await Task.Run(async () =>
             {
-                // Re-render layer at SourceBitmap dimensions to ensure correct alignment of masks.
-                // Using result.MaskBitmap (screen capture) dimensions causes scaling mismatches.
+                // Re-render the layer using the source bitmap dimensions so masks stay aligned 1:1.
                 using var rawMaskBitmap = GenerateRenderedLayer(sourceBitmap.Width, sourceBitmap.Height);
 
                 var sameSizeMaskBitmap = rawMaskBitmap; // Already same size.
@@ -1441,11 +1437,6 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         CurrentTool = tool;
     }
 
-    public override Task OnNavigatedToAsync()
-    {
-        return base.OnNavigatedToAsync();
-    }
-
     public override async Task OnDisappearingAsync()
     {
         await autoSaveOrDeleteMaskAsync();
@@ -1561,19 +1552,21 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             ? "Remove Text/Emoji From Area"
             : "Remove Text/Emoji";
 
+        var keepTextOption = "Keep Text/Emoji for Reuse";
+
         var action = await _popupService.DisplayActionSheetAsync(
             "Text/Emoji is Present. Options:",
             "Cancel",
             null,
             resolveTextOption,
-            "Keep Text/Emoji for Reuse");
+            keepTextOption);
 
         if (action == resolveTextOption)
         {
             return CanvasResultTextHandling.ResolveText;
         }
 
-        if (action == "Keep Text Editable")
+        if (action == keepTextOption)
         {
             return CanvasResultTextHandling.KeepEditable;
         }
