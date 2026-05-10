@@ -23,6 +23,8 @@ public interface ITextElementViewModel : IBaseViewModel
 
     float Alpha { get; set; }
 
+    double Noise { get; set; }
+
     float BaseFontSize { get; }
 
     bool IsSelected { get; set; }

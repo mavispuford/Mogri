@@ -191,7 +191,8 @@ public partial class CanvasHistoryPopupViewModel : PopupBaseViewModel, ICanvasHi
                     Scale = item.TextElement.Scale,
                     Rotation = item.TextElement.Rotation,
                     Color = item.TextElement.Color,
-                    Alpha = item.TextElement.Alpha
+                    Alpha = item.TextElement.Alpha,
+                    Noise = item.TextElement.Noise
                 });
             }
 

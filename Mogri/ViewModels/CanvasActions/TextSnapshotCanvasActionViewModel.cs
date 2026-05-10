@@ -27,7 +27,7 @@ public class TextSnapshotCanvasActionViewModel : CanvasActionViewModel
             CanvasActionType = CanvasActionType,
             Order = Order,
             TextElementsSnapshot = TextElementsSnapshot
-                .Select(textElement => new TextElementViewModel(textElement.Id, textElement.Order)
+                .Select(textElement => new TextElementViewModel(textElement.Id, textElement.Order, textElement.BaseFontSize)
                 {
                     Text = textElement.Text,
                     X = textElement.X,
@@ -36,6 +36,7 @@ public class TextSnapshotCanvasActionViewModel : CanvasActionViewModel
                     Rotation = textElement.Rotation,
                     Color = textElement.Color,
                     Alpha = textElement.Alpha,
+                    Noise = textElement.Noise,
                     IsSelected = textElement.IsSelected
                 })
                 .ToList()

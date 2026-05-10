@@ -20,6 +20,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 {
     private const double DefaultMaskToolAlpha = 0.5d;
     private const double DefaultTextToolAlpha = 1.0d;
+    private const double DefaultMaskToolNoise = 0.5d;
+    private const double DefaultTextToolNoise = 0.0d;
 
     private enum CanvasResultTextHandling
     {
@@ -52,6 +54,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private int _setSegmentationImageVersion = 0;
     private double _maskToolAlpha = DefaultMaskToolAlpha;
     private double _textToolAlpha = DefaultTextToolAlpha;
+    private double _maskToolNoise = DefaultMaskToolNoise;
+    private double _textToolNoise = DefaultTextToolNoise;
 
     private CanvasUseMode _currentCanvasUseMode = CanvasUseMode.Inpaint;
 
@@ -71,7 +75,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     public partial double CurrentBrushSize { get; set; } = 10d;
 
     [ObservableProperty]
-    public partial double CurrentNoise { get; set; } = .5d;
+    public partial double CurrentNoise { get; set; } = DefaultMaskToolNoise;
 
     [ObservableProperty]
     public partial Color CurrentColor { get; set; } = Colors.Black;
@@ -213,7 +217,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             ContextButtons =
             [
                 ContextButtonType.Alpha,
-                ContextButtonType.ColorPicker
+                ContextButtonType.ColorPicker,
+                ContextButtonType.Noise
             ]
         });
 
@@ -1872,6 +1877,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         }
 
         applyStoredAlphaForTool(value.Type);
+        applyStoredNoiseForTool(value.Type);
 
         ShowContextMenu = value.Type == ToolType.MagicWand;
         OnPropertyChanged(nameof(IsZoomMode));
@@ -1891,6 +1897,20 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         }
     }
 
+    partial void OnCurrentNoiseChanged(double value)
+    {
+        switch (CurrentTool?.Type)
+        {
+            case ToolType.Text:
+                _textToolNoise = value;
+                break;
+            case ToolType.PaintBrush:
+            case ToolType.MagicWand:
+                _maskToolNoise = value;
+                break;
+        }
+    }
+
     private void applyStoredAlphaForTool(ToolType toolType)
     {
         if (!tryGetStoredAlphaForTool(toolType, out var storedAlpha)
@@ -1900,6 +1920,17 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         }
 
         CurrentAlpha = storedAlpha;
+    }
+
+    private void applyStoredNoiseForTool(ToolType toolType)
+    {
+        if (!tryGetStoredNoiseForTool(toolType, out var storedNoise)
+            || Math.Abs(CurrentNoise - storedNoise) < double.Epsilon)
+        {
+            return;
+        }
+
+        CurrentNoise = storedNoise;
     }
 
     private bool tryGetStoredAlphaForTool(ToolType toolType, out double alpha)
@@ -1915,6 +1946,23 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 return true;
             default:
                 alpha = 0d;
+                return false;
+        }
+    }
+
+    private bool tryGetStoredNoiseForTool(ToolType toolType, out double noise)
+    {
+        switch (toolType)
+        {
+            case ToolType.Text:
+                noise = _textToolNoise;
+                return true;
+            case ToolType.PaintBrush:
+            case ToolType.MagicWand:
+                noise = _maskToolNoise;
+                return true;
+            default:
+                noise = 0d;
                 return false;
         }
     }
@@ -2043,6 +2091,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             Y = location.Y,
             Color = CurrentColor,
             Alpha = (float)CurrentAlpha,
+            Noise = CurrentNoise,
             Scale = 1f,
             Rotation = 0f
         });
@@ -2105,7 +2154,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             Scale = element.Scale,
             Rotation = element.Rotation,
             Color = element.Color,
-            Alpha = element.Alpha
+            Alpha = element.Alpha,
+            Noise = element.Noise
         });
     }
 
@@ -2164,6 +2214,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             Rotation = textElement.Rotation,
             Color = textElement.Color,
             Alpha = textElement.Alpha,
+            Noise = textElement.Noise,
             IsSelected = textElement.IsSelected
         };
     }

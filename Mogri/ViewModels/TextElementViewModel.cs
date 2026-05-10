@@ -42,6 +42,9 @@ public partial class TextElementViewModel : BaseViewModel, ITextElementViewModel
     [ObservableProperty]
     public partial float Alpha { get; set; } = 1f;
 
+    [ObservableProperty]
+    public partial double Noise { get; set; }
+
     public float BaseFontSize { get; init; } = DefaultBaseFontSize;
 
     [ObservableProperty]

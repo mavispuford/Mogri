@@ -226,6 +226,10 @@ public partial class CanvasHistoryItemViewModel : ObservableObject, ICanvasHisto
             Alpha = TextElement.Alpha;
             updateDescription();
         }
+        else if (e.PropertyName == nameof(TextElementViewModel.Noise))
+        {
+            updateDescription();
+        }
         else if (e.PropertyName == nameof(TextElementViewModel.Text))
         {
             updateDescription();
@@ -289,7 +293,7 @@ public partial class CanvasHistoryItemViewModel : ObservableObject, ICanvasHisto
         else if (TextElement != null)
         {
             var preview = createTextPreview(TextElement.Text);
-            Description = $"{preview}, {TextElement.Alpha:P0}";
+            Description = $"{preview}, {TextElement.Alpha:P0}, Noise {TextElement.Noise:P0}";
         }
     }
 

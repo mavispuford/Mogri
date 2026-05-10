@@ -116,5 +116,42 @@ namespace Mogri.Helpers
 
             return SKShader.CreateCompose(colorShader, adjustedNoiseShader, SKBlendMode.HardLight);
         }
+
+        /// <summary>
+        /// Creates a neutral grayscale noise shader centered around middle gray so it can be
+        /// overlaid on top of intrinsic-color glyphs without replacing their base colors.
+        /// </summary>
+        public static SKShader? CreateNeutralNoiseOverlayShader(double strength)
+        {
+            if (strength <= 0)
+            {
+                return null;
+            }
+
+            strength = Math.Max(0, Math.Min(1, strength));
+
+            var baseNoise = GenerateNoiseBitmap();
+
+            using var noiseBitmapShader = SKShader.CreateBitmap(baseNoise, SKShaderTileMode.Repeat, SKShaderTileMode.Repeat);
+
+            float s = (float)strength;
+            float normOffset = 0.5f * (1 - s);
+
+            const float luminanceRed = 0.2126f;
+            const float luminanceGreen = 0.7152f;
+            const float luminanceBlue = 0.0722f;
+
+            var matrix = new float[]
+            {
+                luminanceRed * s, luminanceGreen * s, luminanceBlue * s, 0, normOffset,
+                luminanceRed * s, luminanceGreen * s, luminanceBlue * s, 0, normOffset,
+                luminanceRed * s, luminanceGreen * s, luminanceBlue * s, 0, normOffset,
+                0, 0, 0, 1, 0
+            };
+
+            using var filter = SKColorFilter.CreateColorMatrix(matrix);
+
+            return noiseBitmapShader.WithColorFilter(filter);
+        }
     }
 }

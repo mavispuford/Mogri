@@ -1455,6 +1455,7 @@ public partial class CanvasPage : BasePage
             or nameof(TextElementViewModel.Rotation)
             or nameof(TextElementViewModel.Color)
             or nameof(TextElementViewModel.Alpha)
+            or nameof(TextElementViewModel.Noise)
             or nameof(TextElementViewModel.IsSelected);
     }
 
@@ -1469,7 +1470,7 @@ public partial class CanvasPage : BasePage
         return TextElementLayoutHelper.GetTextBoundsWithFallback(text, baseFontSize);
     }
 
-    private void DrawTextWithFallback(SKCanvas canvas, string text, Color color, float alpha, float baseFontSize)
+    private void DrawTextWithFallback(SKCanvas canvas, string text, Color color, float alpha, double noise, float baseFontSize)
     {
         if (string.IsNullOrEmpty(text))
         {
@@ -1478,10 +1479,123 @@ public partial class CanvasPage : BasePage
 
         var skColor = color.ToSKColor().WithAlpha((byte)Math.Clamp((int)Math.Round(alpha * 255f), 0, 255));
 
-        ProcessTextRunsWithFallback(text, baseFontSize, skColor, (runText, font, paint, shaper, _, originX) =>
+        if (noise <= 0d)
         {
-            canvas.DrawShapedText(shaper, runText, originX, 0f, font, paint);
+            ProcessTextRunsWithFallback(text, baseFontSize, skColor, (textRun, font, paint, shaper, _, originX) =>
+            {
+                canvas.DrawShapedText(shaper, textRun.Text, originX, 0f, font, paint);
+            });
+
+            return;
+        }
+
+        ProcessTextRunsWithFallback(text, baseFontSize, skColor, (textRun, font, paint, shaper, runBounds, originX) =>
+        {
+            if (textRun.PreserveIntrinsicGlyphDetails)
+            {
+                drawIntrinsicGlyphNoiseOverlay(canvas, textRun, font, paint, shaper, runBounds, originX, noise);
+                return;
+            }
+
+            var layerBounds = getTextRunLayerBounds(runBounds);
+            if (layerBounds.Width <= 0f || layerBounds.Height <= 0f)
+            {
+                return;
+            }
+
+            paint.Color = SKColors.White;
+            paint.Shader = null;
+
+            using var fillPaint = new SKPaint();
+            using var fillShader = configureTextFillPaint(fillPaint, skColor, noise);
+
+            // Fill through a text alpha mask so standard text keeps the current replacement-fill behavior.
+            fillPaint.BlendMode = SKBlendMode.SrcIn;
+            canvas.SaveLayer(layerBounds, null);
+            canvas.DrawShapedText(shaper, textRun.Text, originX, 0f, font, paint);
+            canvas.DrawPaint(fillPaint);
+            canvas.Restore();
         });
+    }
+
+    private static void drawIntrinsicGlyphNoiseOverlay(
+        SKCanvas canvas,
+        TextRun textRun,
+        SKFont font,
+        SKPaint paint,
+        SKShaper shaper,
+        SKRect runBounds,
+        float originX,
+        double noise)
+    {
+        canvas.DrawShapedText(shaper, textRun.Text, originX, 0f, font, paint);
+
+        var layerBounds = getTextRunLayerBounds(runBounds);
+        if (layerBounds.Width <= 0f || layerBounds.Height <= 0f)
+        {
+            return;
+        }
+
+        using var overlayShader = NoiseShaderHelper.CreateNeutralNoiseOverlayShader(noise);
+        if (overlayShader == null)
+        {
+            return;
+        }
+
+        using var compositePaint = new SKPaint
+        {
+            BlendMode = SKBlendMode.Overlay,
+            Color = SKColors.White.WithAlpha((byte)Math.Clamp((int)Math.Round(getIntrinsicGlyphNoiseOverlayOpacity(noise) * 255f), 0, 255))
+        };
+        using var overlayPaint = new SKPaint
+        {
+            IsAntialias = true,
+            Style = SKPaintStyle.Fill,
+            BlendMode = SKBlendMode.SrcIn,
+            Shader = overlayShader
+        };
+
+        canvas.SaveLayer(layerBounds, compositePaint);
+        canvas.DrawShapedText(shaper, textRun.Text, originX, 0f, font, paint);
+        canvas.DrawPaint(overlayPaint);
+        canvas.Restore();
+    }
+
+    private static double getIntrinsicGlyphNoiseOverlayOpacity(double noise)
+    {
+        return Math.Clamp((noise * 0.45d) + (noise * noise * 0.45d), 0d, 0.9d);
+    }
+
+    private static SKShader? configureTextFillPaint(SKPaint paint, SKColor color, double noise)
+    {
+        paint.IsAntialias = true;
+        paint.Style = SKPaintStyle.Fill;
+
+        if (noise > 0d)
+        {
+            var shader = NoiseShaderHelper.CreateNoiseShader(color, noise);
+            if (shader != null)
+            {
+                paint.Shader = shader;
+                paint.Color = SKColors.White.WithAlpha(color.Alpha);
+                return shader;
+            }
+        }
+
+        paint.Shader = null;
+        paint.Color = color;
+        return null;
+    }
+
+    private static SKRect getTextRunLayerBounds(SKRect runBounds)
+    {
+        const float textRunLayerPadding = 2f;
+
+        return new SKRect(
+            runBounds.Left - textRunLayerPadding,
+            runBounds.Top - textRunLayerPadding,
+            runBounds.Right + textRunLayerPadding,
+            runBounds.Bottom + textRunLayerPadding);
     }
 
     private void DrawTextElement(SKCanvas canvas, TextElementViewModel textElement, float canvasScale = 1f)
@@ -1504,7 +1618,7 @@ public partial class CanvasPage : BasePage
         canvas.RotateDegrees(textElement.Rotation);
         canvas.Scale(textElement.Scale);
         canvas.Translate(-bounds.MidX, -bounds.MidY);
-        DrawTextWithFallback(canvas, textElement.Text, textElement.Color, textElement.Alpha, textElement.BaseFontSize);
+        DrawTextWithFallback(canvas, textElement.Text, textElement.Color, textElement.Alpha, textElement.Noise, textElement.BaseFontSize);
 
         canvas.Restore();
     }
@@ -1529,7 +1643,7 @@ public partial class CanvasPage : BasePage
         string text,
         float baseFontSize,
         SKColor color,
-        Action<string, SKFont, SKPaint, SKShaper, SKRect, float> processRun)
+        Action<TextRun, SKFont, SKPaint, SKShaper, SKRect, float> processRun)
     {
         if (string.IsNullOrEmpty(text))
         {
@@ -1569,7 +1683,7 @@ public partial class CanvasPage : BasePage
                 }
 
                 var runBounds = getRunBounds(font, shapedText.Points, glyphBounds, glyphWidths, currentX);
-                processRun(textRun.Text, font, paint, shaper, runBounds, currentX);
+                processRun(textRun, font, paint, shaper, runBounds, currentX);
 
                 currentX += getRunAdvance(shapedText.Points, glyphWidths, currentX);
             }
@@ -1595,22 +1709,26 @@ public partial class CanvasPage : BasePage
         var currentText = new StringBuilder();
         SKTypeface? currentTypeface = null;
         var currentOwnsTypeface = false;
+        var currentPreserveIntrinsicGlyphDetails = false;
 
         var textElementEnumerator = StringInfo.GetTextElementEnumerator(text);
         while (textElementEnumerator.MoveNext())
         {
             var textElement = textElementEnumerator.GetTextElement();
             var (typeface, ownsTypeface) = getTypefaceForTextElement(primaryTypeface, textElement);
+            var preserveIntrinsicGlyphDetails = shouldPreserveIntrinsicGlyphDetails(textElement);
 
             if (currentTypeface == null)
             {
                 currentText.Append(textElement);
                 currentTypeface = typeface;
                 currentOwnsTypeface = ownsTypeface;
+                currentPreserveIntrinsicGlyphDetails = preserveIntrinsicGlyphDetails;
                 continue;
             }
 
-            if (areEquivalentTypefaces(currentTypeface, typeface))
+            if (currentPreserveIntrinsicGlyphDetails == preserveIntrinsicGlyphDetails
+                && areEquivalentTypefaces(currentTypeface, typeface))
             {
                 currentText.Append(textElement);
 
@@ -1622,19 +1740,46 @@ public partial class CanvasPage : BasePage
                 continue;
             }
 
-            textRuns.Add(new TextRun(currentText.ToString(), currentTypeface, currentOwnsTypeface));
+            textRuns.Add(new TextRun(currentText.ToString(), currentTypeface, currentOwnsTypeface, currentPreserveIntrinsicGlyphDetails));
             currentText.Clear();
             currentText.Append(textElement);
             currentTypeface = typeface;
             currentOwnsTypeface = ownsTypeface;
+            currentPreserveIntrinsicGlyphDetails = preserveIntrinsicGlyphDetails;
         }
 
         if (currentTypeface != null && currentText.Length > 0)
         {
-            textRuns.Add(new TextRun(currentText.ToString(), currentTypeface, currentOwnsTypeface));
+            textRuns.Add(new TextRun(currentText.ToString(), currentTypeface, currentOwnsTypeface, currentPreserveIntrinsicGlyphDetails));
         }
 
         return textRuns;
+    }
+
+    private static bool shouldPreserveIntrinsicGlyphDetails(string textElement)
+    {
+        if (string.IsNullOrEmpty(textElement))
+        {
+            return false;
+        }
+
+        foreach (var rune in textElement.EnumerateRunes())
+        {
+            var value = rune.Value;
+
+            if (value is 0x200D or 0x20E3 or 0xFE0F)
+            {
+                return true;
+            }
+
+            if ((value >= 0x1F1E6 && value <= 0x1FAFF)
+                || (value >= 0x1F3FB && value <= 0x1F3FF))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static (SKTypeface Typeface, bool OwnsTypeface) getTypefaceForTextElement(SKTypeface primaryTypeface, string textElement)
@@ -1728,16 +1873,19 @@ public partial class CanvasPage : BasePage
     {
         private readonly bool _ownsTypeface;
 
-        public TextRun(string text, SKTypeface typeface, bool ownsTypeface)
+        public TextRun(string text, SKTypeface typeface, bool ownsTypeface, bool preserveIntrinsicGlyphDetails)
         {
             Text = text;
             Typeface = typeface;
             _ownsTypeface = ownsTypeface;
+            PreserveIntrinsicGlyphDetails = preserveIntrinsicGlyphDetails;
         }
 
         public string Text { get; }
 
         public SKTypeface Typeface { get; }
+
+        public bool PreserveIntrinsicGlyphDetails { get; }
 
         public void Dispose()
         {

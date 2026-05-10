@@ -120,10 +120,10 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
         Title = "Edit Text";
         IsBrush = false;
         IsColorVisible = true;
-        IsNoiseVisible = false;
+        IsNoiseVisible = true;
         Alpha = textElement.Alpha;
         DisplayColor = textElement.Color;
-        Noise = 0;
+        Noise = textElement.Noise;
         BrushSize = 0;
     }
 
@@ -180,6 +180,10 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
         else if (_action is SegmentationMaskViewModel seg)
         {
             seg.Noise = value;
+        }
+        else if (_textElement != null)
+        {
+            _textElement.Noise = value;
         }
     }
 
