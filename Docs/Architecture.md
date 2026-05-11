@@ -50,33 +50,6 @@ This .NET MAUI application follows the MVVM pattern. It consists mainly of these
 - Static classes with bite sized methods (extension methods, etc) that perform shared functionality
 - In most cases, code that lives in helper classes could probably live in a service instead
 
-## Canvas Implementation Map
-
-The canvas feature is one of the largest and most change-prone parts of the app, so both the page and its view model are split into partial classes by concern.
-
-### CanvasPage
-- `Views/CanvasPage.xaml.cs`: root partial for bindable properties, compiled binding setup, and page lifecycle wiring
-- `Views/CanvasPage.Bindings.cs`: collection subscriptions and invalidation of the Skia surfaces when actions or text change
-- `Views/CanvasPage.Touch.cs`: non-text touch routing for brush, eraser, magic wand, eyedropper, and bounding-box interactions
-- `Views/CanvasPage.TextInteraction.cs`: text hit-testing, selection state, tap handling, drag, scale, and rotation gestures
-- `Views/CanvasPage.Rendering.cs`: Skia paint callbacks, temporary overlay drawing, and render preparation for save workflows
-- `Views/CanvasPage.Chrome.cs`: action tray animation, slider chrome, timers, haptics, and bounding-box sizing helpers
-
-The page still owns only view-specific behavior. Deterministic text rendering and hit-testing live in helpers such as `CanvasTextRenderer` and `CanvasTextHitTester` so the interaction flow can stay readable.
-
-### CanvasPageViewModel
-- `ViewModels/Pages/CanvasPageViewModel.cs`: root partial for injected services, observable properties, tool setup, and shared canvas state
-- `ViewModels/Pages/CanvasPageViewModel.Workflows.cs`: save, send, crop, flatten, patch, and workflow payload preparation orchestration
-- `ViewModels/Pages/CanvasPageViewModel.Navigation.cs`: incoming query handling plus applying or stitching returned canvas results
-- `ViewModels/Pages/CanvasPageViewModel.TextAndHistory.cs`: undo flow, text actions, and history popup coordination
-- `ViewModels/Pages/CanvasPageViewModel.Persistence.cs`: autosave and cleanup of persisted mask and text state
-- `ViewModels/Pages/CanvasPageViewModel.Segmentation.cs`: source-image changes, palette extraction, media loading, and segmentation lifecycle management
-- `ViewModels/Pages/CanvasPageViewModel.BitmapOps.cs`: remaining bitmap helpers that still depend on canvas-action view models
-
-Keep the view model orchestration-focused. Reusable bitmap composition belongs in `ICanvasBitmapService`, and reusable encoded image payload preparation belongs in helpers such as `ImagePayloadHelper` when the logic is pure and shared.
-
-When changing canvas behavior, start in the partial that directly owns the concern instead of scanning every canvas file. The root partials should act as the first navigation stop and the sibling partials should stay narrow enough that a single file usually answers one class of questions.
-
 ### Registrations
 - The `Registrations` folder contains registration classes for Popups, Services, View Models, and Views
 - The registrations tie the `Interfaces` to their `Implementations`
@@ -208,3 +181,36 @@ This project uses [MemoryToolkit.Maui](https://github.com/AdamEssenmacher/Memory
 ### CancellationTokenSource
 - Always dispose a CTS after cancelling it: `cts.Cancel(); cts.Dispose();`
 
+## Canvas Implementation Map
+
+The canvas feature is one of the largest and most change-prone parts of the app, so both the page and its view model are split into partial classes by concern.
+
+### CanvasPage
+- `Views/CanvasPage.xaml.cs`: root partial for bindable properties, compiled binding setup, and page lifecycle wiring
+- `Views/CanvasPage.Bindings.cs`: collection subscriptions and invalidation of the Skia surfaces when actions or text change
+- `Views/CanvasPage.Touch.cs`: non-text touch routing for brush, eraser, magic wand, eyedropper, and bounding-box interactions
+- `Views/CanvasPage.TextInteraction.cs`: text hit-testing, selection state, tap handling, drag, scale, and rotation gestures
+- `Views/CanvasPage.Rendering.cs`: Skia paint callbacks, temporary overlay drawing, and render preparation for save workflows
+- `Views/CanvasPage.Layout.cs`: canvas sizing, bounding-box layout, and size-driven invalidation helpers
+- `Views/CanvasPage.Chrome.cs`: action tray animation, slider chrome, timers, haptics, and tool-context button visibility helpers
+
+The page still owns only view-specific behavior. Deterministic text rendering and hit-testing live in helpers such as `CanvasTextRenderer` and `CanvasTextHitTester` so the interaction flow can stay readable.
+
+### CanvasPageViewModel
+- `ViewModels/Pages/CanvasPageViewModel.cs`: root partial for injected services, observable properties, tool setup, and shared canvas state
+- `ViewModels/Pages/CanvasPageViewModel.Workflows.cs`: save, send, crop, flatten, patch, and workflow payload preparation orchestration
+- `ViewModels/Pages/CanvasPageViewModel.Navigation.cs`: incoming query handling plus applying or stitching returned canvas results
+- `ViewModels/Pages/CanvasPageViewModel.TextAndHistory.cs`: undo flow, text add/edit/delete actions, and history popup coordination
+- `ViewModels/Pages/CanvasPageViewModel.State.cs`: canvas ordering, text clone helpers, and shared clear-all coordination
+- `ViewModels/Pages/CanvasPageViewModel.Snapshots.cs`: snapshot save/restore markers, text snapshot plumbing, and collection restore helpers
+- `ViewModels/Pages/CanvasPageViewModel.Persistence.cs`: autosave and cleanup of persisted mask and text state
+- `ViewModels/Pages/CanvasPageViewModel.SourceImage.cs`: source-image changes, palette extraction, persisted overlay restore, media replacement, and bitmap decoding
+- `ViewModels/Pages/CanvasPageViewModel.Segmentation.cs`: segmentation model readiness, interactive mask commands, and segmentation state resets
+
+Canvas-action-driven workflow layers and patch masks are produced by `ICanvasActionBitmapService`, while `ICanvasBitmapService` still owns pure bitmap composition, cropping, mask conversion, and stitching.
+
+Keep the view model orchestration-focused. Reusable bitmap composition belongs in `ICanvasBitmapService`, and reusable encoded image payload preparation belongs in helpers such as `ImagePayloadHelper` when the logic is pure and shared.
+
+The broadest remaining canvas partial is `CanvasPageViewModel.Workflows.cs`, but an additional viewmodel split is not currently justified. After extracting snapshot/state helpers, source-image lifecycle handling, segmentation handling, and canvas-action bitmap generation, the remaining breadth is mostly orchestration over the same observable canvas session. Revisit another split only if workflows or navigation paths grow a separate lifecycle that no longer shares most of the same state.
+
+When changing canvas behavior, start in the partial that directly owns the concern instead of scanning every canvas file. The root partials should act as the first navigation stop and the sibling partials should stay narrow enough that a single file usually answers one class of questions.

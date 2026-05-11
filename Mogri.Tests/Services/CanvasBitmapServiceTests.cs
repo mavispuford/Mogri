@@ -78,6 +78,20 @@ public class CanvasBitmapServiceTests
     }
 
     [Fact]
+    public void GetCroppedBitmap_WithZeroCropSize_ReturnsOriginalBitmapReference()
+    {
+        // Arrange
+        using var bitmap = CreateBitmap(4, 4, SKColors.CadetBlue);
+        var service = CreateService();
+
+        // Act
+        var result = service.GetCroppedBitmap(bitmap, new SKRect(1, 1, 3, 3), 1d, 0f);
+
+        // Assert
+        Assert.Same(bitmap, result);
+    }
+
+    [Fact]
     public void StitchBitmapIntoSource_WithTargetRect_DrawsInsertedBitmapInRect()
     {
         // Arrange

@@ -43,6 +43,7 @@ public static class ServiceRegistrations
         builder.Services.AddSingleton<IImageGenerationService, ProxyImageGenerationService>();
         builder.Services.AddSingleton<IPopupService, PopupService>();
         builder.Services.AddSingleton<IImageService, ImageService>();
+        builder.Services.AddSingleton<ICanvasActionBitmapService, CanvasActionBitmapService>();
         builder.Services.AddSingleton<ICanvasBitmapService, CanvasBitmapService>();
         builder.Services.AddSingleton<ISegmentationService, SegmentationService>();
         builder.Services.AddSingleton<ILoadingService, LoadingService>();

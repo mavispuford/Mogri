@@ -1,222 +1,96 @@
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Mvvm.Input;
 using Mogri.Enums;
-using Mogri.Models;
 using SkiaSharp;
 
 namespace Mogri.ViewModels;
 
+/// <summary>
+/// Canvas page view model partial that manages segmentation readiness, interactive segmentation commands, and segmentation mask state.
+/// </summary>
 public partial class CanvasPageViewModel
 {
-    partial void OnSourceBitmapChanged(SKBitmap? value)
+    private async Task updateSegmentationImageAsync(SKBitmap bitmap)
     {
-        if (value != null)
+        // Latest-wins guard for SourceBitmap changes. A canceled older request can still finish later,
+        // so only the newest version is allowed to publish its result.
+
+        var magicWandTool = AvailableTools.FirstOrDefault(t => t.Type == ToolType.MagicWand);
+        CancellationTokenSource? previousSetSegmentationImageCancellationTokenSource;
+        CancellationTokenSource currentSetSegmentationImageCancellationTokenSource;
+        int currentSetSegmentationImageVersion;
+
+        lock (_setSegmentationImageLock)
         {
-            // Capture for lambda safety
-            var bitmap = value;
+            _setSegmentationImageRequestCount++;
+            _setSegmentationImageVersion++;
+            currentSetSegmentationImageVersion = _setSegmentationImageVersion;
 
-            _ = Task.WhenAll(Task.Run(() =>
+            // Swap in a new token source under the lock so the previous request can be canceled
+            // after the new request is fully registered as the current one.
+            previousSetSegmentationImageCancellationTokenSource = _setSegmentationImageCancellationTokenSource;
+            currentSetSegmentationImageCancellationTokenSource = new CancellationTokenSource();
+            _setSegmentationImageCancellationTokenSource = currentSetSegmentationImageCancellationTokenSource;
+
+            HasSegmentationImage = false;
+
+            if (magicWandTool != null)
             {
-                GettingColorPalette = true;
+                magicWandTool.IsLoading = true;
+            }
 
-                var palette = _imageService.ExtractColorPalette(bitmap, 48);
-                if (palette != null)
-                {
-                    _colorPalette = palette;
-                }
-
-                GettingColorPalette = false;
-            }), Task.Run(async () =>
-            {
-                // Latest-wins guard for SourceBitmap changes. A canceled older request can still finish later,
-                // so only the newest version is allowed to publish its result.
-
-                var magicWandTool = AvailableTools.FirstOrDefault(t => t.Type == ToolType.MagicWand);
-                CancellationTokenSource? previousSetSegmentationImageCancellationTokenSource;
-                CancellationTokenSource currentSetSegmentationImageCancellationTokenSource;
-                int currentSetSegmentationImageVersion;
-
-                lock (_setSegmentationImageLock)
-                {
-                    _setSegmentationImageRequestCount++;
-                    _setSegmentationImageVersion++;
-                    currentSetSegmentationImageVersion = _setSegmentationImageVersion;
-
-                    // Swap in a new token source under the lock so the previous request can be canceled
-                    // after the new request is fully registered as the current one.
-                    previousSetSegmentationImageCancellationTokenSource = _setSegmentationImageCancellationTokenSource;
-                    currentSetSegmentationImageCancellationTokenSource = new CancellationTokenSource();
-                    _setSegmentationImageCancellationTokenSource = currentSetSegmentationImageCancellationTokenSource;
-
-                    HasSegmentationImage = false;
-
-                    if (magicWandTool != null)
-                    {
-                        magicWandTool.IsLoading = true;
-                    }
-
-                    SettingSegmentationImage = true;
-                }
-
-                if (previousSetSegmentationImageCancellationTokenSource != null)
-                {
-                    if (!previousSetSegmentationImageCancellationTokenSource.IsCancellationRequested)
-                    {
-                        previousSetSegmentationImageCancellationTokenSource.Cancel();
-                    }
-
-                    previousSetSegmentationImageCancellationTokenSource.Dispose();
-                }
-
-                var hasSegmentationImage = false;
-
-                try
-                {
-                    hasSegmentationImage = await _segmentationService.SetImage(bitmap, currentSetSegmentationImageCancellationTokenSource.Token);
-                }
-                finally
-                {
-                    var shouldDisposeCurrentSetSegmentationImageCancellationTokenSource = false;
-
-                    lock (_setSegmentationImageLock)
-                    {
-                        // A stale request may still complete after cancellation, but it must not change the
-                        // UI flags if a newer SourceBitmap has already started processing.
-                        if (currentSetSegmentationImageVersion == _setSegmentationImageVersion)
-                        {
-                            HasSegmentationImage = hasSegmentationImage;
-                        }
-
-                        _setSegmentationImageRequestCount--;
-
-                        SettingSegmentationImage = _setSegmentationImageRequestCount > 0;
-
-                        if (magicWandTool != null)
-                        {
-                            magicWandTool.IsLoading = _setSegmentationImageRequestCount > 0;
-                        }
-
-                        if (ReferenceEquals(_setSegmentationImageCancellationTokenSource, currentSetSegmentationImageCancellationTokenSource))
-                        {
-                            _setSegmentationImageCancellationTokenSource = null;
-                            shouldDisposeCurrentSetSegmentationImageCancellationTokenSource = true;
-                        }
-                    }
-
-                    if (shouldDisposeCurrentSetSegmentationImageCancellationTokenSource)
-                    {
-                        currentSetSegmentationImageCancellationTokenSource.Dispose();
-                    }
-                }
-
-            }));
+            SettingSegmentationImage = true;
         }
-    }
 
-    [RelayCommand]
-    private async Task ShowMediaPicker()
-    {
+        if (previousSetSegmentationImageCancellationTokenSource != null)
+        {
+            if (!previousSetSegmentationImageCancellationTokenSource.IsCancellationRequested)
+            {
+                previousSetSegmentationImageCancellationTokenSource.Cancel();
+            }
+
+            previousSetSegmentationImageCancellationTokenSource.Dispose();
+        }
+
+        var hasSegmentationImage = false;
+
         try
         {
-            var photo = await _popupService.PickSinglePhotoAsync();
-
-            if (photo == null)
-            {
-                return;
-            }
-
-            const string newCanvasWithImageOption = "New Canvas with Image";
-            const string scaleImageToExistingCanvasOption = "Scale Image to Existing Canvas";
-            const string scaleImageToBoundingBoxOption = "Scale Image to Bounding Box";
-
-            var actions = new List<string> { newCanvasWithImageOption, scaleImageToExistingCanvasOption };
-
-            if (CurrentTool?.Type == ToolType.BoundingBox)
-            {
-                actions.Add(scaleImageToBoundingBoxOption);
-            }
-
-            var action = await _popupService.DisplayActionSheetAsync("Set Image", "Cancel", null, actions.ToArray());
-
-            if (action == "Cancel" || action == null)
-            {
-                return;
-            }
-
-            using var fileStream = (await _fileService.OpenNormalizedPhotoStreamAsync(photo)).Stream;
-
-            if (fileStream == null)
-            {
-                await _popupService.DisplayAlertAsync("Error", "Could not load the selected image.", "OK");
-                return;
-            }
-
-            if (action == newCanvasWithImageOption)
-            {
-                await _canvasHistoryService.ClearAllAsync();
-                ClearSegmentationMask();
-                await LoadSourceBitmapUsingStream(fileStream, photo.FileName);
-            }
-            else if (action == scaleImageToExistingCanvasOption)
-            {
-                try
-                {
-                    IsBusy = true;
-
-                    var loadedBitmap = LoadBitmapFromStream(fileStream);
-
-                    if (loadedBitmap != null && SourceBitmap != null)
-                    {
-                        var info = new SKImageInfo(SourceBitmap.Width, SourceBitmap.Height);
-                        var resizedBitmap = loadedBitmap.Resize(info, new SKSamplingOptions(SKCubicResampler.Mitchell));
-
-                        loadedBitmap.Dispose();
-
-                        SourceBitmap = resizedBitmap;
-                        _sourceFileName = null;
-
-                        ClearSegmentationMask();
-                        await clearAllActionsAndHistoryAsync();
-                    }
-                }
-                finally
-                {
-                    IsBusy = false;
-                }
-            }
-            else if (action == scaleImageToBoundingBoxOption)
-            {
-                try
-                {
-                    IsBusy = true;
-
-                    var snapshotId = await pushSnapshotAsync("Insert Image", false);
-
-                    var loadedBitmap = LoadBitmapFromStream(fileStream);
-
-                    if (loadedBitmap != null)
-                    {
-                        var stitchedBitmap = _canvasBitmapService.StitchBitmapIntoSource(SourceBitmap, loadedBitmap, BoundingBox, BoundingBoxScale);
-
-                        loadedBitmap.Dispose();
-
-                        if (snapshotId != null)
-                        {
-                            insertSnapshotMarker(snapshotId, "Insert Image", false);
-                        }
-
-                        SourceBitmap = stitchedBitmap;
-                    }
-                }
-                finally
-                {
-                    IsBusy = false;
-                }
-            }
+            hasSegmentationImage = await _segmentationService.SetImage(bitmap, currentSetSegmentationImageCancellationTokenSource.Token);
         }
-        catch (Exception)
+        finally
         {
-            await Toast.Make("Unable to load image. Please check permissions and try again.").Show();
+            var shouldDisposeCurrentSetSegmentationImageCancellationTokenSource = false;
+
+            lock (_setSegmentationImageLock)
+            {
+                // A stale request may still complete after cancellation, but it must not change the
+                // UI flags if a newer SourceBitmap has already started processing.
+                if (currentSetSegmentationImageVersion == _setSegmentationImageVersion)
+                {
+                    HasSegmentationImage = hasSegmentationImage;
+                }
+
+                _setSegmentationImageRequestCount--;
+
+                SettingSegmentationImage = _setSegmentationImageRequestCount > 0;
+
+                if (magicWandTool != null)
+                {
+                    magicWandTool.IsLoading = _setSegmentationImageRequestCount > 0;
+                }
+
+                if (ReferenceEquals(_setSegmentationImageCancellationTokenSource, currentSetSegmentationImageCancellationTokenSource))
+                {
+                    _setSegmentationImageCancellationTokenSource = null;
+                    shouldDisposeCurrentSetSegmentationImageCancellationTokenSource = true;
+                }
+            }
+
+            if (shouldDisposeCurrentSetSegmentationImageCancellationTokenSource)
+            {
+                currentSetSegmentationImageCancellationTokenSource.Dispose();
+            }
         }
     }
 
@@ -400,104 +274,5 @@ public partial class CanvasPageViewModel
         SegmentationAdd = !SegmentationAdd;
 
         _segmentationService.Reset();
-    }
-
-    private SKBitmap? LoadBitmapFromStream(Stream? stream)
-    {
-        if (stream == null) return null;
-
-        var codec = SKCodec.Create(stream);
-        if (codec == null) return null;
-
-        var info = new SKImageInfo
-        {
-            AlphaType = SKAlphaType.Unpremul,
-            ColorSpace = codec.Info.ColorSpace,
-            ColorType = codec.Info.ColorType,
-            Height = codec.Info.Height,
-            Width = codec.Info.Width,
-        };
-
-        return SKBitmap.Decode(codec, info);
-    }
-
-    private async Task LoadSourceBitmapUsingStream(Stream? stream, string fileName)
-    {
-        try
-        {
-            IsBusy = true;
-
-            // Instead of a simple SKBitmap.Decode() call, we're using a codec and SKImageInfo with Unpremul for the
-            // AlphaType so masked images can be reopened after being created
-
-            var sourceBitmap = LoadBitmapFromStream(stream);
-
-            // Wrap in dispatch call because ApplyQueryAttributes can call this method and it
-            // appears to be called from a non-UI thread.
-            var dispatcher = Dispatcher.GetForCurrentThread();
-            if (dispatcher != null)
-            {
-                await dispatcher.DispatchAsync(() =>
-                {
-                    SourceBitmap = sourceBitmap;
-                });
-            }
-            else
-            {
-                SourceBitmap = sourceBitmap;
-            }
-
-            _sourceFileName = fileName;
-            await clearAllActionsAndHistoryAsync();
-
-            var mask = await _fileService.GetMaskFileFromAppDataAsync(_sourceFileName);
-
-            void restorePersistedCanvasState()
-            {
-                if (mask == null)
-                {
-                    return;
-                }
-
-                var allActions = new List<CanvasActionViewModel>();
-
-                if (mask.Lines != null)
-                {
-                    allActions.AddRange(mask.Lines);
-                }
-
-                if (mask.SegmentationMasks != null)
-                {
-                    allActions.AddRange(mask.SegmentationMasks);
-                }
-
-                restoreCanvasActions(allActions);
-                restoreTextElements(mask.TextElements);
-            }
-
-            if (dispatcher != null)
-            {
-                await dispatcher.DispatchAsync(() =>
-                {
-                    restorePersistedCanvasState();
-                });
-            }
-            else
-            {
-                restorePersistedCanvasState();
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            await _popupService.DisplayAlertAsync("Error", "Failed to load mask data", "OK");
-        }
-        finally
-        {
-            if (stream != null)
-                await stream.DisposeAsync();
-
-            IsBusy = false;
-        }
     }
 }

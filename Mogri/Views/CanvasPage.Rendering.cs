@@ -7,6 +7,9 @@ using SkiaSharp.Views.Maui;
 
 namespace Mogri.Views;
 
+/// <summary>
+/// Canvas page partial that paints the canvas surfaces and prepares rendered output for save workflows.
+/// </summary>
 public partial class CanvasPage
 {
     // Page-level view state.

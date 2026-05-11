@@ -6,6 +6,9 @@ using SkiaSharp.Views.Maui;
 
 namespace Mogri.Views;
 
+/// <summary>
+/// Canvas page partial that owns editable text hit-testing, selection state, and gesture-driven text manipulation.
+/// </summary>
 public partial class CanvasPage
 {
     // Text move-mode thresholds and selection chrome.

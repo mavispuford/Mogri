@@ -4,6 +4,9 @@ using SkiaSharp;
 
 namespace Mogri.ViewModels;
 
+/// <summary>
+/// Canvas page view model partial that applies navigation query data and merges returned workflow results back into the canvas state.
+/// </summary>
 public partial class CanvasPageViewModel
 {
     public override async void ApplyQueryAttributes(IDictionary<string, object> query)

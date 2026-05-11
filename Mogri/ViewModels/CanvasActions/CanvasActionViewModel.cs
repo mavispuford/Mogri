@@ -1,9 +1,10 @@
+using Mogri.Interfaces.Services;
 using Mogri.Enums;
 using SkiaSharp;
 
 namespace Mogri.ViewModels;
 
-public abstract class CanvasActionViewModel : BaseViewModel
+public abstract class CanvasActionViewModel : BaseViewModel, ICanvasRenderAction
 {
     public CanvasActionType CanvasActionType { get; set; }
 

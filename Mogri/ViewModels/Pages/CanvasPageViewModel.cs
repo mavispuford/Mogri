@@ -18,14 +18,17 @@ namespace Mogri.ViewModels;
 
 /// <summary>
 /// Root canvas page view model partial that owns dependency injection, observable state,
-/// tool initialization, and shared fields used by the canvas workflows.
+/// tool initialization, and shared state consumed across the canvas feature.
 /// Sibling partials own the remaining coordination concerns:
 /// - CanvasPageViewModel.Workflows.cs: save, send, crop, flatten, and patch orchestration.
 /// - CanvasPageViewModel.Navigation.cs: query handling and applying returned canvas results.
-/// - CanvasPageViewModel.TextAndHistory.cs: text commands, undo flow, and history coordination.
+/// - CanvasPageViewModel.TextAndHistory.cs: text commands, undo flow, and history popup coordination.
+/// - CanvasPageViewModel.State.cs: canvas ordering, text clone helpers, and shared clear-all coordination.
+/// - CanvasPageViewModel.Snapshots.cs: snapshot save/restore markers, text snapshot plumbing, and collection restore helpers.
 /// - CanvasPageViewModel.Persistence.cs: auto-save and cleanup of stored canvas overlay state.
-/// - CanvasPageViewModel.Segmentation.cs: source loading, palette updates, and segmentation lifecycle.
-/// - CanvasPageViewModel.BitmapOps.cs: view-model-local bitmap rendering helpers that still depend on canvas actions.
+/// - CanvasPageViewModel.SourceImage.cs: source-image changes, palette updates, media replacement, bitmap decoding, and persisted restore.
+/// - CanvasPageViewModel.Segmentation.cs: segmentation model readiness, interactive mask commands, and segmentation state resets.
+/// Canvas-action-driven workflow layers and patch masks are built by ICanvasActionBitmapService instead of a viewmodel partial.
 /// </summary>
 public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 {
@@ -44,6 +47,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
     private readonly object _setSegmentationImageLock = new();
     private readonly SemaphoreSlim _autoMaskSaveLock = new(1, 1);
+    private readonly ICanvasActionBitmapService _canvasActionBitmapService;
     private readonly IFileService _fileService;
     private readonly IImageService _imageService;
     private readonly ICanvasBitmapService _canvasBitmapService;
@@ -152,6 +156,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
     // Root partial constructor sets up shared tool state; workflow and navigation logic live in sibling partials.
     public CanvasPageViewModel(
+        ICanvasActionBitmapService canvasActionBitmapService,
         IFileService fileService,
         IPopupService popupService,
         IImageService imageService,
@@ -161,6 +166,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         ICanvasHistoryService canvasHistoryService,
         ILoadingService loadingService) : base(loadingService)
     {
+        _canvasActionBitmapService = canvasActionBitmapService ?? throw new ArgumentNullException(nameof(canvasActionBitmapService));
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));

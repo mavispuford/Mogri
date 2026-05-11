@@ -5,6 +5,9 @@ using SkiaSharp.Views.Maui;
 
 namespace Mogri.Views;
 
+/// <summary>
+/// Canvas page partial that handles non-text touch routing for drawing, segmentation, eyedropper, and bounding-box interactions.
+/// </summary>
 public partial class CanvasPage
 {
     // Active canvas drawing state.

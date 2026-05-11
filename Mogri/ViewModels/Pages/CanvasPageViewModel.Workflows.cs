@@ -7,6 +7,9 @@ using SkiaSharp;
 
 namespace Mogri.ViewModels;
 
+/// <summary>
+/// Canvas page view model partial that orchestrates save, send, crop, flatten, patch, and workflow payload preparation.
+/// </summary>
 public partial class CanvasPageViewModel
 {
     private const string PngContentType = "image/png";
@@ -142,7 +145,7 @@ public partial class CanvasPageViewModel
             await Task.Run(async () =>
             {
                 // Re-render the layer using the source bitmap dimensions so masks stay aligned 1:1.
-                using var rawMaskBitmap = GenerateRenderedLayer(sourceBitmap.Width, sourceBitmap.Height);
+                using var rawMaskBitmap = _canvasActionBitmapService.CreateRenderedLayer(CanvasActions, sourceBitmap.Width, sourceBitmap.Height);
 
                 try
                 {
@@ -209,7 +212,7 @@ public partial class CanvasPageViewModel
 
             await Task.Run(async () =>
             {
-                using var rawMaskBitmap = GenerateRenderedLayer(sourceBitmap.Width, sourceBitmap.Height);
+                using var rawMaskBitmap = _canvasActionBitmapService.CreateRenderedLayer(CanvasActions, sourceBitmap.Width, sourceBitmap.Height);
 
                 var hasMaskActions = CanvasActions.Any(canvasAction => canvasAction.CanvasActionType == CanvasActionType.Mask);
                 var mergedBitmap = hasMaskActions
@@ -256,7 +259,7 @@ public partial class CanvasPageViewModel
             await Task.Run(async () =>
             {
                 // Re-render the layer using the source bitmap dimensions so masks stay aligned 1:1.
-                using var rawMaskBitmap = GenerateRenderedLayer(sourceBitmap.Width, sourceBitmap.Height);
+                using var rawMaskBitmap = _canvasActionBitmapService.CreateRenderedLayer(CanvasActions, sourceBitmap.Width, sourceBitmap.Height);
 
                 try
                 {
@@ -437,7 +440,7 @@ public partial class CanvasPageViewModel
             // Unload Segmentation Service to free resource
             _segmentationService.UnloadModel();
 
-            using var mask = await Task.Run(() => GenerateMask(useLastOnly));
+            using var mask = await Task.Run(() => _canvasActionBitmapService.CreatePatchMask(CanvasActions, sourceBitmap.Width, sourceBitmap.Height, useLastOnly));
 
             if (mask != null)
             {

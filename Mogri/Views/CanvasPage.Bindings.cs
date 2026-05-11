@@ -5,6 +5,9 @@ using System.Collections.Specialized;
 
 namespace Mogri.Views;
 
+/// <summary>
+/// Canvas page partial that tracks bindable collection changes and invalidates the affected surfaces.
+/// </summary>
 public partial class CanvasPage
 {
     private void OnCanvasActionsChanged(ObservableCollection<CanvasActionViewModel>? oldValue, ObservableCollection<CanvasActionViewModel>? newValue)

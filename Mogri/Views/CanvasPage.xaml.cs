@@ -23,7 +23,8 @@ namespace Mogri.Views;
 /// - CanvasPage.Touch.cs: drawing, eyedropper, bounding-box, and segmentation touch routing.
 /// - CanvasPage.TextInteraction.cs: text selection, dragging, scaling, rotation, and tap flow.
 /// - CanvasPage.Rendering.cs: Skia paint callbacks, capture rendering, and temporary overlays.
-/// - CanvasPage.Chrome.cs: slider chrome, action tray animation, timers, haptics, and bounding-box helpers.
+/// - CanvasPage.Layout.cs: canvas sizing, bounding-box layout, and size-driven invalidation.
+/// - CanvasPage.Chrome.cs: slider chrome, action tray animation, timers, haptics, and tool-context button visibility.
 /// </summary>
 public partial class CanvasPage : BasePage
 {

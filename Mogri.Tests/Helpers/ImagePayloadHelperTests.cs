@@ -7,6 +7,19 @@ namespace Mogri.Tests.Helpers;
 public class ImagePayloadHelperTests
 {
     [Fact]
+    public void CreateImageDataString_WithBlankContentType_UsesDefaultPngContentType()
+    {
+        // Arrange
+        using var bitmap = CreateBitmap(8, 8, SKColors.CadetBlue);
+
+        // Act
+        var imageDataString = ImagePayloadHelper.CreateImageDataString(bitmap, string.Empty);
+
+        // Assert
+        Assert.StartsWith("data:image/png;base64,", imageDataString);
+    }
+
+    [Fact]
     public void CreateConstrainedPayload_WithOversizedBitmap_ReturnsEncodedImageAndConstrainedDimensions()
     {
         // Arrange
@@ -29,6 +42,26 @@ public class ImagePayloadHelperTests
     }
 
     [Fact]
+    public void CreateConstrainedPayload_WithInBoundsBitmap_PreservesDimensionsAndDoesNotUpscaleThumbnail()
+    {
+        // Arrange
+        using var bitmap = CreateBitmap(128, 64, SKColors.CadetBlue);
+
+        // Act
+        var payload = ImagePayloadHelper.CreateConstrainedPayload(bitmap);
+
+        // Assert
+        Assert.NotNull(payload);
+        Assert.Equal(128d, payload!.Width);
+        Assert.Equal(64d, payload.Height);
+
+        using var thumbnailBitmap = DecodeDataString(payload.ThumbnailString);
+        Assert.NotNull(thumbnailBitmap);
+        Assert.Equal(128, thumbnailBitmap!.Width);
+        Assert.Equal(64, thumbnailBitmap.Height);
+    }
+
+    [Fact]
     public void CreateFixedPayload_WithBitmap_ReturnsProvidedDimensions()
     {
         // Arrange
@@ -42,6 +75,20 @@ public class ImagePayloadHelperTests
         Assert.Equal(768d, payload!.Width);
         Assert.Equal(768d, payload.Height);
         Assert.StartsWith("data:image/png;base64,", payload.ImageDataString);
+    }
+
+    [Fact]
+    public void HasVisiblePixels_WithOpaquePixel_ReturnsTrue()
+    {
+        // Arrange
+        using var bitmap = CreateBitmap(2, 2, SKColors.Transparent);
+        bitmap.SetPixel(1, 1, SKColors.Orange);
+
+        // Act
+        var hasVisiblePixels = ImagePayloadHelper.HasVisiblePixels(bitmap);
+
+        // Assert
+        Assert.True(hasVisiblePixels);
     }
 
     [Fact]
