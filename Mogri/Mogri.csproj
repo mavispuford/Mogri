@@ -48,8 +48,7 @@
 		<NoWarn>$(NoWarn);XA4301</NoWarn>
 	</PropertyGroup>
 	<ItemGroup Condition="$(TargetFramework.Contains('-android'))">
-		<AndroidLibrary Bind="false"
-		                Include="$(NuGetPackageRoot)microsoft.ml.onnxruntime\1.24.3\runtimes\android\native\onnxruntime.aar">
+		<AndroidLibrary Bind="false" Include="$(NuGetPackageRoot)microsoft.ml.onnxruntime\1.24.3\runtimes\android\native\onnxruntime.aar">
 			<Link>onnxruntime.aar</Link>
 		</AndroidLibrary>
 	</ItemGroup>
