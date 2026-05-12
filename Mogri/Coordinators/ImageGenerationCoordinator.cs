@@ -1,20 +1,20 @@
 using Mogri.Enums;
+using Mogri.Interfaces.Coordinators;
 using Mogri.Interfaces.Services;
 using Mogri.Interfaces.ViewModels;
 using Mogri.Models;
 
-namespace Mogri.Services;
+namespace Mogri.Coordinators;
 
 /// <summary>
-/// A proxy service that sits between the ViewModels and the concrete ImageGenerationBackends.
-/// It routes requests to the currently selected backend (e.g. Forge, ComfyUI) based on user settings.
+/// Coordinates backend selection and forwards image-generation calls to the active backend.
 /// </summary>
-public class ProxyImageGenerationService : IImageGenerationService
+public class ImageGenerationCoordinator : IImageGenerationCoordinator
 {
     private readonly IBackendRegistry _registry;
     private IImageGenerationBackend? _activeBackend;
 
-    public ProxyImageGenerationService(IBackendRegistry registry)
+    public ImageGenerationCoordinator(IBackendRegistry registry)
     {
         _registry = registry;
     }
@@ -50,18 +50,17 @@ public class ProxyImageGenerationService : IImageGenerationService
 
     public async Task<PromptSettings?> GetImageInfoAsync(string base64EncodedImage, CancellationToken cancellationToken = default)
     {
-        // Try the active backend first
-        // Both backends now use PngMetadataHelper locally, but SdForgeNeoService has extra model resolution logic
-        // So sticking with the active backend first is correct to get the "upgraded" model object if possible
         var result = await ActiveBackend.GetImageInfoAsync(base64EncodedImage, cancellationToken);
-        if (result != null) return result;
+        if (result != null)
+        {
+            return result;
+        }
 
         return null;
     }
 
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
-        // Reset active backend to ensure we pick up changes in preferences
         _activeBackend = null;
         await ActiveBackend.InitializeAsync(cancellationToken);
     }

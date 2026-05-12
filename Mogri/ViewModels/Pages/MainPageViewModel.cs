@@ -1,12 +1,13 @@
 using Mogri.Interfaces.ViewModels;
 using Mogri.Interfaces.ViewModels.Pages;
 using CommunityToolkit.Mvvm.Input;
+using Mogri.Interfaces.Coordinators;
 using Mogri.Interfaces.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mogri.Models;
 using System.Collections.ObjectModel;
 using SkiaSharp.Views.Maui.Controls;
-using CommunityToolkit.Maui.Alerts;
+using Mogri.Enums;
 
 namespace Mogri.ViewModels;
 
@@ -19,12 +20,15 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 #endif
 
     private readonly IFileService _fileService;
-    private readonly IImageGenerationService _stableDiffusionService;
-    private readonly IGenerationTaskService _generationTaskService;
+    private readonly IImageGenerationCoordinator _stableDiffusionService;
+    private readonly IGenerationTaskCoordinator _generationTaskCoordinator;
     private readonly IServiceProvider _serviceProvider;
     private readonly IImageService _imageService;
     private readonly IPopupService _popupService;
     private readonly ICheckpointSettingsService _checkpointSettingsService;
+    private readonly IAnimationService _animationService;
+    private readonly IToastService _toastService;
+    private readonly IHapticsService _hapticsService;
 
     private PromptSettings _settings = new();
     private string? _resizedInitImage;
@@ -63,38 +67,45 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
     public MainPageViewModel(
         IFileService fileService,
-        IImageGenerationService stableDiffusionService,
-        IGenerationTaskService generationTaskService,
+        IImageGenerationCoordinator stableDiffusionService,
+        IGenerationTaskCoordinator generationTaskCoordinator,
         IServiceProvider serviceProvider,
         IImageService imageService,
         IPopupService popupService,
         ICheckpointSettingsService checkpointSettingsService,
-        ILoadingService loadingService) : base(loadingService)
+        IAnimationService animationService,
+        IToastService toastService,
+        IHapticsService hapticsService,
+        INavigationService navigationService,
+        ILoadingCoordinator loadingCoordinator) : base(loadingCoordinator, navigationService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
-        _generationTaskService = generationTaskService ?? throw new ArgumentNullException(nameof(generationTaskService));
+        _generationTaskCoordinator = generationTaskCoordinator ?? throw new ArgumentNullException(nameof(generationTaskCoordinator));
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
         _checkpointSettingsService = checkpointSettingsService ?? throw new ArgumentNullException(nameof(checkpointSettingsService));
+        _animationService = animationService ?? throw new ArgumentNullException(nameof(animationService));
+        _toastService = toastService ?? throw new ArgumentNullException(nameof(toastService));
+        _hapticsService = hapticsService ?? throw new ArgumentNullException(nameof(hapticsService));
     }
 
     public override async Task OnNavigatedToAsync()
     {
-        _generationTaskService.ProgressChanged += onGenerationProgressChanged;
-        _generationTaskService.Completed += onGenerationCompleted;
+        _generationTaskCoordinator.ProgressChanged += onGenerationProgressChanged;
+        _generationTaskCoordinator.Completed += onGenerationCompleted;
 
         await base.OnNavigatedToAsync();
 
-        if (_generationTaskService.IsRunning)
+        if (_generationTaskCoordinator.IsRunning)
         {
             IsGenerating = true;
         }
-        else if (_generationTaskService.LastResult != null)
+        else if (_generationTaskCoordinator.LastResult != null)
         {
             // Process the result that completed while we were away
-            onGenerationCompleted(this, _generationTaskService.LastResult);
+            onGenerationCompleted(this, _generationTaskCoordinator.LastResult);
         }
 
         await initializeStableDiffusionService();
@@ -102,8 +113,8 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
     public override async Task OnNavigatedFromAsync()
     {
-        _generationTaskService.ProgressChanged -= onGenerationProgressChanged;
-        _generationTaskService.Completed -= onGenerationCompleted;
+        _generationTaskCoordinator.ProgressChanged -= onGenerationProgressChanged;
+        _generationTaskCoordinator.Completed -= onGenerationCompleted;
 
         await base.OnNavigatedFromAsync();
     }
@@ -120,7 +131,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
         try
         {
-            await LoadingService.ShowAsync("Connecting...");
+            await LoadingCoordinator.ShowAsync("Connecting...");
 
             await _stableDiffusionService.InitializeAsync();
 
@@ -265,7 +276,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         }
         finally
         {
-            await LoadingService.HideAsync();
+            await LoadingCoordinator.HideAsync();
         }
 
         ServerConnected = true;
@@ -276,7 +287,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     [RelayCommand]
     private async Task Create()
     {
-        if (_generationTaskService.IsRunning)
+        if (_generationTaskCoordinator.IsRunning)
         {
             await _popupService.DisplayAlertAsync(
                 "Generation in progress",
@@ -302,7 +313,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                     var hasPreviouslyDenied = Preferences.Default.Get("NotificationPermissionDenied", false);
                     if (hasPreviouslyDenied)
                     {
-                        await CommunityToolkit.Maui.Alerts.Toast.Make("Enable notifications for background progress updates").Show();
+                        await _toastService.ShowAsync("Enable notifications for background progress updates");
                     }
                     else
                     {
@@ -427,7 +438,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                 _checkpointSettingsService.Save(_settings.Model.Key, checkpointSettings);
             }
 
-            await _generationTaskService.StartAsync(request);
+            await _generationTaskCoordinator.StartAsync(request);
         }
         catch (Exception e)
         {
@@ -504,13 +515,13 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                 }
             }
 
-            vibrate(HapticFeedbackType.LongPress);
+            vibrate(HapticType.LongPress);
         }
         finally
         {
             IsGenerating = false;
             DeviceDisplay.Current.KeepScreenOn = false;
-            _generationTaskService.ClearLastResult();
+            _generationTaskCoordinator.ClearLastResult();
         }
     }
 
@@ -518,14 +529,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     {
         _targetProgress = progress;
 
-        Shell.Current.CurrentPage.AbortAnimation("ProgressAnimation");
-
-        var animation = new Animation(value =>
-        {
-            Progress = (float)value;
-        }, Progress, _targetProgress, Easing.SinOut);
-
-        animation.Commit(Shell.Current.CurrentPage, "ProgressAnimation", length: 500);
+        _animationService.AnimateProgress(Progress, _targetProgress, value => Progress = value);
     }
 
     private Task<(string ImageString, int ActualWidth, int ActualHeight)> GetResizedImageStringFromSettingsAsync(PromptSettings settings, string sourceImageString, bool forceExactSize = false, bool filterImage = false)
@@ -579,13 +583,13 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     [RelayCommand]
     private async Task ShowAppSettings()
     {
-        await Shell.Current.GoToAsync("AppSettingsPage");
+        await NavigationService.GoToAsync("AppSettingsPage");
     }
 
     [RelayCommand]
     private async Task ShowHistory()
     {
-        await Shell.Current.GoToAsync("HistoryPage");
+        await NavigationService.GoToAsync("HistoryPage");
     }
 
     [RelayCommand]
@@ -593,7 +597,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     {
         try
         {
-            await _generationTaskService.CancelAsync();
+            await _generationTaskCoordinator.CancelAsync();
         }
         catch
         {
@@ -606,7 +610,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     {
         var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings } };
 
-        await Shell.Current.GoToAsync("ImageToImageSettingsPage", parameters);
+        await NavigationService.GoToAsync("ImageToImageSettingsPage", parameters);
     }
 
     [RelayCommand]
@@ -617,7 +621,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             { NavigationParams.PromptSettings, _settings },
         };
 
-        await Shell.Current.GoToAsync("PromptPage", parameters);
+        await NavigationService.GoToAsync("PromptPage", parameters);
     }
 
     [RelayCommand]
@@ -625,7 +629,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     {
         if (!_stableDiffusionService.Initialized)
         {
-            await LoadingService.ShowAsync("Initializing...");
+            await LoadingCoordinator.ShowAsync("Initializing...");
 
             try
             {
@@ -638,13 +642,13 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             }
             finally
             {
-                await LoadingService.HideAsync();
+                await LoadingCoordinator.HideAsync();
             }
         }
 
         var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings } };
 
-        await Shell.Current.GoToAsync("GenerationSettingsPage", parameters);
+        await NavigationService.GoToAsync("GenerationSettingsPage", parameters);
     }
 
 
@@ -659,7 +663,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
     [RelayCommand]
     private Task NavigateToAboutPage()
     {
-        return Shell.Current.GoToAsync("AboutPage");
+        return NavigationService.GoToAsync("AboutPage");
     }
 
     public override async void ApplyQueryAttributes(IDictionary<string, object>? query)
@@ -729,11 +733,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                     {NavigationParams.CanvasImageString, imageString}
                 };
 
-                await Shell.Current.Dispatcher.DispatchAsync(async () =>
-                {
-                    await Shell.Current.Navigation.PopToRootAsync();
-                    await Shell.Current.GoToAsync("///CanvasPageTab", parameters);
-                });
+                await NavigationService.PopToRootAndGoToAsync("///CanvasPageTab", parameters);
             }
         }
 
@@ -868,7 +868,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                 { NavigationParams.AppShareContentType, contentType }
             };
 
-            await Shell.Current.GoToAsync("///CanvasPageTab", parameters);
+            await NavigationService.GoToAsync("///CanvasPageTab", parameters);
         }
     }
 
@@ -904,7 +904,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         }
         catch
         {
-            await Toast.Make("Unable to load requested image. Please try again.").Show();
+            await _toastService.ShowAsync("Unable to load requested image. Please try again.");
             return;
         }
         finally
@@ -919,12 +919,9 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
         _initImageNeedsResize = true;
     }
 
-    private void vibrate(HapticFeedbackType type)
+    private void vibrate(HapticType type)
     {
-        if (HapticFeedback.Default.IsSupported)
-        {
-            HapticFeedback.Default.Perform(type);
-        }
+        _hapticsService.Perform(type);
     }
 
 }

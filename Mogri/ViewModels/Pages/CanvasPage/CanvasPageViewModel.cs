@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Mogri.Enums;
 using Mogri.Helpers;
+using Mogri.Interfaces.Coordinators;
 using Mogri.Interfaces.Services;
 using Mogri.Interfaces.ViewModels;
 using Mogri.Interfaces.ViewModels.Pages;
@@ -45,15 +46,18 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         ResolveText
     }
 
-    private readonly object _setSegmentationImageLock = new();
     private readonly SemaphoreSlim _autoMaskSaveLock = new(1, 1);
     private readonly ICanvasActionBitmapService _canvasActionBitmapService;
+    private readonly ICanvasSegmentationCoordinator _canvasSegmentationCoordinator;
+    private readonly ICanvasWorkflowCoordinator _canvasWorkflowCoordinator;
     private readonly IFileService _fileService;
     private readonly IImageService _imageService;
     private readonly ICanvasBitmapService _canvasBitmapService;
     private readonly IPopupService _popupService;
-    private readonly ISegmentationService _segmentationService;
     private readonly IPatchService _patchService;
+    private readonly IToastService _toastService;
+    private readonly IHapticsService _hapticsService;
+    private readonly IMainThreadService _mainThreadService;
 
     private int _imgRectIndex = 0;
     private List<int> _supportedImgRectSizes = new()
@@ -64,10 +68,6 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     private List<Color> _colorPalette = new();
     private Color _paletteIconDarkColor = Colors.Black;
     private string? _sourceFileName;
-    private bool _doingSegmentation = false;
-    private CancellationTokenSource? _setSegmentationImageCancellationTokenSource;
-    private int _setSegmentationImageRequestCount = 0;
-    private int _setSegmentationImageVersion = 0;
     private double _maskToolAlpha = DefaultMaskToolAlpha;
     private double _textToolAlpha = DefaultTextToolAlpha;
     private double _maskToolNoise = DefaultMaskToolNoise;
@@ -157,23 +157,34 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     // Root partial constructor sets up shared tool state; workflow and navigation logic live in sibling partials.
     public CanvasPageViewModel(
         ICanvasActionBitmapService canvasActionBitmapService,
+        ICanvasSegmentationCoordinator canvasSegmentationCoordinator,
+        ICanvasWorkflowCoordinator canvasWorkflowCoordinator,
         IFileService fileService,
         IPopupService popupService,
         IImageService imageService,
         ICanvasBitmapService canvasBitmapService,
-        ISegmentationService segmentationService,
         IPatchService patchService,
         ICanvasHistoryService canvasHistoryService,
-        ILoadingService loadingService) : base(loadingService)
+        IToastService toastService,
+        IHapticsService hapticsService,
+        IMainThreadService mainThreadService,
+        INavigationService navigationService,
+        ILoadingCoordinator loadingCoordinator) : base(loadingCoordinator, navigationService)
     {
         _canvasActionBitmapService = canvasActionBitmapService ?? throw new ArgumentNullException(nameof(canvasActionBitmapService));
+        _canvasSegmentationCoordinator = canvasSegmentationCoordinator ?? throw new ArgumentNullException(nameof(canvasSegmentationCoordinator));
+        _canvasWorkflowCoordinator = canvasWorkflowCoordinator ?? throw new ArgumentNullException(nameof(canvasWorkflowCoordinator));
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
         _canvasBitmapService = canvasBitmapService ?? throw new ArgumentNullException(nameof(canvasBitmapService));
-        _segmentationService = segmentationService ?? throw new ArgumentNullException(nameof(segmentationService));
         _patchService = patchService ?? throw new ArgumentNullException(nameof(patchService));
         _canvasHistoryService = canvasHistoryService ?? throw new ArgumentNullException(nameof(canvasHistoryService));
+        _toastService = toastService ?? throw new ArgumentNullException(nameof(toastService));
+        _hapticsService = hapticsService ?? throw new ArgumentNullException(nameof(hapticsService));
+        _mainThreadService = mainThreadService ?? throw new ArgumentNullException(nameof(mainThreadService));
+
+        _canvasSegmentationCoordinator.ImageStateChanged += onSegmentationImageStateChanged;
 
         // Precompute the noise bitmap on a background thread so the first stroke is smooth
         NoiseShaderHelper.Initialize();
@@ -305,10 +316,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     {
         try
         {
-            if (HapticFeedback.Default.IsSupported)
-            {
-                HapticFeedback.Default.Perform(HapticFeedbackType.Click);
-            }
+            _hapticsService.Perform(HapticType.Click);
 
             var parameters = new Dictionary<string, object> {
                 { NavigationParams.Color, CurrentColor },
@@ -324,7 +332,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         }
         catch (Exception)
         {
-            await Toast.Make("Unable to show color picker.").Show();
+            await _toastService.ShowAsync("Unable to show color picker.");
         }
     }
 
@@ -456,7 +464,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     {
         ShowActions = !ShowActions;
 
-        vibrate(HapticFeedbackType.Click);
+        vibrate(HapticType.Click);
     }
 
     public override bool OnBackButtonPressed()
@@ -470,11 +478,8 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
         return base.OnBackButtonPressed();
     }
 
-    private void vibrate(HapticFeedbackType type)
+    private void vibrate(HapticType type)
     {
-        if (HapticFeedback.Default.IsSupported)
-        {
-            HapticFeedback.Default.Perform(type);
-        }
+        _hapticsService.Perform(type);
     }
 }

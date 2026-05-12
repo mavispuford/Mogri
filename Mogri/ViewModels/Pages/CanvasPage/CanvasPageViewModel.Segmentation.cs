@@ -1,6 +1,6 @@
-using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Mvvm.Input;
 using Mogri.Enums;
+using Mogri.Models;
 using SkiaSharp;
 
 namespace Mogri.ViewModels;
@@ -12,93 +12,13 @@ public partial class CanvasPageViewModel
 {
     private async Task updateSegmentationImageAsync(SKBitmap bitmap)
     {
-        // Latest-wins guard for SourceBitmap changes. A canceled older request can still finish later,
-        // so only the newest version is allowed to publish its result.
-
-        var magicWandTool = AvailableTools.FirstOrDefault(t => t.Type == ToolType.MagicWand);
-        CancellationTokenSource? previousSetSegmentationImageCancellationTokenSource;
-        CancellationTokenSource currentSetSegmentationImageCancellationTokenSource;
-        int currentSetSegmentationImageVersion;
-
-        lock (_setSegmentationImageLock)
-        {
-            _setSegmentationImageRequestCount++;
-            _setSegmentationImageVersion++;
-            currentSetSegmentationImageVersion = _setSegmentationImageVersion;
-
-            // Swap in a new token source under the lock so the previous request can be canceled
-            // after the new request is fully registered as the current one.
-            previousSetSegmentationImageCancellationTokenSource = _setSegmentationImageCancellationTokenSource;
-            currentSetSegmentationImageCancellationTokenSource = new CancellationTokenSource();
-            _setSegmentationImageCancellationTokenSource = currentSetSegmentationImageCancellationTokenSource;
-
-            HasSegmentationImage = false;
-
-            if (magicWandTool != null)
-            {
-                magicWandTool.IsLoading = true;
-            }
-
-            SettingSegmentationImage = true;
-        }
-
-        if (previousSetSegmentationImageCancellationTokenSource != null)
-        {
-            if (!previousSetSegmentationImageCancellationTokenSource.IsCancellationRequested)
-            {
-                previousSetSegmentationImageCancellationTokenSource.Cancel();
-            }
-
-            previousSetSegmentationImageCancellationTokenSource.Dispose();
-        }
-
-        var hasSegmentationImage = false;
-
-        try
-        {
-            hasSegmentationImage = await _segmentationService.SetImage(bitmap, currentSetSegmentationImageCancellationTokenSource.Token);
-        }
-        finally
-        {
-            var shouldDisposeCurrentSetSegmentationImageCancellationTokenSource = false;
-
-            lock (_setSegmentationImageLock)
-            {
-                // A stale request may still complete after cancellation, but it must not change the
-                // UI flags if a newer SourceBitmap has already started processing.
-                if (currentSetSegmentationImageVersion == _setSegmentationImageVersion)
-                {
-                    HasSegmentationImage = hasSegmentationImage;
-                }
-
-                _setSegmentationImageRequestCount--;
-
-                SettingSegmentationImage = _setSegmentationImageRequestCount > 0;
-
-                if (magicWandTool != null)
-                {
-                    magicWandTool.IsLoading = _setSegmentationImageRequestCount > 0;
-                }
-
-                if (ReferenceEquals(_setSegmentationImageCancellationTokenSource, currentSetSegmentationImageCancellationTokenSource))
-                {
-                    _setSegmentationImageCancellationTokenSource = null;
-                    shouldDisposeCurrentSetSegmentationImageCancellationTokenSource = true;
-                }
-            }
-
-            if (shouldDisposeCurrentSetSegmentationImageCancellationTokenSource)
-            {
-                currentSetSegmentationImageCancellationTokenSource.Dispose();
-            }
-        }
+        await _canvasSegmentationCoordinator.SetImageAsync(bitmap);
     }
 
     [RelayCommand]
     private async Task DoSegmentation(SKPoint[] points)
     {
-        if (_doingSegmentation ||
-            points == null ||
+        if (points == null ||
             points.Length == 0)
         {
             return;
@@ -127,67 +47,37 @@ public partial class CanvasPageViewModel
 
         try
         {
-            _doingSegmentation = true;
             IsBusy = true;
 
-            var maskBitmap = await _segmentationService.DoSegmentation(points);
-
-            if (maskBitmap != null)
+            var segmentationResult = await _canvasSegmentationCoordinator.DoSegmentationAsync(new CanvasSegmentationRequest
             {
-                if (SegmentationBitmap == null)
-                {
-                    SegmentationBitmap = maskBitmap;
-                }
-                else
-                {
-                    var newBitmap = new SKBitmap(SegmentationBitmap.Info);
+                Points = points,
+                CurrentSegmentationBitmap = SegmentationBitmap,
+                SegmentationAdd = SegmentationAdd
+            });
 
-                    using (var combineCanvas = new SKCanvas(newBitmap))
-                    {
-                        var paint = new SKPaint
-                        {
-                            BlendMode = SKBlendMode.SrcOver
-                        };
-
-                        combineCanvas.DrawBitmap(SegmentationBitmap, 0, 0, paint);
-
-                        paint.BlendMode = SegmentationAdd ? SKBlendMode.SrcOver : SKBlendMode.DstOut;
-
-                        combineCanvas.DrawBitmap(maskBitmap, 0, 0, paint);
-                    }
-
-                    SegmentationBitmap?.Dispose();
-                    SegmentationBitmap = null;
-
-                    SegmentationBitmap = newBitmap;
-                }
+            if (segmentationResult != null)
+            {
+                SegmentationBitmap?.Dispose();
+                SegmentationBitmap = segmentationResult.SegmentationBitmap;
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            await Toast.Make("Failed to perform segmentation.").Show();
+            await _toastService.ShowAsync("Failed to perform segmentation.");
         }
         finally
         {
             IsBusy = false;
-            _doingSegmentation = false;
         }
     }
 
     [RelayCommand]
     private async Task InvertSegmentationMask()
     {
-        if (SegmentationBitmap == null)
+        if (SegmentationBitmap == null && SourceBitmap == null)
         {
-            if (SourceBitmap == null) return;
-
-            // If no existing segmentation mask, the inverted state is simply a completely filled mask
-            var fullMask = new SKBitmap(SourceBitmap.Info);
-            using var canvas = new SKCanvas(fullMask);
-            canvas.Clear(_segmentationService.MaskColor);
-
-            SegmentationBitmap = fullMask;
             return;
         }
 
@@ -195,22 +85,23 @@ public partial class CanvasPageViewModel
         {
             IsBusy = true;
 
-            var invertedBitmap = await Task.Run(() =>
+            var invertResult = await _canvasSegmentationCoordinator.InvertMaskAsync(new CanvasSegmentationInvertRequest
             {
-                return _segmentationService.InvertMask(SegmentationBitmap);
+                CurrentSegmentationBitmap = SegmentationBitmap,
+                SourceImageInfo = SourceBitmap?.Info
             });
 
-            var oldBitmap = SegmentationBitmap;
-            SegmentationBitmap = invertedBitmap;
-            oldBitmap?.Dispose();
-
-            // Reset SAM state so subsequent taps start fresh instead of building on the pre-inverted state
-            _segmentationService.Reset();
+            if (invertResult != null)
+            {
+                var oldBitmap = SegmentationBitmap;
+                SegmentationBitmap = invertResult.SegmentationBitmap;
+                oldBitmap?.Dispose();
+            }
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            await Toast.Make("Failed to invert mask.").Show();
+            await _toastService.ShowAsync("Failed to invert mask.");
         }
         finally
         {
@@ -230,10 +121,11 @@ public partial class CanvasPageViewModel
         {
             IsBusy = true;
 
-            var maskBitmap = await Task.Run(() =>
+            var maskBitmap = await _canvasSegmentationCoordinator.CreateMaskBitmapFromSegmentationAsync(SegmentationBitmap);
+            if (maskBitmap == null)
             {
-                return _canvasBitmapService.CreateMaskBitmapFromSegmentationMask(SegmentationBitmap);
-            });
+                return;
+            }
 
             var segmentationMask = new SegmentationMaskViewModel
             {
@@ -252,7 +144,7 @@ public partial class CanvasPageViewModel
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            await Toast.Make("Failed to apply mask.").Show();
+            await _toastService.ShowAsync("Failed to apply mask.");
         }
         finally
         {
@@ -265,7 +157,7 @@ public partial class CanvasPageViewModel
     {
         SegmentationBitmap?.Dispose();
         SegmentationBitmap = null;
-        _segmentationService.Reset();
+        _canvasSegmentationCoordinator.Reset();
     }
 
     [RelayCommand]
@@ -273,6 +165,21 @@ public partial class CanvasPageViewModel
     {
         SegmentationAdd = !SegmentationAdd;
 
-        _segmentationService.Reset();
+        _canvasSegmentationCoordinator.Reset();
+    }
+
+    private void onSegmentationImageStateChanged(object? sender, CanvasSegmentationImageStateChangedEventArgs e)
+    {
+        _ = _mainThreadService.InvokeOnMainThreadAsync(() =>
+        {
+            HasSegmentationImage = e.HasSegmentationImage;
+            SettingSegmentationImage = e.IsSettingImage;
+
+            var magicWandTool = AvailableTools.FirstOrDefault(t => t.Type == ToolType.MagicWand);
+            if (magicWandTool != null)
+            {
+                magicWandTool.IsLoading = e.IsSettingImage;
+            }
+        });
     }
 }

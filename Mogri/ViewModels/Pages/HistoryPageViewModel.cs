@@ -1,11 +1,11 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mogri.Interfaces.Coordinators;
 using Mogri.Interfaces.Services;
 using Mogri.Interfaces.ViewModels;
 using Mogri.Interfaces.ViewModels.Pages;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
 
 namespace Mogri.ViewModels;
@@ -19,6 +19,8 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     private readonly IHistoryService _historyService;
     private readonly IServiceProvider _serviceProvider;
     private readonly IPopupService _popupService;
+    private readonly IToastService _toastService;
+    private readonly IMainThreadService _mainThreadService;
 
     private int itemIndex = 0;
     private const int itemTakeCount = 12;
@@ -62,19 +64,15 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
             if (Application.Current != null)
             {
-                var dispatcher = Shell.Current?.Dispatcher;
-                if (dispatcher != null)
+                await _mainThreadService.InvokeOnMainThreadAsync(async () =>
                 {
-                    await dispatcher.DispatchAsync(async () =>
+                    itemIndex = 0;
+                    HistoryItems.Clear();
+                    if (LoadItemsCommand != null)
                     {
-                        itemIndex = 0;
-                        HistoryItems.Clear();
-                        if (LoadItemsCommand != null)
-                        {
-                            await LoadItemsCommand.ExecuteAsync(null);
-                        }
-                    });
-                }
+                        await LoadItemsCommand.ExecuteAsync(null);
+                    }
+                });
             }
         });
     }
@@ -88,13 +86,18 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         IHistoryService historyService,
         IServiceProvider serviceProvider,
         IPopupService popupService,
-        ILoadingService loadingService) : base(loadingService)
+        IToastService toastService,
+        IMainThreadService mainThreadService,
+        INavigationService navigationService,
+        ILoadingCoordinator loadingCoordinator) : base(loadingCoordinator, navigationService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
         _historyService = historyService ?? throw new ArgumentNullException(nameof(historyService));
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
+        _toastService = toastService ?? throw new ArgumentNullException(nameof(toastService));
+        _mainThreadService = mainThreadService ?? throw new ArgumentNullException(nameof(mainThreadService));
     }
 
     public override async Task OnNavigatedToAsync()
@@ -111,7 +114,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
                 if (Application.Current != null)
                 {
-                    await Shell.Current.Dispatcher.DispatchAsync(async () =>
+                    await _mainThreadService.InvokeOnMainThreadAsync(async () =>
                     {
                         if (hasChanges || HistoryItems.Count == 0 || !string.IsNullOrWhiteSpace(SearchText))
                         {
@@ -175,7 +178,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
             result.ContainsKey(NavigationParams.InitImgString) ||
             result.ContainsKey(NavigationParams.CanvasImageString))
         {
-            await Shell.Current.GoToAsync("..", result);
+            await NavigationService.GoBackAsync(result);
         }
 
         if (result.TryGetValue(NavigationParams.DeletedHistoryItem, out var deletedItem) && deletedItem is IHistoryItemViewModel deletedHistoryItem)
@@ -327,7 +330,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         }
         catch (Exception ex)
         {
-            await Toast.Make($"Failed to delete items: {ex.Message}").Show();
+            await _toastService.ShowAsync($"Failed to delete items: {ex.Message}");
         }
     }
 

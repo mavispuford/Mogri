@@ -68,7 +68,7 @@ namespace Mogri.Platforms.Android.Services
         {
             base.OnTaskRemoved(rootIntent);
             
-            // The actual cancellation will be handled by the AndroidGenerationTaskService
+            // The actual cancellation is handled by the AndroidGenerationTaskCoordinator
             // when it detects the service is stopping, or we could expose an event here.
             // For now, just stop the service.
             StopForegroundService();

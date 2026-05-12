@@ -39,6 +39,7 @@ public static class MauiProgram
             .UseMauiCommunityToolkit()
             .ConfigureMopups()
             .RegisterServices()
+            .RegisterCoordinators()
             .RegisterViewModels()
             .RegisterViews()
             .RegisterPopups();

@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mogri.Enums;
+using Mogri.Interfaces.Coordinators;
 using Mogri.Interfaces.Services;
 using Mogri.Interfaces.ViewModels;
 using Mogri.Interfaces.ViewModels.Pages;
@@ -10,7 +11,7 @@ namespace Mogri.ViewModels;
 
 public partial class GenerationSettingsPageViewModel : PageViewModel, IGenerationSettingsPageViewModel
 {
-    private readonly IImageGenerationService _stableDiffusionService;
+    private readonly IImageGenerationCoordinator _stableDiffusionService;
     private readonly IPopupService _popupService;
     private readonly IPresetService _presetService;
 
@@ -223,10 +224,11 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
     }
 
     public GenerationSettingsPageViewModel(
-        IImageGenerationService stableDiffusionService,
+        IImageGenerationCoordinator stableDiffusionService,
         IPopupService popupService,
-        ILoadingService loadingService,
-        IPresetService presetService) : base(loadingService)
+        INavigationService navigationService,
+        ILoadingCoordinator loadingCoordinator,
+        IPresetService presetService) : base(loadingCoordinator, navigationService)
     {
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
@@ -341,13 +343,13 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
     [RelayCommand]
     private async Task Cancel()
     {
-        await Shell.Current.GoToAsync("..");
+        await NavigationService.GoBackAsync();
     }
 
     [RelayCommand]
     private async Task ConfirmSettings()
     {
-        await LoadingService.ShowAsync("Saving...");
+        await LoadingCoordinator.ShowAsync("Saving...");
 
         try
         {
@@ -392,11 +394,11 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
 
             var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings } };
 
-            await Shell.Current.GoToAsync("..", parameters);
+            await NavigationService.GoBackAsync(parameters);
         }
         finally
         {
-            await LoadingService.HideAsync();
+            await LoadingCoordinator.HideAsync();
         }
 
     }

@@ -1,12 +1,11 @@
-using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mogri.Interfaces.Coordinators;
 using Mogri.Interfaces.Services;
 using Mogri.Interfaces.ViewModels;
 using Mogri.Interfaces.ViewModels.Popups;
 using SkiaSharp;
 using SkiaSharp.Views.Maui.Controls;
-using Microsoft.Maui.ApplicationModel;
 using Mogri.Models;
 
 namespace Mogri.ViewModels;
@@ -15,7 +14,9 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
 {
     private readonly IFileService _fileService;
     private readonly IImageService _imageService;
-    private readonly IImageGenerationService _stableDiffusionService;
+    private readonly IImageGenerationCoordinator _stableDiffusionService;
+    private readonly IToastService _toastService;
+    private readonly IMainThreadService _mainThreadService;
 
     private IList<IHistoryItemViewModel>? _historyItems;
 
@@ -29,11 +30,15 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
         IPopupService popupService,
         IFileService fileService,
         IImageService imageService,
-        IImageGenerationService stableDiffusionService) : base(popupService)
+        IImageGenerationCoordinator stableDiffusionService,
+        IToastService toastService,
+        IMainThreadService mainThreadService) : base(popupService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
+        _toastService = toastService ?? throw new ArgumentNullException(nameof(toastService));
+        _mainThreadService = mainThreadService ?? throw new ArgumentNullException(nameof(mainThreadService));
     }
 
     public override async void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -109,7 +114,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
                 };
             });
 
-            MainThread.BeginInvokeOnMainThread(() =>
+            await _mainThreadService.InvokeOnMainThreadAsync(() =>
             {
                 if (HistoryItem == currentItem && imageSource != null)
                 {
@@ -132,7 +137,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
 
                 var imageInfoSettings = await _stableDiffusionService.GetImageInfoAsync(formattedImageString);
 
-                MainThread.BeginInvokeOnMainThread(() =>
+                await _mainThreadService.InvokeOnMainThreadAsync(() =>
                 {
                     currentItem.Settings = imageInfoSettings;
                     
@@ -213,7 +218,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
 
         await _fileService.WriteImageFileToExternalStorageAsync(Path.GetFileName(HistoryItem.FileName), stream);
 
-        await Toast.Make("Image saved.").Show();
+        await _toastService.ShowAsync("Image saved.");
     }
 
     [RelayCommand]

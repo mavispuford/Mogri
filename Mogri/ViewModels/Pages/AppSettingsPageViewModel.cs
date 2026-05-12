@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mogri.Interfaces.Coordinators;
 using Mogri.Interfaces.Services;
 using Mogri.Interfaces.ViewModels;
 using Mogri.Interfaces.ViewModels.Pages;
@@ -35,12 +36,13 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
     public bool IsServerUrlVisible => SelectedBackend != "Comfy Cloud";
 
     public AppSettingsPageViewModel(
-        ILoadingService loadingService,
+        ILoadingCoordinator loadingCoordinator,
         IBackendRegistry backendRegistry,
-        IPopupService popupService) : base(loadingService)
+        IPopupService popupService,
+        INavigationService navigationService) : base(loadingCoordinator, navigationService)
     {
-        _backendRegistry = backendRegistry;
-        _popupService = popupService;
+        _backendRegistry = backendRegistry ?? throw new ArgumentNullException(nameof(backendRegistry));
+        _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
         
         ServerUrl = Preferences.Default.Get(Constants.PreferenceKeys.ServerUrl, string.Empty);
         ComfyCloudApiKey = Preferences.Default.Get(Constants.PreferenceKeys.ComfyCloudApiKey, string.Empty);
@@ -54,7 +56,7 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
     [RelayCommand]
     private async Task Cancel()
     {
-        await Shell.Current.GoToAsync("..");
+        await NavigationService.GoBackAsync();
     }
 
     [RelayCommand]
@@ -86,7 +88,7 @@ internal partial class AppSettingsPageViewModel : PageViewModel, IAppSettingsPag
 
         var parameters = new Dictionary<string, object> { { NavigationParams.ForceReinitialize, true } };
 
-        await Shell.Current.GoToAsync("..", parameters);
+        await NavigationService.GoBackAsync(parameters);
     }
 
     [RelayCommand]

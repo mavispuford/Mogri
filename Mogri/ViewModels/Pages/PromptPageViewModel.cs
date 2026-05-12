@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
+using Mogri.Interfaces.Coordinators;
 using Mogri.Interfaces.Services;
 using Mogri.Interfaces.ViewModels;
 using Mogri.Interfaces.ViewModels.Pages;
@@ -12,10 +13,11 @@ namespace Mogri.ViewModels;
 
 public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
 {
-    private readonly IImageGenerationService _stableDiffusionService;
+    private readonly IImageGenerationCoordinator _stableDiffusionService;
     private readonly IPromptStyleService _promptStyleService;
     private readonly IPopupService _popupService;
     private readonly IServiceProvider _serviceProvider;
+    private readonly IMainThreadService _mainThreadService;
 
     private PromptSettings? _settings;
 
@@ -41,16 +43,19 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
     public partial ObservableCollection<IPromptStyleViewModel> SelectedPromptStyles { get; set; } = new();
 
     public PromptPageViewModel(
-        IImageGenerationService stableDiffusionService,
-        ILoadingService loadingService,
+        IImageGenerationCoordinator stableDiffusionService,
+        ILoadingCoordinator loadingCoordinator,
         IPopupService popupService,
         IPromptStyleService promptStyleService,
-        IServiceProvider serviceProvider) : base(loadingService)
+        IServiceProvider serviceProvider,
+        IMainThreadService mainThreadService,
+        INavigationService navigationService) : base(loadingCoordinator, navigationService)
     {
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
         _promptStyleService = promptStyleService ?? throw new ArgumentNullException(nameof(promptStyleService));
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+        _mainThreadService = mainThreadService ?? throw new ArgumentNullException(nameof(mainThreadService));
     }
 
     [RelayCommand]
@@ -112,23 +117,22 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
 
                     if (_settings.PromptStyles?.Any() == true)
                     {
-                        var matchingStyles = AvailablePromptStyles.Where(a => _settings.PromptStyles.Any(p => p.Name.Equals(a.Name, StringComparison.Ordinal)));
+                        var matchingStyles = AvailablePromptStyles
+                            .Where(a => _settings.PromptStyles.Any(p => p.Name.Equals(a.Name, StringComparison.Ordinal)))
+                            .ToList();
 
-                        foreach (var style in SelectedPromptStyles.Where(l => !matchingStyles.Any(ms => ms.Name == l.Name)))
+                        await _mainThreadService.InvokeOnMainThreadAsync(() =>
                         {
-                            Shell.Current.Dispatcher.Dispatch(() =>
+                            foreach (var style in SelectedPromptStyles.Where(l => !matchingStyles.Any(ms => ms.Name == l.Name)).ToList())
                             {
                                 SelectedPromptStyles.Remove(style);
-                            });
-                        }
+                            }
 
-                        foreach (var style in matchingStyles.Where(s => !SelectedPromptStyles.Any(sl => sl.Name == s.Name)))
-                        {
-                            Shell.Current.Dispatcher.Dispatch(() =>
+                            foreach (var style in matchingStyles.Where(s => !SelectedPromptStyles.Any(sl => sl.Name == s.Name)).ToList())
                             {
                                 SelectedPromptStyles.Add(style);
-                            });
-                        }
+                            }
+                        });
                     }
                 }),
                 Task.Run(async () =>
@@ -137,23 +141,22 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
 
                     if (_settings.Loras?.Any() == true)
                     {
-                        var matchingLoras = AvailableLoras.SelectMany(a => _settings.Loras.Where(p => p.Name.Equals(a.Name, StringComparison.Ordinal)));
+                        var matchingLoras = AvailableLoras
+                            .SelectMany(a => _settings.Loras.Where(p => p.Name.Equals(a.Name, StringComparison.Ordinal)))
+                            .ToList();
 
-                        foreach (var lora in SelectedLoras.Where(l => !matchingLoras.Any(ml => ml.Name == l.Name)))
+                        await _mainThreadService.InvokeOnMainThreadAsync(() =>
                         {
-                            Shell.Current.Dispatcher.Dispatch(() =>
+                            foreach (var lora in SelectedLoras.Where(l => !matchingLoras.Any(ml => ml.Name == l.Name)).ToList())
                             {
                                 SelectedLoras.Remove(lora);
-                            });
-                        }
+                            }
 
-                        foreach (var lora in matchingLoras.Where(l => !SelectedLoras.Any(sl => sl.Name == l.Name)))
-                        {
-                            Shell.Current.Dispatcher.Dispatch(() =>
+                            foreach (var lora in matchingLoras.Where(l => !SelectedLoras.Any(sl => sl.Name == l.Name)).ToList())
                             {
                                 SelectedLoras.Add(lora);
-                            });
-                        }
+                            }
+                        });
                     }
                 }));
         }
@@ -223,7 +226,7 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
             {NavigationParams.PromptSettings, _settings.Clone() }
         };
 
-        await Shell.Current.GoToAsync("LoraSelectionPage", parameters);
+        await NavigationService.GoToAsync("LoraSelectionPage", parameters);
     }
 
     [RelayCommand]
@@ -238,7 +241,7 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
             {NavigationParams.PromptSettings, _settings.Clone() }
         };
 
-        await Shell.Current.GoToAsync("PromptStyleSelectionPage", parameters);
+        await NavigationService.GoToAsync("PromptStyleSelectionPage", parameters);
     }
 
     [RelayCommand]
@@ -253,7 +256,7 @@ public partial class PromptPageViewModel : PageViewModel, IPromptPageViewModel
             { NavigationParams.PromptSettings, _settings }
         };
 
-        await Shell.Current.GoToAsync("..", parameters);
+        await NavigationService.GoBackAsync(parameters);
     }
 
     private void SetPromptsOnSettings()

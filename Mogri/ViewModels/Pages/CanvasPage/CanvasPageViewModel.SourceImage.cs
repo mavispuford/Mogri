@@ -1,4 +1,3 @@
-using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Mvvm.Input;
 using Mogri.Enums;
 using SkiaSharp;
@@ -128,7 +127,7 @@ public partial class CanvasPageViewModel
         }
         catch (Exception)
         {
-            await Toast.Make("Unable to load image. Please check permissions and try again.").Show();
+            await _toastService.ShowAsync("Unable to load image. Please check permissions and try again.");
         }
     }
 
@@ -176,18 +175,10 @@ public partial class CanvasPageViewModel
 
             // Wrap in dispatch call because ApplyQueryAttributes can call this method and it
             // appears to be called from a non-UI thread.
-            var dispatcher = Dispatcher.GetForCurrentThread();
-            if (dispatcher != null)
-            {
-                await dispatcher.DispatchAsync(() =>
-                {
-                    SourceBitmap = sourceBitmap;
-                });
-            }
-            else
+            await _mainThreadService.InvokeOnMainThreadAsync(() =>
             {
                 SourceBitmap = sourceBitmap;
-            }
+            });
 
             _sourceFileName = fileName;
             await clearAllActionsAndHistoryAsync();
@@ -217,17 +208,7 @@ public partial class CanvasPageViewModel
                 restoreTextElements(mask.TextElements);
             }
 
-            if (dispatcher != null)
-            {
-                await dispatcher.DispatchAsync(() =>
-                {
-                    restorePersistedCanvasState();
-                });
-            }
-            else
-            {
-                restorePersistedCanvasState();
-            }
+            await _mainThreadService.InvokeOnMainThreadAsync(restorePersistedCanvasState);
         }
         catch (Exception ex)
         {

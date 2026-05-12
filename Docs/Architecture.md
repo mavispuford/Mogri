@@ -20,24 +20,41 @@ This .NET MAUI application follows the MVVM pattern. It consists mainly of these
 
 ### View Models 
 - Exposed via interfaces (ie. `IMainPageViewModel`) and registered in a dependency container in `ViewModelRegistrations.cs`
-- This is the glue that ties the views to the business logic, coordinating calls between the view and the services
+- This is the glue that ties the views to the business logic, coordinating calls between the view, leaf services, and any orchestration-heavy coordinators
 - The aim is not to contain business logic, but to bind Commands and other properties to the view, and to call the `Services` that actually perform the business logic
 - The View Model is also supposed to handle `Exceptions` thrown from the `Services`, and display them in a user friendly way
 - For example, the user taps a `Save` button, which executes a `SaveCommand`, which calls a `Save()` medthod on the `View Model`, which calls a `SaveAsync()` method on some `Service`.  The `Service` either succeeds (and returns relevant data to the `ViewModel` class) or throws an exception, which the `View Model` handles in some way (calling a service to display an alert to the user, show/hide a loading spinner, etc.)
 - All ViewModels inherit from `BaseViewModel` and `ObservableObject`, leveraging CommunityToolkit source generators (e.g., `[ObservableProperty]`, `[RelayCommand]`) to reduce boilerplate. More specific view models extend other classes as a base. For example,
   - Page view models always extend `PageViewModel`
   - Popup view models always extend `PopupBaseViewModel`
-- `View Models` handle navigation between pages and showing/hiding alerts, action sheets, popups, etc.
+- `View Models` may depend on approved framework adapter services such as `IPopupService`, `INavigationService`, `IToastService`, `IHapticsService`, `IAnimationService`, and `IMainThreadService`, but multi-step orchestration should move to `Coordinators`
+- When a flow needs to sequence multiple services, manage workflow state or cancellation, or mix business work with loading/navigation/toast feedback, move that flow into a `Coordinator`
 - `ViewModel` classes should never contain view/business logic
+
+### Coordinators
+- Exposed via interfaces and registered separately from leaf services so orchestration stays visible in DI
+- Own multi-step workflows that sequence calls across `Services`, `Clients`, `Helpers`, and approved framework adapter services
+- Good fit for branch-heavy logic, long-running flows, cancellation ownership, loading state, and backend-selection or navigation orchestration
+- Should accept explicit request data and return explicit results when that keeps `ViewModels` thin and testable
+- Must not depend on `Views` or `ViewModels` directly
 
 ### Services
 - Exposed via interfaces (ie. `IFileService`) and registered in a dependency container in `ServiceRegistrations.cs`
 - Constructor injected by the `View Models` by their interface, and called by the `View Model`
-- Performs business logic and other common code for the `View Model`, such as API calls via HTTP clients, file operations, showing/hiding alert dialogs/action sheets/popups/etc, saving app settings, image segmentation, image operations, and more.
+- Performs leaf business logic and reusable capabilities such as API calls via HTTP clients, file operations, saving app settings, image segmentation, and image operations.
+- A `Service` should expose one reusable capability. If a type mostly sequences other services or combines business work with loading/navigation/toast feedback, it belongs in `Coordinators` instead.
 - Services managing heavy resources (like `SegmentationService` with AI models) implement `IDisposable` and are responsible for resource cleanup.
 - Services may be stateful singletons (e.g., maintaining connection status or loaded models) and are registered as such.
 - Long-running background tasks (like image generation) are abstracted behind cross-platform service interfaces, allowing platform-specific implementations (like Android Foreground Services) to continue running when the app is backgrounded.
-- `Services` are expected to throw exceptions when errors happen, leaving it to the `View Model` to handle them gracefully
+- `Services` are expected to throw exceptions when errors happen, leaving it to the `View Model` or `Coordinator` to handle them gracefully
+- Leaf `Services` should not depend on `Coordinators`, and service-to-service dependencies should be rare and justified
+
+### Framework Adapter Services
+- Framework adapter services are a small subset of `Services` whose job is to wrap UI or runtime APIs that should not leak through shared layers
+- `IPopupService` is the existing adapter service. `INavigationService`, `IToastService`, `IHapticsService`, `IAnimationService`, and `IMainThreadService` belong in the same category
+- `ViewModels` and `Coordinators` may depend on these adapters
+- Regular leaf `Services` should generally not depend on them. If a platform boundary still requires one, document that exception explicitly
+- Adapter implementations are the approved home for direct `Shell.Current`, `Toast.Make`, `HapticFeedback`, `MainThread`, `Dispatcher`, page animation APIs, `Mopups`, and similar framework calls
 
 ### Clients
 - Located in the `Clients` namespace and folder
@@ -55,6 +72,7 @@ This .NET MAUI application follows the MVVM pattern. It consists mainly of these
 - The registrations tie the `Interfaces` to their `Implementations`
 - The application currently uses Microsoft's dependency container
 - Registrations are implemented as extension methods on `MauiAppBuilder` (e.g., `.RegisterServices()`) to keep `MauiProgram.cs` clean and organized.
+- Keep coordinator registrations in a separate extension so workflow registrations stay distinct from leaf service registrations
 
 ### Dependency Injection
 - Classes that require things from the dependency container should inject them in their constructor.
@@ -87,6 +105,36 @@ foreach (var item in items)
 ### OpenAPI Specs
 - The `OpenApiSpecs` folder contains OpenAPI specifications for the APIs that the app targets (for example, the `SdForgeNeo` folder has the openapi specs for SD Forge Neo, and `ComfyUi` for ComfyUI)
 - Each OpenAPI spec folder should have a `README.md` file that contains any details about that API spec (gotchas, modifications, commands for code generation, etc.)
+
+## Dependency Direction
+
+The dependency flow is:
+
+- `Views` -> `ViewModels`
+- `ViewModels` -> `Coordinators`, leaf `Services`, framework adapter services
+- `Coordinators` -> leaf `Services`, `Clients`, `Helpers`, framework adapter services
+- Leaf `Services` -> `Clients`, `Helpers`, platform/runtime libraries
+- Framework adapter services -> MAUI, CommunityToolkit, Mopups, and platform UI/runtime APIs
+- `Clients` -> generated API clients, HTTP plumbing, DTO mapping
+- `Helpers` -> static reusable logic with no DI-managed workflow responsibility
+
+The following directions are intentionally disallowed unless a documented exception says otherwise:
+
+- `Services` -> `Coordinators`
+- `Coordinators` -> `ViewModels` or `Views`
+- `ViewModels` -> `Clients`
+- Non-view layers -> direct `Shell.Current`, `Toast.Make`, `HapticFeedback`, `MainThread`, or `Dispatcher` usage when an approved adapter exists
+
+## Service vs Coordinator Decision Rule
+
+- Keep code in `Services` when it represents one reusable capability, even if it is stateful, resource-heavy, or platform-specific
+- Move code to `Coordinators` when it sequences multiple capabilities, owns workflow or cancellation state, switches between backends, or combines business work with loading/navigation/toast/popup feedback
+- Treat infrastructure bridges and platform-bound exceptions as explicit exceptions, not silent rule breaks
+
+
+## Current Exceptions
+
+- `AndroidFileService` and `IosFileService` still use `IPopupService` for permission messaging until a narrower permission adapter exists
 
 ## Key Frameworks & Libraries
 - **CommunityToolkit.Mvvm**: Heavily used for MVVM implementation (Source Generators for Observables and Commands)

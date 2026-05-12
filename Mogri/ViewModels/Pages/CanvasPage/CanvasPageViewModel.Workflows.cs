@@ -1,7 +1,6 @@
-using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Mvvm.Input;
 using Mogri.Enums;
-using Mogri.Helpers;
+using Mogri.Interfaces.Services;
 using Mogri.Models;
 using SkiaSharp;
 
@@ -24,7 +23,7 @@ public partial class CanvasPageViewModel
     {
         if (SourceBitmap == null)
         {
-            await Toast.Make("There is no image to save.").Show();
+            await _toastService.ShowAsync("There is no image to save.");
 
             return;
         }
@@ -66,7 +65,7 @@ public partial class CanvasPageViewModel
 
         if (SourceBitmap == null)
         {
-            await Toast.Make("There is no image to send.").Show();
+            await _toastService.ShowAsync("There is no image to send.");
 
             return;
         }
@@ -86,7 +85,7 @@ public partial class CanvasPageViewModel
 
         if (SourceBitmap == null)
         {
-            await Toast.Make("There is no image data to crop.").Show();
+            await _toastService.ShowAsync("There is no image data to crop.");
 
             return;
         }
@@ -104,34 +103,15 @@ public partial class CanvasPageViewModel
     {
         await ExecuteWithPreparedSourceBitmapAsync(result, async (sourceBitmap, _) =>
         {
-            await Task.Run(async () =>
+            try
             {
-                var dispatcher = Shell.Current.CurrentPage.Dispatcher;
-
-                try
-                {
-                    using var memStream = new MemoryStream();
-                    using var skiaStream = new SKManagedWStream(memStream);
-
-                    sourceBitmap.Encode(skiaStream, SKEncodedImageFormat.Png, 100);
-
-                    var fileName = $"CanvasImage-{DateTime.Now.Ticks}.png";
-                    memStream.Seek(0, SeekOrigin.Begin);
-                    await _fileService.WriteImageFileToExternalStorageAsync(fileName, memStream, false);
-
-                    await (dispatcher?.DispatchAsync(async () =>
-                    {
-                        await Toast.Make($"{fileName} saved.").Show();
-                    }) ?? Task.CompletedTask);
-                }
-                catch (Exception)
-                {
-                    await (dispatcher?.DispatchAsync(async () =>
-                    {
-                        await Toast.Make("Failed to save image. Please try again.").Show();
-                    }) ?? Task.CompletedTask);
-                }
-            });
+                var fileName = await _canvasWorkflowCoordinator.SaveImageAsync(sourceBitmap);
+                await _toastService.ShowAsync($"{fileName} saved.");
+            }
+            catch (Exception)
+            {
+                await _toastService.ShowAsync("Failed to save image. Please try again.");
+            }
 
             return true;
         });
@@ -142,37 +122,18 @@ public partial class CanvasPageViewModel
     {
         await ExecuteWithPreparedSourceBitmapAsync(result, async (sourceBitmap, _) =>
         {
-            await Task.Run(async () =>
+            try
             {
-                // Re-render the layer using the source bitmap dimensions so masks stay aligned 1:1.
-                using var rawMaskBitmap = _canvasActionBitmapService.CreateRenderedLayer(CanvasActions, sourceBitmap.Width, sourceBitmap.Height);
-
-                try
+                var navigationResult = await _canvasWorkflowCoordinator.CreateImageToImageNavigationAsync(CreateWorkflowRequest(sourceBitmap));
+                if (navigationResult != null)
                 {
-                    var colorizedBitmap = CreatePreparedWorkflowBitmap(sourceBitmap, rawMaskBitmap);
-                    using var ownedColorizedBitmap = colorizedBitmap != null && !ReferenceEquals(colorizedBitmap, sourceBitmap)
-                        ? colorizedBitmap
-                        : null;
-
-                    var payload = ImagePayloadHelper.CreateConstrainedPayload(colorizedBitmap, PngContentType);
-                    if (payload == null)
-                    {
-                        return;
-                    }
-
-                    var parameters = CreateWorkflowNavigationParameters(payload, CreateWorkflowMaskImageData(rawMaskBitmap));
-
-                    var dispatcher = Shell.Current.CurrentPage?.Dispatcher;
-                    await (dispatcher?.DispatchAsync(async () =>
-                    {
-                        await Shell.Current.GoToAsync("///MainPageTab", parameters);
-                    }) ?? Task.CompletedTask);
+                    await NavigationService.GoToAsync("///MainPageTab", navigationResult.Parameters);
                 }
-                catch
-                {
-                    // Ignored
-                }
-            });
+            }
+            catch
+            {
+                // Ignored
+            }
 
             return true;
         });
@@ -185,7 +146,7 @@ public partial class CanvasPageViewModel
 
         if (SourceBitmap == null)
         {
-            await Toast.Make("There is no image to apply paint/masks to.").Show();
+            await _toastService.ShowAsync("There is no image to apply paint/masks to.");
             return;
         }
 
@@ -210,42 +171,29 @@ public partial class CanvasPageViewModel
             var snapshotId = await pushSnapshotAsync("Flatten", true);
             var transferredPreparedSourceBitmapOwnership = false;
 
-            await Task.Run(async () =>
+            var flattenResult = await _canvasWorkflowCoordinator.ApplyPaintAndMasksAsync(CreateFlattenWorkflowRequest(sourceBitmap, preparedSourceBitmap));
+            if (flattenResult != null)
             {
-                using var rawMaskBitmap = _canvasActionBitmapService.CreateRenderedLayer(CanvasActions, sourceBitmap.Width, sourceBitmap.Height);
-
-                var hasMaskActions = CanvasActions.Any(canvasAction => canvasAction.CanvasActionType == CanvasActionType.Mask);
-                var mergedBitmap = hasMaskActions
-                    ? _canvasBitmapService.CreateMaskedBitmap(sourceBitmap, rawMaskBitmap)
-                    : preparedSourceBitmap;
-
-                if (mergedBitmap != null)
+                await _mainThreadService.InvokeOnMainThreadAsync(() =>
                 {
-                    var dispatcher = Shell.Current.CurrentPage?.Dispatcher;
-                    await (dispatcher?.DispatchAsync(async () =>
+                    var oldBitmap = SourceBitmap;
+                    SourceBitmap = flattenResult.MergedBitmap;
+                    oldBitmap?.Dispose();
+
+                    CanvasActions.Clear();
+                    TextElements.Clear();
+                    ClearSegmentationMask();
+
+                    transferredPreparedSourceBitmapOwnership = flattenResult.TransfersPreparedSourceBitmapOwnership;
+
+                    if (snapshotId != null)
                     {
-                        var oldBitmap = SourceBitmap;
-                        SourceBitmap = mergedBitmap;
-                        oldBitmap?.Dispose();
+                        insertSnapshotMarker(snapshotId, "Flatten", true);
+                    }
+                });
 
-                        CanvasActions.Clear();
-                        TextElements.Clear();
-                        ClearSegmentationMask();
-
-                        if (ReferenceEquals(mergedBitmap, preparedSourceBitmap))
-                        {
-                            transferredPreparedSourceBitmapOwnership = true;
-                        }
-
-                        if (snapshotId != null)
-                        {
-                            insertSnapshotMarker(snapshotId, "Flatten", true);
-                        }
-
-                        await Toast.Make("Paint and Masks applied.").Show();
-                    }) ?? Task.CompletedTask);
-                }
-            });
+                await _toastService.ShowAsync("Paint and Masks applied.");
+            }
 
             return !transferredPreparedSourceBitmapOwnership;
         });
@@ -256,49 +204,19 @@ public partial class CanvasPageViewModel
     {
         await ExecuteWithPreparedSourceBitmapAsync(result, async (sourceBitmap, _) =>
         {
-            await Task.Run(async () =>
+            try
             {
-                // Re-render the layer using the source bitmap dimensions so masks stay aligned 1:1.
-                using var rawMaskBitmap = _canvasActionBitmapService.CreateRenderedLayer(CanvasActions, sourceBitmap.Width, sourceBitmap.Height);
-
-                try
+                var navigationResult = await _canvasWorkflowCoordinator.CreateCropNavigationAsync(CreateCropWorkflowRequest(sourceBitmap));
+                if (navigationResult != null)
                 {
-                    var colorizedBitmap = CreatePreparedWorkflowBitmap(sourceBitmap, rawMaskBitmap);
-                    using var ownedColorizedBitmap = colorizedBitmap != null && !ReferenceEquals(colorizedBitmap, sourceBitmap)
-                        ? colorizedBitmap
-                        : null;
-
-                    if (colorizedBitmap == null)
-                    {
-                        return;
-                    }
-
-                    var croppedBitmap = _canvasBitmapService.GetCroppedBitmap(colorizedBitmap, BoundingBox, BoundingBoxScale, BoundingBoxSize);
-                    using var ownedCroppedBitmap = croppedBitmap != null && !ReferenceEquals(croppedBitmap, colorizedBitmap)
-                        ? croppedBitmap
-                        : null;
-
-                    var payload = ImagePayloadHelper.CreateFixedPayload(croppedBitmap, BoundingBoxSize, BoundingBoxSize, PngContentType);
-                    if (payload == null)
-                    {
-                        return;
-                    }
-
-                    var parameters = CreateWorkflowNavigationParameters(payload, CreateCroppedWorkflowMaskImageData(rawMaskBitmap));
-
-                    var dispatcher = Shell.Current.CurrentPage?.Dispatcher;
-                    await (dispatcher?.DispatchAsync(async () =>
-                    {
-                        await Shell.Current.GoToAsync("///MainPageTab", parameters);
-
-                        await Toast.Make("Section has been cropped and set as source image.").Show();
-                    }) ?? Task.CompletedTask);
+                    await NavigationService.GoToAsync("///MainPageTab", navigationResult.Parameters);
+                    await _toastService.ShowAsync("Section has been cropped and set as source image.");
                 }
-                catch
-                {
-                    // Ignored
-                }
-            });
+            }
+            catch
+            {
+                // Ignored
+            }
 
             return true;
         });
@@ -334,67 +252,55 @@ public partial class CanvasPageViewModel
         }
     }
 
-    private SKBitmap? CreatePreparedWorkflowBitmap(SKBitmap sourceBitmap, SKBitmap sameSizeMaskBitmap)
+    private CanvasWorkflowRequest CreateWorkflowRequest(SKBitmap sourceBitmap)
     {
-        return _currentCanvasUseMode == CanvasUseMode.Inpaint || _currentCanvasUseMode == CanvasUseMode.PaintOnly
-            ? _canvasBitmapService.CreateMaskedBitmap(sourceBitmap, sameSizeMaskBitmap)
-            : sourceBitmap;
-    }
-
-    private bool ShouldIncludeWorkflowMask()
-    {
-        return (_currentCanvasUseMode == CanvasUseMode.Inpaint || _currentCanvasUseMode == CanvasUseMode.MaskOnly) &&
-            CanvasActions.Any(canvasAction => canvasAction.CanvasActionType == CanvasActionType.Mask);
-    }
-
-    private Dictionary<string, object?> CreateWorkflowNavigationParameters(ImageTransferPayload payload, string? maskImageDataString = null)
-    {
-        return new Dictionary<string, object?>
+        return new CanvasWorkflowRequest
         {
-            { NavigationParams.ImageWidth, payload.Width },
-            { NavigationParams.ImageHeight, payload.Height },
-            { NavigationParams.InitImgString, payload.ImageDataString },
-            { NavigationParams.InitImgThumbnail, payload.ThumbnailString },
-            { NavigationParams.MaskImgString, maskImageDataString ?? string.Empty }
+            SourceBitmap = sourceBitmap,
+            CanvasActions = CanvasActions.Cast<ICanvasRenderAction>().ToArray(),
+            CanvasUseMode = _currentCanvasUseMode,
+            HasMaskActions = HasMaskActions()
         };
     }
 
-    private string CreateWorkflowMaskImageData(SKBitmap rawMaskBitmap)
+    private CanvasCropWorkflowRequest CreateCropWorkflowRequest(SKBitmap sourceBitmap)
     {
-        if (!ShouldIncludeWorkflowMask() || !ImagePayloadHelper.HasVisiblePixels(rawMaskBitmap))
+        return new CanvasCropWorkflowRequest
         {
-            return string.Empty;
-        }
-
-        using var blackAndWhiteMaskBitmap = _canvasBitmapService.CreateBlackAndWhiteMask(rawMaskBitmap);
-
-        return ImagePayloadHelper.CreateImageDataString(blackAndWhiteMaskBitmap, PngContentType) ?? string.Empty;
+            SourceBitmap = sourceBitmap,
+            CanvasActions = CanvasActions.Cast<ICanvasRenderAction>().ToArray(),
+            CanvasUseMode = _currentCanvasUseMode,
+            HasMaskActions = HasMaskActions(),
+            BoundingBox = BoundingBox,
+            BoundingBoxScale = BoundingBoxScale,
+            BoundingBoxSize = BoundingBoxSize
+        };
     }
 
-    private string CreateCroppedWorkflowMaskImageData(SKBitmap rawMaskBitmap)
+    private CanvasFlattenWorkflowRequest CreateFlattenWorkflowRequest(SKBitmap sourceBitmap, SKBitmap? preparedSourceBitmap)
     {
-        if (!ShouldIncludeWorkflowMask() || !ImagePayloadHelper.HasVisiblePixels(rawMaskBitmap))
+        return new CanvasFlattenWorkflowRequest
         {
-            return string.Empty;
-        }
+            SourceBitmap = sourceBitmap,
+            PreparedSourceBitmap = preparedSourceBitmap,
+            CanvasActions = CanvasActions.Cast<ICanvasRenderAction>().ToArray(),
+            HasMaskActions = HasMaskActions()
+        };
+    }
 
-        using var blackAndWhiteMaskBitmap = _canvasBitmapService.CreateBlackAndWhiteMask(rawMaskBitmap);
-        if (blackAndWhiteMaskBitmap == null)
+    private CanvasPatchWorkflowRequest CreatePatchWorkflowRequest(SKBitmap sourceBitmap, bool useLastOnly)
+    {
+        return new CanvasPatchWorkflowRequest
         {
-            return string.Empty;
-        }
+            SourceBitmap = sourceBitmap,
+            CanvasActions = CanvasActions.Cast<ICanvasRenderAction>().ToArray(),
+            UseLastOnly = useLastOnly
+        };
+    }
 
-        var croppedMask = _canvasBitmapService.GetCroppedBitmap(blackAndWhiteMaskBitmap, BoundingBox, BoundingBoxScale, BoundingBoxSize);
-        using var ownedCroppedMask = croppedMask != null && !ReferenceEquals(croppedMask, blackAndWhiteMaskBitmap)
-            ? croppedMask
-            : null;
-
-        if (!ImagePayloadHelper.HasVisiblePixels(croppedMask))
-        {
-            return string.Empty;
-        }
-
-        return ImagePayloadHelper.CreateImageDataString(croppedMask, PngContentType) ?? string.Empty;
+    private bool HasMaskActions()
+    {
+        return CanvasActions.Any(canvasAction => canvasAction.CanvasActionType == CanvasActionType.Mask);
     }
 
     [RelayCommand]
@@ -437,28 +343,18 @@ public partial class CanvasPageViewModel
                 await Task.Delay(100);
             }
 
-            // Unload Segmentation Service to free resource
-            _segmentationService.UnloadModel();
+            var patchResult = await _canvasWorkflowCoordinator.PatchAsync(CreatePatchWorkflowRequest(sourceBitmap, useLastOnly));
 
-            using var mask = await Task.Run(() => _canvasActionBitmapService.CreatePatchMask(CanvasActions, sourceBitmap.Width, sourceBitmap.Height, useLastOnly));
-
-            if (mask != null)
+            if (patchResult?.PatchedBitmap != null)
             {
-                var result = await _patchService.PatchImageAsync(sourceBitmap, mask);
-
-                if (result != null)
+                if (snapshotId != null)
                 {
-                    if (snapshotId != null)
-                    {
-                        insertSnapshotMarker(snapshotId, "Patch", false);
-                    }
-                    PreserveZoomOnNextBitmapChange = true;
-                    SourceBitmap = result;
+                    insertSnapshotMarker(snapshotId, "Patch", false);
                 }
-            }
 
-            // Unload Patch Service after use
-            _patchService.UnloadModel();
+                PreserveZoomOnNextBitmapChange = true;
+                SourceBitmap = patchResult.PatchedBitmap;
+            }
         }
         catch (Exception ex)
         {
