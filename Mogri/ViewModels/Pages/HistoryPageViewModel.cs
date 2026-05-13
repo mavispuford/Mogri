@@ -24,6 +24,8 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
     private int itemIndex = 0;
     private const int itemTakeCount = 12;
+    private const int trailingPrefetchCount = 6;
+    private const int initialLoadTakeCount = itemTakeCount + trailingPrefetchCount;
     private bool _isInitialized = false;
     private int _lastSelectionCount = 0;
 
@@ -155,6 +157,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
         await _historyService.DeleteItemsAsync(allItems);
 
+        itemIndex = 0;
         HistoryItems.Clear();
     }
 
@@ -183,7 +186,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
         if (result.TryGetValue(NavigationParams.DeletedHistoryItem, out var deletedItem) && deletedItem is IHistoryItemViewModel deletedHistoryItem)
         {
-            HistoryItems.Remove(deletedHistoryItem);
+            await RemoveDeletedItemsAndBackfillAsync([deletedHistoryItem]);
         }
     }
 
@@ -209,31 +212,80 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     [RelayCommand]
     private async Task LoadItems()
     {
-        if (!_isInitialized) return;
+        var takeCount = itemIndex == 0 && HistoryItems.Count == 0
+            ? initialLoadTakeCount
+            : itemTakeCount;
+
+        await LoadItemsAsync(takeCount);
+    }
+
+    private async Task LoadItemsAsync(int takeCount)
+    {
+        if (!_isInitialized || takeCount <= 0)
+        {
+            return;
+        }
 
         await _semaphore.WaitAsync();
 
         try
         {
-            var results = await _historyService.SearchAsync(SearchText ?? string.Empty, itemIndex, itemTakeCount);
+            await LoadItemsCoreAsync(takeCount);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
 
-            foreach (var entity in results)
+    private async Task LoadItemsCoreAsync(int takeCount)
+    {
+        var results = (await _historyService.SearchAsync(SearchText ?? string.Empty, itemIndex, takeCount)).ToList();
+
+        foreach (var entity in results)
+        {
+            var historyItem = _serviceProvider.GetService<IHistoryItemViewModel>();
+            if (historyItem != null)
             {
-                var historyItem = _serviceProvider.GetService<IHistoryItemViewModel>();
-                if (historyItem != null)
-                {
-                    HistoryItems.Add(historyItem);
+                HistoryItems.Add(historyItem);
 
-                    // Fire and forget initialization to keep UI responsive
-                    _ = Task.Run(() => historyItem.InitWith(entity, _fileService, _imageService));
-                }
+                // Fire and forget initialization to keep UI responsive
+                _ = Task.Run(() => historyItem.InitWith(entity, _fileService, _imageService));
             }
+        }
 
-            // Only increment if we actually got results
-            if (results.Any())
+        itemIndex += results.Count;
+    }
+
+    private async Task RemoveDeletedItemsAndBackfillAsync(IEnumerable<IHistoryItemViewModel> deletedItems)
+    {
+        var removedCount = 0;
+
+        foreach (var deletedItem in deletedItems)
+        {
+            if (HistoryItems.Remove(deletedItem))
             {
-                itemIndex += itemTakeCount;
+                removedCount++;
             }
+        }
+
+        if (removedCount == 0)
+        {
+            return;
+        }
+
+        if (!_isInitialized)
+        {
+            itemIndex = Math.Max(0, itemIndex - removedCount);
+            return;
+        }
+
+        await _semaphore.WaitAsync();
+
+        try
+        {
+            itemIndex = Math.Max(0, itemIndex - removedCount);
+            await LoadItemsCoreAsync(removedCount);
         }
         finally
         {
@@ -320,11 +372,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
             await _historyService.DeleteItemsAsync(entities);
 
             // Update UI
-            foreach (var item in itemsToDelete)
-            {
-                HistoryItems.Remove(item);
-            }
-
+            await RemoveDeletedItemsAndBackfillAsync(itemsToDelete);
             SelectedItems.Clear();
             SelectionChanged(null);
         }

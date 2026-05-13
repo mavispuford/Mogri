@@ -13,6 +13,7 @@ namespace Mogri.ViewModels;
 public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryItemPopupViewModel
 {
     private readonly IFileService _fileService;
+    private readonly IHistoryService _historyService;
     private readonly IImageService _imageService;
     private readonly IImageGenerationCoordinator _stableDiffusionService;
     private readonly IToastService _toastService;
@@ -29,12 +30,14 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
     public HistoryItemPopupViewModel(
         IPopupService popupService,
         IFileService fileService,
+        IHistoryService historyService,
         IImageService imageService,
         IImageGenerationCoordinator stableDiffusionService,
         IToastService toastService,
         IMainThreadService mainThreadService) : base(popupService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
+        _historyService = historyService ?? throw new ArgumentNullException(nameof(historyService));
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
         _toastService = toastService ?? throw new ArgumentNullException(nameof(toastService));
@@ -190,8 +193,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
             return;
         }
 
-        await _fileService.DeleteFileFromInternalStorageAsync(HistoryItem.FileName);
-        await _fileService.DeleteFileFromInternalStorageAsync(HistoryItem.ThumbnailFileName);
+        await _historyService.DeleteItemsAsync(new List<HistoryEntity> { HistoryItem.Entity });
 
         var parameters = new Dictionary<string, object>
         {
