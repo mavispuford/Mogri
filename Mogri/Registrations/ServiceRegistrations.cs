@@ -1,3 +1,4 @@
+using Microsoft.Maui.Dispatching;
 using Mogri.Interfaces.Services;
 using Mogri.Services;
 using System.Net;
@@ -42,7 +43,14 @@ public static class ServiceRegistrations
         builder.Services.AddSingleton<IBackendRegistry, BackendRegistry>();
         builder.Services.AddSingleton<IAnimationService, AnimationService>();
         builder.Services.AddSingleton<INavigationService, NavigationService>();
-        builder.Services.AddSingleton<IMainThreadService, MainThreadService>();
+                builder.Services.AddTransient<IMainThreadService>(provider =>
+                {
+                        var dispatcher = provider.GetService<IDispatcher>()
+                                ?? Shell.Current?.Dispatcher
+                                ?? throw new InvalidOperationException("No UI dispatcher is available.");
+
+                        return new MainThreadService(dispatcher);
+                });
         builder.Services.AddSingleton<IToastService, ToastService>();
         builder.Services.AddSingleton<IHapticsService, HapticsService>();
         builder.Services.AddSingleton<IPopupService, PopupService>();

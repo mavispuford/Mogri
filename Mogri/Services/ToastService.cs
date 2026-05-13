@@ -1,5 +1,5 @@
 using CommunityToolkit.Maui.Alerts;
-using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Dispatching;
 using Mogri.Interfaces.Services;
 
 namespace Mogri.Services;
@@ -13,6 +13,13 @@ public class ToastService : IToastService
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(message);
 
-        return MainThread.InvokeOnMainThreadAsync(() => Toast.Make(message).Show());
+        var shell = getShell();
+
+        return shell.Dispatcher.DispatchAsync(() => Toast.Make(message).Show());
+    }
+
+    private static Shell getShell()
+    {
+        return Shell.Current ?? throw new InvalidOperationException("Shell is not available.");
     }
 }

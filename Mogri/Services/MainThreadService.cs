@@ -4,25 +4,24 @@ using Mogri.Interfaces.Services;
 namespace Mogri.Services;
 
 /// <summary>
-/// Adapter around MAUI main-thread helpers.
+/// Adapter around a window-scoped MAUI dispatcher.
 /// </summary>
 public class MainThreadService : IMainThreadService
 {
-    public bool IsMainThread => tryGetDispatcher() is { IsDispatchRequired: false };
+    private readonly IDispatcher _dispatcher;
+
+    public MainThreadService(IDispatcher dispatcher)
+    {
+        _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
+    }
+
+    public bool IsMainThread => !_dispatcher.IsDispatchRequired;
 
     public void BeginInvokeOnMainThread(Action action)
     {
         ArgumentNullException.ThrowIfNull(action);
 
-        var dispatcher = getDispatcher();
-
-        if (!dispatcher.IsDispatchRequired)
-        {
-            action();
-            return;
-        }
-
-        if (!dispatcher.Dispatch(action))
+        if (!_dispatcher.Dispatch(action))
         {
             throw new InvalidOperationException("Failed to dispatch work to the UI thread.");
         }
@@ -32,67 +31,27 @@ public class MainThreadService : IMainThreadService
     {
         ArgumentNullException.ThrowIfNull(action);
 
-        var dispatcher = getDispatcher();
-
-        if (!dispatcher.IsDispatchRequired)
-        {
-            action();
-            return Task.CompletedTask;
-        }
-
-        return DispatcherExtensions.DispatchAsync(dispatcher, action);
+        return _dispatcher.DispatchAsync(action);
     }
 
     public Task InvokeOnMainThreadAsync(Func<Task> action)
     {
         ArgumentNullException.ThrowIfNull(action);
 
-        var dispatcher = getDispatcher();
-
-        if (!dispatcher.IsDispatchRequired)
-        {
-            return action();
-        }
-
-        return DispatcherExtensions.DispatchAsync(dispatcher, action);
+        return _dispatcher.DispatchAsync(action);
     }
 
     public Task<T> InvokeOnMainThreadAsync<T>(Func<T> action)
     {
         ArgumentNullException.ThrowIfNull(action);
 
-        var dispatcher = getDispatcher();
-
-        if (!dispatcher.IsDispatchRequired)
-        {
-            return Task.FromResult(action());
-        }
-
-        return DispatcherExtensions.DispatchAsync(dispatcher, action);
+        return _dispatcher.DispatchAsync(action);
     }
 
     public Task<T> InvokeOnMainThreadAsync<T>(Func<Task<T>> action)
     {
         ArgumentNullException.ThrowIfNull(action);
 
-        var dispatcher = getDispatcher();
-
-        if (!dispatcher.IsDispatchRequired)
-        {
-            return action();
-        }
-
-        return DispatcherExtensions.DispatchAsync(dispatcher, action);
-    }
-
-    private static IDispatcher getDispatcher()
-    {
-        return tryGetDispatcher() ?? throw new InvalidOperationException("No UI dispatcher is available.");
-    }
-
-    private static IDispatcher? tryGetDispatcher()
-    {
-        return Dispatcher.GetForCurrentThread()
-            ?? Microsoft.Maui.Controls.Application.Current?.Windows.FirstOrDefault()?.Page?.Dispatcher;
+        return _dispatcher.DispatchAsync(action);
     }
 }

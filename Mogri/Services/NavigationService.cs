@@ -1,4 +1,4 @@
-using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Dispatching;
 using Mogri.Interfaces.Services;
 
 namespace Mogri.Services;
@@ -12,7 +12,9 @@ public class NavigationService : INavigationService
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(route);
 
-        return MainThread.InvokeOnMainThreadAsync(() => getShell().GoToAsync(route));
+        var shell = getShell();
+
+        return shell.Dispatcher.DispatchAsync(() => shell.GoToAsync(route));
     }
 
     public Task GoToAsync(string route, IDictionary<string, object> parameters)
@@ -20,7 +22,9 @@ public class NavigationService : INavigationService
         ArgumentException.ThrowIfNullOrWhiteSpace(route);
         ArgumentNullException.ThrowIfNull(parameters);
 
-        return MainThread.InvokeOnMainThreadAsync(() => getShell().GoToAsync(route, parameters));
+        var shell = getShell();
+
+        return shell.Dispatcher.DispatchAsync(() => shell.GoToAsync(route, parameters));
     }
 
     public Task GoBackAsync()
@@ -37,7 +41,9 @@ public class NavigationService : INavigationService
 
     public Task PopToRootAsync()
     {
-        return MainThread.InvokeOnMainThreadAsync(() => getShell().Navigation.PopToRootAsync());
+        var shell = getShell();
+
+        return shell.Dispatcher.DispatchAsync(() => shell.Navigation.PopToRootAsync());
     }
 
     public Task PopToRootAndGoToAsync(string route, IDictionary<string, object> parameters)
@@ -45,9 +51,10 @@ public class NavigationService : INavigationService
         ArgumentException.ThrowIfNullOrWhiteSpace(route);
         ArgumentNullException.ThrowIfNull(parameters);
 
-        return MainThread.InvokeOnMainThreadAsync(async () =>
+        var shell = getShell();
+
+        return shell.Dispatcher.DispatchAsync(async () =>
         {
-            var shell = getShell();
             await shell.Navigation.PopToRootAsync();
             await shell.GoToAsync(route, parameters);
         });
