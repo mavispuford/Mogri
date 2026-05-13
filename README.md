@@ -42,6 +42,13 @@ There are two main tabs in the app:
 
 > The Patch tool can be useful for filling in a space that has contrasting colors (e.g. A red fire hydrant in a field of green grass), making it easier to follow up with inpainting.
 
+#### Text & Emoji
+
+Add Text and Emoji to the canvas to help with generation
+
+&nbsp; ![Text Demo](Media/ReadmeImages/TextDemo.gif) &nbsp;&nbsp; ![Emoji Demo](Media/ReadmeImages/EmojiDemo.gif)
+
+
 ## Getting Started
 
 ### Prerequisites
