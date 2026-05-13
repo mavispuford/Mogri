@@ -45,7 +45,15 @@
             </ImageButton.Triggers>
         </ImageButton>
 
-        <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center" IsRunning="{Binding IsLoading}" InputTransparent="True" Scale="{OnPlatform Android=1, iOS=1.5}" IsVisible="{Binding IsLoading}"/>
+        <!-- For some reason, the ActivityIndicator doesn't show on Android unless we wrap it in a ContentView -->
+        <ContentView>
+            <ActivityIndicator HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            IsRunning="{Binding IsLoading}"
+                            IsVisible="{Binding IsLoading}"
+                            InputTransparent="True"
+                            Scale="{OnPlatform Android=1, iOS=1.5}"/>
+        </ContentView>
     </Grid>
 
 </ContentView>

@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Mogri.Interfaces.Services;
 using SkiaSharp;
 
@@ -17,15 +18,22 @@ public sealed class CanvasBitmapService : ICanvasBitmapService
 
         var resultBitmap = new SKBitmap(maskBitmap.Width, maskBitmap.Height, maskBitmap.ColorType, SKAlphaType.Unpremul);
 
-        for (int row = 0; row < maskBitmap.Height; row++)
+        // Get the raw byte spans
+        var srcBytes = maskBitmap.GetPixelSpan();
+        var destBytes = resultBitmap.GetPixelSpan();
+
+        // Cast the byte spans safely into SKColor spans
+        var srcPixels = MemoryMarshal.Cast<byte, SKColor>(srcBytes);
+        var destPixels = MemoryMarshal.Cast<byte, SKColor>(destBytes);
+
+        // Pre-allocate colors outside the loop
+        var transparentWhite = new SKColor(255, 255, 255, 0);
+        var opaqueBlack = new SKColor(0, 0, 0, 255);
+
+        // Iterate through the properly cast span
+        for (int i = 0; i < srcPixels.Length; i++)
         {
-            for (int col = 0; col < maskBitmap.Width; col++)
-            {
-                var alpha = maskBitmap.GetPixel(col, row).Alpha;
-                resultBitmap.SetPixel(col, row, alpha == 0
-                    ? new SKColor(255, 255, 255, 0)
-                    : new SKColor(0, 0, 0, 255));
-            }
+            destPixels[i] = srcPixels[i].Alpha == 0 ? transparentWhite : opaqueBlack;
         }
 
         return resultBitmap;

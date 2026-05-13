@@ -186,13 +186,15 @@
             </Grid>
         </controls:GestureContainer>
 
-        <ActivityIndicator Grid.RowSpan="3"
-                           HorizontalOptions="Center" 
+        <!-- For some reason, the ActivityIndicator doesn't show on Android unless we wrap it in a ContentView -->
+        <ContentView Grid.RowSpan="3">
+            <ActivityIndicator HorizontalOptions="Center" 
                            VerticalOptions="Center"
                            IsRunning="{Binding IsBusy}"
                            IsVisible="{Binding IsBusy}"
                            InputTransparent="True"
                            Scale="{OnPlatform Android=1, iOS=1.5}"/>
+        </ContentView>
 
         <Border Grid.Row="0"
                 BackgroundColor="{AppThemeBinding Light={StaticResource MutedPeach}, Dark={StaticResource Cadet}}"
