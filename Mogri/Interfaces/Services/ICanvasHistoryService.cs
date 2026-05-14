@@ -21,16 +21,17 @@ public interface ICanvasHistoryService
     /// </summary>
     /// <param name="bitmap">The current SKBitmap to snapshot.</param>
     /// <param name="canvasActions">The optional list of CanvasActions to serialize.</param>
+    /// <param name="textElements">The optional list of text elements to serialize.</param>
     /// <returns>A string representing the snapshot ID (GUID).</returns>
-    Task<string> SaveSnapshotAsync(SKBitmap bitmap, IList<CanvasActionViewModel>? canvasActions = null);
+    Task<string> SaveSnapshotAsync(SKBitmap bitmap, IList<CanvasActionViewModel>? canvasActions = null, IList<TextElementViewModel>? textElements = null);
 
     /// <summary>
     /// Loads the bitmap and optionally the canvas actions from disk.
     /// Also deletes the physical files for the given ID after loading (consumes the snapshot).
     /// </summary>
     /// <param name="snapshotId">The snapshot ID to restore.</param>
-    /// <returns>A tuple containing the deserialized SKBitmap and the optional list of CanvasActions.</returns>
-    Task<(SKBitmap? Bitmap, List<CanvasActionViewModel>? CanvasActions)> RestoreSnapshotAsync(string snapshotId);
+    /// <returns>A tuple containing the deserialized SKBitmap, the optional list of CanvasActions, and the optional list of text elements.</returns>
+    Task<(SKBitmap? Bitmap, List<CanvasActionViewModel>? CanvasActions, List<TextElementViewModel>? TextElements)> RestoreSnapshotAsync(string snapshotId);
 
     /// <summary>
     /// Deletes the snapshot files for a given ID without restoring.

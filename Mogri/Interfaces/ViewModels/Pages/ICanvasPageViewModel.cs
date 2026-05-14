@@ -31,6 +31,8 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     ObservableCollection<CanvasActionViewModel> CanvasActions { get; set; }
 
+    ObservableCollection<TextElementViewModel> TextElements { get; set; }
+
     Color PaletteIconColor { get; set; }
 
 
@@ -101,6 +103,12 @@ public interface ICanvasPageViewModel : IPageViewModel
     IAsyncRelayCommand ShowHistoryCommand { get; }
 
     IAsyncRelayCommand ApplyPaintAndMasksCommand { get; }
+
+    IAsyncRelayCommand<SKPoint> AddTextCommand { get; }
+
+    IRelayCommand<TextElementViewModel> DeleteTextCommand { get; }
+
+    IAsyncRelayCommand<TextElementViewModel> EditTextCommand { get; }
 
     IAsyncRelayCommand PatchCommand { get; }
 

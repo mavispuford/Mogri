@@ -1,11 +1,11 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mogri.Interfaces.Coordinators;
 using Mogri.Interfaces.Services;
 using Mogri.Interfaces.ViewModels;
 using Mogri.Interfaces.ViewModels.Pages;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
 
 namespace Mogri.ViewModels;
@@ -19,9 +19,13 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     private readonly IHistoryService _historyService;
     private readonly IServiceProvider _serviceProvider;
     private readonly IPopupService _popupService;
+    private readonly IToastService _toastService;
+    private readonly IMainThreadService _mainThreadService;
 
     private int itemIndex = 0;
     private const int itemTakeCount = 12;
+    private const int trailingPrefetchCount = 6;
+    private const int initialLoadTakeCount = itemTakeCount + trailingPrefetchCount;
     private bool _isInitialized = false;
     private int _lastSelectionCount = 0;
 
@@ -60,22 +64,15 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         {
             if (t.IsCanceled) return;
 
-            if (Application.Current != null)
+            await _mainThreadService.InvokeOnMainThreadAsync(async () =>
             {
-                var dispatcher = Shell.Current?.Dispatcher;
-                if (dispatcher != null)
+                itemIndex = 0;
+                HistoryItems.Clear();
+                if (LoadItemsCommand != null)
                 {
-                    await dispatcher.DispatchAsync(async () =>
-                    {
-                        itemIndex = 0;
-                        HistoryItems.Clear();
-                        if (LoadItemsCommand != null)
-                        {
-                            await LoadItemsCommand.ExecuteAsync(null);
-                        }
-                    });
+                    await LoadItemsCommand.ExecuteAsync(null);
                 }
-            }
+            });
         });
     }
 
@@ -88,13 +85,18 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         IHistoryService historyService,
         IServiceProvider serviceProvider,
         IPopupService popupService,
-        ILoadingService loadingService) : base(loadingService)
+        IToastService toastService,
+        IMainThreadService mainThreadService,
+        INavigationService navigationService,
+        ILoadingCoordinator loadingCoordinator) : base(loadingCoordinator, navigationService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
         _historyService = historyService ?? throw new ArgumentNullException(nameof(historyService));
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
+        _toastService = toastService ?? throw new ArgumentNullException(nameof(toastService));
+        _mainThreadService = mainThreadService ?? throw new ArgumentNullException(nameof(mainThreadService));
     }
 
     public override async Task OnNavigatedToAsync()
@@ -109,23 +111,20 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
             {
                 var hasChanges = await _historyService.InitializeAsync();
 
-                if (Application.Current != null)
+                await _mainThreadService.InvokeOnMainThreadAsync(async () =>
                 {
-                    await Shell.Current.Dispatcher.DispatchAsync(async () =>
+                    if (hasChanges || HistoryItems.Count == 0 || !string.IsNullOrWhiteSpace(SearchText))
                     {
-                        if (hasChanges || HistoryItems.Count == 0 || !string.IsNullOrWhiteSpace(SearchText))
-                        {
-                            itemIndex = 0;
-                            HistoryItems.Clear();
-                            _isInitialized = true; // Set to true before calling LoadItems
-                            await LoadItems();
-                        }
-                        else
-                        {
-                            _isInitialized = true;
-                        }
-                    });
-                }
+                        itemIndex = 0;
+                        HistoryItems.Clear();
+                        _isInitialized = true; // Set to true before calling LoadItems
+                        await LoadItems();
+                    }
+                    else
+                    {
+                        _isInitialized = true;
+                    }
+                });
             }
             catch (Exception ex)
             {
@@ -152,6 +151,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
         await _historyService.DeleteItemsAsync(allItems);
 
+        itemIndex = 0;
         HistoryItems.Clear();
     }
 
@@ -175,12 +175,12 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
             result.ContainsKey(NavigationParams.InitImgString) ||
             result.ContainsKey(NavigationParams.CanvasImageString))
         {
-            await Shell.Current.GoToAsync("..", result);
+            await NavigationService.GoBackAsync(result);
         }
 
         if (result.TryGetValue(NavigationParams.DeletedHistoryItem, out var deletedItem) && deletedItem is IHistoryItemViewModel deletedHistoryItem)
         {
-            HistoryItems.Remove(deletedHistoryItem);
+            await RemoveDeletedItemsAndBackfillAsync([deletedHistoryItem]);
         }
     }
 
@@ -206,31 +206,80 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     [RelayCommand]
     private async Task LoadItems()
     {
-        if (!_isInitialized) return;
+        var takeCount = itemIndex == 0 && HistoryItems.Count == 0
+            ? initialLoadTakeCount
+            : itemTakeCount;
+
+        await LoadItemsAsync(takeCount);
+    }
+
+    private async Task LoadItemsAsync(int takeCount)
+    {
+        if (!_isInitialized || takeCount <= 0)
+        {
+            return;
+        }
 
         await _semaphore.WaitAsync();
 
         try
         {
-            var results = await _historyService.SearchAsync(SearchText ?? string.Empty, itemIndex, itemTakeCount);
+            await LoadItemsCoreAsync(takeCount);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
 
-            foreach (var entity in results)
+    private async Task LoadItemsCoreAsync(int takeCount)
+    {
+        var results = (await _historyService.SearchAsync(SearchText ?? string.Empty, itemIndex, takeCount) ?? []).ToList();
+
+        foreach (var entity in results)
+        {
+            var historyItem = _serviceProvider.GetService<IHistoryItemViewModel>();
+            if (historyItem != null)
             {
-                var historyItem = _serviceProvider.GetService<IHistoryItemViewModel>();
-                if (historyItem != null)
-                {
-                    HistoryItems.Add(historyItem);
+                HistoryItems.Add(historyItem);
 
-                    // Fire and forget initialization to keep UI responsive
-                    _ = Task.Run(() => historyItem.InitWith(entity, _fileService, _imageService));
-                }
+                // Fire and forget initialization to keep UI responsive
+                _ = Task.Run(() => historyItem.InitWith(entity, _fileService, _imageService));
             }
+        }
 
-            // Only increment if we actually got results
-            if (results.Any())
+        itemIndex += results.Count;
+    }
+
+    private async Task RemoveDeletedItemsAndBackfillAsync(IEnumerable<IHistoryItemViewModel> deletedItems)
+    {
+        var removedCount = 0;
+
+        foreach (var deletedItem in deletedItems)
+        {
+            if (HistoryItems.Remove(deletedItem))
             {
-                itemIndex += itemTakeCount;
+                removedCount++;
             }
+        }
+
+        if (removedCount == 0)
+        {
+            return;
+        }
+
+        if (!_isInitialized)
+        {
+            itemIndex = Math.Max(0, itemIndex - removedCount);
+            return;
+        }
+
+        await _semaphore.WaitAsync();
+
+        try
+        {
+            itemIndex = Math.Max(0, itemIndex - removedCount);
+            await LoadItemsCoreAsync(removedCount);
         }
         finally
         {
@@ -317,17 +366,13 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
             await _historyService.DeleteItemsAsync(entities);
 
             // Update UI
-            foreach (var item in itemsToDelete)
-            {
-                HistoryItems.Remove(item);
-            }
-
+            await RemoveDeletedItemsAndBackfillAsync(itemsToDelete);
             SelectedItems.Clear();
             SelectionChanged(null);
         }
         catch (Exception ex)
         {
-            await Toast.Make($"Failed to delete items: {ex.Message}").Show();
+            await _toastService.ShowAsync($"Failed to delete items: {ex.Message}");
         }
     }
 

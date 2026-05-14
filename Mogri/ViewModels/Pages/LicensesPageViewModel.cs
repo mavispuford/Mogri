@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.Input;
+using Mogri.Interfaces.Coordinators;
 using Mogri.Interfaces.Services;
 using Mogri.Interfaces.ViewModels;
 using Mogri.Interfaces.ViewModels.Pages;
@@ -17,10 +18,11 @@ public partial class LicensesPageViewModel : PageViewModel, ILicensesPageViewMod
     public ObservableCollection<ILicenseItemViewModel> Licenses { get; } = new();
 
     public LicensesPageViewModel(
-        ILoadingService loadingService,
+        ILoadingCoordinator loadingCoordinator,
         ILicenseService licenseService,
-        IServiceProvider serviceProvider) 
-        : base(loadingService)
+        IServiceProvider serviceProvider,
+        INavigationService navigationService) 
+        : base(loadingCoordinator, navigationService)
     {
         _licenseService = licenseService;
         _serviceProvider = serviceProvider;

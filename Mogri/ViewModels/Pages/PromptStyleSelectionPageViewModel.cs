@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LiteDB;
 using Microsoft.Extensions.DependencyInjection;
+using Mogri.Interfaces.Coordinators;
 using Mogri.Interfaces.Services;
 using Mogri.Interfaces.ViewModels;
 using Mogri.Interfaces.ViewModels.Pages;
@@ -30,8 +31,9 @@ internal partial class PromptStyleSelectionPageViewModel : PageViewModel, IPromp
     public PromptStyleSelectionPageViewModel(
         IPromptStyleService promptStyleService,
         IPopupService popupService,
-        ILoadingService loadingService,
-        IServiceProvider serviceProvider) : base(loadingService)
+        ILoadingCoordinator loadingCoordinator,
+        IServiceProvider serviceProvider,
+        INavigationService navigationService) : base(loadingCoordinator, navigationService)
     {
         _promptStyleService = promptStyleService ?? throw new ArgumentNullException(nameof(promptStyleService));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
@@ -229,7 +231,7 @@ internal partial class PromptStyleSelectionPageViewModel : PageViewModel, IPromp
                 { NavigationParams.PromptSettings, _settings }
             };
 
-        await Shell.Current.GoToAsync("..", parameters);
+        await NavigationService.GoBackAsync(parameters!);
     }
 
     [RelayCommand]
@@ -248,7 +250,7 @@ internal partial class PromptStyleSelectionPageViewModel : PageViewModel, IPromp
                 { NavigationParams.PromptSettings, newSettings }
             };
 
-            await Shell.Current.GoToAsync("..", parameters);
+            await NavigationService.GoBackAsync(parameters);
         }
         else
         {

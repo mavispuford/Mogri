@@ -11,6 +11,10 @@ namespace Mogri.ViewModels;
 public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskItemPopupViewModel, IRecipient<MaskSliderDragMessage>
 {
     private CanvasActionViewModel? _action;
+    private TextElementViewModel? _textElement;
+
+    [ObservableProperty]
+    private string _title = "Edit Mask";
 
     [ObservableProperty]
     private bool _isBrush;
@@ -82,6 +86,8 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
     public void InitWith(CanvasActionViewModel action)
     {
         _action = action;
+        _textElement = null;
+        Title = "Edit Mask";
 
         if (_action is MaskLineViewModel line)
         {
@@ -107,12 +113,30 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
         }
     }
 
+    public void InitWith(TextElementViewModel textElement)
+    {
+        _action = null;
+        _textElement = textElement;
+        Title = "Edit Text";
+        IsBrush = false;
+        IsColorVisible = true;
+        IsNoiseVisible = true;
+        Alpha = textElement.Alpha;
+        DisplayColor = textElement.Color;
+        Noise = textElement.Noise;
+        BrushSize = 0;
+    }
+
     public override void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         base.ApplyQueryAttributes(query);
         if (query.TryGetValue("Action", out var actionObj) && actionObj is CanvasActionViewModel action)
         {
             InitWith(action);
+        }
+        else if (query.TryGetValue("TextElement", out var textElementObj) && textElementObj is TextElementViewModel textElement)
+        {
+            InitWith(textElement);
         }
     }
 
@@ -139,6 +163,10 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
         {
             seg.Alpha = value;
         }
+        else if (_textElement != null)
+        {
+            _textElement.Alpha = value;
+        }
     }
 
     partial void OnNoiseChanged(double value)
@@ -152,6 +180,10 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
         else if (_action is SegmentationMaskViewModel seg)
         {
             seg.Noise = value;
+        }
+        else if (_textElement != null)
+        {
+            _textElement.Noise = value;
         }
     }
 
@@ -177,6 +209,10 @@ public partial class EditMaskItemPopupViewModel : PopupBaseViewModel, IEditMaskI
             else if (_action is SegmentationMaskViewModel seg)
             {
                 seg.Color = color;
+            }
+            else if (_textElement != null)
+            {
+                _textElement.Color = color;
             }
         }
     }

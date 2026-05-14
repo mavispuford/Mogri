@@ -2,11 +2,12 @@ using CommunityToolkit.Maui.Core.Extensions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mogri.Enums;
 using Mogri.Helpers;
+using Mogri.Interfaces.Services;
 using SkiaSharp;
 
 namespace Mogri.ViewModels;
 
-public partial class MaskLineViewModel : PaintActionViewModel
+public partial class MaskLineViewModel : PaintActionViewModel, ICanvasMaskStrokeAction
 {
     [ObservableProperty]
     public partial float BrushSize { get; set; }
@@ -15,6 +16,10 @@ public partial class MaskLineViewModel : PaintActionViewModel
 
     public List<SKPoint> Path { get; set; } = new();
     public MaskEffect MaskEffect { get; set; }
+
+    bool ICanvasMaskStrokeAction.AddsToMask => MaskEffect == MaskEffect.Paint;
+
+    IReadOnlyList<SKPoint> ICanvasMaskStrokeAction.Points => Path;
 
     public override void Execute(SKCanvas canvas, SKImageInfo imageInfo, bool isSaving)
     {

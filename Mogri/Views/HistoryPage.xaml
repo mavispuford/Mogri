@@ -65,7 +65,7 @@
                         CanReorderItems="False"
                         HorizontalOptions="Fill"
                         VerticalOptions="Fill"
-                        RemainingItemsThreshold="3"
+                        RemainingItemsThreshold="6"
                         RemainingItemsThresholdReachedCommand="{Binding LoadItemsCommand}"
                         SelectionMode="{Binding SelectionModeEnabled, Converter={StaticResource BoolToSelectionMode}}"
                         SelectedItems="{Binding SelectedItems, Mode=TwoWay}"

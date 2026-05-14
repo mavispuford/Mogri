@@ -10,13 +10,61 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+    <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.60" />
+    <PackageReference Include="Microsoft.Maui.Essentials" Version="10.0.60" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
     <PackageReference Include="Moq" Version="4.20.72" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.2" />
+    <PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.119.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Mogri.Core\Mogri.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Mogri\NavigationParams.cs" Link="Shared\NavigationParams.cs" />
+    <Compile Include="..\Mogri\Enums\HapticType.cs" Link="Shared\Enums\HapticType.cs" />
+    <Compile Include="..\Mogri\Interfaces\Coordinators\ICanvasSegmentationCoordinator.cs" Link="Shared\Interfaces\Coordinators\ICanvasSegmentationCoordinator.cs" />
+    <Compile Include="..\Mogri\Enums\CanvasUseMode.cs" Link="Shared\Enums\CanvasUseMode.cs" />
+    <Compile Include="..\Mogri\Interfaces\Coordinators\ICanvasWorkflowCoordinator.cs" Link="Shared\Interfaces\Coordinators\ICanvasWorkflowCoordinator.cs" />
+    <Compile Include="..\Mogri\Coordinators\CanvasSegmentationCoordinator.cs" Link="Shared\Coordinators\CanvasSegmentationCoordinator.cs" />
+    <Compile Include="..\Mogri\Interfaces\Coordinators\IGenerationTaskCoordinator.cs" Link="Shared\Interfaces\Coordinators\IGenerationTaskCoordinator.cs" />
+    <Compile Include="..\Mogri\Interfaces\Coordinators\IImageGenerationCoordinator.cs" Link="Shared\Interfaces\Coordinators\IImageGenerationCoordinator.cs" />
+    <Compile Include="..\Mogri\Interfaces\Coordinators\ILoadingCoordinator.cs" Link="Shared\Interfaces\Coordinators\ILoadingCoordinator.cs" />
+    <Compile Include="..\Mogri\Coordinators\CanvasWorkflowCoordinator.cs" Link="Shared\Coordinators\CanvasWorkflowCoordinator.cs" />
+    <Compile Include="..\Mogri\Models\CanvasSegmentationImageStateChangedEventArgs.cs" Link="Shared\Models\CanvasSegmentationImageStateChangedEventArgs.cs" />
+    <Compile Include="..\Mogri\Models\CanvasSegmentationInvertRequest.cs" Link="Shared\Models\CanvasSegmentationInvertRequest.cs" />
+    <Compile Include="..\Mogri\Models\CanvasSegmentationMaskUpdateResult.cs" Link="Shared\Models\CanvasSegmentationMaskUpdateResult.cs" />
+    <Compile Include="..\Mogri\Models\CanvasSegmentationRequest.cs" Link="Shared\Models\CanvasSegmentationRequest.cs" />
+    <Compile Include="..\Mogri\Models\GenerationResultImage.cs" Link="Shared\Models\GenerationResultImage.cs" />
+    <Compile Include="..\Mogri\Models\GenerationTaskRequest.cs" Link="Shared\Models\GenerationTaskRequest.cs" />
+    <Compile Include="..\Mogri\Models\GenerationTaskResult.cs" Link="Shared\Models\GenerationTaskResult.cs" />
+    <Compile Include="..\Mogri\Models\CanvasCropWorkflowRequest.cs" Link="Shared\Models\CanvasCropWorkflowRequest.cs" />
+    <Compile Include="..\Mogri\Models\CanvasFlattenWorkflowRequest.cs" Link="Shared\Models\CanvasFlattenWorkflowRequest.cs" />
+    <Compile Include="..\Mogri\Models\CanvasFlattenWorkflowResult.cs" Link="Shared\Models\CanvasFlattenWorkflowResult.cs" />
+    <Compile Include="..\Mogri\Models\CanvasPatchWorkflowRequest.cs" Link="Shared\Models\CanvasPatchWorkflowRequest.cs" />
+    <Compile Include="..\Mogri\Models\CanvasPatchWorkflowResult.cs" Link="Shared\Models\CanvasPatchWorkflowResult.cs" />
+    <Compile Include="..\Mogri\Models\CanvasWorkflowNavigationResult.cs" Link="Shared\Models\CanvasWorkflowNavigationResult.cs" />
+    <Compile Include="..\Mogri\Models\CanvasWorkflowRequest.cs" Link="Shared\Models\CanvasWorkflowRequest.cs" />
+    <Compile Include="..\Mogri\Interfaces\ViewModels\IHistoryItemViewModel.cs" Link="Shared\Interfaces\IHistoryItemViewModel.cs" />
+    <Compile Include="..\Mogri\Interfaces\ViewModels\IResultItemViewModel.cs" Link="Shared\Interfaces\IResultItemViewModel.cs" />
+    <Compile Include="..\Mogri\Interfaces\ViewModels\Pages\IAboutPageViewModel.cs" Link="Shared\Interfaces\Pages\IAboutPageViewModel.cs" />
+    <Compile Include="..\Mogri\Interfaces\ViewModels\Pages\IMainPageViewModel.cs" Link="Shared\Interfaces\Pages\IMainPageViewModel.cs" />
+    <Compile Include="..\Mogri\Interfaces\ViewModels\Pages\IPageViewModel.cs" Link="Shared\Interfaces\Pages\IPageViewModel.cs" />
+    <Compile Include="..\Mogri\Interfaces\ViewModels\Pages\IHistoryPageViewModel.cs" Link="Shared\Interfaces\Pages\IHistoryPageViewModel.cs" />
+    <Compile Include="..\Mogri\Interfaces\ViewModels\Popups\IPopupBaseViewModel.cs" Link="Shared\Interfaces\Popups\IPopupBaseViewModel.cs" />
+    <Compile Include="..\Mogri\Interfaces\ViewModels\Popups\IHistoryItemPopupViewModel.cs" Link="Shared\Interfaces\Popups\IHistoryItemPopupViewModel.cs" />
+    <Compile Include="..\Mogri\Interfaces\ViewModels\Popups\IResultItemPopupViewModel.cs" Link="Shared\Interfaces\Popups\IResultItemPopupViewModel.cs" />
+    <Compile Include="..\Mogri\ViewModels\Pages\AboutPageViewModel.cs" Link="Shared\ViewModels\Pages\AboutPageViewModel.cs" />
+    <Compile Include="..\Mogri\ViewModels\Pages\MainPageViewModel.cs" Link="Shared\ViewModels\Pages\MainPageViewModel.cs" />
+    <Compile Include="..\Mogri\ViewModels\Pages\PageViewModel.cs" Link="Shared\ViewModels\Pages\PageViewModel.cs" />
+    <Compile Include="..\Mogri\ViewModels\Pages\HistoryPageViewModel.cs" Link="Shared\ViewModels\Pages\HistoryPageViewModel.cs" />
+    <Compile Include="..\Mogri\ViewModels\Popups\PopupBaseViewModel.cs" Link="Shared\ViewModels\Popups\PopupBaseViewModel.cs" />
+    <Compile Include="..\Mogri\ViewModels\Popups\HistoryItemPopupViewModel.cs" Link="Shared\ViewModels\Popups\HistoryItemPopupViewModel.cs" />
+    <Compile Include="..\Mogri\ViewModels\Popups\ResultItemPopupViewModel.cs" Link="Shared\ViewModels\Popups\ResultItemPopupViewModel.cs" />
   </ItemGroup>
 </Project>

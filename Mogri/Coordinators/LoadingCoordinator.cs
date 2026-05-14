@@ -1,17 +1,21 @@
+using Mogri.Interfaces.Coordinators;
 using Mogri.Interfaces.Services;
 using Mogri.Views.Popups;
 using Mopups.Services;
 
-namespace Mogri.Services;
+namespace Mogri.Coordinators;
 
-public class LoadingService : ILoadingService
+/// <summary>
+/// Coordinates the loading popup lifecycle so viewmodels do not manage popup workflow state directly.
+/// </summary>
+public class LoadingCoordinator : ILoadingCoordinator
 {
-    private const string _loadingPopupName = "LoadingPopup";
+    private const string LoadingPopupName = "LoadingPopup";
 
     private readonly SemaphoreSlim _semaphore = new(1, 1);
     private readonly IPopupService _popupService;
 
-    public LoadingService(IPopupService popupService)
+    public LoadingCoordinator(IPopupService popupService)
     {
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
     }
@@ -22,7 +26,7 @@ public class LoadingService : ILoadingService
 
         try
         {
-            await _popupService.ClosePopupAsync(_loadingPopupName, null);
+            await _popupService.ClosePopupAsync(LoadingPopupName, null);
         }
         finally
         {
@@ -36,7 +40,6 @@ public class LoadingService : ILoadingService
 
         try
         {
-            // Already showing...
             if (MopupService.Instance.PopupStack.FirstOrDefault(p => p is LoadingPopup) is LoadingPopup loadingPopup)
             {
                 loadingPopup.SetLoadingMessage(loadingMessage ?? string.Empty);
@@ -44,7 +47,7 @@ public class LoadingService : ILoadingService
                 return;
             }
 
-            await _popupService.ShowPopupAsync(_loadingPopupName, new Dictionary<string, object>()
+            await _popupService.ShowPopupAsync(LoadingPopupName, new Dictionary<string, object>
             {
                 { NavigationParams.LoadingMessage, loadingMessage ?? string.Empty }
             });

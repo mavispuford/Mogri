@@ -1,3 +1,4 @@
+using Microsoft.Maui.Dispatching;
 using Mogri.Interfaces.Services;
 using Mogri.Services;
 using System.Net;
@@ -40,11 +41,23 @@ public static class ServiceRegistrations
         builder.Services.AddSingleton<IImageGenerationBackend, ComfyUiService>();
         builder.Services.AddSingleton<IImageGenerationBackend, ComfyCloudService>();
         builder.Services.AddSingleton<IBackendRegistry, BackendRegistry>();
-        builder.Services.AddSingleton<IImageGenerationService, ProxyImageGenerationService>();
+        builder.Services.AddSingleton<IAnimationService, AnimationService>();
+        builder.Services.AddSingleton<INavigationService, NavigationService>();
+                builder.Services.AddTransient<IMainThreadService>(provider =>
+                {
+                        var dispatcher = provider.GetService<IDispatcher>()
+                                ?? Shell.Current?.Dispatcher
+                                ?? throw new InvalidOperationException("No UI dispatcher is available.");
+
+                        return new MainThreadService(dispatcher);
+                });
+        builder.Services.AddSingleton<IToastService, ToastService>();
+        builder.Services.AddSingleton<IHapticsService, HapticsService>();
         builder.Services.AddSingleton<IPopupService, PopupService>();
         builder.Services.AddSingleton<IImageService, ImageService>();
+        builder.Services.AddSingleton<ICanvasActionBitmapService, CanvasActionBitmapService>();
+        builder.Services.AddSingleton<ICanvasBitmapService, CanvasBitmapService>();
         builder.Services.AddSingleton<ISegmentationService, SegmentationService>();
-        builder.Services.AddSingleton<ILoadingService, LoadingService>();
         builder.Services.AddSingleton<IPresetService, PresetService>();
         builder.Services.AddSingleton<IPatchService, AotGanPatchService>();
         builder.Services.AddSingleton<IHistoryService, HistoryService>();
@@ -54,13 +67,9 @@ public static class ServiceRegistrations
         builder.Services.AddSingleton<ICheckpointSettingsService, CheckpointSettingsService>();
 
 #if ANDROID
-        builder.Services.AddSingleton<IGenerationTaskService, AndroidGenerationTaskService>();
         builder.Services.AddSingleton<IFileService, AndroidFileService>();
 #elif IOS
-        builder.Services.AddSingleton<IGenerationTaskService, IosGenerationTaskService>();
         builder.Services.AddSingleton<IFileService, IosFileService>();
-#else
-        builder.Services.AddSingleton<IGenerationTaskService, GenerationTaskService>();
 #endif
 
         return builder;

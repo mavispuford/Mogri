@@ -42,6 +42,13 @@ There are two main tabs in the app:
 
 > The Patch tool can be useful for filling in a space that has contrasting colors (e.g. A red fire hydrant in a field of green grass), making it easier to follow up with inpainting.
 
+#### Text & Emoji
+
+Add Text and Emoji to the canvas to help with generation
+
+&nbsp; ![Text Demo](Media/ReadmeImages/TextDemo.gif) &nbsp;&nbsp; ![Emoji Demo](Media/ReadmeImages/EmojiDemo.gif)
+
+
 ## Getting Started
 
 ### Prerequisites
@@ -70,11 +77,11 @@ To listen for connections on the local network in ComfyUI, [follow their officia
 
 ## Architecture
 
-Mogri follows the MVVM pattern and utilizes standard `.NET MAUI` features along with the `MVVM Toolkit`.
+Mogri follows the MVVM pattern with an explicit split between `ViewModels`, `Coordinators`, leaf `Services`, `Clients`, `Helpers`, and a small set of framework adapter services. `ViewModels` stay focused on bound state and commands, `Coordinators` own multi-step workflows, leaf `Services` own reusable capabilities, and adapter services isolate framework concerns such as popup, navigation, toast, haptics, page animation, and main-thread dispatch from shared logic.
 
 Notable libraries include `.NET MAUI Community Toolkit`, `SkiaSharp` for image operations and drawing, `LiteDB`, `Mopups`, `ColorMinePortable`, and `Microsoft.Kiota` for generating the OpenAPI backend clients. Additionally, it leverages `ML.NET` and the `ONNX Runtime` to run on-device machine-learning models for image segmentation and patching.
 
-For a detailed breakdown of the application structure, including Views, ViewModels, and Services, please see [Architecture.md](Docs/Architecture.md).
+For a detailed breakdown of the application structure and dependency rules, see [Architecture.md](Docs/Architecture.md).
 
 ### FAQ (or *Possibly* Asked Questions)
 

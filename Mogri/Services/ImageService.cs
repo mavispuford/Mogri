@@ -1,5 +1,6 @@
 using ColorMine.ColorSpaces.Comparisons;
 using ColorMine.ColorSpaces;
+using Mogri.Helpers;
 using Mogri.Interfaces.Services;
 using SkiaSharp;
 
@@ -116,54 +117,7 @@ public class ImageService : IImageService
 
         try
         {
-            if (forceExactSize)
-            {
-                return resizeBitmap(bitmap, width, height, filterImage);
-            }
-
-            if (bitmap.Width == width &&
-                bitmap.Height == height)
-            {
-                return bitmap;
-            }
-
-            if (onlyIfLarger &&
-                bitmap.Width < width &&
-                bitmap.Height < height)
-            {
-                return bitmap;
-            }
-
-            // Scale to target, maintaining the aspect ratio
-            // 1024 x 512 -> 512 x 512 = 512 x 256
-            // 512 x 1024 -> 512 x 512 = 256 x 512
-            // 1024 x 512 -> 512 x 1024 = 512 x 256
-
-            var landscape = bitmap.Width > bitmap.Height;
-
-            var bitmapRatio = landscape ?
-                bitmap.Width / (float)bitmap.Height :
-                bitmap.Height / (float)bitmap.Width;
-
-            var targetWidth = 0;
-            var targetHeight = 0;
-
-            if (landscape)
-            {
-                targetWidth = width;
-                var dividedHeight = width / bitmapRatio;
-
-                targetHeight = (int)dividedHeight;
-            }
-            else
-            {
-                targetHeight = height;
-                var dividedWidth = height / bitmapRatio;
-
-                targetWidth = (int)dividedWidth;
-            }
-
-            return resizeBitmap(bitmap, targetWidth, targetHeight, filterImage);
+            return ImagePayloadHelper.GetResizedBitmap(bitmap, width, height, forceExactSize, filterImage, onlyIfLarger);
         }
         catch (Exception ex)
         {
@@ -237,20 +191,7 @@ public class ImageService : IImageService
     {
         try
         {
-            if (bitmap != null)
-            {
-                var thumbnailBitmap = GetResizedSKBitmap(bitmap, width, height, false, false, true);
-                if (thumbnailBitmap != null)
-                {
-                    using var thumbStream = new MemoryStream();
-                    using var skiaStream = new SKManagedWStream(thumbStream);
-                    thumbnailBitmap.Encode(skiaStream, SKEncodedImageFormat.Png, 100);
-                    thumbStream.Seek(0, SeekOrigin.Begin);
-                    var thumbBytes = thumbStream.ToArray();
-                    var thumbString = Convert.ToBase64String(thumbBytes);
-                    return string.Format(Constants.ImageDataFormat, contentType ?? "image/png", thumbString);
-                }
-            }
+            return ImagePayloadHelper.CreateThumbnailString(bitmap, contentType, width, height);
         }
         catch (Exception ex)
         {
@@ -258,11 +199,6 @@ public class ImageService : IImageService
         }
 
         return null;
-    }
-
-    private SKBitmap resizeBitmap(SKBitmap bitmap, int width, int height, bool filterImage = false)
-    {
-        return bitmap.Resize(new SKSizeI(width, height), filterImage ? new SKSamplingOptions(SKCubicResampler.Mitchell) : new SKSamplingOptions(SKFilterMode.Nearest, SKMipmapMode.None));
     }
 
     private List<Rgb> filterColors(List<Rgb> sourceList, double minDeltaE, IColorSpaceComparison colorSpaceComparison)

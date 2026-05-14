@@ -64,6 +64,14 @@ public class GestureContainer : ContentView
             else if (!EnableZooming && GestureRecognizers.Contains(_pinchGesture))
                 GestureRecognizers.Remove(_pinchGesture);
         }
+
+        if (_doubleTapGesture != null)
+        {
+            if (EnableZooming && !GestureRecognizers.Contains(_doubleTapGesture))
+                GestureRecognizers.Add(_doubleTapGesture);
+            else if (!EnableZooming && GestureRecognizers.Contains(_doubleTapGesture))
+                GestureRecognizers.Remove(_doubleTapGesture);
+        }
     }
 
     public static readonly BindableProperty EnableSwipeCommandsWhenScaleIsOneProperty = BindableProperty.Create(nameof(EnableSwipeCommandsWhenScaleIsOne), typeof(bool), typeof(GestureContainer), false);
@@ -131,12 +139,14 @@ public class GestureContainer : ContentView
         GestureRecognizers.Add(_pinchGesture);
         GestureRecognizers.Add(_doubleTapGesture);
 
+        UpdateGestureRecognizers();
+
         Unloaded += (s, e) => pinchTimer?.Dispose();
     }
 
     private async void OnDoubleTapped(object? sender, TappedEventArgs e)
     {
-        if (Content == null) return;
+        if (!EnableZooming || Content == null) return;
 
         if (currentScale > 1)
         {

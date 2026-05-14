@@ -1,12 +1,13 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mogri.Helpers;
+using Mogri.Interfaces.Services;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using System.Text.Json.Serialization;
 
 namespace Mogri.ViewModels;
 
-public partial class SegmentationMaskViewModel : PaintActionViewModel
+public partial class SegmentationMaskViewModel : PaintActionViewModel, ICanvasBitmapMaskAction
 {
     [ObservableProperty]
     [property: JsonIgnore]

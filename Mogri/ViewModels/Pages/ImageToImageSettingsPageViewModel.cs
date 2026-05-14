@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mogri.Helpers;
+using Mogri.Interfaces.Coordinators;
 using Mogri.Interfaces.Services;
 using Mogri.Interfaces.ViewModels;
 using Mogri.Interfaces.ViewModels.Pages;
@@ -55,7 +56,8 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
         IFileService fileService,
         IImageService imageService,
         IPopupService popupService,
-        ILoadingService loadingService) : base(loadingService)
+        INavigationService navigationService,
+        ILoadingCoordinator loadingCoordinator) : base(loadingCoordinator, navigationService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
@@ -110,7 +112,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
         cancelInitImageLoading();
         cancelMaskImageLoading();
 
-        await Shell.Current.GoToAsync("..");
+        await NavigationService.GoBackAsync();
     }
 
     [RelayCommand]
@@ -125,7 +127,7 @@ public partial class ImageToImageSettingsPageViewModel : PageViewModel, IImageTo
 
         var parameters = new Dictionary<string, object> { { NavigationParams.PromptSettings, _settings }, };
 
-        await Shell.Current.GoToAsync("..", parameters);
+        await NavigationService.GoBackAsync(parameters);
     }
 
     public override bool OnBackButtonPressed()

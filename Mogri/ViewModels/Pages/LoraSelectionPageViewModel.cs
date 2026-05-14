@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mogri.Interfaces.Coordinators;
 using Mogri.Interfaces.Services;
 using Mogri.Interfaces.ViewModels;
 using Mogri.Interfaces.ViewModels.Pages;
@@ -10,7 +11,7 @@ namespace Mogri.ViewModels;
 
 public partial class LoraSelectionPageViewModel : PageViewModel, ILoraSelectionPageViewModel
 {
-    private readonly IImageGenerationService _stableDiffusionService;
+    private readonly IImageGenerationCoordinator _stableDiffusionService;
     private readonly IPopupService _popupService;
 
     private List<ILoraViewModel> _allLoras = new();
@@ -26,9 +27,10 @@ public partial class LoraSelectionPageViewModel : PageViewModel, ILoraSelectionP
     public partial ILoraViewModel? LoraToAdd { get; set; }
 
     public LoraSelectionPageViewModel(
-        IImageGenerationService stableDiffusionService,
+        IImageGenerationCoordinator stableDiffusionService,
         IPopupService popupService,
-        ILoadingService loadingService) : base(loadingService)
+        INavigationService navigationService,
+        ILoadingCoordinator loadingCoordinator) : base(loadingCoordinator, navigationService)
     {
         _stableDiffusionService = stableDiffusionService ?? throw new ArgumentNullException(nameof(stableDiffusionService));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
@@ -88,7 +90,7 @@ public partial class LoraSelectionPageViewModel : PageViewModel, ILoraSelectionP
                 { NavigationParams.PromptSettings, _settings }
             };
 
-        await Shell.Current.GoToAsync("..", parameters);
+        await NavigationService.GoBackAsync(parameters!);
     }
 
     [RelayCommand]
@@ -106,7 +108,7 @@ public partial class LoraSelectionPageViewModel : PageViewModel, ILoraSelectionP
                 { NavigationParams.PromptSettings, newSettings }
             };
 
-            await Shell.Current.GoToAsync("..", parameters);
+            await NavigationService.GoBackAsync(parameters);
         }
         else
         {

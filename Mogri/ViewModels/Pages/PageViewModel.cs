@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.Input;
+using Mogri.Interfaces.Coordinators;
 using Mogri.Interfaces.Services;
 using Mogri.Interfaces.ViewModels;
 using Mogri.Interfaces.ViewModels.Pages;
@@ -7,11 +8,13 @@ namespace Mogri.ViewModels;
 
 public partial class PageViewModel : BaseViewModel, IPageViewModel
 {
-    protected ILoadingService LoadingService { get; set; }
+    protected ILoadingCoordinator LoadingCoordinator { get; }
+    protected INavigationService NavigationService { get; }
 
-    public PageViewModel(ILoadingService loadingService)
+    public PageViewModel(ILoadingCoordinator loadingCoordinator, INavigationService navigationService)
     {
-        LoadingService = loadingService ?? throw new ArgumentNullException(nameof(loadingService));
+        LoadingCoordinator = loadingCoordinator ?? throw new ArgumentNullException(nameof(loadingCoordinator));
+        NavigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
     }
 
     public virtual void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -55,7 +58,7 @@ public partial class PageViewModel : BaseViewModel, IPageViewModel
     [RelayCommand]
     protected async Task NavigateBack()
     {
-        await Shell.Current.GoToAsync("..");
+        await NavigationService.GoBackAsync();
     }
 
 }

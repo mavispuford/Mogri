@@ -1,6 +1,6 @@
 using System;
-using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Mvvm.Input;
+using Mogri.Interfaces.Coordinators;
 using Mogri.Interfaces.Services;
 using Mogri.Interfaces.ViewModels.Pages;
 
@@ -9,10 +9,14 @@ namespace Mogri.ViewModels.Pages;
 public partial class AboutPageViewModel : PageViewModel, IAboutPageViewModel
 {
     private const string GitHubPageUrl = "https://github.com/mavispuford/Mogri";
+    private readonly IToastService _toastService;
 
     public AboutPageViewModel(
-        ILoadingService loadingService) : base(loadingService)
+        ILoadingCoordinator loadingCoordinator,
+        IToastService toastService,
+        INavigationService navigationService) : base(loadingCoordinator, navigationService)
     {
+        _toastService = toastService ?? throw new ArgumentNullException(nameof(toastService));
     }
 
     public string AppVersion => $"v{AppInfo.Current.VersionString} ({AppInfo.Current.BuildString})";
@@ -21,7 +25,7 @@ public partial class AboutPageViewModel : PageViewModel, IAboutPageViewModel
     private async Task CopyVersionToClipboard()
     {
         await Clipboard.Default.SetTextAsync(AppVersion);
-        await Toast.Make("Copied to clipboard").Show();
+        await _toastService.ShowAsync("Copied to clipboard");
     }
 
     [RelayCommand]
@@ -33,7 +37,7 @@ public partial class AboutPageViewModel : PageViewModel, IAboutPageViewModel
     [RelayCommand]
     private Task NavigateToLicensesPage()
     {
-        return Shell.Current.GoToAsync("LicensesPage");
+        return NavigationService.GoToAsync("LicensesPage");
     }
 
 }

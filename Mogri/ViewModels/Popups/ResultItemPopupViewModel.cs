@@ -1,4 +1,3 @@
-using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mogri.Interfaces.Services;
@@ -10,6 +9,7 @@ namespace Mogri.ViewModels;
 public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemPopupViewModel
 {
     private readonly IFileService _fileService;
+    private readonly IToastService _toastService;
     private IList<IResultItemViewModel> _resultItems = [];
 
     [ObservableProperty]
@@ -17,9 +17,11 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
 
     public ResultItemPopupViewModel(
         IPopupService popupService,
-        IFileService fileService) : base(popupService)
+        IFileService fileService,
+        IToastService toastService) : base(popupService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
+        _toastService = toastService ?? throw new ArgumentNullException(nameof(toastService));
     }
 
     public override async void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -74,7 +76,7 @@ public partial class ResultItemPopupViewModel : PopupBaseViewModel, IResultItemP
 
         await _fileService.WriteImageFileToExternalStorageAsync(Path.GetFileName(ResultItem.InternalUri), stream);
 
-        await Toast.Make("Image saved.").Show();
+        await _toastService.ShowAsync("Image saved.");
     }
 
     [RelayCommand]

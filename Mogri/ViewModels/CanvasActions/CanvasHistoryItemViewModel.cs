@@ -24,6 +24,9 @@ public partial class CanvasHistoryItemViewModel : ObservableObject, ICanvasHisto
     private CanvasActionViewModel? _canvasAction;
 
     [ObservableProperty]
+    private TextElementViewModel? _textElement;
+
+    [ObservableProperty]
     private string _icon = string.Empty;
 
     [ObservableProperty]
@@ -62,7 +65,18 @@ public partial class CanvasHistoryItemViewModel : ObservableObject, ICanvasHisto
     {
         _deleteAction = deleteAction;
         _duplicateAction = duplicateAction;
+        TextElement = null;
         CanvasAction = canvasAction;
+
+        initialize();
+    }
+
+    public void InitWith(TextElementViewModel textElement, Action<ICanvasHistoryItemViewModel> deleteAction, Action<ICanvasHistoryItemViewModel> duplicateAction)
+    {
+        _deleteAction = deleteAction;
+        _duplicateAction = duplicateAction;
+        CanvasAction = null;
+        TextElement = textElement;
 
         initialize();
     }
@@ -116,6 +130,17 @@ public partial class CanvasHistoryItemViewModel : ObservableObject, ICanvasHisto
             DisplayColor = segMask.Color;
             Alpha = segMask.Alpha;
         }
+        else if (TextElement != null)
+        {
+            IsSnapshot = false;
+            IsEditable = true;
+            IsDuplicable = true;
+            IsDeletable = true;
+            Icon = "\uea1e"; // Text
+            IsColorVisible = true;
+            DisplayColor = TextElement.Color;
+            Alpha = TextElement.Alpha;
+        }
 
         if (!IsSnapshot)
         {
@@ -127,6 +152,11 @@ public partial class CanvasHistoryItemViewModel : ObservableObject, ICanvasHisto
         if (CanvasAction != null && !IsSnapshot)
         {
             CanvasAction.PropertyChanged += action_PropertyChanged;
+        }
+
+        if (TextElement != null)
+        {
+            TextElement.PropertyChanged += textElement_PropertyChanged;
         }
     }
 
@@ -180,15 +210,51 @@ public partial class CanvasHistoryItemViewModel : ObservableObject, ICanvasHisto
         }
     }
 
+    private void textElement_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (TextElement == null)
+        {
+            return;
+        }
+
+        if (e.PropertyName == nameof(TextElementViewModel.Color))
+        {
+            DisplayColor = TextElement.Color;
+        }
+        else if (e.PropertyName == nameof(TextElementViewModel.Alpha))
+        {
+            Alpha = TextElement.Alpha;
+            updateDescription();
+        }
+        else if (e.PropertyName == nameof(TextElementViewModel.Noise))
+        {
+            updateDescription();
+        }
+        else if (e.PropertyName == nameof(TextElementViewModel.Text))
+        {
+            updateDescription();
+        }
+    }
+
     [RelayCommand]
     private async Task EditAsync()
     {
-        if (CanvasAction == null || !IsEditable) return;
+        if (!IsEditable) return;
 
-        var parameters = new Dictionary<string, object>
+        var parameters = new Dictionary<string, object>();
+
+        if (CanvasAction != null)
         {
-            { "Action", CanvasAction }
-        };
+            parameters.Add("Action", CanvasAction);
+        }
+        else if (TextElement != null)
+        {
+            parameters.Add("TextElement", TextElement);
+        }
+        else
+        {
+            return;
+        }
 
         await _popupService.ShowPopupAsync("EditMaskItemPopup", parameters);
     }
@@ -224,5 +290,28 @@ public partial class CanvasHistoryItemViewModel : ObservableObject, ICanvasHisto
         {
             Description = $"{segMask.Alpha:P0}";
         }
+        else if (TextElement != null)
+        {
+            var preview = createTextPreview(TextElement.Text);
+            Description = $"{preview}, {TextElement.Alpha:P0}, Noise {TextElement.Noise:P0}";
+        }
+    }
+
+    private static string createTextPreview(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return "Text";
+        }
+
+        var flattened = string.Join(" ", text
+            .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+
+        if (flattened.Length > 18)
+        {
+            flattened = flattened[..18] + "...";
+        }
+
+        return $"\"{flattened}\"";
     }
 }
