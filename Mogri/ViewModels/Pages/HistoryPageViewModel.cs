@@ -64,18 +64,15 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         {
             if (t.IsCanceled) return;
 
-            if (Application.Current != null)
+            await _mainThreadService.InvokeOnMainThreadAsync(async () =>
             {
-                await _mainThreadService.InvokeOnMainThreadAsync(async () =>
+                itemIndex = 0;
+                HistoryItems.Clear();
+                if (LoadItemsCommand != null)
                 {
-                    itemIndex = 0;
-                    HistoryItems.Clear();
-                    if (LoadItemsCommand != null)
-                    {
-                        await LoadItemsCommand.ExecuteAsync(null);
-                    }
-                });
-            }
+                    await LoadItemsCommand.ExecuteAsync(null);
+                }
+            });
         });
     }
 
@@ -114,23 +111,20 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
             {
                 var hasChanges = await _historyService.InitializeAsync();
 
-                if (Application.Current != null)
+                await _mainThreadService.InvokeOnMainThreadAsync(async () =>
                 {
-                    await _mainThreadService.InvokeOnMainThreadAsync(async () =>
+                    if (hasChanges || HistoryItems.Count == 0 || !string.IsNullOrWhiteSpace(SearchText))
                     {
-                        if (hasChanges || HistoryItems.Count == 0 || !string.IsNullOrWhiteSpace(SearchText))
-                        {
-                            itemIndex = 0;
-                            HistoryItems.Clear();
-                            _isInitialized = true; // Set to true before calling LoadItems
-                            await LoadItems();
-                        }
-                        else
-                        {
-                            _isInitialized = true;
-                        }
-                    });
-                }
+                        itemIndex = 0;
+                        HistoryItems.Clear();
+                        _isInitialized = true; // Set to true before calling LoadItems
+                        await LoadItems();
+                    }
+                    else
+                    {
+                        _isInitialized = true;
+                    }
+                });
             }
             catch (Exception ex)
             {
@@ -240,7 +234,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
     private async Task LoadItemsCoreAsync(int takeCount)
     {
-        var results = (await _historyService.SearchAsync(SearchText ?? string.Empty, itemIndex, takeCount)).ToList();
+        var results = (await _historyService.SearchAsync(SearchText ?? string.Empty, itemIndex, takeCount) ?? []).ToList();
 
         foreach (var entity in results)
         {
