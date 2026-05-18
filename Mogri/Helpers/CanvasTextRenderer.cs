@@ -62,7 +62,7 @@ public static class CanvasTextRenderer
         canvas.Restore();
     }
 
-    public static void DrawTextElement(SKCanvas canvas, TextElementViewModel textElement, float canvasScale = 1f)
+    public static void DrawTextElement(SKCanvas canvas, TextElementViewModel textElement, float canvasScale = 1f, bool suppressNoise = false)
     {
         if (string.IsNullOrEmpty(textElement.Text))
         {
@@ -82,7 +82,7 @@ public static class CanvasTextRenderer
         canvas.RotateDegrees(textElement.Rotation);
         canvas.Scale(textElement.Scale * textElement.ScaleXMultiplier, textElement.Scale * textElement.ScaleYMultiplier);
         canvas.Translate(-bounds.MidX, -bounds.MidY);
-        drawTextWithFallback(canvas, textElement.Text, textElement.Color, textElement.Alpha, textElement.Noise, textElement.BaseFontSize);
+        drawTextWithFallback(canvas, textElement.Text, textElement.Color, textElement.Alpha, textElement.Noise, textElement.BaseFontSize, suppressNoise);
 
         canvas.Restore();
     }
@@ -103,7 +103,7 @@ public static class CanvasTextRenderer
         return preparedBitmap;
     }
 
-    private static void drawTextWithFallback(SKCanvas canvas, string text, Color color, float alpha, double noise, float baseFontSize)
+    private static void drawTextWithFallback(SKCanvas canvas, string text, Color color, float alpha, double noise, float baseFontSize, bool suppressNoise)
     {
         if (string.IsNullOrEmpty(text))
         {
@@ -111,8 +111,9 @@ public static class CanvasTextRenderer
         }
 
         var skColor = color.ToSKColor().WithAlpha((byte)Math.Clamp((int)Math.Round(alpha * 255f), 0, 255));
+        var effectiveNoise = suppressNoise ? 0d : noise;
 
-        if (noise <= 0d)
+        if (effectiveNoise <= 0d)
         {
             processTextRunsWithFallback(text, baseFontSize, skColor, (textRun, font, paint, shaper, _, originX) =>
             {
@@ -140,7 +141,7 @@ public static class CanvasTextRenderer
             paint.Shader = null;
 
             using var fillPaint = new SKPaint();
-            using var fillShader = configureTextFillPaint(fillPaint, skColor, noise);
+            using var fillShader = configureTextFillPaint(fillPaint, skColor, effectiveNoise);
 
             // Fill through a text alpha mask so standard text keeps the current replacement-fill behavior.
             fillPaint.BlendMode = SKBlendMode.SrcIn;

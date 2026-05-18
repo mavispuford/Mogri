@@ -46,6 +46,10 @@ internal sealed class CanvasPageTextInteractionState
 
     public SKPoint LastTapViewLocation { get; set; }
 
+    public bool IsSelectedTextGestureActive => SelectedTextElement != null
+        && ActiveTouches.Count > 0
+        && (IsTransformGesture || (PrimaryTouchId.HasValue && !SuppressSingleTouchUntilRelease));
+
     public void ResetGestureState(bool clearTapState)
     {
         ActiveTouches.Clear();

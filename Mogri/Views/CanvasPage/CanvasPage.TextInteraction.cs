@@ -28,6 +28,8 @@ public partial class CanvasPage
     // Text tool interaction flow.
     private void handleTextToolTouch(SKTouchEventArgs e, SKPoint viewLocation, SKPoint imageLocation)
     {
+        var wasSelectedTextGestureActive = _textInteraction.IsSelectedTextGestureActive;
+
         switch (e.ActionType)
         {
             case SKTouchAction.Pressed:
@@ -99,6 +101,8 @@ public partial class CanvasPage
                 completeTextToolTouch(e.Id, viewLocation, imageLocation, e.ActionType == SKTouchAction.Released);
                 break;
         }
+
+        invalidateTextSurfaceForNoiseRenderingStateChange(wasSelectedTextGestureActive);
     }
 
     private void beginTextDragGesture(long touchId, SKPoint imageLocation, TextElementViewModel textElement)
@@ -339,6 +343,14 @@ public partial class CanvasPage
     private void clearLastTextTap()
     {
         _textInteraction.ClearTapState();
+    }
+
+    private void invalidateTextSurfaceForNoiseRenderingStateChange(bool wasSelectedTextGestureActive)
+    {
+        if (wasSelectedTextGestureActive != _textInteraction.IsSelectedTextGestureActive)
+        {
+            TextCanvasView.InvalidateSurface();
+        }
     }
 
     private bool canFlipSelectedText()
