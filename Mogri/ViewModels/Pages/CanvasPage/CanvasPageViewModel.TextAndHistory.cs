@@ -210,6 +210,8 @@ public partial class CanvasPageViewModel
             X = element.X,
             Y = element.Y,
             Scale = element.Scale,
+            ScaleXMultiplier = element.ScaleXMultiplier,
+            ScaleYMultiplier = element.ScaleYMultiplier,
             Rotation = element.Rotation,
             Color = element.Color,
             Alpha = element.Alpha,

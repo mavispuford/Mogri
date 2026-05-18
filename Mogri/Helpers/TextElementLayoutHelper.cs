@@ -78,8 +78,8 @@ public static class TextElementLayoutHelper
         float cos,
         float sin)
     {
-        var offsetX = (localX - center.X) * textElement.Scale;
-        var offsetY = (localY - center.Y) * textElement.Scale;
+        var offsetX = (localX - center.X) * textElement.Scale * textElement.ScaleXMultiplier;
+        var offsetY = (localY - center.Y) * textElement.Scale * textElement.ScaleYMultiplier;
 
         var rotatedX = offsetX * cos - offsetY * sin;
         var rotatedY = offsetX * sin + offsetY * cos;

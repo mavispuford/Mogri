@@ -79,6 +79,12 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
     public partial IRelayCommand? ResetZoomCommand { get; set; }
 
     [ObservableProperty]
+    public partial IRelayCommand? FlipSelectedTextHorizontallyCommand { get; set; }
+
+    [ObservableProperty]
+    public partial IRelayCommand? FlipSelectedTextVerticallyCommand { get; set; }
+
+    [ObservableProperty]
     public partial List<IPaintingToolViewModel> AvailableTools { get; set; } = new();
 
     [ObservableProperty]

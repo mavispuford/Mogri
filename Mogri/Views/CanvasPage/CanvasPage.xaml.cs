@@ -114,6 +114,18 @@ public partial class CanvasPage : BasePage
         set => SetValue(ResetZoomCommandProperty, value);
     }
 
+    public IRelayCommand FlipSelectedTextHorizontallyCommand
+    {
+        get => (IRelayCommand)GetValue(FlipSelectedTextHorizontallyCommandProperty);
+        set => SetValue(FlipSelectedTextHorizontallyCommandProperty, value);
+    }
+
+    public IRelayCommand FlipSelectedTextVerticallyCommand
+    {
+        get => (IRelayCommand)GetValue(FlipSelectedTextVerticallyCommandProperty);
+        set => SetValue(FlipSelectedTextVerticallyCommandProperty, value);
+    }
+
     public float BoundingBoxSize
     {
         get => (float)GetValue(BoundingBoxSizeProperty);
@@ -193,6 +205,10 @@ public partial class CanvasPage : BasePage
 
     public static BindableProperty ResetZoomCommandProperty = BindableProperty.Create(nameof(ResetZoomCommand), typeof(IRelayCommand), typeof(CanvasPage), default(IRelayCommand));
 
+    public static BindableProperty FlipSelectedTextHorizontallyCommandProperty = BindableProperty.Create(nameof(FlipSelectedTextHorizontallyCommand), typeof(IRelayCommand), typeof(CanvasPage), default(IRelayCommand));
+
+    public static BindableProperty FlipSelectedTextVerticallyCommandProperty = BindableProperty.Create(nameof(FlipSelectedTextVerticallyCommand), typeof(IRelayCommand), typeof(CanvasPage), default(IRelayCommand));
+
     public static BindableProperty ShowBoundingBoxProperty = BindableProperty.Create(nameof(ShowBoundingBox), typeof(bool), typeof(CanvasPage), false, propertyChanged: (bindable, oldValue, newValue) =>
     {
         ((CanvasPage)bindable).UpdateBoundingBox(false);
@@ -236,9 +252,13 @@ public partial class CanvasPage : BasePage
         this.SetBinding(SegmentationBitmapProperty, nameof(ICanvasPageViewModel.SegmentationBitmap), BindingMode.TwoWay);
         this.SetBinding(ShowActionsProperty, nameof(ICanvasPageViewModel.ShowActions), BindingMode.OneWay);
         this.SetBinding(ResetZoomCommandProperty, nameof(ICanvasPageViewModel.ResetZoomCommand), BindingMode.OneWayToSource);
+        this.SetBinding(FlipSelectedTextHorizontallyCommandProperty, nameof(ICanvasPageViewModel.FlipSelectedTextHorizontallyCommand), BindingMode.OneWayToSource);
+        this.SetBinding(FlipSelectedTextVerticallyCommandProperty, nameof(ICanvasPageViewModel.FlipSelectedTextVerticallyCommand), BindingMode.OneWayToSource);
 
         PrepareForSavingCommand = new AsyncRelayCommand<IAsyncRelayCommand>(PrepareForSaving);
         ResetZoomCommand = new RelayCommand(() => ZoomContainer.Reset(true));
+        FlipSelectedTextHorizontallyCommand = new RelayCommand(flipSelectedTextHorizontally, canFlipSelectedText);
+        FlipSelectedTextVerticallyCommand = new RelayCommand(flipSelectedTextVertically, canFlipSelectedText);
     }
 
     protected override void OnAppearing()

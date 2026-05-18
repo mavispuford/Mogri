@@ -258,6 +258,7 @@ public partial class CanvasPage
         {
             resetTextInteractionState(clearSelection: true, clearTapState: true);
             ShowBoundingBox = false;
+            updateTextFlipButtonsVisibility();
             return;
         }
 
@@ -318,6 +319,8 @@ public partial class CanvasPage
                     break;
             }
         }
+
+        updateTextFlipButtonsVisibility();
     }
 
     private void disposeTimers()

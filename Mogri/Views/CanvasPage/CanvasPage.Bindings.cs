@@ -150,6 +150,8 @@ public partial class CanvasPage
             or nameof(TextElementViewModel.X)
             or nameof(TextElementViewModel.Y)
             or nameof(TextElementViewModel.Scale)
+            or nameof(TextElementViewModel.ScaleXMultiplier)
+            or nameof(TextElementViewModel.ScaleYMultiplier)
             or nameof(TextElementViewModel.Rotation)
             or nameof(TextElementViewModel.Color)
             or nameof(TextElementViewModel.Alpha)

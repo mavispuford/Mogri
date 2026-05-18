@@ -38,7 +38,7 @@ public static class CanvasTextRenderer
 
         canvas.Translate(textElement.X, textElement.Y);
         canvas.RotateDegrees(textElement.Rotation);
-        canvas.Scale(textElement.Scale);
+        canvas.Scale(textElement.Scale * textElement.ScaleXMultiplier, textElement.Scale * textElement.ScaleYMultiplier);
         canvas.Translate(-bounds.MidX, -bounds.MidY);
 
         using var shadowPaint = new SKPaint
@@ -80,7 +80,7 @@ public static class CanvasTextRenderer
 
         canvas.Translate(textElement.X, textElement.Y);
         canvas.RotateDegrees(textElement.Rotation);
-        canvas.Scale(textElement.Scale);
+        canvas.Scale(textElement.Scale * textElement.ScaleXMultiplier, textElement.Scale * textElement.ScaleYMultiplier);
         canvas.Translate(-bounds.MidX, -bounds.MidY);
         drawTextWithFallback(canvas, textElement.Text, textElement.Color, textElement.Alpha, textElement.Noise, textElement.BaseFontSize);
 

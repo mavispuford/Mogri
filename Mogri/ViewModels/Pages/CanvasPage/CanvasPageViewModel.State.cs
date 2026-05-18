@@ -28,6 +28,8 @@ public partial class CanvasPageViewModel
             X = textElement.X,
             Y = textElement.Y,
             Scale = textElement.Scale,
+            ScaleXMultiplier = textElement.ScaleXMultiplier,
+            ScaleYMultiplier = textElement.ScaleYMultiplier,
             Rotation = textElement.Rotation,
             Color = textElement.Color,
             Alpha = textElement.Alpha,

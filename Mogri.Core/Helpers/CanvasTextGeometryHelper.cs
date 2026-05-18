@@ -20,6 +20,8 @@ public static class CanvasTextGeometryHelper
         float textY,
         float rotationDegrees,
         float scale,
+        float scaleXMultiplier,
+        float scaleYMultiplier,
         float minScale,
         SKRect bounds)
     {
@@ -31,8 +33,15 @@ public static class CanvasTextGeometryHelper
             translatedPoint.X * cos - translatedPoint.Y * sin,
             translatedPoint.X * sin + translatedPoint.Y * cos);
         var safeScale = Math.Max(scale, minScale);
-        var unscaledPoint = new SKPoint(rotatedPoint.X / safeScale, rotatedPoint.Y / safeScale);
+        var safeScaleX = safeScale * getSafeAxisMultiplier(scaleXMultiplier);
+        var safeScaleY = safeScale * getSafeAxisMultiplier(scaleYMultiplier);
+        var unscaledPoint = new SKPoint(rotatedPoint.X / safeScaleX, rotatedPoint.Y / safeScaleY);
 
         return new SKPoint(unscaledPoint.X + bounds.MidX, unscaledPoint.Y + bounds.MidY);
+    }
+
+    private static float getSafeAxisMultiplier(float value)
+    {
+        return value == 0f ? 1f : value;
     }
 }

@@ -38,6 +38,8 @@ public static class CanvasTextHitTester
                 textElement.Y,
                 textElement.Rotation,
                 textElement.Scale,
+                textElement.ScaleXMultiplier,
+                textElement.ScaleYMultiplier,
                 minTextScale,
                 bounds);
             var hitBounds = CanvasTextGeometryHelper.GetInflatedBounds(bounds, textSelectionPadding);

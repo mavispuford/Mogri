@@ -96,6 +96,10 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     IRelayCommand? ResetZoomCommand { get; set; }
 
+    IRelayCommand? FlipSelectedTextHorizontallyCommand { get; set; }
+
+    IRelayCommand? FlipSelectedTextVerticallyCommand { get; set; }
+
     bool IsZoomMode { get; }
 
     IAsyncRelayCommand SetResolutionCommand { get; }
