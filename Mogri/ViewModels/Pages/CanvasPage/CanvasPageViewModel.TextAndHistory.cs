@@ -4,7 +4,8 @@ using SkiaSharp;
 namespace Mogri.ViewModels;
 
 /// <summary>
-/// Canvas page view model partial that owns undo, history actions, and user-facing text add, edit, delete, and duplicate flows.
+/// Canvas page view model partial that owns undo/history actions, user-facing text flows,
+/// and the snapshot/state helpers those editing flows depend on.
 /// </summary>
 public partial class CanvasPageViewModel
 {
@@ -167,33 +168,6 @@ public partial class CanvasPageViewModel
         TextElements.Remove(element);
     }
 
-    private void DeleteCanvasAction(CanvasActionViewModel action)
-    {
-        if (action == null
-            || action is SnapshotCanvasActionViewModel
-            || !CanvasActions.Contains(action))
-        {
-            return;
-        }
-
-        CanvasActions.Remove(action);
-    }
-
-    private void DuplicateCanvasAction(CanvasActionViewModel action)
-    {
-        if (action == null
-            || action is SnapshotCanvasActionViewModel
-            || !CanvasActions.Contains(action))
-        {
-            return;
-        }
-
-        var duplicatedAction = action.Clone();
-        duplicatedAction.Order = getNextCanvasOrder();
-
-        CanvasActions.Add(duplicatedAction);
-    }
-
     [RelayCommand]
     private void DuplicateText(TextElementViewModel element)
     {
@@ -239,5 +213,134 @@ public partial class CanvasPageViewModel
         }
 
         element.Text = updatedText.Trim();
+    }
+
+    private void DeleteCanvasAction(CanvasActionViewModel action)
+    {
+        if (action == null
+            || action is SnapshotCanvasActionViewModel
+            || !CanvasActions.Contains(action))
+        {
+            return;
+        }
+
+        CanvasActions.Remove(action);
+    }
+
+    private void DuplicateCanvasAction(CanvasActionViewModel action)
+    {
+        if (action == null
+            || action is SnapshotCanvasActionViewModel
+            || !CanvasActions.Contains(action))
+        {
+            return;
+        }
+
+        var duplicatedAction = action.Clone();
+        duplicatedAction.Order = getNextCanvasOrder();
+
+        CanvasActions.Add(duplicatedAction);
+    }
+
+    private int PushTextSnapshot()
+    {
+        var nextOrder = getNextCanvasOrder();
+        CanvasActions.Add(new TextSnapshotCanvasActionViewModel
+        {
+            Order = nextOrder,
+            TextElementsSnapshot = TextElements
+                .Select(cloneTextElement)
+                .ToList()
+        });
+
+        return nextOrder;
+    }
+
+    private async Task<string?> pushSnapshotAsync(string description, bool includeCanvasActions)
+    {
+        var sourceBitmap = SourceBitmap;
+        if (sourceBitmap == null) return null;
+
+        var actionsToSave = includeCanvasActions ? CanvasActions.ToList() : null;
+        var textElementsToSave = TextElements.Count > 0
+            ? TextElements.Select(cloneTextElement).ToList()
+            : null;
+        var snapshotId = await _canvasHistoryService.SaveSnapshotAsync(sourceBitmap, actionsToSave, textElementsToSave);
+
+        return snapshotId;
+    }
+
+    private void insertSnapshotMarker(string snapshotId, string description, bool includeCanvasActions)
+    {
+        CanvasActions.Add(new SnapshotCanvasActionViewModel
+        {
+            Order = getNextCanvasOrder(),
+            SnapshotId = snapshotId,
+            Description = description,
+            IncludesCanvasActions = includeCanvasActions
+        });
+    }
+
+    private void restoreCanvasActions(IEnumerable<CanvasActionViewModel>? actions)
+    {
+        CanvasActions.Clear();
+
+        if (actions == null)
+        {
+            return;
+        }
+
+        foreach (var action in actions.OrderBy(action => action.Order))
+        {
+            CanvasActions.Add(action);
+        }
+    }
+
+    private void restoreTextElements(IEnumerable<TextElementViewModel>? textElements)
+    {
+        TextElements.Clear();
+
+        if (textElements == null)
+        {
+            return;
+        }
+
+        foreach (var textElement in textElements.OrderBy(textElement => textElement.Order))
+        {
+            TextElements.Add(textElement);
+        }
+    }
+
+    private async Task clearAllActionsAndHistoryAsync()
+    {
+        await _canvasHistoryService.ClearAllAsync();
+        CanvasActions.Clear();
+        TextElements.Clear();
+    }
+
+    private int getNextCanvasOrder()
+    {
+        var nextCanvasActionOrder = CanvasActions.Count == 0 ? 0 : CanvasActions.Max(canvasAction => canvasAction.Order) + 1;
+        var nextTextOrder = TextElements.Count == 0 ? 0 : checked((int)(TextElements.Max(textElement => textElement.Order) + 1));
+
+        return Math.Max(nextCanvasActionOrder, nextTextOrder);
+    }
+
+    private static TextElementViewModel cloneTextElement(TextElementViewModel textElement)
+    {
+        return new TextElementViewModel(textElement.Id, textElement.Order, textElement.BaseFontSize)
+        {
+            Text = textElement.Text,
+            X = textElement.X,
+            Y = textElement.Y,
+            Scale = textElement.Scale,
+            ScaleXMultiplier = textElement.ScaleXMultiplier,
+            ScaleYMultiplier = textElement.ScaleYMultiplier,
+            Rotation = textElement.Rotation,
+            Color = textElement.Color,
+            Alpha = textElement.Alpha,
+            Noise = textElement.Noise,
+            IsSelected = textElement.IsSelected
+        };
     }
 }
