@@ -277,7 +277,7 @@ public partial class CanvasHistoryPopupViewModel : PopupBaseViewModel, ICanvasHi
     [RelayCommand]
     private async Task ClearAll()
     {
-        var result = await _popupService.DisplayAlertAsync("Clear all?", "This will clear all history including image undo checkpoints. Continue?", "YES", "Cancel");
+        var result = await _popupService.DisplayAlertAsync("Clear all?", "This will clear all items including image undo checkpoints. Continue?", "YES", "Cancel");
         if (result)
         {
             if (_onClearAllCallback != null)

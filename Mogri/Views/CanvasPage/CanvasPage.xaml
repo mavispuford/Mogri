@@ -108,13 +108,13 @@
     </Shell.TitleView>
 
     <views:BasePage.ToolbarItems>
-        <ToolbarItem Text="Undo" Command="{Binding UndoCommand}" Order="Primary">
+        <ToolbarItem Text="Undo Last Item" Command="{Binding UndoCommand}" Order="Primary">
             <ToolbarItem.IconImageSource>
                 <FontImageSource Glyph="&#xe166;" FontFamily="{StaticResource IconFontLight}" Size="30" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
 
-        <ToolbarItem Text="History" Order="Primary" Command="{Binding ShowHistoryCommand}">
+        <ToolbarItem Text="Canvas Items" Order="Primary" Command="{Binding ShowHistoryCommand}">
             <ToolbarItem.IconImageSource>
                 <FontImageSource Glyph="&#xe241;" FontFamily="{StaticResource IconFontLight}" Size="30" />
             </ToolbarItem.IconImageSource>
