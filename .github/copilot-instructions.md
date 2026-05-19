@@ -13,7 +13,7 @@ For full architecture details, see `Docs/Architecture.md`.
 - `Mogri/` — Main MAUI app (Views, ViewModels, Services, Clients, Controls, Models, Registrations)
 - `Mogri.Core/` — Shared core library (platform-independent services, interfaces, models, helpers)
 - `Mogri.Tests/` — Unit tests (xUnit + Moq)
-- `Docs/` — Architecture docs, changelog, how-to guides
+- `Docs/` — Architecture docs, how-to guides
 - `OpenApiSpecs/` — OpenAPI specs for backend APIs (SD Forge Neo, ComfyUI)
 
 ## Architecture (MVVM)
