@@ -82,6 +82,13 @@
                 <Setter Property="WidthRequest" Value="200" />
                 <Setter Property="HeightRequest" Value="40" />
             </Style>
+
+            <Style x:Key="SecondaryContextButtonStyle" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Secondary}, Dark=Transparent}" />
+                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Primary}, Dark=White}" />
+                <Setter Property="BorderColor" Value="{AppThemeBinding Light=Transparent, Dark={StaticResource CadetFortyPercent}}" />
+                <Setter Property="BorderWidth" Value="1" />
+            </Style>
         </ResourceDictionary>
     </views:BasePage.Resources>
 
@@ -101,13 +108,13 @@
     </Shell.TitleView>
 
     <views:BasePage.ToolbarItems>
-        <ToolbarItem Text="Undo" Command="{Binding UndoCommand}" Order="Primary">
+        <ToolbarItem Text="Undo Last Item" Command="{Binding UndoCommand}" Order="Primary">
             <ToolbarItem.IconImageSource>
                 <FontImageSource Glyph="&#xe166;" FontFamily="{StaticResource IconFontLight}" Size="30" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
 
-        <ToolbarItem Text="History" Order="Primary" Command="{Binding ShowHistoryCommand}">
+        <ToolbarItem Text="Canvas Items" Order="Primary" Command="{Binding ShowHistoryCommand}">
             <ToolbarItem.IconImageSource>
                 <FontImageSource Glyph="&#xe241;" FontFamily="{StaticResource IconFontLight}" Size="30" />
             </ToolbarItem.IconImageSource>
@@ -187,7 +194,8 @@
         </controls:GestureContainer>
 
         <!-- For some reason, the ActivityIndicator doesn't show on Android unless we wrap it in a ContentView -->
-        <ContentView Grid.RowSpan="3">
+        <ContentView Grid.RowSpan="3"
+                     InputTransparent="True">
             <ActivityIndicator HorizontalOptions="Center" 
                            VerticalOptions="Center"
                            IsRunning="{Binding IsBusy}"
@@ -219,7 +227,7 @@
                     <LinearItemsLayout Orientation="Horizontal"
                                     SnapPointsAlignment="Center"
                                     SnapPointsType="MandatorySingle"
-                                    ItemSpacing="4"/>
+                                    ItemSpacing="2"/>
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="viewModels:IPaintingToolViewModel">
@@ -259,6 +267,8 @@
                              Grid.RowSpan="2"
                              HorizontalOptions="Fill"
                              VerticalOptions="Start"
+                             InputTransparent="True"
+                             CascadeInputTransparent="False"
                              Spacing="10">
             
             <HorizontalStackLayout x:Name="ContextButtonsLayout"
@@ -481,6 +491,8 @@
               Grid.Row="2"
               ColumnDefinitions="*,auto"
               ColumnSpacing="10"
+              InputTransparent="True"
+              CascadeInputTransparent="False"
               Margin="0">
             <FlexLayout Grid.Column="0"
                         AlignContent="Center"
@@ -489,8 +501,20 @@
                         IsVisible="{Binding CurrentTool.Type, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:ToolType.MagicWand}}">
 
                 <Button Text="Fill" Command="{Binding ApplySegmentationMaskCommand}" WidthRequest="70"/>
-                <Button Text="Invert" BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark=Transparent}" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark=White}" BorderColor="{AppThemeBinding Light=Transparent, Dark={StaticResource CadetFortyPercent}}" BorderWidth="1" Command="{Binding InvertSegmentationMaskCommand}" />
-                <Button Text="Clear" BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark=Transparent}" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark=White}" BorderColor="{AppThemeBinding Light=Transparent, Dark={StaticResource CadetFortyPercent}}" BorderWidth="1" Command="{Binding ClearSegmentationMaskCommand}" />
+                <Button Text="Invert" Style="{StaticResource SecondaryContextButtonStyle}" Command="{Binding InvertSegmentationMaskCommand}" />
+                <Button Text="Clear" Style="{StaticResource SecondaryContextButtonStyle}" Command="{Binding ClearSegmentationMaskCommand}" />
+
+            </FlexLayout>
+
+            <FlexLayout x:Name="TextFlipButtonsLayout"
+                        Grid.Column="0"
+                        AlignContent="Center"
+                        AlignItems="Center"
+                        JustifyContent="SpaceEvenly"
+                        IsVisible="False">
+                        
+                <Button Text="Flip X" Style="{StaticResource SecondaryContextButtonStyle}" Command="{Binding FlipSelectedTextHorizontallyCommand}" WidthRequest="80" />
+                <Button Text="Flip Y" Style="{StaticResource SecondaryContextButtonStyle}" Command="{Binding FlipSelectedTextVerticallyCommand}" WidthRequest="80" />
 
             </FlexLayout>
 

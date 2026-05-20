@@ -1,5 +1,6 @@
 using Mogri.Interfaces.ViewModels.Pages;
 using Mogri.Helpers;
+using Mogri.Enums;
 using Mogri.ViewModels;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
@@ -27,6 +28,8 @@ public partial class CanvasPage
     // Text tool interaction flow.
     private void handleTextToolTouch(SKTouchEventArgs e, SKPoint viewLocation, SKPoint imageLocation)
     {
+        var wasSelectedTextGestureActive = _textInteraction.IsSelectedTextGestureActive;
+
         switch (e.ActionType)
         {
             case SKTouchAction.Pressed:
@@ -98,6 +101,8 @@ public partial class CanvasPage
                 completeTextToolTouch(e.Id, viewLocation, imageLocation, e.ActionType == SKTouchAction.Released);
                 break;
         }
+
+        invalidateTextSurfaceForNoiseRenderingStateChange(wasSelectedTextGestureActive);
     }
 
     private void beginTextDragGesture(long touchId, SKPoint imageLocation, TextElementViewModel textElement)
@@ -319,6 +324,8 @@ public partial class CanvasPage
         {
             _textInteraction.SelectedTextElement.IsSelected = true;
         }
+
+        updateTextFlipButtonsVisibility();
     }
 
     private void resetTextInteractionState(bool clearSelection, bool clearTapState)
@@ -336,6 +343,63 @@ public partial class CanvasPage
     private void clearLastTextTap()
     {
         _textInteraction.ClearTapState();
+    }
+
+    private void invalidateTextSurfaceForNoiseRenderingStateChange(bool wasSelectedTextGestureActive)
+    {
+        if (wasSelectedTextGestureActive != _textInteraction.IsSelectedTextGestureActive)
+        {
+            TextCanvasView.InvalidateSurface();
+        }
+    }
+
+    private bool canFlipSelectedText()
+    {
+        return CurrentTool?.Type == ToolType.Text
+            && _textInteraction.SelectedTextElement != null;
+    }
+
+    private void flipSelectedTextHorizontally()
+    {
+        var selectedTextElement = _textInteraction.SelectedTextElement;
+        if (selectedTextElement == null)
+        {
+            return;
+        }
+
+        vibrate(HapticFeedbackType.Click);
+        selectedTextElement.ScaleXMultiplier = getToggledAxisMultiplier(selectedTextElement.ScaleXMultiplier);
+    }
+
+    private void flipSelectedTextVertically()
+    {
+        var selectedTextElement = _textInteraction.SelectedTextElement;
+        if (selectedTextElement == null)
+        {
+            return;
+        }
+
+        vibrate(HapticFeedbackType.Click);
+        selectedTextElement.ScaleYMultiplier = getToggledAxisMultiplier(selectedTextElement.ScaleYMultiplier);
+    }
+
+    private void updateTextFlipButtonsVisibility()
+    {
+        if (TextFlipButtonsLayout == null)
+        {
+            return;
+        }
+
+        TextFlipButtonsLayout.IsVisible = CurrentTool?.Type == ToolType.Text
+            && _textInteraction.SelectedTextElement != null;
+
+        FlipSelectedTextHorizontallyCommand?.NotifyCanExecuteChanged();
+        FlipSelectedTextVerticallyCommand?.NotifyCanExecuteChanged();
+    }
+
+    private static float getToggledAxisMultiplier(float value)
+    {
+        return value < 0f ? 1f : -1f;
     }
 
     // Text move-mode geometry helpers.

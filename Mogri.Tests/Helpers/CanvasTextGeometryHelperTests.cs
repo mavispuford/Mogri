@@ -36,6 +36,8 @@ public class CanvasTextGeometryHelperTests
             200f,
             0f,
             1f,
+            1f,
+            1f,
             0.35f,
             bounds);
 
@@ -58,6 +60,8 @@ public class CanvasTextGeometryHelperTests
             70f,
             90f,
             2f,
+            1f,
+            1f,
             0.35f,
             bounds);
 
@@ -80,11 +84,61 @@ public class CanvasTextGeometryHelperTests
             20f,
             0f,
             0.1f,
+            1f,
+            1f,
             0.35f,
             bounds);
 
         // Assert
         Assert.Equal(10f, result.X, 3);
         Assert.Equal(0f, result.Y, 3);
+    }
+
+    [Fact]
+    public void GetLocalTextPoint_HorizontalFlip_InvertsSignedScale()
+    {
+        // Arrange
+        var bounds = new SKRect(10f, 20f, 30f, 40f);
+        var imageLocation = new SKPoint(95f, 210f);
+
+        // Act
+        var result = CanvasTextGeometryHelper.GetLocalTextPoint(
+            imageLocation,
+            100f,
+            200f,
+            0f,
+            1f,
+            -1f,
+            1f,
+            0.35f,
+            bounds);
+
+        // Assert
+        Assert.Equal(25f, result.X, 3);
+        Assert.Equal(40f, result.Y, 3);
+    }
+
+    [Fact]
+    public void GetLocalTextPoint_VerticalFlip_InvertsSignedScale()
+    {
+        // Arrange
+        var bounds = new SKRect(10f, 20f, 30f, 40f);
+        var imageLocation = new SKPoint(105f, 190f);
+
+        // Act
+        var result = CanvasTextGeometryHelper.GetLocalTextPoint(
+            imageLocation,
+            100f,
+            200f,
+            0f,
+            1f,
+            1f,
+            -1f,
+            0.35f,
+            bounds);
+
+        // Assert
+        Assert.Equal(25f, result.X, 3);
+        Assert.Equal(40f, result.Y, 3);
     }
 }

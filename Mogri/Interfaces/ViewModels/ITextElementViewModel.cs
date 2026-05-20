@@ -17,6 +17,10 @@ public interface ITextElementViewModel : IBaseViewModel
 
     float Scale { get; set; }
 
+    float ScaleXMultiplier { get; set; }
+
+    float ScaleYMultiplier { get; set; }
+
     float Rotation { get; set; }
 
     Color Color { get; set; }

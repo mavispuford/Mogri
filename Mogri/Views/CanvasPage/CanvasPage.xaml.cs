@@ -16,19 +16,17 @@ using Mogri.Models;
 namespace Mogri.Views;
 
 /// <summary>
-/// Root canvas page partial that keeps the bindable-property surface, compiled bindings,
-/// and page lifecycle wiring together.
+/// Root canvas page partial that keeps the bindable-property surface, binding handlers,
+/// compiled bindings, page lifecycle wiring, and layout wiring together.
 /// Sibling partials own the remaining page concerns:
-/// - CanvasPage.Bindings.cs: collection subscriptions and surface invalidation.
 /// - CanvasPage.Touch.cs: drawing, eyedropper, bounding-box, and segmentation touch routing.
 /// - CanvasPage.TextInteraction.cs: text selection, dragging, scaling, rotation, and tap flow.
 /// - CanvasPage.Rendering.cs: Skia paint callbacks, capture rendering, and temporary overlays.
-/// - CanvasPage.Layout.cs: canvas sizing, bounding-box layout, and size-driven invalidation.
 /// - CanvasPage.Chrome.cs: slider chrome, action tray animation, timers, haptics, and tool-context button visibility.
 /// </summary>
 public partial class CanvasPage : BasePage
 {
-    // Root partial surface exposed to XAML bindings and sibling partials.
+    // Root partial surface exposed to XAML bindings and the remaining sibling partials.
     public SKBitmap Bitmap
     {
         get => (SKBitmap)GetValue(BitmapProperty);
@@ -114,6 +112,18 @@ public partial class CanvasPage : BasePage
         set => SetValue(ResetZoomCommandProperty, value);
     }
 
+    public IRelayCommand FlipSelectedTextHorizontallyCommand
+    {
+        get => (IRelayCommand)GetValue(FlipSelectedTextHorizontallyCommandProperty);
+        set => SetValue(FlipSelectedTextHorizontallyCommandProperty, value);
+    }
+
+    public IRelayCommand FlipSelectedTextVerticallyCommand
+    {
+        get => (IRelayCommand)GetValue(FlipSelectedTextVerticallyCommandProperty);
+        set => SetValue(FlipSelectedTextVerticallyCommandProperty, value);
+    }
+
     public float BoundingBoxSize
     {
         get => (float)GetValue(BoundingBoxSizeProperty);
@@ -193,6 +203,10 @@ public partial class CanvasPage : BasePage
 
     public static BindableProperty ResetZoomCommandProperty = BindableProperty.Create(nameof(ResetZoomCommand), typeof(IRelayCommand), typeof(CanvasPage), default(IRelayCommand));
 
+    public static BindableProperty FlipSelectedTextHorizontallyCommandProperty = BindableProperty.Create(nameof(FlipSelectedTextHorizontallyCommand), typeof(IRelayCommand), typeof(CanvasPage), default(IRelayCommand));
+
+    public static BindableProperty FlipSelectedTextVerticallyCommandProperty = BindableProperty.Create(nameof(FlipSelectedTextVerticallyCommand), typeof(IRelayCommand), typeof(CanvasPage), default(IRelayCommand));
+
     public static BindableProperty ShowBoundingBoxProperty = BindableProperty.Create(nameof(ShowBoundingBox), typeof(bool), typeof(CanvasPage), false, propertyChanged: (bindable, oldValue, newValue) =>
     {
         ((CanvasPage)bindable).UpdateBoundingBox(false);
@@ -214,7 +228,165 @@ public partial class CanvasPage : BasePage
         set => SetValue(ShowActionsProperty, value);
     }
 
-    // Root partial constructor and lifecycle hooks keep the page wiring in one place.
+    // Page-level layout state used by lifecycle and size-changed handlers.
+    private bool _hasCreatedBoundingBox;
+
+    private void OnCanvasActionsChanged(ObservableCollection<CanvasActionViewModel>? oldValue, ObservableCollection<CanvasActionViewModel>? newValue)
+    {
+        if (oldValue != null)
+        {
+            oldValue.CollectionChanged -= CanvasActions_CollectionChanged;
+            foreach (var item in oldValue)
+            {
+                item.PropertyChanged -= OnCanvasActionPropertyChanged;
+            }
+        }
+
+        if (newValue != null)
+        {
+            newValue.CollectionChanged += CanvasActions_CollectionChanged;
+            foreach (var item in newValue)
+            {
+                item.PropertyChanged += OnCanvasActionPropertyChanged;
+            }
+        }
+
+        MaskCanvasView.InvalidateSurface();
+    }
+
+    private void CanvasActions_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.OldItems != null)
+        {
+            foreach (CanvasActionViewModel item in e.OldItems)
+            {
+                item.PropertyChanged -= OnCanvasActionPropertyChanged;
+            }
+        }
+
+        if (e.NewItems != null)
+        {
+            foreach (CanvasActionViewModel item in e.NewItems)
+            {
+                item.PropertyChanged += OnCanvasActionPropertyChanged;
+            }
+        }
+
+        MaskCanvasView.InvalidateSurface();
+    }
+
+    private void OnCanvasActionPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        MaskCanvasView.InvalidateSurface();
+    }
+
+    private void OnTextElementsChanged(ObservableCollection<TextElementViewModel>? oldValue, ObservableCollection<TextElementViewModel>? newValue)
+    {
+        if (oldValue != null)
+        {
+            oldValue.CollectionChanged -= TextElements_CollectionChanged;
+            foreach (var item in oldValue)
+            {
+                item.PropertyChanged -= OnTextElementPropertyChanged;
+            }
+        }
+
+        if (newValue != null)
+        {
+            newValue.CollectionChanged += TextElements_CollectionChanged;
+            foreach (var item in newValue)
+            {
+                item.PropertyChanged += OnTextElementPropertyChanged;
+            }
+        }
+
+        TextCanvasView.InvalidateSurface();
+        TemporaryCanvasView.InvalidateSurface();
+    }
+
+    private void TextElements_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.OldItems != null)
+        {
+            foreach (TextElementViewModel item in e.OldItems)
+            {
+                item.PropertyChanged -= OnTextElementPropertyChanged;
+            }
+        }
+
+        if (e.NewItems != null)
+        {
+            foreach (TextElementViewModel item in e.NewItems)
+            {
+                item.PropertyChanged += OnTextElementPropertyChanged;
+            }
+        }
+
+        if (_textInteraction.SelectedTextElement != null && (TextElements == null || !TextElements.Contains(_textInteraction.SelectedTextElement)))
+        {
+            resetTextInteractionState(clearSelection: true, clearTapState: true);
+        }
+
+        TextCanvasView.InvalidateSurface();
+        TemporaryCanvasView.InvalidateSurface();
+    }
+
+    private void OnTextElementPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (isTextElementRenderProperty(e.PropertyName))
+        {
+            TextCanvasView.InvalidateSurface();
+        }
+
+        if (sender is TextElementViewModel textElement && shouldInvalidateTemporaryCanvas(textElement, e.PropertyName))
+        {
+            TemporaryCanvasView.InvalidateSurface();
+        }
+    }
+
+    private void OnSourceBitmapChanged()
+    {
+        SegmentationBitmap = null;
+
+        UpdateCanvasSizes();
+
+        if (BindingContext is ICanvasPageViewModel vm && vm.PreserveZoomOnNextBitmapChange)
+        {
+            vm.PreserveZoomOnNextBitmapChange = false;
+        }
+        else
+        {
+            ZoomContainer.Reset();
+        }
+    }
+
+    private void OnSegmentationBitmapChanged()
+    {
+        SegmentationMaskCanvasView.InvalidateSurface();
+    }
+
+    private static bool isTextElementRenderProperty(string? propertyName)
+    {
+        return propertyName is nameof(TextElementViewModel.Text)
+            or nameof(TextElementViewModel.X)
+            or nameof(TextElementViewModel.Y)
+            or nameof(TextElementViewModel.Scale)
+            or nameof(TextElementViewModel.ScaleXMultiplier)
+            or nameof(TextElementViewModel.ScaleYMultiplier)
+            or nameof(TextElementViewModel.Rotation)
+            or nameof(TextElementViewModel.Color)
+            or nameof(TextElementViewModel.Alpha)
+            or nameof(TextElementViewModel.Noise)
+            or nameof(TextElementViewModel.IsSelected);
+    }
+
+    private static bool shouldInvalidateTemporaryCanvas(TextElementViewModel textElement, string? propertyName)
+    {
+        return propertyName == nameof(TextElementViewModel.IsSelected)
+            || (textElement.IsSelected && isTextElementRenderProperty(propertyName));
+    }
+
+    // Root partial constructor, lifecycle hooks, and layout wiring keep page setup in one place.
     public CanvasPage()
     {
         InitializeComponent();
@@ -236,9 +408,13 @@ public partial class CanvasPage : BasePage
         this.SetBinding(SegmentationBitmapProperty, nameof(ICanvasPageViewModel.SegmentationBitmap), BindingMode.TwoWay);
         this.SetBinding(ShowActionsProperty, nameof(ICanvasPageViewModel.ShowActions), BindingMode.OneWay);
         this.SetBinding(ResetZoomCommandProperty, nameof(ICanvasPageViewModel.ResetZoomCommand), BindingMode.OneWayToSource);
+        this.SetBinding(FlipSelectedTextHorizontallyCommandProperty, nameof(ICanvasPageViewModel.FlipSelectedTextHorizontallyCommand), BindingMode.OneWayToSource);
+        this.SetBinding(FlipSelectedTextVerticallyCommandProperty, nameof(ICanvasPageViewModel.FlipSelectedTextVerticallyCommand), BindingMode.OneWayToSource);
 
         PrepareForSavingCommand = new AsyncRelayCommand<IAsyncRelayCommand>(PrepareForSaving);
         ResetZoomCommand = new RelayCommand(() => ZoomContainer.Reset(true));
+        FlipSelectedTextHorizontallyCommand = new RelayCommand(flipSelectedTextHorizontally, canFlipSelectedText);
+        FlipSelectedTextVerticallyCommand = new RelayCommand(flipSelectedTextVertically, canFlipSelectedText);
     }
 
     protected override void OnAppearing()
@@ -268,6 +444,89 @@ public partial class CanvasPage : BasePage
         TemporaryCanvasView.SizeChanged -= TemporaryCanvasView_SizeChanged;
         ActionsContainer.SizeChanged -= ActionsContainer_SizeChanged;
         disposeTimers();
+    }
+
+    private void TemporaryCanvasView_SizeChanged(object? sender, EventArgs e)
+    {
+        if (TemporaryCanvasView.Width != -1 &&
+            TemporaryCanvasView.Height != -1)
+        {
+            UpdateBoundingBox(true, true);
+        }
+    }
+
+    private void UpdateBoundingBox(bool sizeChanged, bool resetPosition = false)
+    {
+        var rectSize = (float)(BoundingBoxSize / BoundingBoxScale);
+
+        if ((!_hasCreatedBoundingBox || resetPosition) &&
+            TemporaryCanvasView.Width != -1 &&
+            TemporaryCanvasView.Height != -1)
+        {
+            BoundingBox = new SKRect(
+                (float)(TemporaryCanvasView.Width / 2) - (rectSize / 2),
+                (float)(TemporaryCanvasView.Height / 2) - (rectSize / 2),
+                (float)(TemporaryCanvasView.Width / 2) + (rectSize / 2),
+                (float)(TemporaryCanvasView.Height / 2) + (rectSize / 2));
+
+            _hasCreatedBoundingBox = true;
+        }
+        else if (sizeChanged)
+        {
+            BoundingBox = new SKRect(
+                BoundingBox.MidX - (rectSize / 2),
+                BoundingBox.MidY - (rectSize / 2),
+                BoundingBox.MidX + (rectSize / 2),
+                BoundingBox.MidY + (rectSize / 2));
+        }
+
+        TemporaryCanvasView.InvalidateSurface();
+    }
+
+    private void UpdateCanvasSizes()
+    {
+        if (Bitmap == null)
+        {
+            return;
+        }
+
+        var scale = Math.Min((float)MaskGrid.Width / Bitmap.Width, (float)MaskGrid.Height / Bitmap.Height);
+        var width = scale * Bitmap.Width;
+        var height = scale * Bitmap.Height;
+
+        SourceImageCanvasView.WidthRequest = width;
+        SourceImageCanvasView.HeightRequest = height;
+
+        TextCanvasView.WidthRequest = width;
+        TextCanvasView.HeightRequest = height;
+
+        MaskCanvasView.WidthRequest = width;
+        MaskCanvasView.HeightRequest = height;
+
+        SegmentationMaskCanvasView.WidthRequest = width;
+        SegmentationMaskCanvasView.HeightRequest = height;
+
+        TemporaryCanvasView.WidthRequest = width;
+        TemporaryCanvasView.HeightRequest = height;
+
+        // Force a measure on both canvas views because setting width/height request doesn't seem to be enough.
+        SourceImageCanvasView.Measure(width, height);
+        SourceImageCanvasView.InvalidateSurface();
+        TextCanvasView.Measure(width, height);
+        TextCanvasView.InvalidateSurface();
+        MaskCanvasView.Measure(width, height);
+        MaskCanvasView.InvalidateSurface();
+        SegmentationMaskCanvasView.Measure(width, height);
+        SegmentationMaskCanvasView.InvalidateSurface();
+        TemporaryCanvasView.Measure(width, height);
+        TemporaryCanvasView.InvalidateSurface();
+
+        BoundingBoxScale = Bitmap.Width / width;
+    }
+
+    private void MaskGrid_SizeChanged(object? sender, EventArgs e)
+    {
+        UpdateCanvasSizes();
     }
 
 }

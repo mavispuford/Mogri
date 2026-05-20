@@ -21,7 +21,7 @@
                 <Grid Grid.Row="0" ColumnDefinitions="*,auto,auto">
 
                     <Label Grid.Column="0"
-                           Text="Canvas History"
+                           Text="Canvas Items"
                            FontSize="16"
                            FontFamily="ComfortaaBold"
                            HorizontalOptions="Start"
@@ -47,7 +47,7 @@
                                  HorizontalOptions="End"
                                  VerticalOptions="Center"
                                  BackgroundColor="Transparent"
-                                 ToolTipProperties.Text="Clear All History">
+                                 ToolTipProperties.Text="Clear All Items">
                         <ImageButton.Source>
                             <FontImageSource Glyph="&#xe16c;" 
                                              FontFamily="{StaticResource IconFontLight}"
@@ -61,7 +61,7 @@
                 <CollectionView Grid.Row="1"
                                 ItemsSource="{Binding Items}">
                     <CollectionView.EmptyView>
-                        <Label Text="No History" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                        <Label Text="No Items" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
                     </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="itemViewModels:ICanvasHistoryItemViewModel">

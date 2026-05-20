@@ -34,6 +34,12 @@ public partial class TextElementViewModel : BaseViewModel, ITextElementViewModel
     public partial float Scale { get; set; } = 1f;
 
     [ObservableProperty]
+    public partial float ScaleXMultiplier { get; set; } = 1f;
+
+    [ObservableProperty]
+    public partial float ScaleYMultiplier { get; set; } = 1f;
+
+    [ObservableProperty]
     public partial float Rotation { get; set; }
 
     [ObservableProperty]

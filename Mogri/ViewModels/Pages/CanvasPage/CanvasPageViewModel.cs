@@ -23,17 +23,14 @@ namespace Mogri.ViewModels;
 /// Sibling partials own the remaining coordination concerns:
 /// - CanvasPageViewModel.Workflows.cs: save, send, crop, flatten, and patch orchestration.
 /// - CanvasPageViewModel.Navigation.cs: query handling and applying returned canvas results.
-/// - CanvasPageViewModel.TextAndHistory.cs: text commands, undo flow, and history popup coordination.
-/// - CanvasPageViewModel.State.cs: canvas ordering, text clone helpers, and shared clear-all coordination.
-/// - CanvasPageViewModel.Snapshots.cs: snapshot save/restore markers, text snapshot plumbing, and collection restore helpers.
-/// - CanvasPageViewModel.Persistence.cs: auto-save and cleanup of stored canvas overlay state.
-/// - CanvasPageViewModel.SourceImage.cs: source-image changes, palette updates, media replacement, bitmap decoding, and persisted restore.
+/// - CanvasPageViewModel.TextAndHistory.cs: text commands, undo/history flow, snapshot save/restore helpers, ordering helpers, and editing-state restore plumbing.
+/// - CanvasPageViewModel.SourceImage.cs: source-image changes, palette updates, media replacement, bitmap decoding, persisted restore, and stored overlay save/cleanup.
 /// - CanvasPageViewModel.Segmentation.cs: segmentation model readiness, interactive mask commands, and segmentation state resets.
 /// Canvas-action-driven workflow layers and patch masks are built by ICanvasActionBitmapService instead of a viewmodel partial.
 /// </summary>
 public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 {
-    // Root partial constants, injected services, and shared state consumed across sibling partials.
+    // Root partial constants, injected services, and shared state consumed across the remaining sibling partials.
     private const double DefaultMaskToolAlpha = 0.5d;
     private const double DefaultTextToolAlpha = 1.0d;
     private const double DefaultMaskToolNoise = 0.5d;
@@ -77,6 +74,12 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
 
     [ObservableProperty]
     public partial IRelayCommand? ResetZoomCommand { get; set; }
+
+    [ObservableProperty]
+    public partial IRelayCommand? FlipSelectedTextHorizontallyCommand { get; set; }
+
+    [ObservableProperty]
+    public partial IRelayCommand? FlipSelectedTextVerticallyCommand { get; set; }
 
     [ObservableProperty]
     public partial List<IPaintingToolViewModel> AvailableTools { get; set; } = new();

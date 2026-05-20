@@ -151,7 +151,7 @@ public partial class CanvasPageViewModel
         }
 
         var result = await _popupService.DisplayAlertAsync("Flatten Canvas?",
-            "This will apply the paint/masks and replace the current canvas image. This can be undone from the Canvas History.\n\nContinue?",
+            "This will apply the paint/masks and replace the current canvas image. This can be undone.\n\nContinue?",
             "YES",
             "NO");
 

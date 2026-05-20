@@ -47,9 +47,8 @@ public static class MauiProgram
         builder.Services.AddSingleton(DeviceDisplay.Current);
 
 #if DEBUG
-        builder.UseLeakDetection();
+        builder.UseMemoryToolkit();
         builder.Logging.AddDebug();
-
 #endif
 
 #if ANDROID
