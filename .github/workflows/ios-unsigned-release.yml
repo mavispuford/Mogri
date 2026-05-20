@@ -48,6 +48,17 @@ jobs:
         dotnet workload restore Mogri/Mogri.csproj --skip-manifest-update
         dotnet workload list
 
+    - name: Work around AppleSdkSettings runner bug
+      run: |
+        mkdir -p "$HOME/Library/Preferences/Xamarin"
+        cat <<'EOF' > "$HOME/Library/Preferences/Xamarin/Settings.plist"
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict></dict>
+        </plist>
+        EOF
+
     - name: Publish iOS app (Unsigned)
       run: |
         dotnet publish Mogri/Mogri.csproj -f net10.0-ios -c Release -p:RuntimeIdentifier=ios-arm64 -p:EnableCodeSigning=false -p:ApplicationDisplayVersion=$APP_DISPLAY_VERSION -p:ApplicationVersion=$APP_BUILD_NUMBER
