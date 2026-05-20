@@ -20,28 +20,33 @@ jobs:
         lfs: true
 
     - name: Determine Version
+      id: version
       run: |
         if [ "${{ github.ref_type }}" = "tag" ]; then
           TAG_NAME="${{ github.ref_name }}"
           VERSION="${TAG_NAME#v}"
-          echo "APP_DISPLAY_VERSION=$VERSION" >> $GITHUB_ENV
         else
-          echo "APP_DISPLAY_VERSION=0.0.0-dev" >> $GITHUB_ENV
+          VERSION="0.0.0-dev"
         fi
+        echo "APP_DISPLAY_VERSION=$VERSION" >> $GITHUB_ENV
         echo "APP_BUILD_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
+        echo "app_display_version=$VERSION" >> $GITHUB_OUTPUT
+        echo "app_build_number=${{ github.run_number }}" >> $GITHUB_OUTPUT
 
     - name: Setup Xcode
       uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: '26.4.1'
+        xcode-version: '26.5'
 
     - name: Setup .NET 10
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '10.0.x'
+        global-json-file: ./global.json
 
     - name: Install MAUI Workloads
-      run: dotnet workload restore
+      run: |
+        dotnet workload restore Mogri/Mogri.csproj --skip-manifest-update
+        dotnet workload list
 
     - name: Publish iOS app (Unsigned)
       run: |
@@ -62,11 +67,11 @@ jobs:
     - name: Upload Unsigned IPA Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: Mogri-v${{ env.APP_DISPLAY_VERSION }}-iOS-Unsigned-IPA
-        path: Mogri/bin/Release/net10.0-ios/ios-arm64/Mogri-v${{ env.APP_DISPLAY_VERSION }}-iOS-Unsigned.ipa
+        name: Mogri-v${{ steps.version.outputs.app_display_version }}-iOS-Unsigned-IPA
+        path: Mogri/bin/Release/net10.0-ios/ios-arm64/Mogri-v${{ steps.version.outputs.app_display_version }}-iOS-Unsigned.ipa
 
     - name: Upload Payload Zip Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: Mogri-v${{ env.APP_DISPLAY_VERSION }}-iOS-Payload-Zip
+        name: Mogri-v${{ steps.version.outputs.app_display_version }}-iOS-Payload-Zip
         path: Mogri/bin/Release/net10.0-ios/ios-arm64/Payload.zip

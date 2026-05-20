@@ -20,6 +20,7 @@ jobs:
         lfs: true
 
     - name: Determine Version
+      id: version
       run: |
         if ("${{ github.ref_type }}" -eq "tag") {
           $tag = "${{ github.ref_name }}"
@@ -33,14 +34,28 @@ jobs:
           echo "APP_DISPLAY_VERSION=0.0.0-dev" >> $env:GITHUB_ENV
         }
         echo "APP_BUILD_NUMBER=${{ github.run_number }}" >> $env:GITHUB_ENV
+        if ($tag -and $tag.StartsWith("v")) {
+          echo "app_display_version=$version" >> $env:GITHUB_OUTPUT
+        } elseif ($version) {
+          echo "app_display_version=$version" >> $env:GITHUB_OUTPUT
+        } else {
+          echo "app_display_version=0.0.0-dev" >> $env:GITHUB_OUTPUT
+        }
+        echo "app_build_number=${{ github.run_number }}" >> $env:GITHUB_OUTPUT
 
     - name: Setup .NET 10
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '10.0.x'
+        global-json-file: ./global.json
+
+    - name: Setup JDK 21
+      uses: actions/setup-java@v5
+      with:
+        distribution: 'microsoft'
+        java-version: '21'
 
     - name: Install MAUI Workloads
-      run: dotnet workload restore
+      run: dotnet workload restore Mogri/Mogri.csproj --skip-manifest-update
 
     - name: Decode Keystore
       env:
@@ -62,6 +77,7 @@ jobs:
         -p:ApplicationVersion=$env:APP_BUILD_NUMBER
 
     - name: Rename Artifacts
+      id: artifacts
       run: |
         $publishDir = "Mogri/bin/Release/net10.0-android/publish"
         $apk = Get-ChildItem -Path $publishDir -Recurse -Filter "*-Signed.apk" | Select-Object -First 1
@@ -70,22 +86,24 @@ jobs:
           $dest = Join-Path $apk.DirectoryName "Mogri-v$env:APP_DISPLAY_VERSION-Android-Signed.apk"
           Move-Item $apk.FullName $dest
           echo "APK_PATH=$dest" >> $env:GITHUB_ENV
+          echo "apk_path=$dest" >> $env:GITHUB_OUTPUT
         }
         if ($aab) {
           $dest = Join-Path $aab.DirectoryName "Mogri-v$env:APP_DISPLAY_VERSION-Android-Signed.aab"
           Move-Item $aab.FullName $dest
           echo "AAB_PATH=$dest" >> $env:GITHUB_ENV
+          echo "aab_path=$dest" >> $env:GITHUB_OUTPUT
         }
       shell: pwsh
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: Mogri-v${{ env.APP_DISPLAY_VERSION }}-Android-APK
-        path: ${{ env.APK_PATH }}
+        name: Mogri-v${{ steps.version.outputs.app_display_version }}-Android-APK
+        path: ${{ steps.artifacts.outputs.apk_path }}
 
     - name: Upload AAB Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: Mogri-v${{ env.APP_DISPLAY_VERSION }}-Android-AAB
-        path: ${{ env.AAB_PATH }}
+        name: Mogri-v${{ steps.version.outputs.app_display_version }}-Android-AAB
+        path: ${{ steps.artifacts.outputs.aab_path }}
