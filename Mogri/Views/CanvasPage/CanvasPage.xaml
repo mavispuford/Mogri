@@ -194,7 +194,8 @@
         </controls:GestureContainer>
 
         <!-- For some reason, the ActivityIndicator doesn't show on Android unless we wrap it in a ContentView -->
-        <ContentView Grid.RowSpan="3">
+        <ContentView Grid.RowSpan="3"
+                     InputTransparent="True">
             <ActivityIndicator HorizontalOptions="Center" 
                            VerticalOptions="Center"
                            IsRunning="{Binding IsBusy}"
@@ -266,6 +267,8 @@
                              Grid.RowSpan="2"
                              HorizontalOptions="Fill"
                              VerticalOptions="Start"
+                             InputTransparent="True"
+                             CascadeInputTransparent="False"
                              Spacing="10">
             
             <HorizontalStackLayout x:Name="ContextButtonsLayout"
@@ -488,6 +491,8 @@
               Grid.Row="2"
               ColumnDefinitions="*,auto"
               ColumnSpacing="10"
+              InputTransparent="True"
+              CascadeInputTransparent="False"
               Margin="0">
             <FlexLayout Grid.Column="0"
                         AlignContent="Center"
