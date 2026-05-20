@@ -227,7 +227,7 @@
                     <LinearItemsLayout Orientation="Horizontal"
                                     SnapPointsAlignment="Center"
                                     SnapPointsType="MandatorySingle"
-                                    ItemSpacing="4"/>
+                                    ItemSpacing="2"/>
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="viewModels:IPaintingToolViewModel">
