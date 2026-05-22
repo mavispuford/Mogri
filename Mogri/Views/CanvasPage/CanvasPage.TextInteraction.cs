@@ -41,9 +41,10 @@ public partial class CanvasPage
                 if (_textInteraction.ActiveTouches.Count == 1)
                 {
                     var hitTextElement = CanvasTextHitTester.GetHitTextElement(TextElements, imageLocation, TextSelectionPadding, MinTextScale);
-                    var hadSelection = _textInteraction.SelectedTextElement != null;
+                    var selectedTextElement = _textInteraction.SelectedTextElement;
+                    var hadSelection = selectedTextElement != null;
 
-                    if (hitTextElement != null)
+                    if (hitTextElement != null && (!hadSelection || ReferenceEquals(hitTextElement, selectedTextElement)))
                     {
                         setSelectedTextElement(hitTextElement);
                         beginTextDragGesture(e.Id, imageLocation, hitTextElement);
@@ -211,7 +212,12 @@ public partial class CanvasPage
 
         if (isTapCandidate)
         {
-            if (tappedTextElement != null)
+            if (shouldDeselectTextOnTapRelease)
+            {
+                setSelectedTextElement(null);
+                clearLastTextTap();
+            }
+            else if (tappedTextElement != null)
             {
                 handleTextTapGesture(tappedTextElement, viewLocation);
             }
@@ -219,11 +225,6 @@ public partial class CanvasPage
             {
                 clearLastTextTap();
                 _ = PlaceTextAtPointAsync(imageLocation);
-            }
-            else if (shouldDeselectTextOnTapRelease)
-            {
-                setSelectedTextElement(null);
-                clearLastTextTap();
             }
             else
             {
