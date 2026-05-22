@@ -309,7 +309,7 @@ public static class CanvasTextRenderer
         {
             var textElement = textElementEnumerator.GetTextElement();
             var (typeface, ownsTypeface) = getTypefaceForTextElement(primaryTypeface, textElement);
-            var preserveIntrinsicGlyphDetails = shouldPreserveIntrinsicGlyphDetails(textElement);
+            var preserveIntrinsicGlyphDetails = EmojiPresentationHelper.ShouldPreserveIntrinsicGlyphDetails(textElement);
 
             if (currentTypeface == null)
             {
@@ -349,49 +349,9 @@ public static class CanvasTextRenderer
         return textRuns;
     }
 
-    private static bool shouldPreserveIntrinsicGlyphDetails(string textElement)
-    {
-        if (string.IsNullOrEmpty(textElement))
-        {
-            return false;
-        }
-
-        foreach (var rune in textElement.EnumerateRunes())
-        {
-            var value = rune.Value;
-
-            if (value is 0x200D or 0x20E3 or 0xFE0F)
-            {
-                return true;
-            }
-
-            if ((value >= 0x1F1E6 && value <= 0x1FAFF)
-                || (value >= 0x1F3FB && value <= 0x1F3FF))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     private static (SKTypeface Typeface, bool OwnsTypeface) getTypefaceForTextElement(SKTypeface primaryTypeface, string textElement)
     {
-        using var primaryFont = new SKFont(primaryTypeface, 12f);
-        if (primaryFont.ContainsGlyphs(textElement))
-        {
-            return (primaryTypeface, false);
-        }
-
-        var firstCodePoint = Rune.GetRuneAt(textElement, 0).Value;
-        var fallbackTypeface = SKFontManager.Default.MatchCharacter(primaryTypeface.FamilyName, primaryTypeface.FontStyle, Array.Empty<string>(), firstCodePoint);
-
-        if (fallbackTypeface == null)
-        {
-            return (primaryTypeface, false);
-        }
-
-        return (fallbackTypeface, !ReferenceEquals(fallbackTypeface, primaryTypeface));
+        return TextElementTypefaceHelper.GetTypefaceForTextElement(primaryTypeface, textElement);
     }
 
     private static bool areEquivalentTypefaces(SKTypeface left, SKTypeface right)

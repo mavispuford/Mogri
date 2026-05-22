@@ -377,3 +377,5 @@ local.properties
 Directory.Build.Override.props
 
 .private-journal/*
+
+.vscode

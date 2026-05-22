@@ -201,21 +201,7 @@ public static class TextElementLayoutHelper
 
     private static (SKTypeface Typeface, bool OwnsTypeface) GetTypefaceForTextElement(SKTypeface primaryTypeface, string textElement)
     {
-        using var primaryFont = new SKFont(primaryTypeface, 12f);
-        if (primaryFont.ContainsGlyphs(textElement))
-        {
-            return (primaryTypeface, false);
-        }
-
-        var firstCodePoint = Rune.GetRuneAt(textElement, 0).Value;
-        var fallbackTypeface = SKFontManager.Default.MatchCharacter(primaryTypeface.FamilyName, primaryTypeface.FontStyle, Array.Empty<string>(), firstCodePoint);
-
-        if (fallbackTypeface == null)
-        {
-            return (primaryTypeface, false);
-        }
-
-        return (fallbackTypeface, !ReferenceEquals(fallbackTypeface, primaryTypeface));
+        return TextElementTypefaceHelper.GetTypefaceForTextElement(primaryTypeface, textElement);
     }
 
     private static bool AreEquivalentTypefaces(SKTypeface left, SKTypeface right)
