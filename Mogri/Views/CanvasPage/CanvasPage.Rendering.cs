@@ -77,7 +77,7 @@ public partial class CanvasPage
         }
 
         var scale = (float)e.Info.Width / Bitmap.Width;
-        var suppressNoiseForSelectedText = _textInteraction.IsSelectedTextGestureActive;
+        var suppressNoiseDuringTextGesture = _textInteraction.IsSelectedTextGestureActive;
 
         foreach (var textElement in TextElements.OrderBy(textElement => textElement.Order))
         {
@@ -85,7 +85,7 @@ public partial class CanvasPage
                 canvas,
                 textElement,
                 scale,
-                suppressNoiseForSelectedText && ReferenceEquals(_textInteraction.SelectedTextElement, textElement));
+            suppressNoiseDuringTextGesture);
         }
     }
 
