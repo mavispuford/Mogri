@@ -142,7 +142,7 @@ public class BasePage : ContentPage
         // this.SetAppThemeColor(Shell.BackgroundColorProperty, LightToolBarColor, DarkToolBarColor);
     }
 
-    private void updateStatusBarBehavior(AppTheme appTheme)
+    private async void updateStatusBarBehavior(AppTheme appTheme)
     {
         if (_statusBarBehavior != null)
         {
@@ -150,6 +150,14 @@ public class BasePage : ContentPage
             _statusBarBehavior.StatusBarStyle = StatusBarStyle;
             _statusBarBehavior.StatusBarColor = appTheme == AppTheme.Dark ? DarkStatusBarColor : LightStatusBarColor;
 #pragma warning restore CA1416
+
+            // WORKAROUND - Just setting the style/color doesn't seem to fully work in some cases,
+            // so we remove the behavior, wait a bit, and re-add it.
+            Behaviors.Remove(_statusBarBehavior);
+
+            await Task.Delay(50);
+
+            Behaviors.Add(_statusBarBehavior);
         }
     }
 
