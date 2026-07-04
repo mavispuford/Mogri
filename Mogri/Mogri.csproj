@@ -111,8 +111,8 @@
 	  <PackageReference Include="AdamE.MemoryToolkit.Maui" Version="2.0.0" />
 	  <PackageReference Include="ColorMinePortable" Version="2.0.4" />
 	  <PackageReference Include="LiteDB" Version="5.0.21" />
-	  <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.71" />
-	  <PackageReference Include="Microsoft.Maui.Essentials" Version="10.0.71" />
+	  <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.80" />
+	  <PackageReference Include="Microsoft.Maui.Essentials" Version="10.0.80" />
 	  <PackageReference Include="CommunityToolkit.Maui" Version="14.2.0" />
 	  <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 	  <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.9" />
@@ -137,10 +137,10 @@
 	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	    <PrivateAssets>all</PrivateAssets>
 	  </PackageReference>
-	  <PackageReference Include="SkiaSharp" Version="3.119.4" />
-	  <PackageReference Include="SkiaSharp.HarfBuzz" Version="3.119.4" />
-	  <PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.119.4" />
-	  <PackageReference Include="SkiaSharp.Views.Maui.Core" Version="3.119.4" />
+	  <PackageReference Include="SkiaSharp" Version="4.148.0" />
+	  <PackageReference Include="SkiaSharp.HarfBuzz" Version="4.148.0" />
+	  <PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="4.148.0" />
+	  <PackageReference Include="SkiaSharp.Views.Maui.Core" Version="4.148.0" />
 	  <PackageReference Include="System.IO.Hashing" Version="10.0.9" />
 	</ItemGroup>
 
