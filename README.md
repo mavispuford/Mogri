@@ -4,6 +4,8 @@ Mogri is a .NET MAUI mobile application for image generation and editing. It com
 
 ## Overview
 
+> **AI Disclosure**: Mogri was started in August 2022 before I used AI tools in my workflow. I had been working professionally with C# for almost 10 years, and I wanted to work on something of my own. In 2025, I brought Copilot in to accelerate my work, and I personally review/test/maintain all the code changes in the project.
+
 There are two main tabs in the app:
 
 | **Generate** | **Canvas** |
