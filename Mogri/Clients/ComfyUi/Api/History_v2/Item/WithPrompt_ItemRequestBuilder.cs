@@ -34,7 +34,7 @@ namespace Mogri.Clients.ComfyUi.Api.History_v2.Item
         {
         }
         /// <summary>
-        /// Retrieve detailed execution history for a specific prompt ID.Returns full history data including complete prompt information.
+        /// **Deprecated.** Use [`/api/jobs/{job_id}`](#tag/job/GET/api/jobs/{job_id}) instead — the `prompt_id` returned by `/api/prompt` is the same value as `job_id`. This endpoint is maintained for ComfyUI compatibility but will be removed in a future release; no removal date set.Retrieve detailed execution history for a specific prompt ID.Returns full history data including complete prompt information.
         /// </summary>
         /// <returns>A <see cref="global::Mogri.Clients.ComfyUi.Models.HistoryDetailResponse"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
@@ -42,6 +42,7 @@ namespace Mogri.Clients.ComfyUi.Api.History_v2.Item
         /// <exception cref="global::Mogri.Clients.ComfyUi.Models.ErrorResponse">When receiving a 401 status code</exception>
         /// <exception cref="global::Mogri.Clients.ComfyUi.Models.ErrorResponse">When receiving a 404 status code</exception>
         /// <exception cref="global::Mogri.Clients.ComfyUi.Models.ErrorResponse">When receiving a 500 status code</exception>
+        [Obsolete("")]
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public async Task<global::Mogri.Clients.ComfyUi.Models.HistoryDetailResponse?> GetAsync(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
@@ -61,10 +62,11 @@ namespace Mogri.Clients.ComfyUi.Api.History_v2.Item
             return await RequestAdapter.SendAsync<global::Mogri.Clients.ComfyUi.Models.HistoryDetailResponse>(requestInfo, global::Mogri.Clients.ComfyUi.Models.HistoryDetailResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Retrieve detailed execution history for a specific prompt ID.Returns full history data including complete prompt information.
+        /// **Deprecated.** Use [`/api/jobs/{job_id}`](#tag/job/GET/api/jobs/{job_id}) instead — the `prompt_id` returned by `/api/prompt` is the same value as `job_id`. This endpoint is maintained for ComfyUI compatibility but will be removed in a future release; no removal date set.Retrieve detailed execution history for a specific prompt ID.Returns full history data including complete prompt information.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
+        [Obsolete("")]
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
@@ -84,6 +86,7 @@ namespace Mogri.Clients.ComfyUi.Api.History_v2.Item
         /// </summary>
         /// <returns>A <see cref="global::Mogri.Clients.ComfyUi.Api.History_v2.Item.WithPrompt_ItemRequestBuilder"/></returns>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
+        [Obsolete("")]
         public global::Mogri.Clients.ComfyUi.Api.History_v2.Item.WithPrompt_ItemRequestBuilder WithUrl(string rawUrl)
         {
             return new global::Mogri.Clients.ComfyUi.Api.History_v2.Item.WithPrompt_ItemRequestBuilder(rawUrl, RequestAdapter);

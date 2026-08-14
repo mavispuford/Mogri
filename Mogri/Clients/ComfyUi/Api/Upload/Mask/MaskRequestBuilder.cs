@@ -34,7 +34,7 @@ namespace Mogri.Clients.ComfyUi.Api.Upload.Mask
         {
         }
         /// <summary>
-        /// Upload a mask image to be applied to an existing image
+        /// Upload a mask image to be applied to an existing image.Image limits apply to both the uploaded mask and the referencedoriginal image:  - Maximum file size: 50 MB  - Maximum width/height per edge: 16384 px  - Maximum total pixel count: 64 megapixels (67108864 pixels)Uploads that exceed any of these limits are rejected with HTTP 400.
         /// </summary>
         /// <returns>A <see cref="global::Mogri.Clients.ComfyUi.Api.Upload.Mask.MaskPostResponse"/></returns>
         /// <param name="body">The request body</param>
@@ -63,7 +63,7 @@ namespace Mogri.Clients.ComfyUi.Api.Upload.Mask
             return await RequestAdapter.SendAsync<global::Mogri.Clients.ComfyUi.Api.Upload.Mask.MaskPostResponse>(requestInfo, global::Mogri.Clients.ComfyUi.Api.Upload.Mask.MaskPostResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Upload a mask image to be applied to an existing image
+        /// Upload a mask image to be applied to an existing image.Image limits apply to both the uploaded mask and the referencedoriginal image:  - Maximum file size: 50 MB  - Maximum width/height per edge: 16384 px  - Maximum total pixel count: 64 megapixels (67108864 pixels)Uploads that exceed any of these limits are rejected with HTTP 400.
         /// </summary>
         /// <returns>A <see cref="global::Mogri.Clients.ComfyUi.Api.Upload.Mask.MaskResponse"/></returns>
         /// <param name="body">The request body</param>
@@ -93,7 +93,7 @@ namespace Mogri.Clients.ComfyUi.Api.Upload.Mask
             return await RequestAdapter.SendAsync<global::Mogri.Clients.ComfyUi.Api.Upload.Mask.MaskResponse>(requestInfo, global::Mogri.Clients.ComfyUi.Api.Upload.Mask.MaskResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Upload a mask image to be applied to an existing image
+        /// Upload a mask image to be applied to an existing image.Image limits apply to both the uploaded mask and the referencedoriginal image:  - Maximum file size: 50 MB  - Maximum width/height per edge: 16384 px  - Maximum total pixel count: 64 megapixels (67108864 pixels)Uploads that exceed any of these limits are rejected with HTTP 400.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="body">The request body</param>

@@ -21,6 +21,7 @@ namespace Mogri.Clients.ComfyUi.Api.History_v2
         /// <summary>Gets an item from the Mogri.Clients.ComfyUi.api.history_v2.item collection</summary>
         /// <param name="position">The prompt ID to retrieve history for</param>
         /// <returns>A <see cref="global::Mogri.Clients.ComfyUi.Api.History_v2.Item.WithPrompt_ItemRequestBuilder"/></returns>
+        [Obsolete("")]
         public global::Mogri.Clients.ComfyUi.Api.History_v2.Item.WithPrompt_ItemRequestBuilder this[string position]
         {
             get
@@ -47,13 +48,14 @@ namespace Mogri.Clients.ComfyUi.Api.History_v2
         {
         }
         /// <summary>
-        /// Retrieve execution history for the authenticated user with pagination support.Returns a lightweight history format with filtered prompt data (workflow removed from extra_pnginfo).
+        /// **Deprecated.** Use [`/api/jobs`](#tag/job/GET/api/jobs) instead. This endpoint is maintained for ComfyUI compatibility but will be removed in a future release; no removal date set.Retrieve execution history for the authenticated user with pagination support.Returns a lightweight history format with filtered prompt data (workflow removed from extra_pnginfo).
         /// </summary>
         /// <returns>A <see cref="global::Mogri.Clients.ComfyUi.Models.HistoryResponse"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::Mogri.Clients.ComfyUi.Models.ErrorResponse">When receiving a 401 status code</exception>
         /// <exception cref="global::Mogri.Clients.ComfyUi.Models.ErrorResponse">When receiving a 500 status code</exception>
+        [Obsolete("")]
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public async Task<global::Mogri.Clients.ComfyUi.Models.HistoryResponse?> GetAsync(Action<RequestConfiguration<global::Mogri.Clients.ComfyUi.Api.History_v2.History_v2RequestBuilder.History_v2RequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
@@ -72,10 +74,11 @@ namespace Mogri.Clients.ComfyUi.Api.History_v2
             return await RequestAdapter.SendAsync<global::Mogri.Clients.ComfyUi.Models.HistoryResponse>(requestInfo, global::Mogri.Clients.ComfyUi.Models.HistoryResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Retrieve execution history for the authenticated user with pagination support.Returns a lightweight history format with filtered prompt data (workflow removed from extra_pnginfo).
+        /// **Deprecated.** Use [`/api/jobs`](#tag/job/GET/api/jobs) instead. This endpoint is maintained for ComfyUI compatibility but will be removed in a future release; no removal date set.Retrieve execution history for the authenticated user with pagination support.Returns a lightweight history format with filtered prompt data (workflow removed from extra_pnginfo).
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
+        [Obsolete("")]
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<global::Mogri.Clients.ComfyUi.Api.History_v2.History_v2RequestBuilder.History_v2RequestBuilderGetQueryParameters>>? requestConfiguration = default)
@@ -95,12 +98,13 @@ namespace Mogri.Clients.ComfyUi.Api.History_v2
         /// </summary>
         /// <returns>A <see cref="global::Mogri.Clients.ComfyUi.Api.History_v2.History_v2RequestBuilder"/></returns>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
+        [Obsolete("")]
         public global::Mogri.Clients.ComfyUi.Api.History_v2.History_v2RequestBuilder WithUrl(string rawUrl)
         {
             return new global::Mogri.Clients.ComfyUi.Api.History_v2.History_v2RequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Retrieve execution history for the authenticated user with pagination support.Returns a lightweight history format with filtered prompt data (workflow removed from extra_pnginfo).
+        /// **Deprecated.** Use [`/api/jobs`](#tag/job/GET/api/jobs) instead. This endpoint is maintained for ComfyUI compatibility but will be removed in a future release; no removal date set.Retrieve execution history for the authenticated user with pagination support.Returns a lightweight history format with filtered prompt data (workflow removed from extra_pnginfo).
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class History_v2RequestBuilderGetQueryParameters 

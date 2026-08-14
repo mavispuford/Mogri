@@ -174,6 +174,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string Prompt { get; set; }
 #endif
+        /// <summary>The refiner_cfg property</summary>
+        public double? RefinerCfg { get; set; }
         /// <summary>The refiner_checkpoint property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -325,6 +327,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "override_settings", n => { OverrideSettings = n.GetObjectValue<global::Mogri.Clients.SdForgeNeo.Models.StableDiffusionProcessingTxt2Img_override_settings>(global::Mogri.Clients.SdForgeNeo.Models.StableDiffusionProcessingTxt2Img_override_settings.CreateFromDiscriminatorValue); } },
                 { "override_settings_restore_afterwards", n => { OverrideSettingsRestoreAfterwards = n.GetBoolValue(); } },
                 { "prompt", n => { Prompt = n.GetStringValue(); } },
+                { "refiner_cfg", n => { RefinerCfg = n.GetDoubleValue(); } },
                 { "refiner_checkpoint", n => { RefinerCheckpoint = n.GetStringValue(); } },
                 { "refiner_switch_at", n => { RefinerSwitchAt = n.GetDoubleValue(); } },
                 { "restore_faces", n => { RestoreFaces = n.GetBoolValue(); } },
@@ -393,6 +396,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteObjectValue<global::Mogri.Clients.SdForgeNeo.Models.StableDiffusionProcessingTxt2Img_override_settings>("override_settings", OverrideSettings);
             writer.WriteBoolValue("override_settings_restore_afterwards", OverrideSettingsRestoreAfterwards);
             writer.WriteStringValue("prompt", Prompt);
+            writer.WriteDoubleValue("refiner_cfg", RefinerCfg);
             writer.WriteStringValue("refiner_checkpoint", RefinerCheckpoint);
             writer.WriteDoubleValue("refiner_switch_at", RefinerSwitchAt);
             writer.WriteBoolValue("restore_faces", RestoreFaces);

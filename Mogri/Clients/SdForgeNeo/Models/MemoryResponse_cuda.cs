@@ -8,7 +8,7 @@ using System;
 namespace Mogri.Clients.SdForgeNeo.Models
 {
     /// <summary>
-    /// nVidia CUDA memory stats
+    /// GPU memory stats
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class MemoryResponse_cuda : IAdditionalDataHolder, IParsable

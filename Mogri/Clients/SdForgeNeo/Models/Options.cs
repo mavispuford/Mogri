@@ -26,12 +26,16 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode AddUserNameToInfo { get; set; }
 #endif
-        /// <summary>Add VAE hash to infotext</summary>
-        public bool? AddVaeHashToInfo { get; set; }
-        /// <summary>Add VAE name to infotext</summary>
-        public bool? AddVaeNameToInfo { get; set; }
         /// <summary>Add webui version to infotext</summary>
         public bool? AddVersionToInfotext { get; set; }
+        /// <summary>Send the Parameters too when using the &quot;Send to&quot; buttons in img2img tab</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? AllowI2iSendInfo { get; set; }
+#nullable restore
+#else
+        public UntypedNode AllowI2iSendInfo { get; set; }
+#endif
         /// <summary>Always discard next-to-last sigma</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -39,6 +43,22 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #nullable restore
 #else
         public UntypedNode AlwaysDiscardNextToLastSigma { get; set; }
+#endif
+        /// <summary>The anima_batch0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? AnimaBatch0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode AnimaBatch0 { get; set; }
+#endif
+        /// <summary>The anima_batch1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? AnimaBatch1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode AnimaBatch1 { get; set; }
 #endif
         /// <summary>The anima_cfg0 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -56,8 +76,36 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode AnimaCfg1 { get; set; }
 #endif
+        /// <summary>The anima_dcfg0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? AnimaDcfg0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode AnimaDcfg0 { get; set; }
+#endif
+        /// <summary>The anima_dcfg1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? AnimaDcfg1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode AnimaDcfg1 { get; set; }
+#endif
+        /// <summary>[Anima] Enable Reference</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? AnimaDoReference { get; set; }
+#nullable restore
+#else
+        public UntypedNode AnimaDoReference { get; set; }
+#endif
+        /// <summary>img2img Batch Size</summary>
+        public double? AnimaI2iBatchSize { get; set; }
         /// <summary>img2img CFG</summary>
         public double? AnimaI2iCfg { get; set; }
+        /// <summary>img2img Shift</summary>
+        public double? AnimaI2iDcfg { get; set; }
         /// <summary>The anima_i2i_dim0 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -82,7 +130,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode AnimaI2iHeight { get; set; }
 #endif
-        /// <summary>img2img sampler</summary>
+        /// <summary>img2img Sampler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? AnimaI2iSampler { get; set; }
@@ -90,7 +138,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string AnimaI2iSampler { get; set; }
 #endif
-        /// <summary>img2img scheduler</summary>
+        /// <summary>img2img Scheduler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? AnimaI2iScheduler { get; set; }
@@ -124,6 +172,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode AnimaI2iWidth { get; set; }
 #endif
+        /// <summary>Display Shift Slider</summary>
+        public bool? AnimaShowShift { get; set; }
         /// <summary>The anima_steps0 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -140,8 +190,12 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode AnimaSteps1 { get; set; }
 #endif
+        /// <summary>txt2img Batch Size</summary>
+        public double? AnimaT2iBatchSize { get; set; }
         /// <summary>txt2img CFG</summary>
         public double? AnimaT2iCfg { get; set; }
+        /// <summary>txt2img Shift</summary>
+        public double? AnimaT2iDcfg { get; set; }
         /// <summary>The anima_t2i_dim0 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -168,9 +222,11 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #endif
         /// <summary>txt2img Hires. CFG</summary>
         public double? AnimaT2iHrCfg { get; set; }
+        /// <summary>txt2img Hires. Shift</summary>
+        public double? AnimaT2iHrDcfg { get; set; }
         /// <summary>txt2img Hires. Steps</summary>
         public double? AnimaT2iHrStep { get; set; }
-        /// <summary>txt2img sampler</summary>
+        /// <summary>txt2img Sampler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? AnimaT2iSampler { get; set; }
@@ -178,7 +234,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string AnimaT2iSampler { get; set; }
 #endif
-        /// <summary>txt2img scheduler</summary>
+        /// <summary>txt2img Scheduler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? AnimaT2iScheduler { get; set; }
@@ -224,8 +280,6 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode ApiUseragent { get; set; }
 #endif
-        /// <summary>Automatic backward compatibility</summary>
-        public bool? AutoBackcompat { get; set; }
         /// <summary>Launch the webui in browser on startup</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -246,22 +300,6 @@ namespace Mogri.Clients.SdForgeNeo.Models
         public double? CodeFormerWeight { get; set; }
         /// <summary>Token Wrap Length</summary>
         public double? CommaPaddingBacktrack { get; set; }
-        /// <summary>Compact Prompt Layout</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? CompactPromptBox { get; set; }
-#nullable restore
-#else
-        public UntypedNode CompactPromptBox { get; set; }
-#endif
-        /// <summary>The compatibility_explanation property</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public string? CompatibilityExplanation { get; set; }
-#nullable restore
-#else
-        public string CompatibilityExplanation { get; set; }
-#endif
         /// <summary>Composite the Tiles on GPU</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -269,6 +307,14 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #nullable restore
 #else
         public UntypedNode CompositeTilesOnGpu { get; set; }
+#endif
+        /// <summary>Show a browser confirmation before leaving the page</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ConfirmLeave { get; set; }
+#nullable restore
+#else
+        public UntypedNode ConfirmLeave { get; set; }
 #endif
         /// <summary>Cross Attention Optimization</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -322,6 +368,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode DisabledExtensions { get; set; }
 #endif
+        /// <summary>Ignore the VAE / Text Encoder when reading infotext</summary>
+        public bool? DisableModulesAutoSwap { get; set; }
         /// <summary>Disable Token Counter</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -330,6 +378,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode DisableTokenCounters { get; set; }
 #endif
+        /// <summary>Ignore the Checkpoint when reading infotext</summary>
+        public bool? DisableWeightsAutoSwap { get; set; }
         /// <summary>The div00 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -362,13 +412,21 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode Divlumina { get; set; }
 #endif
-        /// <summary>The divqwen property</summary>
+        /// <summary>The divmisc property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public UntypedNode? Divqwen { get; set; }
+        public UntypedNode? Divmisc { get; set; }
 #nullable restore
 #else
-        public UntypedNode Divqwen { get; set; }
+        public UntypedNode Divmisc { get; set; }
+#endif
+        /// <summary>The div_prompt property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? DivPrompt { get; set; }
+#nullable restore
+#else
+        public UntypedNode DivPrompt { get; set; }
 #endif
         /// <summary>The div_tome property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -432,6 +490,222 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #endif
         /// <summary>Show a progress bar in the console for tiled upscaling</summary>
         public bool? EnableUpscaleProgressbar { get; set; }
+        /// <summary>The ernie_batch0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ErnieBatch0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ErnieBatch0 { get; set; }
+#endif
+        /// <summary>The ernie_batch1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ErnieBatch1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ErnieBatch1 { get; set; }
+#endif
+        /// <summary>The ernie_cfg0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ErnieCfg0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ErnieCfg0 { get; set; }
+#endif
+        /// <summary>The ernie_cfg1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ErnieCfg1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ErnieCfg1 { get; set; }
+#endif
+        /// <summary>The ernie_dcfg0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ErnieDcfg0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ErnieDcfg0 { get; set; }
+#endif
+        /// <summary>The ernie_dcfg1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ErnieDcfg1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ErnieDcfg1 { get; set; }
+#endif
+        /// <summary>img2img Batch Size</summary>
+        public double? ErnieI2iBatchSize { get; set; }
+        /// <summary>img2img CFG</summary>
+        public double? ErnieI2iCfg { get; set; }
+        /// <summary>img2img Shift</summary>
+        public double? ErnieI2iDcfg { get; set; }
+        /// <summary>The ernie_i2i_dim0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ErnieI2iDim0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ErnieI2iDim0 { get; set; }
+#endif
+        /// <summary>The ernie_i2i_dim1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ErnieI2iDim1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ErnieI2iDim1 { get; set; }
+#endif
+        /// <summary>img2img Height</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ErnieI2iHeight { get; set; }
+#nullable restore
+#else
+        public UntypedNode ErnieI2iHeight { get; set; }
+#endif
+        /// <summary>img2img Sampler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ErnieI2iSampler { get; set; }
+#nullable restore
+#else
+        public string ErnieI2iSampler { get; set; }
+#endif
+        /// <summary>img2img Scheduler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ErnieI2iScheduler { get; set; }
+#nullable restore
+#else
+        public string ErnieI2iScheduler { get; set; }
+#endif
+        /// <summary>The ernie_i2i_ss0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ErnieI2iSs0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ErnieI2iSs0 { get; set; }
+#endif
+        /// <summary>The ernie_i2i_ss1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ErnieI2iSs1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ErnieI2iSs1 { get; set; }
+#endif
+        /// <summary>img2img Steps</summary>
+        public double? ErnieI2iStep { get; set; }
+        /// <summary>img2img Width</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ErnieI2iWidth { get; set; }
+#nullable restore
+#else
+        public UntypedNode ErnieI2iWidth { get; set; }
+#endif
+        /// <summary>Display Shift Slider</summary>
+        public bool? ErnieShowShift { get; set; }
+        /// <summary>The ernie_steps0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ErnieSteps0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ErnieSteps0 { get; set; }
+#endif
+        /// <summary>The ernie_steps1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ErnieSteps1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ErnieSteps1 { get; set; }
+#endif
+        /// <summary>txt2img Batch Size</summary>
+        public double? ErnieT2iBatchSize { get; set; }
+        /// <summary>txt2img CFG</summary>
+        public double? ErnieT2iCfg { get; set; }
+        /// <summary>txt2img Shift</summary>
+        public double? ErnieT2iDcfg { get; set; }
+        /// <summary>The ernie_t2i_dim0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ErnieT2iDim0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ErnieT2iDim0 { get; set; }
+#endif
+        /// <summary>The ernie_t2i_dim1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ErnieT2iDim1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ErnieT2iDim1 { get; set; }
+#endif
+        /// <summary>txt2img Height</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ErnieT2iHeight { get; set; }
+#nullable restore
+#else
+        public UntypedNode ErnieT2iHeight { get; set; }
+#endif
+        /// <summary>txt2img Hires. CFG</summary>
+        public double? ErnieT2iHrCfg { get; set; }
+        /// <summary>txt2img Hires. Shift</summary>
+        public double? ErnieT2iHrDcfg { get; set; }
+        /// <summary>txt2img Hires. Steps</summary>
+        public double? ErnieT2iHrStep { get; set; }
+        /// <summary>txt2img Sampler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ErnieT2iSampler { get; set; }
+#nullable restore
+#else
+        public string ErnieT2iSampler { get; set; }
+#endif
+        /// <summary>txt2img Scheduler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ErnieT2iScheduler { get; set; }
+#nullable restore
+#else
+        public string ErnieT2iScheduler { get; set; }
+#endif
+        /// <summary>The ernie_t2i_ss0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ErnieT2iSs0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ErnieT2iSs0 { get; set; }
+#endif
+        /// <summary>The ernie_t2i_ss1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ErnieT2iSs1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ErnieT2iSs1 { get; set; }
+#endif
+        /// <summary>txt2img Steps</summary>
+        public double? ErnieT2iStep { get; set; }
+        /// <summary>txt2img Width</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ErnieT2iWidth { get; set; }
+#nullable restore
+#else
+        public UntypedNode ErnieT2iWidth { get; set; }
+#endif
         /// <summary>Tile Size for Upscalers</summary>
         public double? ESRGANTile { get; set; }
         /// <summary>Tile Overlap for Upscalers</summary>
@@ -606,6 +880,22 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode FaceRestorationUnload { get; set; }
 #endif
+        /// <summary>The flux_batch0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? FluxBatch0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode FluxBatch0 { get; set; }
+#endif
+        /// <summary>The flux_batch1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? FluxBatch1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode FluxBatch1 { get; set; }
+#endif
         /// <summary>The flux_cfg0 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -638,6 +928,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode FluxDcfg1 { get; set; }
 #endif
+        /// <summary>img2img Batch Size</summary>
+        public double? FluxI2iBatchSize { get; set; }
         /// <summary>img2img CFG</summary>
         public double? FluxI2iCfg { get; set; }
         /// <summary>img2img Distilled CFG</summary>
@@ -666,7 +958,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode FluxI2iHeight { get; set; }
 #endif
-        /// <summary>img2img sampler</summary>
+        /// <summary>img2img Sampler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? FluxI2iSampler { get; set; }
@@ -674,7 +966,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string FluxI2iSampler { get; set; }
 #endif
-        /// <summary>img2img scheduler</summary>
+        /// <summary>img2img Scheduler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? FluxI2iScheduler { get; set; }
@@ -724,6 +1016,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode FluxSteps1 { get; set; }
 #endif
+        /// <summary>txt2img Batch Size</summary>
+        public double? FluxT2iBatchSize { get; set; }
         /// <summary>txt2img CFG</summary>
         public double? FluxT2iCfg { get; set; }
         /// <summary>txt2img Distilled CFG</summary>
@@ -758,7 +1052,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
         public double? FluxT2iHrDcfg { get; set; }
         /// <summary>txt2img Hires. Steps</summary>
         public double? FluxT2iHrStep { get; set; }
-        /// <summary>txt2img sampler</summary>
+        /// <summary>txt2img Sampler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? FluxT2iSampler { get; set; }
@@ -766,7 +1060,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string FluxT2iSampler { get; set; }
 #endif
-        /// <summary>txt2img scheduler</summary>
+        /// <summary>txt2img Scheduler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? FluxT2iScheduler { get; set; }
@@ -824,6 +1118,14 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode ForgeAdditionalModulesAnima { get; set; }
 #endif
+        /// <summary>The forge_additional_modules_ernie property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeAdditionalModulesErnie { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeAdditionalModulesErnie { get; set; }
+#endif
         /// <summary>The forge_additional_modules_flux property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -840,6 +1142,14 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode ForgeAdditionalModulesKlein { get; set; }
 #endif
+        /// <summary>The forge_additional_modules_krea property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeAdditionalModulesKrea { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeAdditionalModulesKrea { get; set; }
+#endif
         /// <summary>The forge_additional_modules_lumina property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -847,6 +1157,14 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #nullable restore
 #else
         public UntypedNode ForgeAdditionalModulesLumina { get; set; }
+#endif
+        /// <summary>The forge_additional_modules_pid property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeAdditionalModulesPid { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeAdditionalModulesPid { get; set; }
 #endif
         /// <summary>The forge_additional_modules_qwen property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -930,6 +1248,14 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode ForgeCheckpointAnima { get; set; }
 #endif
+        /// <summary>The forge_checkpoint_ernie property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeCheckpointErnie { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeCheckpointErnie { get; set; }
+#endif
         /// <summary>The forge_checkpoint_flux property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -946,6 +1272,14 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode ForgeCheckpointKlein { get; set; }
 #endif
+        /// <summary>The forge_checkpoint_krea property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeCheckpointKrea { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeCheckpointKrea { get; set; }
+#endif
         /// <summary>The forge_checkpoint_lumina property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -953,6 +1287,14 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #nullable restore
 #else
         public UntypedNode ForgeCheckpointLumina { get; set; }
+#endif
+        /// <summary>The forge_checkpoint_pid property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ForgeCheckpointPid { get; set; }
+#nullable restore
+#else
+        public UntypedNode ForgeCheckpointPid { get; set; }
 #endif
         /// <summary>The forge_checkpoint_qwen property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -1002,14 +1344,6 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string ForgePreset { get; set; }
 #endif
-        /// <summary>Try to reproduce the results from external software</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public string? ForgeTryReproduce { get; set; }
-#nullable restore
-#else
-        public string ForgeTryReproduce { get; set; }
-#endif
         /// <summary>The forge_unet_storage_dtype property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -1025,6 +1359,14 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #nullable restore
 #else
         public string ForgeUnetStorageDtypeAnima { get; set; }
+#endif
+        /// <summary>The forge_unet_storage_dtype_ernie property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ForgeUnetStorageDtypeErnie { get; set; }
+#nullable restore
+#else
+        public string ForgeUnetStorageDtypeErnie { get; set; }
 #endif
         /// <summary>The forge_unet_storage_dtype_flux property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -1042,6 +1384,14 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string ForgeUnetStorageDtypeKlein { get; set; }
 #endif
+        /// <summary>The forge_unet_storage_dtype_krea property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ForgeUnetStorageDtypeKrea { get; set; }
+#nullable restore
+#else
+        public string ForgeUnetStorageDtypeKrea { get; set; }
+#endif
         /// <summary>The forge_unet_storage_dtype_lumina property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -1049,6 +1399,14 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #nullable restore
 #else
         public string ForgeUnetStorageDtypeLumina { get; set; }
+#endif
+        /// <summary>The forge_unet_storage_dtype_pid property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ForgeUnetStorageDtypePid { get; set; }
+#nullable restore
+#else
+        public string ForgeUnetStorageDtypePid { get; set; }
 #endif
         /// <summary>The forge_unet_storage_dtype_qwen property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -1180,6 +1538,14 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode HideSamplers { get; set; }
 #endif
+        /// <summary>Hide Schedulers</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? HideSchedulers { get; set; }
+#nullable restore
+#else
+        public UntypedNode HideSchedulers { get; set; }
+#endif
         /// <summary>When using the [✨] button, insert the upscaled image to the gallery</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -1204,7 +1570,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode HiresFixShowSampler { get; set; }
 #endif
-        /// <summary>For hires fix, calculate conds of second pass using extra networks of first pass.</summary>
+        /// <summary>For Hires. Fix, calculate conds of Hires. pass using Extra Networks of the normal pass</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public UntypedNode? HiresFixUseFirstpassConds { get; set; }
@@ -1276,6 +1642,14 @@ namespace Mogri.Clients.SdForgeNeo.Models
         public bool? Img2imgInpaintMaskHighContrast { get; set; }
         /// <summary>Inpaint mask alpha (transparency)</summary>
         public double? Img2imgInpaintMaskScribbleAlpha { get; set; }
+        /// <summary>Process the &quot;Mask blur&quot; in fp32 instead of uint8 precision</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? Img2imgInpaintPreciseMask { get; set; }
+#nullable restore
+#else
+        public UntypedNode Img2imgInpaintPreciseMask { get; set; }
+#endif
         /// <summary>Initial Brush Color for Inpaint Sketch</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -1374,6 +1748,14 @@ namespace Mogri.Clients.SdForgeNeo.Models
         public double? JsModalLightboxGamepadRepeat { get; set; }
         /// <summary>[Lightbox]: show images zoomed in by default</summary>
         public bool? JsModalLightboxInitiallyZoomed { get; set; }
+        /// <summary>Keep generating even when the WebUI browser tab is not in focus</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KeepAlive { get; set; }
+#nullable restore
+#else
+        public UntypedNode KeepAlive { get; set; }
+#endif
         /// <summary>RegEx Delimiters when editing the prompt with Ctrl + Up/Down</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -1396,6 +1778,22 @@ namespace Mogri.Clients.SdForgeNeo.Models
         public double? KeyeditPrecisionAttention { get; set; }
         /// <summary>Precision for &lt;lora:0.9&gt; when editing the prompt with Ctrl + Up/Down</summary>
         public double? KeyeditPrecisionExtra { get; set; }
+        /// <summary>The klein_batch0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KleinBatch0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KleinBatch0 { get; set; }
+#endif
+        /// <summary>The klein_batch1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KleinBatch1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KleinBatch1 { get; set; }
+#endif
         /// <summary>The klein_cfg0 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -1412,6 +1810,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode KleinCfg1 { get; set; }
 #endif
+        /// <summary>img2img Batch Size</summary>
+        public double? KleinI2iBatchSize { get; set; }
         /// <summary>img2img CFG</summary>
         public double? KleinI2iCfg { get; set; }
         /// <summary>The klein_i2i_dim0 property</summary>
@@ -1438,7 +1838,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode KleinI2iHeight { get; set; }
 #endif
-        /// <summary>img2img sampler</summary>
+        /// <summary>img2img Sampler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? KleinI2iSampler { get; set; }
@@ -1446,7 +1846,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string KleinI2iSampler { get; set; }
 #endif
-        /// <summary>img2img scheduler</summary>
+        /// <summary>img2img Scheduler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? KleinI2iScheduler { get; set; }
@@ -1480,6 +1880,14 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode KleinI2iWidth { get; set; }
 #endif
+        /// <summary>[Klein] Disable Reference</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KleinNoReference { get; set; }
+#nullable restore
+#else
+        public UntypedNode KleinNoReference { get; set; }
+#endif
         /// <summary>The klein_steps0 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -1496,6 +1904,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode KleinSteps1 { get; set; }
 #endif
+        /// <summary>txt2img Batch Size</summary>
+        public double? KleinT2iBatchSize { get; set; }
         /// <summary>txt2img CFG</summary>
         public double? KleinT2iCfg { get; set; }
         /// <summary>The klein_t2i_dim0 property</summary>
@@ -1526,7 +1936,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
         public double? KleinT2iHrCfg { get; set; }
         /// <summary>txt2img Hires. Steps</summary>
         public double? KleinT2iHrStep { get; set; }
-        /// <summary>txt2img sampler</summary>
+        /// <summary>txt2img Sampler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? KleinT2iSampler { get; set; }
@@ -1534,7 +1944,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string KleinT2iSampler { get; set; }
 #endif
-        /// <summary>txt2img scheduler</summary>
+        /// <summary>txt2img Scheduler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? KleinT2iScheduler { get; set; }
@@ -1568,6 +1978,236 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode KleinT2iWidth { get; set; }
 #endif
+        /// <summary>[Krea2] Enable Reference</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? Krea2DoReference { get; set; }
+#nullable restore
+#else
+        public UntypedNode Krea2DoReference { get; set; }
+#endif
+        /// <summary>The krea_batch0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KreaBatch0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KreaBatch0 { get; set; }
+#endif
+        /// <summary>The krea_batch1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KreaBatch1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KreaBatch1 { get; set; }
+#endif
+        /// <summary>The krea_cfg0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KreaCfg0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KreaCfg0 { get; set; }
+#endif
+        /// <summary>The krea_cfg1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KreaCfg1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KreaCfg1 { get; set; }
+#endif
+        /// <summary>The krea_dcfg0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KreaDcfg0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KreaDcfg0 { get; set; }
+#endif
+        /// <summary>The krea_dcfg1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KreaDcfg1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KreaDcfg1 { get; set; }
+#endif
+        /// <summary>img2img Batch Size</summary>
+        public double? KreaI2iBatchSize { get; set; }
+        /// <summary>img2img CFG</summary>
+        public double? KreaI2iCfg { get; set; }
+        /// <summary>img2img Shift</summary>
+        public double? KreaI2iDcfg { get; set; }
+        /// <summary>The krea_i2i_dim0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KreaI2iDim0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KreaI2iDim0 { get; set; }
+#endif
+        /// <summary>The krea_i2i_dim1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KreaI2iDim1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KreaI2iDim1 { get; set; }
+#endif
+        /// <summary>img2img Height</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KreaI2iHeight { get; set; }
+#nullable restore
+#else
+        public UntypedNode KreaI2iHeight { get; set; }
+#endif
+        /// <summary>img2img Sampler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? KreaI2iSampler { get; set; }
+#nullable restore
+#else
+        public string KreaI2iSampler { get; set; }
+#endif
+        /// <summary>img2img Scheduler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? KreaI2iScheduler { get; set; }
+#nullable restore
+#else
+        public string KreaI2iScheduler { get; set; }
+#endif
+        /// <summary>The krea_i2i_ss0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KreaI2iSs0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KreaI2iSs0 { get; set; }
+#endif
+        /// <summary>The krea_i2i_ss1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KreaI2iSs1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KreaI2iSs1 { get; set; }
+#endif
+        /// <summary>img2img Steps</summary>
+        public double? KreaI2iStep { get; set; }
+        /// <summary>img2img Width</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KreaI2iWidth { get; set; }
+#nullable restore
+#else
+        public UntypedNode KreaI2iWidth { get; set; }
+#endif
+        /// <summary>Display Shift Slider</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KreaShowShift { get; set; }
+#nullable restore
+#else
+        public UntypedNode KreaShowShift { get; set; }
+#endif
+        /// <summary>The krea_steps0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KreaSteps0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KreaSteps0 { get; set; }
+#endif
+        /// <summary>The krea_steps1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KreaSteps1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KreaSteps1 { get; set; }
+#endif
+        /// <summary>txt2img Batch Size</summary>
+        public double? KreaT2iBatchSize { get; set; }
+        /// <summary>txt2img CFG</summary>
+        public double? KreaT2iCfg { get; set; }
+        /// <summary>txt2img Shift</summary>
+        public double? KreaT2iDcfg { get; set; }
+        /// <summary>The krea_t2i_dim0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KreaT2iDim0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KreaT2iDim0 { get; set; }
+#endif
+        /// <summary>The krea_t2i_dim1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KreaT2iDim1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KreaT2iDim1 { get; set; }
+#endif
+        /// <summary>txt2img Height</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KreaT2iHeight { get; set; }
+#nullable restore
+#else
+        public UntypedNode KreaT2iHeight { get; set; }
+#endif
+        /// <summary>txt2img Hires. CFG</summary>
+        public double? KreaT2iHrCfg { get; set; }
+        /// <summary>txt2img Hires. Shift</summary>
+        public double? KreaT2iHrDcfg { get; set; }
+        /// <summary>txt2img Hires. Steps</summary>
+        public double? KreaT2iHrStep { get; set; }
+        /// <summary>txt2img Sampler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? KreaT2iSampler { get; set; }
+#nullable restore
+#else
+        public string KreaT2iSampler { get; set; }
+#endif
+        /// <summary>txt2img Scheduler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? KreaT2iScheduler { get; set; }
+#nullable restore
+#else
+        public string KreaT2iScheduler { get; set; }
+#endif
+        /// <summary>The krea_t2i_ss0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KreaT2iSs0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KreaT2iSs0 { get; set; }
+#endif
+        /// <summary>The krea_t2i_ss1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KreaT2iSs1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode KreaT2iSs1 { get; set; }
+#endif
+        /// <summary>txt2img Steps</summary>
+        public double? KreaT2iStep { get; set; }
+        /// <summary>txt2img Width</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? KreaT2iWidth { get; set; }
+#nullable restore
+#else
+        public UntypedNode KreaT2iWidth { get; set; }
+#endif
         /// <summary>List the models/files under hidden directories</summary>
         public bool? ListHiddenFiles { get; set; }
         /// <summary>Return image with the selected preview method on interruption</summary>
@@ -1597,6 +2237,22 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #nullable restore
 #else
         public string Localization { get; set; }
+#endif
+        /// <summary>The lumina_batch0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? LuminaBatch0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode LuminaBatch0 { get; set; }
+#endif
+        /// <summary>The lumina_batch1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? LuminaBatch1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode LuminaBatch1 { get; set; }
 #endif
         /// <summary>The lumina_cfg0 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -1630,6 +2286,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode LuminaDcfg1 { get; set; }
 #endif
+        /// <summary>img2img Batch Size</summary>
+        public double? LuminaI2iBatchSize { get; set; }
         /// <summary>img2img CFG</summary>
         public double? LuminaI2iCfg { get; set; }
         /// <summary>img2img Shift</summary>
@@ -1658,7 +2316,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode LuminaI2iHeight { get; set; }
 #endif
-        /// <summary>img2img sampler</summary>
+        /// <summary>img2img Sampler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? LuminaI2iSampler { get; set; }
@@ -1666,7 +2324,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string LuminaI2iSampler { get; set; }
 #endif
-        /// <summary>img2img scheduler</summary>
+        /// <summary>img2img Scheduler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? LuminaI2iScheduler { get; set; }
@@ -1700,6 +2358,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode LuminaI2iWidth { get; set; }
 #endif
+        /// <summary>Display Shift Slider</summary>
+        public bool? LuminaShowShift { get; set; }
         /// <summary>The lumina_steps0 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -1716,6 +2376,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode LuminaSteps1 { get; set; }
 #endif
+        /// <summary>txt2img Batch Size</summary>
+        public double? LuminaT2iBatchSize { get; set; }
         /// <summary>txt2img CFG</summary>
         public double? LuminaT2iCfg { get; set; }
         /// <summary>txt2img Shift</summary>
@@ -1750,7 +2412,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
         public double? LuminaT2iHrDcfg { get; set; }
         /// <summary>txt2img Hires. Steps</summary>
         public double? LuminaT2iHrStep { get; set; }
-        /// <summary>txt2img sampler</summary>
+        /// <summary>txt2img Sampler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? LuminaT2iSampler { get; set; }
@@ -1758,7 +2420,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string LuminaT2iSampler { get; set; }
 #endif
-        /// <summary>txt2img scheduler</summary>
+        /// <summary>txt2img Scheduler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? LuminaT2iScheduler { get; set; }
@@ -1812,13 +2474,13 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string NetaTemplatePositive { get; set; }
 #endif
-        /// <summary>Do not make DPM++ SDE deterministic across different batch sizes.</summary>
+        /// <summary>Disable auto-correct / spellcheck for prompt fields</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public UntypedNode? NoDpmppSdeBatchDeterminism { get; set; }
+        public UntypedNode? NoSpellcheck { get; set; }
 #nullable restore
 #else
-        public UntypedNode NoDpmppSdeBatchDeterminism { get; set; }
+        public UntypedNode NoSpellcheck { get; set; }
 #endif
         /// <summary>Play a notification sound after image generation</summary>
         public bool? NotificationAudio { get; set; }
@@ -1926,6 +2588,228 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #endif
         /// <summary>Persistent Cond Cache</summary>
         public bool? PersistentCondCache { get; set; }
+        /// <summary>The pid_batch0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? PidBatch0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode PidBatch0 { get; set; }
+#endif
+        /// <summary>The pid_batch1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? PidBatch1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode PidBatch1 { get; set; }
+#endif
+        /// <summary>The pid_cfg0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? PidCfg0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode PidCfg0 { get; set; }
+#endif
+        /// <summary>The pid_cfg1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? PidCfg1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode PidCfg1 { get; set; }
+#endif
+        /// <summary>The pid_dcfg0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? PidDcfg0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode PidDcfg0 { get; set; }
+#endif
+        /// <summary>The pid_dcfg1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? PidDcfg1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode PidDcfg1 { get; set; }
+#endif
+        /// <summary>img2img Batch Size</summary>
+        public double? PidI2iBatchSize { get; set; }
+        /// <summary>img2img CFG</summary>
+        public double? PidI2iCfg { get; set; }
+        /// <summary>img2img Shift</summary>
+        public double? PidI2iDcfg { get; set; }
+        /// <summary>The pid_i2i_dim0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? PidI2iDim0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode PidI2iDim0 { get; set; }
+#endif
+        /// <summary>The pid_i2i_dim1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? PidI2iDim1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode PidI2iDim1 { get; set; }
+#endif
+        /// <summary>img2img Height</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? PidI2iHeight { get; set; }
+#nullable restore
+#else
+        public UntypedNode PidI2iHeight { get; set; }
+#endif
+        /// <summary>img2img Sampler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? PidI2iSampler { get; set; }
+#nullable restore
+#else
+        public string PidI2iSampler { get; set; }
+#endif
+        /// <summary>img2img Scheduler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? PidI2iScheduler { get; set; }
+#nullable restore
+#else
+        public string PidI2iScheduler { get; set; }
+#endif
+        /// <summary>The pid_i2i_ss0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? PidI2iSs0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode PidI2iSs0 { get; set; }
+#endif
+        /// <summary>The pid_i2i_ss1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? PidI2iSs1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode PidI2iSs1 { get; set; }
+#endif
+        /// <summary>img2img Steps</summary>
+        public double? PidI2iStep { get; set; }
+        /// <summary>img2img Width</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? PidI2iWidth { get; set; }
+#nullable restore
+#else
+        public UntypedNode PidI2iWidth { get; set; }
+#endif
+        /// <summary>Display Shift Slider</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? PidShowShift { get; set; }
+#nullable restore
+#else
+        public UntypedNode PidShowShift { get; set; }
+#endif
+        /// <summary>The pid_steps0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? PidSteps0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode PidSteps0 { get; set; }
+#endif
+        /// <summary>The pid_steps1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? PidSteps1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode PidSteps1 { get; set; }
+#endif
+        /// <summary>txt2img Batch Size</summary>
+        public double? PidT2iBatchSize { get; set; }
+        /// <summary>txt2img CFG</summary>
+        public double? PidT2iCfg { get; set; }
+        /// <summary>txt2img Shift</summary>
+        public double? PidT2iDcfg { get; set; }
+        /// <summary>The pid_t2i_dim0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? PidT2iDim0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode PidT2iDim0 { get; set; }
+#endif
+        /// <summary>The pid_t2i_dim1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? PidT2iDim1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode PidT2iDim1 { get; set; }
+#endif
+        /// <summary>txt2img Height</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? PidT2iHeight { get; set; }
+#nullable restore
+#else
+        public UntypedNode PidT2iHeight { get; set; }
+#endif
+        /// <summary>txt2img Hires. CFG</summary>
+        public double? PidT2iHrCfg { get; set; }
+        /// <summary>txt2img Hires. Shift</summary>
+        public double? PidT2iHrDcfg { get; set; }
+        /// <summary>txt2img Hires. Steps</summary>
+        public double? PidT2iHrStep { get; set; }
+        /// <summary>txt2img Sampler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? PidT2iSampler { get; set; }
+#nullable restore
+#else
+        public string PidT2iSampler { get; set; }
+#endif
+        /// <summary>txt2img Scheduler</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? PidT2iScheduler { get; set; }
+#nullable restore
+#else
+        public string PidT2iScheduler { get; set; }
+#endif
+        /// <summary>The pid_t2i_ss0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? PidT2iSs0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode PidT2iSs0 { get; set; }
+#endif
+        /// <summary>The pid_t2i_ss1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? PidT2iSs1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode PidT2iSs1 { get; set; }
+#endif
+        /// <summary>txt2img Steps</summary>
+        public double? PidT2iStep { get; set; }
+        /// <summary>txt2img Width</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? PidT2iWidth { get; set; }
+#nullable restore
+#else
+        public UntypedNode PidT2iWidth { get; set; }
+#endif
         /// <summary>Disable Postprocessing operations in Extras tab</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -1998,6 +2882,14 @@ namespace Mogri.Clients.SdForgeNeo.Models
         public bool? ProfilingRecordShapes { get; set; }
         /// <summary>Include Python Stack</summary>
         public bool? ProfilingWithStack { get; set; }
+        /// <summary>Prompt Layout</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? PromptBoxStyle { get; set; }
+#nullable restore
+#else
+        public string PromptBoxStyle { get; set; }
+#endif
         /// <summary>Place the Quicksettings under an Accordion</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -2022,6 +2914,22 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode QuicksettingsList { get; set; }
 #endif
+        /// <summary>The qwen_batch0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? QwenBatch0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode QwenBatch0 { get; set; }
+#endif
+        /// <summary>The qwen_batch1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? QwenBatch1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode QwenBatch1 { get; set; }
+#endif
         /// <summary>The qwen_cfg0 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -2038,6 +2946,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode QwenCfg1 { get; set; }
 #endif
+        /// <summary>img2img Batch Size</summary>
+        public double? QwenI2iBatchSize { get; set; }
         /// <summary>img2img CFG</summary>
         public double? QwenI2iCfg { get; set; }
         /// <summary>The qwen_i2i_dim0 property</summary>
@@ -2064,7 +2974,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode QwenI2iHeight { get; set; }
 #endif
-        /// <summary>img2img sampler</summary>
+        /// <summary>img2img Sampler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? QwenI2iSampler { get; set; }
@@ -2072,7 +2982,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string QwenI2iSampler { get; set; }
 #endif
-        /// <summary>img2img scheduler</summary>
+        /// <summary>img2img Scheduler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? QwenI2iScheduler { get; set; }
@@ -2122,6 +3032,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode QwenSteps1 { get; set; }
 #endif
+        /// <summary>txt2img Batch Size</summary>
+        public double? QwenT2iBatchSize { get; set; }
         /// <summary>txt2img CFG</summary>
         public double? QwenT2iCfg { get; set; }
         /// <summary>The qwen_t2i_dim0 property</summary>
@@ -2152,7 +3064,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
         public double? QwenT2iHrCfg { get; set; }
         /// <summary>txt2img Hires. Steps</summary>
         public double? QwenT2iHrStep { get; set; }
-        /// <summary>txt2img sampler</summary>
+        /// <summary>txt2img Sampler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? QwenT2iSampler { get; set; }
@@ -2160,7 +3072,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string QwenT2iSampler { get; set; }
 #endif
-        /// <summary>txt2img scheduler</summary>
+        /// <summary>txt2img Scheduler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? QwenT2iScheduler { get; set; }
@@ -2194,7 +3106,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode QwenT2iWidth { get; set; }
 #endif
-        /// <summary>Resize input image to 1 megapixel for Qwen-Image-Edit ref_latent</summary>
+        /// <summary>[Qwen-Image-Edit] Resize input image to 1 megapixel for ref_latent</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public UntypedNode? QwenVaeResize { get; set; }
@@ -2210,6 +3122,14 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string RandnSource { get; set; }
 #endif
+        /// <summary>The reference_explanation property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ReferenceExplanation { get; set; }
+#nullable restore
+#else
+        public string ReferenceExplanation { get; set; }
+#endif
         /// <summary>Reload &quot;state_dict&quot; Only</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -2217,22 +3137,6 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #nullable restore
 #else
         public UntypedNode RefinerFastSd { get; set; }
-#endif
-        /// <summary>The refiner_lora_explanation property</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public string? RefinerLoraExplanation { get; set; }
-#nullable restore
-#else
-        public string RefinerLoraExplanation { get; set; }
-#endif
-        /// <summary>Lora Replacements</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public string? RefinerLoraReplacement { get; set; }
-#nullable restore
-#else
-        public string RefinerLoraReplacement { get; set; }
 #endif
         /// <summary>Switch based on &quot;steps&quot; instead</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -2242,6 +3146,10 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode RefinerUseSteps { get; set; }
 #endif
+        /// <summary>For image inputs in Extras and PNG Info, remove the current image when dragging another image over it</summary>
+        public bool? RemoveImageOnHover { get; set; }
+        /// <summary>Resolution Step</summary>
+        public double? ResStep { get; set; }
         /// <summary>Config state file to restore from, under &quot;config-states/&quot; folder</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -2400,13 +3308,21 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode SChurn { get; set; }
 #endif
-        /// <summary>Scrollable Prompt Layout</summary>
+        /// <summary>The sd_batch0 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public UntypedNode? ScrollablePromptBox { get; set; }
+        public UntypedNode? SdBatch0 { get; set; }
 #nullable restore
 #else
-        public UntypedNode ScrollablePromptBox { get; set; }
+        public UntypedNode SdBatch0 { get; set; }
+#endif
+        /// <summary>The sd_batch1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? SdBatch1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode SdBatch1 { get; set; }
 #endif
         /// <summary>The sd_cfg0 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -2440,6 +3356,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode SdCheckpointHash { get; set; }
 #endif
+        /// <summary>img2img Batch Size</summary>
+        public double? SdI2iBatchSize { get; set; }
         /// <summary>img2img CFG</summary>
         public double? SdI2iCfg { get; set; }
         /// <summary>The sd_i2i_dim0 property</summary>
@@ -2466,7 +3384,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode SdI2iHeight { get; set; }
 #endif
-        /// <summary>img2img sampler</summary>
+        /// <summary>img2img Sampler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? SdI2iSampler { get; set; }
@@ -2474,7 +3392,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string SdI2iSampler { get; set; }
 #endif
-        /// <summary>img2img scheduler</summary>
+        /// <summary>img2img Scheduler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? SdI2iScheduler { get; set; }
@@ -2540,6 +3458,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode SdSteps1 { get; set; }
 #endif
+        /// <summary>txt2img Batch Size</summary>
+        public double? SdT2iBatchSize { get; set; }
         /// <summary>txt2img CFG</summary>
         public double? SdT2iCfg { get; set; }
         /// <summary>The sd_t2i_dim0 property</summary>
@@ -2570,7 +3490,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
         public double? SdT2iHrCfg { get; set; }
         /// <summary>txt2img Hires. Steps</summary>
         public double? SdT2iHrStep { get; set; }
-        /// <summary>txt2img sampler</summary>
+        /// <summary>txt2img Sampler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? SdT2iSampler { get; set; }
@@ -2578,7 +3498,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string SdT2iSampler { get; set; }
 #endif
-        /// <summary>txt2img scheduler</summary>
+        /// <summary>txt2img Scheduler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? SdT2iScheduler { get; set; }
@@ -2652,12 +3572,42 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string SdVaeExplanation { get; set; }
 #endif
-        /// <summary>&quot;SD VAE&quot; option overrides per-model preference</summary>
-        public bool? SdVaeOverridesPerModelPreferences { get; set; }
         /// <summary>[Lightbox]: control icon unfocused opacity</summary>
         public double? SdWebuiModalLightboxIconOpacity { get; set; }
         /// <summary>[Lightbox]: tool bar opacity</summary>
         public double? SdWebuiModalLightboxToolbarOpacity { get; set; }
+        /// <summary>The sdxl_00 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? Sdxl00 { get; set; }
+#nullable restore
+#else
+        public UntypedNode Sdxl00 { get; set; }
+#endif
+        /// <summary>The sdxl_01 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? Sdxl01 { get; set; }
+#nullable restore
+#else
+        public UntypedNode Sdxl01 { get; set; }
+#endif
+        /// <summary>The sdxl_10 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? Sdxl10 { get; set; }
+#nullable restore
+#else
+        public UntypedNode Sdxl10 { get; set; }
+#endif
+        /// <summary>The sdxl_11 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? Sdxl11 { get; set; }
+#nullable restore
+#else
+        public UntypedNode Sdxl11 { get; set; }
+#endif
         /// <summary>[SDXL] Crop-Left Coordinate</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -2678,7 +3628,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
         public double? SdxlRefinerHighAestheticScore { get; set; }
         /// <summary>[SDXL] Low Aesthetic Score</summary>
         public double? SdxlRefinerLowAestheticScore { get; set; }
-        /// <summary>For SDXL, zero out the conditioning when negative prompt is empty</summary>
+        /// <summary>[SDXL] Zero out the conditioning when negative prompt is empty</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public UntypedNode? SdxlZeroNeg { get; set; }
@@ -2688,6 +3638,14 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #endif
         /// <summary>Send the CFG information when using the &quot;Send to&quot; buttons</summary>
         public bool? SendCfg { get; set; }
+        /// <summary>Send the Parameters in the infotext instead of the UI fields when using the &quot;Send to&quot; buttons</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? SendImageInfoNotUi { get; set; }
+#nullable restore
+#else
+        public UntypedNode SendImageInfoNotUi { get; set; }
+#endif
         /// <summary>Send the Seed information when using the &quot;Send to&quot; buttons</summary>
         public bool? SendSeed { get; set; }
         /// <summary>Send the Resolution information when using the &quot;Send to&quot; buttons</summary>
@@ -2745,13 +3703,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
         public string ShowProgressType { get; set; }
 #endif
         /// <summary>Display the Refiner Accordion</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? ShowRefiner { get; set; }
-#nullable restore
-#else
-        public UntypedNode ShowRefiner { get; set; }
-#endif
+        public bool? ShowRefiner { get; set; }
         /// <summary>Display the Rescale CFG Slider</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -2948,6 +3900,10 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode Txt2imgSettingsAccordion { get; set; }
 #endif
+        /// <summary>When using the [✨] button, pass the Seed of the input image instead of the UI value</summary>
+        public bool? Txt2imgUpscaleSameSeed { get; set; }
+        /// <summary>When using the [✨] button, lock the Batch Count and Batch Size to 1 regardless of the UI values</summary>
+        public bool? Txt2imgUpscaleSingleBatch { get; set; }
         /// <summary>Extra Networks Tab Order</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -2972,6 +3928,14 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode UiTabOrder { get; set; }
 #endif
+        /// <summary>Enable undo / redo history for prompt fields</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? UndoRedo { get; set; }
+#nullable restore
+#else
+        public UntypedNode UndoRedo { get; set; }
+#endif
         /// <summary>Upscaler for img2img</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -2989,14 +3953,6 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #nullable restore
 #else
         public UntypedNode UseBetaSigmas { get; set; }
-#endif
-        /// <summary>Downcast model alphas_cumprod to fp16 before sampling. For reproducing old seeds.</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? UseDowncastedAlphaBar { get; set; }
-#nullable restore
-#else
-        public UntypedNode UseDowncastedAlphaBar { get; set; }
 #endif
         /// <summary>use_dynamic_shifting</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -3022,29 +3978,13 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode UseKarrasSigmas { get; set; }
 #endif
-        /// <summary>For hires fix, use width/height sliders to set final resolution rather than first pass (disables Upscale by, Resize width/height to).</summary>
+        /// <summary>For Hires. Fix, use Width/Height sliders to set the final resolution</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public UntypedNode? UseOldHiresFixWidthHeight { get; set; }
 #nullable restore
 #else
         public UntypedNode UseOldHiresFixWidthHeight { get; set; }
-#endif
-        /// <summary>Use old karras scheduler sigmas (0.1 to 10).</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? UseOldKarrasSchedulerSigmas { get; set; }
-#nullable restore
-#else
-        public UntypedNode UseOldKarrasSchedulerSigmas { get; set; }
-#endif
-        /// <summary>Use old prompt editing timelines.</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? UseOldScheduling { get; set; }
-#nullable restore
-#else
-        public UntypedNode UseOldScheduling { get; set; }
 #endif
         /// <summary>During batch process in Extras tab, use the input filename for output filename</summary>
         public bool? UseOriginalNameBatch { get; set; }
@@ -3116,6 +4056,22 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode VideoSaveFrames { get; set; }
 #endif
+        /// <summary>The wan_batch0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? WanBatch0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode WanBatch0 { get; set; }
+#endif
+        /// <summary>The wan_batch1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? WanBatch1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode WanBatch1 { get; set; }
+#endif
         /// <summary>The wan_cfg0 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -3148,6 +4104,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode WanDcfg1 { get; set; }
 #endif
+        /// <summary>img2img Frames</summary>
+        public double? WanI2iBatchSize { get; set; }
         /// <summary>img2img CFG</summary>
         public double? WanI2iCfg { get; set; }
         /// <summary>img2img Shift</summary>
@@ -3176,7 +4134,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode WanI2iHeight { get; set; }
 #endif
-        /// <summary>img2img sampler</summary>
+        /// <summary>img2img Sampler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? WanI2iSampler { get; set; }
@@ -3184,7 +4142,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string WanI2iSampler { get; set; }
 #endif
-        /// <summary>img2img scheduler</summary>
+        /// <summary>img2img Scheduler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? WanI2iScheduler { get; set; }
@@ -3218,6 +4176,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode WanI2iWidth { get; set; }
 #endif
+        /// <summary>Display Shift Slider</summary>
+        public bool? WanShowShift { get; set; }
         /// <summary>The wan_steps0 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -3234,6 +4194,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode WanSteps1 { get; set; }
 #endif
+        /// <summary>txt2img Frames</summary>
+        public double? WanT2iBatchSize { get; set; }
         /// <summary>txt2img CFG</summary>
         public double? WanT2iCfg { get; set; }
         /// <summary>txt2img Shift</summary>
@@ -3268,7 +4230,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
         public double? WanT2iHrDcfg { get; set; }
         /// <summary>txt2img Hires. Steps</summary>
         public double? WanT2iHrStep { get; set; }
-        /// <summary>txt2img sampler</summary>
+        /// <summary>txt2img Sampler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? WanT2iSampler { get; set; }
@@ -3276,7 +4238,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string WanT2iSampler { get; set; }
 #endif
-        /// <summary>txt2img scheduler</summary>
+        /// <summary>txt2img Scheduler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? WanT2iScheduler { get; set; }
@@ -3318,6 +4280,22 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode WebpLossless { get; set; }
 #endif
+        /// <summary>The xl_batch0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? XlBatch0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode XlBatch0 { get; set; }
+#endif
+        /// <summary>The xl_batch1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? XlBatch1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode XlBatch1 { get; set; }
+#endif
         /// <summary>The xl_cfg0 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -3334,8 +4312,28 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode XlCfg1 { get; set; }
 #endif
+        /// <summary>The xl_dcfg0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? XlDcfg0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode XlDcfg0 { get; set; }
+#endif
+        /// <summary>The xl_dcfg1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? XlDcfg1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode XlDcfg1 { get; set; }
+#endif
+        /// <summary>img2img Batch Size</summary>
+        public double? XlI2iBatchSize { get; set; }
         /// <summary>img2img CFG</summary>
         public double? XlI2iCfg { get; set; }
+        /// <summary>img2img Shift</summary>
+        public double? XlI2iDcfg { get; set; }
         /// <summary>The xl_i2i_dim0 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -3360,7 +4358,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode XlI2iHeight { get; set; }
 #endif
-        /// <summary>img2img sampler</summary>
+        /// <summary>img2img Sampler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? XlI2iSampler { get; set; }
@@ -3368,7 +4366,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string XlI2iSampler { get; set; }
 #endif
-        /// <summary>img2img scheduler</summary>
+        /// <summary>img2img Scheduler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? XlI2iScheduler { get; set; }
@@ -3402,6 +4400,14 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode XlI2iWidth { get; set; }
 #endif
+        /// <summary>Display Shift Slider</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? XlShowShift { get; set; }
+#nullable restore
+#else
+        public UntypedNode XlShowShift { get; set; }
+#endif
         /// <summary>The xl_steps0 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -3418,8 +4424,12 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode XlSteps1 { get; set; }
 #endif
+        /// <summary>txt2img Batch Size</summary>
+        public double? XlT2iBatchSize { get; set; }
         /// <summary>txt2img CFG</summary>
         public double? XlT2iCfg { get; set; }
+        /// <summary>txt2img Shift</summary>
+        public double? XlT2iDcfg { get; set; }
         /// <summary>The xl_t2i_dim0 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -3446,9 +4456,11 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #endif
         /// <summary>txt2img Hires. CFG</summary>
         public double? XlT2iHrCfg { get; set; }
+        /// <summary>txt2img Hires. Shift</summary>
+        public double? XlT2iHrDcfg { get; set; }
         /// <summary>txt2img Hires. Steps</summary>
         public double? XlT2iHrStep { get; set; }
-        /// <summary>txt2img sampler</summary>
+        /// <summary>txt2img Sampler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? XlT2iSampler { get; set; }
@@ -3456,7 +4468,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string XlT2iSampler { get; set; }
 #endif
-        /// <summary>txt2img scheduler</summary>
+        /// <summary>txt2img Scheduler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? XlT2iScheduler { get; set; }
@@ -3490,6 +4502,22 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode XlT2iWidth { get; set; }
 #endif
+        /// <summary>The zit_batch0 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ZitBatch0 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ZitBatch0 { get; set; }
+#endif
+        /// <summary>The zit_batch1 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ZitBatch1 { get; set; }
+#nullable restore
+#else
+        public UntypedNode ZitBatch1 { get; set; }
+#endif
         /// <summary>The zit_cfg0 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -3522,6 +4550,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode ZitDcfg1 { get; set; }
 #endif
+        /// <summary>img2img Batch Size</summary>
+        public double? ZitI2iBatchSize { get; set; }
         /// <summary>img2img CFG</summary>
         public double? ZitI2iCfg { get; set; }
         /// <summary>img2img Shift</summary>
@@ -3550,7 +4580,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode ZitI2iHeight { get; set; }
 #endif
-        /// <summary>img2img sampler</summary>
+        /// <summary>img2img Sampler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? ZitI2iSampler { get; set; }
@@ -3558,7 +4588,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string ZitI2iSampler { get; set; }
 #endif
-        /// <summary>img2img scheduler</summary>
+        /// <summary>img2img Scheduler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? ZitI2iScheduler { get; set; }
@@ -3592,6 +4622,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode ZitI2iWidth { get; set; }
 #endif
+        /// <summary>Display Shift Slider</summary>
+        public bool? ZitShowShift { get; set; }
         /// <summary>The zit_steps0 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -3608,6 +4640,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public UntypedNode ZitSteps1 { get; set; }
 #endif
+        /// <summary>txt2img Batch Size</summary>
+        public double? ZitT2iBatchSize { get; set; }
         /// <summary>txt2img CFG</summary>
         public double? ZitT2iCfg { get; set; }
         /// <summary>txt2img Shift</summary>
@@ -3642,7 +4676,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
         public double? ZitT2iHrDcfg { get; set; }
         /// <summary>txt2img Hires. Steps</summary>
         public double? ZitT2iHrStep { get; set; }
-        /// <summary>txt2img sampler</summary>
+        /// <summary>txt2img Sampler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? ZitT2iSampler { get; set; }
@@ -3650,7 +4684,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string ZitT2iSampler { get; set; }
 #endif
-        /// <summary>txt2img scheduler</summary>
+        /// <summary>txt2img Scheduler</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? ZitT2iScheduler { get; set; }
@@ -3695,12 +4729,15 @@ namespace Mogri.Clients.SdForgeNeo.Models
             AnimaT2iSampler = "ER SDE";
             AnimaT2iScheduler = "Beta";
             AutoLaunchBrowser = "Local";
-            CompatibilityExplanation = "Don't touch these unless you know what you are doing...";
             CrossAttentionOptimization = "Automatic";
             DdimDiscretize = "uniform";
             DirectoriesFilenamePattern = "[date]";
             DisableAllExtensions = "none";
             Emphasis = "Original";
+            ErnieI2iSampler = "Euler";
+            ErnieI2iScheduler = "Simple";
+            ErnieT2iSampler = "Euler";
+            ErnieT2iScheduler = "Simple";
             ExtraNetworksAddTextSeparator = " ";
             ExtraNetworksCardOrder = "Ascending";
             ExtraNetworksCardOrderField = "Path";
@@ -3713,12 +4750,14 @@ namespace Mogri.Clients.SdForgeNeo.Models
             FluxT2iScheduler = "Beta";
             ForgeCanvasPlainColor = "#808080";
             ForgePreset = "sd";
-            ForgeTryReproduce = "None";
             ForgeUnetStorageDtype = "Automatic";
             ForgeUnetStorageDtypeAnima = "Automatic";
+            ForgeUnetStorageDtypeErnie = "Automatic";
             ForgeUnetStorageDtypeFlux = "Automatic";
             ForgeUnetStorageDtypeKlein = "Automatic";
+            ForgeUnetStorageDtypeKrea = "Automatic";
             ForgeUnetStorageDtypeLumina = "Automatic";
+            ForgeUnetStorageDtypePid = "Automatic";
             ForgeUnetStorageDtypeQwen = "Automatic";
             ForgeUnetStorageDtypeSd = "Automatic";
             ForgeUnetStorageDtypeWan = "Automatic";
@@ -3740,6 +4779,10 @@ namespace Mogri.Clients.SdForgeNeo.Models
             KleinI2iScheduler = "Beta";
             KleinT2iSampler = "Euler";
             KleinT2iScheduler = "Beta";
+            KreaI2iSampler = "Euler";
+            KreaI2iScheduler = "Simple";
+            KreaT2iSampler = "Euler";
+            KreaT2iScheduler = "Simple";
             LivePreviewsImageFormat = "jpeg";
             Localization = "None";
             LuminaI2iSampler = "Res Multistep";
@@ -3749,23 +4792,27 @@ namespace Mogri.Clients.SdForgeNeo.Models
             NetaTemplateNegative = "You are an assistant designed to generate low-quality images based on textual prompts. <Prompt Start>";
             NetaTemplatePositive = "You are an assistant designed to generate anime images with the highest degree of image-text alignment based on danbooru tags. <Prompt Start>";
             OpenDirButtonChoice = "Subdirectory";
-            OutdirExtrasSamples = "output\\extras-images";
-            OutdirImg2imgGrids = "output\\img2img-grids";
-            OutdirImg2imgSamples = "output\\img2img-images";
-            OutdirInitImages = "output\\init-images";
-            OutdirSave = "output\\images";
-            OutdirTxt2imgGrids = "output\\txt2img-grids";
-            OutdirTxt2imgSamples = "output\\txt2img-images";
-            OutdirVideos = "output\\videos";
+            OutdirExtrasSamples = "output/extras-images";
+            OutdirImg2imgGrids = "output/img2img-grids";
+            OutdirImg2imgSamples = "output/img2img-images";
+            OutdirInitImages = "output/init-images";
+            OutdirSave = "output/images";
+            OutdirTxt2imgGrids = "output/txt2img-grids";
+            OutdirTxt2imgSamples = "output/txt2img-images";
+            OutdirVideos = "output/videos";
+            PidI2iSampler = "LCM";
+            PidI2iScheduler = "Simple";
+            PidT2iSampler = "LCM";
+            PidT2iScheduler = "Simple";
             ProfilingExplanation = "These settings allow you to enable PyTorch profiler during generation.<br>\nProfiling allows you to see which code uses how much of the computer's resources.\nEach generation writes its own profile to one file, overwriting previous ones.\nThe file can be viewed in <a href=\"chrome:tracing\">Chrome</a> or on the <a href=\"https://ui.perfetto.dev/\">Perfetto</a> website.\n<br><b>Warning:</b> Writing profile can take up to 30 seconds, and the file itself can be around 500MB in size.";
             ProfilingFilename = "trace.json";
+            PromptBoxStyle = "Default";
             QwenI2iSampler = "LCM";
             QwenI2iScheduler = "Normal";
             QwenT2iSampler = "LCM";
             QwenT2iScheduler = "Normal";
             RandnSource = "CPU";
-            RefinerLoraExplanation = "Use the \"Lora Replacements\" to load different LoRAs between the normal pass and the refiner pass.<br>\nSeparate the original and the target with an equal sign; Place each entry in its own line.";
-            RefinerLoraReplacement = "high_noise=low_noise";
+            ReferenceExplanation = "<b>Note:</b> Remember to change the setting before txt2img to clear the reference";
             SamplesFormat = "png";
             SaveImagesReplaceAction = "Override";
             SdI2iSampler = "Euler a";
@@ -3824,13 +4871,19 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "add_model_hash_to_info", n => { AddModelHashToInfo = n.GetBoolValue(); } },
                 { "add_model_name_to_info", n => { AddModelNameToInfo = n.GetBoolValue(); } },
                 { "add_user_name_to_info", n => { AddUserNameToInfo = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "add_vae_hash_to_info", n => { AddVaeHashToInfo = n.GetBoolValue(); } },
-                { "add_vae_name_to_info", n => { AddVaeNameToInfo = n.GetBoolValue(); } },
                 { "add_version_to_infotext", n => { AddVersionToInfotext = n.GetBoolValue(); } },
+                { "allow_i2i_send_info", n => { AllowI2iSendInfo = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "always_discard_next_to_last_sigma", n => { AlwaysDiscardNextToLastSigma = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "anima_batch0", n => { AnimaBatch0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "anima_batch1", n => { AnimaBatch1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "anima_cfg0", n => { AnimaCfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "anima_cfg1", n => { AnimaCfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "anima_dcfg0", n => { AnimaDcfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "anima_dcfg1", n => { AnimaDcfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "anima_do_reference", n => { AnimaDoReference = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "anima_i2i_batch_size", n => { AnimaI2iBatchSize = n.GetDoubleValue(); } },
                 { "anima_i2i_cfg", n => { AnimaI2iCfg = n.GetDoubleValue(); } },
+                { "anima_i2i_dcfg", n => { AnimaI2iDcfg = n.GetDoubleValue(); } },
                 { "anima_i2i_dim0", n => { AnimaI2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "anima_i2i_dim1", n => { AnimaI2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "anima_i2i_height", n => { AnimaI2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -3840,13 +4893,17 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "anima_i2i_ss1", n => { AnimaI2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "anima_i2i_step", n => { AnimaI2iStep = n.GetDoubleValue(); } },
                 { "anima_i2i_width", n => { AnimaI2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "anima_show_shift", n => { AnimaShowShift = n.GetBoolValue(); } },
                 { "anima_steps0", n => { AnimaSteps0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "anima_steps1", n => { AnimaSteps1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "anima_t2i_batch_size", n => { AnimaT2iBatchSize = n.GetDoubleValue(); } },
                 { "anima_t2i_cfg", n => { AnimaT2iCfg = n.GetDoubleValue(); } },
+                { "anima_t2i_dcfg", n => { AnimaT2iDcfg = n.GetDoubleValue(); } },
                 { "anima_t2i_dim0", n => { AnimaT2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "anima_t2i_dim1", n => { AnimaT2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "anima_t2i_height", n => { AnimaT2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "anima_t2i_hr_cfg", n => { AnimaT2iHrCfg = n.GetDoubleValue(); } },
+                { "anima_t2i_hr_dcfg", n => { AnimaT2iHrDcfg = n.GetDoubleValue(); } },
                 { "anima_t2i_hr_step", n => { AnimaT2iHrStep = n.GetDoubleValue(); } },
                 { "anima_t2i_sampler", n => { AnimaT2iSampler = n.GetStringValue(); } },
                 { "anima_t2i_scheduler", n => { AnimaT2iScheduler = n.GetStringValue(); } },
@@ -3857,7 +4914,6 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "api_enable_requests", n => { ApiEnableRequests = n.GetBoolValue(); } },
                 { "api_forbid_local_requests", n => { ApiForbidLocalRequests = n.GetBoolValue(); } },
                 { "api_useragent", n => { ApiUseragent = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "auto_backcompat", n => { AutoBackcompat = n.GetBoolValue(); } },
                 { "auto_launch_browser", n => { AutoLaunchBrowser = n.GetStringValue(); } },
                 { "beta_dist_alpha", n => { BetaDistAlpha = n.GetDoubleValue(); } },
                 { "beta_dist_beta", n => { BetaDistBeta = n.GetDoubleValue(); } },
@@ -3865,9 +4921,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "clean_temp_dir_at_start", n => { CleanTempDirAtStart = n.GetBoolValue(); } },
                 { "code_former_weight", n => { CodeFormerWeight = n.GetDoubleValue(); } },
                 { "comma_padding_backtrack", n => { CommaPaddingBacktrack = n.GetDoubleValue(); } },
-                { "compact_prompt_box", n => { CompactPromptBox = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "compatibility_explanation", n => { CompatibilityExplanation = n.GetStringValue(); } },
                 { "composite_tiles_on_gpu", n => { CompositeTilesOnGpu = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "confirm_leave", n => { ConfirmLeave = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "cross_attention_optimization", n => { CrossAttentionOptimization = n.GetStringValue(); } },
                 { "ctrl_enter_interrupt", n => { CtrlEnterInterrupt = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "ddim_discretize", n => { DdimDiscretize = n.GetStringValue(); } },
@@ -3875,14 +4930,17 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "directories_filename_pattern", n => { DirectoriesFilenamePattern = n.GetStringValue(); } },
                 { "directories_max_prompt_words", n => { DirectoriesMaxPromptWords = n.GetDoubleValue(); } },
                 { "disable_all_extensions", n => { DisableAllExtensions = n.GetStringValue(); } },
+                { "disable_modules_auto_swap", n => { DisableModulesAutoSwap = n.GetBoolValue(); } },
                 { "disable_token_counters", n => { DisableTokenCounters = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "disable_weights_auto_swap", n => { DisableWeightsAutoSwap = n.GetBoolValue(); } },
                 { "disabled_extensions", n => { DisabledExtensions = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "div00", n => { Div00 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "div01", n => { Div01 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "div_classic", n => { DivClassic = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "div_prompt", n => { DivPrompt = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "div_tome", n => { DivTome = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "divlumina", n => { Divlumina = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "divqwen", n => { Divqwen = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "divmisc", n => { Divmisc = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "divxl", n => { Divxl = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "do_not_show_images", n => { DoNotShowImages = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "dump_stacks_on_signal", n => { DumpStacksOnSignal = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -3894,6 +4952,42 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "enable_prompt_comments", n => { EnablePromptComments = n.GetBoolValue(); } },
                 { "enable_reloading_ui_scripts", n => { EnableReloadingUiScripts = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "enable_upscale_progressbar", n => { EnableUpscaleProgressbar = n.GetBoolValue(); } },
+                { "ernie_batch0", n => { ErnieBatch0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "ernie_batch1", n => { ErnieBatch1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "ernie_cfg0", n => { ErnieCfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "ernie_cfg1", n => { ErnieCfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "ernie_dcfg0", n => { ErnieDcfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "ernie_dcfg1", n => { ErnieDcfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "ernie_i2i_batch_size", n => { ErnieI2iBatchSize = n.GetDoubleValue(); } },
+                { "ernie_i2i_cfg", n => { ErnieI2iCfg = n.GetDoubleValue(); } },
+                { "ernie_i2i_dcfg", n => { ErnieI2iDcfg = n.GetDoubleValue(); } },
+                { "ernie_i2i_dim0", n => { ErnieI2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "ernie_i2i_dim1", n => { ErnieI2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "ernie_i2i_height", n => { ErnieI2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "ernie_i2i_sampler", n => { ErnieI2iSampler = n.GetStringValue(); } },
+                { "ernie_i2i_scheduler", n => { ErnieI2iScheduler = n.GetStringValue(); } },
+                { "ernie_i2i_ss0", n => { ErnieI2iSs0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "ernie_i2i_ss1", n => { ErnieI2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "ernie_i2i_step", n => { ErnieI2iStep = n.GetDoubleValue(); } },
+                { "ernie_i2i_width", n => { ErnieI2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "ernie_show_shift", n => { ErnieShowShift = n.GetBoolValue(); } },
+                { "ernie_steps0", n => { ErnieSteps0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "ernie_steps1", n => { ErnieSteps1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "ernie_t2i_batch_size", n => { ErnieT2iBatchSize = n.GetDoubleValue(); } },
+                { "ernie_t2i_cfg", n => { ErnieT2iCfg = n.GetDoubleValue(); } },
+                { "ernie_t2i_dcfg", n => { ErnieT2iDcfg = n.GetDoubleValue(); } },
+                { "ernie_t2i_dim0", n => { ErnieT2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "ernie_t2i_dim1", n => { ErnieT2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "ernie_t2i_height", n => { ErnieT2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "ernie_t2i_hr_cfg", n => { ErnieT2iHrCfg = n.GetDoubleValue(); } },
+                { "ernie_t2i_hr_dcfg", n => { ErnieT2iHrDcfg = n.GetDoubleValue(); } },
+                { "ernie_t2i_hr_step", n => { ErnieT2iHrStep = n.GetDoubleValue(); } },
+                { "ernie_t2i_sampler", n => { ErnieT2iSampler = n.GetStringValue(); } },
+                { "ernie_t2i_scheduler", n => { ErnieT2iScheduler = n.GetStringValue(); } },
+                { "ernie_t2i_ss0", n => { ErnieT2iSs0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "ernie_t2i_ss1", n => { ErnieT2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "ernie_t2i_step", n => { ErnieT2iStep = n.GetDoubleValue(); } },
+                { "ernie_t2i_width", n => { ErnieT2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "eta_ancestral", n => { EtaAncestral = n.GetDoubleValue(); } },
                 { "eta_ddim", n => { EtaDdim = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "eta_noise_seed_delta", n => { EtaNoiseSeedDelta = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -3922,10 +5016,13 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "face_restoration", n => { FaceRestoration = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "face_restoration_model", n => { FaceRestorationModel = n.GetStringValue(); } },
                 { "face_restoration_unload", n => { FaceRestorationUnload = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "flux_batch0", n => { FluxBatch0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "flux_batch1", n => { FluxBatch1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "flux_cfg0", n => { FluxCfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "flux_cfg1", n => { FluxCfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "flux_dcfg0", n => { FluxDcfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "flux_dcfg1", n => { FluxDcfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "flux_i2i_batch_size", n => { FluxI2iBatchSize = n.GetDoubleValue(); } },
                 { "flux_i2i_cfg", n => { FluxI2iCfg = n.GetDoubleValue(); } },
                 { "flux_i2i_dcfg", n => { FluxI2iDcfg = n.GetDoubleValue(); } },
                 { "flux_i2i_dim0", n => { FluxI2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -3939,6 +5036,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "flux_i2i_width", n => { FluxI2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "flux_steps0", n => { FluxSteps0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "flux_steps1", n => { FluxSteps1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "flux_t2i_batch_size", n => { FluxT2iBatchSize = n.GetDoubleValue(); } },
                 { "flux_t2i_cfg", n => { FluxT2iCfg = n.GetDoubleValue(); } },
                 { "flux_t2i_dcfg", n => { FluxT2iDcfg = n.GetDoubleValue(); } },
                 { "flux_t2i_dim0", n => { FluxT2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -3956,9 +5054,12 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "forbidden_knowledge", n => { ForbiddenKnowledge = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "forge_additional_modules", n => { ForgeAdditionalModules = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "forge_additional_modules_anima", n => { ForgeAdditionalModulesAnima = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_additional_modules_ernie", n => { ForgeAdditionalModulesErnie = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "forge_additional_modules_flux", n => { ForgeAdditionalModulesFlux = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "forge_additional_modules_klein", n => { ForgeAdditionalModulesKlein = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_additional_modules_krea", n => { ForgeAdditionalModulesKrea = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "forge_additional_modules_lumina", n => { ForgeAdditionalModulesLumina = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_additional_modules_pid", n => { ForgeAdditionalModulesPid = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "forge_additional_modules_qwen", n => { ForgeAdditionalModulesQwen = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "forge_additional_modules_sd", n => { ForgeAdditionalModulesSd = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "forge_additional_modules_wan", n => { ForgeAdditionalModulesWan = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -3970,21 +5071,26 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "forge_canvas_plain_color", n => { ForgeCanvasPlainColor = n.GetStringValue(); } },
                 { "forge_canvas_toolbar_always", n => { ForgeCanvasToolbarAlways = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "forge_checkpoint_anima", n => { ForgeCheckpointAnima = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_checkpoint_ernie", n => { ForgeCheckpointErnie = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "forge_checkpoint_flux", n => { ForgeCheckpointFlux = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "forge_checkpoint_klein", n => { ForgeCheckpointKlein = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_checkpoint_krea", n => { ForgeCheckpointKrea = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "forge_checkpoint_lumina", n => { ForgeCheckpointLumina = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "forge_checkpoint_pid", n => { ForgeCheckpointPid = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "forge_checkpoint_qwen", n => { ForgeCheckpointQwen = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "forge_checkpoint_sd", n => { ForgeCheckpointSd = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "forge_checkpoint_wan", n => { ForgeCheckpointWan = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "forge_checkpoint_xl", n => { ForgeCheckpointXl = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "forge_checkpoint_zit", n => { ForgeCheckpointZit = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "forge_preset", n => { ForgePreset = n.GetStringValue(); } },
-                { "forge_try_reproduce", n => { ForgeTryReproduce = n.GetStringValue(); } },
                 { "forge_unet_storage_dtype", n => { ForgeUnetStorageDtype = n.GetStringValue(); } },
                 { "forge_unet_storage_dtype_anima", n => { ForgeUnetStorageDtypeAnima = n.GetStringValue(); } },
+                { "forge_unet_storage_dtype_ernie", n => { ForgeUnetStorageDtypeErnie = n.GetStringValue(); } },
                 { "forge_unet_storage_dtype_flux", n => { ForgeUnetStorageDtypeFlux = n.GetStringValue(); } },
                 { "forge_unet_storage_dtype_klein", n => { ForgeUnetStorageDtypeKlein = n.GetStringValue(); } },
+                { "forge_unet_storage_dtype_krea", n => { ForgeUnetStorageDtypeKrea = n.GetStringValue(); } },
                 { "forge_unet_storage_dtype_lumina", n => { ForgeUnetStorageDtypeLumina = n.GetStringValue(); } },
+                { "forge_unet_storage_dtype_pid", n => { ForgeUnetStorageDtypePid = n.GetStringValue(); } },
                 { "forge_unet_storage_dtype_qwen", n => { ForgeUnetStorageDtypeQwen = n.GetStringValue(); } },
                 { "forge_unet_storage_dtype_sd", n => { ForgeUnetStorageDtypeSd = n.GetStringValue(); } },
                 { "forge_unet_storage_dtype_wan", n => { ForgeUnetStorageDtypeWan = n.GetStringValue(); } },
@@ -4005,6 +5111,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "grid_zip_filename_pattern", n => { GridZipFilenamePattern = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "hidden_tabs", n => { HiddenTabs = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "hide_samplers", n => { HideSamplers = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "hide_schedulers", n => { HideSchedulers = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "hires_button_gallery_insert", n => { HiresButtonGalleryInsert = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "hires_fix_show_prompts", n => { HiresFixShowPrompts = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "hires_fix_show_sampler", n => { HiresFixShowSampler = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -4020,6 +5127,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "img2img_inpaint_mask_brush_color", n => { Img2imgInpaintMaskBrushColor = n.GetStringValue(); } },
                 { "img2img_inpaint_mask_high_contrast", n => { Img2imgInpaintMaskHighContrast = n.GetBoolValue(); } },
                 { "img2img_inpaint_mask_scribble_alpha", n => { Img2imgInpaintMaskScribbleAlpha = n.GetDoubleValue(); } },
+                { "img2img_inpaint_precise_mask", n => { Img2imgInpaintPreciseMask = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "img2img_inpaint_sketch_default_brush_color", n => { Img2imgInpaintSketchDefaultBrushColor = n.GetStringValue(); } },
                 { "img2img_settings_accordion", n => { Img2imgSettingsAccordion = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "img2img_sketch_default_brush_color", n => { Img2imgSketchDefaultBrushColor = n.GetStringValue(); } },
@@ -4039,13 +5147,17 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "js_modal_lightbox_gamepad", n => { JsModalLightboxGamepad = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "js_modal_lightbox_gamepad_repeat", n => { JsModalLightboxGamepadRepeat = n.GetDoubleValue(); } },
                 { "js_modal_lightbox_initially_zoomed", n => { JsModalLightboxInitiallyZoomed = n.GetBoolValue(); } },
+                { "keep_alive", n => { KeepAlive = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "keyedit_delimiters", n => { KeyeditDelimiters = n.GetStringValue(); } },
                 { "keyedit_delimiters_whitespace", n => { KeyeditDelimitersWhitespace = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "keyedit_move", n => { KeyeditMove = n.GetBoolValue(); } },
                 { "keyedit_precision_attention", n => { KeyeditPrecisionAttention = n.GetDoubleValue(); } },
                 { "keyedit_precision_extra", n => { KeyeditPrecisionExtra = n.GetDoubleValue(); } },
+                { "klein_batch0", n => { KleinBatch0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "klein_batch1", n => { KleinBatch1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "klein_cfg0", n => { KleinCfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "klein_cfg1", n => { KleinCfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "klein_i2i_batch_size", n => { KleinI2iBatchSize = n.GetDoubleValue(); } },
                 { "klein_i2i_cfg", n => { KleinI2iCfg = n.GetDoubleValue(); } },
                 { "klein_i2i_dim0", n => { KleinI2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "klein_i2i_dim1", n => { KleinI2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -4056,8 +5168,10 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "klein_i2i_ss1", n => { KleinI2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "klein_i2i_step", n => { KleinI2iStep = n.GetDoubleValue(); } },
                 { "klein_i2i_width", n => { KleinI2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "klein_no_reference", n => { KleinNoReference = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "klein_steps0", n => { KleinSteps0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "klein_steps1", n => { KleinSteps1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "klein_t2i_batch_size", n => { KleinT2iBatchSize = n.GetDoubleValue(); } },
                 { "klein_t2i_cfg", n => { KleinT2iCfg = n.GetDoubleValue(); } },
                 { "klein_t2i_dim0", n => { KleinT2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "klein_t2i_dim1", n => { KleinT2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -4070,16 +5184,56 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "klein_t2i_ss1", n => { KleinT2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "klein_t2i_step", n => { KleinT2iStep = n.GetDoubleValue(); } },
                 { "klein_t2i_width", n => { KleinT2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "krea2_do_reference", n => { Krea2DoReference = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "krea_batch0", n => { KreaBatch0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "krea_batch1", n => { KreaBatch1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "krea_cfg0", n => { KreaCfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "krea_cfg1", n => { KreaCfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "krea_dcfg0", n => { KreaDcfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "krea_dcfg1", n => { KreaDcfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "krea_i2i_batch_size", n => { KreaI2iBatchSize = n.GetDoubleValue(); } },
+                { "krea_i2i_cfg", n => { KreaI2iCfg = n.GetDoubleValue(); } },
+                { "krea_i2i_dcfg", n => { KreaI2iDcfg = n.GetDoubleValue(); } },
+                { "krea_i2i_dim0", n => { KreaI2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "krea_i2i_dim1", n => { KreaI2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "krea_i2i_height", n => { KreaI2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "krea_i2i_sampler", n => { KreaI2iSampler = n.GetStringValue(); } },
+                { "krea_i2i_scheduler", n => { KreaI2iScheduler = n.GetStringValue(); } },
+                { "krea_i2i_ss0", n => { KreaI2iSs0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "krea_i2i_ss1", n => { KreaI2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "krea_i2i_step", n => { KreaI2iStep = n.GetDoubleValue(); } },
+                { "krea_i2i_width", n => { KreaI2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "krea_show_shift", n => { KreaShowShift = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "krea_steps0", n => { KreaSteps0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "krea_steps1", n => { KreaSteps1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "krea_t2i_batch_size", n => { KreaT2iBatchSize = n.GetDoubleValue(); } },
+                { "krea_t2i_cfg", n => { KreaT2iCfg = n.GetDoubleValue(); } },
+                { "krea_t2i_dcfg", n => { KreaT2iDcfg = n.GetDoubleValue(); } },
+                { "krea_t2i_dim0", n => { KreaT2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "krea_t2i_dim1", n => { KreaT2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "krea_t2i_height", n => { KreaT2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "krea_t2i_hr_cfg", n => { KreaT2iHrCfg = n.GetDoubleValue(); } },
+                { "krea_t2i_hr_dcfg", n => { KreaT2iHrDcfg = n.GetDoubleValue(); } },
+                { "krea_t2i_hr_step", n => { KreaT2iHrStep = n.GetDoubleValue(); } },
+                { "krea_t2i_sampler", n => { KreaT2iSampler = n.GetStringValue(); } },
+                { "krea_t2i_scheduler", n => { KreaT2iScheduler = n.GetStringValue(); } },
+                { "krea_t2i_ss0", n => { KreaT2iSs0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "krea_t2i_ss1", n => { KreaT2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "krea_t2i_step", n => { KreaT2iStep = n.GetDoubleValue(); } },
+                { "krea_t2i_width", n => { KreaT2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "list_hidden_files", n => { ListHiddenFiles = n.GetBoolValue(); } },
                 { "live_preview_fast_interrupt", n => { LivePreviewFastInterrupt = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "live_preview_refresh_period", n => { LivePreviewRefreshPeriod = n.GetDoubleValue(); } },
                 { "live_previews_enable", n => { LivePreviewsEnable = n.GetBoolValue(); } },
                 { "live_previews_image_format", n => { LivePreviewsImageFormat = n.GetStringValue(); } },
                 { "localization", n => { Localization = n.GetStringValue(); } },
+                { "lumina_batch0", n => { LuminaBatch0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "lumina_batch1", n => { LuminaBatch1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "lumina_cfg0", n => { LuminaCfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "lumina_cfg1", n => { LuminaCfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "lumina_dcfg0", n => { LuminaDcfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "lumina_dcfg1", n => { LuminaDcfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "lumina_i2i_batch_size", n => { LuminaI2iBatchSize = n.GetDoubleValue(); } },
                 { "lumina_i2i_cfg", n => { LuminaI2iCfg = n.GetDoubleValue(); } },
                 { "lumina_i2i_dcfg", n => { LuminaI2iDcfg = n.GetDoubleValue(); } },
                 { "lumina_i2i_dim0", n => { LuminaI2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -4091,8 +5245,10 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "lumina_i2i_ss1", n => { LuminaI2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "lumina_i2i_step", n => { LuminaI2iStep = n.GetDoubleValue(); } },
                 { "lumina_i2i_width", n => { LuminaI2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "lumina_show_shift", n => { LuminaShowShift = n.GetBoolValue(); } },
                 { "lumina_steps0", n => { LuminaSteps0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "lumina_steps1", n => { LuminaSteps1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "lumina_t2i_batch_size", n => { LuminaT2iBatchSize = n.GetDoubleValue(); } },
                 { "lumina_t2i_cfg", n => { LuminaT2iCfg = n.GetDoubleValue(); } },
                 { "lumina_t2i_dcfg", n => { LuminaT2iDcfg = n.GetDoubleValue(); } },
                 { "lumina_t2i_dim0", n => { LuminaT2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -4112,7 +5268,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "n_rows", n => { NRows = n.GetDoubleValue(); } },
                 { "neta_template_negative", n => { NetaTemplateNegative = n.GetStringValue(); } },
                 { "neta_template_positive", n => { NetaTemplatePositive = n.GetStringValue(); } },
-                { "no_dpmpp_sde_batch_determinism", n => { NoDpmppSdeBatchDeterminism = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "no_spellcheck", n => { NoSpellcheck = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "notification_audio", n => { NotificationAudio = n.GetBoolValue(); } },
                 { "notification_volume", n => { NotificationVolume = n.GetDoubleValue(); } },
                 { "open_dir_button_choice", n => { OpenDirButtonChoice = n.GetStringValue(); } },
@@ -4129,6 +5285,42 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "overlay_inpaint", n => { OverlayInpaint = n.GetBoolValue(); } },
                 { "paste_safe_guard", n => { PasteSafeGuard = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "persistent_cond_cache", n => { PersistentCondCache = n.GetBoolValue(); } },
+                { "pid_batch0", n => { PidBatch0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "pid_batch1", n => { PidBatch1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "pid_cfg0", n => { PidCfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "pid_cfg1", n => { PidCfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "pid_dcfg0", n => { PidDcfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "pid_dcfg1", n => { PidDcfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "pid_i2i_batch_size", n => { PidI2iBatchSize = n.GetDoubleValue(); } },
+                { "pid_i2i_cfg", n => { PidI2iCfg = n.GetDoubleValue(); } },
+                { "pid_i2i_dcfg", n => { PidI2iDcfg = n.GetDoubleValue(); } },
+                { "pid_i2i_dim0", n => { PidI2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "pid_i2i_dim1", n => { PidI2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "pid_i2i_height", n => { PidI2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "pid_i2i_sampler", n => { PidI2iSampler = n.GetStringValue(); } },
+                { "pid_i2i_scheduler", n => { PidI2iScheduler = n.GetStringValue(); } },
+                { "pid_i2i_ss0", n => { PidI2iSs0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "pid_i2i_ss1", n => { PidI2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "pid_i2i_step", n => { PidI2iStep = n.GetDoubleValue(); } },
+                { "pid_i2i_width", n => { PidI2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "pid_show_shift", n => { PidShowShift = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "pid_steps0", n => { PidSteps0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "pid_steps1", n => { PidSteps1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "pid_t2i_batch_size", n => { PidT2iBatchSize = n.GetDoubleValue(); } },
+                { "pid_t2i_cfg", n => { PidT2iCfg = n.GetDoubleValue(); } },
+                { "pid_t2i_dcfg", n => { PidT2iDcfg = n.GetDoubleValue(); } },
+                { "pid_t2i_dim0", n => { PidT2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "pid_t2i_dim1", n => { PidT2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "pid_t2i_height", n => { PidT2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "pid_t2i_hr_cfg", n => { PidT2iHrCfg = n.GetDoubleValue(); } },
+                { "pid_t2i_hr_dcfg", n => { PidT2iHrDcfg = n.GetDoubleValue(); } },
+                { "pid_t2i_hr_step", n => { PidT2iHrStep = n.GetDoubleValue(); } },
+                { "pid_t2i_sampler", n => { PidT2iSampler = n.GetStringValue(); } },
+                { "pid_t2i_scheduler", n => { PidT2iScheduler = n.GetStringValue(); } },
+                { "pid_t2i_ss0", n => { PidT2iSs0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "pid_t2i_ss1", n => { PidT2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "pid_t2i_step", n => { PidT2iStep = n.GetDoubleValue(); } },
+                { "pid_t2i_width", n => { PidT2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "postprocessing_disable_in_extras", n => { PostprocessingDisableInExtras = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "postprocessing_enable_in_main_ui", n => { PostprocessingEnableInMainUi = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "postprocessing_operation_order", n => { PostprocessingOperationOrder = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -4141,11 +5333,15 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "profiling_profile_memory", n => { ProfilingProfileMemory = n.GetBoolValue(); } },
                 { "profiling_record_shapes", n => { ProfilingRecordShapes = n.GetBoolValue(); } },
                 { "profiling_with_stack", n => { ProfilingWithStack = n.GetBoolValue(); } },
+                { "prompt_box_style", n => { PromptBoxStyle = n.GetStringValue(); } },
                 { "quicksettings_accordion", n => { QuicksettingsAccordion = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "quicksettings_accordion_starts_closed", n => { QuicksettingsAccordionStartsClosed = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "quicksettings_list", n => { QuicksettingsList = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "qwen_batch0", n => { QwenBatch0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "qwen_batch1", n => { QwenBatch1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "qwen_cfg0", n => { QwenCfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "qwen_cfg1", n => { QwenCfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "qwen_i2i_batch_size", n => { QwenI2iBatchSize = n.GetDoubleValue(); } },
                 { "qwen_i2i_cfg", n => { QwenI2iCfg = n.GetDoubleValue(); } },
                 { "qwen_i2i_dim0", n => { QwenI2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "qwen_i2i_dim1", n => { QwenI2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -4158,6 +5354,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "qwen_i2i_width", n => { QwenI2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "qwen_steps0", n => { QwenSteps0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "qwen_steps1", n => { QwenSteps1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "qwen_t2i_batch_size", n => { QwenT2iBatchSize = n.GetDoubleValue(); } },
                 { "qwen_t2i_cfg", n => { QwenT2iCfg = n.GetDoubleValue(); } },
                 { "qwen_t2i_dim0", n => { QwenT2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "qwen_t2i_dim1", n => { QwenT2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -4172,10 +5369,11 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "qwen_t2i_width", n => { QwenT2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "qwen_vae_resize", n => { QwenVaeResize = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "randn_source", n => { RandnSource = n.GetStringValue(); } },
+                { "reference_explanation", n => { ReferenceExplanation = n.GetStringValue(); } },
                 { "refiner_fast_sd", n => { RefinerFastSd = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "refiner_lora_explanation", n => { RefinerLoraExplanation = n.GetStringValue(); } },
-                { "refiner_lora_replacement", n => { RefinerLoraReplacement = n.GetStringValue(); } },
                 { "refiner_use_steps", n => { RefinerUseSteps = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "remove_image_on_hover", n => { RemoveImageOnHover = n.GetBoolValue(); } },
+                { "res_step", n => { ResStep = n.GetDoubleValue(); } },
                 { "restore_config_state_file", n => { RestoreConfigStateFile = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "return_grid", n => { ReturnGrid = n.GetBoolValue(); } },
                 { "return_mask", n => { ReturnMask = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -4206,11 +5404,13 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "save_txt", n => { SaveTxt = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "save_write_log_csv", n => { SaveWriteLogCsv = n.GetBoolValue(); } },
                 { "scaling_factor", n => { ScalingFactor = n.GetDoubleValue(); } },
-                { "scrollable_prompt_box", n => { ScrollablePromptBox = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "sd_batch0", n => { SdBatch0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "sd_batch1", n => { SdBatch1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "sd_cfg0", n => { SdCfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "sd_cfg1", n => { SdCfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "sd_checkpoint_dropdown_use_short", n => { SdCheckpointDropdownUseShort = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "sd_checkpoint_hash", n => { SdCheckpointHash = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "sd_i2i_batch_size", n => { SdI2iBatchSize = n.GetDoubleValue(); } },
                 { "sd_i2i_cfg", n => { SdI2iCfg = n.GetDoubleValue(); } },
                 { "sd_i2i_dim0", n => { SdI2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "sd_i2i_dim1", n => { SdI2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -4225,6 +5425,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "sd_noise_schedule", n => { SdNoiseSchedule = n.GetStringValue(); } },
                 { "sd_steps0", n => { SdSteps0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "sd_steps1", n => { SdSteps1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "sd_t2i_batch_size", n => { SdT2iBatchSize = n.GetDoubleValue(); } },
                 { "sd_t2i_cfg", n => { SdT2iCfg = n.GetDoubleValue(); } },
                 { "sd_t2i_dim0", n => { SdT2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "sd_t2i_dim1", n => { SdT2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -4242,15 +5443,19 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "sd_vae_decode_method", n => { SdVaeDecodeMethod = n.GetStringValue(); } },
                 { "sd_vae_encode_method", n => { SdVaeEncodeMethod = n.GetStringValue(); } },
                 { "sd_vae_explanation", n => { SdVaeExplanation = n.GetStringValue(); } },
-                { "sd_vae_overrides_per_model_preferences", n => { SdVaeOverridesPerModelPreferences = n.GetBoolValue(); } },
                 { "sd_webui_modal_lightbox_icon_opacity", n => { SdWebuiModalLightboxIconOpacity = n.GetDoubleValue(); } },
                 { "sd_webui_modal_lightbox_toolbar_opacity", n => { SdWebuiModalLightboxToolbarOpacity = n.GetDoubleValue(); } },
+                { "sdxl_00", n => { Sdxl00 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "sdxl_01", n => { Sdxl01 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "sdxl_10", n => { Sdxl10 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "sdxl_11", n => { Sdxl11 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "sdxl_crop_left", n => { SdxlCropLeft = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "sdxl_crop_top", n => { SdxlCropTop = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "sdxl_refiner_high_aesthetic_score", n => { SdxlRefinerHighAestheticScore = n.GetDoubleValue(); } },
                 { "sdxl_refiner_low_aesthetic_score", n => { SdxlRefinerLowAestheticScore = n.GetDoubleValue(); } },
                 { "sdxl_zero_neg", n => { SdxlZeroNeg = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "send_cfg", n => { SendCfg = n.GetBoolValue(); } },
+                { "send_image_info_not_ui", n => { SendImageInfoNotUi = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "send_seed", n => { SendSeed = n.GetBoolValue(); } },
                 { "send_size", n => { SendSize = n.GetBoolValue(); } },
                 { "set_scale_by_when_changing_upscaler", n => { SetScaleByWhenChangingUpscaler = n.GetBoolValue(); } },
@@ -4264,7 +5469,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "show_progress_in_title", n => { ShowProgressInTitle = n.GetBoolValue(); } },
                 { "show_progress_type", n => { ShowProgressType = n.GetStringValue(); } },
                 { "show_progressbar", n => { ShowProgressbar = n.GetBoolValue(); } },
-                { "show_refiner", n => { ShowRefiner = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "show_refiner", n => { ShowRefiner = n.GetBoolValue(); } },
                 { "show_rescale_cfg", n => { ShowRescaleCfg = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "show_warnings", n => { ShowWarnings = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "sigma_max", n => { SigmaMax = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -4289,19 +5494,19 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "token_merging_ratio_img2img", n => { TokenMergingRatioImg2img = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "token_merging_stride", n => { TokenMergingStride = n.GetDoubleValue(); } },
                 { "txt2img_settings_accordion", n => { Txt2imgSettingsAccordion = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "txt2img_upscale_same_seed", n => { Txt2imgUpscaleSameSeed = n.GetBoolValue(); } },
+                { "txt2img_upscale_single_batch", n => { Txt2imgUpscaleSingleBatch = n.GetBoolValue(); } },
                 { "ui_extra_networks_tab_reorder", n => { UiExtraNetworksTabReorder = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "ui_reorder_list", n => { UiReorderList = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "ui_tab_order", n => { UiTabOrder = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "undo_redo", n => { UndoRedo = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "upscaler_for_img2img", n => { UpscalerForImg2img = n.GetStringValue(); } },
                 { "upscaling_max_images_in_cache", n => { UpscalingMaxImagesInCache = n.GetDoubleValue(); } },
                 { "use_beta_sigmas", n => { UseBetaSigmas = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "use_downcasted_alpha_bar", n => { UseDowncastedAlphaBar = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "use_dynamic_shifting", n => { UseDynamicShifting = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "use_exponential_sigmas", n => { UseExponentialSigmas = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "use_karras_sigmas", n => { UseKarrasSigmas = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "use_old_hires_fix_width_height", n => { UseOldHiresFixWidthHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "use_old_karras_scheduler_sigmas", n => { UseOldKarrasSchedulerSigmas = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
-                { "use_old_scheduling", n => { UseOldScheduling = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "use_original_name_batch", n => { UseOriginalNameBatch = n.GetBoolValue(); } },
                 { "use_save_to_dirs_for_ui", n => { UseSaveToDirsForUi = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "VERSION_UID", n => { VERSIONUID = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -4313,10 +5518,13 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "video_preset", n => { VideoPreset = n.GetStringValue(); } },
                 { "video_profile", n => { VideoProfile = n.GetStringValue(); } },
                 { "video_save_frames", n => { VideoSaveFrames = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "wan_batch0", n => { WanBatch0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "wan_batch1", n => { WanBatch1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "wan_cfg0", n => { WanCfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "wan_cfg1", n => { WanCfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "wan_dcfg0", n => { WanDcfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "wan_dcfg1", n => { WanDcfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "wan_i2i_batch_size", n => { WanI2iBatchSize = n.GetDoubleValue(); } },
                 { "wan_i2i_cfg", n => { WanI2iCfg = n.GetDoubleValue(); } },
                 { "wan_i2i_dcfg", n => { WanI2iDcfg = n.GetDoubleValue(); } },
                 { "wan_i2i_dim0", n => { WanI2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -4328,8 +5536,10 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "wan_i2i_ss1", n => { WanI2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "wan_i2i_step", n => { WanI2iStep = n.GetDoubleValue(); } },
                 { "wan_i2i_width", n => { WanI2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "wan_show_shift", n => { WanShowShift = n.GetBoolValue(); } },
                 { "wan_steps0", n => { WanSteps0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "wan_steps1", n => { WanSteps1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "wan_t2i_batch_size", n => { WanT2iBatchSize = n.GetDoubleValue(); } },
                 { "wan_t2i_cfg", n => { WanT2iCfg = n.GetDoubleValue(); } },
                 { "wan_t2i_dcfg", n => { WanT2iDcfg = n.GetDoubleValue(); } },
                 { "wan_t2i_dim0", n => { WanT2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -4345,9 +5555,15 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "wan_t2i_step", n => { WanT2iStep = n.GetDoubleValue(); } },
                 { "wan_t2i_width", n => { WanT2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "webp_lossless", n => { WebpLossless = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "xl_batch0", n => { XlBatch0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "xl_batch1", n => { XlBatch1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "xl_cfg0", n => { XlCfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "xl_cfg1", n => { XlCfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "xl_dcfg0", n => { XlDcfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "xl_dcfg1", n => { XlDcfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "xl_i2i_batch_size", n => { XlI2iBatchSize = n.GetDoubleValue(); } },
                 { "xl_i2i_cfg", n => { XlI2iCfg = n.GetDoubleValue(); } },
+                { "xl_i2i_dcfg", n => { XlI2iDcfg = n.GetDoubleValue(); } },
                 { "xl_i2i_dim0", n => { XlI2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "xl_i2i_dim1", n => { XlI2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "xl_i2i_height", n => { XlI2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -4357,13 +5573,17 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "xl_i2i_ss1", n => { XlI2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "xl_i2i_step", n => { XlI2iStep = n.GetDoubleValue(); } },
                 { "xl_i2i_width", n => { XlI2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "xl_show_shift", n => { XlShowShift = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "xl_steps0", n => { XlSteps0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "xl_steps1", n => { XlSteps1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "xl_t2i_batch_size", n => { XlT2iBatchSize = n.GetDoubleValue(); } },
                 { "xl_t2i_cfg", n => { XlT2iCfg = n.GetDoubleValue(); } },
+                { "xl_t2i_dcfg", n => { XlT2iDcfg = n.GetDoubleValue(); } },
                 { "xl_t2i_dim0", n => { XlT2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "xl_t2i_dim1", n => { XlT2iDim1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "xl_t2i_height", n => { XlT2iHeight = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "xl_t2i_hr_cfg", n => { XlT2iHrCfg = n.GetDoubleValue(); } },
+                { "xl_t2i_hr_dcfg", n => { XlT2iHrDcfg = n.GetDoubleValue(); } },
                 { "xl_t2i_hr_step", n => { XlT2iHrStep = n.GetDoubleValue(); } },
                 { "xl_t2i_sampler", n => { XlT2iSampler = n.GetStringValue(); } },
                 { "xl_t2i_scheduler", n => { XlT2iScheduler = n.GetStringValue(); } },
@@ -4371,10 +5591,13 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "xl_t2i_ss1", n => { XlT2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "xl_t2i_step", n => { XlT2iStep = n.GetDoubleValue(); } },
                 { "xl_t2i_width", n => { XlT2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "zit_batch0", n => { ZitBatch0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "zit_batch1", n => { ZitBatch1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "zit_cfg0", n => { ZitCfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "zit_cfg1", n => { ZitCfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "zit_dcfg0", n => { ZitDcfg0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "zit_dcfg1", n => { ZitDcfg1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "zit_i2i_batch_size", n => { ZitI2iBatchSize = n.GetDoubleValue(); } },
                 { "zit_i2i_cfg", n => { ZitI2iCfg = n.GetDoubleValue(); } },
                 { "zit_i2i_dcfg", n => { ZitI2iDcfg = n.GetDoubleValue(); } },
                 { "zit_i2i_dim0", n => { ZitI2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -4386,8 +5609,10 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "zit_i2i_ss1", n => { ZitI2iSs1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "zit_i2i_step", n => { ZitI2iStep = n.GetDoubleValue(); } },
                 { "zit_i2i_width", n => { ZitI2iWidth = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "zit_show_shift", n => { ZitShowShift = n.GetBoolValue(); } },
                 { "zit_steps0", n => { ZitSteps0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "zit_steps1", n => { ZitSteps1 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "zit_t2i_batch_size", n => { ZitT2iBatchSize = n.GetDoubleValue(); } },
                 { "zit_t2i_cfg", n => { ZitT2iCfg = n.GetDoubleValue(); } },
                 { "zit_t2i_dcfg", n => { ZitT2iDcfg = n.GetDoubleValue(); } },
                 { "zit_t2i_dim0", n => { ZitT2iDim0 = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -4414,13 +5639,19 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteBoolValue("add_model_hash_to_info", AddModelHashToInfo);
             writer.WriteBoolValue("add_model_name_to_info", AddModelNameToInfo);
             writer.WriteObjectValue<UntypedNode>("add_user_name_to_info", AddUserNameToInfo);
-            writer.WriteBoolValue("add_vae_hash_to_info", AddVaeHashToInfo);
-            writer.WriteBoolValue("add_vae_name_to_info", AddVaeNameToInfo);
             writer.WriteBoolValue("add_version_to_infotext", AddVersionToInfotext);
+            writer.WriteObjectValue<UntypedNode>("allow_i2i_send_info", AllowI2iSendInfo);
             writer.WriteObjectValue<UntypedNode>("always_discard_next_to_last_sigma", AlwaysDiscardNextToLastSigma);
+            writer.WriteObjectValue<UntypedNode>("anima_batch0", AnimaBatch0);
+            writer.WriteObjectValue<UntypedNode>("anima_batch1", AnimaBatch1);
             writer.WriteObjectValue<UntypedNode>("anima_cfg0", AnimaCfg0);
             writer.WriteObjectValue<UntypedNode>("anima_cfg1", AnimaCfg1);
+            writer.WriteObjectValue<UntypedNode>("anima_dcfg0", AnimaDcfg0);
+            writer.WriteObjectValue<UntypedNode>("anima_dcfg1", AnimaDcfg1);
+            writer.WriteObjectValue<UntypedNode>("anima_do_reference", AnimaDoReference);
+            writer.WriteDoubleValue("anima_i2i_batch_size", AnimaI2iBatchSize);
             writer.WriteDoubleValue("anima_i2i_cfg", AnimaI2iCfg);
+            writer.WriteDoubleValue("anima_i2i_dcfg", AnimaI2iDcfg);
             writer.WriteObjectValue<UntypedNode>("anima_i2i_dim0", AnimaI2iDim0);
             writer.WriteObjectValue<UntypedNode>("anima_i2i_dim1", AnimaI2iDim1);
             writer.WriteObjectValue<UntypedNode>("anima_i2i_height", AnimaI2iHeight);
@@ -4430,13 +5661,17 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteObjectValue<UntypedNode>("anima_i2i_ss1", AnimaI2iSs1);
             writer.WriteDoubleValue("anima_i2i_step", AnimaI2iStep);
             writer.WriteObjectValue<UntypedNode>("anima_i2i_width", AnimaI2iWidth);
+            writer.WriteBoolValue("anima_show_shift", AnimaShowShift);
             writer.WriteObjectValue<UntypedNode>("anima_steps0", AnimaSteps0);
             writer.WriteObjectValue<UntypedNode>("anima_steps1", AnimaSteps1);
+            writer.WriteDoubleValue("anima_t2i_batch_size", AnimaT2iBatchSize);
             writer.WriteDoubleValue("anima_t2i_cfg", AnimaT2iCfg);
+            writer.WriteDoubleValue("anima_t2i_dcfg", AnimaT2iDcfg);
             writer.WriteObjectValue<UntypedNode>("anima_t2i_dim0", AnimaT2iDim0);
             writer.WriteObjectValue<UntypedNode>("anima_t2i_dim1", AnimaT2iDim1);
             writer.WriteObjectValue<UntypedNode>("anima_t2i_height", AnimaT2iHeight);
             writer.WriteDoubleValue("anima_t2i_hr_cfg", AnimaT2iHrCfg);
+            writer.WriteDoubleValue("anima_t2i_hr_dcfg", AnimaT2iHrDcfg);
             writer.WriteDoubleValue("anima_t2i_hr_step", AnimaT2iHrStep);
             writer.WriteStringValue("anima_t2i_sampler", AnimaT2iSampler);
             writer.WriteStringValue("anima_t2i_scheduler", AnimaT2iScheduler);
@@ -4447,7 +5682,6 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteBoolValue("api_enable_requests", ApiEnableRequests);
             writer.WriteBoolValue("api_forbid_local_requests", ApiForbidLocalRequests);
             writer.WriteObjectValue<UntypedNode>("api_useragent", ApiUseragent);
-            writer.WriteBoolValue("auto_backcompat", AutoBackcompat);
             writer.WriteStringValue("auto_launch_browser", AutoLaunchBrowser);
             writer.WriteDoubleValue("beta_dist_alpha", BetaDistAlpha);
             writer.WriteDoubleValue("beta_dist_beta", BetaDistBeta);
@@ -4455,9 +5689,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteDoubleValue("CLIP_stop_at_last_layers", CLIPStopAtLastLayers);
             writer.WriteDoubleValue("code_former_weight", CodeFormerWeight);
             writer.WriteDoubleValue("comma_padding_backtrack", CommaPaddingBacktrack);
-            writer.WriteObjectValue<UntypedNode>("compact_prompt_box", CompactPromptBox);
-            writer.WriteStringValue("compatibility_explanation", CompatibilityExplanation);
             writer.WriteObjectValue<UntypedNode>("composite_tiles_on_gpu", CompositeTilesOnGpu);
+            writer.WriteObjectValue<UntypedNode>("confirm_leave", ConfirmLeave);
             writer.WriteStringValue("cross_attention_optimization", CrossAttentionOptimization);
             writer.WriteObjectValue<UntypedNode>("ctrl_enter_interrupt", CtrlEnterInterrupt);
             writer.WriteStringValue("ddim_discretize", DdimDiscretize);
@@ -4466,12 +5699,15 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteDoubleValue("directories_max_prompt_words", DirectoriesMaxPromptWords);
             writer.WriteStringValue("disable_all_extensions", DisableAllExtensions);
             writer.WriteObjectValue<UntypedNode>("disabled_extensions", DisabledExtensions);
+            writer.WriteBoolValue("disable_modules_auto_swap", DisableModulesAutoSwap);
             writer.WriteObjectValue<UntypedNode>("disable_token_counters", DisableTokenCounters);
+            writer.WriteBoolValue("disable_weights_auto_swap", DisableWeightsAutoSwap);
             writer.WriteObjectValue<UntypedNode>("div00", Div00);
             writer.WriteObjectValue<UntypedNode>("div01", Div01);
             writer.WriteObjectValue<UntypedNode>("div_classic", DivClassic);
             writer.WriteObjectValue<UntypedNode>("divlumina", Divlumina);
-            writer.WriteObjectValue<UntypedNode>("divqwen", Divqwen);
+            writer.WriteObjectValue<UntypedNode>("divmisc", Divmisc);
+            writer.WriteObjectValue<UntypedNode>("div_prompt", DivPrompt);
             writer.WriteObjectValue<UntypedNode>("div_tome", DivTome);
             writer.WriteObjectValue<UntypedNode>("divxl", Divxl);
             writer.WriteObjectValue<UntypedNode>("do_not_show_images", DoNotShowImages);
@@ -4482,6 +5718,42 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteBoolValue("enable_prompt_comments", EnablePromptComments);
             writer.WriteObjectValue<UntypedNode>("enable_reloading_ui_scripts", EnableReloadingUiScripts);
             writer.WriteBoolValue("enable_upscale_progressbar", EnableUpscaleProgressbar);
+            writer.WriteObjectValue<UntypedNode>("ernie_batch0", ErnieBatch0);
+            writer.WriteObjectValue<UntypedNode>("ernie_batch1", ErnieBatch1);
+            writer.WriteObjectValue<UntypedNode>("ernie_cfg0", ErnieCfg0);
+            writer.WriteObjectValue<UntypedNode>("ernie_cfg1", ErnieCfg1);
+            writer.WriteObjectValue<UntypedNode>("ernie_dcfg0", ErnieDcfg0);
+            writer.WriteObjectValue<UntypedNode>("ernie_dcfg1", ErnieDcfg1);
+            writer.WriteDoubleValue("ernie_i2i_batch_size", ErnieI2iBatchSize);
+            writer.WriteDoubleValue("ernie_i2i_cfg", ErnieI2iCfg);
+            writer.WriteDoubleValue("ernie_i2i_dcfg", ErnieI2iDcfg);
+            writer.WriteObjectValue<UntypedNode>("ernie_i2i_dim0", ErnieI2iDim0);
+            writer.WriteObjectValue<UntypedNode>("ernie_i2i_dim1", ErnieI2iDim1);
+            writer.WriteObjectValue<UntypedNode>("ernie_i2i_height", ErnieI2iHeight);
+            writer.WriteStringValue("ernie_i2i_sampler", ErnieI2iSampler);
+            writer.WriteStringValue("ernie_i2i_scheduler", ErnieI2iScheduler);
+            writer.WriteObjectValue<UntypedNode>("ernie_i2i_ss0", ErnieI2iSs0);
+            writer.WriteObjectValue<UntypedNode>("ernie_i2i_ss1", ErnieI2iSs1);
+            writer.WriteDoubleValue("ernie_i2i_step", ErnieI2iStep);
+            writer.WriteObjectValue<UntypedNode>("ernie_i2i_width", ErnieI2iWidth);
+            writer.WriteBoolValue("ernie_show_shift", ErnieShowShift);
+            writer.WriteObjectValue<UntypedNode>("ernie_steps0", ErnieSteps0);
+            writer.WriteObjectValue<UntypedNode>("ernie_steps1", ErnieSteps1);
+            writer.WriteDoubleValue("ernie_t2i_batch_size", ErnieT2iBatchSize);
+            writer.WriteDoubleValue("ernie_t2i_cfg", ErnieT2iCfg);
+            writer.WriteDoubleValue("ernie_t2i_dcfg", ErnieT2iDcfg);
+            writer.WriteObjectValue<UntypedNode>("ernie_t2i_dim0", ErnieT2iDim0);
+            writer.WriteObjectValue<UntypedNode>("ernie_t2i_dim1", ErnieT2iDim1);
+            writer.WriteObjectValue<UntypedNode>("ernie_t2i_height", ErnieT2iHeight);
+            writer.WriteDoubleValue("ernie_t2i_hr_cfg", ErnieT2iHrCfg);
+            writer.WriteDoubleValue("ernie_t2i_hr_dcfg", ErnieT2iHrDcfg);
+            writer.WriteDoubleValue("ernie_t2i_hr_step", ErnieT2iHrStep);
+            writer.WriteStringValue("ernie_t2i_sampler", ErnieT2iSampler);
+            writer.WriteStringValue("ernie_t2i_scheduler", ErnieT2iScheduler);
+            writer.WriteObjectValue<UntypedNode>("ernie_t2i_ss0", ErnieT2iSs0);
+            writer.WriteObjectValue<UntypedNode>("ernie_t2i_ss1", ErnieT2iSs1);
+            writer.WriteDoubleValue("ernie_t2i_step", ErnieT2iStep);
+            writer.WriteObjectValue<UntypedNode>("ernie_t2i_width", ErnieT2iWidth);
             writer.WriteDoubleValue("ESRGAN_tile", ESRGANTile);
             writer.WriteDoubleValue("ESRGAN_tile_overlap", ESRGANTileOverlap);
             writer.WriteDoubleValue("eta_ancestral", EtaAncestral);
@@ -4512,10 +5784,13 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteObjectValue<UntypedNode>("face_restoration", FaceRestoration);
             writer.WriteStringValue("face_restoration_model", FaceRestorationModel);
             writer.WriteObjectValue<UntypedNode>("face_restoration_unload", FaceRestorationUnload);
+            writer.WriteObjectValue<UntypedNode>("flux_batch0", FluxBatch0);
+            writer.WriteObjectValue<UntypedNode>("flux_batch1", FluxBatch1);
             writer.WriteObjectValue<UntypedNode>("flux_cfg0", FluxCfg0);
             writer.WriteObjectValue<UntypedNode>("flux_cfg1", FluxCfg1);
             writer.WriteObjectValue<UntypedNode>("flux_dcfg0", FluxDcfg0);
             writer.WriteObjectValue<UntypedNode>("flux_dcfg1", FluxDcfg1);
+            writer.WriteDoubleValue("flux_i2i_batch_size", FluxI2iBatchSize);
             writer.WriteDoubleValue("flux_i2i_cfg", FluxI2iCfg);
             writer.WriteDoubleValue("flux_i2i_dcfg", FluxI2iDcfg);
             writer.WriteObjectValue<UntypedNode>("flux_i2i_dim0", FluxI2iDim0);
@@ -4529,6 +5804,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteObjectValue<UntypedNode>("flux_i2i_width", FluxI2iWidth);
             writer.WriteObjectValue<UntypedNode>("flux_steps0", FluxSteps0);
             writer.WriteObjectValue<UntypedNode>("flux_steps1", FluxSteps1);
+            writer.WriteDoubleValue("flux_t2i_batch_size", FluxT2iBatchSize);
             writer.WriteDoubleValue("flux_t2i_cfg", FluxT2iCfg);
             writer.WriteDoubleValue("flux_t2i_dcfg", FluxT2iDcfg);
             writer.WriteObjectValue<UntypedNode>("flux_t2i_dim0", FluxT2iDim0);
@@ -4546,9 +5822,12 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteObjectValue<UntypedNode>("forbidden_knowledge", ForbiddenKnowledge);
             writer.WriteObjectValue<UntypedNode>("forge_additional_modules", ForgeAdditionalModules);
             writer.WriteObjectValue<UntypedNode>("forge_additional_modules_anima", ForgeAdditionalModulesAnima);
+            writer.WriteObjectValue<UntypedNode>("forge_additional_modules_ernie", ForgeAdditionalModulesErnie);
             writer.WriteObjectValue<UntypedNode>("forge_additional_modules_flux", ForgeAdditionalModulesFlux);
             writer.WriteObjectValue<UntypedNode>("forge_additional_modules_klein", ForgeAdditionalModulesKlein);
+            writer.WriteObjectValue<UntypedNode>("forge_additional_modules_krea", ForgeAdditionalModulesKrea);
             writer.WriteObjectValue<UntypedNode>("forge_additional_modules_lumina", ForgeAdditionalModulesLumina);
+            writer.WriteObjectValue<UntypedNode>("forge_additional_modules_pid", ForgeAdditionalModulesPid);
             writer.WriteObjectValue<UntypedNode>("forge_additional_modules_qwen", ForgeAdditionalModulesQwen);
             writer.WriteObjectValue<UntypedNode>("forge_additional_modules_sd", ForgeAdditionalModulesSd);
             writer.WriteObjectValue<UntypedNode>("forge_additional_modules_wan", ForgeAdditionalModulesWan);
@@ -4560,21 +5839,26 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteStringValue("forge_canvas_plain_color", ForgeCanvasPlainColor);
             writer.WriteObjectValue<UntypedNode>("forge_canvas_toolbar_always", ForgeCanvasToolbarAlways);
             writer.WriteObjectValue<UntypedNode>("forge_checkpoint_anima", ForgeCheckpointAnima);
+            writer.WriteObjectValue<UntypedNode>("forge_checkpoint_ernie", ForgeCheckpointErnie);
             writer.WriteObjectValue<UntypedNode>("forge_checkpoint_flux", ForgeCheckpointFlux);
             writer.WriteObjectValue<UntypedNode>("forge_checkpoint_klein", ForgeCheckpointKlein);
+            writer.WriteObjectValue<UntypedNode>("forge_checkpoint_krea", ForgeCheckpointKrea);
             writer.WriteObjectValue<UntypedNode>("forge_checkpoint_lumina", ForgeCheckpointLumina);
+            writer.WriteObjectValue<UntypedNode>("forge_checkpoint_pid", ForgeCheckpointPid);
             writer.WriteObjectValue<UntypedNode>("forge_checkpoint_qwen", ForgeCheckpointQwen);
             writer.WriteObjectValue<UntypedNode>("forge_checkpoint_sd", ForgeCheckpointSd);
             writer.WriteObjectValue<UntypedNode>("forge_checkpoint_wan", ForgeCheckpointWan);
             writer.WriteObjectValue<UntypedNode>("forge_checkpoint_xl", ForgeCheckpointXl);
             writer.WriteObjectValue<UntypedNode>("forge_checkpoint_zit", ForgeCheckpointZit);
             writer.WriteStringValue("forge_preset", ForgePreset);
-            writer.WriteStringValue("forge_try_reproduce", ForgeTryReproduce);
             writer.WriteStringValue("forge_unet_storage_dtype", ForgeUnetStorageDtype);
             writer.WriteStringValue("forge_unet_storage_dtype_anima", ForgeUnetStorageDtypeAnima);
+            writer.WriteStringValue("forge_unet_storage_dtype_ernie", ForgeUnetStorageDtypeErnie);
             writer.WriteStringValue("forge_unet_storage_dtype_flux", ForgeUnetStorageDtypeFlux);
             writer.WriteStringValue("forge_unet_storage_dtype_klein", ForgeUnetStorageDtypeKlein);
+            writer.WriteStringValue("forge_unet_storage_dtype_krea", ForgeUnetStorageDtypeKrea);
             writer.WriteStringValue("forge_unet_storage_dtype_lumina", ForgeUnetStorageDtypeLumina);
+            writer.WriteStringValue("forge_unet_storage_dtype_pid", ForgeUnetStorageDtypePid);
             writer.WriteStringValue("forge_unet_storage_dtype_qwen", ForgeUnetStorageDtypeQwen);
             writer.WriteStringValue("forge_unet_storage_dtype_sd", ForgeUnetStorageDtypeSd);
             writer.WriteStringValue("forge_unet_storage_dtype_wan", ForgeUnetStorageDtypeWan);
@@ -4595,6 +5879,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteObjectValue<UntypedNode>("grid_zip_filename_pattern", GridZipFilenamePattern);
             writer.WriteObjectValue<UntypedNode>("hidden_tabs", HiddenTabs);
             writer.WriteObjectValue<UntypedNode>("hide_samplers", HideSamplers);
+            writer.WriteObjectValue<UntypedNode>("hide_schedulers", HideSchedulers);
             writer.WriteObjectValue<UntypedNode>("hires_button_gallery_insert", HiresButtonGalleryInsert);
             writer.WriteObjectValue<UntypedNode>("hires_fix_show_prompts", HiresFixShowPrompts);
             writer.WriteObjectValue<UntypedNode>("hires_fix_show_sampler", HiresFixShowSampler);
@@ -4610,6 +5895,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteStringValue("img2img_inpaint_mask_brush_color", Img2imgInpaintMaskBrushColor);
             writer.WriteBoolValue("img2img_inpaint_mask_high_contrast", Img2imgInpaintMaskHighContrast);
             writer.WriteDoubleValue("img2img_inpaint_mask_scribble_alpha", Img2imgInpaintMaskScribbleAlpha);
+            writer.WriteObjectValue<UntypedNode>("img2img_inpaint_precise_mask", Img2imgInpaintPreciseMask);
             writer.WriteStringValue("img2img_inpaint_sketch_default_brush_color", Img2imgInpaintSketchDefaultBrushColor);
             writer.WriteObjectValue<UntypedNode>("img2img_settings_accordion", Img2imgSettingsAccordion);
             writer.WriteStringValue("img2img_sketch_default_brush_color", Img2imgSketchDefaultBrushColor);
@@ -4629,13 +5915,17 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteObjectValue<UntypedNode>("js_modal_lightbox_gamepad", JsModalLightboxGamepad);
             writer.WriteDoubleValue("js_modal_lightbox_gamepad_repeat", JsModalLightboxGamepadRepeat);
             writer.WriteBoolValue("js_modal_lightbox_initially_zoomed", JsModalLightboxInitiallyZoomed);
+            writer.WriteObjectValue<UntypedNode>("keep_alive", KeepAlive);
             writer.WriteStringValue("keyedit_delimiters", KeyeditDelimiters);
             writer.WriteObjectValue<UntypedNode>("keyedit_delimiters_whitespace", KeyeditDelimitersWhitespace);
             writer.WriteBoolValue("keyedit_move", KeyeditMove);
             writer.WriteDoubleValue("keyedit_precision_attention", KeyeditPrecisionAttention);
             writer.WriteDoubleValue("keyedit_precision_extra", KeyeditPrecisionExtra);
+            writer.WriteObjectValue<UntypedNode>("klein_batch0", KleinBatch0);
+            writer.WriteObjectValue<UntypedNode>("klein_batch1", KleinBatch1);
             writer.WriteObjectValue<UntypedNode>("klein_cfg0", KleinCfg0);
             writer.WriteObjectValue<UntypedNode>("klein_cfg1", KleinCfg1);
+            writer.WriteDoubleValue("klein_i2i_batch_size", KleinI2iBatchSize);
             writer.WriteDoubleValue("klein_i2i_cfg", KleinI2iCfg);
             writer.WriteObjectValue<UntypedNode>("klein_i2i_dim0", KleinI2iDim0);
             writer.WriteObjectValue<UntypedNode>("klein_i2i_dim1", KleinI2iDim1);
@@ -4646,8 +5936,10 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteObjectValue<UntypedNode>("klein_i2i_ss1", KleinI2iSs1);
             writer.WriteDoubleValue("klein_i2i_step", KleinI2iStep);
             writer.WriteObjectValue<UntypedNode>("klein_i2i_width", KleinI2iWidth);
+            writer.WriteObjectValue<UntypedNode>("klein_no_reference", KleinNoReference);
             writer.WriteObjectValue<UntypedNode>("klein_steps0", KleinSteps0);
             writer.WriteObjectValue<UntypedNode>("klein_steps1", KleinSteps1);
+            writer.WriteDoubleValue("klein_t2i_batch_size", KleinT2iBatchSize);
             writer.WriteDoubleValue("klein_t2i_cfg", KleinT2iCfg);
             writer.WriteObjectValue<UntypedNode>("klein_t2i_dim0", KleinT2iDim0);
             writer.WriteObjectValue<UntypedNode>("klein_t2i_dim1", KleinT2iDim1);
@@ -4660,16 +5952,56 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteObjectValue<UntypedNode>("klein_t2i_ss1", KleinT2iSs1);
             writer.WriteDoubleValue("klein_t2i_step", KleinT2iStep);
             writer.WriteObjectValue<UntypedNode>("klein_t2i_width", KleinT2iWidth);
+            writer.WriteObjectValue<UntypedNode>("krea2_do_reference", Krea2DoReference);
+            writer.WriteObjectValue<UntypedNode>("krea_batch0", KreaBatch0);
+            writer.WriteObjectValue<UntypedNode>("krea_batch1", KreaBatch1);
+            writer.WriteObjectValue<UntypedNode>("krea_cfg0", KreaCfg0);
+            writer.WriteObjectValue<UntypedNode>("krea_cfg1", KreaCfg1);
+            writer.WriteObjectValue<UntypedNode>("krea_dcfg0", KreaDcfg0);
+            writer.WriteObjectValue<UntypedNode>("krea_dcfg1", KreaDcfg1);
+            writer.WriteDoubleValue("krea_i2i_batch_size", KreaI2iBatchSize);
+            writer.WriteDoubleValue("krea_i2i_cfg", KreaI2iCfg);
+            writer.WriteDoubleValue("krea_i2i_dcfg", KreaI2iDcfg);
+            writer.WriteObjectValue<UntypedNode>("krea_i2i_dim0", KreaI2iDim0);
+            writer.WriteObjectValue<UntypedNode>("krea_i2i_dim1", KreaI2iDim1);
+            writer.WriteObjectValue<UntypedNode>("krea_i2i_height", KreaI2iHeight);
+            writer.WriteStringValue("krea_i2i_sampler", KreaI2iSampler);
+            writer.WriteStringValue("krea_i2i_scheduler", KreaI2iScheduler);
+            writer.WriteObjectValue<UntypedNode>("krea_i2i_ss0", KreaI2iSs0);
+            writer.WriteObjectValue<UntypedNode>("krea_i2i_ss1", KreaI2iSs1);
+            writer.WriteDoubleValue("krea_i2i_step", KreaI2iStep);
+            writer.WriteObjectValue<UntypedNode>("krea_i2i_width", KreaI2iWidth);
+            writer.WriteObjectValue<UntypedNode>("krea_show_shift", KreaShowShift);
+            writer.WriteObjectValue<UntypedNode>("krea_steps0", KreaSteps0);
+            writer.WriteObjectValue<UntypedNode>("krea_steps1", KreaSteps1);
+            writer.WriteDoubleValue("krea_t2i_batch_size", KreaT2iBatchSize);
+            writer.WriteDoubleValue("krea_t2i_cfg", KreaT2iCfg);
+            writer.WriteDoubleValue("krea_t2i_dcfg", KreaT2iDcfg);
+            writer.WriteObjectValue<UntypedNode>("krea_t2i_dim0", KreaT2iDim0);
+            writer.WriteObjectValue<UntypedNode>("krea_t2i_dim1", KreaT2iDim1);
+            writer.WriteObjectValue<UntypedNode>("krea_t2i_height", KreaT2iHeight);
+            writer.WriteDoubleValue("krea_t2i_hr_cfg", KreaT2iHrCfg);
+            writer.WriteDoubleValue("krea_t2i_hr_dcfg", KreaT2iHrDcfg);
+            writer.WriteDoubleValue("krea_t2i_hr_step", KreaT2iHrStep);
+            writer.WriteStringValue("krea_t2i_sampler", KreaT2iSampler);
+            writer.WriteStringValue("krea_t2i_scheduler", KreaT2iScheduler);
+            writer.WriteObjectValue<UntypedNode>("krea_t2i_ss0", KreaT2iSs0);
+            writer.WriteObjectValue<UntypedNode>("krea_t2i_ss1", KreaT2iSs1);
+            writer.WriteDoubleValue("krea_t2i_step", KreaT2iStep);
+            writer.WriteObjectValue<UntypedNode>("krea_t2i_width", KreaT2iWidth);
             writer.WriteBoolValue("list_hidden_files", ListHiddenFiles);
             writer.WriteObjectValue<UntypedNode>("live_preview_fast_interrupt", LivePreviewFastInterrupt);
             writer.WriteDoubleValue("live_preview_refresh_period", LivePreviewRefreshPeriod);
             writer.WriteBoolValue("live_previews_enable", LivePreviewsEnable);
             writer.WriteStringValue("live_previews_image_format", LivePreviewsImageFormat);
             writer.WriteStringValue("localization", Localization);
+            writer.WriteObjectValue<UntypedNode>("lumina_batch0", LuminaBatch0);
+            writer.WriteObjectValue<UntypedNode>("lumina_batch1", LuminaBatch1);
             writer.WriteObjectValue<UntypedNode>("lumina_cfg0", LuminaCfg0);
             writer.WriteObjectValue<UntypedNode>("lumina_cfg1", LuminaCfg1);
             writer.WriteObjectValue<UntypedNode>("lumina_dcfg0", LuminaDcfg0);
             writer.WriteObjectValue<UntypedNode>("lumina_dcfg1", LuminaDcfg1);
+            writer.WriteDoubleValue("lumina_i2i_batch_size", LuminaI2iBatchSize);
             writer.WriteDoubleValue("lumina_i2i_cfg", LuminaI2iCfg);
             writer.WriteDoubleValue("lumina_i2i_dcfg", LuminaI2iDcfg);
             writer.WriteObjectValue<UntypedNode>("lumina_i2i_dim0", LuminaI2iDim0);
@@ -4681,8 +6013,10 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteObjectValue<UntypedNode>("lumina_i2i_ss1", LuminaI2iSs1);
             writer.WriteDoubleValue("lumina_i2i_step", LuminaI2iStep);
             writer.WriteObjectValue<UntypedNode>("lumina_i2i_width", LuminaI2iWidth);
+            writer.WriteBoolValue("lumina_show_shift", LuminaShowShift);
             writer.WriteObjectValue<UntypedNode>("lumina_steps0", LuminaSteps0);
             writer.WriteObjectValue<UntypedNode>("lumina_steps1", LuminaSteps1);
+            writer.WriteDoubleValue("lumina_t2i_batch_size", LuminaT2iBatchSize);
             writer.WriteDoubleValue("lumina_t2i_cfg", LuminaT2iCfg);
             writer.WriteDoubleValue("lumina_t2i_dcfg", LuminaT2iDcfg);
             writer.WriteObjectValue<UntypedNode>("lumina_t2i_dim0", LuminaT2iDim0);
@@ -4701,7 +6035,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteBoolValue("multiple_tqdm", MultipleTqdm);
             writer.WriteStringValue("neta_template_negative", NetaTemplateNegative);
             writer.WriteStringValue("neta_template_positive", NetaTemplatePositive);
-            writer.WriteObjectValue<UntypedNode>("no_dpmpp_sde_batch_determinism", NoDpmppSdeBatchDeterminism);
+            writer.WriteObjectValue<UntypedNode>("no_spellcheck", NoSpellcheck);
             writer.WriteBoolValue("notification_audio", NotificationAudio);
             writer.WriteDoubleValue("notification_volume", NotificationVolume);
             writer.WriteDoubleValue("n_rows", NRows);
@@ -4719,6 +6053,42 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteBoolValue("overlay_inpaint", OverlayInpaint);
             writer.WriteObjectValue<UntypedNode>("paste_safe_guard", PasteSafeGuard);
             writer.WriteBoolValue("persistent_cond_cache", PersistentCondCache);
+            writer.WriteObjectValue<UntypedNode>("pid_batch0", PidBatch0);
+            writer.WriteObjectValue<UntypedNode>("pid_batch1", PidBatch1);
+            writer.WriteObjectValue<UntypedNode>("pid_cfg0", PidCfg0);
+            writer.WriteObjectValue<UntypedNode>("pid_cfg1", PidCfg1);
+            writer.WriteObjectValue<UntypedNode>("pid_dcfg0", PidDcfg0);
+            writer.WriteObjectValue<UntypedNode>("pid_dcfg1", PidDcfg1);
+            writer.WriteDoubleValue("pid_i2i_batch_size", PidI2iBatchSize);
+            writer.WriteDoubleValue("pid_i2i_cfg", PidI2iCfg);
+            writer.WriteDoubleValue("pid_i2i_dcfg", PidI2iDcfg);
+            writer.WriteObjectValue<UntypedNode>("pid_i2i_dim0", PidI2iDim0);
+            writer.WriteObjectValue<UntypedNode>("pid_i2i_dim1", PidI2iDim1);
+            writer.WriteObjectValue<UntypedNode>("pid_i2i_height", PidI2iHeight);
+            writer.WriteStringValue("pid_i2i_sampler", PidI2iSampler);
+            writer.WriteStringValue("pid_i2i_scheduler", PidI2iScheduler);
+            writer.WriteObjectValue<UntypedNode>("pid_i2i_ss0", PidI2iSs0);
+            writer.WriteObjectValue<UntypedNode>("pid_i2i_ss1", PidI2iSs1);
+            writer.WriteDoubleValue("pid_i2i_step", PidI2iStep);
+            writer.WriteObjectValue<UntypedNode>("pid_i2i_width", PidI2iWidth);
+            writer.WriteObjectValue<UntypedNode>("pid_show_shift", PidShowShift);
+            writer.WriteObjectValue<UntypedNode>("pid_steps0", PidSteps0);
+            writer.WriteObjectValue<UntypedNode>("pid_steps1", PidSteps1);
+            writer.WriteDoubleValue("pid_t2i_batch_size", PidT2iBatchSize);
+            writer.WriteDoubleValue("pid_t2i_cfg", PidT2iCfg);
+            writer.WriteDoubleValue("pid_t2i_dcfg", PidT2iDcfg);
+            writer.WriteObjectValue<UntypedNode>("pid_t2i_dim0", PidT2iDim0);
+            writer.WriteObjectValue<UntypedNode>("pid_t2i_dim1", PidT2iDim1);
+            writer.WriteObjectValue<UntypedNode>("pid_t2i_height", PidT2iHeight);
+            writer.WriteDoubleValue("pid_t2i_hr_cfg", PidT2iHrCfg);
+            writer.WriteDoubleValue("pid_t2i_hr_dcfg", PidT2iHrDcfg);
+            writer.WriteDoubleValue("pid_t2i_hr_step", PidT2iHrStep);
+            writer.WriteStringValue("pid_t2i_sampler", PidT2iSampler);
+            writer.WriteStringValue("pid_t2i_scheduler", PidT2iScheduler);
+            writer.WriteObjectValue<UntypedNode>("pid_t2i_ss0", PidT2iSs0);
+            writer.WriteObjectValue<UntypedNode>("pid_t2i_ss1", PidT2iSs1);
+            writer.WriteDoubleValue("pid_t2i_step", PidT2iStep);
+            writer.WriteObjectValue<UntypedNode>("pid_t2i_width", PidT2iWidth);
             writer.WriteObjectValue<UntypedNode>("postprocessing_disable_in_extras", PostprocessingDisableInExtras);
             writer.WriteObjectValue<UntypedNode>("postprocessing_enable_in_main_ui", PostprocessingEnableInMainUi);
             writer.WriteObjectValue<UntypedNode>("postprocessing_operation_order", PostprocessingOperationOrder);
@@ -4731,11 +6101,15 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteBoolValue("profiling_profile_memory", ProfilingProfileMemory);
             writer.WriteBoolValue("profiling_record_shapes", ProfilingRecordShapes);
             writer.WriteBoolValue("profiling_with_stack", ProfilingWithStack);
+            writer.WriteStringValue("prompt_box_style", PromptBoxStyle);
             writer.WriteObjectValue<UntypedNode>("quicksettings_accordion", QuicksettingsAccordion);
             writer.WriteObjectValue<UntypedNode>("quicksettings_accordion_starts_closed", QuicksettingsAccordionStartsClosed);
             writer.WriteObjectValue<UntypedNode>("quicksettings_list", QuicksettingsList);
+            writer.WriteObjectValue<UntypedNode>("qwen_batch0", QwenBatch0);
+            writer.WriteObjectValue<UntypedNode>("qwen_batch1", QwenBatch1);
             writer.WriteObjectValue<UntypedNode>("qwen_cfg0", QwenCfg0);
             writer.WriteObjectValue<UntypedNode>("qwen_cfg1", QwenCfg1);
+            writer.WriteDoubleValue("qwen_i2i_batch_size", QwenI2iBatchSize);
             writer.WriteDoubleValue("qwen_i2i_cfg", QwenI2iCfg);
             writer.WriteObjectValue<UntypedNode>("qwen_i2i_dim0", QwenI2iDim0);
             writer.WriteObjectValue<UntypedNode>("qwen_i2i_dim1", QwenI2iDim1);
@@ -4748,6 +6122,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteObjectValue<UntypedNode>("qwen_i2i_width", QwenI2iWidth);
             writer.WriteObjectValue<UntypedNode>("qwen_steps0", QwenSteps0);
             writer.WriteObjectValue<UntypedNode>("qwen_steps1", QwenSteps1);
+            writer.WriteDoubleValue("qwen_t2i_batch_size", QwenT2iBatchSize);
             writer.WriteDoubleValue("qwen_t2i_cfg", QwenT2iCfg);
             writer.WriteObjectValue<UntypedNode>("qwen_t2i_dim0", QwenT2iDim0);
             writer.WriteObjectValue<UntypedNode>("qwen_t2i_dim1", QwenT2iDim1);
@@ -4762,10 +6137,11 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteObjectValue<UntypedNode>("qwen_t2i_width", QwenT2iWidth);
             writer.WriteObjectValue<UntypedNode>("qwen_vae_resize", QwenVaeResize);
             writer.WriteStringValue("randn_source", RandnSource);
+            writer.WriteStringValue("reference_explanation", ReferenceExplanation);
             writer.WriteObjectValue<UntypedNode>("refiner_fast_sd", RefinerFastSd);
-            writer.WriteStringValue("refiner_lora_explanation", RefinerLoraExplanation);
-            writer.WriteStringValue("refiner_lora_replacement", RefinerLoraReplacement);
             writer.WriteObjectValue<UntypedNode>("refiner_use_steps", RefinerUseSteps);
+            writer.WriteBoolValue("remove_image_on_hover", RemoveImageOnHover);
+            writer.WriteDoubleValue("res_step", ResStep);
             writer.WriteObjectValue<UntypedNode>("restore_config_state_file", RestoreConfigStateFile);
             writer.WriteBoolValue("return_grid", ReturnGrid);
             writer.WriteObjectValue<UntypedNode>("return_mask", ReturnMask);
@@ -4791,11 +6167,13 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteBoolValue("save_write_log_csv", SaveWriteLogCsv);
             writer.WriteDoubleValue("scaling_factor", ScalingFactor);
             writer.WriteObjectValue<UntypedNode>("s_churn", SChurn);
-            writer.WriteObjectValue<UntypedNode>("scrollable_prompt_box", ScrollablePromptBox);
+            writer.WriteObjectValue<UntypedNode>("sd_batch0", SdBatch0);
+            writer.WriteObjectValue<UntypedNode>("sd_batch1", SdBatch1);
             writer.WriteObjectValue<UntypedNode>("sd_cfg0", SdCfg0);
             writer.WriteObjectValue<UntypedNode>("sd_cfg1", SdCfg1);
             writer.WriteObjectValue<UntypedNode>("sd_checkpoint_dropdown_use_short", SdCheckpointDropdownUseShort);
             writer.WriteObjectValue<UntypedNode>("sd_checkpoint_hash", SdCheckpointHash);
+            writer.WriteDoubleValue("sd_i2i_batch_size", SdI2iBatchSize);
             writer.WriteDoubleValue("sd_i2i_cfg", SdI2iCfg);
             writer.WriteObjectValue<UntypedNode>("sd_i2i_dim0", SdI2iDim0);
             writer.WriteObjectValue<UntypedNode>("sd_i2i_dim1", SdI2iDim1);
@@ -4810,6 +6188,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteStringValue("sd_noise_schedule", SdNoiseSchedule);
             writer.WriteObjectValue<UntypedNode>("sd_steps0", SdSteps0);
             writer.WriteObjectValue<UntypedNode>("sd_steps1", SdSteps1);
+            writer.WriteDoubleValue("sd_t2i_batch_size", SdT2iBatchSize);
             writer.WriteDoubleValue("sd_t2i_cfg", SdT2iCfg);
             writer.WriteObjectValue<UntypedNode>("sd_t2i_dim0", SdT2iDim0);
             writer.WriteObjectValue<UntypedNode>("sd_t2i_dim1", SdT2iDim1);
@@ -4827,15 +6206,19 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteStringValue("sd_vae_decode_method", SdVaeDecodeMethod);
             writer.WriteStringValue("sd_vae_encode_method", SdVaeEncodeMethod);
             writer.WriteStringValue("sd_vae_explanation", SdVaeExplanation);
-            writer.WriteBoolValue("sd_vae_overrides_per_model_preferences", SdVaeOverridesPerModelPreferences);
             writer.WriteDoubleValue("sd_webui_modal_lightbox_icon_opacity", SdWebuiModalLightboxIconOpacity);
             writer.WriteDoubleValue("sd_webui_modal_lightbox_toolbar_opacity", SdWebuiModalLightboxToolbarOpacity);
+            writer.WriteObjectValue<UntypedNode>("sdxl_00", Sdxl00);
+            writer.WriteObjectValue<UntypedNode>("sdxl_01", Sdxl01);
+            writer.WriteObjectValue<UntypedNode>("sdxl_10", Sdxl10);
+            writer.WriteObjectValue<UntypedNode>("sdxl_11", Sdxl11);
             writer.WriteObjectValue<UntypedNode>("sdxl_crop_left", SdxlCropLeft);
             writer.WriteObjectValue<UntypedNode>("sdxl_crop_top", SdxlCropTop);
             writer.WriteDoubleValue("sdxl_refiner_high_aesthetic_score", SdxlRefinerHighAestheticScore);
             writer.WriteDoubleValue("sdxl_refiner_low_aesthetic_score", SdxlRefinerLowAestheticScore);
             writer.WriteObjectValue<UntypedNode>("sdxl_zero_neg", SdxlZeroNeg);
             writer.WriteBoolValue("send_cfg", SendCfg);
+            writer.WriteObjectValue<UntypedNode>("send_image_info_not_ui", SendImageInfoNotUi);
             writer.WriteBoolValue("send_seed", SendSeed);
             writer.WriteBoolValue("send_size", SendSize);
             writer.WriteBoolValue("set_scale_by_when_changing_upscaler", SetScaleByWhenChangingUpscaler);
@@ -4849,7 +6232,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteBoolValue("show_progress_grid", ShowProgressGrid);
             writer.WriteBoolValue("show_progress_in_title", ShowProgressInTitle);
             writer.WriteStringValue("show_progress_type", ShowProgressType);
-            writer.WriteObjectValue<UntypedNode>("show_refiner", ShowRefiner);
+            writer.WriteBoolValue("show_refiner", ShowRefiner);
             writer.WriteObjectValue<UntypedNode>("show_rescale_cfg", ShowRescaleCfg);
             writer.WriteObjectValue<UntypedNode>("show_warnings", ShowWarnings);
             writer.WriteObjectValue<UntypedNode>("sigma_max", SigmaMax);
@@ -4879,19 +6262,19 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteObjectValue<UntypedNode>("token_merging_ratio_img2img", TokenMergingRatioImg2img);
             writer.WriteDoubleValue("token_merging_stride", TokenMergingStride);
             writer.WriteObjectValue<UntypedNode>("txt2img_settings_accordion", Txt2imgSettingsAccordion);
+            writer.WriteBoolValue("txt2img_upscale_same_seed", Txt2imgUpscaleSameSeed);
+            writer.WriteBoolValue("txt2img_upscale_single_batch", Txt2imgUpscaleSingleBatch);
             writer.WriteObjectValue<UntypedNode>("ui_extra_networks_tab_reorder", UiExtraNetworksTabReorder);
             writer.WriteObjectValue<UntypedNode>("ui_reorder_list", UiReorderList);
             writer.WriteObjectValue<UntypedNode>("ui_tab_order", UiTabOrder);
+            writer.WriteObjectValue<UntypedNode>("undo_redo", UndoRedo);
             writer.WriteStringValue("upscaler_for_img2img", UpscalerForImg2img);
             writer.WriteDoubleValue("upscaling_max_images_in_cache", UpscalingMaxImagesInCache);
             writer.WriteObjectValue<UntypedNode>("use_beta_sigmas", UseBetaSigmas);
-            writer.WriteObjectValue<UntypedNode>("use_downcasted_alpha_bar", UseDowncastedAlphaBar);
             writer.WriteObjectValue<UntypedNode>("use_dynamic_shifting", UseDynamicShifting);
             writer.WriteObjectValue<UntypedNode>("use_exponential_sigmas", UseExponentialSigmas);
             writer.WriteObjectValue<UntypedNode>("use_karras_sigmas", UseKarrasSigmas);
             writer.WriteObjectValue<UntypedNode>("use_old_hires_fix_width_height", UseOldHiresFixWidthHeight);
-            writer.WriteObjectValue<UntypedNode>("use_old_karras_scheduler_sigmas", UseOldKarrasSchedulerSigmas);
-            writer.WriteObjectValue<UntypedNode>("use_old_scheduling", UseOldScheduling);
             writer.WriteBoolValue("use_original_name_batch", UseOriginalNameBatch);
             writer.WriteObjectValue<UntypedNode>("use_save_to_dirs_for_ui", UseSaveToDirsForUi);
             writer.WriteObjectValue<UntypedNode>("VERSION_UID", VERSIONUID);
@@ -4903,10 +6286,13 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteStringValue("video_preset", VideoPreset);
             writer.WriteStringValue("video_profile", VideoProfile);
             writer.WriteObjectValue<UntypedNode>("video_save_frames", VideoSaveFrames);
+            writer.WriteObjectValue<UntypedNode>("wan_batch0", WanBatch0);
+            writer.WriteObjectValue<UntypedNode>("wan_batch1", WanBatch1);
             writer.WriteObjectValue<UntypedNode>("wan_cfg0", WanCfg0);
             writer.WriteObjectValue<UntypedNode>("wan_cfg1", WanCfg1);
             writer.WriteObjectValue<UntypedNode>("wan_dcfg0", WanDcfg0);
             writer.WriteObjectValue<UntypedNode>("wan_dcfg1", WanDcfg1);
+            writer.WriteDoubleValue("wan_i2i_batch_size", WanI2iBatchSize);
             writer.WriteDoubleValue("wan_i2i_cfg", WanI2iCfg);
             writer.WriteDoubleValue("wan_i2i_dcfg", WanI2iDcfg);
             writer.WriteObjectValue<UntypedNode>("wan_i2i_dim0", WanI2iDim0);
@@ -4918,8 +6304,10 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteObjectValue<UntypedNode>("wan_i2i_ss1", WanI2iSs1);
             writer.WriteDoubleValue("wan_i2i_step", WanI2iStep);
             writer.WriteObjectValue<UntypedNode>("wan_i2i_width", WanI2iWidth);
+            writer.WriteBoolValue("wan_show_shift", WanShowShift);
             writer.WriteObjectValue<UntypedNode>("wan_steps0", WanSteps0);
             writer.WriteObjectValue<UntypedNode>("wan_steps1", WanSteps1);
+            writer.WriteDoubleValue("wan_t2i_batch_size", WanT2iBatchSize);
             writer.WriteDoubleValue("wan_t2i_cfg", WanT2iCfg);
             writer.WriteDoubleValue("wan_t2i_dcfg", WanT2iDcfg);
             writer.WriteObjectValue<UntypedNode>("wan_t2i_dim0", WanT2iDim0);
@@ -4935,9 +6323,15 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteDoubleValue("wan_t2i_step", WanT2iStep);
             writer.WriteObjectValue<UntypedNode>("wan_t2i_width", WanT2iWidth);
             writer.WriteObjectValue<UntypedNode>("webp_lossless", WebpLossless);
+            writer.WriteObjectValue<UntypedNode>("xl_batch0", XlBatch0);
+            writer.WriteObjectValue<UntypedNode>("xl_batch1", XlBatch1);
             writer.WriteObjectValue<UntypedNode>("xl_cfg0", XlCfg0);
             writer.WriteObjectValue<UntypedNode>("xl_cfg1", XlCfg1);
+            writer.WriteObjectValue<UntypedNode>("xl_dcfg0", XlDcfg0);
+            writer.WriteObjectValue<UntypedNode>("xl_dcfg1", XlDcfg1);
+            writer.WriteDoubleValue("xl_i2i_batch_size", XlI2iBatchSize);
             writer.WriteDoubleValue("xl_i2i_cfg", XlI2iCfg);
+            writer.WriteDoubleValue("xl_i2i_dcfg", XlI2iDcfg);
             writer.WriteObjectValue<UntypedNode>("xl_i2i_dim0", XlI2iDim0);
             writer.WriteObjectValue<UntypedNode>("xl_i2i_dim1", XlI2iDim1);
             writer.WriteObjectValue<UntypedNode>("xl_i2i_height", XlI2iHeight);
@@ -4947,13 +6341,17 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteObjectValue<UntypedNode>("xl_i2i_ss1", XlI2iSs1);
             writer.WriteDoubleValue("xl_i2i_step", XlI2iStep);
             writer.WriteObjectValue<UntypedNode>("xl_i2i_width", XlI2iWidth);
+            writer.WriteObjectValue<UntypedNode>("xl_show_shift", XlShowShift);
             writer.WriteObjectValue<UntypedNode>("xl_steps0", XlSteps0);
             writer.WriteObjectValue<UntypedNode>("xl_steps1", XlSteps1);
+            writer.WriteDoubleValue("xl_t2i_batch_size", XlT2iBatchSize);
             writer.WriteDoubleValue("xl_t2i_cfg", XlT2iCfg);
+            writer.WriteDoubleValue("xl_t2i_dcfg", XlT2iDcfg);
             writer.WriteObjectValue<UntypedNode>("xl_t2i_dim0", XlT2iDim0);
             writer.WriteObjectValue<UntypedNode>("xl_t2i_dim1", XlT2iDim1);
             writer.WriteObjectValue<UntypedNode>("xl_t2i_height", XlT2iHeight);
             writer.WriteDoubleValue("xl_t2i_hr_cfg", XlT2iHrCfg);
+            writer.WriteDoubleValue("xl_t2i_hr_dcfg", XlT2iHrDcfg);
             writer.WriteDoubleValue("xl_t2i_hr_step", XlT2iHrStep);
             writer.WriteStringValue("xl_t2i_sampler", XlT2iSampler);
             writer.WriteStringValue("xl_t2i_scheduler", XlT2iScheduler);
@@ -4961,10 +6359,13 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteObjectValue<UntypedNode>("xl_t2i_ss1", XlT2iSs1);
             writer.WriteDoubleValue("xl_t2i_step", XlT2iStep);
             writer.WriteObjectValue<UntypedNode>("xl_t2i_width", XlT2iWidth);
+            writer.WriteObjectValue<UntypedNode>("zit_batch0", ZitBatch0);
+            writer.WriteObjectValue<UntypedNode>("zit_batch1", ZitBatch1);
             writer.WriteObjectValue<UntypedNode>("zit_cfg0", ZitCfg0);
             writer.WriteObjectValue<UntypedNode>("zit_cfg1", ZitCfg1);
             writer.WriteObjectValue<UntypedNode>("zit_dcfg0", ZitDcfg0);
             writer.WriteObjectValue<UntypedNode>("zit_dcfg1", ZitDcfg1);
+            writer.WriteDoubleValue("zit_i2i_batch_size", ZitI2iBatchSize);
             writer.WriteDoubleValue("zit_i2i_cfg", ZitI2iCfg);
             writer.WriteDoubleValue("zit_i2i_dcfg", ZitI2iDcfg);
             writer.WriteObjectValue<UntypedNode>("zit_i2i_dim0", ZitI2iDim0);
@@ -4976,8 +6377,10 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteObjectValue<UntypedNode>("zit_i2i_ss1", ZitI2iSs1);
             writer.WriteDoubleValue("zit_i2i_step", ZitI2iStep);
             writer.WriteObjectValue<UntypedNode>("zit_i2i_width", ZitI2iWidth);
+            writer.WriteBoolValue("zit_show_shift", ZitShowShift);
             writer.WriteObjectValue<UntypedNode>("zit_steps0", ZitSteps0);
             writer.WriteObjectValue<UntypedNode>("zit_steps1", ZitSteps1);
+            writer.WriteDoubleValue("zit_t2i_batch_size", ZitT2iBatchSize);
             writer.WriteDoubleValue("zit_t2i_cfg", ZitT2iCfg);
             writer.WriteDoubleValue("zit_t2i_dcfg", ZitT2iDcfg);
             writer.WriteObjectValue<UntypedNode>("zit_t2i_dim0", ZitT2iDim0);

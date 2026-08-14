@@ -64,8 +64,6 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #endif
         /// <summary>The height property</summary>
         public int? Height { get; set; }
-        /// <summary>The hr_distilled_cfg property</summary>
-        public double? HrDistilledCfg { get; set; }
         /// <summary>The image_cfg_scale property</summary>
         public double? ImageCfgScale { get; set; }
         /// <summary>The include_init_images property</summary>
@@ -87,6 +85,14 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #nullable restore
 #else
         public UntypedNode InitImages { get; set; }
+#endif
+        /// <summary>The init_latent property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? InitLatent { get; set; }
+#nullable restore
+#else
+        public UntypedNode InitLatent { get; set; }
 #endif
         /// <summary>The inpaint_full_res property</summary>
         public bool? InpaintFullRes { get; set; }
@@ -144,6 +150,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string Prompt { get; set; }
 #endif
+        /// <summary>The refiner_cfg property</summary>
+        public double? RefinerCfg { get; set; }
         /// <summary>The refiner_checkpoint property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -275,11 +283,11 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "firstpass_image", n => { FirstpassImage = n.GetStringValue(); } },
                 { "force_task_id", n => { ForceTaskId = n.GetStringValue(); } },
                 { "height", n => { Height = n.GetIntValue(); } },
-                { "hr_distilled_cfg", n => { HrDistilledCfg = n.GetDoubleValue(); } },
                 { "image_cfg_scale", n => { ImageCfgScale = n.GetDoubleValue(); } },
                 { "include_init_images", n => { IncludeInitImages = n.GetBoolValue(); } },
                 { "infotext", n => { Infotext = n.GetStringValue(); } },
                 { "init_images", n => { InitImages = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "init_latent", n => { InitLatent = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "initial_noise_multiplier", n => { InitialNoiseMultiplier = n.GetDoubleValue(); } },
                 { "inpaint_full_res", n => { InpaintFullRes = n.GetBoolValue(); } },
                 { "inpaint_full_res_padding", n => { InpaintFullResPadding = n.GetIntValue(); } },
@@ -294,6 +302,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "override_settings", n => { OverrideSettings = n.GetObjectValue<global::Mogri.Clients.SdForgeNeo.Models.StableDiffusionProcessingImg2Img_override_settings>(global::Mogri.Clients.SdForgeNeo.Models.StableDiffusionProcessingImg2Img_override_settings.CreateFromDiscriminatorValue); } },
                 { "override_settings_restore_afterwards", n => { OverrideSettingsRestoreAfterwards = n.GetBoolValue(); } },
                 { "prompt", n => { Prompt = n.GetStringValue(); } },
+                { "refiner_cfg", n => { RefinerCfg = n.GetDoubleValue(); } },
                 { "refiner_checkpoint", n => { RefinerCheckpoint = n.GetStringValue(); } },
                 { "refiner_switch_at", n => { RefinerSwitchAt = n.GetDoubleValue(); } },
                 { "resize_mode", n => { ResizeMode = n.GetIntValue(); } },
@@ -341,12 +350,12 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteStringValue("firstpass_image", FirstpassImage);
             writer.WriteStringValue("force_task_id", ForceTaskId);
             writer.WriteIntValue("height", Height);
-            writer.WriteDoubleValue("hr_distilled_cfg", HrDistilledCfg);
             writer.WriteDoubleValue("image_cfg_scale", ImageCfgScale);
             writer.WriteBoolValue("include_init_images", IncludeInitImages);
             writer.WriteStringValue("infotext", Infotext);
             writer.WriteDoubleValue("initial_noise_multiplier", InitialNoiseMultiplier);
             writer.WriteObjectValue<UntypedNode>("init_images", InitImages);
+            writer.WriteObjectValue<UntypedNode>("init_latent", InitLatent);
             writer.WriteBoolValue("inpaint_full_res", InpaintFullRes);
             writer.WriteIntValue("inpaint_full_res_padding", InpaintFullResPadding);
             writer.WriteIntValue("inpainting_fill", InpaintingFill);
@@ -360,6 +369,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteObjectValue<global::Mogri.Clients.SdForgeNeo.Models.StableDiffusionProcessingImg2Img_override_settings>("override_settings", OverrideSettings);
             writer.WriteBoolValue("override_settings_restore_afterwards", OverrideSettingsRestoreAfterwards);
             writer.WriteStringValue("prompt", Prompt);
+            writer.WriteDoubleValue("refiner_cfg", RefinerCfg);
             writer.WriteStringValue("refiner_checkpoint", RefinerCheckpoint);
             writer.WriteDoubleValue("refiner_switch_at", RefinerSwitchAt);
             writer.WriteIntValue("resize_mode", ResizeMode);
