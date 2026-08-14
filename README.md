@@ -67,6 +67,28 @@ Add Text and Emoji to the canvas to help with generation
 3.  Enter your backend server URL (e.g., `http://192.168.1.x:7860`), or if using Comfy Cloud, enter your API Key.
 4.  *(Optional)* Add authentication header info, if necessary
 
+### Supported Models
+
+Mogri provides generation profiles for the following model families:
+
+- Stable Diffusion 1.5
+- Stable Diffusion XL
+- Z-Image Turbo
+- FLUX
+- Krea 2 Turbo
+- Krea 2 Raw
+
+All models require a compatible checkpoint to be installed and available through the selected backend. Mogri does not provide model files. The default auxiliary resources are:
+
+| Model family | Default backend resources |
+| --- | --- |
+| Stable Diffusion 1.5 / Stable Diffusion XL | Compatible checkpoint; no additional VAE or text encoder is selected by Mogri |
+| Z-Image Turbo | `ae.safetensors` VAE and `Qwen3` text encoder |
+| FLUX | `ae.safetensors` VAE and `t5xxl` text encoder |
+| Krea 2 Turbo / Krea 2 Raw | Krea checkpoint, `ae.safetensors` VAE, and `qwen3vl` text encoder (often listed as `qwen3vl_4b`) |
+
+Resource names can include backend-specific suffixes.
+
 ### Backend Configuration
 
 #### SD Forge Neo
