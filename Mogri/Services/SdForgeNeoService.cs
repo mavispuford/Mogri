@@ -494,7 +494,9 @@ namespace Mogri.Services
             request.Scheduler = settings.Scheduler;
             System.Diagnostics.Debug.WriteLine($"[SdForgeNeoService] Scheduler: {settings.Scheduler}");
 
-            if (settings.ModelType == Enums.ModelType.ZImageTurbo || settings.ModelType == Enums.ModelType.Flux)
+            if (settings.ModelType == Enums.ModelType.ZImageTurbo ||
+                settings.ModelType == Enums.ModelType.Flux ||
+                settings.ModelType == Enums.ModelType.Krea2Turbo)
             {
                 if (settings.DistilledCfgScale.HasValue)
                 {
@@ -547,7 +549,9 @@ namespace Mogri.Services
 
             request.Scheduler = settings.Scheduler;
 
-            if (settings.ModelType == Enums.ModelType.ZImageTurbo || settings.ModelType == Enums.ModelType.Flux)
+            if (settings.ModelType == Enums.ModelType.ZImageTurbo ||
+                settings.ModelType == Enums.ModelType.Flux ||
+                settings.ModelType == Enums.ModelType.Krea2Turbo)
             {
                 if (settings.DistilledCfgScale.HasValue)
                 {
@@ -1174,7 +1178,7 @@ namespace Mogri.Services
                 return Task.FromResult(ModelType.SDXL);
             }
 
-            var normalizedCurrentModel = StripModelHash(currentModel);
+            var normalizedCurrentModel = StripModelHash(currentModel) ?? string.Empty;
 
             if (normalizedCurrentModel == StripModelHash(GetOptionValue(_options.ForgeCheckpointSd)))
             {
@@ -1191,6 +1195,18 @@ namespace Mogri.Services
             if (normalizedCurrentModel == StripModelHash(GetOptionValue(_options.ForgeCheckpointFlux)))
             {
                 return Task.FromResult(ModelType.Flux);
+            }
+
+            var kreaCheckpoint = StripModelHash(GetOptionValue(_options.ForgeCheckpointKrea));
+            if (normalizedCurrentModel == kreaCheckpoint ||
+                normalizedCurrentModel.Contains("krea", StringComparison.OrdinalIgnoreCase))
+            {
+                if (normalizedCurrentModel.Contains("raw", StringComparison.OrdinalIgnoreCase))
+                {
+                    return Task.FromResult(ModelType.Krea2Raw);
+                }
+
+                return Task.FromResult(ModelType.Krea2Turbo);
             }
 
             return Task.FromResult(ModelType.SDXL);

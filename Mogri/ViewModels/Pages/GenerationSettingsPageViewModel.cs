@@ -177,7 +177,9 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
                 TextEncoder = "None";
             }
 
-            IsDistilledCfgScaleVisible = value == ModelType.ZImageTurbo || value == ModelType.Flux;
+            IsDistilledCfgScaleVisible = value == ModelType.ZImageTurbo ||
+                value == ModelType.Flux ||
+                value == ModelType.Krea2Turbo;
             IsSeamlessVisible = CurrentCapabilities.SupportsSeamless && value == ModelType.SDXL;
         }
         catch (Exception ex)
@@ -501,7 +503,9 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
             UpscaleSteps = _settings.UpscaleSteps.ToString();
             Width = _settings.Width.ToString();
 
-            IsDistilledCfgScaleVisible = SelectedModelType == ModelType.ZImageTurbo || SelectedModelType == ModelType.Flux;
+            IsDistilledCfgScaleVisible = SelectedModelType == ModelType.ZImageTurbo ||
+                SelectedModelType == ModelType.Flux ||
+                SelectedModelType == ModelType.Krea2Turbo;
             IsSeamlessVisible = CurrentCapabilities.SupportsSeamless && SelectedModelType == ModelType.SDXL;
         }
         finally
