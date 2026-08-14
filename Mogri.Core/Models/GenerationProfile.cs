@@ -42,6 +42,30 @@ public class GenerationProfile
                 DefaultWidth = 1024,
                 DefaultHeight = 1024
             },
+            ModelType.Krea2Turbo => new GenerationProfile
+            {
+                DefaultSteps = 8,
+                DefaultCfg = 1.0,
+                DefaultDistilledCfg = 1.15,
+                DefaultSampler = "Euler",
+                DefaultScheduler = "Simple",
+                DefaultVae = "ae.safetensors",
+                DefaultTextEncoder = "qwen3vl",
+                DefaultWidth = 1024,
+                DefaultHeight = 1024
+            },
+            ModelType.Krea2Raw => new GenerationProfile
+            {
+                DefaultSteps = 52,
+                DefaultCfg = 3.5,
+                DefaultDistilledCfg = null,
+                DefaultSampler = "Euler",
+                DefaultScheduler = "Simple",
+                DefaultVae = "ae.safetensors",
+                DefaultTextEncoder = "qwen3vl",
+                DefaultWidth = 1024,
+                DefaultHeight = 1024
+            },
             ModelType.SD15 => new GenerationProfile
             {
                 DefaultSteps = 30,
