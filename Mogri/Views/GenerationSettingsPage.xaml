@@ -112,6 +112,7 @@
                         HorizontalOptions="End">
                         <Picker Title="Model" 
                                 ItemsSource="{Binding AvailableModelValues}"
+                                ItemDisplayBinding="{Binding DisplayName}"
                                 SelectedItem="{Binding Model}" 
                                 FontSize="16" 
                                 HorizontalTextAlignment="End"

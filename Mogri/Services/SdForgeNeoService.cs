@@ -625,11 +625,16 @@ namespace Mogri.Services
                             var modelVm = _serviceProvider.GetService<IModelViewModel>();
                             if (modelVm != null)
                             {
-                                modelVm.DisplayName = matchingModel.ModelName ?? string.Empty;
+                                modelVm.DisplayName = ModelIdentityHelper.GetDisplayName(matchingModel.ModelName, matchingModel.Title);
                                 modelVm.Key = matchingModel.Title ?? string.Empty;
                                 settings.Model = modelVm;
                             }
                         }
+                    }
+
+                    if (settings.Model != null && string.IsNullOrWhiteSpace(settings.Model.DisplayName))
+                    {
+                        settings.Model.DisplayName = ModelIdentityHelper.GetDisplayName(settings.Model.DisplayName, settings.Model.Key);
                     }
 
                     if (settings.Model == null && _client != null)
@@ -954,15 +959,24 @@ namespace Mogri.Services
         {
             var result = _serviceProvider.GetService<IModelViewModel>();
 
-            if (_options == null || _models == null) return Task.FromResult<IModelViewModel?>(result);
+            if (_options == null) return Task.FromResult<IModelViewModel?>(result);
 
             var currentModelTitle = GetOptionValue(_options.SdModelCheckpoint);
-            var selectedModel = _models.FirstOrDefault(m => m.Title == currentModelTitle);
+            var selectedModel = _models?.FirstOrDefault(m => m.Title == currentModelTitle);
 
-            if (selectedModel != null && result != null)
+            if (selectedModel != null)
             {
-                result.DisplayName = selectedModel.ModelName ?? string.Empty;
-                result.Key = selectedModel.Title ?? string.Empty;
+                var selectedModelViewModel = convertModelToViewModel(selectedModel);
+                if (selectedModelViewModel != null)
+                {
+                    return Task.FromResult<IModelViewModel?>(selectedModelViewModel);
+                }
+            }
+
+            if (result != null && !string.IsNullOrWhiteSpace(currentModelTitle))
+            {
+                result.DisplayName = ModelIdentityHelper.GetDisplayName(null, currentModelTitle);
+                result.Key = currentModelTitle;
             }
 
             return Task.FromResult<IModelViewModel?>(result);
@@ -1120,7 +1134,7 @@ namespace Mogri.Services
             var viewModel = _serviceProvider.GetService<IModelViewModel>();
             if (viewModel == null) return null;
 
-            viewModel.DisplayName = model.ModelName ?? string.Empty;
+            viewModel.DisplayName = ModelIdentityHelper.GetDisplayName(model.ModelName, model.Title);
             viewModel.Key = model.Title ?? string.Empty;
 
             return viewModel;

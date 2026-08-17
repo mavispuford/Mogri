@@ -73,7 +73,7 @@ public class GenerationProfileTests
         var profile = GenerationProfile.GetDefault(ModelType.Krea2Turbo);
 
         // Assert
-        Assert.Equal("ae.safetensors", profile.DefaultVae);
+        Assert.Equal("Qwen2D_VAE.safetensors", profile.DefaultVae);
         Assert.Equal("qwen3vl", profile.DefaultTextEncoder);
     }
 
@@ -86,7 +86,7 @@ public class GenerationProfileTests
         var profile = GenerationProfile.GetDefault(ModelType.Krea2Raw);
 
         // Assert
-        Assert.Equal("ae.safetensors", profile.DefaultVae);
+        Assert.Equal("Qwen2D_VAE.safetensors", profile.DefaultVae);
         Assert.Equal("qwen3vl", profile.DefaultTextEncoder);
     }
 

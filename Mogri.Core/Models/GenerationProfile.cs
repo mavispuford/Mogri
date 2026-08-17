@@ -49,7 +49,7 @@ public class GenerationProfile
                 DefaultDistilledCfg = 1.15,
                 DefaultSampler = "Euler",
                 DefaultScheduler = "Simple",
-                DefaultVae = "ae.safetensors",
+                DefaultVae = "Qwen2D_VAE.safetensors",
                 DefaultTextEncoder = "qwen3vl",
                 DefaultWidth = 1024,
                 DefaultHeight = 1024
@@ -61,7 +61,7 @@ public class GenerationProfile
                 DefaultDistilledCfg = null,
                 DefaultSampler = "Euler",
                 DefaultScheduler = "Simple",
-                DefaultVae = "ae.safetensors",
+                DefaultVae = "Qwen2D_VAE.safetensors",
                 DefaultTextEncoder = "qwen3vl",
                 DefaultWidth = 1024,
                 DefaultHeight = 1024
