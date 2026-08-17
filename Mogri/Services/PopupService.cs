@@ -14,9 +14,10 @@ namespace Mogri.Services
 {
     public class PopupService : IPopupService
     {
-        private static Dictionary<PopupPage, TaskCompletionSource<object?>> activePopups = new();
+        private readonly Dictionary<PopupPage, TaskCompletionSource<object?>> _activePopups = new();
 
         private readonly IServiceProvider _serviceProvider;
+        private readonly SemaphoreSlim _loadingPopupLifecycleSemaphore = new(1, 1);
 
         public PopupService(IServiceProvider serviceProvider)
         {
@@ -43,29 +44,55 @@ namespace Mogri.Services
                 queryAttributablePopup.ApplyQueryAttributes(parameters);
             }
 
-            var tcs = new TaskCompletionSource<object?>();
-
-            activePopups.Add(popup, tcs);
+            var gateAcquired = false;
 
             try
             {
-                await MopupService.Instance.PushAsync(popup);
-            }
-            catch
-            {
-                activePopups.Remove(popup);
-                throw;
-            }
-
-            // It takes a bit of time for the popup to show...
-            for (var i = 0; i < 5; i++)
-            {
-                if (MopupService.Instance.PopupStack.Contains(popup))
+                if (popupType == typeof(LoadingPopup))
                 {
+                    await _loadingPopupLifecycleSemaphore.WaitAsync();
+                    gateAcquired = true;
+                }
+
+                if (_activePopups.ContainsKey(popup))
+                {
+                    // If it is already tracked in active popups, do not add a duplicate entry.
+                    // If it is currently temporarily hidden by withLoadingPopupHiddenAsync,
+                    // do not push it now — withLoadingPopupHiddenAsync will restore it.
                     return;
                 }
 
-                await Task.Delay(100);
+                var tcs = new TaskCompletionSource<object?>();
+
+                _activePopups.Add(popup, tcs);
+
+                try
+                {
+                    await MopupService.Instance.PushAsync(popup);
+                }
+                catch
+                {
+                    _activePopups.Remove(popup);
+                    throw;
+                }
+
+                // It takes a bit of time for the popup to show...
+                for (var i = 0; i < 5; i++)
+                {
+                    if (MopupService.Instance.PopupStack.Contains(popup))
+                    {
+                        return;
+                    }
+
+                    await Task.Delay(100);
+                }
+            }
+            finally
+            {
+                if (gateAcquired)
+                {
+                    _loadingPopupLifecycleSemaphore.Release();
+                }
             }
         }
 
@@ -87,7 +114,7 @@ namespace Mogri.Services
 
             var tcs = new TaskCompletionSource<object?>();
 
-            activePopups.Add(popup, tcs);
+            _activePopups.Add(popup, tcs);
 
             try
             {
@@ -95,7 +122,7 @@ namespace Mogri.Services
             }
             catch
             {
-                activePopups.Remove(popup);
+                _activePopups.Remove(popup);
                 throw;
             }
 
@@ -106,17 +133,17 @@ namespace Mogri.Services
 
         public async Task ClosePopupAsync(IPopupBaseViewModel viewModel, object? result)
         {
-            if (!activePopups.Any(p => p.Key.BindingContext == viewModel))
+            if (!_activePopups.Any(p => p.Key.BindingContext == viewModel))
             {
                 return;
             }
 
-            var entry = activePopups.First(p => p.Key.BindingContext == viewModel);
+            var entry = _activePopups.First(p => p.Key.BindingContext == viewModel);
             var popupPage = entry.Key;
 
             // Remove from tracking before RemovePageAsync to prevent the
             // Disappearing safety-net handler from racing with this method.
-            activePopups.Remove(popupPage);
+            _activePopups.Remove(popupPage);
 
             await closePopupPageAsync(popupPage, entry.Value, result);
         }
@@ -124,53 +151,70 @@ namespace Mogri.Services
         public async Task ClosePopupAsync(string name, object? result)
         {
             var popupType = PopupRegistrations.GetPopupTypeByName(name);
+            var gateAcquired = false;
 
-            var popupPage = activePopups.Keys.FirstOrDefault(p => p.GetType().Name == popupType.Name);
-
-            // If not tracked in activePopups, fall back to the Mopups stack directly.
-            // This handles cases where the Disappearing safety-net already cleaned up
-            // the dictionary entry but the popup is still visually present.
-            if (popupPage == null)
+            try
             {
-                popupPage = MopupService.Instance.PopupStack
-                    .FirstOrDefault(p => p.GetType().Name == popupType.Name);
-
-                if (popupPage != null)
+                if (popupType == typeof(LoadingPopup))
                 {
-                    await closePopupPageAsync(popupPage, null, result);
+                    await _loadingPopupLifecycleSemaphore.WaitAsync();
+                    gateAcquired = true;
                 }
 
-                return;
+                var popupPage = _activePopups.Keys.FirstOrDefault(p => p.GetType().Name == popupType.Name);
+
+                // If not tracked in activePopups, fall back to the Mopups stack directly.
+                // This handles cases where the Disappearing safety-net already cleaned up
+                // the dictionary entry but the popup is still visually present.
+                if (popupPage == null)
+                {
+                    popupPage = MopupService.Instance.PopupStack
+                        .FirstOrDefault(p => p.GetType().Name == popupType.Name);
+
+                    if (popupPage != null)
+                    {
+                        await closePopupPageAsync(popupPage, null, result);
+                    }
+
+                    return;
+                }
+
+                var resultSource = _activePopups[popupPage];
+                _activePopups.Remove(popupPage);
+
+                await closePopupPageAsync(popupPage, resultSource, result);
             }
-
-            var resultSource = activePopups[popupPage];
-            activePopups.Remove(popupPage);
-
-            await closePopupPageAsync(popupPage, resultSource, result);
+            finally
+            {
+                if (gateAcquired)
+                {
+                    _loadingPopupLifecycleSemaphore.Release();
+                }
+            }
         }
 
         public async Task ClosePopupAsync(object? result)
         {
-            if (!activePopups.Any())
+            if (!_activePopups.Any())
             {
                 return;
             }
 
-            var entry = activePopups.Last();
+            var entry = _activePopups.Last();
             var popupPage = entry.Key;
 
-            activePopups.Remove(popupPage);
+            _activePopups.Remove(popupPage);
 
             await closePopupPageAsync(popupPage, entry.Value, result);
         }
 
         public void ClearAllPopups()
         {
-            foreach (var kvp in activePopups)
+            foreach (var kvp in _activePopups)
             {
                 kvp.Value.TrySetCanceled();
             }
-            activePopups.Clear();
+            _activePopups.Clear();
         }
 
         private Page GetActivePage()
@@ -186,11 +230,23 @@ namespace Mogri.Services
         /// </summary>
         private async Task<T> withLoadingPopupHiddenAsync<T>(Func<Task<T>> action)
         {
-            var loadingPopup = MopupService.Instance.PopupStack
-                .FirstOrDefault(p => p is LoadingPopup) as LoadingPopup;
+            LoadingPopup? loadingPopup;
 
-            if (loadingPopup != null)
-                await MopupService.Instance.RemovePageAsync(loadingPopup);
+            await _loadingPopupLifecycleSemaphore.WaitAsync();
+            try
+            {
+                loadingPopup = MopupService.Instance.PopupStack
+                    .FirstOrDefault(p => p is LoadingPopup) as LoadingPopup;
+
+                if (loadingPopup != null)
+                {
+                    await MopupService.Instance.RemovePageAsync(loadingPopup);
+                }
+            }
+            finally
+            {
+                _loadingPopupLifecycleSemaphore.Release();
+            }
 
             try
             {
@@ -198,8 +254,20 @@ namespace Mogri.Services
             }
             finally
             {
-                if (loadingPopup != null)
-                    await MopupService.Instance.PushAsync(loadingPopup);
+                await _loadingPopupLifecycleSemaphore.WaitAsync();
+                try
+                {
+                    if (loadingPopup != null &&
+                        _activePopups.ContainsKey(loadingPopup) &&
+                        !MopupService.Instance.PopupStack.Contains(loadingPopup))
+                    {
+                        await MopupService.Instance.PushAsync(loadingPopup);
+                    }
+                }
+                finally
+                {
+                    _loadingPopupLifecycleSemaphore.Release();
+                }
             }
         }
 
