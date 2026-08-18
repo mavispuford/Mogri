@@ -84,7 +84,7 @@ All models require a compatible checkpoint to be installed and available through
 | --- | --- |
 | Stable Diffusion 1.5 / Stable Diffusion XL | Compatible checkpoint; no additional VAE or text encoder is selected by Mogri |
 | Z-Image Turbo | `ae.safetensors` VAE and `Qwen3` text encoder |
-| FLUX | `ae.safetensors` VAE and `t5xxl` text encoder |
+| FLUX | `ae.safetensors` VAE, `t5xxl`, and `clip_l` text encoders |
 | Krea 2 Turbo / Krea 2 Raw | Krea checkpoint, `ae.safetensors` VAE, and `qwen3vl` text encoder (often listed as `qwen3vl_4b`) |
 
 Resource names can include backend-specific suffixes.
