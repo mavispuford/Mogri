@@ -141,9 +141,9 @@ public sealed class CanvasSegmentationCoordinator : ICanvasSegmentationCoordinat
             using (var combineCanvas = new SKCanvas(mergedBitmap))
             using (var paint = new SKPaint { BlendMode = SKBlendMode.SrcOver })
             {
-                combineCanvas.DrawBitmap(request.CurrentSegmentationBitmap, 0, 0, paint);
+                combineCanvas.DrawBitmap(request.CurrentSegmentationBitmap, 0, 0, SKSamplingOptions.Default, paint);
                 paint.BlendMode = request.SegmentationAdd ? SKBlendMode.SrcOver : SKBlendMode.DstOut;
-                combineCanvas.DrawBitmap(maskBitmap, 0, 0, paint);
+                combineCanvas.DrawBitmap(maskBitmap, 0, 0, SKSamplingOptions.Default, paint);
             }
 
             return new CanvasSegmentationMaskUpdateResult(mergedBitmap);

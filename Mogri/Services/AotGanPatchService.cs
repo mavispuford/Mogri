@@ -163,12 +163,12 @@ namespace Mogri.Services
                     {
                         c.Clear(SKColors.Black);
                         // Draw source image offset by -cropRect.Left, -cropRect.Top
-                        c.DrawBitmap(image, -cropRect.Left, -cropRect.Top);
+                        c.DrawBitmap(image, -cropRect.Left, -cropRect.Top, SKSamplingOptions.Default, null);
                     }
                     using (var c = new SKCanvas(croppedMask))
                     {
                         c.Clear(SKColors.Transparent);
-                        c.DrawBitmap(mask, -cropRect.Left, -cropRect.Top);
+                        c.DrawBitmap(mask, -cropRect.Left, -cropRect.Top, SKSamplingOptions.Default, null);
                     }
 
                     // FIX: Ensure mask is truly transparent where black/empty, to support DstIn blending.
@@ -205,12 +205,12 @@ namespace Mogri.Services
                             canvas.SaveLayer(new SKRect(cropRect.Left, cropRect.Top, cropRect.Right, cropRect.Bottom), null);
 
                             // 2. Draw the predicted patch (opaque)
-                            canvas.DrawBitmap(outputCroppedSize, cropRect.Left, cropRect.Top);
+                            canvas.DrawBitmap(outputCroppedSize, cropRect.Left, cropRect.Top, SKSamplingOptions.Default, null);
 
                             // 3. Mask it with the original mask using DstIn (Keep DST (prediction) where SRC (mask) is opaque)
                             // The croppedMask likely has high alpha where the user painted.
                             paint.BlendMode = SKBlendMode.DstIn;
-                            canvas.DrawBitmap(croppedMask, cropRect.Left, cropRect.Top, paint);
+                            canvas.DrawBitmap(croppedMask, cropRect.Left, cropRect.Top, SKSamplingOptions.Default, paint);
 
                             // 4. Restore the layer, which composites the masked prediction onto the original image
                             canvas.Restore();

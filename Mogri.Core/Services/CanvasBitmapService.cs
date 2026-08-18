@@ -54,7 +54,7 @@ public sealed class CanvasBitmapService : ICanvasBitmapService
 
             using var paint = new SKPaint();
             paint.ColorFilter = SKColorFilter.CreateBlendMode(SKColors.White, SKBlendMode.SrcIn);
-            canvas.DrawBitmap(segmentationBitmap, 0, 0, paint);
+            canvas.DrawBitmap(segmentationBitmap, 0, 0, SKSamplingOptions.Default, paint);
         }
 
         return resultBitmap;
@@ -90,8 +90,8 @@ public sealed class CanvasBitmapService : ICanvasBitmapService
 
         using (var canvas = new SKCanvas(resultBitmap))
         {
-            canvas.DrawBitmap(sourceBitmap, 0, 0);
-            canvas.DrawBitmap(maskBitmap, 0, 0);
+            canvas.DrawBitmap(sourceBitmap, 0, 0, SKSamplingOptions.Default, null);
+            canvas.DrawBitmap(maskBitmap, 0, 0, SKSamplingOptions.Default, null);
         }
 
         return resultBitmap;
@@ -199,7 +199,7 @@ public sealed class CanvasBitmapService : ICanvasBitmapService
                 IsAntialias = true,
             };
 
-            canvas.DrawBitmap(bitmap, 0, 0);
+            canvas.DrawBitmap(bitmap, 0, 0, SKSamplingOptions.Default, null);
 
             var toStitch = bitmapToStitchIn.Width != dest.Width || bitmapToStitchIn.Height != dest.Height
                 ? bitmapToStitchIn.Resize(adjustedRect.Size.ToSizeI(), new SKSamplingOptions(SKCubicResampler.Mitchell))

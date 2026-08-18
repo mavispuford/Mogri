@@ -52,8 +52,8 @@ public partial class MaskLineViewModel : PaintActionViewModel, ICanvasMaskStroke
             return;
         }
 
-        using var path = new SKPath();
-        path.MoveTo(points[0]);
+        using var pathBuilder = new SKPathBuilder();
+        pathBuilder.MoveTo(points[0]);
 
         if (points.Count > 2)
         {
@@ -68,21 +68,23 @@ public partial class MaskLineViewModel : PaintActionViewModel, ICanvasMaskStroke
 
                 // QuadTo uses the 'current' point as the control point (the "pull")
                 // and the 'midPoint' as the actual destination.
-                path.QuadTo(current, midPoint);
+                pathBuilder.QuadTo(current, midPoint);
             }
 
             // Connect to the very last point to finish the line
-            path.LineTo(points[^1]);
+            pathBuilder.LineTo(points[^1]);
         }
         else if (points.Count == 2)
         {
-            path.LineTo(points[1]);
+            pathBuilder.LineTo(points[1]);
         }
         else if (points.Count == 1)
         {
             // Draw a tiny line/dot so a single tap is visible
-            path.LineTo(points[0].X, points[0].Y);
+            pathBuilder.LineTo(points[0].X, points[0].Y);
         }
+
+        using var path = pathBuilder.Detach();
 
         if (MaskEffect == MaskEffect.Paint)
         {

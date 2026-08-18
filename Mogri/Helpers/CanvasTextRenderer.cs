@@ -93,7 +93,7 @@ public static class CanvasTextRenderer
         var preparedBitmap = new SKBitmap(info);
 
         using var canvas = new SKCanvas(preparedBitmap);
-        canvas.DrawBitmap(sourceBitmap, 0, 0);
+        canvas.DrawBitmap(sourceBitmap, 0, 0, SKSamplingOptions.Default, null);
 
         foreach (var textElement in textElements.OrderBy(textElement => textElement.Order))
         {
@@ -117,7 +117,7 @@ public static class CanvasTextRenderer
         {
             processTextRunsWithFallback(text, baseFontSize, skColor, (textRun, font, paint, shaper, _, originX) =>
             {
-                canvas.DrawShapedText(shaper, textRun.Text, originX, 0f, font, paint);
+                canvas.DrawShapedText(shaper, textRun.Text, originX, 0f, SKTextAlign.Left, font, paint);
             });
 
             return;
@@ -146,7 +146,7 @@ public static class CanvasTextRenderer
             // Fill through a text alpha mask so standard text keeps the current replacement-fill behavior.
             fillPaint.BlendMode = SKBlendMode.SrcIn;
             canvas.SaveLayer(layerBounds, null);
-            canvas.DrawShapedText(shaper, textRun.Text, originX, 0f, font, paint);
+            canvas.DrawShapedText(shaper, textRun.Text, originX, 0f, SKTextAlign.Left, font, paint);
             canvas.DrawPaint(fillPaint);
             canvas.Restore();
         });
@@ -162,7 +162,7 @@ public static class CanvasTextRenderer
         float originX,
         double noise)
     {
-        canvas.DrawShapedText(shaper, textRun.Text, originX, 0f, font, paint);
+        canvas.DrawShapedText(shaper, textRun.Text, originX, 0f, SKTextAlign.Left, font, paint);
 
         var layerBounds = getTextRunLayerBounds(runBounds);
         if (layerBounds.Width <= 0f || layerBounds.Height <= 0f)
@@ -190,7 +190,7 @@ public static class CanvasTextRenderer
         };
 
         canvas.SaveLayer(layerBounds, compositePaint);
-        canvas.DrawShapedText(shaper, textRun.Text, originX, 0f, font, paint);
+        canvas.DrawShapedText(shaper, textRun.Text, originX, 0f, SKTextAlign.Left, font, paint);
         canvas.DrawPaint(overlayPaint);
         canvas.Restore();
     }
