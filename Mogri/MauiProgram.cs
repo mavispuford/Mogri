@@ -8,6 +8,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using MemoryToolkit.Maui;
 using Mogri.Interfaces.Services;
+#if MAUI_DEVFLOW
+using Microsoft.Maui.DevFlow.Agent;
+#endif
 
 namespace Mogri;
 
@@ -16,6 +19,10 @@ public static class MauiProgram
     public static MauiApp CreateMauiApp()
     {
         var builder = MauiApp.CreateBuilder();
+
+#if MAUI_DEVFLOW
+        builder.AddMauiDevFlowAgent();
+#endif
 
         builder
             .UseMauiApp<App>()

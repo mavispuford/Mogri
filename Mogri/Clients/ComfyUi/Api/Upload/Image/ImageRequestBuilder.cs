@@ -34,7 +34,7 @@ namespace Mogri.Clients.ComfyUi.Api.Upload.Image
         {
         }
         /// <summary>
-        /// Upload an image file to cloud storage
+        /// Upload an image file to cloud storage.Image limits:  - Maximum file size: 50 MB  - Maximum width/height per edge: 16384 px  - Maximum total pixel count: 64 megapixels (67108864 pixels)Uploads that exceed any of these limits are rejected with HTTP 400.
         /// </summary>
         /// <returns>A <see cref="global::Mogri.Clients.ComfyUi.Api.Upload.Image.ImagePostResponse"/></returns>
         /// <param name="body">The request body</param>
@@ -63,7 +63,7 @@ namespace Mogri.Clients.ComfyUi.Api.Upload.Image
             return await RequestAdapter.SendAsync<global::Mogri.Clients.ComfyUi.Api.Upload.Image.ImagePostResponse>(requestInfo, global::Mogri.Clients.ComfyUi.Api.Upload.Image.ImagePostResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Upload an image file to cloud storage
+        /// Upload an image file to cloud storage.Image limits:  - Maximum file size: 50 MB  - Maximum width/height per edge: 16384 px  - Maximum total pixel count: 64 megapixels (67108864 pixels)Uploads that exceed any of these limits are rejected with HTTP 400.
         /// </summary>
         /// <returns>A <see cref="global::Mogri.Clients.ComfyUi.Api.Upload.Image.ImageResponse"/></returns>
         /// <param name="body">The request body</param>
@@ -93,7 +93,7 @@ namespace Mogri.Clients.ComfyUi.Api.Upload.Image
             return await RequestAdapter.SendAsync<global::Mogri.Clients.ComfyUi.Api.Upload.Image.ImageResponse>(requestInfo, global::Mogri.Clients.ComfyUi.Api.Upload.Image.ImageResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Upload an image file to cloud storage
+        /// Upload an image file to cloud storage.Image limits:  - Maximum file size: 50 MB  - Maximum width/height per edge: 16384 px  - Maximum total pixel count: 64 megapixels (67108864 pixels)Uploads that exceed any of these limits are rejected with HTTP 400.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="body">The request body</param>

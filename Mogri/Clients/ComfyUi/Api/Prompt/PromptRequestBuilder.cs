@@ -34,7 +34,7 @@ namespace Mogri.Clients.ComfyUi.Api.Prompt
         {
         }
         /// <summary>
-        /// Returns information about the current prompt in the execution queue
+        /// Returns information about current prompts in the execution queue
         /// </summary>
         /// <returns>A <see cref="global::Mogri.Clients.ComfyUi.Models.PromptInfo"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
@@ -92,7 +92,7 @@ namespace Mogri.Clients.ComfyUi.Api.Prompt
             return await RequestAdapter.SendAsync<global::Mogri.Clients.ComfyUi.Models.PromptResponse>(requestInfo, global::Mogri.Clients.ComfyUi.Models.PromptResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Returns information about the current prompt in the execution queue
+        /// Returns information about current prompts in the execution queue
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>

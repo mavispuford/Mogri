@@ -4,6 +4,8 @@ Mogri is a .NET MAUI mobile application for image generation and editing. It com
 
 ## Overview
 
+> **AI Disclosure**: Mogri was started in August 2022 before I used AI tools in my workflow. I had been working professionally with C# for almost 10 years, and I wanted to work on something of my own. In 2025, I brought Copilot in to accelerate my work, and I personally review/test/maintain all the code changes in the project.
+
 There are two main tabs in the app:
 
 | **Generate** | **Canvas** |
@@ -64,6 +66,28 @@ Add Text and Emoji to the canvas to help with generation
 2.  Select your backend (**SD Forge Neo**/**ComfyUI**/**Comfy Cloud**) from the dropdown.
 3.  Enter your backend server URL (e.g., `http://192.168.1.x:7860`), or if using Comfy Cloud, enter your API Key.
 4.  *(Optional)* Add authentication header info, if necessary
+
+### Supported Models
+
+Mogri provides generation profiles for the following model families:
+
+- Stable Diffusion 1.5
+- Stable Diffusion XL
+- Z-Image Turbo
+- FLUX
+- Krea 2 Turbo
+- Krea 2 Raw
+
+All models require a compatible checkpoint to be installed and available through the selected backend. Mogri does not provide model files. The default auxiliary resources are:
+
+| Model family | Default backend resources |
+| --- | --- |
+| Stable Diffusion 1.5 / Stable Diffusion XL | Compatible checkpoint; no additional VAE or text encoder is selected by Mogri |
+| Z-Image Turbo | `ae.safetensors` VAE and `Qwen3` text encoder |
+| FLUX | `ae.safetensors` VAE, `t5xxl`, and `clip_l` text encoders |
+| Krea 2 Turbo / Krea 2 Raw | Krea checkpoint, `ae.safetensors` VAE, and `qwen3vl` text encoder (often listed as `qwen3vl_4b`) |
+
+Resource names can include backend-specific suffixes.
 
 ### Backend Configuration
 

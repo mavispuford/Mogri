@@ -6,6 +6,7 @@ using Mogri.Interfaces.Services;
 using Mogri.Interfaces.ViewModels;
 using Mogri.Interfaces.ViewModels.Pages;
 using Mogri.Models;
+using Mogri.Helpers;
 
 namespace Mogri.ViewModels;
 
@@ -177,7 +178,9 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
                 TextEncoder = "None";
             }
 
-            IsDistilledCfgScaleVisible = value == ModelType.ZImageTurbo || value == ModelType.Flux;
+            IsDistilledCfgScaleVisible = value == ModelType.ZImageTurbo ||
+                value == ModelType.Flux ||
+                value == ModelType.Krea2Turbo;
             IsSeamlessVisible = CurrentCapabilities.SupportsSeamless && value == ModelType.SDXL;
         }
         catch (Exception ex)
@@ -280,6 +283,16 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
             AvailableUpscalerValues = upscalers.Select(u => u.Name).ToList();
 
             var models = await _stableDiffusionService.GetModelsAsync();
+
+            if (_settings.Model != null &&
+                !models.Any(model => ModelIdentityHelper.AreEquivalent(
+                    model.DisplayName,
+                    model.Key,
+                    _settings.Model.DisplayName,
+                    _settings.Model.Key)))
+            {
+                models.Insert(0, _settings.Model);
+            }
 
             AvailableModelValues = models;
 
@@ -452,7 +465,11 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
             BatchSize = _settings.BatchSize.ToString();
             EnableTiling = _settings.EnableTiling;
             Model = _settings.Model != null
-                ? AvailableModelValues?.FirstOrDefault(m => m.Key == _settings.Model.Key)
+                ? AvailableModelValues?.FirstOrDefault(m => ModelIdentityHelper.AreEquivalent(
+                    m.DisplayName,
+                    m.Key,
+                    _settings.Model.DisplayName,
+                    _settings.Model.Key))
                 : null;
             Sampler = _settings.Sampler;
             Scheduler = _settings.Scheduler;
@@ -501,7 +518,9 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
             UpscaleSteps = _settings.UpscaleSteps.ToString();
             Width = _settings.Width.ToString();
 
-            IsDistilledCfgScaleVisible = SelectedModelType == ModelType.ZImageTurbo || SelectedModelType == ModelType.Flux;
+            IsDistilledCfgScaleVisible = SelectedModelType == ModelType.ZImageTurbo ||
+                SelectedModelType == ModelType.Flux ||
+                SelectedModelType == ModelType.Krea2Turbo;
             IsSeamlessVisible = CurrentCapabilities.SupportsSeamless && SelectedModelType == ModelType.SDXL;
         }
         finally

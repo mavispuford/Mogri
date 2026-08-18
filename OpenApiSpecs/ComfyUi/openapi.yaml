@@ -31,7 +31,7 @@ info:
   version: 1.0.0
   license:
     name: GNU General Public License v3.0
-    url: https://github.com/comfyanonymous/ComfyUI/blob/master/LICENSE
+    url: https://github.com/Comfy-Org/ComfyUI/blob/master/LICENSE
 
 servers:
   - url: https://cloud.comfy.org
@@ -146,8 +146,8 @@ paths:
     get:
       tags:
         - workflow
-      summary: Get information about current prompt execution
-      description: Returns information about the current prompt in the execution queue
+      summary: Get information about current prompt executions
+      description: Returns information about current prompts in the execution queue
       operationId: getPromptInfo
       responses:
         '200':
@@ -451,7 +451,10 @@ paths:
       tags:
         - job
       summary: Get execution history (v2)
+      deprecated: true
       description: |
+        **Deprecated.** Use [`/api/jobs`](#tag/job/GET/api/jobs) instead. This endpoint is maintained for ComfyUI compatibility but will be removed in a future release; no removal date set.
+
         Retrieve execution history for the authenticated user with pagination support.
         Returns a lightweight history format with filtered prompt data (workflow removed from extra_pnginfo).
       operationId: getHistory
@@ -494,7 +497,10 @@ paths:
       tags:
         - job
       summary: Get history for specific prompt
+      deprecated: true
       description: |
+        **Deprecated.** Use [`/api/jobs/{job_id}`](#tag/job/GET/api/jobs/{job_id}) instead — the `prompt_id` returned by `/api/prompt` is the same value as `job_id`. This endpoint is maintained for ComfyUI compatibility but will be removed in a future release; no removal date set.
+
         Retrieve detailed execution history for a specific prompt ID.
         Returns full history data including complete prompt information.
       operationId: getHistoryForPrompt
@@ -2063,7 +2069,15 @@ paths:
       tags:
         - file
       summary: Upload an image file
-      description: Upload an image file to cloud storage
+      description: |
+        Upload an image file to cloud storage.
+
+        Image limits:
+          - Maximum file size: 50 MB
+          - Maximum width/height per edge: 16384 px
+          - Maximum total pixel count: 64 megapixels (67108864 pixels)
+
+        Uploads that exceed any of these limits are rejected with HTTP 400.
       operationId: uploadImage
       requestBody:
         required: true
@@ -2139,7 +2153,16 @@ paths:
       tags:
         - file
       summary: Upload a mask image
-      description: Upload a mask image to be applied to an existing image
+      description: |
+        Upload a mask image to be applied to an existing image.
+
+        Image limits apply to both the uploaded mask and the referenced
+        original image:
+          - Maximum file size: 50 MB
+          - Maximum width/height per edge: 16384 px
+          - Maximum total pixel count: 64 megapixels (67108864 pixels)
+
+        Uploads that exceed any of these limits are rejected with HTTP 400.
       operationId: uploadMask
       requestBody:
         required: true
@@ -2318,7 +2341,7 @@ components:
       name: X-API-Key
       description: |
         API key authentication. Generate an API key from your account settings
-        at https://comfy.org/account. Pass the key in the X-API-Key header.
+        at https://platform.comfy.org/profile/api-keys. Pass the key in the X-API-Key header.
   schemas:
     PromptRequest:
       type: object

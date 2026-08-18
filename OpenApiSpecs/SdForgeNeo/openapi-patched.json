@@ -3369,19 +3369,19 @@
           "fp32_vae": {
             "type": "boolean",
             "title": "Fp32 Vae",
-            "description": "Run the VAE in full precision fp32",
+            "description": "Store the VAE in full precision fp32",
             "default": false
           },
           "bf16_vae": {
             "type": "boolean",
             "title": "Bf16 Vae",
-            "description": "Run the VAE in bf16",
+            "description": "Store the VAE in bf16",
             "default": false
           },
           "fp16_vae": {
             "type": "boolean",
             "title": "Fp16 Vae",
-            "description": "Run the VAE in fp16 (might cause black images)",
+            "description": "Store the VAE in fp16 (might cause black images)",
             "default": false
           },
           "cpu_vae": {
@@ -3435,7 +3435,7 @@
           "force_xformers_vae": {
             "type": "boolean",
             "title": "Force Xformers Vae",
-            "description": "Force VAE to use xformers attention (meant to use with PyTorch cross attention)",
+            "description": "Force VAE to use xformers attention (meant to be used with --use-pytorch-cross-attention)",
             "default": false
           },
           "force_upcast_attention": {
@@ -3468,10 +3468,10 @@
             "description": "install nunchaku for SVDQ inference",
             "default": false
           },
-          "bnb": {
+          "use_ck_attention": {
             "type": "boolean",
-            "title": "Bnb",
-            "description": "install bitsandbytes for 4-bit inference",
+            "title": "Use Ck Attention",
+            "description": "use Comfy-Kitchen attention",
             "default": false
           },
           "onnxruntime_gpu": {
@@ -3503,12 +3503,6 @@
             "description": "Use torch-directml",
             "type": "string"
           },
-          "disable_ipex_optimize": {
-            "type": "boolean",
-            "title": "Disable Ipex Optimize",
-            "description": "Disable ipex.optimize default when loading models with Intel's Extension for PyTorch",
-            "default": false
-          },
           "deterministic": {
             "type": "boolean",
             "title": "Deterministic",
@@ -3525,12 +3519,6 @@
             "type": "boolean",
             "title": "Highvram",
             "description": "Keeps models in VRAM after usage",
-            "default": false
-          },
-          "normalvram": {
-            "type": "boolean",
-            "title": "Normalvram",
-            "description": "Force NORMAL_VRAM in case LOW_VRAM gets automatically enabled",
             "default": false
           },
           "lowvram": {
@@ -3585,6 +3573,12 @@
             "description": "improve RAM utilization",
             "default": false
           },
+          "expandable_segments": {
+            "type": "boolean",
+            "title": "Expandable Segments",
+            "description": "improve memory allocation ; experimental",
+            "default": false
+          },
           "fast_fp8": {
             "type": "boolean",
             "title": "Fast Fp8",
@@ -3615,27 +3609,27 @@
             "description": "Don't use mmap when loading safetensors",
             "default": false
           },
-          "sage2_function": {
+          "tiled_conv2d": {
+            "type": "integer",
+            "title": "Tiled Conv2D",
+            "description": "reduce VAE memory usage ; increase processing time",
+            "default": 0
+          },
+          "enable_triton_backend": {
+            "type": "boolean",
+            "title": "Enable Triton Backend",
+            "description": "Enable the use of Triton backend in comfy-kitchen",
+            "default": false
+          },
+          "sage_function": {
             "$ref": "#/components/schemas/SageAttentionFuncs",
             "default": "auto"
-          },
-          "sage_quantization_backend": {
-            "$ref": "#/components/schemas/Sage_quantization_backend",
-            "default": "triton"
-          },
-          "sage_quant_gran": {
-            "$ref": "#/components/schemas/Sage_qk_quant_gran",
-            "default": "per_thread"
-          },
-          "sage_accum_dtype": {
-            "$ref": "#/components/schemas/Sage_pv_accum_dtype",
-            "default": "fp32"
           },
           "data_dir": {
             "type": "string",
             "title": "Data Dir",
             "description": "base path where all user data is stored",
-            "default": "D:\\\\StableDiffusion\\\\sd-webui-forge-classic"
+            "default": "/Users/blakeross/Projects/sd-webui-forge-neo"
           },
           "model_ref": {
             "title": "Model Ref",
@@ -3746,7 +3740,7 @@
             "type": "string",
             "title": "Ui Config File",
             "description": "filename to use for ui configuration",
-            "default": "D:\\\\StableDiffusion\\\\sd-webui-forge-classic\\\\ui-config.json"
+            "default": "/Users/blakeross/Projects/sd-webui-forge-neo/ui-config.json"
           },
           "hide_ui_dir_config": {
             "type": "boolean",
@@ -3774,7 +3768,7 @@
             "type": "string",
             "title": "Ui Settings File",
             "description": "filename to use for ui settings",
-            "default": "D:\\\\StableDiffusion\\\\sd-webui-forge-classic\\\\config.json"
+            "default": "/Users/blakeross/Projects/sd-webui-forge-neo/config.json"
           },
           "gradio_debug": {
             "type": "boolean",
@@ -3798,7 +3792,7 @@
             "title": "Gradio Allowed Path",
             "description": "add path to gradio's allowed_paths, make it possible to serve files from it",
             "default": [
-              "D:\\StableDiffusion\\sd-webui-forge-classic"
+              "/Users/blakeross/Projects/sd-webui-forge-neo"
             ]
           },
           "styles_file": {
@@ -3829,18 +3823,6 @@
             "type": "boolean",
             "title": "Disable Console Progressbars",
             "description": "do not output progressbars to console",
-            "default": false
-          },
-          "enable_console_prompts": {
-            "type": "boolean",
-            "title": "Enable Console Prompts",
-            "description": "does not do anything",
-            "default": false
-          },
-          "disable_safe_unpickle": {
-            "type": "boolean",
-            "title": "Disable Safe Unpickle",
-            "description": "disable checking pytorch models for malicious code",
             "default": false
           },
           "api": {
@@ -4016,31 +3998,31 @@
             "type": "string",
             "title": "Embeddings Dir",
             "description": "Directory for Textual Inversion model(s)",
-            "default": "D:\\\\StableDiffusion\\\\sd-webui-forge-classic\\\\models\\\\embeddings"
+            "default": "/Users/blakeross/Projects/sd-webui-forge-neo/models/embeddings"
           },
           "localizations_dir": {
             "type": "string",
             "title": "Localizations Dir",
             "description": "Directory for localization file(s)",
-            "default": "D:\\\\StableDiffusion\\\\sd-webui-forge-classic\\\\localizations"
+            "default": "/Users/blakeross/Projects/sd-webui-forge-neo/localizations"
           },
           "codeformer_models_path": {
             "type": "string",
             "title": "Codeformer Models Path",
             "description": "Directory for CodeFormer model file(s)",
-            "default": "D:\\\\StableDiffusion\\\\sd-webui-forge-classic\\\\models\\\\Codeformer"
+            "default": "/Users/blakeross/Projects/sd-webui-forge-neo/models/Codeformer"
           },
           "gfpgan_models_path": {
             "type": "string",
             "title": "Gfpgan Models Path",
             "description": "Directory for GFPGAN model file(s)",
-            "default": "D:\\\\StableDiffusion\\\\sd-webui-forge-classic\\\\models\\\\GFPGAN"
+            "default": "/Users/blakeross/Projects/sd-webui-forge-neo/models/GFPGAN"
           },
           "esrgan_models_path": {
             "type": "string",
             "title": "Esrgan Models Path",
             "description": "Directory for ESRGAN model file(s)",
-            "default": "D:\\\\StableDiffusion\\\\sd-webui-forge-classic\\\\models\\\\ESRGAN"
+            "default": "/Users/blakeross/Projects/sd-webui-forge-neo/models/ESRGAN"
           },
           "forge_ref_a1111_home": {
             "title": "Forge Ref A1111 Home",
@@ -4075,35 +4057,30 @@
             "description": "Use the uv package manager with symlink",
             "default": false
           },
-          "use_cpu": {
-            "items": {},
-            "type": "array",
-            "title": "Use Cpu",
-            "description": "required by adetailer",
-            "default": []
+          "uv_local_cache": {
+            "type": "boolean",
+            "title": "Uv Local Cache",
+            "description": "Use the uv package manager with a local cache (.uv-cache) instead of the system-wide cache",
+            "default": false
           },
           "controlnet_dir": {
             "type": "string",
             "title": "Controlnet Dir",
             "description": "Path to directory with ControlNet models",
-            "default": "D:\\\\StableDiffusion\\\\sd-webui-forge-classic\\\\models\\\\ControlNet"
+            "default": "/Users/blakeross/Projects/sd-webui-forge-neo/models/ControlNet"
+          },
+          "controlnet_dirs": {
+            "items": {},
+            "type": "array",
+            "title": "Controlnet Dirs",
+            "description": "Directories for ControlNet model(s)",
+            "default": []
           },
           "controlnet_preprocessor_models_dir": {
             "type": "string",
             "title": "Controlnet Preprocessor Models Dir",
             "description": "Path to directory with Annotator models",
-            "default": "D:\\\\StableDiffusion\\\\sd-webui-forge-classic\\\\models\\\\ControlNetPreprocessor"
-          },
-          "configpresets_dir": {
-            "title": "Configpresets Dir",
-            "description": "[Extension][Config-Presets] Path to directory with Config Presets configuration files (use forward slashes or double blackslashes). Default config files will be created if none exist.",
-            "type": "string"
-          },
-          "image_browser_tmp_db": {
-            "type": "boolean",
-            "title": "Image Browser Tmp Db",
-            "description": "Copy database file to and from /tmp when transacting (workaround for filesystems sqlite does not support)",
-            "default": false
+            "default": "/Users/blakeross/Projects/sd-webui-forge-neo/models/ControlNetPreprocessor"
           },
           "controlnet_loglevel": {
             "type": "string",
@@ -4115,7 +4092,7 @@
             "type": "string",
             "title": "Lora Dir",
             "description": "Path to directory with Lora networks.",
-            "default": "D:\\\\StableDiffusion\\\\sd-webui-forge-classic\\\\models\\\\Lora"
+            "default": "/Users/blakeross/Projects/sd-webui-forge-neo/models/Lora"
           }
         },
         "type": "object",
@@ -4182,8 +4159,8 @@
           },
           "cuda": {
             "type": "object",
-            "title": "CUDA",
-            "description": "nVidia CUDA memory stats"
+            "title": "VRAM",
+            "description": "GPU memory stats"
           }
         },
         "type": "object",
@@ -4448,25 +4425,25 @@
           "outdir_txt2img_samples": {
             "title": "Outdir Txt2Img Samples",
             "description": "Output Directory for txt2img Images",
-            "default": "output\\\\txt2img-images",
+            "default": "output/txt2img-images",
             "type": "string"
           },
           "outdir_img2img_samples": {
             "title": "Outdir Img2Img Samples",
             "description": "Output Directory for img2img Images",
-            "default": "output\\\\img2img-images",
+            "default": "output/img2img-images",
             "type": "string"
           },
           "outdir_extras_samples": {
             "title": "Outdir Extras Samples",
             "description": "Output Directory for Extras Images",
-            "default": "output\\\\extras-images",
+            "default": "output/extras-images",
             "type": "string"
           },
           "outdir_videos": {
             "title": "Outdir Videos",
             "description": "Output Directory for Videos",
-            "default": "output\\\\videos",
+            "default": "output/videos",
             "type": "string"
           },
           "div00": {
@@ -4482,13 +4459,13 @@
           "outdir_txt2img_grids": {
             "title": "Outdir Txt2Img Grids",
             "description": "Output Directory for txt2img Grids",
-            "default": "output\\\\txt2img-grids",
+            "default": "output/txt2img-grids",
             "type": "string"
           },
           "outdir_img2img_grids": {
             "title": "Outdir Img2Img Grids",
             "description": "Output Directory for img2img Grids",
-            "default": "output\\\\img2img-grids",
+            "default": "output/img2img-grids",
             "type": "string"
           },
           "div01": {
@@ -4499,13 +4476,13 @@
           "outdir_save": {
             "title": "Outdir Save",
             "description": "Directory for manually saving images via the \"Save\" button",
-            "default": "output\\\\images",
+            "default": "output/images",
             "type": "string"
           },
           "outdir_init_images": {
             "title": "Outdir Init Images",
             "description": "Directory for saving img2img init images if enabled",
-            "default": "output\\\\init-images",
+            "default": "output/init-images",
             "type": "string"
           },
           "save_to_dirs": {
@@ -4605,6 +4582,12 @@
             "default": 1.0,
             "type": "number"
           },
+          "res_step": {
+            "title": "Res Step",
+            "description": "Resolution Step",
+            "default": 64,
+            "type": "number"
+          },
           "auto_launch_browser": {
             "title": "Auto Launch Browser",
             "description": "Launch the webui in browser on startup",
@@ -4658,6 +4641,26 @@
           "dump_stacks_on_signal": {
             "title": "Dump Stacks On Signal",
             "description": "Print the stack trace before terminating the webui via Ctrl + C",
+            "default": false
+          },
+          "confirm_leave": {
+            "title": "Confirm Leave",
+            "description": "Show a browser confirmation before leaving the page",
+            "default": false
+          },
+          "no_spellcheck": {
+            "title": "No Spellcheck",
+            "description": "Disable auto-correct / spellcheck for prompt fields",
+            "default": false
+          },
+          "keep_alive": {
+            "title": "Keep Alive",
+            "description": "Keep generating even when the WebUI browser tab is not in focus",
+            "default": false
+          },
+          "undo_redo": {
+            "title": "Undo Redo",
+            "description": "Enable undo / redo history for prompt fields",
             "default": false
           },
           "profiling_explanation": {
@@ -4772,6 +4775,11 @@
             "description": "",
             "default": ""
           },
+          "sdxl_01": {
+            "title": "Sdxl 01",
+            "description": "",
+            "default": ""
+          },
           "sdxl_crop_top": {
             "title": "Sdxl Crop Top",
             "description": "[SDXL] Crop-Top Coordinate",
@@ -4781,6 +4789,16 @@
             "title": "Sdxl Crop Left",
             "description": "[SDXL] Crop-Left Coordinate",
             "default": 0
+          },
+          "sdxl_00": {
+            "title": "Sdxl 00",
+            "description": "",
+            "default": ""
+          },
+          "sdxl_11": {
+            "title": "Sdxl 11",
+            "description": "",
+            "default": ""
           },
           "sdxl_refiner_low_aesthetic_score": {
             "title": "Sdxl Refiner Low Aesthetic Score",
@@ -4793,6 +4811,16 @@
             "description": "[SDXL] High Aesthetic Score",
             "default": 6.0,
             "type": "number"
+          },
+          "sdxl_10": {
+            "title": "Sdxl 10",
+            "description": "",
+            "default": ""
+          },
+          "sdxl_zero_neg": {
+            "title": "Sdxl Zero Neg",
+            "description": "[SDXL] Zero out the conditioning when negative prompt is empty",
+            "default": false
           },
           "divlumina": {
             "title": "Divlumina",
@@ -4811,15 +4839,36 @@
             "default": "You are an assistant designed to generate low-quality images based on textual prompts. <Prompt Start>",
             "type": "string"
           },
-          "divqwen": {
-            "title": "Divqwen",
+          "divmisc": {
+            "title": "Divmisc",
             "description": "",
             "default": ""
           },
           "qwen_vae_resize": {
             "title": "Qwen Vae Resize",
-            "description": "Resize input image to 1 megapixel for Qwen-Image-Edit ref_latent",
+            "description": "[Qwen-Image-Edit] Resize input image to 1 megapixel for ref_latent",
             "default": false
+          },
+          "klein_no_reference": {
+            "title": "Klein No Reference",
+            "description": "[Klein] Disable Reference",
+            "default": false
+          },
+          "anima_do_reference": {
+            "title": "Anima Do Reference",
+            "description": "[Anima] Enable Reference",
+            "default": false
+          },
+          "krea2_do_reference": {
+            "title": "Krea2 Do Reference",
+            "description": "[Krea2] Enable Reference",
+            "default": false
+          },
+          "reference_explanation": {
+            "title": "Reference Explanation",
+            "description": "",
+            "default": "<b>Note:</b> Remember to change the setting before txt2img to clear the reference",
+            "type": "string"
           },
           "sd_vae_explanation": {
             "title": "Sd Vae Explanation",
@@ -4833,12 +4882,6 @@
             "default": "Automatic",
             "type": "string"
           },
-          "sd_vae_overrides_per_model_preferences": {
-            "title": "Sd Vae Overrides Per Model Preferences",
-            "description": "\"SD VAE\" option overrides per-model preference",
-            "default": true,
-            "type": "boolean"
-          },
           "sd_vae_encode_method": {
             "title": "Sd Vae Encode Method",
             "description": "VAE for Encoding",
@@ -4850,6 +4893,39 @@
             "description": "VAE for Decoding",
             "default": "Full",
             "type": "string"
+          },
+          "txt2img_upscale_single_batch": {
+            "title": "Txt2Img Upscale Single Batch",
+            "description": "When using the [\u2728] button, lock the Batch Count and Batch Size to 1 regardless of the UI values",
+            "default": true,
+            "type": "boolean"
+          },
+          "txt2img_upscale_same_seed": {
+            "title": "Txt2Img Upscale Same Seed",
+            "description": "When using the [\u2728] button, pass the Seed of the input image instead of the UI value",
+            "default": true,
+            "type": "boolean"
+          },
+          "hires_button_gallery_insert": {
+            "title": "Hires Button Gallery Insert",
+            "description": "When using the [\u2728] button, insert the upscaled image to the gallery",
+            "default": false
+          },
+          "hires_insert_index": {
+            "title": "Hires Insert Index",
+            "description": "When the above option is enabled, automatically select the upscaled image",
+            "default": true,
+            "type": "boolean"
+          },
+          "use_old_hires_fix_width_height": {
+            "title": "Use Old Hires Fix Width Height",
+            "description": "For Hires. Fix, use Width/Height sliders to set the final resolution",
+            "default": false
+          },
+          "hires_fix_use_firstpass_conds": {
+            "title": "Hires Fix Use Firstpass Conds",
+            "description": "For Hires. Fix, calculate conds of Hires. pass using Extra Networks of the normal pass",
+            "default": false
           },
           "inpainting_mask_weight": {
             "title": "Inpainting Mask Weight",
@@ -4946,6 +5022,11 @@
             "description": "In img2img Batch, use the input filenames when saving",
             "default": false
           },
+          "img2img_inpaint_precise_mask": {
+            "title": "Img2Img Inpaint Precise Mask",
+            "description": "Process the \"Mask blur\" in fp32 instead of uint8 precision",
+            "default": false
+          },
           "cross_attention_optimization": {
             "title": "Cross Attention Optimization",
             "description": "Cross Attention Optimization",
@@ -5014,59 +5095,6 @@
           "token_merging_no_rand": {
             "title": "Token Merging No Rand",
             "description": "Token Merging - No Random",
-            "default": false
-          },
-          "compatibility_explanation": {
-            "title": "Compatibility Explanation",
-            "description": "",
-            "default": "Don't touch these unless you know what you are doing...",
-            "type": "string"
-          },
-          "forge_try_reproduce": {
-            "title": "Forge Try Reproduce",
-            "description": "Try to reproduce the results from external software",
-            "default": "None",
-            "type": "string"
-          },
-          "auto_backcompat": {
-            "title": "Auto Backcompat",
-            "description": "Automatic backward compatibility",
-            "default": true,
-            "type": "boolean"
-          },
-          "use_old_karras_scheduler_sigmas": {
-            "title": "Use Old Karras Scheduler Sigmas",
-            "description": "Use old karras scheduler sigmas (0.1 to 10).",
-            "default": false
-          },
-          "no_dpmpp_sde_batch_determinism": {
-            "title": "No Dpmpp Sde Batch Determinism",
-            "description": "Do not make DPM++ SDE deterministic across different batch sizes.",
-            "default": false
-          },
-          "use_old_hires_fix_width_height": {
-            "title": "Use Old Hires Fix Width Height",
-            "description": "For hires fix, use width/height sliders to set final resolution rather than first pass (disables Upscale by, Resize width/height to).",
-            "default": false
-          },
-          "hires_fix_use_firstpass_conds": {
-            "title": "Hires Fix Use Firstpass Conds",
-            "description": "For hires fix, calculate conds of second pass using extra networks of first pass.",
-            "default": false
-          },
-          "use_old_scheduling": {
-            "title": "Use Old Scheduling",
-            "description": "Use old prompt editing timelines.",
-            "default": false
-          },
-          "use_downcasted_alpha_bar": {
-            "title": "Use Downcasted Alpha Bar",
-            "description": "Downcast model alphas_cumprod to fp16 before sampling. For reproducing old seeds.",
-            "default": false
-          },
-          "sdxl_zero_neg": {
-            "title": "Sdxl Zero Neg",
-            "description": "For SDXL, zero out the conditioning when negative prompt is empty",
             "default": false
           },
           "extra_networks_tree_view_style": {
@@ -5173,7 +5201,8 @@
           "show_refiner": {
             "title": "Show Refiner",
             "description": "Display the Refiner Accordion",
-            "default": false
+            "default": true,
+            "type": "boolean"
           },
           "refiner_fast_sd": {
             "title": "Refiner Fast Sd",
@@ -5184,18 +5213,6 @@
             "title": "Refiner Use Steps",
             "description": "Switch based on \"steps\" instead",
             "default": false
-          },
-          "refiner_lora_replacement": {
-            "title": "Refiner Lora Replacement",
-            "description": "Lora Replacements",
-            "default": "high_noise=low_noise",
-            "type": "string"
-          },
-          "refiner_lora_explanation": {
-            "title": "Refiner Lora Explanation",
-            "description": "",
-            "default": "Use the \"Lora Replacements\" to load different LoRAs between the normal pass and the refiner pass.<br>\nSeparate the original and the target with an equal sign; Place each entry in its own line.",
-            "type": "string"
           },
           "keyedit_precision_attention": {
             "title": "Keyedit Precision Attention",
@@ -5300,17 +5317,6 @@
             "default": "Subdirectory",
             "type": "string"
           },
-          "hires_button_gallery_insert": {
-            "title": "Hires Button Gallery Insert",
-            "description": "When using the [\u2728] button, insert the upscaled image to the gallery",
-            "default": false
-          },
-          "hires_insert_index": {
-            "title": "Hires Insert Index",
-            "description": "When the above option is enabled, automatically select the upscaled image",
-            "default": true,
-            "type": "boolean"
-          },
           "show_rescale_cfg": {
             "title": "Show Rescale Cfg",
             "description": "Display the Rescale CFG Slider",
@@ -5341,25 +5347,32 @@
             "description": "Close the Accordion on startup",
             "default": false
           },
+          "remove_image_on_hover": {
+            "title": "Remove Image On Hover",
+            "description": "For image inputs in Extras and PNG Info, remove the current image when dragging another image over it",
+            "default": true,
+            "type": "boolean"
+          },
           "forbidden_knowledge": {
             "title": "Forbidden Knowledge",
             "description": "Forbidden Knowledge",
             "default": false
           },
+          "div_prompt": {
+            "title": "Div Prompt",
+            "description": "",
+            "default": ""
+          },
+          "prompt_box_style": {
+            "title": "Prompt Box Style",
+            "description": "Prompt Layout",
+            "default": "Default",
+            "type": "string"
+          },
           "div_classic": {
             "title": "Div Classic",
             "description": "",
             "default": ""
-          },
-          "scrollable_prompt_box": {
-            "title": "Scrollable Prompt Box",
-            "description": "Scrollable Prompt Layout",
-            "default": false
-          },
-          "compact_prompt_box": {
-            "title": "Compact Prompt Box",
-            "description": "Compact Prompt Layout",
-            "default": false
           },
           "dimensions_and_batch_together": {
             "title": "Dimensions And Batch Together",
@@ -5459,6 +5472,16 @@
             "default": true,
             "type": "boolean"
           },
+          "send_image_info_not_ui": {
+            "title": "Send Image Info Not Ui",
+            "description": "Send the Parameters in the infotext instead of the UI fields when using the \"Send to\" buttons",
+            "default": false
+          },
+          "allow_i2i_send_info": {
+            "title": "Allow I2I Send Info",
+            "description": "Send the Parameters too when using the \"Send to\" buttons in img2img tab",
+            "default": false
+          },
           "enable_reloading_ui_scripts": {
             "title": "Enable Reloading Ui Scripts",
             "description": "Additionally reload the \"modules.ui\" scripts when using \"Reload UI\"",
@@ -5493,18 +5516,6 @@
             "default": true,
             "type": "boolean"
           },
-          "add_vae_name_to_info": {
-            "title": "Add Vae Name To Info",
-            "description": "Add VAE name to infotext",
-            "default": true,
-            "type": "boolean"
-          },
-          "add_vae_hash_to_info": {
-            "title": "Add Vae Hash To Info",
-            "description": "Add VAE hash to infotext",
-            "default": true,
-            "type": "boolean"
-          },
           "add_user_name_to_info": {
             "title": "Add User Name To Info",
             "description": "Add user name to infotext when authenticated",
@@ -5513,6 +5524,18 @@
           "add_version_to_infotext": {
             "title": "Add Version To Infotext",
             "description": "Add webui version to infotext",
+            "default": true,
+            "type": "boolean"
+          },
+          "disable_weights_auto_swap": {
+            "title": "Disable Weights Auto Swap",
+            "description": "Ignore the Checkpoint when reading infotext",
+            "default": true,
+            "type": "boolean"
+          },
+          "disable_modules_auto_swap": {
+            "title": "Disable Modules Auto Swap",
+            "description": "Ignore the VAE / Text Encoder when reading infotext",
             "default": true,
             "type": "boolean"
           },
@@ -5588,6 +5611,11 @@
           "hide_samplers": {
             "title": "Hide Samplers",
             "description": "Hide Samplers",
+            "default": []
+          },
+          "hide_schedulers": {
+            "title": "Hide Schedulers",
+            "description": "Hide Schedulers",
             "default": []
           },
           "eta_ddim": {
@@ -5852,13 +5880,13 @@
           },
           "sd_t2i_sampler": {
             "title": "Sd T2I Sampler",
-            "description": "txt2img sampler",
+            "description": "txt2img Sampler",
             "default": "Euler a",
             "type": "string"
           },
           "sd_t2i_scheduler": {
             "title": "Sd T2I Scheduler",
-            "description": "txt2img scheduler",
+            "description": "txt2img Scheduler",
             "default": "Automatic",
             "type": "string"
           },
@@ -5874,13 +5902,13 @@
           },
           "sd_i2i_sampler": {
             "title": "Sd I2I Sampler",
-            "description": "img2img sampler",
+            "description": "img2img Sampler",
             "default": "Euler a",
             "type": "string"
           },
           "sd_i2i_scheduler": {
             "title": "Sd I2I Scheduler",
-            "description": "img2img scheduler",
+            "description": "img2img Scheduler",
             "default": "Automatic",
             "type": "string"
           },
@@ -5942,6 +5970,28 @@
           },
           "sd_cfg0": {
             "title": "Sd Cfg0",
+            "description": "",
+            "default": ""
+          },
+          "sd_batch1": {
+            "title": "Sd Batch1",
+            "description": "",
+            "default": ""
+          },
+          "sd_t2i_batch_size": {
+            "title": "Sd T2I Batch Size",
+            "description": "txt2img Batch Size",
+            "default": 1,
+            "type": "number"
+          },
+          "sd_i2i_batch_size": {
+            "title": "Sd I2I Batch Size",
+            "description": "img2img Batch Size",
+            "default": 1,
+            "type": "number"
+          },
+          "sd_batch0": {
+            "title": "Sd Batch0",
             "description": "",
             "default": ""
           },
@@ -6007,13 +6057,13 @@
           },
           "xl_t2i_sampler": {
             "title": "Xl T2I Sampler",
-            "description": "txt2img sampler",
+            "description": "txt2img Sampler",
             "default": "Euler a",
             "type": "string"
           },
           "xl_t2i_scheduler": {
             "title": "Xl T2I Scheduler",
-            "description": "txt2img scheduler",
+            "description": "txt2img Scheduler",
             "default": "Automatic",
             "type": "string"
           },
@@ -6029,13 +6079,13 @@
           },
           "xl_i2i_sampler": {
             "title": "Xl I2I Sampler",
-            "description": "img2img sampler",
+            "description": "img2img Sampler",
             "default": "Euler a",
             "type": "string"
           },
           "xl_i2i_scheduler": {
             "title": "Xl I2I Scheduler",
-            "description": "img2img scheduler",
+            "description": "img2img Scheduler",
             "default": "Automatic",
             "type": "string"
           },
@@ -6097,6 +6147,61 @@
           },
           "xl_cfg0": {
             "title": "Xl Cfg0",
+            "description": "",
+            "default": ""
+          },
+          "xl_show_shift": {
+            "title": "Xl Show Shift",
+            "description": "Display Shift Slider",
+            "default": false
+          },
+          "xl_dcfg1": {
+            "title": "Xl Dcfg1",
+            "description": "",
+            "default": ""
+          },
+          "xl_t2i_dcfg": {
+            "title": "Xl T2I Dcfg",
+            "description": "txt2img Shift",
+            "default": 9.0,
+            "type": "number"
+          },
+          "xl_t2i_hr_dcfg": {
+            "title": "Xl T2I Hr Dcfg",
+            "description": "txt2img Hires. Shift",
+            "default": 9.0,
+            "type": "number"
+          },
+          "xl_i2i_dcfg": {
+            "title": "Xl I2I Dcfg",
+            "description": "img2img Shift",
+            "default": 9.0,
+            "type": "number"
+          },
+          "xl_dcfg0": {
+            "title": "Xl Dcfg0",
+            "description": "",
+            "default": ""
+          },
+          "xl_batch1": {
+            "title": "Xl Batch1",
+            "description": "",
+            "default": ""
+          },
+          "xl_t2i_batch_size": {
+            "title": "Xl T2I Batch Size",
+            "description": "txt2img Batch Size",
+            "default": 1,
+            "type": "number"
+          },
+          "xl_i2i_batch_size": {
+            "title": "Xl I2I Batch Size",
+            "description": "img2img Batch Size",
+            "default": 1,
+            "type": "number"
+          },
+          "xl_batch0": {
+            "title": "Xl Batch0",
             "description": "",
             "default": ""
           },
@@ -6162,13 +6267,13 @@
           },
           "flux_t2i_sampler": {
             "title": "Flux T2I Sampler",
-            "description": "txt2img sampler",
+            "description": "txt2img Sampler",
             "default": "Euler",
             "type": "string"
           },
           "flux_t2i_scheduler": {
             "title": "Flux T2I Scheduler",
-            "description": "txt2img scheduler",
+            "description": "txt2img Scheduler",
             "default": "Beta",
             "type": "string"
           },
@@ -6184,13 +6289,13 @@
           },
           "flux_i2i_sampler": {
             "title": "Flux I2I Sampler",
-            "description": "img2img sampler",
+            "description": "img2img Sampler",
             "default": "Euler",
             "type": "string"
           },
           "flux_i2i_scheduler": {
             "title": "Flux I2I Scheduler",
-            "description": "img2img scheduler",
+            "description": "img2img Scheduler",
             "default": "Beta",
             "type": "string"
           },
@@ -6283,6 +6388,28 @@
             "description": "",
             "default": ""
           },
+          "flux_batch1": {
+            "title": "Flux Batch1",
+            "description": "",
+            "default": ""
+          },
+          "flux_t2i_batch_size": {
+            "title": "Flux T2I Batch Size",
+            "description": "txt2img Batch Size",
+            "default": 1,
+            "type": "number"
+          },
+          "flux_i2i_batch_size": {
+            "title": "Flux I2I Batch Size",
+            "description": "img2img Batch Size",
+            "default": 1,
+            "type": "number"
+          },
+          "flux_batch0": {
+            "title": "Flux Batch0",
+            "description": "",
+            "default": ""
+          },
           "flux_t2i_dim1": {
             "title": "Flux T2I Dim1",
             "description": "",
@@ -6345,13 +6472,13 @@
           },
           "klein_t2i_sampler": {
             "title": "Klein T2I Sampler",
-            "description": "txt2img sampler",
+            "description": "txt2img Sampler",
             "default": "Euler",
             "type": "string"
           },
           "klein_t2i_scheduler": {
             "title": "Klein T2I Scheduler",
-            "description": "txt2img scheduler",
+            "description": "txt2img Scheduler",
             "default": "Beta",
             "type": "string"
           },
@@ -6367,13 +6494,13 @@
           },
           "klein_i2i_sampler": {
             "title": "Klein I2I Sampler",
-            "description": "img2img sampler",
+            "description": "img2img Sampler",
             "default": "Euler",
             "type": "string"
           },
           "klein_i2i_scheduler": {
             "title": "Klein I2I Scheduler",
-            "description": "img2img scheduler",
+            "description": "img2img Scheduler",
             "default": "Beta",
             "type": "string"
           },
@@ -6435,6 +6562,28 @@
           },
           "klein_cfg0": {
             "title": "Klein Cfg0",
+            "description": "",
+            "default": ""
+          },
+          "klein_batch1": {
+            "title": "Klein Batch1",
+            "description": "",
+            "default": ""
+          },
+          "klein_t2i_batch_size": {
+            "title": "Klein T2I Batch Size",
+            "description": "txt2img Batch Size",
+            "default": 1,
+            "type": "number"
+          },
+          "klein_i2i_batch_size": {
+            "title": "Klein I2I Batch Size",
+            "description": "img2img Batch Size",
+            "default": 1,
+            "type": "number"
+          },
+          "klein_batch0": {
+            "title": "Klein Batch0",
             "description": "",
             "default": ""
           },
@@ -6500,13 +6649,13 @@
           },
           "qwen_t2i_sampler": {
             "title": "Qwen T2I Sampler",
-            "description": "txt2img sampler",
+            "description": "txt2img Sampler",
             "default": "LCM",
             "type": "string"
           },
           "qwen_t2i_scheduler": {
             "title": "Qwen T2I Scheduler",
-            "description": "txt2img scheduler",
+            "description": "txt2img Scheduler",
             "default": "Normal",
             "type": "string"
           },
@@ -6522,13 +6671,13 @@
           },
           "qwen_i2i_sampler": {
             "title": "Qwen I2I Sampler",
-            "description": "img2img sampler",
+            "description": "img2img Sampler",
             "default": "LCM",
             "type": "string"
           },
           "qwen_i2i_scheduler": {
             "title": "Qwen I2I Scheduler",
-            "description": "img2img scheduler",
+            "description": "img2img Scheduler",
             "default": "Normal",
             "type": "string"
           },
@@ -6590,6 +6739,28 @@
           },
           "qwen_cfg0": {
             "title": "Qwen Cfg0",
+            "description": "",
+            "default": ""
+          },
+          "qwen_batch1": {
+            "title": "Qwen Batch1",
+            "description": "",
+            "default": ""
+          },
+          "qwen_t2i_batch_size": {
+            "title": "Qwen T2I Batch Size",
+            "description": "txt2img Batch Size",
+            "default": 1,
+            "type": "number"
+          },
+          "qwen_i2i_batch_size": {
+            "title": "Qwen I2I Batch Size",
+            "description": "img2img Batch Size",
+            "default": 1,
+            "type": "number"
+          },
+          "qwen_batch0": {
+            "title": "Qwen Batch0",
             "description": "",
             "default": ""
           },
@@ -6655,13 +6826,13 @@
           },
           "lumina_t2i_sampler": {
             "title": "Lumina T2I Sampler",
-            "description": "txt2img sampler",
+            "description": "txt2img Sampler",
             "default": "Res Multistep",
             "type": "string"
           },
           "lumina_t2i_scheduler": {
             "title": "Lumina T2I Scheduler",
-            "description": "txt2img scheduler",
+            "description": "txt2img Scheduler",
             "default": "Simple",
             "type": "string"
           },
@@ -6677,13 +6848,13 @@
           },
           "lumina_i2i_sampler": {
             "title": "Lumina I2I Sampler",
-            "description": "img2img sampler",
+            "description": "img2img Sampler",
             "default": "Res Multistep",
             "type": "string"
           },
           "lumina_i2i_scheduler": {
             "title": "Lumina I2I Scheduler",
-            "description": "img2img scheduler",
+            "description": "img2img Scheduler",
             "default": "Simple",
             "type": "string"
           },
@@ -6748,6 +6919,12 @@
             "description": "",
             "default": ""
           },
+          "lumina_show_shift": {
+            "title": "Lumina Show Shift",
+            "description": "Display Shift Slider",
+            "default": true,
+            "type": "boolean"
+          },
           "lumina_dcfg1": {
             "title": "Lumina Dcfg1",
             "description": "",
@@ -6773,6 +6950,28 @@
           },
           "lumina_dcfg0": {
             "title": "Lumina Dcfg0",
+            "description": "",
+            "default": ""
+          },
+          "lumina_batch1": {
+            "title": "Lumina Batch1",
+            "description": "",
+            "default": ""
+          },
+          "lumina_t2i_batch_size": {
+            "title": "Lumina T2I Batch Size",
+            "description": "txt2img Batch Size",
+            "default": 1,
+            "type": "number"
+          },
+          "lumina_i2i_batch_size": {
+            "title": "Lumina I2I Batch Size",
+            "description": "img2img Batch Size",
+            "default": 1,
+            "type": "number"
+          },
+          "lumina_batch0": {
+            "title": "Lumina Batch0",
             "description": "",
             "default": ""
           },
@@ -6838,13 +7037,13 @@
           },
           "zit_t2i_sampler": {
             "title": "Zit T2I Sampler",
-            "description": "txt2img sampler",
+            "description": "txt2img Sampler",
             "default": "Euler",
             "type": "string"
           },
           "zit_t2i_scheduler": {
             "title": "Zit T2I Scheduler",
-            "description": "txt2img scheduler",
+            "description": "txt2img Scheduler",
             "default": "Beta",
             "type": "string"
           },
@@ -6860,13 +7059,13 @@
           },
           "zit_i2i_sampler": {
             "title": "Zit I2I Sampler",
-            "description": "img2img sampler",
+            "description": "img2img Sampler",
             "default": "Euler",
             "type": "string"
           },
           "zit_i2i_scheduler": {
             "title": "Zit I2I Scheduler",
-            "description": "img2img scheduler",
+            "description": "img2img Scheduler",
             "default": "Beta",
             "type": "string"
           },
@@ -6931,6 +7130,12 @@
             "description": "",
             "default": ""
           },
+          "zit_show_shift": {
+            "title": "Zit Show Shift",
+            "description": "Display Shift Slider",
+            "default": true,
+            "type": "boolean"
+          },
           "zit_dcfg1": {
             "title": "Zit Dcfg1",
             "description": "",
@@ -6956,6 +7161,28 @@
           },
           "zit_dcfg0": {
             "title": "Zit Dcfg0",
+            "description": "",
+            "default": ""
+          },
+          "zit_batch1": {
+            "title": "Zit Batch1",
+            "description": "",
+            "default": ""
+          },
+          "zit_t2i_batch_size": {
+            "title": "Zit T2I Batch Size",
+            "description": "txt2img Batch Size",
+            "default": 1,
+            "type": "number"
+          },
+          "zit_i2i_batch_size": {
+            "title": "Zit I2I Batch Size",
+            "description": "img2img Batch Size",
+            "default": 1,
+            "type": "number"
+          },
+          "zit_batch0": {
+            "title": "Zit Batch0",
             "description": "",
             "default": ""
           },
@@ -7021,13 +7248,13 @@
           },
           "wan_t2i_sampler": {
             "title": "Wan T2I Sampler",
-            "description": "txt2img sampler",
+            "description": "txt2img Sampler",
             "default": "Euler",
             "type": "string"
           },
           "wan_t2i_scheduler": {
             "title": "Wan T2I Scheduler",
-            "description": "txt2img scheduler",
+            "description": "txt2img Scheduler",
             "default": "Simple",
             "type": "string"
           },
@@ -7043,13 +7270,13 @@
           },
           "wan_i2i_sampler": {
             "title": "Wan I2I Sampler",
-            "description": "img2img sampler",
+            "description": "img2img Sampler",
             "default": "Euler",
             "type": "string"
           },
           "wan_i2i_scheduler": {
             "title": "Wan I2I Scheduler",
-            "description": "img2img scheduler",
+            "description": "img2img Scheduler",
             "default": "Simple",
             "type": "string"
           },
@@ -7114,6 +7341,12 @@
             "description": "",
             "default": ""
           },
+          "wan_show_shift": {
+            "title": "Wan Show Shift",
+            "description": "Display Shift Slider",
+            "default": true,
+            "type": "boolean"
+          },
           "wan_dcfg1": {
             "title": "Wan Dcfg1",
             "description": "",
@@ -7139,6 +7372,28 @@
           },
           "wan_dcfg0": {
             "title": "Wan Dcfg0",
+            "description": "",
+            "default": ""
+          },
+          "wan_batch1": {
+            "title": "Wan Batch1",
+            "description": "",
+            "default": ""
+          },
+          "wan_t2i_batch_size": {
+            "title": "Wan T2I Batch Size",
+            "description": "txt2img Frames",
+            "default": 1,
+            "type": "number"
+          },
+          "wan_i2i_batch_size": {
+            "title": "Wan I2I Batch Size",
+            "description": "img2img Frames",
+            "default": 1,
+            "type": "number"
+          },
+          "wan_batch0": {
+            "title": "Wan Batch0",
             "description": "",
             "default": ""
           },
@@ -7204,13 +7459,13 @@
           },
           "anima_t2i_sampler": {
             "title": "Anima T2I Sampler",
-            "description": "txt2img sampler",
+            "description": "txt2img Sampler",
             "default": "ER SDE",
             "type": "string"
           },
           "anima_t2i_scheduler": {
             "title": "Anima T2I Scheduler",
-            "description": "txt2img scheduler",
+            "description": "txt2img Scheduler",
             "default": "Beta",
             "type": "string"
           },
@@ -7226,13 +7481,13 @@
           },
           "anima_i2i_sampler": {
             "title": "Anima I2I Sampler",
-            "description": "img2img sampler",
+            "description": "img2img Sampler",
             "default": "ER SDE",
             "type": "string"
           },
           "anima_i2i_scheduler": {
             "title": "Anima I2I Scheduler",
-            "description": "img2img scheduler",
+            "description": "img2img Scheduler",
             "default": "Beta",
             "type": "string"
           },
@@ -7297,6 +7552,62 @@
             "description": "",
             "default": ""
           },
+          "anima_show_shift": {
+            "title": "Anima Show Shift",
+            "description": "Display Shift Slider",
+            "default": true,
+            "type": "boolean"
+          },
+          "anima_dcfg1": {
+            "title": "Anima Dcfg1",
+            "description": "",
+            "default": ""
+          },
+          "anima_t2i_dcfg": {
+            "title": "Anima T2I Dcfg",
+            "description": "txt2img Shift",
+            "default": 3.0,
+            "type": "number"
+          },
+          "anima_t2i_hr_dcfg": {
+            "title": "Anima T2I Hr Dcfg",
+            "description": "txt2img Hires. Shift",
+            "default": 3.0,
+            "type": "number"
+          },
+          "anima_i2i_dcfg": {
+            "title": "Anima I2I Dcfg",
+            "description": "img2img Shift",
+            "default": 3.0,
+            "type": "number"
+          },
+          "anima_dcfg0": {
+            "title": "Anima Dcfg0",
+            "description": "",
+            "default": ""
+          },
+          "anima_batch1": {
+            "title": "Anima Batch1",
+            "description": "",
+            "default": ""
+          },
+          "anima_t2i_batch_size": {
+            "title": "Anima T2I Batch Size",
+            "description": "txt2img Batch Size",
+            "default": 1,
+            "type": "number"
+          },
+          "anima_i2i_batch_size": {
+            "title": "Anima I2I Batch Size",
+            "description": "img2img Batch Size",
+            "default": 1,
+            "type": "number"
+          },
+          "anima_batch0": {
+            "title": "Anima Batch0",
+            "description": "",
+            "default": ""
+          },
           "anima_t2i_dim1": {
             "title": "Anima T2I Dim1",
             "description": "",
@@ -7334,6 +7645,637 @@
           },
           "anima_i2i_dim0": {
             "title": "Anima I2I Dim0",
+            "description": "",
+            "default": ""
+          },
+          "forge_checkpoint_ernie": {
+            "title": "Forge Checkpoint Ernie",
+            "description": ""
+          },
+          "forge_additional_modules_ernie": {
+            "title": "Forge Additional Modules Ernie",
+            "description": "",
+            "default": []
+          },
+          "forge_unet_storage_dtype_ernie": {
+            "title": "Forge Unet Storage Dtype Ernie",
+            "description": "",
+            "default": "Automatic",
+            "type": "string"
+          },
+          "ernie_t2i_ss1": {
+            "title": "Ernie T2I Ss1",
+            "description": "",
+            "default": ""
+          },
+          "ernie_t2i_sampler": {
+            "title": "Ernie T2I Sampler",
+            "description": "txt2img Sampler",
+            "default": "Euler",
+            "type": "string"
+          },
+          "ernie_t2i_scheduler": {
+            "title": "Ernie T2I Scheduler",
+            "description": "txt2img Scheduler",
+            "default": "Simple",
+            "type": "string"
+          },
+          "ernie_t2i_ss0": {
+            "title": "Ernie T2I Ss0",
+            "description": "",
+            "default": ""
+          },
+          "ernie_i2i_ss1": {
+            "title": "Ernie I2I Ss1",
+            "description": "",
+            "default": ""
+          },
+          "ernie_i2i_sampler": {
+            "title": "Ernie I2I Sampler",
+            "description": "img2img Sampler",
+            "default": "Euler",
+            "type": "string"
+          },
+          "ernie_i2i_scheduler": {
+            "title": "Ernie I2I Scheduler",
+            "description": "img2img Scheduler",
+            "default": "Simple",
+            "type": "string"
+          },
+          "ernie_i2i_ss0": {
+            "title": "Ernie I2I Ss0",
+            "description": "",
+            "default": ""
+          },
+          "ernie_steps1": {
+            "title": "Ernie Steps1",
+            "description": "",
+            "default": ""
+          },
+          "ernie_t2i_step": {
+            "title": "Ernie T2I Step",
+            "description": "txt2img Steps",
+            "default": 8,
+            "type": "number"
+          },
+          "ernie_t2i_hr_step": {
+            "title": "Ernie T2I Hr Step",
+            "description": "txt2img Hires. Steps",
+            "default": 8,
+            "type": "number"
+          },
+          "ernie_i2i_step": {
+            "title": "Ernie I2I Step",
+            "description": "img2img Steps",
+            "default": 8,
+            "type": "number"
+          },
+          "ernie_steps0": {
+            "title": "Ernie Steps0",
+            "description": "",
+            "default": ""
+          },
+          "ernie_cfg1": {
+            "title": "Ernie Cfg1",
+            "description": "",
+            "default": ""
+          },
+          "ernie_t2i_cfg": {
+            "title": "Ernie T2I Cfg",
+            "description": "txt2img CFG",
+            "default": 1.0,
+            "type": "number"
+          },
+          "ernie_t2i_hr_cfg": {
+            "title": "Ernie T2I Hr Cfg",
+            "description": "txt2img Hires. CFG",
+            "default": 1.0,
+            "type": "number"
+          },
+          "ernie_i2i_cfg": {
+            "title": "Ernie I2I Cfg",
+            "description": "img2img CFG",
+            "default": 1.0,
+            "type": "number"
+          },
+          "ernie_cfg0": {
+            "title": "Ernie Cfg0",
+            "description": "",
+            "default": ""
+          },
+          "ernie_show_shift": {
+            "title": "Ernie Show Shift",
+            "description": "Display Shift Slider",
+            "default": true,
+            "type": "boolean"
+          },
+          "ernie_dcfg1": {
+            "title": "Ernie Dcfg1",
+            "description": "",
+            "default": ""
+          },
+          "ernie_t2i_dcfg": {
+            "title": "Ernie T2I Dcfg",
+            "description": "txt2img Shift",
+            "default": 3.0,
+            "type": "number"
+          },
+          "ernie_t2i_hr_dcfg": {
+            "title": "Ernie T2I Hr Dcfg",
+            "description": "txt2img Hires. Shift",
+            "default": 3.0,
+            "type": "number"
+          },
+          "ernie_i2i_dcfg": {
+            "title": "Ernie I2I Dcfg",
+            "description": "img2img Shift",
+            "default": 3.0,
+            "type": "number"
+          },
+          "ernie_dcfg0": {
+            "title": "Ernie Dcfg0",
+            "description": "",
+            "default": ""
+          },
+          "ernie_batch1": {
+            "title": "Ernie Batch1",
+            "description": "",
+            "default": ""
+          },
+          "ernie_t2i_batch_size": {
+            "title": "Ernie T2I Batch Size",
+            "description": "txt2img Batch Size",
+            "default": 1,
+            "type": "number"
+          },
+          "ernie_i2i_batch_size": {
+            "title": "Ernie I2I Batch Size",
+            "description": "img2img Batch Size",
+            "default": 1,
+            "type": "number"
+          },
+          "ernie_batch0": {
+            "title": "Ernie Batch0",
+            "description": "",
+            "default": ""
+          },
+          "ernie_t2i_dim1": {
+            "title": "Ernie T2I Dim1",
+            "description": "",
+            "default": ""
+          },
+          "ernie_t2i_width": {
+            "title": "Ernie T2I Width",
+            "description": "txt2img Width",
+            "default": 0
+          },
+          "ernie_i2i_width": {
+            "title": "Ernie I2I Width",
+            "description": "img2img Width",
+            "default": 0
+          },
+          "ernie_t2i_dim0": {
+            "title": "Ernie T2I Dim0",
+            "description": "",
+            "default": ""
+          },
+          "ernie_i2i_dim1": {
+            "title": "Ernie I2I Dim1",
+            "description": "",
+            "default": ""
+          },
+          "ernie_t2i_height": {
+            "title": "Ernie T2I Height",
+            "description": "txt2img Height",
+            "default": 0
+          },
+          "ernie_i2i_height": {
+            "title": "Ernie I2I Height",
+            "description": "img2img Height",
+            "default": 0
+          },
+          "ernie_i2i_dim0": {
+            "title": "Ernie I2I Dim0",
+            "description": "",
+            "default": ""
+          },
+          "forge_checkpoint_pid": {
+            "title": "Forge Checkpoint Pid",
+            "description": ""
+          },
+          "forge_additional_modules_pid": {
+            "title": "Forge Additional Modules Pid",
+            "description": "",
+            "default": []
+          },
+          "forge_unet_storage_dtype_pid": {
+            "title": "Forge Unet Storage Dtype Pid",
+            "description": "",
+            "default": "Automatic",
+            "type": "string"
+          },
+          "pid_t2i_ss1": {
+            "title": "Pid T2I Ss1",
+            "description": "",
+            "default": ""
+          },
+          "pid_t2i_sampler": {
+            "title": "Pid T2I Sampler",
+            "description": "txt2img Sampler",
+            "default": "LCM",
+            "type": "string"
+          },
+          "pid_t2i_scheduler": {
+            "title": "Pid T2I Scheduler",
+            "description": "txt2img Scheduler",
+            "default": "Simple",
+            "type": "string"
+          },
+          "pid_t2i_ss0": {
+            "title": "Pid T2I Ss0",
+            "description": "",
+            "default": ""
+          },
+          "pid_i2i_ss1": {
+            "title": "Pid I2I Ss1",
+            "description": "",
+            "default": ""
+          },
+          "pid_i2i_sampler": {
+            "title": "Pid I2I Sampler",
+            "description": "img2img Sampler",
+            "default": "LCM",
+            "type": "string"
+          },
+          "pid_i2i_scheduler": {
+            "title": "Pid I2I Scheduler",
+            "description": "img2img Scheduler",
+            "default": "Simple",
+            "type": "string"
+          },
+          "pid_i2i_ss0": {
+            "title": "Pid I2I Ss0",
+            "description": "",
+            "default": ""
+          },
+          "pid_steps1": {
+            "title": "Pid Steps1",
+            "description": "",
+            "default": ""
+          },
+          "pid_t2i_step": {
+            "title": "Pid T2I Step",
+            "description": "txt2img Steps",
+            "default": 4,
+            "type": "number"
+          },
+          "pid_t2i_hr_step": {
+            "title": "Pid T2I Hr Step",
+            "description": "txt2img Hires. Steps",
+            "default": 4,
+            "type": "number"
+          },
+          "pid_i2i_step": {
+            "title": "Pid I2I Step",
+            "description": "img2img Steps",
+            "default": 4,
+            "type": "number"
+          },
+          "pid_steps0": {
+            "title": "Pid Steps0",
+            "description": "",
+            "default": ""
+          },
+          "pid_cfg1": {
+            "title": "Pid Cfg1",
+            "description": "",
+            "default": ""
+          },
+          "pid_t2i_cfg": {
+            "title": "Pid T2I Cfg",
+            "description": "txt2img CFG",
+            "default": 1.0,
+            "type": "number"
+          },
+          "pid_t2i_hr_cfg": {
+            "title": "Pid T2I Hr Cfg",
+            "description": "txt2img Hires. CFG",
+            "default": 1.0,
+            "type": "number"
+          },
+          "pid_i2i_cfg": {
+            "title": "Pid I2I Cfg",
+            "description": "img2img CFG",
+            "default": 1.0,
+            "type": "number"
+          },
+          "pid_cfg0": {
+            "title": "Pid Cfg0",
+            "description": "",
+            "default": ""
+          },
+          "pid_show_shift": {
+            "title": "Pid Show Shift",
+            "description": "Display Shift Slider",
+            "default": false
+          },
+          "pid_dcfg1": {
+            "title": "Pid Dcfg1",
+            "description": "",
+            "default": ""
+          },
+          "pid_t2i_dcfg": {
+            "title": "Pid T2I Dcfg",
+            "description": "txt2img Shift",
+            "default": 1.5,
+            "type": "number"
+          },
+          "pid_t2i_hr_dcfg": {
+            "title": "Pid T2I Hr Dcfg",
+            "description": "txt2img Hires. Shift",
+            "default": 1.5,
+            "type": "number"
+          },
+          "pid_i2i_dcfg": {
+            "title": "Pid I2I Dcfg",
+            "description": "img2img Shift",
+            "default": 1.5,
+            "type": "number"
+          },
+          "pid_dcfg0": {
+            "title": "Pid Dcfg0",
+            "description": "",
+            "default": ""
+          },
+          "pid_batch1": {
+            "title": "Pid Batch1",
+            "description": "",
+            "default": ""
+          },
+          "pid_t2i_batch_size": {
+            "title": "Pid T2I Batch Size",
+            "description": "txt2img Batch Size",
+            "default": 1,
+            "type": "number"
+          },
+          "pid_i2i_batch_size": {
+            "title": "Pid I2I Batch Size",
+            "description": "img2img Batch Size",
+            "default": 1,
+            "type": "number"
+          },
+          "pid_batch0": {
+            "title": "Pid Batch0",
+            "description": "",
+            "default": ""
+          },
+          "pid_t2i_dim1": {
+            "title": "Pid T2I Dim1",
+            "description": "",
+            "default": ""
+          },
+          "pid_t2i_width": {
+            "title": "Pid T2I Width",
+            "description": "txt2img Width",
+            "default": 0
+          },
+          "pid_i2i_width": {
+            "title": "Pid I2I Width",
+            "description": "img2img Width",
+            "default": 0
+          },
+          "pid_t2i_dim0": {
+            "title": "Pid T2I Dim0",
+            "description": "",
+            "default": ""
+          },
+          "pid_i2i_dim1": {
+            "title": "Pid I2I Dim1",
+            "description": "",
+            "default": ""
+          },
+          "pid_t2i_height": {
+            "title": "Pid T2I Height",
+            "description": "txt2img Height",
+            "default": 0
+          },
+          "pid_i2i_height": {
+            "title": "Pid I2I Height",
+            "description": "img2img Height",
+            "default": 0
+          },
+          "pid_i2i_dim0": {
+            "title": "Pid I2I Dim0",
+            "description": "",
+            "default": ""
+          },
+          "forge_checkpoint_krea": {
+            "title": "Forge Checkpoint Krea",
+            "description": ""
+          },
+          "forge_additional_modules_krea": {
+            "title": "Forge Additional Modules Krea",
+            "description": "",
+            "default": []
+          },
+          "forge_unet_storage_dtype_krea": {
+            "title": "Forge Unet Storage Dtype Krea",
+            "description": "",
+            "default": "Automatic",
+            "type": "string"
+          },
+          "krea_t2i_ss1": {
+            "title": "Krea T2I Ss1",
+            "description": "",
+            "default": ""
+          },
+          "krea_t2i_sampler": {
+            "title": "Krea T2I Sampler",
+            "description": "txt2img Sampler",
+            "default": "Euler",
+            "type": "string"
+          },
+          "krea_t2i_scheduler": {
+            "title": "Krea T2I Scheduler",
+            "description": "txt2img Scheduler",
+            "default": "Simple",
+            "type": "string"
+          },
+          "krea_t2i_ss0": {
+            "title": "Krea T2I Ss0",
+            "description": "",
+            "default": ""
+          },
+          "krea_i2i_ss1": {
+            "title": "Krea I2I Ss1",
+            "description": "",
+            "default": ""
+          },
+          "krea_i2i_sampler": {
+            "title": "Krea I2I Sampler",
+            "description": "img2img Sampler",
+            "default": "Euler",
+            "type": "string"
+          },
+          "krea_i2i_scheduler": {
+            "title": "Krea I2I Scheduler",
+            "description": "img2img Scheduler",
+            "default": "Simple",
+            "type": "string"
+          },
+          "krea_i2i_ss0": {
+            "title": "Krea I2I Ss0",
+            "description": "",
+            "default": ""
+          },
+          "krea_steps1": {
+            "title": "Krea Steps1",
+            "description": "",
+            "default": ""
+          },
+          "krea_t2i_step": {
+            "title": "Krea T2I Step",
+            "description": "txt2img Steps",
+            "default": 8,
+            "type": "number"
+          },
+          "krea_t2i_hr_step": {
+            "title": "Krea T2I Hr Step",
+            "description": "txt2img Hires. Steps",
+            "default": 8,
+            "type": "number"
+          },
+          "krea_i2i_step": {
+            "title": "Krea I2I Step",
+            "description": "img2img Steps",
+            "default": 8,
+            "type": "number"
+          },
+          "krea_steps0": {
+            "title": "Krea Steps0",
+            "description": "",
+            "default": ""
+          },
+          "krea_cfg1": {
+            "title": "Krea Cfg1",
+            "description": "",
+            "default": ""
+          },
+          "krea_t2i_cfg": {
+            "title": "Krea T2I Cfg",
+            "description": "txt2img CFG",
+            "default": 1.0,
+            "type": "number"
+          },
+          "krea_t2i_hr_cfg": {
+            "title": "Krea T2I Hr Cfg",
+            "description": "txt2img Hires. CFG",
+            "default": 1.0,
+            "type": "number"
+          },
+          "krea_i2i_cfg": {
+            "title": "Krea I2I Cfg",
+            "description": "img2img CFG",
+            "default": 1.0,
+            "type": "number"
+          },
+          "krea_cfg0": {
+            "title": "Krea Cfg0",
+            "description": "",
+            "default": ""
+          },
+          "krea_show_shift": {
+            "title": "Krea Show Shift",
+            "description": "Display Shift Slider",
+            "default": false
+          },
+          "krea_dcfg1": {
+            "title": "Krea Dcfg1",
+            "description": "",
+            "default": ""
+          },
+          "krea_t2i_dcfg": {
+            "title": "Krea T2I Dcfg",
+            "description": "txt2img Shift",
+            "default": 1.15,
+            "type": "number"
+          },
+          "krea_t2i_hr_dcfg": {
+            "title": "Krea T2I Hr Dcfg",
+            "description": "txt2img Hires. Shift",
+            "default": 1.15,
+            "type": "number"
+          },
+          "krea_i2i_dcfg": {
+            "title": "Krea I2I Dcfg",
+            "description": "img2img Shift",
+            "default": 1.15,
+            "type": "number"
+          },
+          "krea_dcfg0": {
+            "title": "Krea Dcfg0",
+            "description": "",
+            "default": ""
+          },
+          "krea_batch1": {
+            "title": "Krea Batch1",
+            "description": "",
+            "default": ""
+          },
+          "krea_t2i_batch_size": {
+            "title": "Krea T2I Batch Size",
+            "description": "txt2img Batch Size",
+            "default": 1,
+            "type": "number"
+          },
+          "krea_i2i_batch_size": {
+            "title": "Krea I2I Batch Size",
+            "description": "img2img Batch Size",
+            "default": 1,
+            "type": "number"
+          },
+          "krea_batch0": {
+            "title": "Krea Batch0",
+            "description": "",
+            "default": ""
+          },
+          "krea_t2i_dim1": {
+            "title": "Krea T2I Dim1",
+            "description": "",
+            "default": ""
+          },
+          "krea_t2i_width": {
+            "title": "Krea T2I Width",
+            "description": "txt2img Width",
+            "default": 0
+          },
+          "krea_i2i_width": {
+            "title": "Krea I2I Width",
+            "description": "img2img Width",
+            "default": 0
+          },
+          "krea_t2i_dim0": {
+            "title": "Krea T2I Dim0",
+            "description": "",
+            "default": ""
+          },
+          "krea_i2i_dim1": {
+            "title": "Krea I2I Dim1",
+            "description": "",
+            "default": ""
+          },
+          "krea_t2i_height": {
+            "title": "Krea T2I Height",
+            "description": "txt2img Height",
+            "default": 0
+          },
+          "krea_i2i_height": {
+            "title": "Krea I2I Height",
+            "description": "img2img Height",
+            "default": 0
+          },
+          "krea_i2i_dim0": {
+            "title": "Krea I2I Dim0",
             "description": "",
             "default": ""
           },
@@ -7596,35 +8538,11 @@
           "auto",
           "fp16_triton",
           "fp16_cuda",
-          "fp8_cuda"
+          "fp8_cuda",
+          "fp8_cuda++",
+          "sageattn3"
         ],
         "title": "SageAttentionFuncs"
-      },
-      "Sage_pv_accum_dtype": {
-        "type": "string",
-        "enum": [
-          "fp16",
-          "fp32",
-          "fp16+fp32",
-          "fp32+fp32"
-        ],
-        "title": "Sage_pv_accum_dtype"
-      },
-      "Sage_qk_quant_gran": {
-        "type": "string",
-        "enum": [
-          "per_warp",
-          "per_thread"
-        ],
-        "title": "Sage_qk_quant_gran"
-      },
-      "Sage_quantization_backend": {
-        "type": "string",
-        "enum": [
-          "cuda",
-          "triton"
-        ],
-        "title": "Sage_quantization_backend"
       },
       "SamplerItem": {
         "properties": {
@@ -7943,6 +8861,10 @@
             "title": "Refiner Switch At",
             "type": "number"
           },
+          "refiner_cfg": {
+            "title": "Refiner Cfg",
+            "type": "number"
+          },
           "disable_extra_networks": {
             "title": "Disable Extra Networks",
             "default": false,
@@ -8016,10 +8938,8 @@
             "title": "Force Task Id",
             "type": "string"
           },
-          "hr_distilled_cfg": {
-            "title": "Hr Distilled Cfg",
-            "default": 3.5,
-            "type": "number"
+          "init_latent": {
+            "title": "Init Latent"
           },
           "sampler_index": {
             "type": "string",
@@ -8213,6 +9133,10 @@
           },
           "refiner_switch_at": {
             "title": "Refiner Switch At",
+            "type": "number"
+          },
+          "refiner_cfg": {
+            "title": "Refiner Cfg",
             "type": "number"
           },
           "disable_extra_networks": {

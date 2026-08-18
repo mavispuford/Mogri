@@ -42,10 +42,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
         public bool? Bf16TextEnc { get; set; }
         /// <summary>Store the diffusion model in bf16</summary>
         public bool? Bf16Unet { get; set; }
-        /// <summary>Run the VAE in bf16</summary>
+        /// <summary>Store the VAE in bf16</summary>
         public bool? Bf16Vae { get; set; }
-        /// <summary>install bitsandbytes for 4-bit inference</summary>
-        public bool? Bnb { get; set; }
         /// <summary>Directories for Checkpoint model(s)</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -62,14 +60,6 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string CodeformerModelsPath { get; set; }
 #endif
-        /// <summary>[Extension][Config-Presets] Path to directory with Config Presets configuration files (use forward slashes or double blackslashes). Default config files will be created if none exist.</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public string? ConfigpresetsDir { get; set; }
-#nullable restore
-#else
-        public string ConfigpresetsDir { get; set; }
-#endif
         /// <summary>Path to directory with ControlNet models</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -77,6 +67,14 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #nullable restore
 #else
         public string ControlnetDir { get; set; }
+#endif
+        /// <summary>Directories for ControlNet model(s)</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? ControlnetDirs { get; set; }
+#nullable restore
+#else
+        public UntypedNode ControlnetDirs { get; set; }
 #endif
         /// <summary>Set the log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -162,12 +160,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
         public bool? DisableFlash { get; set; }
         /// <summary>Disable the low VRAM warnings</summary>
         public bool? DisableGpuWarning { get; set; }
-        /// <summary>Disable ipex.optimize default when loading models with Intel&apos;s Extension for PyTorch</summary>
-        public bool? DisableIpexOptimize { get; set; }
         /// <summary>Don&apos;t use mmap when loading safetensors</summary>
         public bool? DisableMmap { get; set; }
-        /// <summary>disable checking pytorch models for malicious code</summary>
-        public bool? DisableSafeUnpickle { get; set; }
         /// <summary>disable sageattention</summary>
         public bool? DisableSage { get; set; }
         /// <summary>Aggressively offload to RAM instead of keeping models in VRAM when possible</summary>
@@ -192,10 +186,10 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string EmbeddingsDir { get; set; }
 #endif
-        /// <summary>does not do anything</summary>
-        public bool? EnableConsolePrompts { get; set; }
         /// <summary>enable extensions tab regardless of other options</summary>
         public bool? EnableInsecureExtensionAccess { get; set; }
+        /// <summary>Enable the use of Triton backend in comfy-kitchen</summary>
+        public bool? EnableTritonBackend { get; set; }
         /// <summary>Directory for ESRGAN model file(s)</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -204,6 +198,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string EsrganModelsPath { get; set; }
 #endif
+        /// <summary>improve memory allocation ; experimental</summary>
+        public bool? ExpandableSegments { get; set; }
         /// <summary>==SUPPRESS==</summary>
         public bool? F { get; set; }
         /// <summary>torch.backends.cuda.matmul.allow_fp16_accumulation</summary>
@@ -222,7 +218,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
         public bool? ForceNonBlocking { get; set; }
         /// <summary>Always upcast to fp32 during attention</summary>
         public bool? ForceUpcastAttention { get; set; }
-        /// <summary>Force VAE to use xformers attention (meant to use with PyTorch cross attention)</summary>
+        /// <summary>Force VAE to use xformers attention (meant to be used with --use-pytorch-cross-attention)</summary>
         public bool? ForceXformersVae { get; set; }
         /// <summary>Look for models in an existing installation of Automatic1111 Webui</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -252,13 +248,13 @@ namespace Mogri.Clients.SdForgeNeo.Models
         public bool? Fp16TextEnc { get; set; }
         /// <summary>Store the diffusion model in fp16</summary>
         public bool? Fp16Unet { get; set; }
-        /// <summary>Run the VAE in fp16 (might cause black images)</summary>
+        /// <summary>Store the VAE in fp16 (might cause black images)</summary>
         public bool? Fp16Vae { get; set; }
         /// <summary>Store the text encoder in fp32</summary>
         public bool? Fp32TextEnc { get; set; }
         /// <summary>Store the diffusion model in fp32</summary>
         public bool? Fp32Unet { get; set; }
-        /// <summary>Run the VAE in full precision fp32</summary>
+        /// <summary>Store the VAE in full precision fp32</summary>
         public bool? Fp32Vae { get; set; }
         /// <summary>Store the text encoder in fp8_e4m3fn</summary>
         public bool? Fp8E4m3fnTextEnc { get; set; }
@@ -336,8 +332,6 @@ namespace Mogri.Clients.SdForgeNeo.Models
         public bool? HideUiDirConfig { get; set; }
         /// <summary>Keeps models in VRAM after usage</summary>
         public bool? Highvram { get; set; }
-        /// <summary>Copy database file to and from /tmp when transacting (workaround for filesystems sqlite does not support)</summary>
-        public bool? ImageBrowserTmpDb { get; set; }
         /// <summary>launch gradio with 0.0.0.0 as server name, allowing to respond to network requests</summary>
         public bool? Listen { get; set; }
         /// <summary>Directory for localization file(s)</summary>
@@ -416,8 +410,6 @@ namespace Mogri.Clients.SdForgeNeo.Models
         public bool? NoHashing { get; set; }
         /// <summary>disable read prompt from last generation feature; settings this argument will not create &apos;--data_path/params.txt&apos; file</summary>
         public bool? NoPromptHistory { get; set; }
-        /// <summary>Force NORMAL_VRAM in case LOW_VRAM gets automatically enabled</summary>
-        public bool? Normalvram { get; set; }
         /// <summary>When even LOW_VRAM is still not enough</summary>
         public bool? Novram { get; set; }
         /// <summary>use api=True to launch the API instead of the webui</summary>
@@ -450,14 +442,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #endif
         /// <summary>install sageattention</summary>
         public bool? Sage { get; set; }
-        /// <summary>The sage2_function property</summary>
-        public global::Mogri.Clients.SdForgeNeo.Models.SageAttentionFuncs? Sage2Function { get; set; }
-        /// <summary>The sage_accum_dtype property</summary>
-        public global::Mogri.Clients.SdForgeNeo.Models.Sage_pv_accum_dtype? SageAccumDtype { get; set; }
-        /// <summary>The sage_quant_gran property</summary>
-        public global::Mogri.Clients.SdForgeNeo.Models.Sage_qk_quant_gran? SageQuantGran { get; set; }
-        /// <summary>The sage_quantization_backend property</summary>
-        public global::Mogri.Clients.SdForgeNeo.Models.Sage_quantization_backend? SageQuantizationBackend { get; set; }
+        /// <summary>The sage_function property</summary>
+        public global::Mogri.Clients.SdForgeNeo.Models.SageAttentionFuncs? SageFunction { get; set; }
         /// <summary>Sets hostname of server</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -518,6 +504,8 @@ namespace Mogri.Clients.SdForgeNeo.Models
 #else
         public string Theme { get; set; }
 #endif
+        /// <summary>reduce VAE memory usage ; increase processing time</summary>
+        public int? TiledConv2d { get; set; }
         /// <summary>set timeout_keep_alive for uvicorn</summary>
         public int? TimeoutKeepAlive { get; set; }
         /// <summary>Partially enables TLS, requires --tls-keyfile to fully function</summary>
@@ -558,20 +546,16 @@ namespace Mogri.Clients.SdForgeNeo.Models
         public bool? UnixFilenamesSanitization { get; set; }
         /// <summary>launch.py argument: download updates for all extensions when starting the program</summary>
         public bool? UpdateAllExtensions { get; set; }
-        /// <summary>required by adetailer</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public UntypedNode? UseCpu { get; set; }
-#nullable restore
-#else
-        public UntypedNode UseCpu { get; set; }
-#endif
+        /// <summary>use Comfy-Kitchen attention</summary>
+        public bool? UseCkAttention { get; set; }
         /// <summary>Use the PyTorch cross attention (override sageattention/flash_attn/xformers)</summary>
         public bool? UsePytorchCrossAttention { get; set; }
         /// <summary>use textbox for seeds in UI (no up/down, but possible to input long seeds)</summary>
         public bool? UseTextboxSeed { get; set; }
         /// <summary>Use the uv package manager</summary>
         public bool? Uv { get; set; }
+        /// <summary>Use the uv package manager with a local cache (.uv-cache) instead of the system-wide cache</summary>
+        public bool? UvLocalCache { get; set; }
         /// <summary>Use the uv package manager with symlink</summary>
         public bool? UvSymlink { get; set; }
         /// <summary>Set the device to load VAE (e.g. &quot;cuda:1&quot;)</summary>
@@ -598,22 +582,19 @@ namespace Mogri.Clients.SdForgeNeo.Models
         public Flags()
         {
             AdditionalData = new Dictionary<string, object>();
-            CodeformerModelsPath = "D:\\StableDiffusion\\sd-webui-forge-classic\\models\\Codeformer";
-            ControlnetDir = "D:\\StableDiffusion\\sd-webui-forge-classic\\models\\ControlNet";
+            CodeformerModelsPath = "/Users/blakeross/Projects/sd-webui-forge-neo/models/Codeformer";
+            ControlnetDir = "/Users/blakeross/Projects/sd-webui-forge-neo/models/ControlNet";
             ControlnetLoglevel = "INFO";
-            ControlnetPreprocessorModelsDir = "D:\\StableDiffusion\\sd-webui-forge-classic\\models\\ControlNetPreprocessor";
-            DataDir = "D:\\StableDiffusion\\sd-webui-forge-classic";
-            EmbeddingsDir = "D:\\StableDiffusion\\sd-webui-forge-classic\\models\\embeddings";
-            EsrganModelsPath = "D:\\StableDiffusion\\sd-webui-forge-classic\\models\\ESRGAN";
-            GfpganModelsPath = "D:\\StableDiffusion\\sd-webui-forge-classic\\models\\GFPGAN";
-            LocalizationsDir = "D:\\StableDiffusion\\sd-webui-forge-classic\\localizations";
-            LoraDir = "D:\\StableDiffusion\\sd-webui-forge-classic\\models\\Lora";
-            Sage2Function = global::Mogri.Clients.SdForgeNeo.Models.SageAttentionFuncs.Auto;
-            SageAccumDtype = global::Mogri.Clients.SdForgeNeo.Models.Sage_pv_accum_dtype.Fp32;
-            SageQuantGran = global::Mogri.Clients.SdForgeNeo.Models.Sage_qk_quant_gran.Per_thread;
-            SageQuantizationBackend = global::Mogri.Clients.SdForgeNeo.Models.Sage_quantization_backend.Triton;
-            UiConfigFile = "D:\\StableDiffusion\\sd-webui-forge-classic\\ui-config.json";
-            UiSettingsFile = "D:\\StableDiffusion\\sd-webui-forge-classic\\config.json";
+            ControlnetPreprocessorModelsDir = "/Users/blakeross/Projects/sd-webui-forge-neo/models/ControlNetPreprocessor";
+            DataDir = "/Users/blakeross/Projects/sd-webui-forge-neo";
+            EmbeddingsDir = "/Users/blakeross/Projects/sd-webui-forge-neo/models/embeddings";
+            EsrganModelsPath = "/Users/blakeross/Projects/sd-webui-forge-neo/models/ESRGAN";
+            GfpganModelsPath = "/Users/blakeross/Projects/sd-webui-forge-neo/models/GFPGAN";
+            LocalizationsDir = "/Users/blakeross/Projects/sd-webui-forge-neo/localizations";
+            LoraDir = "/Users/blakeross/Projects/sd-webui-forge-neo/models/Lora";
+            SageFunction = global::Mogri.Clients.SdForgeNeo.Models.SageAttentionFuncs.Auto;
+            UiConfigFile = "/Users/blakeross/Projects/sd-webui-forge-neo/ui-config.json";
+            UiSettingsFile = "/Users/blakeross/Projects/sd-webui-forge-neo/config.json";
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -645,11 +626,10 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "bf16_text_enc", n => { Bf16TextEnc = n.GetBoolValue(); } },
                 { "bf16_unet", n => { Bf16Unet = n.GetBoolValue(); } },
                 { "bf16_vae", n => { Bf16Vae = n.GetBoolValue(); } },
-                { "bnb", n => { Bnb = n.GetBoolValue(); } },
                 { "ckpt_dirs", n => { CkptDirs = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "codeformer_models_path", n => { CodeformerModelsPath = n.GetStringValue(); } },
-                { "configpresets_dir", n => { ConfigpresetsDir = n.GetStringValue(); } },
                 { "controlnet_dir", n => { ControlnetDir = n.GetStringValue(); } },
+                { "controlnet_dirs", n => { ControlnetDirs = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "controlnet_loglevel", n => { ControlnetLoglevel = n.GetStringValue(); } },
                 { "controlnet_preprocessor_models_dir", n => { ControlnetPreprocessorModelsDir = n.GetStringValue(); } },
                 { "cors_allow_origins", n => { CorsAllowOrigins = n.GetStringValue(); } },
@@ -668,18 +648,17 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "disable_extra_extensions", n => { DisableExtraExtensions = n.GetBoolValue(); } },
                 { "disable_flash", n => { DisableFlash = n.GetBoolValue(); } },
                 { "disable_gpu_warning", n => { DisableGpuWarning = n.GetBoolValue(); } },
-                { "disable_ipex_optimize", n => { DisableIpexOptimize = n.GetBoolValue(); } },
                 { "disable_mmap", n => { DisableMmap = n.GetBoolValue(); } },
-                { "disable_safe_unpickle", n => { DisableSafeUnpickle = n.GetBoolValue(); } },
                 { "disable_sage", n => { DisableSage = n.GetBoolValue(); } },
                 { "disable_smart_memory", n => { DisableSmartMemory = n.GetBoolValue(); } },
                 { "disable_tls_verify", n => { DisableTlsVerify = n.GetStringValue(); } },
                 { "disable_xformers", n => { DisableXformers = n.GetBoolValue(); } },
                 { "dump_sysinfo", n => { DumpSysinfo = n.GetBoolValue(); } },
                 { "embeddings_dir", n => { EmbeddingsDir = n.GetStringValue(); } },
-                { "enable_console_prompts", n => { EnableConsolePrompts = n.GetBoolValue(); } },
                 { "enable_insecure_extension_access", n => { EnableInsecureExtensionAccess = n.GetBoolValue(); } },
+                { "enable_triton_backend", n => { EnableTritonBackend = n.GetBoolValue(); } },
                 { "esrgan_models_path", n => { EsrganModelsPath = n.GetStringValue(); } },
+                { "expandable_segments", n => { ExpandableSegments = n.GetBoolValue(); } },
                 { "f", n => { F = n.GetBoolValue(); } },
                 { "fast_fp16", n => { FastFp16 = n.GetBoolValue(); } },
                 { "fast_fp8", n => { FastFp8 = n.GetBoolValue(); } },
@@ -716,7 +695,6 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "gradio_debug", n => { GradioDebug = n.GetBoolValue(); } },
                 { "hide_ui_dir_config", n => { HideUiDirConfig = n.GetBoolValue(); } },
                 { "highvram", n => { Highvram = n.GetBoolValue(); } },
-                { "image_browser_tmp_db", n => { ImageBrowserTmpDb = n.GetBoolValue(); } },
                 { "listen", n => { Listen = n.GetBoolValue(); } },
                 { "localizations_dir", n => { LocalizationsDir = n.GetStringValue(); } },
                 { "log_startup", n => { LogStartup = n.GetBoolValue(); } },
@@ -732,7 +710,6 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "no_gradio_queue", n => { NoGradioQueue = n.GetBoolValue(); } },
                 { "no_hashing", n => { NoHashing = n.GetBoolValue(); } },
                 { "no_prompt_history", n => { NoPromptHistory = n.GetBoolValue(); } },
-                { "normalvram", n => { Normalvram = n.GetBoolValue(); } },
                 { "novram", n => { Novram = n.GetBoolValue(); } },
                 { "nowebui", n => { Nowebui = n.GetBoolValue(); } },
                 { "nunchaku", n => { Nunchaku = n.GetBoolValue(); } },
@@ -743,10 +720,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "reinstall_xformers", n => { ReinstallXformers = n.GetBoolValue(); } },
                 { "reserve_vram", n => { ReserveVram = n.GetStringValue(); } },
                 { "sage", n => { Sage = n.GetBoolValue(); } },
-                { "sage2_function", n => { Sage2Function = n.GetEnumValue<global::Mogri.Clients.SdForgeNeo.Models.SageAttentionFuncs>(); } },
-                { "sage_accum_dtype", n => { SageAccumDtype = n.GetEnumValue<global::Mogri.Clients.SdForgeNeo.Models.Sage_pv_accum_dtype>(); } },
-                { "sage_quant_gran", n => { SageQuantGran = n.GetEnumValue<global::Mogri.Clients.SdForgeNeo.Models.Sage_qk_quant_gran>(); } },
-                { "sage_quantization_backend", n => { SageQuantizationBackend = n.GetEnumValue<global::Mogri.Clients.SdForgeNeo.Models.Sage_quantization_backend>(); } },
+                { "sage_function", n => { SageFunction = n.GetEnumValue<global::Mogri.Clients.SdForgeNeo.Models.SageAttentionFuncs>(); } },
                 { "server_name", n => { ServerName = n.GetStringValue(); } },
                 { "share", n => { Share = n.GetBoolValue(); } },
                 { "skip_install", n => { SkipInstall = n.GetBoolValue(); } },
@@ -759,6 +733,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "text_enc_device", n => { TextEncDevice = n.GetStringValue(); } },
                 { "text_encoder_dirs", n => { TextEncoderDirs = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "theme", n => { Theme = n.GetStringValue(); } },
+                { "tiled_conv2d", n => { TiledConv2d = n.GetIntValue(); } },
                 { "timeout_keep_alive", n => { TimeoutKeepAlive = n.GetIntValue(); } },
                 { "tls_certfile", n => { TlsCertfile = n.GetStringValue(); } },
                 { "tls_keyfile", n => { TlsKeyfile = n.GetStringValue(); } },
@@ -767,10 +742,11 @@ namespace Mogri.Clients.SdForgeNeo.Models
                 { "ui_settings_file", n => { UiSettingsFile = n.GetStringValue(); } },
                 { "unix_filenames_sanitization", n => { UnixFilenamesSanitization = n.GetBoolValue(); } },
                 { "update_all_extensions", n => { UpdateAllExtensions = n.GetBoolValue(); } },
-                { "use_cpu", n => { UseCpu = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "use_ck_attention", n => { UseCkAttention = n.GetBoolValue(); } },
                 { "use_pytorch_cross_attention", n => { UsePytorchCrossAttention = n.GetBoolValue(); } },
                 { "use_textbox_seed", n => { UseTextboxSeed = n.GetBoolValue(); } },
                 { "uv", n => { Uv = n.GetBoolValue(); } },
+                { "uv_local_cache", n => { UvLocalCache = n.GetBoolValue(); } },
                 { "uv_symlink", n => { UvSymlink = n.GetBoolValue(); } },
                 { "vae_device", n => { VaeDevice = n.GetStringValue(); } },
                 { "vae_dirs", n => { VaeDirs = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
@@ -796,11 +772,10 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteBoolValue("bf16_text_enc", Bf16TextEnc);
             writer.WriteBoolValue("bf16_unet", Bf16Unet);
             writer.WriteBoolValue("bf16_vae", Bf16Vae);
-            writer.WriteBoolValue("bnb", Bnb);
             writer.WriteObjectValue<UntypedNode>("ckpt_dirs", CkptDirs);
             writer.WriteStringValue("codeformer_models_path", CodeformerModelsPath);
-            writer.WriteStringValue("configpresets_dir", ConfigpresetsDir);
             writer.WriteStringValue("controlnet_dir", ControlnetDir);
+            writer.WriteObjectValue<UntypedNode>("controlnet_dirs", ControlnetDirs);
             writer.WriteStringValue("controlnet_loglevel", ControlnetLoglevel);
             writer.WriteStringValue("controlnet_preprocessor_models_dir", ControlnetPreprocessorModelsDir);
             writer.WriteStringValue("cors_allow_origins", CorsAllowOrigins);
@@ -819,18 +794,17 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteBoolValue("disable_extra_extensions", DisableExtraExtensions);
             writer.WriteBoolValue("disable_flash", DisableFlash);
             writer.WriteBoolValue("disable_gpu_warning", DisableGpuWarning);
-            writer.WriteBoolValue("disable_ipex_optimize", DisableIpexOptimize);
             writer.WriteBoolValue("disable_mmap", DisableMmap);
-            writer.WriteBoolValue("disable_safe_unpickle", DisableSafeUnpickle);
             writer.WriteBoolValue("disable_sage", DisableSage);
             writer.WriteBoolValue("disable_smart_memory", DisableSmartMemory);
             writer.WriteStringValue("disable_tls_verify", DisableTlsVerify);
             writer.WriteBoolValue("disable_xformers", DisableXformers);
             writer.WriteBoolValue("dump_sysinfo", DumpSysinfo);
             writer.WriteStringValue("embeddings_dir", EmbeddingsDir);
-            writer.WriteBoolValue("enable_console_prompts", EnableConsolePrompts);
             writer.WriteBoolValue("enable_insecure_extension_access", EnableInsecureExtensionAccess);
+            writer.WriteBoolValue("enable_triton_backend", EnableTritonBackend);
             writer.WriteStringValue("esrgan_models_path", EsrganModelsPath);
+            writer.WriteBoolValue("expandable_segments", ExpandableSegments);
             writer.WriteBoolValue("f", F);
             writer.WriteBoolValue("fast_fp16", FastFp16);
             writer.WriteBoolValue("fast_fp8", FastFp8);
@@ -867,7 +841,6 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteBoolValue("gradio_debug", GradioDebug);
             writer.WriteBoolValue("hide_ui_dir_config", HideUiDirConfig);
             writer.WriteBoolValue("highvram", Highvram);
-            writer.WriteBoolValue("image_browser_tmp_db", ImageBrowserTmpDb);
             writer.WriteBoolValue("listen", Listen);
             writer.WriteStringValue("localizations_dir", LocalizationsDir);
             writer.WriteStringValue("loglevel", Loglevel);
@@ -883,7 +856,6 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteBoolValue("no_gradio_queue", NoGradioQueue);
             writer.WriteBoolValue("no_hashing", NoHashing);
             writer.WriteBoolValue("no_prompt_history", NoPromptHistory);
-            writer.WriteBoolValue("normalvram", Normalvram);
             writer.WriteBoolValue("novram", Novram);
             writer.WriteBoolValue("nowebui", Nowebui);
             writer.WriteBoolValue("nunchaku", Nunchaku);
@@ -894,10 +866,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteBoolValue("reinstall_xformers", ReinstallXformers);
             writer.WriteStringValue("reserve_vram", ReserveVram);
             writer.WriteBoolValue("sage", Sage);
-            writer.WriteEnumValue<global::Mogri.Clients.SdForgeNeo.Models.SageAttentionFuncs>("sage2_function", Sage2Function);
-            writer.WriteEnumValue<global::Mogri.Clients.SdForgeNeo.Models.Sage_pv_accum_dtype>("sage_accum_dtype", SageAccumDtype);
-            writer.WriteEnumValue<global::Mogri.Clients.SdForgeNeo.Models.Sage_qk_quant_gran>("sage_quant_gran", SageQuantGran);
-            writer.WriteEnumValue<global::Mogri.Clients.SdForgeNeo.Models.Sage_quantization_backend>("sage_quantization_backend", SageQuantizationBackend);
+            writer.WriteEnumValue<global::Mogri.Clients.SdForgeNeo.Models.SageAttentionFuncs>("sage_function", SageFunction);
             writer.WriteStringValue("server_name", ServerName);
             writer.WriteBoolValue("share", Share);
             writer.WriteBoolValue("skip_install", SkipInstall);
@@ -910,6 +879,7 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteStringValue("text_enc_device", TextEncDevice);
             writer.WriteObjectValue<UntypedNode>("text_encoder_dirs", TextEncoderDirs);
             writer.WriteStringValue("theme", Theme);
+            writer.WriteIntValue("tiled_conv2d", TiledConv2d);
             writer.WriteIntValue("timeout_keep_alive", TimeoutKeepAlive);
             writer.WriteStringValue("tls_certfile", TlsCertfile);
             writer.WriteStringValue("tls_keyfile", TlsKeyfile);
@@ -918,10 +888,11 @@ namespace Mogri.Clients.SdForgeNeo.Models
             writer.WriteStringValue("ui_settings_file", UiSettingsFile);
             writer.WriteBoolValue("unix_filenames_sanitization", UnixFilenamesSanitization);
             writer.WriteBoolValue("update_all_extensions", UpdateAllExtensions);
-            writer.WriteObjectValue<UntypedNode>("use_cpu", UseCpu);
+            writer.WriteBoolValue("use_ck_attention", UseCkAttention);
             writer.WriteBoolValue("use_pytorch_cross_attention", UsePytorchCrossAttention);
             writer.WriteBoolValue("use_textbox_seed", UseTextboxSeed);
             writer.WriteBoolValue("uv", Uv);
+            writer.WriteBoolValue("uv_local_cache", UvLocalCache);
             writer.WriteBoolValue("uv_symlink", UvSymlink);
             writer.WriteStringValue("vae_device", VaeDevice);
             writer.WriteObjectValue<UntypedNode>("vae_dirs", VaeDirs);

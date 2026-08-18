@@ -6,7 +6,7 @@
     "version": "1.0.0",
     "license": {
       "name": "GNU General Public License v3.0",
-      "url": "https://github.com/comfyanonymous/ComfyUI/blob/master/LICENSE"
+      "url": "https://github.com/Comfy-Org/ComfyUI/blob/master/LICENSE"
     }
   },
   "servers": [
@@ -170,8 +170,8 @@
         "tags": [
           "workflow"
         ],
-        "summary": "Get information about current prompt execution",
-        "description": "Returns information about the current prompt in the execution queue",
+        "summary": "Get information about current prompt executions",
+        "description": "Returns information about current prompts in the execution queue",
         "operationId": "getPromptInfo",
         "responses": {
           "200": {
@@ -616,7 +616,8 @@
           "job"
         ],
         "summary": "Get execution history (v2)",
-        "description": "Retrieve execution history for the authenticated user with pagination support.\nReturns a lightweight history format with filtered prompt data (workflow removed from extra_pnginfo).\n",
+        "deprecated": true,
+        "description": "**Deprecated.** Use [`/api/jobs`](#tag/job/GET/api/jobs) instead. This endpoint is maintained for ComfyUI compatibility but will be removed in a future release; no removal date set.\n\nRetrieve execution history for the authenticated user with pagination support.\nReturns a lightweight history format with filtered prompt data (workflow removed from extra_pnginfo).\n",
         "operationId": "getHistory",
         "parameters": [
           {
@@ -679,7 +680,8 @@
           "job"
         ],
         "summary": "Get history for specific prompt",
-        "description": "Retrieve detailed execution history for a specific prompt ID.\nReturns full history data including complete prompt information.\n",
+        "deprecated": true,
+        "description": "**Deprecated.** Use [`/api/jobs/{job_id}`](#tag/job/GET/api/jobs/{job_id}) instead \u2014 the `prompt_id` returned by `/api/prompt` is the same value as `job_id`. This endpoint is maintained for ComfyUI compatibility but will be removed in a future release; no removal date set.\n\nRetrieve detailed execution history for a specific prompt ID.\nReturns full history data including complete prompt information.\n",
         "operationId": "getHistoryForPrompt",
         "parameters": [
           {
@@ -3018,7 +3020,7 @@
           "file"
         ],
         "summary": "Upload an image file",
-        "description": "Upload an image file to cloud storage",
+        "description": "Upload an image file to cloud storage.\n\nImage limits:\n  - Maximum file size: 50 MB\n  - Maximum width/height per edge: 16384 px\n  - Maximum total pixel count: 64 megapixels (67108864 pixels)\n\nUploads that exceed any of these limits are rejected with HTTP 400.\n",
         "operationId": "uploadImage",
         "requestBody": {
           "required": true,
@@ -3116,7 +3118,7 @@
           "file"
         ],
         "summary": "Upload a mask image",
-        "description": "Upload a mask image to be applied to an existing image",
+        "description": "Upload a mask image to be applied to an existing image.\n\nImage limits apply to both the uploaded mask and the referenced\noriginal image:\n  - Maximum file size: 50 MB\n  - Maximum width/height per edge: 16384 px\n  - Maximum total pixel count: 64 megapixels (67108864 pixels)\n\nUploads that exceed any of these limits are rejected with HTTP 400.\n",
         "operationId": "uploadMask",
         "requestBody": {
           "required": true,
@@ -3383,7 +3385,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "X-API-Key",
-        "description": "API key authentication. Generate an API key from your account settings\nat https://comfy.org/account. Pass the key in the X-API-Key header.\n"
+        "description": "API key authentication. Generate an API key from your account settings\nat https://platform.comfy.org/profile/api-keys. Pass the key in the X-API-Key header.\n"
       }
     },
     "schemas": {

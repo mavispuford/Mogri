@@ -22,7 +22,7 @@ public partial class CanvasPage
 
         if (Bitmap != null)
         {
-            canvas.DrawBitmap(Bitmap, Bitmap.Info.Rect, e.Info.Rect);
+            canvas.DrawBitmap(Bitmap, Bitmap.Info.Rect, e.Info.Rect, SKSamplingOptions.Default, null);
         }
     }
 
@@ -146,7 +146,7 @@ public partial class CanvasPage
 
         if (SegmentationBitmap != null)
         {
-            canvas.DrawBitmap(SegmentationBitmap, SegmentationBitmap.Info.Rect, e.Info.Rect);
+            canvas.DrawBitmap(SegmentationBitmap, SegmentationBitmap.Info.Rect, e.Info.Rect, SKSamplingOptions.Default, null);
         }
     }
 

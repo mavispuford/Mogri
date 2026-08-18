@@ -11,6 +11,8 @@ public class GenerationProfileTests
     [InlineData(ModelType.SDXL, 30, 6.0, null, "DPM++ 2M", "karras", 1024, 1024)]
     [InlineData(ModelType.Flux, 20, 1.0, 3.5, "Euler", "beta", 1024, 1024)]
     [InlineData(ModelType.ZImageTurbo, 8, 1.0, 3.5, "Euler", "beta", 1024, 1024)]
+    [InlineData(ModelType.Krea2Turbo, 8, 1.0, 1.15, "Euler", "Simple", 1024, 1024)]
+    [InlineData(ModelType.Krea2Raw, 52, 3.5, null, "Euler", "Simple", 1024, 1024)]
     public void GetDefault_ReturnsExpectedProfile(
         ModelType modelType,
         int expectedSteps,
@@ -60,6 +62,32 @@ public class GenerationProfileTests
         // Assert
         Assert.Equal("ae.safetensors", profile.DefaultVae);
         Assert.Equal("t5xxl", profile.DefaultTextEncoder);
+    }
+
+    [Fact]
+    public void GetDefault_Krea2Turbo_HasVaeAndTextEncoder()
+    {
+        // Arrange
+
+        // Act
+        var profile = GenerationProfile.GetDefault(ModelType.Krea2Turbo);
+
+        // Assert
+        Assert.Equal("Qwen2D_VAE.safetensors", profile.DefaultVae);
+        Assert.Equal("qwen3vl", profile.DefaultTextEncoder);
+    }
+
+    [Fact]
+    public void GetDefault_Krea2Raw_HasVaeAndTextEncoder()
+    {
+        // Arrange
+
+        // Act
+        var profile = GenerationProfile.GetDefault(ModelType.Krea2Raw);
+
+        // Assert
+        Assert.Equal("Qwen2D_VAE.safetensors", profile.DefaultVae);
+        Assert.Equal("qwen3vl", profile.DefaultTextEncoder);
     }
 
     [Fact]

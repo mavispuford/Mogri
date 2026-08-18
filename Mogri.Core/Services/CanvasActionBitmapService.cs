@@ -85,14 +85,15 @@ public sealed class CanvasActionBitmapService : ICanvasActionBitmapService
             return;
         }
 
-        using var path = new SKPath();
-        path.MoveTo(strokeAction.Points[0]);
+        using var pathBuilder = new SKPathBuilder();
+        pathBuilder.MoveTo(strokeAction.Points[0]);
 
         for (var index = 1; index < strokeAction.Points.Count; index++)
         {
-            path.ConicTo(strokeAction.Points[index - 1], strokeAction.Points[index], .5f);
+            pathBuilder.ConicTo(strokeAction.Points[index - 1], strokeAction.Points[index], .5f);
         }
 
+        using var path = pathBuilder.Detach();
         canvas.DrawPath(path, paint);
     }
 
@@ -101,6 +102,6 @@ public sealed class CanvasActionBitmapService : ICanvasActionBitmapService
         using var paint = new SKPaint();
         paint.ColorFilter = SKColorFilter.CreateBlendMode(SKColors.White, SKBlendMode.SrcIn);
 
-        canvas.DrawBitmap(bitmap, new SKRect(0, 0, width, height), paint);
+        canvas.DrawBitmap(bitmap, new SKRect(0, 0, width, height), SKSamplingOptions.Default, paint);
     }
 }

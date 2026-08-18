@@ -229,6 +229,27 @@ public class PngMetadataDtoTests
         Assert.Null(settings.Model);
     }
 
+    [Theory]
+    [InlineData("Krea2Turbo")]
+    [InlineData("Krea2Raw")]
+    public void ModelType_KreaValues_RoundTripPreservesValue(string modelTypeName)
+    {
+        // Arrange
+        var modelType = Enum.Parse<ModelType>(modelTypeName);
+        var settings = new PromptSettings
+        {
+            ModelType = modelType
+        };
+
+        // Act
+        var dto = PngMetadataDto.FromPromptSettings(settings);
+        var roundTripped = dto.ToPromptSettings();
+
+        // Assert
+        Assert.Equal(modelTypeName, dto.ModelType);
+        Assert.Equal(modelType, roundTripped.ModelType);
+    }
+
     private static PromptSettings CreatePromptSettingsForMetadata()
     {
         return new PromptSettings

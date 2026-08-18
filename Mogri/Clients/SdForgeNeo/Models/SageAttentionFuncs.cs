@@ -24,5 +24,13 @@ namespace Mogri.Clients.SdForgeNeo.Models
         #pragma warning disable CS1591
         Fp8_cuda,
         #pragma warning restore CS1591
+        [EnumMember(Value = "fp8_cuda++")]
+        #pragma warning disable CS1591
+        Fp8_cuda_plus__plus,
+        #pragma warning restore CS1591
+        [EnumMember(Value = "sageattn3")]
+        #pragma warning disable CS1591
+        Sageattn3,
+        #pragma warning restore CS1591
     }
 }

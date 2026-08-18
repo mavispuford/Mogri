@@ -8,6 +8,7 @@ using Mogri.Models;
 using System.Collections.ObjectModel;
 using SkiaSharp.Views.Maui.Controls;
 using Mogri.Enums;
+using Mogri.Helpers;
 
 namespace Mogri.ViewModels;
 
@@ -812,7 +813,19 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
             if (settings.Model != null)
             {
                 var models = await _stableDiffusionService.GetModelsAsync();
-                if (models != null && !models.Any(m => m.Key == settings.Model.Key))
+                var currentModel = await _stableDiffusionService.GetSelectedModelAsync();
+                var modelIsAvailable = models?.Any(model => ModelIdentityHelper.AreEquivalent(
+                    model.DisplayName,
+                    model.Key,
+                    settings.Model.DisplayName,
+                    settings.Model.Key)) == true;
+                var modelIsActive = currentModel != null && ModelIdentityHelper.AreEquivalent(
+                    currentModel.DisplayName,
+                    currentModel.Key,
+                    settings.Model.DisplayName,
+                    settings.Model.Key);
+
+                if (models != null && !modelIsAvailable && !modelIsActive)
                 {
                      messages.Add($"Model: {settings.Model.DisplayName}");
                 }

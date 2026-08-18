@@ -109,7 +109,7 @@ public static class ImageOrientationHelper
                 break;
         }
 
-        canvas.DrawBitmap(bitmap, 0, 0);
+        canvas.DrawBitmap(bitmap, 0, 0, SKSamplingOptions.Default, null);
         canvas.Flush();
 
         return result;
