@@ -82,11 +82,11 @@
 
                 <Label 
                     Text="{Binding Prompt}"
-                    TextColor="{AppThemeBinding Light={StaticResource CadetDark}, Dark={StaticResource Primary}}"/>
+                    TextColor="{AppThemeBinding Light={StaticResource CadetDark}, Dark={StaticResource Primary}}" MaxLines="5"/>
 
                 <Label Text="{Binding NegativePrompt}"
                        TextColor="{AppThemeBinding Light={StaticResource Cadet}, Dark={StaticResource Secondary}}"
-                       IsVisible="{Binding NegativePrompt, Converter={StaticResource IsStringNotNullOrEmptyConverter}}"/>
+                       IsVisible="{Binding NegativePrompt, Converter={StaticResource IsStringNotNullOrEmptyConverter}}" MaxLines="3"/>
             </VerticalStackLayout>
 
             <Grid Grid.Row="1"

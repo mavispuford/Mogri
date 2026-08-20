@@ -134,23 +134,24 @@ public partial class LoraSelectionPageViewModel : PageViewModel, ILoraSelectionP
         SelectedLoras.Clear();
     }
 
+    [RelayCommand]
+    private void CommitLora(ILoraViewModel? loraViewModel)
+    {
+        if (loraViewModel == null || SelectedLoras.Contains(loraViewModel))
+        {
+            return;
+        }
+
+        SelectedLoras.Add(loraViewModel);
+
+        LoraToAdd = null;
+    }
+
     public override bool OnBackButtonPressed()
     {
         ConfirmCommand.Execute(null);
 
         return true;
-    }
-
-    partial void OnLoraToAddChanged(ILoraViewModel? value)
-    {
-        if (value == null)
-        {
-            return;
-        }
-
-        SelectedLoras.Add(value);
-
-        LoraToAdd = null;
     }
 
 }

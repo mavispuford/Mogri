@@ -37,7 +37,7 @@ public class HistoryService : IHistoryService
             bool hasChanges = false;
 
             // Ensure indexes
-            col.EnsureIndex(x => x.UserPrompt);
+            col.DropIndex(nameof(HistoryEntity.UserPrompt));
             col.EnsureIndex(x => x.ImageFileName);
             col.EnsureIndex(x => x.CreatedAt);
 
