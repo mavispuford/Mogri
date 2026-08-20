@@ -15,6 +15,8 @@ public interface ILoraSelectionPageViewModel : IPageViewModel
 
     IAsyncRelayCommand ConfirmCommand { get; }
 
+    IRelayCommand<ILoraViewModel?> CommitLoraCommand { get; }
+
     IRelayCommand<ILoraViewModel> RemoveCommand { get; }
 
     IRelayCommand ResetCommand { get; }
