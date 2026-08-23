@@ -328,12 +328,10 @@ namespace Mogri.Services
                             // Ignore
                         }
 
-                        var generationResponse = new GenerationResponse
-                        {
-                            Images = img2ImgResponse?.Images ?? [],
-                            Info = img2ImgResponse?.Info ?? string.Empty
-                        };
-                        PopulateSeeds(generationResponse);
+                        var generationResponse = await createImageToImageGenerationResponse(
+                            settings,
+                            img2ImgResponse,
+                            cancellationToken);
 
                         apiResponse = new ApiResponse
                         {
@@ -349,12 +347,10 @@ namespace Mogri.Services
                     await imgToImageTask;
 
                     // Set the final response
-                    var generationResponse = new GenerationResponse
-                    {
-                        Images = img2ImgResponse?.Images ?? [],
-                        Info = img2ImgResponse?.Info ?? string.Empty
-                    };
-                    PopulateSeeds(generationResponse);
+                    var generationResponse = await createImageToImageGenerationResponse(
+                        settings,
+                        img2ImgResponse,
+                        cancellationToken);
 
                     apiResponse = new ApiResponse
                     {
@@ -373,6 +369,66 @@ namespace Mogri.Services
                 // Skip current image every other time
                 // skipCurrentImage = !skipCurrentImage;
             }
+        }
+
+        private async Task<GenerationResponse> createImageToImageGenerationResponse(
+            PromptSettings settings,
+            ImageToImageResponse? response,
+            CancellationToken cancellationToken)
+        {
+            var images = response?.Images ?? [];
+
+            if (settings.EnableUpscaling &&
+                !string.IsNullOrWhiteSpace(settings.Upscaler) &&
+                settings.UpscaleLevel > 0 &&
+                _client != null)
+            {
+                images = await upscaleImagesAsync(images, settings, cancellationToken);
+            }
+
+            var generationResponse = new GenerationResponse
+            {
+                Images = images,
+                Info = response?.Info ?? string.Empty
+            };
+            PopulateSeeds(generationResponse);
+
+            return generationResponse;
+        }
+
+        private async Task<List<string>> upscaleImagesAsync(
+            List<string> images,
+            PromptSettings settings,
+            CancellationToken cancellationToken)
+        {
+            var upscaledImages = new List<string>(images.Count);
+
+            foreach (var image in images)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if (string.IsNullOrWhiteSpace(image))
+                {
+                    upscaledImages.Add(image);
+                    continue;
+                }
+
+                var extrasResponse = await _client!.Sdapi.V1.ExtraSingleImage.PostAsync(
+                    new ExtrasSingleImageRequest
+                    {
+                        Image = image,
+                        ResizeMode = 0,
+                        ShowExtrasResults = true,
+                        Upscaler1 = settings.Upscaler,
+                        UpscalingResize = settings.UpscaleLevel
+                    },
+                    cancellationToken: cancellationToken);
+
+                var upscaledImage = extrasResponse?.Image;
+                upscaledImages.Add(string.IsNullOrWhiteSpace(upscaledImage) ? image : upscaledImage!);
+            }
+
+            return upscaledImages;
         }
 
         private async Task<ApiResponse> getCurrentProgress(CancellationToken token, bool skipCurrentImage)
