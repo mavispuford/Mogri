@@ -189,8 +189,8 @@ public class ViewModelFrameworkAdapterTests
         var invoked = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         var mainThreadService = new Mock<IMainThreadService>();
         var navigationService = CreateNavigationService();
-        var initialEntities = Enumerable.Range(1, 18).Select(index => CreateHistoryEntity($"history-{index}.png")).ToList();
-        var refillEntity = CreateHistoryEntity("history-19.png");
+        var initialEntities = Enumerable.Range(1, 48).Select(index => CreateHistoryEntity($"history-{index}.png")).ToList();
+        var refillEntity = CreateHistoryEntity("history-49.png");
         var historyItems = new Queue<Mock<IHistoryItemViewModel>>(
             initialEntities
                 .Append(refillEntity)
@@ -207,8 +207,8 @@ public class ViewModelFrameworkAdapterTests
             .ReturnsAsync((string _, int skip, int take) =>
                 (IList<HistoryEntity>)((skip, take) switch
                 {
-                    (0, 18) => initialEntities,
-                    (17, 1) => new List<HistoryEntity> { refillEntity },
+                    (0, 48) => initialEntities,
+                    (47, 1) => new List<HistoryEntity> { refillEntity },
                     _ => new List<HistoryEntity>()
                 }));
         mainThreadService
@@ -250,8 +250,8 @@ public class ViewModelFrameworkAdapterTests
         await viewModel.DeleteSelectedItemsCommand.ExecuteAsync(null);
 
         // Assert
-        Assert.Equal(18, viewModel.HistoryItems.Count);
-        historyService.Verify(service => service.SearchAsync(string.Empty, 17, 1), Times.Once);
+        Assert.Equal(48, viewModel.HistoryItems.Count);
+        historyService.Verify(service => service.SearchAsync(string.Empty, 47, 1), Times.Once);
     }
 
     [Fact]
@@ -268,8 +268,8 @@ public class ViewModelFrameworkAdapterTests
         var invoked = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         var mainThreadService = new Mock<IMainThreadService>();
         var navigationService = CreateNavigationService();
-        var initialEntities = Enumerable.Range(1, 18).Select(index => CreateHistoryEntity($"history-{index}.png")).ToList();
-        var refillEntity = CreateHistoryEntity("history-19.png");
+        var initialEntities = Enumerable.Range(1, 48).Select(index => CreateHistoryEntity($"history-{index}.png")).ToList();
+        var refillEntity = CreateHistoryEntity("history-49.png");
         var historyItems = new Queue<Mock<IHistoryItemViewModel>>(
             initialEntities
                 .Append(refillEntity)
@@ -286,8 +286,8 @@ public class ViewModelFrameworkAdapterTests
             .ReturnsAsync((string _, int skip, int take) =>
                 (IList<HistoryEntity>)((skip, take) switch
                 {
-                    (0, 18) => initialEntities,
-                    (17, 1) => new List<HistoryEntity> { refillEntity },
+                    (0, 48) => initialEntities,
+                    (47, 1) => new List<HistoryEntity> { refillEntity },
                     _ => new List<HistoryEntity>()
                 }));
         mainThreadService
@@ -329,8 +329,8 @@ public class ViewModelFrameworkAdapterTests
         await viewModel.DeleteSelectedItemsCommand.ExecuteAsync(null);
 
         // Assert
-        Assert.Equal(18, viewModel.HistoryItems.Count);
-        historyService.Verify(service => service.SearchAsync(string.Empty, 17, 1), Times.Once);
+        Assert.Equal(48, viewModel.HistoryItems.Count);
+        historyService.Verify(service => service.SearchAsync(string.Empty, 47, 1), Times.Once);
     }
 
     [Fact]
@@ -356,7 +356,7 @@ public class ViewModelFrameworkAdapterTests
             .ReturnsAsync((string _, int skip, int take) =>
                 (IList<Mogri.Models.HistoryEntity>)((skip, take) switch
                 {
-                    (0, 18) => new List<Mogri.Models.HistoryEntity>(),
+                    (0, 48) => new List<Mogri.Models.HistoryEntity>(),
                     _ => new List<Mogri.Models.HistoryEntity>()
                 }));
         mainThreadService
@@ -392,7 +392,7 @@ public class ViewModelFrameworkAdapterTests
 
         // Assert
         mainThreadService.Verify(service => service.InvokeOnMainThreadAsync(It.IsAny<Func<Task>>()), Times.Once);
-        historyService.Verify(service => service.SearchAsync(string.Empty, 0, 18), Times.Once);
+        historyService.Verify(service => service.SearchAsync(string.Empty, 0, 48), Times.Once);
     }
 
     private static Mock<IResultItemViewModel> CreateResultItem(string internalUri)

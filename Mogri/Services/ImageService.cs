@@ -89,7 +89,12 @@ public class ImageService : IImageService
             // Instead of a simple SKBitmap.Decode() call, we're using a codec and SKImageInfo with Unpremul for the
             // AlphaType to preserve masked image pixel data
 
-            var codec = SKCodec.Create(stream);
+            using var codec = SKCodec.Create(stream);
+            if (codec == null)
+            {
+                return null;
+            }
+
             var info = new SKImageInfo
             {
                 AlphaType = SKAlphaType.Unpremul,
@@ -131,7 +136,7 @@ public class ImageService : IImageService
     {
         try
         {
-            var bitmap = GetSkBitmapFromStream(stream);
+            using var bitmap = GetSkBitmapFromStream(stream);
 
             if (bitmap == null)
             {
@@ -139,6 +144,9 @@ public class ImageService : IImageService
             }
 
             var resizedBitmap = GetResizedSKBitmap(bitmap, width, height, forceExactSize, filterImage, onlyIfLarger);
+            using var ownedResizedBitmap = resizedBitmap != null && !ReferenceEquals(resizedBitmap, bitmap)
+                ? resizedBitmap
+                : null;
 
             if (resizedBitmap == null)
             {

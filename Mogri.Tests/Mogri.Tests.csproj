@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\Mogri\Helpers\ObservableRangeCollection.cs" Link="Shared\Helpers\ObservableRangeCollection.cs" />
     <Compile Include="..\Mogri\NavigationParams.cs" Link="Shared\NavigationParams.cs" />
     <Compile Include="..\Mogri\Enums\HapticType.cs" Link="Shared\Enums\HapticType.cs" />
     <Compile Include="..\Mogri\Interfaces\Coordinators\ICanvasSegmentationCoordinator.cs" Link="Shared\Interfaces\Coordinators\ICanvasSegmentationCoordinator.cs" />

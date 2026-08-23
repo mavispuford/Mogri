@@ -12,5 +12,13 @@ public class ScaleToAnimation : BaseAnimation
         set => SetValue(ScaleProperty, value);
     }
 
-    public override Task Animate(VisualElement view, CancellationToken token = default) => view.ScaleToAsync(Scale, Length, Easing);
+    public override Task Animate(VisualElement view, CancellationToken token = default)
+    {
+        if (Math.Abs(view.Scale - Scale) < 0.001)
+        {
+            return Task.CompletedTask;
+        }
+
+        return view.ScaleToAsync(Scale, Length, Easing);
+    }
 }

@@ -2,6 +2,7 @@
 <views:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                 xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+                xmlns:behaviors="clr-namespace:Mogri.Behaviors;assembly=Mogri"
                 xmlns:animations="clr-namespace:Mogri.Animations;assembly=Mogri"
                 xmlns:pages="clr-namespace:Mogri.Interfaces.ViewModels.Pages"
                 xmlns:viewModels="clr-namespace:Mogri.Interfaces.ViewModels"
@@ -18,14 +19,14 @@
               ColumnSpacing="10"
               Padding="0,0,10,0">
             
-            <Border Grid.Column="0" StrokeShape="RoundRectangle 23" StrokeThickness="0" BackgroundColor="{AppThemeBinding Light=#F0F0F0, Dark=#303030}" Padding="10,0" HeightRequest="{OnPlatform Android=46, iOS=36}" VerticalOptions="Center">
+            <Border Grid.Column="0" StrokeShape="RoundRectangle 23" StrokeThickness="0" Background="{AppThemeBinding Light=#F0F0F0, Dark=#303030}" Padding="10,0" HeightRequest="{OnPlatform Android=46, iOS=36}" VerticalOptions="Center">
                 <Grid ColumnDefinitions="Auto, *">
                     <Image Grid.Column="0" VerticalOptions="Center" Margin="0,0,5,0">
                         <Image.Source>
                             <FontImageSource Glyph="&#xe8b6;" FontFamily="{StaticResource IconFontRegular}" Size="20" Color="{AppThemeBinding Light={StaticResource Primary}, Dark=Gray}" />
                         </Image.Source>
                     </Image>
-                    <Entry Grid.Column="1" HeightRequest="{OnPlatform Android=46, iOS=36}" Placeholder="Search history..." VerticalTextAlignment="Center" Text="{Binding SearchText}" VerticalOptions="Fill" BackgroundColor="Transparent" FontSize="14" ClearButtonVisibility="WhileEditing" ReturnType="Search" FontFamily="ComfortaaBold" />
+                    <Entry Grid.Column="1" HeightRequest="{OnPlatform Android=46, iOS=36}" Placeholder="Search history..." PlaceholderColor="{AppThemeBinding Light=#6E6E6E, Dark=#B8B8B8}" VerticalTextAlignment="Center" Text="{Binding SearchText}" VerticalOptions="Fill" BackgroundColor="Transparent" FontSize="14" ClearButtonVisibility="WhileEditing" ReturnType="Search" FontFamily="ComfortaaBold" />
                 </Grid>
             </Border>
 
@@ -65,11 +66,19 @@
                         CanReorderItems="False"
                         HorizontalOptions="Fill"
                         VerticalOptions="Fill"
-                        RemainingItemsThreshold="6"
+                        RemainingItemsThreshold="18"
                         RemainingItemsThresholdReachedCommand="{Binding LoadItemsCommand}"
+                        ItemSizingStrategy="MeasureFirstItem"
                         SelectionMode="{Binding SelectionModeEnabled, Converter={StaticResource BoolToSelectionMode}}"
                         SelectedItems="{Binding SelectedItems, Mode=TwoWay}"
                         SelectionChangedCommand="{Binding SelectionChangedCommand}">
+            <CollectionView.Behaviors>
+                <behaviors:HistoryCollectionViewTouchBehavior x:DataType="{x:Null}"
+                                                               IsEnabled="{Binding BindingContext.SelectionModeEnabled, Source={x:Reference HistoryPageRoot}, Converter={StaticResource InvertedBool}}"
+                                                               TapCommand="{Binding BindingContext.ItemTappedCommand, Source={x:Reference HistoryPageRoot}}"
+                                                               LongPressCommand="{Binding BindingContext.ItemLongPressedCommand, Source={x:Reference HistoryPageRoot}}"
+                                                               LongPressDuration="500" />
+            </CollectionView.Behaviors>
             <CollectionView.ItemsLayout>
                 <GridItemsLayout Orientation="Vertical" 
                          Span="3"
@@ -91,7 +100,7 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="viewModels:IHistoryItemViewModel">
                     <Border StrokeThickness="0" Margin="-1"
-                            BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}">
+                            Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}">
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroupList>
                                 <VisualStateGroup x:Name="CommonStates">
@@ -101,7 +110,7 @@
                                                 <animations:ScaleToAnimation Scale="1" Easing="{x:Static Easing.CubicInOut}" Length="200" />
                                             </Setter>
 
-                                            <Setter Property="BackgroundColor" Value="Transparent" />
+                                            <Setter Property="Background" Value="Transparent" />
                                             <Setter Property="StrokeShape" Value="Rectangle" />
                                         </VisualState.Setters>
                                     </VisualState>
@@ -111,7 +120,7 @@
                                                 <animations:ScaleToAnimation Scale=".75" Easing="{x:Static Easing.CubicInOut}" Length="200" />
                                             </Setter>
 
-                                            <Setter Property="BackgroundColor" Value="Transparent" />
+                                            <Setter Property="Background" Value="Transparent" />
                                             <Setter Property="StrokeShape" Value="RoundRectangle 10" />
                                         </VisualState.Setters>
                                     </VisualState>
@@ -126,24 +135,9 @@
                         <Image x:Name="ItemImage"
                                Source="{Binding ThumbnailImageSource}"
                                Aspect="AspectFill"
-                               WidthRequest="200"
+                               HorizontalOptions="Fill"
                                HeightRequest="200"
-                               InputTransparent="{Binding SelectionModeEnabled, Source={RelativeSource AncestorType={x:Type pages:IHistoryPageViewModel}}}">
-
-                            <Image.Behaviors>
-                                <!-- x:DataType disabled: TouchBehavior is not an Element, so RelativeSource
-                                     bindings are unsupported. Using x:Reference with BindingContext path instead.
-                                     CommandParameters explicitly reference the Image's BindingContext because
-                                     PlatformBehavior does not reliably propagate BindingContext for {Binding .}. -->
-                                <toolkit:TouchBehavior x:DataType="{x:Null}"
-                                                       Command="{Binding BindingContext.ItemTappedCommand, Source={x:Reference HistoryPageRoot}}"
-                                                       CommandParameter="{Binding BindingContext, Source={x:Reference ItemImage}}"
-                                                       LongPressCommand="{Binding BindingContext.ItemLongPressedCommand, Source={x:Reference HistoryPageRoot}}"
-                                                       LongPressCommandParameter="{Binding BindingContext, Source={x:Reference ItemImage}}"
-                                                       LongPressDuration="500" />
-                            </Image.Behaviors>
-
-                        </Image>
+                               InputTransparent="True" />
 
                     </Border>
                 </DataTemplate>
@@ -154,7 +148,7 @@
                 VerticalOptions="End" 
                 HeightRequest="100" 
                 Margin="-1"
-                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}"
+                Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}"
                 Stroke="Transparent"
                 StrokeThickness="0"
                 StrokeShape="RoundRectangle 10,10,0,0">
