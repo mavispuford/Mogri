@@ -201,7 +201,7 @@ namespace Mogri.Services
             }, cancellationToken);
 
             ApiResponse? apiResponse = null;
-            var skipCurrentImage = false;
+            var skipCurrentImage = true;
             var finished = false;
 
             while (!finished)
@@ -269,7 +269,8 @@ namespace Mogri.Services
                 }
 
                 // Skip current image every other time
-                skipCurrentImage = !skipCurrentImage;
+                // skipCurrentImage = !skipCurrentImage;
+                skipCurrentImage = true;
             }
         }
 
