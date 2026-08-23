@@ -74,7 +74,7 @@ namespace Mogri.Services
             // Initialize client
             var httpClient = _httpClientFactory.CreateClient();
             httpClient.BaseAddress = baseUri;
-            httpClient.Timeout = TimeSpan.FromMinutes(15);
+            httpClient.Timeout = Timeout.InfiniteTimeSpan;
 
             var customAuthName = Preferences.Default.Get(Constants.PreferenceKeys.AuthHeaderName, string.Empty);
             var customAuthValue = Preferences.Default.Get(Constants.PreferenceKeys.AuthHeaderValue, string.Empty);
@@ -93,7 +93,7 @@ namespace Mogri.Services
             // Initialize progress client
             var progressHttpClient = _httpClientFactory.CreateClient();
             progressHttpClient.BaseAddress = baseUri;
-            progressHttpClient.Timeout = TimeSpan.FromSeconds(10);
+            progressHttpClient.Timeout = Timeout.InfiniteTimeSpan;
 
             if (!string.IsNullOrWhiteSpace(customAuthName) && !string.IsNullOrWhiteSpace(customAuthValue))
             {
