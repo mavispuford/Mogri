@@ -216,8 +216,8 @@
                     <Label Grid.Row="17" Grid.Column="1" Text="Upscale Lvl:" Style="{StaticResource SettingLabel}" IsVisible="{Binding CurrentCapabilities.SupportsUpscaling}"/>
                     <Picker Grid.Row="17" Grid.Column="2" Title="Level" ItemsSource="{Binding AvailableUpscaleLevelValues}" SelectedItem="{Binding UpscaleLevel}" FontSize="16" HorizontalTextAlignment="End" IsVisible="{Binding CurrentCapabilities.SupportsUpscaling}"/>
 
-                    <Label Grid.Row="18" Grid.Column="1" Text="Steps:" Style="{StaticResource SettingLabel}" IsVisible="{Binding CurrentCapabilities.SupportsUpscaling}"/>
-                    <Entry Grid.Row="18" Grid.Column="2" Placeholder="{Binding UpscaleStepsPlaceholder}" Text="{Binding UpscaleSteps}" Keyboard="Numeric" FontSize="16" HorizontalTextAlignment="End" IsVisible="{Binding CurrentCapabilities.SupportsUpscaling}"/>
+                    <Label Grid.Row="18" Grid.Column="1" Text="Hires Fix Steps:" Style="{StaticResource SettingLabel}" IsVisible="{Binding IsHiresFixStepsVisible}"/>
+                    <Entry Grid.Row="18" Grid.Column="2" Placeholder="{Binding UpscaleStepsPlaceholder}" Text="{Binding UpscaleSteps}" Keyboard="Numeric" FontSize="16" HorizontalTextAlignment="End" IsVisible="{Binding IsHiresFixStepsVisible}"/>
 
                     <Image Grid.Row="19" Grid.Column="0" WidthRequest="32" IsVisible="{Binding IsSeamlessVisible}">
                         <Image.Source>

@@ -61,6 +61,8 @@ public interface IGenerationSettingsPageViewModel : IPageViewModel
 
     string? UpscaleStepsPlaceholder { get; set; }
 
+    bool IsHiresFixStepsVisible { get; set; }
+
     bool EnableTiling { get; set; }
 
     bool IsSeamlessVisible { get; set; }

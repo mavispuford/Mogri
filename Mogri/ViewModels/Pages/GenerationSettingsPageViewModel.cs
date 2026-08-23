@@ -91,6 +91,9 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
     public partial string? UpscaleStepsPlaceholder { get; set; }
 
     [ObservableProperty]
+    public partial bool IsHiresFixStepsVisible { get; set; }
+
+    [ObservableProperty]
     public partial bool EnableTiling { get; set; }
 
     [ObservableProperty]
@@ -516,6 +519,9 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
             Upscaler = _settings.Upscaler?.ToString();
             UpscaleLevel = _settings.UpscaleLevel == 0 ? "2" : _settings.UpscaleLevel.ToString();
             UpscaleSteps = _settings.UpscaleSteps.ToString();
+            IsHiresFixStepsVisible = CurrentCapabilities.SupportsUpscaling &&
+                CurrentCapabilities.SupportsHiresFix &&
+                string.IsNullOrEmpty(_settings.InitImage);
             Width = _settings.Width.ToString();
 
             IsDistilledCfgScaleVisible = SelectedModelType == ModelType.ZImageTurbo ||
