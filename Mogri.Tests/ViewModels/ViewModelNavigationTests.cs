@@ -102,6 +102,7 @@ public class ViewModelNavigationTests
             ImageFileName = fileName,
             ThumbnailFileName = $"thumb-{fileName}"
         });
+        historyItem.SetupProperty(item => item.IsSelected);
         return historyItem;
     }
 

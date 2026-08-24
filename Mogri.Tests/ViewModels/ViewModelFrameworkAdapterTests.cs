@@ -176,6 +176,47 @@ public class ViewModelFrameworkAdapterTests
     }
 
     [Fact]
+    public void SelectionChanged_UpdatesHistoryItemSelectionState()
+    {
+        // Arrange
+        var fileService = new Mock<IFileService>();
+        var imageService = new Mock<IImageService>();
+        var historyService = new Mock<IHistoryService>();
+        var serviceProvider = new Mock<IServiceProvider>();
+        var popupService = new Mock<IPopupService>();
+        var toastService = new Mock<IToastService>();
+        var mainThreadService = CreateMainThreadService();
+        var navigationService = CreateNavigationService();
+        var loadingCoordinator = new Mock<ILoadingCoordinator>();
+        var firstItem = CreateHistoryItem("first.png");
+        var secondItem = CreateHistoryItem("second.png");
+
+        var viewModel = new HistoryPageViewModel(
+            fileService.Object,
+            imageService.Object,
+            historyService.Object,
+            serviceProvider.Object,
+            popupService.Object,
+            toastService.Object,
+            mainThreadService.Object,
+            navigationService.Object,
+            loadingCoordinator.Object)
+        {
+            SelectedItems = new List<object>()
+        };
+        viewModel.HistoryItems.Add(firstItem.Object);
+        viewModel.HistoryItems.Add(secondItem.Object);
+
+        // Act
+        viewModel.SelectedItems.Add(firstItem.Object);
+        viewModel.SelectionChangedCommand.Execute(null);
+
+        // Assert
+        Assert.True(firstItem.Object.IsSelected);
+        Assert.False(secondItem.Object.IsSelected);
+    }
+
+    [Fact]
     public async Task DeleteSelectedItems_WhenMoreHistoryExists_RefillsRemovedSlots()
     {
         // Arrange
@@ -408,6 +449,7 @@ public class ViewModelFrameworkAdapterTests
         historyItem.SetupProperty(item => item.FileName, fileName);
         historyItem.SetupProperty(item => item.ThumbnailFileName, $"thumb-{fileName}");
         historyItem.SetupProperty(item => item.Entity, CreateHistoryEntity(fileName));
+        historyItem.SetupProperty(item => item.IsSelected);
         historyItem
             .Setup(item => item.InitWith(It.IsAny<HistoryEntity>(), It.IsAny<IFileService>(), It.IsAny<IImageService>()))
             .Returns<HistoryEntity, IFileService, IImageService>((entity, _, _) =>

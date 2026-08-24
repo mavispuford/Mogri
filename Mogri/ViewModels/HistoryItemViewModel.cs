@@ -8,19 +8,22 @@ namespace Mogri.ViewModels;
 public partial class HistoryItemViewModel : BaseViewModel, IHistoryItemViewModel
 {
     [ObservableProperty]
-    public partial string FileName { get; set; }
+    public partial string FileName { get; set; } = string.Empty;
 
     [ObservableProperty]
-    public partial string ThumbnailFileName { get; set; }
+    public partial string ThumbnailFileName { get; set; } = string.Empty;
 
     [ObservableProperty]
-    public partial ImageSource ThumbnailImageSource { get; set; }
+    public partial ImageSource ThumbnailImageSource { get; set; } = null!;
 
     [ObservableProperty]
     public partial PromptSettings? Settings { get; set; }
 
     [ObservableProperty]
-    public partial HistoryEntity Entity { get; set; }
+    public partial HistoryEntity Entity { get; set; } = null!;
+
+    [ObservableProperty]
+    public partial bool IsSelected { get; set; }
 
     private readonly IMainThreadService _mainThreadService;
 

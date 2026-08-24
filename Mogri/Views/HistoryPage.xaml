@@ -99,47 +99,49 @@
             </CollectionView.EmptyView>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="viewModels:IHistoryItemViewModel">
-                    <Border StrokeThickness="0" Margin="-1"
-                            Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}">
+                    <Grid Background="Transparent">
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroupList>
                                 <VisualStateGroup x:Name="CommonStates">
                                     <VisualState x:Name="Normal">
                                         <VisualState.Setters>
-                                            <Setter Property="animations:AnimationProperties.Animations">
-                                                <animations:ScaleToAnimation Scale="1" Easing="{x:Static Easing.CubicInOut}" Length="200" />
-                                            </Setter>
-
                                             <Setter Property="Background" Value="Transparent" />
-                                            <Setter Property="StrokeShape" Value="Rectangle" />
                                         </VisualState.Setters>
                                     </VisualState>
                                     <VisualState x:Name="Selected">
                                         <VisualState.Setters>
-                                            <Setter Property="animations:AnimationProperties.Animations">
-                                                <animations:ScaleToAnimation Scale=".75" Easing="{x:Static Easing.CubicInOut}" Length="200" />
-                                            </Setter>
-
-                                            <Setter Property="Background" Value="Transparent" />
-                                            <Setter Property="StrokeShape" Value="RoundRectangle 10" />
+                                            <Setter Property="Background" Value="{StaticResource LivingCoral}" />
                                         </VisualState.Setters>
                                     </VisualState>
-
-                                    <VisualState x:Name="PointerOver" />
-                                    <VisualState x:Name="Pressed" />
-
                                 </VisualStateGroup>
                             </VisualStateGroupList>
                         </VisualStateManager.VisualStateGroups>
 
-                        <Image x:Name="ItemImage"
-                               Source="{Binding ThumbnailImageSource}"
-                               Aspect="AspectFill"
-                               HorizontalOptions="Fill"
-                               HeightRequest="200"
-                               InputTransparent="True" />
+                        <Border StrokeThickness="0" Margin="-1"
+                                Background="Transparent"
+                                StrokeShape="Rectangle">
+                            <animations:AnimationProperties.Animations>
+                                <animations:ScaleToAnimation Scale="1" Easing="{x:Static Easing.CubicInOut}" Length="200" />
+                            </animations:AnimationProperties.Animations>
 
-                    </Border>
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                <Setter Property="animations:AnimationProperties.Animations">
+                                    <animations:ScaleToAnimation Scale=".75" Easing="{x:Static Easing.CubicInOut}" Length="200" />
+                                </Setter>
+                                <Setter Property="StrokeShape" Value="RoundRectangle 10" />
+                                </DataTrigger>
+                            </Border.Triggers>
+
+                            <Image x:Name="ItemImage"
+                                   Source="{Binding ThumbnailImageSource}"
+                                   Aspect="AspectFill"
+                                   HorizontalOptions="Fill"
+                                   HeightRequest="200"
+                                   InputTransparent="True" />
+
+                        </Border>
+                    </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>

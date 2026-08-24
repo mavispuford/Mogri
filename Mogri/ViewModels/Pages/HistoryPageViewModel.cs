@@ -96,6 +96,11 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         });
     }
 
+    partial void OnSelectedItemsChanged(IList<Object>? value)
+    {
+        updateSelectionStates();
+    }
+
     public ICommand? HideBottomPanelCommand { get; set; }
 
     public ICommand? ShowBottomPanelCommand { get; set; }
@@ -372,6 +377,8 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     {
         if (SelectedItems == null) return;
 
+        updateSelectionStates();
+
         if (_lastSelectionCount != 0 && SelectedItems.Count == 0 && SelectionModeEnabled)
         {
             ToggleSelectionMode();
@@ -381,6 +388,14 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
         var pluralityString = SelectedItems.Count != 1 ? "s" : string.Empty;
         SelectedItemsText = $"{SelectedItems.Count} item{pluralityString} selected";
+    }
+
+    private void updateSelectionStates()
+    {
+        foreach (var item in HistoryItems)
+        {
+            item.IsSelected = SelectedItems?.Contains(item) == true;
+        }
     }
 
     [RelayCommand]
