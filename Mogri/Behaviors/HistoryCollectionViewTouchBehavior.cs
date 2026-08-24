@@ -62,6 +62,8 @@ public sealed class HistoryCollectionViewTouchBehavior : Behavior<CollectionView
     private UICollectionView? _nativeCollectionView;
     private UITapGestureRecognizer? _tapGestureRecognizer;
     private UILongPressGestureRecognizer? _longPressGestureRecognizer;
+    private SimultaneousGestureRecognizerDelegate? _gestureDelegate;
+    private bool _longPressTriggered;
 #endif
 
     public bool IsEnabled
@@ -94,12 +96,14 @@ public sealed class HistoryCollectionViewTouchBehavior : Behavior<CollectionView
 
         _collectionView = bindable;
         bindable.HandlerChanged += OnHandlerChanged;
+        bindable.Loaded += OnLoaded;
         attachToPlatformView();
     }
 
     protected override void OnDetachingFrom(CollectionView bindable)
     {
         bindable.HandlerChanged -= OnHandlerChanged;
+        bindable.Loaded -= OnLoaded;
         detachFromPlatformView();
         _collectionView = null;
 
@@ -109,6 +113,11 @@ public sealed class HistoryCollectionViewTouchBehavior : Behavior<CollectionView
     private void OnHandlerChanged(object? sender, EventArgs e)
     {
         detachFromPlatformView();
+        attachToPlatformView();
+    }
+
+    private void OnLoaded(object? sender, EventArgs e)
+    {
         attachToPlatformView();
     }
 
@@ -131,8 +140,16 @@ public sealed class HistoryCollectionViewTouchBehavior : Behavior<CollectionView
     private void attachToPlatformView()
     {
 #if ANDROID
-        if (_collectionView?.Handler?.PlatformView is RecyclerView recyclerView)
+        var recyclerView = findRecyclerView(_collectionView?.Handler?.PlatformView as Android.Views.View);
+        if (recyclerView is not null)
         {
+            if (ReferenceEquals(_recyclerView, recyclerView))
+            {
+                return;
+            }
+
+            detachFromPlatformView();
+
             if (recyclerView.Context is not { } context)
             {
                 return;
@@ -144,20 +161,31 @@ public sealed class HistoryCollectionViewTouchBehavior : Behavior<CollectionView
             recyclerView.AddOnItemTouchListener(_touchListener);
         }
 #elif IOS || MACCATALYST
-        if (_collectionView?.Handler?.PlatformView is UICollectionView collectionView)
+        var nativeCollectionView = findUICollectionView(_collectionView?.Handler?.PlatformView as UIView);
+        if (nativeCollectionView is not null)
         {
-            _nativeCollectionView = collectionView;
+            if (ReferenceEquals(_nativeCollectionView, nativeCollectionView))
+            {
+                return;
+            }
+
+            detachFromPlatformView();
+
+            _nativeCollectionView = nativeCollectionView;
+            _gestureDelegate = new SimultaneousGestureRecognizerDelegate();
             _tapGestureRecognizer = new UITapGestureRecognizer(onCollectionViewTapped)
             {
-                CancelsTouchesInView = false
+                CancelsTouchesInView = false,
+                Delegate = _gestureDelegate
             };
             _longPressGestureRecognizer = new UILongPressGestureRecognizer(onCollectionViewLongPressed)
             {
-                CancelsTouchesInView = false
+                CancelsTouchesInView = false,
+                Delegate = _gestureDelegate
             };
 
-            collectionView.AddGestureRecognizer(_tapGestureRecognizer);
-            collectionView.AddGestureRecognizer(_longPressGestureRecognizer);
+            nativeCollectionView.AddGestureRecognizer(_tapGestureRecognizer);
+            nativeCollectionView.AddGestureRecognizer(_longPressGestureRecognizer);
             updateLongPressDuration();
             updatePlatformGestureState();
         }
@@ -196,9 +224,12 @@ public sealed class HistoryCollectionViewTouchBehavior : Behavior<CollectionView
 
         _tapGestureRecognizer?.Dispose();
         _longPressGestureRecognizer?.Dispose();
+        _gestureDelegate?.Dispose();
         _tapGestureRecognizer = null;
         _longPressGestureRecognizer = null;
+        _gestureDelegate = null;
         _nativeCollectionView = null;
+        _longPressTriggered = false;
 #endif
     }
 
@@ -366,10 +397,48 @@ public sealed class HistoryCollectionViewTouchBehavior : Behavior<CollectionView
 #endif
 
 #if IOS || MACCATALYST
+    private sealed class SimultaneousGestureRecognizerDelegate : UIGestureRecognizerDelegate
+    {
+        public override bool ShouldRecognizeSimultaneously(UIGestureRecognizer gestureRecognizer, UIGestureRecognizer otherGestureRecognizer)
+        {
+            return true;
+        }
+    }
+
+    private static UICollectionView? findUICollectionView(UIView? view)
+    {
+        if (view is null)
+        {
+            return null;
+        }
+
+        if (view is UICollectionView collectionView)
+        {
+            return collectionView;
+        }
+
+        foreach (var subview in view.Subviews)
+        {
+            var found = findUICollectionView(subview);
+            if (found is not null)
+            {
+                return found;
+            }
+        }
+
+        return null;
+    }
+
     private void onCollectionViewTapped()
     {
         if (!IsEnabled || _tapGestureRecognizer is null || _nativeCollectionView is null)
         {
+            return;
+        }
+
+        if (_longPressTriggered)
+        {
+            _longPressTriggered = false;
             return;
         }
 
@@ -379,19 +448,75 @@ public sealed class HistoryCollectionViewTouchBehavior : Behavior<CollectionView
 
     private void onCollectionViewLongPressed()
     {
-        if (!IsEnabled || _longPressGestureRecognizer is not { State: UIGestureRecognizerState.Began } || _nativeCollectionView is null)
+        if (!IsEnabled || _longPressGestureRecognizer is null || _nativeCollectionView is null)
         {
             return;
         }
 
-        var item = getItemAt(_longPressGestureRecognizer.LocationInView(_nativeCollectionView));
-        executeCommand(LongPressCommand, item);
+        if (_longPressGestureRecognizer.State == UIGestureRecognizerState.Began)
+        {
+            _longPressTriggered = true;
+            var item = getItemAt(_longPressGestureRecognizer.LocationInView(_nativeCollectionView));
+            executeCommand(LongPressCommand, item);
+        }
+        else if (_longPressGestureRecognizer.State is UIGestureRecognizerState.Ended or UIGestureRecognizerState.Cancelled or UIGestureRecognizerState.Failed)
+        {
+            _longPressTriggered = false;
+        }
     }
 
     private object? getItemAt(CGPoint location)
     {
-        var indexPath = _nativeCollectionView?.IndexPathForItemAtPoint(location);
+        if (_nativeCollectionView is null)
+        {
+            return null;
+        }
+
+        var indexPath = _nativeCollectionView.IndexPathForItemAtPoint(location);
+        if (indexPath is null)
+        {
+            var hitView = _nativeCollectionView.HitTest(location, null);
+            while (hitView is not null && hitView is not UICollectionViewCell && hitView != _nativeCollectionView)
+            {
+                hitView = hitView.Superview;
+            }
+
+            if (hitView is UICollectionViewCell cell)
+            {
+                indexPath = _nativeCollectionView.IndexPathForCell(cell);
+            }
+        }
+
         return indexPath is null ? null : getItemAt((int)indexPath.Item);
+    }
+#endif
+
+#if ANDROID
+    private static RecyclerView? findRecyclerView(Android.Views.View? view)
+    {
+        if (view is null)
+        {
+            return null;
+        }
+
+        if (view is RecyclerView recyclerView)
+        {
+            return recyclerView;
+        }
+
+        if (view is ViewGroup viewGroup)
+        {
+            for (var i = 0; i < viewGroup.ChildCount; i++)
+            {
+                var found = findRecyclerView(viewGroup.GetChildAt(i));
+                if (found is not null)
+                {
+                    return found;
+                }
+            }
+        }
+
+        return null;
     }
 #endif
 
@@ -439,6 +564,11 @@ public sealed class HistoryCollectionViewTouchBehavior : Behavior<CollectionView
         }
 
         var position = _recyclerView.GetChildAdapterPosition(child);
+        if (position == RecyclerView.NoPosition)
+        {
+            return null;
+        }
+
         return getItemAt(position);
     }
 #endif
