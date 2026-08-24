@@ -8,45 +8,56 @@ namespace Mogri.ViewModels;
 public partial class HistoryItemViewModel : BaseViewModel, IHistoryItemViewModel
 {
     [ObservableProperty]
-    public partial string FileName { get; set; }
+    public partial string FileName { get; set; } = string.Empty;
 
     [ObservableProperty]
-    public partial string ThumbnailFileName { get; set; }
+    public partial string ThumbnailFileName { get; set; } = string.Empty;
 
     [ObservableProperty]
-    public partial ImageSource ThumbnailImageSource { get; set; }
+    public partial ImageSource ThumbnailImageSource { get; set; } = null!;
 
     [ObservableProperty]
     public partial PromptSettings? Settings { get; set; }
 
     [ObservableProperty]
-    public partial HistoryEntity Entity { get; set; }
+    public partial HistoryEntity Entity { get; set; } = null!;
+
+    [ObservableProperty]
+    public partial bool IsSelected { get; set; }
+
+    private readonly IMainThreadService _mainThreadService;
+
+    public HistoryItemViewModel(IMainThreadService mainThreadService)
+    {
+        _mainThreadService = mainThreadService ?? throw new ArgumentNullException(nameof(mainThreadService));
+    }
 
     public async Task InitWith(HistoryEntity entity, IFileService fileService, IImageService imageService)
     {
-        Entity = entity;
-        FileName = entity.ImageFileName;
+        var fileName = entity.ImageFileName;
 
-        var filenameNoPath = Path.GetFileName(FileName);
+        var filenameNoPath = Path.GetFileName(fileName);
         // On iOS the internal path changes per debug session, so always use the current CacheDirectory
         var thumbnailFilename = $"{Constants.ThumbnailPrefix}{filenameNoPath}";
-        ThumbnailFileName = Path.Combine(FileSystem.CacheDirectory, thumbnailFilename);
+        var thumbnailFilePath = Path.Combine(FileSystem.CacheDirectory, thumbnailFilename);
 
-        if (!await fileService.FileExistsInInternalStorageAsync(ThumbnailFileName))
+        if (!await fileService.FileExistsInInternalStorageAsync(thumbnailFilePath))
         {
             using var fileStream = await fileService.GetFileStreamFromInternalStorageAsync(filenameNoPath);
             var resized = imageService.GetResizedImageStreamBytes(fileStream, 256, 256, filterImage: true);
 
             if (resized.Bytes != null)
             {
-                await fileService.WriteFileToInternalStorageAsync(ThumbnailFileName, resized.Bytes);
+                await fileService.WriteFileToInternalStorageAsync(thumbnailFilePath, resized.Bytes);
             }
         }
-        else
-        {
-            // File exists
-        }
 
-        ThumbnailImageSource = ImageSource.FromFile(ThumbnailFileName);
+        await _mainThreadService.InvokeOnMainThreadAsync(() =>
+        {
+            Entity = entity;
+            FileName = fileName;
+            ThumbnailFileName = thumbnailFilePath;
+            ThumbnailImageSource = ImageSource.FromFile(thumbnailFilePath);
+        });
     }
 }

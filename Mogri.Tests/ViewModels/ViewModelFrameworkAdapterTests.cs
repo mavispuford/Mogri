@@ -176,6 +176,47 @@ public class ViewModelFrameworkAdapterTests
     }
 
     [Fact]
+    public void SelectionChanged_UpdatesHistoryItemSelectionState()
+    {
+        // Arrange
+        var fileService = new Mock<IFileService>();
+        var imageService = new Mock<IImageService>();
+        var historyService = new Mock<IHistoryService>();
+        var serviceProvider = new Mock<IServiceProvider>();
+        var popupService = new Mock<IPopupService>();
+        var toastService = new Mock<IToastService>();
+        var mainThreadService = CreateMainThreadService();
+        var navigationService = CreateNavigationService();
+        var loadingCoordinator = new Mock<ILoadingCoordinator>();
+        var firstItem = CreateHistoryItem("first.png");
+        var secondItem = CreateHistoryItem("second.png");
+
+        var viewModel = new HistoryPageViewModel(
+            fileService.Object,
+            imageService.Object,
+            historyService.Object,
+            serviceProvider.Object,
+            popupService.Object,
+            toastService.Object,
+            mainThreadService.Object,
+            navigationService.Object,
+            loadingCoordinator.Object)
+        {
+            SelectedItems = new List<object>()
+        };
+        viewModel.HistoryItems.Add(firstItem.Object);
+        viewModel.HistoryItems.Add(secondItem.Object);
+
+        // Act
+        viewModel.SelectedItems.Add(firstItem.Object);
+        viewModel.SelectionChangedCommand.Execute(null);
+
+        // Assert
+        Assert.True(firstItem.Object.IsSelected);
+        Assert.False(secondItem.Object.IsSelected);
+    }
+
+    [Fact]
     public async Task DeleteSelectedItems_WhenMoreHistoryExists_RefillsRemovedSlots()
     {
         // Arrange
@@ -189,8 +230,8 @@ public class ViewModelFrameworkAdapterTests
         var invoked = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         var mainThreadService = new Mock<IMainThreadService>();
         var navigationService = CreateNavigationService();
-        var initialEntities = Enumerable.Range(1, 18).Select(index => CreateHistoryEntity($"history-{index}.png")).ToList();
-        var refillEntity = CreateHistoryEntity("history-19.png");
+        var initialEntities = Enumerable.Range(1, 48).Select(index => CreateHistoryEntity($"history-{index}.png")).ToList();
+        var refillEntity = CreateHistoryEntity("history-49.png");
         var historyItems = new Queue<Mock<IHistoryItemViewModel>>(
             initialEntities
                 .Append(refillEntity)
@@ -207,8 +248,8 @@ public class ViewModelFrameworkAdapterTests
             .ReturnsAsync((string _, int skip, int take) =>
                 (IList<HistoryEntity>)((skip, take) switch
                 {
-                    (0, 18) => initialEntities,
-                    (17, 1) => new List<HistoryEntity> { refillEntity },
+                    (0, 48) => initialEntities,
+                    (47, 1) => new List<HistoryEntity> { refillEntity },
                     _ => new List<HistoryEntity>()
                 }));
         mainThreadService
@@ -250,8 +291,8 @@ public class ViewModelFrameworkAdapterTests
         await viewModel.DeleteSelectedItemsCommand.ExecuteAsync(null);
 
         // Assert
-        Assert.Equal(18, viewModel.HistoryItems.Count);
-        historyService.Verify(service => service.SearchAsync(string.Empty, 17, 1), Times.Once);
+        Assert.Equal(48, viewModel.HistoryItems.Count);
+        historyService.Verify(service => service.SearchAsync(string.Empty, 47, 1), Times.Once);
     }
 
     [Fact]
@@ -268,8 +309,8 @@ public class ViewModelFrameworkAdapterTests
         var invoked = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         var mainThreadService = new Mock<IMainThreadService>();
         var navigationService = CreateNavigationService();
-        var initialEntities = Enumerable.Range(1, 18).Select(index => CreateHistoryEntity($"history-{index}.png")).ToList();
-        var refillEntity = CreateHistoryEntity("history-19.png");
+        var initialEntities = Enumerable.Range(1, 48).Select(index => CreateHistoryEntity($"history-{index}.png")).ToList();
+        var refillEntity = CreateHistoryEntity("history-49.png");
         var historyItems = new Queue<Mock<IHistoryItemViewModel>>(
             initialEntities
                 .Append(refillEntity)
@@ -286,8 +327,8 @@ public class ViewModelFrameworkAdapterTests
             .ReturnsAsync((string _, int skip, int take) =>
                 (IList<HistoryEntity>)((skip, take) switch
                 {
-                    (0, 18) => initialEntities,
-                    (17, 1) => new List<HistoryEntity> { refillEntity },
+                    (0, 48) => initialEntities,
+                    (47, 1) => new List<HistoryEntity> { refillEntity },
                     _ => new List<HistoryEntity>()
                 }));
         mainThreadService
@@ -329,8 +370,8 @@ public class ViewModelFrameworkAdapterTests
         await viewModel.DeleteSelectedItemsCommand.ExecuteAsync(null);
 
         // Assert
-        Assert.Equal(18, viewModel.HistoryItems.Count);
-        historyService.Verify(service => service.SearchAsync(string.Empty, 17, 1), Times.Once);
+        Assert.Equal(48, viewModel.HistoryItems.Count);
+        historyService.Verify(service => service.SearchAsync(string.Empty, 47, 1), Times.Once);
     }
 
     [Fact]
@@ -356,7 +397,7 @@ public class ViewModelFrameworkAdapterTests
             .ReturnsAsync((string _, int skip, int take) =>
                 (IList<Mogri.Models.HistoryEntity>)((skip, take) switch
                 {
-                    (0, 18) => new List<Mogri.Models.HistoryEntity>(),
+                    (0, 48) => new List<Mogri.Models.HistoryEntity>(),
                     _ => new List<Mogri.Models.HistoryEntity>()
                 }));
         mainThreadService
@@ -392,7 +433,7 @@ public class ViewModelFrameworkAdapterTests
 
         // Assert
         mainThreadService.Verify(service => service.InvokeOnMainThreadAsync(It.IsAny<Func<Task>>()), Times.Once);
-        historyService.Verify(service => service.SearchAsync(string.Empty, 0, 18), Times.Once);
+        historyService.Verify(service => service.SearchAsync(string.Empty, 0, 48), Times.Once);
     }
 
     private static Mock<IResultItemViewModel> CreateResultItem(string internalUri)
@@ -408,6 +449,7 @@ public class ViewModelFrameworkAdapterTests
         historyItem.SetupProperty(item => item.FileName, fileName);
         historyItem.SetupProperty(item => item.ThumbnailFileName, $"thumb-{fileName}");
         historyItem.SetupProperty(item => item.Entity, CreateHistoryEntity(fileName));
+        historyItem.SetupProperty(item => item.IsSelected);
         historyItem
             .Setup(item => item.InitWith(It.IsAny<HistoryEntity>(), It.IsAny<IFileService>(), It.IsAny<IImageService>()))
             .Returns<HistoryEntity, IFileService, IImageService>((entity, _, _) =>

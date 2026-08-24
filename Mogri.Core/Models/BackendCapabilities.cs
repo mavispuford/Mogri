@@ -17,6 +17,11 @@ public record BackendCapabilities
     public bool SupportsUpscaling { get; init; }
 
     /// <summary>
+    /// Gets whether the backend supports Hires Fix upscaling.
+    /// </summary>
+    public bool SupportsHiresFix { get; init; }
+
+    /// <summary>
     /// Gets whether the backend can provide a list of samplers.
     /// </summary>
     public bool SupportsSamplerList { get; init; }
@@ -52,6 +57,7 @@ public record BackendCapabilities
     {
         SupportsSeamless = true,
         SupportsUpscaling = true,
+        SupportsHiresFix = true,
         SupportsSamplerList = true,
         SupportsCancellation = true,
         SupportsLoras = true,

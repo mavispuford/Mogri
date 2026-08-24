@@ -4,6 +4,8 @@ using Mogri.Interfaces.Coordinators;
 using Mogri.Interfaces.Services;
 using Mogri.Interfaces.ViewModels;
 using Mogri.Interfaces.ViewModels.Pages;
+using Mogri.Helpers;
+using Mogri.Models;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using CommunityToolkit.Maui.Core;
@@ -13,6 +15,7 @@ namespace Mogri.ViewModels;
 public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 {
     private readonly SemaphoreSlim _semaphore = new(1, 1);
+    private readonly SemaphoreSlim _thumbnailLoadSemaphore = new(2, 2);
 
     private readonly IFileService _fileService;
     private readonly IImageService _imageService;
@@ -23,14 +26,14 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     private readonly IMainThreadService _mainThreadService;
 
     private int itemIndex = 0;
-    private const int itemTakeCount = 12;
-    private const int trailingPrefetchCount = 6;
+    private const int itemTakeCount = 30;
+    private const int trailingPrefetchCount = 18;
     private const int initialLoadTakeCount = itemTakeCount + trailingPrefetchCount;
     private bool _isInitialized = false;
     private int _lastSelectionCount = 0;
 
     [ObservableProperty]
-    public partial ObservableCollection<IHistoryItemViewModel> HistoryItems { get; set; } = new();
+    public partial ObservableCollection<IHistoryItemViewModel> HistoryItems { get; set; } = new ObservableRangeCollection<IHistoryItemViewModel>();
 
     [ObservableProperty]
     public partial IList<Object>? SelectedItems { get; set; }
@@ -62,18 +65,40 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
         Task.Delay(500, token).ContinueWith(async t =>
         {
-            if (t.IsCanceled) return;
+            if (t.IsCanceled || token.IsCancellationRequested) return;
 
             await _mainThreadService.InvokeOnMainThreadAsync(async () =>
             {
-                itemIndex = 0;
-                HistoryItems.Clear();
-                if (LoadItemsCommand != null)
+                if (token.IsCancellationRequested || !_isInitialized) return;
+
+                try
                 {
-                    await LoadItemsCommand.ExecuteAsync(null);
+                    await _semaphore.WaitAsync(token);
+                }
+                catch (OperationCanceledException)
+                {
+                    return;
+                }
+
+                try
+                {
+                    if (token.IsCancellationRequested) return;
+
+                    itemIndex = 0;
+                    HistoryItems.Clear();
+                    await LoadItemsCoreAsync(initialLoadTakeCount);
+                }
+                finally
+                {
+                    _semaphore.Release();
                 }
             });
         });
+    }
+
+    partial void OnSelectedItemsChanged(IList<Object>? value)
+    {
+        updateSelectionStates();
     }
 
     public ICommand? HideBottomPanelCommand { get; set; }
@@ -151,8 +176,16 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
         await _historyService.DeleteItemsAsync(allItems);
 
-        itemIndex = 0;
-        HistoryItems.Clear();
+        await _semaphore.WaitAsync();
+        try
+        {
+            itemIndex = 0;
+            HistoryItems.Clear();
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
     }
 
     [RelayCommand]
@@ -235,20 +268,53 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     private async Task LoadItemsCoreAsync(int takeCount)
     {
         var results = (await _historyService.SearchAsync(SearchText ?? string.Empty, itemIndex, takeCount) ?? []).ToList();
+        var newItems = new List<(IHistoryItemViewModel ViewModel, HistoryEntity Entity)>();
 
         foreach (var entity in results)
         {
             var historyItem = _serviceProvider.GetService<IHistoryItemViewModel>();
             if (historyItem != null)
             {
-                HistoryItems.Add(historyItem);
-
-                // Fire and forget initialization to keep UI responsive
-                _ = Task.Run(() => historyItem.InitWith(entity, _fileService, _imageService));
+                newItems.Add((historyItem, entity));
             }
         }
 
+        if (HistoryItems is ObservableRangeCollection<IHistoryItemViewModel> range)
+        {
+            range.AddRange(newItems.Select(item => item.ViewModel));
+        }
+        else
+        {
+            foreach (var item in newItems)
+            {
+                HistoryItems.Add(item.ViewModel);
+            }
+        }
+
+        foreach (var item in newItems)
+        {
+            _ = InitializeHistoryItemAsync(item.ViewModel, item.Entity);
+        }
+
         itemIndex += results.Count;
+    }
+
+    private async Task InitializeHistoryItemAsync(IHistoryItemViewModel historyItem, HistoryEntity entity)
+    {
+        await _thumbnailLoadSemaphore.WaitAsync();
+
+        try
+        {
+            await Task.Run(() => historyItem.InitWith(entity, _fileService, _imageService));
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error loading history thumbnail: {ex}");
+        }
+        finally
+        {
+            _thumbnailLoadSemaphore.Release();
+        }
     }
 
     private async Task RemoveDeletedItemsAndBackfillAsync(IEnumerable<IHistoryItemViewModel> deletedItems)
@@ -311,6 +377,8 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     {
         if (SelectedItems == null) return;
 
+        updateSelectionStates();
+
         if (_lastSelectionCount != 0 && SelectedItems.Count == 0 && SelectionModeEnabled)
         {
             ToggleSelectionMode();
@@ -320,6 +388,14 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
         var pluralityString = SelectedItems.Count != 1 ? "s" : string.Empty;
         SelectedItemsText = $"{SelectedItems.Count} item{pluralityString} selected";
+    }
+
+    private void updateSelectionStates()
+    {
+        foreach (var item in HistoryItems)
+        {
+            item.IsSelected = SelectedItems?.Contains(item) == true;
+        }
     }
 
     [RelayCommand]

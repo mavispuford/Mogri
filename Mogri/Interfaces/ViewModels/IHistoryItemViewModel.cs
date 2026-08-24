@@ -15,5 +15,7 @@ public interface IHistoryItemViewModel : IBaseViewModel
 
     HistoryEntity Entity { get; set; }
 
+    bool IsSelected { get; set; }
+
     Task InitWith(HistoryEntity entity, IFileService fileService, IImageService imageService);
 }
