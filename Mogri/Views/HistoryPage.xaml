@@ -146,24 +146,57 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <Border x:Name="BottomPanel"
-                VerticalOptions="End" 
-                HeightRequest="100" 
-                Margin="-1"
-                Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}"
-                Stroke="Transparent"
-                StrokeThickness="0"
-                StrokeShape="RoundRectangle 10,10,0,0">
-            <Border.Shadow>
-                <Shadow Brush="Black"
-                        Offset="0,0"
-                        Radius="50"
-                        Opacity="0.2" />
-            </Border.Shadow>
-            <Border.Behaviors>
+        <Grid x:Name="BottomPanel"
+              VerticalOptions="End"
+              HeightRequest="100"
+              Margin="-1"
+              InputTransparent="True"
+              CascadeInputTransparent="False">
+            <Border InputTransparent="True"
+                    Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}"
+                    Stroke="Transparent"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 10,10,0,0">
+                <Border.Shadow>
+                    <Shadow Brush="Black"
+                            Offset="0,0"
+                            Radius="50"
+                            Opacity="0.2" />
+                </Border.Shadow>
+            </Border>
+
+            <Grid ColumnDefinitions="*,auto"
+                  VerticalOptions="Start"
+                  InputTransparent="True"
+                  CascadeInputTransparent="False">
+
+                <Label Grid.Column="0" Margin="30,0,0,0" Text="{Binding SelectedItemsText}" FontSize="16" VerticalTextAlignment="Center" InputTransparent="True"/>
+
+                <ContentView Grid.Column="1"
+                             Padding="20"
+                             WidthRequest="84"
+                             InputTransparent="False"
+                             ToolTipProperties.Text="Delete Selected Item(s)">
+                    <ContentView.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding DeleteSelectedItemsCommand}"/>
+                    </ContentView.GestureRecognizers>
+
+                    <Image HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           InputTransparent="True">
+                        <Image.Source>
+                            <FontImageSource Glyph="&#xe872;" FontFamily="{StaticResource IconFontRegular}" Size="36" Color="{StaticResource SteelRed}" />
+                        </Image.Source>
+                    </Image>
+                    
+                </ContentView>
+
+            </Grid>
+
+            <Grid.Behaviors>
                 <animations:CustomAnimationBehavior AnimateCommand="{Binding ShowBottomPanelCommand}">
                     <animations:CustomAnimationBehavior.AnimationType>
-                        <animations:TranslateToAnimation TranslationY="36" 
+                        <animations:TranslateToAnimation TranslationY="36"
                                                          Length="200" Easing="{x:Static Easing.CubicInOut}" />
                     </animations:CustomAnimationBehavior.AnimationType>
                 </animations:CustomAnimationBehavior>
@@ -175,28 +208,8 @@
                                                          Length="200" Easing="{x:Static Easing.CubicInOut}"/>
                     </animations:CustomAnimationBehavior.AnimationType>
                 </animations:CustomAnimationBehavior>
-            </Border.Behaviors>
-
-            <Grid ColumnDefinitions="*,auto" VerticalOptions="Start">
-                <Label Grid.Column="0" Margin="30,0,0,0" Text="{Binding SelectedItemsText}" FontSize="16" VerticalTextAlignment="Center"/>
-
-                <ContentView Grid.Column="1"
-                             Padding="20"
-                             WidthRequest="84"
-                             ToolTipProperties.Text="Delete Selected Item(s)">
-                    <ContentView.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding DeleteSelectedItemsCommand}"/>
-                    </ContentView.GestureRecognizers>
-                    <Image HorizontalOptions="Center"
-                           VerticalOptions="Center"
-                           InputTransparent="True">
-                        <Image.Source>
-                            <FontImageSource Glyph="&#xe872;" FontFamily="{StaticResource IconFontRegular}" Size="36" Color="{StaticResource SteelRed}" />
-                        </Image.Source>
-                    </Image>
-                </ContentView>
-            </Grid>
-        </Border>
+            </Grid.Behaviors>
+        </Grid>
     </Grid>
 
 </views:BasePage>
