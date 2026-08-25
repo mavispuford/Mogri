@@ -137,6 +137,7 @@
                                    Source="{Binding ThumbnailImageSource}"
                                    Aspect="AspectFill"
                                    HorizontalOptions="Fill"
+                                   WidthRequest="200"
                                    HeightRequest="200"
                                    InputTransparent="True" />
 
