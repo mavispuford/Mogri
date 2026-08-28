@@ -173,6 +173,29 @@ public class PngMetadataDtoTests
     }
 
     [Fact]
+    public void FromPromptSettings_WithPromptStyles_StoresComposedPrompts()
+    {
+        // Arrange
+        var settings = new PromptSettings
+        {
+            Prompt = "a cat",
+            NegativePrompt = "blur",
+            PromptStyles =
+            [
+                CreatePromptStyle("cinematic", "cinematic lighting" , "flat"),
+                CreatePromptStyle("film-grain", "film grain", "artifacts")
+            ]
+        };
+
+        // Act
+        var dto = PngMetadataDto.FromPromptSettings(settings);
+
+        // Assert
+        Assert.Equal("a cat, cinematic lighting, film grain", dto.Prompt);
+        Assert.Equal("blur, flat, artifacts", dto.NegativePrompt);
+    }
+
+    [Fact]
     public void ToPromptSettings_InvalidModelType_UsesDefault()
     {
         // Arrange
@@ -299,10 +322,12 @@ public class PngMetadataDtoTests
         };
     }
 
-    private static IPromptStyleViewModel CreatePromptStyle(string name)
+    private static IPromptStyleViewModel CreatePromptStyle(string name, string prompt = "", string negativePrompt = "")
     {
         var style = new Mock<IPromptStyleViewModel>();
         style.SetupGet(x => x.Name).Returns(name);
+        style.SetupGet(x => x.Prompt).Returns(prompt);
+        style.SetupGet(x => x.NegativePrompt).Returns(negativePrompt);
         return style.Object;
     }
 }

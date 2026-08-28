@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Mogri.Enums;
+using Mogri.Helpers;
 using Mogri.Interfaces.ViewModels;
 using Mogri.ViewModels;
 
@@ -92,10 +93,12 @@ public class PngMetadataDto
 
     public static PngMetadataDto FromPromptSettings(PromptSettings settings)
     {
+        var (prompt, negativePrompt) = settings.GetCombinedPromptAndPromptStyles();
+
         return new PngMetadataDto
         {
-            Prompt = settings.Prompt,
-            NegativePrompt = settings.NegativePrompt,
+            Prompt = prompt ?? string.Empty,
+            NegativePrompt = negativePrompt ?? string.Empty,
             Steps = settings.Steps,
             Sampler = settings.Sampler,
             Scheduler = settings.Scheduler,
