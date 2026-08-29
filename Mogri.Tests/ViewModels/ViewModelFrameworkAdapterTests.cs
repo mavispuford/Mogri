@@ -217,6 +217,121 @@ public class ViewModelFrameworkAdapterTests
     }
 
     [Fact]
+    public async Task SelectAllResults_WithUnloadedMatches_SelectsAllResults()
+    {
+        // Arrange
+        var fileService = new Mock<IFileService>();
+        var imageService = new Mock<IImageService>();
+        var historyService = new Mock<IHistoryService>();
+        var serviceProvider = new Mock<IServiceProvider>();
+        var popupService = new Mock<IPopupService>();
+        var toastService = new Mock<IToastService>();
+        var mainThreadService = CreateMainThreadService();
+        var navigationService = CreateNavigationService();
+        var loadingCoordinator = new Mock<ILoadingCoordinator>();
+        var firstItem = CreateHistoryItem("tree-1.png");
+        var secondItem = CreateHistoryItem("tree-2.png");
+        var matchingEntities = new List<HistoryEntity>
+        {
+            firstItem.Object.Entity,
+            secondItem.Object.Entity,
+            CreateHistoryEntity("tree-3.png")
+        };
+
+        historyService
+            .Setup(service => service.SearchAsync("tree", 0, int.MaxValue))
+            .ReturnsAsync(matchingEntities);
+
+        var viewModel = new HistoryPageViewModel(
+            fileService.Object,
+            imageService.Object,
+            historyService.Object,
+            serviceProvider.Object,
+            popupService.Object,
+            toastService.Object,
+            mainThreadService.Object,
+            navigationService.Object,
+            loadingCoordinator.Object)
+        {
+            SearchText = "tree",
+            SelectedItems = new List<object>()
+        };
+        viewModel.HistoryItems.Add(firstItem.Object);
+        viewModel.HistoryItems.Add(secondItem.Object);
+
+        // Act
+        await viewModel.SelectAllResultsCommand.ExecuteAsync(null);
+
+        // Assert
+        Assert.Equal("3 items selected", viewModel.SelectedItemsText);
+        Assert.True(firstItem.Object.IsSelected);
+        Assert.True(secondItem.Object.IsSelected);
+        Assert.Equal(2, viewModel.SelectedItems.Count);
+    }
+
+    [Fact]
+    public async Task DeleteSelectedItems_WithSearchQuery_DeletesOnlyMatchingResults()
+    {
+        // Arrange
+        var fileService = new Mock<IFileService>();
+        var imageService = new Mock<IImageService>();
+        var historyService = new Mock<IHistoryService>();
+        var serviceProvider = new Mock<IServiceProvider>();
+        var popupService = new Mock<IPopupService>();
+        var toastService = new Mock<IToastService>();
+        var mainThreadService = CreateMainThreadService();
+        var navigationService = CreateNavigationService();
+        var loadingCoordinator = new Mock<ILoadingCoordinator>();
+        var matchingItem = CreateHistoryItem("tree.png");
+        var nonMatchingItem = CreateHistoryItem("car.png");
+        var matchingEntities = new List<HistoryEntity>
+        {
+            matchingItem.Object.Entity,
+            CreateHistoryEntity("tree-2.png")
+        };
+
+        historyService
+            .Setup(service => service.SearchAsync("tree", 0, int.MaxValue))
+            .ReturnsAsync(matchingEntities);
+        historyService
+            .Setup(service => service.DeleteItemsAsync(It.IsAny<IList<HistoryEntity>>()))
+            .Returns(Task.CompletedTask);
+        popupService
+            .Setup(service => service.DisplayAlertAsync("Confirm", "Delete 2 items?", "DELETE", "Cancel"))
+            .ReturnsAsync(true);
+
+        var viewModel = new HistoryPageViewModel(
+            fileService.Object,
+            imageService.Object,
+            historyService.Object,
+            serviceProvider.Object,
+            popupService.Object,
+            toastService.Object,
+            mainThreadService.Object,
+            navigationService.Object,
+            loadingCoordinator.Object)
+        {
+            SearchText = "tree",
+            SelectedItems = new List<object>()
+        };
+        viewModel.HistoryItems.Add(matchingItem.Object);
+        viewModel.HistoryItems.Add(nonMatchingItem.Object);
+
+        await viewModel.SelectAllResultsCommand.ExecuteAsync(null);
+
+        // Act
+        await viewModel.DeleteSelectedItemsCommand.ExecuteAsync(null);
+
+        // Assert
+        historyService.Verify(
+            service => service.DeleteItemsAsync(It.Is<IList<HistoryEntity>>(items =>
+                items.Count == 2 &&
+                items.All(item => item.ImageFileName.StartsWith("tree", StringComparison.Ordinal)))),
+            Times.Once);
+        Assert.False(nonMatchingItem.Object.IsSelected);
+    }
+
+    [Fact]
     public async Task DeleteSelectedItems_WhenMoreHistoryExists_RefillsRemovedSlots()
     {
         // Arrange

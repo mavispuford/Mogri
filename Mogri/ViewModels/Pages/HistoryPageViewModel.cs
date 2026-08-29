@@ -31,12 +31,16 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     private const int initialLoadTakeCount = itemTakeCount + trailingPrefetchCount;
     private bool _isInitialized = false;
     private int _lastSelectionCount = 0;
+    private readonly Dictionary<IHistoryItemViewModel, HistoryEntity> _loadedEntities = new();
+    private readonly Dictionary<string, HistoryEntity> _selectedEntities = new(StringComparer.Ordinal);
+    private bool _isSynchronizingSelection;
+    private int _searchVersion;
 
     [ObservableProperty]
     public partial ObservableCollection<IHistoryItemViewModel> HistoryItems { get; set; } = new ObservableRangeCollection<IHistoryItemViewModel>();
 
     [ObservableProperty]
-    public partial IList<Object>? SelectedItems { get; set; }
+    public partial IList<Object>? SelectedItems { get; set; } = new List<object>();
 
     [ObservableProperty]
     public partial bool SelectionModeEnabled { get; set; }
@@ -54,6 +58,9 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
     partial void OnSearchTextChanged(string? value)
     {
+        var searchVersion = ++_searchVersion;
+        clearSelection();
+
         if (_searchDebounceCts != null)
         {
             _searchDebounceCts.Cancel();
@@ -69,7 +76,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
             await _mainThreadService.InvokeOnMainThreadAsync(async () =>
             {
-                if (token.IsCancellationRequested || !_isInitialized) return;
+                if (token.IsCancellationRequested || searchVersion != _searchVersion || !_isInitialized) return;
 
                 try
                 {
@@ -86,6 +93,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
                     itemIndex = 0;
                     HistoryItems.Clear();
+                    _loadedEntities.Clear();
                     await LoadItemsCoreAsync(initialLoadTakeCount);
                 }
                 finally
@@ -140,8 +148,10 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
                 {
                     if (hasChanges || HistoryItems.Count == 0 || !string.IsNullOrWhiteSpace(SearchText))
                     {
+                        clearSelection();
                         itemIndex = 0;
                         HistoryItems.Clear();
+                        _loadedEntities.Clear();
                         _isInitialized = true; // Set to true before calling LoadItems
                         await LoadItems();
                     }
@@ -181,6 +191,8 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         {
             itemIndex = 0;
             HistoryItems.Clear();
+            _loadedEntities.Clear();
+            clearSelection();
         }
         finally
         {
@@ -293,6 +305,13 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
         foreach (var item in newItems)
         {
+            _loadedEntities[item.ViewModel] = item.Entity;
+
+            if (_selectedEntities.ContainsKey(getEntityKey(item.Entity)))
+            {
+                addVisibleSelectedItem(item.ViewModel);
+            }
+
             _ = InitializeHistoryItemAsync(item.ViewModel, item.Entity);
         }
 
@@ -325,6 +344,53 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         {
             if (HistoryItems.Remove(deletedItem))
             {
+                _loadedEntities.Remove(deletedItem);
+                removedCount++;
+            }
+        }
+
+        if (removedCount == 0)
+        {
+            return;
+        }
+
+        if (!_isInitialized)
+        {
+            itemIndex = Math.Max(0, itemIndex - removedCount);
+            return;
+        }
+
+        await _semaphore.WaitAsync();
+
+        try
+        {
+            itemIndex = Math.Max(0, itemIndex - removedCount);
+            await LoadItemsCoreAsync(removedCount);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    private async Task RemoveDeletedEntitiesAndBackfillAsync(IEnumerable<HistoryEntity> deletedEntities)
+    {
+        var deletedKeys = deletedEntities
+            .Select(getEntityKey)
+            .ToHashSet(StringComparer.Ordinal);
+        var removedCount = 0;
+
+        foreach (var item in HistoryItems.ToList())
+        {
+            var entity = getHistoryEntity(item);
+            if (entity == null || !deletedKeys.Contains(getEntityKey(entity)))
+            {
+                continue;
+            }
+
+            if (HistoryItems.Remove(item))
+            {
+                _loadedEntities.Remove(item);
                 removedCount++;
             }
         }
@@ -361,7 +427,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         if (!SelectionModeEnabled)
         {
             HideBottomPanelCommand?.Execute(null);
-            SelectedItems?.Clear();
+            clearSelection();
         }
         else
         {
@@ -377,54 +443,204 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     {
         if (SelectedItems == null) return;
 
+        if (_isSynchronizingSelection)
+        {
+            return;
+        }
+
+        synchronizeSelectedEntities();
         updateSelectionStates();
 
-        if (_lastSelectionCount != 0 && SelectedItems.Count == 0 && SelectionModeEnabled)
+        var selectedCount = _selectedEntities.Count;
+
+        if (_lastSelectionCount != 0 && selectedCount == 0 && SelectionModeEnabled)
         {
             ToggleSelectionMode();
         }
 
-        _lastSelectionCount = SelectedItems.Count;
+        _lastSelectionCount = selectedCount;
 
-        var pluralityString = SelectedItems.Count != 1 ? "s" : string.Empty;
-        SelectedItemsText = $"{SelectedItems.Count} item{pluralityString} selected";
+        var pluralityString = selectedCount != 1 ? "s" : string.Empty;
+        SelectedItemsText = $"{selectedCount} item{pluralityString} selected";
     }
 
     private void updateSelectionStates()
     {
         foreach (var item in HistoryItems)
         {
-            item.IsSelected = SelectedItems?.Contains(item) == true;
+            var entity = getHistoryEntity(item);
+            item.IsSelected = entity != null && _selectedEntities.ContainsKey(getEntityKey(entity));
         }
     }
 
     [RelayCommand]
-    private void SelectAllResults()
+    private async Task SelectAllResults()
     {
-        if (HistoryItems == null || SelectedItems == null) return;
+        var query = SearchText ?? string.Empty;
+        var searchVersion = _searchVersion;
+
+        try
+        {
+            List<HistoryEntity> results;
+
+            await _semaphore.WaitAsync();
+            try
+            {
+                results = (await _historyService.SearchAsync(query, 0, int.MaxValue) ?? []).ToList();
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+
+            if (searchVersion != _searchVersion)
+            {
+                return;
+            }
+
+            _selectedEntities.Clear();
+            foreach (var entity in results)
+            {
+                _selectedEntities[getEntityKey(entity)] = entity;
+            }
+
+            replaceVisibleSelection();
+            SelectionChanged(null);
+        }
+        catch (Exception ex)
+        {
+            await _toastService.ShowAsync($"Failed to select items: {ex.Message}");
+        }
+    }
+
+    private void synchronizeSelectedEntities()
+    {
+        if (SelectedItems == null)
+        {
+            return;
+        }
+
+        var visibleSelectedKeys = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (var selectedItem in SelectedItems.OfType<IHistoryItemViewModel>())
+        {
+            var entity = getHistoryEntity(selectedItem);
+            if (entity == null)
+            {
+                continue;
+            }
+
+            var key = getEntityKey(entity);
+            visibleSelectedKeys.Add(key);
+            _selectedEntities[key] = entity;
+        }
 
         foreach (var item in HistoryItems)
         {
-            if (!SelectedItems.Contains(item))
+            var entity = getHistoryEntity(item);
+            if (entity != null && !visibleSelectedKeys.Contains(getEntityKey(entity)))
             {
-                SelectedItems.Add(item);
+                _selectedEntities.Remove(getEntityKey(entity));
             }
         }
-        SelectionChanged(null);
+    }
+
+    private void replaceVisibleSelection()
+    {
+        var selectedItems = getOrCreateSelectedItems();
+
+        _isSynchronizingSelection = true;
+        try
+        {
+            selectedItems.Clear();
+
+            foreach (var item in HistoryItems)
+            {
+                var entity = getHistoryEntity(item);
+                if (entity != null && _selectedEntities.ContainsKey(getEntityKey(entity)))
+                {
+                    selectedItems.Add(item);
+                }
+            }
+        }
+        finally
+        {
+            _isSynchronizingSelection = false;
+        }
+    }
+
+    private void addVisibleSelectedItem(IHistoryItemViewModel item)
+    {
+        var selectedItems = getOrCreateSelectedItems();
+        if (!selectedItems.Contains(item))
+        {
+            selectedItems.Add(item);
+        }
+    }
+
+    private IList<object> getOrCreateSelectedItems()
+    {
+        if (SelectedItems == null)
+        {
+            SelectedItems = new List<object>();
+        }
+
+        return SelectedItems;
+    }
+
+    private void clearSelection()
+    {
+        _selectedEntities.Clear();
+
+        _isSynchronizingSelection = true;
+        try
+        {
+            SelectedItems?.Clear();
+        }
+        finally
+        {
+            _isSynchronizingSelection = false;
+        }
+
+        updateSelectionStates();
+        _lastSelectionCount = 0;
+        SelectedItemsText = "0 items selected";
+    }
+
+    private HistoryEntity? getHistoryEntity(IHistoryItemViewModel item)
+    {
+        if (_loadedEntities.TryGetValue(item, out var entity))
+        {
+            return entity;
+        }
+
+        return item.Entity;
+    }
+
+    private static string getEntityKey(HistoryEntity entity)
+    {
+        return entity.ImageFileName;
     }
 
     [RelayCommand]
     private async Task DeleteSelectedItems()
     {
-        if (SelectedItems == null || SelectedItems.Count == 0)
+        if (SelectedItems == null)
         {
             return;
         }
 
-        var pluralityString = SelectedItems.Count != 1 ? "s" : string.Empty;
-        SelectedItemsText = $"{SelectedItems.Count} item{pluralityString} selected";
+        synchronizeSelectedEntities();
+        var selectedCount = _selectedEntities.Count;
+        if (selectedCount == 0)
+        {
+            return;
+        }
 
-        var result = await _popupService.DisplayAlertAsync("Confirm", $"Delete {SelectedItems.Count} item{pluralityString}?", "DELETE", "Cancel");
+        var pluralityString = selectedCount != 1 ? "s" : string.Empty;
+        SelectedItemsText = $"{selectedCount} item{pluralityString} selected";
+
+        var result = await _popupService.DisplayAlertAsync("Confirm", $"Delete {selectedCount} item{pluralityString}?", "DELETE", "Cancel");
 
         if (!result)
         {
@@ -433,17 +649,15 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
         try
         {
-            var itemsToDelete = SelectedItems.OfType<IHistoryItemViewModel>().ToList();
-
-            // Get entities
-            var entities = itemsToDelete.Select(x => x.Entity).Where(x => x != null).ToList();
+            var entities = _selectedEntities.Values.ToList();
 
             // Delete from Service (DB + Files)
             await _historyService.DeleteItemsAsync(entities);
 
             // Update UI
-            await RemoveDeletedItemsAndBackfillAsync(itemsToDelete);
-            SelectedItems.Clear();
+            await RemoveDeletedEntitiesAndBackfillAsync(entities);
+            _selectedEntities.Clear();
+            clearSelection();
             SelectionChanged(null);
         }
         catch (Exception ex)

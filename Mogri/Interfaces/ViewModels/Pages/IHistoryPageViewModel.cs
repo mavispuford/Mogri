@@ -25,7 +25,7 @@ public interface IHistoryPageViewModel : IPageViewModel
 
     IRelayCommand<IHistoryItemViewModel> ItemLongPressedCommand { get; }
 
-    IRelayCommand SelectAllResultsCommand { get; }
+    IAsyncRelayCommand SelectAllResultsCommand { get; }
 
     IAsyncRelayCommand LoadItemsCommand { get; }
 
