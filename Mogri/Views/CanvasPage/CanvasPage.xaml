@@ -211,9 +211,6 @@
                 Stroke="Transparent"
                 StrokeThickness="0"
                 StrokeShape="RoundRectangle 25">
-                <!-- <Border.Shadow>
-                <Shadow Radius="5" Offset="5,5" Opacity=".2"></Shadow>
-                </Border.Shadow> -->
             <CollectionView SelectedItem="{Binding CurrentTool}"
                             ItemsSource="{Binding AvailableTools}"
                             HorizontalOptions="Center"
@@ -528,7 +525,7 @@
                     HeightRequest="56"
                     StrokeShape="RoundRectangle 15">
                 <Border.Shadow>
-                    <Shadow Radius="2" Offset="0,1" Opacity=".3" />
+                    <Shadow Radius="2" Offset="0,1" Opacity=".3" Brush="Black" />
                 </Border.Shadow>
                 <animations:AnimationProperties.Animations>
                     <animations:ScaleToAnimation Scale="{Binding ShowActions, Converter={StaticResource BoolToScaleOutDoubleConverter}}" Easing="{x:Static Easing.CubicInOut}" Length="200" />
@@ -560,7 +557,7 @@
                     Scale="0"
                     StrokeShape="RoundRectangle 28">
                 <Border.Shadow>
-                    <Shadow Radius="5" Opacity=".2" />
+                    <Shadow Radius="2" Offset="0,1" Opacity=".3" Brush="Black" />
                 </Border.Shadow>
                 <animations:AnimationProperties.Animations>
                     <animations:ScaleToAnimation Scale="{Binding ShowActions, Converter={StaticResource BoolToScaleInDoubleConverter}}" Easing="{x:Static Easing.CubicInOut}" Length="200" />

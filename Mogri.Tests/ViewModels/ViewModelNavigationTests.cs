@@ -76,6 +76,7 @@ public class ViewModelNavigationTests
             serviceProvider.Object,
             popupService.Object,
             toastService.Object,
+            new Mock<IHapticsService>().Object,
             mainThreadService.Object,
             navigationService.Object,
             loadingCoordinator.Object)

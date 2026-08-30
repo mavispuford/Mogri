@@ -55,9 +55,11 @@ public interface IHistoryService
 {
     Task<bool> InitializeAsync();
 
-    Task<IList<HistoryEntity>> SearchAsync(string searchText, int skip, int take);
+    Task<IEnumerable<HistoryEntity>> SearchAsync(string searchText, int skip, int take, bool isHidden = false);
 
-    Task DeleteItemsAsync(IList<HistoryEntity> items);
+    Task SetItemsHiddenAsync(IEnumerable<HistoryEntity> items, bool isHidden);
+
+    Task DeleteItemsAsync(IEnumerable<HistoryEntity> items);
 }
 
 public interface IPopupService

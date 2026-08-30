@@ -9,6 +9,14 @@ public interface IHistoryPageViewModel : IPageViewModel
 {
     bool IsLoading { get; set; }
 
+    bool IsVaultMode { get; set; }
+
+    bool IsRefreshing { get; set; }
+
+    string SearchPlaceholderText { get; }
+
+    string EmptyViewText { get; }
+
     ObservableCollection<IHistoryItemViewModel> HistoryItems { get; set; }
 
     IList<object>? SelectedItems { get; set; }
@@ -25,9 +33,19 @@ public interface IHistoryPageViewModel : IPageViewModel
 
     IRelayCommand<IHistoryItemViewModel> ItemLongPressedCommand { get; }
 
-    IRelayCommand SelectAllResultsCommand { get; }
+    IAsyncRelayCommand SelectAllResultsCommand { get; }
 
     IAsyncRelayCommand LoadItemsCommand { get; }
+
+    IAsyncRelayCommand PullDownGestureCommand { get; }
+
+    IAsyncRelayCommand RefreshEndedCommand { get; }
+
+    IAsyncRelayCommand ExitVaultModeCommand { get; }
+
+    IAsyncRelayCommand HideSelectedItemsCommand { get; }
+
+    IAsyncRelayCommand UnhideSelectedItemsCommand { get; }
 
     IRelayCommand ToggleSelectionModeCommand { get; }
 

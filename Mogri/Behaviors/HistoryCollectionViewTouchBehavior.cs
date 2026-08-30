@@ -5,11 +5,14 @@ using Microsoft.Maui.Controls;
 #if ANDROID
 using Android.Views;
 using AndroidX.RecyclerView.Widget;
+using AndroidX.SwipeRefreshLayout.Widget;
 using Microsoft.Maui.ApplicationModel;
 #endif
 
 #if IOS || MACCATALYST
 using CoreGraphics;
+using Foundation;
+using ObjCRuntime;
 using UIKit;
 #endif
 
@@ -44,10 +47,16 @@ public sealed class HistoryCollectionViewTouchBehavior : Behavior<CollectionView
         500,
         propertyChanged: OnLongPressDurationChanged);
 
+    public static readonly BindableProperty TouchEndedCommandProperty = BindableProperty.Create(
+        nameof(TouchEndedCommand),
+        typeof(ICommand),
+        typeof(HistoryCollectionViewTouchBehavior));
+
     private CollectionView? _collectionView;
 
 #if ANDROID
     private RecyclerView? _recyclerView;
+    private SwipeRefreshLayout? _swipeRefreshLayout;
     private HistoryItemTouchListener? _touchListener;
     private CancellationTokenSource? _longPressCancellation;
     private object? _pressedItem;
@@ -60,6 +69,8 @@ public sealed class HistoryCollectionViewTouchBehavior : Behavior<CollectionView
 
 #if IOS || MACCATALYST
     private UICollectionView? _nativeCollectionView;
+    private UIPanGestureRecognizer? _panGestureRecognizer;
+    private PanGestureTarget? _panGestureTarget;
     private UITapGestureRecognizer? _tapGestureRecognizer;
     private UILongPressGestureRecognizer? _longPressGestureRecognizer;
     private SimultaneousGestureRecognizerDelegate? _gestureDelegate;
@@ -88,6 +99,12 @@ public sealed class HistoryCollectionViewTouchBehavior : Behavior<CollectionView
     {
         get => (int)GetValue(LongPressDurationProperty);
         set => SetValue(LongPressDurationProperty, value);
+    }
+
+    public ICommand? TouchEndedCommand
+    {
+        get => (ICommand?)GetValue(TouchEndedCommandProperty);
+        set => SetValue(TouchEndedCommandProperty, value);
     }
 
     protected override void OnAttachedTo(CollectionView bindable)
@@ -143,8 +160,10 @@ public sealed class HistoryCollectionViewTouchBehavior : Behavior<CollectionView
         var recyclerView = findRecyclerView(_collectionView?.Handler?.PlatformView as Android.Views.View);
         if (recyclerView is not null)
         {
+            var swipeRefreshLayout = findSwipeRefreshLayout(recyclerView);
             if (ReferenceEquals(_recyclerView, recyclerView))
             {
+                attachToSwipeRefreshLayout(swipeRefreshLayout);
                 return;
             }
 
@@ -159,6 +178,7 @@ public sealed class HistoryCollectionViewTouchBehavior : Behavior<CollectionView
             _touchSlop = ViewConfiguration.Get(context)?.ScaledTouchSlop ?? 0;
             _touchListener = new HistoryItemTouchListener(this);
             recyclerView.AddOnItemTouchListener(_touchListener);
+            attachToSwipeRefreshLayout(swipeRefreshLayout);
         }
 #elif IOS || MACCATALYST
         var nativeCollectionView = findUICollectionView(_collectionView?.Handler?.PlatformView as UIView);
@@ -172,6 +192,10 @@ public sealed class HistoryCollectionViewTouchBehavior : Behavior<CollectionView
             detachFromPlatformView();
 
             _nativeCollectionView = nativeCollectionView;
+            _panGestureRecognizer = nativeCollectionView.PanGestureRecognizer;
+            _panGestureTarget = new PanGestureTarget(this);
+            // Observe the existing pan recognizer so MAUI keeps ownership of CollectionView scrolling.
+            _panGestureRecognizer.AddTarget(_panGestureTarget, new Selector("handlePan:"));
             _gestureDelegate = new SimultaneousGestureRecognizerDelegate();
             _tapGestureRecognizer = new UITapGestureRecognizer(onCollectionViewTapped)
             {
@@ -195,6 +219,8 @@ public sealed class HistoryCollectionViewTouchBehavior : Behavior<CollectionView
     private void detachFromPlatformView()
     {
 #if ANDROID
+    attachToSwipeRefreshLayout(null);
+
         if (_recyclerView is not null)
         {
             if (_touchListener is not null)
@@ -211,6 +237,11 @@ public sealed class HistoryCollectionViewTouchBehavior : Behavior<CollectionView
 #elif IOS || MACCATALYST
         if (_nativeCollectionView is not null)
         {
+            if (_panGestureRecognizer is not null && _panGestureTarget is not null)
+            {
+                _panGestureRecognizer.RemoveTarget(_panGestureTarget, new Selector("handlePan:"));
+            }
+
             if (_tapGestureRecognizer is not null)
             {
                 _nativeCollectionView.RemoveGestureRecognizer(_tapGestureRecognizer);
@@ -228,6 +259,9 @@ public sealed class HistoryCollectionViewTouchBehavior : Behavior<CollectionView
         _tapGestureRecognizer = null;
         _longPressGestureRecognizer = null;
         _gestureDelegate = null;
+        _panGestureTarget?.Dispose();
+        _panGestureTarget = null;
+        _panGestureRecognizer = null;
         _nativeCollectionView = null;
         _longPressTriggered = false;
 #endif
@@ -273,9 +307,45 @@ public sealed class HistoryCollectionViewTouchBehavior : Behavior<CollectionView
                 handleTouchUp();
                 break;
             case MotionEventActions.Cancel:
+                // SwipeRefreshLayout cancels the child stream when it takes over; this is not finger release.
                 resetTouchState();
                 break;
         }
+    }
+
+    private void attachToSwipeRefreshLayout(SwipeRefreshLayout? swipeRefreshLayout)
+    {
+        if (ReferenceEquals(_swipeRefreshLayout, swipeRefreshLayout))
+        {
+            return;
+        }
+
+        if (_swipeRefreshLayout is not null)
+        {
+            _swipeRefreshLayout.Refresh -= onSwipeRefresh;
+        }
+
+        _swipeRefreshLayout = swipeRefreshLayout;
+
+        if (_swipeRefreshLayout is not null)
+        {
+            _swipeRefreshLayout.Refresh += onSwipeRefresh;
+        }
+    }
+
+    private void onSwipeRefresh(object? sender, EventArgs e)
+    {
+        // This callback is raised by the native refresh control after the actual pull-to-refresh release.
+        resetTouchState();
+
+        if (sender is SwipeRefreshLayout swipeRefreshLayout)
+        {
+            // Let MAUI's native handler finish publishing IsRefreshing before the async command samples state.
+            swipeRefreshLayout.Post(() => executeCommand(TouchEndedCommand));
+            return;
+        }
+
+        executeCommand(TouchEndedCommand);
     }
 
 
@@ -345,6 +415,8 @@ public sealed class HistoryCollectionViewTouchBehavior : Behavior<CollectionView
         {
             executeCommand(TapCommand, item);
         }
+
+        executeCommand(TouchEndedCommand);
     }
 
     private async Task runLongPressAsync(object item, CancellationToken cancellationToken)
@@ -397,6 +469,22 @@ public sealed class HistoryCollectionViewTouchBehavior : Behavior<CollectionView
 #endif
 
 #if IOS || MACCATALYST
+    private sealed class PanGestureTarget : NSObject
+    {
+        private readonly HistoryCollectionViewTouchBehavior _owner;
+
+        public PanGestureTarget(HistoryCollectionViewTouchBehavior owner)
+        {
+            _owner = owner;
+        }
+
+        [Export("handlePan:")]
+        public void HandlePan(UIGestureRecognizer gestureRecognizer)
+        {
+            _owner.onCollectionViewPanStateChanged(gestureRecognizer);
+        }
+    }
+
     private sealed class SimultaneousGestureRecognizerDelegate : UIGestureRecognizerDelegate
     {
         public override bool ShouldRecognizeSimultaneously(UIGestureRecognizer gestureRecognizer, UIGestureRecognizer otherGestureRecognizer)
@@ -465,6 +553,15 @@ public sealed class HistoryCollectionViewTouchBehavior : Behavior<CollectionView
         }
     }
 
+    private void onCollectionViewPanStateChanged(UIGestureRecognizer gestureRecognizer)
+    {
+        // UIKit reports both completed and interrupted touches through terminal pan states.
+        if (gestureRecognizer.State is UIGestureRecognizerState.Ended or UIGestureRecognizerState.Cancelled or UIGestureRecognizerState.Failed)
+        {
+            executeCommand(TouchEndedCommand);
+        }
+    }
+
     private object? getItemAt(CGPoint location)
     {
         if (_nativeCollectionView is null)
@@ -492,6 +589,21 @@ public sealed class HistoryCollectionViewTouchBehavior : Behavior<CollectionView
 #endif
 
 #if ANDROID
+    private static SwipeRefreshLayout? findSwipeRefreshLayout(Android.Views.View? view)
+    {
+        while (view is not null)
+        {
+            if (view is SwipeRefreshLayout swipeRefreshLayout)
+            {
+                return swipeRefreshLayout;
+            }
+
+            view = view.Parent as Android.Views.View;
+        }
+
+        return null;
+    }
+
     private static RecyclerView? findRecyclerView(Android.Views.View? view)
     {
         if (view is null)
@@ -578,6 +690,14 @@ public sealed class HistoryCollectionViewTouchBehavior : Behavior<CollectionView
         if (parameter is not null && command?.CanExecute(parameter) == true)
         {
             command.Execute(parameter);
+        }
+    }
+
+    private static void executeCommand(ICommand? command)
+    {
+        if (command?.CanExecute(null) == true)
+        {
+            command.Execute(null);
         }
     }
 }

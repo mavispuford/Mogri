@@ -50,6 +50,14 @@ Add Text and Emoji to the canvas to help with generation
 
 &nbsp; ![Text Demo](Media/ReadmeImages/TextDemo.gif) &nbsp;&nbsp; ![Emoji Demo](Media/ReadmeImages/EmojiDemo.gif)
 
+#### History & Vault Mode
+
+The **History** page archives previously generated images and lets you quickly send prompts or source images back to Canvas or Generate.
+
+- **Vault Mode**: Double pull-down on the History grid to reveal your private vault for sensitive images.
+- **Hide & Unhide**: Use multi-select to move images to the vault or restore them back to standard history.
+- **Safe by Default**: Navigating away from History always closes the vault automatically.
+
 
 ## Getting Started
 

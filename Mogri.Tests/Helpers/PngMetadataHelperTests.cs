@@ -177,6 +177,8 @@ public class PngMetadataHelperTests
 
         // Assert
         Assert.NotNull(result);
+        Assert.Equal("a fox, cinematic lighting", result.Prompt);
+        Assert.Equal("flat", result.NegativePrompt);
         var lora = Assert.Single(result.Loras);
         Assert.Equal("detail", lora.Name);
         Assert.Equal("Detail", lora.Alias);

@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mogri.Helpers;
 using Mogri.Interfaces.Coordinators;
 using Mogri.Interfaces.Services;
 using Mogri.Interfaces.ViewModels;
@@ -246,33 +247,36 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
             return;
         }
 
-        var message = $"Prompt: {HistoryItem.Settings.Prompt}\n\n" +
-            $"Negative Prompt: {HistoryItem.Settings.NegativePrompt}\n\n" +
-            $"Steps: {HistoryItem.Settings.Steps}, Sampler: {HistoryItem.Settings.Sampler}\n" +
-            $"Guidance Scale (Cfg): {HistoryItem.Settings.GuidanceScale}\n" +
-            $"Seed: {HistoryItem.Settings.Seed}\n" +
-            $"Size: {HistoryItem.Settings.Width}x{HistoryItem.Settings.Height}\n" +
-            $"Denoising Strength: {HistoryItem.Settings.DenoisingStrength}\n" +
-            $"Model: {HistoryItem.Settings.Model?.DisplayName ?? "Unknown"}";
+        var settings = HistoryItem.Settings;
+        var (prompt, negativePrompt) = settings.GetCombinedPromptAndPromptStyles();
 
-        if (!string.IsNullOrEmpty(HistoryItem.Settings.Scheduler))
+        var message = $"Prompt: {prompt}\n\n" +
+            $"Negative Prompt: {negativePrompt}\n\n" +
+            $"Steps: {settings.Steps}, Sampler: {settings.Sampler}\n" +
+            $"Guidance Scale (Cfg): {settings.GuidanceScale}\n" +
+            $"Seed: {settings.Seed}\n" +
+            $"Size: {settings.Width}x{settings.Height}\n" +
+            $"Denoising Strength: {settings.DenoisingStrength}\n" +
+            $"Model: {settings.Model?.DisplayName ?? "Unknown"}";
+
+        if (!string.IsNullOrEmpty(settings.Scheduler))
         {
-            message += $"\nScheduler: {HistoryItem.Settings.Scheduler}";
+            message += $"\nScheduler: {settings.Scheduler}";
         }
 
-        if (HistoryItem.Settings.DistilledCfgScale.HasValue)
+        if (settings.DistilledCfgScale.HasValue)
         {
-            message += $"\nDistilled CFG Scale: {HistoryItem.Settings.DistilledCfgScale}";
+            message += $"\nDistilled CFG Scale: {settings.DistilledCfgScale}";
         }
 
-        if (HistoryItem.Settings.EnableUpscaling &&
-            !string.IsNullOrEmpty(HistoryItem.Settings.Upscaler) &&
-            HistoryItem.Settings.UpscaleLevel > 0 &&
-            HistoryItem.Settings.UpscaleSteps > 0)
+        if (settings.EnableUpscaling &&
+            !string.IsNullOrEmpty(settings.Upscaler) &&
+            settings.UpscaleLevel > 0 &&
+            settings.UpscaleSteps > 0)
         {
-            message += $"\nUpscaler: {HistoryItem.Settings.Upscaler}\n" +
-                $"Upscale Level: {HistoryItem.Settings.UpscaleLevel}\n" +
-                $"Upscale Steps: {HistoryItem.Settings.UpscaleSteps}\n";
+            message += $"\nUpscaler: {settings.Upscaler}\n" +
+                $"Upscale Level: {settings.UpscaleLevel}\n" +
+                $"Upscale Steps: {settings.UpscaleSteps}\n";
         }
 
         var result = await _popupService.DisplayAlertAsync("Image Info", message, "Copy to clipboard", "Close");
