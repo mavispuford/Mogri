@@ -53,6 +53,27 @@ public class HistoryServiceTests
     }
 
     [Fact]
+    public async Task SearchAsync_LegacyItemWithoutHiddenField_IsIncludedAsVisible()
+    {
+        // Arrange
+        using var fixture = CreateFixture();
+        fixture.InsertLegacy("legacy.png", "legacy prompt");
+        fixture.EnsureHiddenIndex();
+
+        // Act
+        var visibleResults = (await fixture.Service.SearchAsync(string.Empty, 0, 10)).ToList();
+        var textResults = (await fixture.Service.SearchAsync("legacy", 0, 10)).ToList();
+        var hiddenResults = (await fixture.Service.SearchAsync(string.Empty, 0, 10, isHidden: true)).ToList();
+
+        // Assert
+        Assert.Single(visibleResults);
+        Assert.Equal("legacy.png", visibleResults[0].ImageFileName);
+        Assert.Single(textResults);
+        Assert.Equal("legacy.png", textResults[0].ImageFileName);
+        Assert.Empty(hiddenResults);
+    }
+
+    [Fact]
     public async Task SetItemsHiddenAsync_BatchUpdatesVisibility()
     {
         // Arrange
@@ -102,6 +123,7 @@ public class HistoryServiceTests
     {
         return new HistoryEntity
         {
+            Id = ObjectId.NewObjectId(),
             ImageFileName = fileName,
             ThumbnailFileName = $"thumbnail-{fileName}",
             UserPrompt = prompt,
@@ -130,6 +152,27 @@ public class HistoryServiceTests
             using var database = new LiteDatabase(Path.Combine(databaseDirectory, "history.db"));
             var collection = database.GetCollection<HistoryEntity>(CollectionName);
             collection.InsertBulk(items);
+        }
+
+        public void InsertLegacy(string fileName, string prompt)
+        {
+            using var database = new LiteDatabase(Path.Combine(databaseDirectory, "history.db"));
+            var collection = database.GetCollection(CollectionName);
+            collection.Insert(new BsonDocument
+            {
+                ["_id"] = ObjectId.NewObjectId(),
+                [nameof(HistoryEntity.ImageFileName)] = fileName,
+                [nameof(HistoryEntity.ThumbnailFileName)] = $"thumbnail-{fileName}",
+                [nameof(HistoryEntity.UserPrompt)] = prompt,
+                [nameof(HistoryEntity.CreatedAt)] = DateTime.UtcNow
+            });
+        }
+
+        public void EnsureHiddenIndex()
+        {
+            using var database = new LiteDatabase(Path.Combine(databaseDirectory, "history.db"));
+            var collection = database.GetCollection<HistoryEntity>(CollectionName);
+            collection.EnsureIndex(x => x.IsHidden);
         }
 
         public void Dispose()

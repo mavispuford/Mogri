@@ -128,6 +128,7 @@ public class HistoryService : IHistoryService
 
                         var entity = new HistoryEntity
                         {
+                            Id = ObjectId.NewObjectId(),
                             ImageFileName = filePath,
                             ThumbnailFileName = Path.Combine(cacheDir, Constants.ThumbnailPrefix + fileInfo.Name), // Approximate, standard naming convention
                             UserPrompt = positive,
@@ -160,11 +161,12 @@ public class HistoryService : IHistoryService
             using var db = GetDatabase();
             var col = db.GetCollection<HistoryEntity>(CollectionName);
             var result = Enumerable.Empty<HistoryEntity>();
+            var hiddenFilter = CreateHiddenFilter(isHidden);
 
             if (string.IsNullOrWhiteSpace(query))
             {
                 result = col.Query()
-                    .Where(x => x.IsHidden == isHidden)
+                    .Where(hiddenFilter)
                     .OrderByDescending(x => x.CreatedAt)
                     .Skip(skip)
                     .Limit(take)
@@ -184,10 +186,9 @@ public class HistoryService : IHistoryService
 
                 // Fetch all matching records to sort them by relevance in memory
                 var candidates = col.Query()
-                    .Where(x => x.IsHidden == isHidden &&
-                                ((x.UserPrompt != null && x.UserPrompt.ToLower().Contains(cleanQuery)) ||
+                    .Where(hiddenFilter)
+                    .Where(x => (x.UserPrompt != null && x.UserPrompt.ToLower().Contains(cleanQuery)) ||
                                 (x.NegativePrompt != null && x.NegativePrompt.ToLower().Contains(cleanQuery)))
-                    )
                     .ToEnumerable();
 
                 if (isExact)
@@ -213,6 +214,16 @@ public class HistoryService : IHistoryService
             // Materialize list before disposing DB
             return (IEnumerable<HistoryEntity>)result.ToList();
         });
+    }
+
+    private static BsonExpression CreateHiddenFilter(bool isHidden)
+    {
+        var fieldName = nameof(HistoryEntity.IsHidden);
+        var predicate = isHidden
+            ? $"$.{fieldName} = true"
+            : $"$.{fieldName} = false OR IS_NULL($.{fieldName})";
+
+        return BsonExpression.Create(predicate);
     }
 
     public Task SetItemsHiddenAsync(IEnumerable<HistoryEntity> items, bool isHidden)
