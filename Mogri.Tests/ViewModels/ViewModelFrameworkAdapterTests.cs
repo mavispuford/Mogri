@@ -161,6 +161,7 @@ public class ViewModelFrameworkAdapterTests
             serviceProvider.Object,
             popupService.Object,
             toastService.Object,
+            new Mock<IHapticsService>().Object,
             mainThreadService.Object,
             navigationService.Object,
             loadingCoordinator.Object)
@@ -198,6 +199,7 @@ public class ViewModelFrameworkAdapterTests
             serviceProvider.Object,
             popupService.Object,
             toastService.Object,
+            new Mock<IHapticsService>().Object,
             mainThreadService.Object,
             navigationService.Object,
             loadingCoordinator.Object)
@@ -249,6 +251,7 @@ public class ViewModelFrameworkAdapterTests
             serviceProvider.Object,
             popupService.Object,
             toastService.Object,
+            new Mock<IHapticsService>().Object,
             mainThreadService.Object,
             navigationService.Object,
             loadingCoordinator.Object)
@@ -307,6 +310,7 @@ public class ViewModelFrameworkAdapterTests
             serviceProvider.Object,
             popupService.Object,
             toastService.Object,
+            new Mock<IHapticsService>().Object,
             mainThreadService.Object,
             navigationService.Object,
             loadingCoordinator.Object)
@@ -360,7 +364,7 @@ public class ViewModelFrameworkAdapterTests
             .ReturnsAsync(true);
         historyService
             .Setup(service => service.SearchAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
-            .ReturnsAsync((string _, int skip, int take) =>
+            .ReturnsAsync((string _, int skip, int take, bool _) =>
                 (IList<HistoryEntity>)((skip, take) switch
                 {
                     (0, 48) => initialEntities,
@@ -393,6 +397,7 @@ public class ViewModelFrameworkAdapterTests
             serviceProvider.Object,
             popupService.Object,
             toastService.Object,
+            new Mock<IHapticsService>().Object,
             mainThreadService.Object,
             navigationService.Object,
             loadingCoordinator.Object);
@@ -439,7 +444,7 @@ public class ViewModelFrameworkAdapterTests
             .ReturnsAsync(true);
         historyService
             .Setup(service => service.SearchAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
-            .ReturnsAsync((string _, int skip, int take) =>
+            .ReturnsAsync((string _, int skip, int take, bool _) =>
                 (IList<HistoryEntity>)((skip, take) switch
                 {
                     (0, 48) => initialEntities,
@@ -472,6 +477,7 @@ public class ViewModelFrameworkAdapterTests
             serviceProvider.Object,
             popupService.Object,
             toastService.Object,
+            new Mock<IHapticsService>().Object,
             mainThreadService.Object,
             navigationService.Object,
             loadingCoordinator.Object);
@@ -509,7 +515,7 @@ public class ViewModelFrameworkAdapterTests
             .ReturnsAsync(true);
         historyService
             .Setup(service => service.SearchAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
-            .ReturnsAsync((string _, int skip, int take) =>
+            .ReturnsAsync((string _, int skip, int take, bool _) =>
                 (IList<Mogri.Models.HistoryEntity>)((skip, take) switch
                 {
                     (0, 48) => new List<Mogri.Models.HistoryEntity>(),
@@ -538,6 +544,7 @@ public class ViewModelFrameworkAdapterTests
             serviceProvider.Object,
             popupService.Object,
             toastService.Object,
+            new Mock<IHapticsService>().Object,
             mainThreadService.Object,
             navigationService.Object,
             loadingCoordinator.Object);

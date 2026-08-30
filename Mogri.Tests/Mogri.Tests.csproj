@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="LiteDB" Version="5.0.21" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
     <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.100" />
     <PackageReference Include="Microsoft.Maui.Essentials" Version="10.0.100" />
@@ -40,6 +41,7 @@
     <Compile Include="..\Mogri\Interfaces\Coordinators\IImageGenerationCoordinator.cs" Link="Shared\Interfaces\Coordinators\IImageGenerationCoordinator.cs" />
     <Compile Include="..\Mogri\Interfaces\Coordinators\ILoadingCoordinator.cs" Link="Shared\Interfaces\Coordinators\ILoadingCoordinator.cs" />
     <Compile Include="..\Mogri\Interfaces\Services\IPresetService.cs" Link="Shared\Interfaces\Services\IPresetService.cs" />
+    <Compile Include="..\Mogri\Services\HistoryService.cs" Link="Shared\Services\HistoryService.cs" />
     <Compile Include="..\Mogri\Coordinators\CanvasWorkflowCoordinator.cs" Link="Shared\Coordinators\CanvasWorkflowCoordinator.cs" />
     <Compile Include="..\Mogri\Models\CanvasSegmentationImageStateChangedEventArgs.cs" Link="Shared\Models\CanvasSegmentationImageStateChangedEventArgs.cs" />
     <Compile Include="..\Mogri\Models\CanvasSegmentationInvertRequest.cs" Link="Shared\Models\CanvasSegmentationInvertRequest.cs" />

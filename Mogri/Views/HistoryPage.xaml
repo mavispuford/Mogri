@@ -19,14 +19,23 @@
               ColumnSpacing="10"
               Padding="0,0,10,0">
             
-            <Border Grid.Column="0" StrokeShape="RoundRectangle 23" StrokeThickness="0" Background="{AppThemeBinding Light=#F0F0F0, Dark=#303030}" Padding="10,0" HeightRequest="{OnPlatform Android=46, iOS=36}" VerticalOptions="Center">
+            <Border Grid.Column="0" Stroke="Transparent" StrokeShape="RoundRectangle 23" StrokeThickness="0" Background="{AppThemeBinding Light=#F0F0F0, Dark=#303030}" Padding="10,0" HeightRequest="{OnPlatform Android=46, iOS=36}" VerticalOptions="Center">
+                <Border.Triggers>
+                    <DataTrigger TargetType="Border" Binding="{Binding IsVaultMode}" Value="True">
+                        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource SteelRed}, Dark={StaticResource LivingCoral}}" />
+                        <Setter Property="StrokeThickness" Value="1.5" />
+                    </DataTrigger>
+                </Border.Triggers>
                 <Grid ColumnDefinitions="Auto, *">
                     <Image Grid.Column="0" VerticalOptions="Center" Margin="0,0,5,0">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ExitVaultModeCommand}" />
+                        </Image.GestureRecognizers>
                         <Image.Source>
-                            <FontImageSource Glyph="&#xe8b6;" FontFamily="{StaticResource IconFontRegular}" Size="20" Color="{AppThemeBinding Light={StaticResource Primary}, Dark=Gray}" />
+                            <FontImageSource Glyph="{Binding IsVaultMode, Converter={StaticResource BoolToSearchGlyph}}" FontFamily="{StaticResource IconFontRegular}" Size="20" Color="{AppThemeBinding Light={StaticResource Primary}, Dark=Gray}" />
                         </Image.Source>
                     </Image>
-                    <Entry Grid.Column="1" HeightRequest="{OnPlatform Android=46, iOS=36}" Placeholder="Search history..." PlaceholderColor="{AppThemeBinding Light=#6E6E6E, Dark=#B8B8B8}" VerticalTextAlignment="Center" Text="{Binding SearchText}" VerticalOptions="Fill" BackgroundColor="Transparent" FontSize="14" ClearButtonVisibility="WhileEditing" ReturnType="Search" FontFamily="ComfortaaBold" />
+                    <Entry Grid.Column="1" HeightRequest="{OnPlatform Android=46, iOS=36}" Placeholder="{Binding SearchPlaceholderText}" PlaceholderColor="{AppThemeBinding Light=#6E6E6E, Dark=#B8B8B8}" VerticalTextAlignment="Center" Text="{Binding SearchText}" VerticalOptions="Fill" Background="Transparent" FontSize="14" ClearButtonVisibility="WhileEditing" ReturnType="Search" FontFamily="ComfortaaBold" />
                 </Grid>
             </Border>
 
@@ -55,28 +64,32 @@
         <ResourceDictionary>
             <toolkit:InvertedBoolConverter x:Key="InvertedBool" />
             <toolkit:BoolToObjectConverter x:Key="BoolToSelectionModeGlyph" TrueObject="&#xe5cd;" FalseObject="&#xe86c;" />
-            <toolkit:BoolToObjectConverter x:Key="BoolToLoadingText" TrueObject="Loading history..." FalseObject="No items found." />
+            <toolkit:BoolToObjectConverter x:Key="BoolToSearchGlyph" TrueObject="&#xe897;" FalseObject="&#xe8b6;" />
             <toolkit:BoolToObjectConverter x:Key="BoolToSelectionMode" TrueObject="{x:Static SelectionMode.Multiple}" FalseObject="{x:Static SelectionMode.None}" />
         </ResourceDictionary>
     </views:BasePage.Resources>
     
     <Grid>
-        <CollectionView ItemsSource="{Binding HistoryItems}"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}"
-                        CanReorderItems="False"
-                        HorizontalOptions="Fill"
-                        VerticalOptions="Fill"
-                        RemainingItemsThreshold="18"
-                        RemainingItemsThresholdReachedCommand="{Binding LoadItemsCommand}"
-                        ItemSizingStrategy="MeasureFirstItem"
-                        SelectionMode="{Binding SelectionModeEnabled, Converter={StaticResource BoolToSelectionMode}}"
-                        SelectedItems="{Binding SelectedItems, Mode=TwoWay}"
-                        SelectionChangedCommand="{Binding SelectionChangedCommand}">
+        <RefreshView IsRefreshing="{Binding IsRefreshing}"
+                 Command="{Binding PullDownGestureCommand}"
+                 RefreshColor="Transparent">
+            <CollectionView ItemsSource="{Binding HistoryItems}"
+                    Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}"
+                    CanReorderItems="False"
+                    HorizontalOptions="Fill"
+                    VerticalOptions="Fill"
+                    RemainingItemsThreshold="18"
+                    RemainingItemsThresholdReachedCommand="{Binding LoadItemsCommand}"
+                    ItemSizingStrategy="MeasureFirstItem"
+                    SelectionMode="{Binding SelectionModeEnabled, Converter={StaticResource BoolToSelectionMode}}"
+                    SelectedItems="{Binding SelectedItems, Mode=TwoWay}"
+                    SelectionChangedCommand="{Binding SelectionChangedCommand}">
             <CollectionView.Behaviors>
                 <behaviors:HistoryCollectionViewTouchBehavior x:DataType="{x:Null}"
                                                                IsEnabled="{Binding BindingContext.SelectionModeEnabled, Source={x:Reference HistoryPageRoot}, Converter={StaticResource InvertedBool}}"
                                                                TapCommand="{Binding BindingContext.ItemTappedCommand, Source={x:Reference HistoryPageRoot}}"
                                                                LongPressCommand="{Binding BindingContext.ItemLongPressedCommand, Source={x:Reference HistoryPageRoot}}"
+                                                               TouchEndedCommand="{Binding BindingContext.RefreshEndedCommand, Source={x:Reference HistoryPageRoot}}"
                                                                LongPressDuration="500" />
             </CollectionView.Behaviors>
             <CollectionView.ItemsLayout>
@@ -92,9 +105,15 @@
                                        VerticalOptions="Center"
                                        IsVisible="{Binding IsLoading}"
                                        IsRunning="{Binding IsLoading}" />
-                    <Label Grid.Row="2" Text="{Binding IsLoading, Converter={StaticResource BoolToLoadingText}}"
+                    <Label Grid.Row="2" Text="{Binding EmptyViewText}"
                            FontSize="18"
-                           HorizontalTextAlignment="Center"/>
+                           HorizontalTextAlignment="Center">
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label" Binding="{Binding IsLoading}" Value="True">
+                                <Setter Property="Text" Value="Loading history..." />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
                 </Grid>
             </CollectionView.EmptyView>
             <CollectionView.ItemTemplate>
@@ -145,7 +164,8 @@
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
-        </CollectionView>
+            </CollectionView>
+        </RefreshView>
 
         <Grid x:Name="BottomPanel"
               VerticalOptions="End"
@@ -166,7 +186,7 @@
                 </Border.Shadow>
             </Border>
 
-            <Grid ColumnDefinitions="*,auto"
+            <Grid ColumnDefinitions="*,auto,auto"
                   VerticalOptions="Start"
                   InputTransparent="True"
                   CascadeInputTransparent="False">
@@ -174,6 +194,44 @@
                 <Label Grid.Column="0" Margin="30,0,0,0" Text="{Binding SelectedItemsText}" FontSize="16" VerticalTextAlignment="Center" InputTransparent="True"/>
 
                 <ContentView Grid.Column="1"
+                             Padding="20"
+                             WidthRequest="84"
+                             InputTransparent="False"
+                             IsVisible="{Binding IsVaultMode, Converter={StaticResource InvertedBool}}"
+                             ToolTipProperties.Text="Move to Vault">
+                    <ContentView.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding HideSelectedItemsCommand}"/>
+                    </ContentView.GestureRecognizers>
+
+                    <Image HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           InputTransparent="True">
+                        <Image.Source>
+                            <FontImageSource Glyph="&#xe8f5;" FontFamily="{StaticResource IconFontRegular}" Size="36" Color="{StaticResource LivingCoral}" />
+                        </Image.Source>
+                    </Image>
+                </ContentView>
+
+                <ContentView Grid.Column="1"
+                             Padding="20"
+                             WidthRequest="84"
+                             InputTransparent="False"
+                             IsVisible="{Binding IsVaultMode}"
+                             ToolTipProperties.Text="Restore to History">
+                    <ContentView.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding UnhideSelectedItemsCommand}"/>
+                    </ContentView.GestureRecognizers>
+
+                    <Image HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           InputTransparent="True">
+                        <Image.Source>
+                            <FontImageSource Glyph="&#xe8f4;" FontFamily="{StaticResource IconFontRegular}" Size="36" Color="{StaticResource LivingCoral}" />
+                        </Image.Source>
+                    </Image>
+                </ContentView>
+
+                <ContentView Grid.Column="2"
                              Padding="20"
                              WidthRequest="84"
                              InputTransparent="False"

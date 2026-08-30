@@ -11,4 +11,5 @@ public class HistoryEntity
     public string? UserPrompt { get; set; }
     public string? NegativePrompt { get; set; }
     public DateTime CreatedAt { get; set; }
+    public bool IsHidden { get; set; } = false;
 }

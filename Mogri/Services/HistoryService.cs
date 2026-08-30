@@ -17,9 +17,9 @@ public class HistoryService : IHistoryService
     private readonly IFileService _fileService;
     private const string CollectionName = "history";
 
-    public HistoryService(IFileService fileService)
+    public HistoryService(IFileService fileService, string? dbPath = null)
     {
-        _dbPath = Path.Combine(FileSystem.AppDataDirectory, "history.db");
+        _dbPath = dbPath ?? Path.Combine(FileSystem.AppDataDirectory, "history.db");
         _fileService = fileService;
     }
 
@@ -40,6 +40,7 @@ public class HistoryService : IHistoryService
             col.DropIndex(nameof(HistoryEntity.UserPrompt));
             col.EnsureIndex(x => x.ImageFileName);
             col.EnsureIndex(x => x.CreatedAt);
+            col.EnsureIndex(x => x.IsHidden);
 
             // Get all files from cache directory (source of truth)
             var cacheDir = FileSystem.CacheDirectory;
@@ -152,7 +153,7 @@ public class HistoryService : IHistoryService
         });
     }
 
-    public Task<IEnumerable<HistoryEntity>> SearchAsync(string query, int skip, int take)
+    public Task<IEnumerable<HistoryEntity>> SearchAsync(string query, int skip, int take, bool isHidden = false)
     {
         return Task.Run(() =>
         {
@@ -163,6 +164,7 @@ public class HistoryService : IHistoryService
             if (string.IsNullOrWhiteSpace(query))
             {
                 result = col.Query()
+                    .Where(x => x.IsHidden == isHidden)
                     .OrderByDescending(x => x.CreatedAt)
                     .Skip(skip)
                     .Limit(take)
@@ -182,8 +184,10 @@ public class HistoryService : IHistoryService
 
                 // Fetch all matching records to sort them by relevance in memory
                 var candidates = col.Query()
-                    .Where(x => (x.UserPrompt != null && x.UserPrompt.ToLower().Contains(cleanQuery)) ||
+                    .Where(x => x.IsHidden == isHidden &&
+                                ((x.UserPrompt != null && x.UserPrompt.ToLower().Contains(cleanQuery)) ||
                                 (x.NegativePrompt != null && x.NegativePrompt.ToLower().Contains(cleanQuery)))
+                    )
                     .ToEnumerable();
 
                 if (isExact)
@@ -208,6 +212,38 @@ public class HistoryService : IHistoryService
 
             // Materialize list before disposing DB
             return (IEnumerable<HistoryEntity>)result.ToList();
+        });
+    }
+
+    public Task SetItemsHiddenAsync(IEnumerable<HistoryEntity> items, bool isHidden)
+    {
+        return Task.Run(() =>
+        {
+            using var db = GetDatabase();
+            var col = db.GetCollection<HistoryEntity>(CollectionName);
+
+            if (items is null)
+            {
+                return;
+            }
+
+            foreach (var item in items)
+            {
+                if (item is null || item.Id is null)
+                {
+                    continue;
+                }
+
+                item.IsHidden = isHidden;
+                var storedItem = col.FindById(item.Id);
+                if (storedItem is null)
+                {
+                    continue;
+                }
+
+                storedItem.IsHidden = isHidden;
+                col.Update(storedItem);
+            }
         });
     }
 

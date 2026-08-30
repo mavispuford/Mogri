@@ -23,6 +23,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     private readonly IServiceProvider _serviceProvider;
     private readonly IPopupService _popupService;
     private readonly IToastService _toastService;
+    private readonly IHapticsService _hapticsService;
     private readonly IMainThreadService _mainThreadService;
 
     private int itemIndex = 0;
@@ -35,6 +36,20 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     private readonly Dictionary<string, HistoryEntity> _selectedEntities = new(StringComparer.Ordinal);
     private bool _isSynchronizingSelection;
     private int _searchVersion;
+    private DateTime _lastPullDownTimestamp = DateTime.MinValue;
+    private const int PullDownWindowSeconds = 2;
+    #if ANDROID
+    private const int RefreshAnimationDelayMilliseconds = 0;
+    #else
+    private const int RefreshAnimationDelayMilliseconds = 500;
+    #endif
+    // Null means the gesture does not request a mode change; otherwise this is the mode to apply after release.
+    private bool? _pendingVaultMode;
+    // The native RefreshView state can lag behind the command on Android, so track the logical request separately.
+    private bool _refreshRequested;
+    // Delayed refresh completion must not update a page after navigation has changed its state.
+    private int _navigationVersion;
+    private bool _reloadOnNextNavigation;
 
     [ObservableProperty]
     public partial ObservableCollection<IHistoryItemViewModel> HistoryItems { get; set; } = new ObservableRangeCollection<IHistoryItemViewModel>();
@@ -52,7 +67,19 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     public partial bool IsLoading { get; set; } = true;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SearchPlaceholderText))]
+    [NotifyPropertyChangedFor(nameof(EmptyViewText))]
+    public partial bool IsVaultMode { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsRefreshing { get; set; }
+
+    [ObservableProperty]
     public partial string? SearchText { get; set; }
+
+    public string SearchPlaceholderText => IsVaultMode ? "Search vault..." : "Search history...";
+
+    public string EmptyViewText => IsVaultMode ? "Vault is empty." : "No items found.";
 
     private CancellationTokenSource? _searchDebounceCts;
 
@@ -61,11 +88,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         var searchVersion = ++_searchVersion;
         clearSelection();
 
-        if (_searchDebounceCts != null)
-        {
-            _searchDebounceCts.Cancel();
-            _searchDebounceCts.Dispose();
-        }
+        cancelSearchDebounce();
         var cts = new CancellationTokenSource();
         _searchDebounceCts = cts;
         var token = cts.Token;
@@ -89,7 +112,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
                 try
                 {
-                    if (token.IsCancellationRequested) return;
+                    if (token.IsCancellationRequested || searchVersion != _searchVersion) return;
 
                     itemIndex = 0;
                     HistoryItems.Clear();
@@ -109,6 +132,18 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         updateSelectionStates();
     }
 
+    private void cancelSearchDebounce()
+    {
+        if (_searchDebounceCts == null)
+        {
+            return;
+        }
+
+        _searchDebounceCts.Cancel();
+        _searchDebounceCts.Dispose();
+        _searchDebounceCts = null;
+    }
+
     public ICommand? HideBottomPanelCommand { get; set; }
 
     public ICommand? ShowBottomPanelCommand { get; set; }
@@ -119,6 +154,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         IServiceProvider serviceProvider,
         IPopupService popupService,
         IToastService toastService,
+        IHapticsService hapticsService,
         IMainThreadService mainThreadService,
         INavigationService navigationService,
         ILoadingCoordinator loadingCoordinator) : base(loadingCoordinator, navigationService)
@@ -129,6 +165,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _popupService = popupService ?? throw new ArgumentNullException(nameof(popupService));
         _toastService = toastService ?? throw new ArgumentNullException(nameof(toastService));
+        _hapticsService = hapticsService ?? throw new ArgumentNullException(nameof(hapticsService));
         _mainThreadService = mainThreadService ?? throw new ArgumentNullException(nameof(mainThreadService));
     }
 
@@ -136,6 +173,14 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     {
         await base.OnNavigatedToAsync();
 
+        _navigationVersion++;
+        var shouldReload = _reloadOnNextNavigation || IsVaultMode;
+        _reloadOnNextNavigation = false;
+        IsVaultMode = false;
+        _pendingVaultMode = null;
+        _refreshRequested = false;
+        _lastPullDownTimestamp = DateTime.MinValue;
+        cancelSearchDebounce();
         _isInitialized = false;
 
         _ = Task.Run(async () =>
@@ -146,9 +191,9 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
                 await _mainThreadService.InvokeOnMainThreadAsync(async () =>
                 {
-                    if (hasChanges || HistoryItems.Count == 0 || !string.IsNullOrWhiteSpace(SearchText))
+                    if (shouldReload || hasChanges || HistoryItems.Count == 0 || !string.IsNullOrWhiteSpace(SearchText))
                     {
-                        clearSelection();
+                        resetSelectionMode();
                         itemIndex = 0;
                         HistoryItems.Clear();
                         _loadedEntities.Clear();
@@ -172,6 +217,121 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         });
     }
 
+    public override async Task OnNavigatedFromAsync()
+    {
+        _navigationVersion++;
+        _reloadOnNextNavigation = IsVaultMode;
+        IsVaultMode = false;
+        IsRefreshing = false;
+        _pendingVaultMode = null;
+        _refreshRequested = false;
+        _lastPullDownTimestamp = DateTime.MinValue;
+        cancelSearchDebounce();
+
+        await base.OnNavigatedFromAsync();
+    }
+
+    [RelayCommand]
+    private async Task PullDownGesture()
+    {
+        _refreshRequested = true;
+        IsRefreshing = true;
+
+        if (SelectionModeEnabled)
+        {
+            return;
+        }
+
+        if (IsVaultMode)
+        {
+            _lastPullDownTimestamp = DateTime.MinValue;
+            _pendingVaultMode = false;
+            _hapticsService.Perform(Enums.HapticType.Click);
+            return;
+        }
+
+        var now = DateTime.UtcNow;
+        if ((now - _lastPullDownTimestamp).TotalSeconds <= PullDownWindowSeconds)
+        {
+            _lastPullDownTimestamp = DateTime.MinValue;
+            _pendingVaultMode = true;
+            _hapticsService.Perform(Enums.HapticType.LongPress);
+            return;
+        }
+
+        _pendingVaultMode = null;
+        _lastPullDownTimestamp = now;
+        _hapticsService.Perform(Enums.HapticType.Click);
+        await _toastService.ShowAsync("Swipe down again to open vault");
+    }
+
+    [RelayCommand]
+    private async Task RefreshEnded()
+    {
+        // The touch behavior also reports ordinary scrolling, so use the command signal instead of sampling IsRefreshing.
+        if (!_refreshRequested)
+        {
+            return;
+        }
+
+        var navigationVersion = _navigationVersion;
+        var pendingVaultMode = _pendingVaultMode;
+        _refreshRequested = false;
+        _pendingVaultMode = null;
+
+        // Let the native refresh control settle before changing the collection contents.
+        await Task.Delay(RefreshAnimationDelayMilliseconds);
+
+        if (navigationVersion != _navigationVersion)
+        {
+            return;
+        }
+
+        IsRefreshing = false;
+
+        if (pendingVaultMode.HasValue)
+        {
+            await reloadHistoryForModeAsync(pendingVaultMode.Value);
+        }
+    }
+
+    [RelayCommand]
+    private async Task ExitVaultMode()
+    {
+        if (!IsVaultMode)
+        {
+            return;
+        }
+
+        _lastPullDownTimestamp = DateTime.MinValue;
+        await reloadHistoryForModeAsync(false);
+    }
+
+    private async Task reloadHistoryForModeAsync(bool isVaultMode)
+    {
+        cancelSearchDebounce();
+        SearchText = string.Empty;
+        IsVaultMode = isVaultMode;
+
+        await _semaphore.WaitAsync();
+        try
+        {
+            itemIndex = 0;
+            HistoryItems.Clear();
+            _loadedEntities.Clear();
+            resetSelectionMode();
+
+            if (_isInitialized)
+            {
+                await LoadItemsCoreAsync(initialLoadTakeCount);
+            }
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
     [RelayCommand]
     private async Task ClearHistory()
     {
@@ -182,7 +342,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
             return;
         }
 
-        var allItems = await _historyService.SearchAsync(string.Empty, 0, int.MaxValue);
+        var allItems = await _historyService.SearchAsync(string.Empty, 0, int.MaxValue, isHidden: IsVaultMode);
 
         await _historyService.DeleteItemsAsync(allItems);
 
@@ -279,7 +439,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
 
     private async Task LoadItemsCoreAsync(int takeCount)
     {
-        var results = (await _historyService.SearchAsync(SearchText ?? string.Empty, itemIndex, takeCount) ?? []).ToList();
+        var results = (await _historyService.SearchAsync(SearchText ?? string.Empty, itemIndex, takeCount, isHidden: IsVaultMode) ?? []).ToList();
         var newItems = new List<(IHistoryItemViewModel ViewModel, HistoryEntity Entity)>();
 
         foreach (var entity in results)
@@ -486,7 +646,7 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
             await _semaphore.WaitAsync();
             try
             {
-                results = (await _historyService.SearchAsync(query, 0, int.MaxValue) ?? []).ToList();
+                results = (await _historyService.SearchAsync(query, 0, int.MaxValue, isHidden: IsVaultMode) ?? []).ToList();
             }
             finally
             {
@@ -607,6 +767,17 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
         SelectedItemsText = "0 items selected";
     }
 
+    private void resetSelectionMode()
+    {
+        if (SelectionModeEnabled)
+        {
+            SelectionModeEnabled = false;
+            HideBottomPanelCommand?.Execute(null);
+        }
+
+        clearSelection();
+    }
+
     private HistoryEntity? getHistoryEntity(IHistoryItemViewModel item)
     {
         if (_loadedEntities.TryGetValue(item, out var entity))
@@ -620,6 +791,50 @@ public partial class HistoryPageViewModel : PageViewModel, IHistoryPageViewModel
     private static string getEntityKey(HistoryEntity entity)
     {
         return entity.ImageFileName;
+    }
+
+    [RelayCommand]
+    private Task HideSelectedItems()
+    {
+        return setSelectedItemsHiddenAsync(true);
+    }
+
+    [RelayCommand]
+    private Task UnhideSelectedItems()
+    {
+        return setSelectedItemsHiddenAsync(false);
+    }
+
+    private async Task setSelectedItemsHiddenAsync(bool isHidden)
+    {
+        if (SelectedItems == null)
+        {
+            return;
+        }
+
+        synchronizeSelectedEntities();
+        var entities = _selectedEntities.Values.ToList();
+        if (entities.Count == 0)
+        {
+            return;
+        }
+
+        try
+        {
+            await _historyService.SetItemsHiddenAsync(entities, isHidden);
+            await RemoveDeletedEntitiesAndBackfillAsync(entities);
+            resetSelectionMode();
+
+            var message = isHidden
+                ? $"{entities.Count} item(s) moved to vault"
+                : $"{entities.Count} item(s) restored to history";
+            await _toastService.ShowAsync(message);
+        }
+        catch (Exception ex)
+        {
+            var action = isHidden ? "move items to vault" : "restore items to history";
+            await _toastService.ShowAsync($"Failed to {action}: {ex.Message}");
+        }
     }
 
     [RelayCommand]
