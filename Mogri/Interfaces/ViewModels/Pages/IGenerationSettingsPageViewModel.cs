@@ -39,6 +39,10 @@ public interface IGenerationSettingsPageViewModel : IPageViewModel
 
     bool IsDistilledCfgScaleVisible { get; set; }
 
+    bool IsVaeVisible { get; set; }
+
+    bool IsTextEncoderVisible { get; set; }
+
     IModelViewModel? Model { get; set; }
 
     string? Sampler { get; set; }

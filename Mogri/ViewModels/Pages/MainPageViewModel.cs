@@ -170,6 +170,7 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
                 _settings.Scheduler = profile.DefaultScheduler;
                 _settings.Vae = profile.DefaultVae;
                 _settings.TextEncoder = profile.DefaultTextEncoder;
+                _settings.TextEncoderSecondary = profile.DefaultTextEncoderSecondary;
             }
 
             var samplers = await _stableDiffusionService.GetSamplersAsync();
@@ -223,13 +224,14 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
             if (vaes != null && vaes.Any())
             {
-                if (!string.IsNullOrEmpty(currentVae) && vaes.Contains(currentVae))
+                var currentVaeMatch = ModelResourceHelper.FindMatch(vaes, currentVae);
+                if (currentVaeMatch != null)
                 {
-                    _settings.Vae = currentVae;
+                    _settings.Vae = currentVaeMatch;
                 }
                 else if (!string.IsNullOrEmpty(profile.DefaultVae))
                 {
-                    _settings.Vae = vaes.FirstOrDefault(v => v.Contains(profile.DefaultVae, StringComparison.OrdinalIgnoreCase))
+                    _settings.Vae = ModelResourceHelper.FindMatch(vaes, profile.DefaultVae)
                         ?? vaes.FirstOrDefault();
                 }
                 else
@@ -243,13 +245,16 @@ public partial class MainPageViewModel : PageViewModel, IMainPageViewModel
 
             if (textEncoders != null && textEncoders.Any())
             {
-                if (!string.IsNullOrEmpty(currentTextEncoder) && textEncoders.Contains(currentTextEncoder))
+                var currentTextEncoderMatch = ModelResourceHelper.FindMatch(textEncoders, currentTextEncoder);
+                var isKreaModel = _settings.ModelType is ModelType.Krea2Turbo or ModelType.Krea2Raw;
+                if (currentTextEncoderMatch != null &&
+                    (!isKreaModel || ModelResourceHelper.IsKreaTextEncoder(currentTextEncoderMatch)))
                 {
-                    _settings.TextEncoder = currentTextEncoder;
+                    _settings.TextEncoder = currentTextEncoderMatch;
                 }
                 else if (!string.IsNullOrEmpty(profile.DefaultTextEncoder))
                 {
-                    _settings.TextEncoder = textEncoders.FirstOrDefault(v => v.Contains(profile.DefaultTextEncoder, StringComparison.OrdinalIgnoreCase))
+                    _settings.TextEncoder = ModelResourceHelper.FindMatch(textEncoders, profile.DefaultTextEncoder)
                         ?? textEncoders.FirstOrDefault();
                 }
                 else

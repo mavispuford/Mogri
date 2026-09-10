@@ -40,6 +40,7 @@ public class PromptSettingsTests
         Assert.Equal(original.Scheduler, clone.Scheduler);
         Assert.Equal(original.Vae, clone.Vae);
         Assert.Equal(original.TextEncoder, clone.TextEncoder);
+        Assert.Equal(original.TextEncoderSecondary, clone.TextEncoderSecondary);
         Assert.Equal(original.EnableTiling, clone.EnableTiling);
         Assert.Equal(original.Seed, clone.Seed);
         Assert.Equal(original.Upscaler, clone.Upscaler);
@@ -146,6 +147,7 @@ public class PromptSettingsTests
             Scheduler = "karras",
             Vae = "auto",
             TextEncoder = "clip",
+            TextEncoderSecondary = "clip_l",
             EnableTiling = true,
             Seed = 42,
             Upscaler = "ESRGAN",

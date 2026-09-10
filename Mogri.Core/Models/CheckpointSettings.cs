@@ -12,6 +12,7 @@ public class CheckpointSettings
     public string? Scheduler { get; set; }
     public string? Vae { get; set; }
     public string? TextEncoder { get; set; }
+    public string? TextEncoderSecondary { get; set; }
     public double Width { get; set; }
     public double Height { get; set; }
     public int BatchCount { get; set; }
@@ -32,6 +33,7 @@ public class CheckpointSettings
             Scheduler = settings.Scheduler,
             Vae = settings.Vae,
             TextEncoder = settings.TextEncoder,
+            TextEncoderSecondary = settings.TextEncoderSecondary,
             Width = settings.Width,
             Height = settings.Height,
             BatchCount = settings.BatchCount,
@@ -52,6 +54,7 @@ public class CheckpointSettings
         settings.Scheduler = Scheduler;
         settings.Vae = Vae;
         settings.TextEncoder = TextEncoder;
+        settings.TextEncoderSecondary = TextEncoderSecondary;
         settings.Width = Width;
         settings.Height = Height;
         settings.BatchCount = BatchCount;

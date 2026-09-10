@@ -57,6 +57,20 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
     [ObservableProperty]
     public partial bool IsDistilledCfgScaleVisible { get; set; }
 
+    private bool _isVaeVisible;
+    public bool IsVaeVisible
+    {
+        get => _isVaeVisible;
+        set => SetProperty(ref _isVaeVisible, value);
+    }
+
+    private bool _isTextEncoderVisible;
+    public bool IsTextEncoderVisible
+    {
+        get => _isTextEncoderVisible;
+        set => SetProperty(ref _isTextEncoderVisible, value);
+    }
+
     [ObservableProperty]
     public partial IModelViewModel? Model { get; set; }
 
@@ -139,6 +153,17 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
         {
             var profile = GenerationProfile.GetDefault(value);
 
+            var previousInitializingState = _isInitializing;
+            _isInitializing = true;
+            try
+            {
+                Model = FindModelForType(value);
+            }
+            finally
+            {
+                _isInitializing = previousInitializingState;
+            }
+
             Steps = profile.DefaultSteps.ToString();
             CfgScale = profile.DefaultCfg.ToString();
             DistilledCfgScale = profile.DefaultDistilledCfg?.ToString();
@@ -163,8 +188,7 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
 
             if (!string.IsNullOrEmpty(profile.DefaultVae))
             {
-                var match = AvailableVaes.FirstOrDefault(v => v.Contains(profile.DefaultVae, StringComparison.OrdinalIgnoreCase));
-                if (match != null) Vae = match;
+                Vae = ModelResourceHelper.FindMatch(AvailableVaes, profile.DefaultVae) ?? "Automatic";
             }
             else
             {
@@ -173,14 +197,14 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
 
             if (!string.IsNullOrEmpty(profile.DefaultTextEncoder))
             {
-                var match = AvailableTextEncoders.FirstOrDefault(v => v.Contains(profile.DefaultTextEncoder, StringComparison.OrdinalIgnoreCase));
-                if (match != null) TextEncoder = match;
+                TextEncoder = ModelResourceHelper.FindMatch(AvailableTextEncoders, profile.DefaultTextEncoder) ?? "None";
             }
             else
             {
                 TextEncoder = "None";
             }
 
+            UpdateResourceVisibility(value);
             IsDistilledCfgScaleVisible = value == ModelType.ZImageTurbo ||
                 value == ModelType.Flux ||
                 value == ModelType.Krea2Turbo;
@@ -197,35 +221,27 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
         if (_isInitializing || value == null) return;
 
         string savedVae;
-        if (Preferences.Default.ContainsKey($"Vae_{value.Key}"))
+        if (TryGetPreference($"Vae_{value.Key}", "Automatic", out savedVae))
         {
-            savedVae = Preferences.Default.Get($"Vae_{value.Key}", "Automatic");
+            Vae = ModelResourceHelper.FindMatch(AvailableVaes, savedVae) ?? "Automatic";
         }
         else
         {
             var profile = GenerationProfile.GetDefault(SelectedModelType);
-            savedVae = AvailableVaes.FirstOrDefault(v => !string.IsNullOrEmpty(profile.DefaultVae) && v.Contains(profile.DefaultVae, StringComparison.OrdinalIgnoreCase)) ?? "Automatic";
-        }
-
-        if (AvailableVaes.Contains(savedVae))
-        {
-            Vae = savedVae;
+            savedVae = profile.DefaultVae ?? "Automatic";
+            Vae = ModelResourceHelper.FindMatch(AvailableVaes, savedVae) ?? "Automatic";
         }
 
         string savedTextEncoder;
-        if (Preferences.Default.ContainsKey($"TextEncoder_{value.Key}"))
+        if (TryGetPreference($"TextEncoder_{value.Key}", "None", out savedTextEncoder))
         {
-            savedTextEncoder = Preferences.Default.Get($"TextEncoder_{value.Key}", "None");
+            SetTextEncoderFromSavedValue(savedTextEncoder);
         }
         else
         {
             var profile = GenerationProfile.GetDefault(SelectedModelType);
-            savedTextEncoder = AvailableTextEncoders.FirstOrDefault(v => !string.IsNullOrEmpty(profile.DefaultTextEncoder) && v.Contains(profile.DefaultTextEncoder, StringComparison.OrdinalIgnoreCase)) ?? "None";
-        }
-
-        if (AvailableTextEncoders.Contains(savedTextEncoder))
-        {
-            TextEncoder = savedTextEncoder;
+            savedTextEncoder = profile.DefaultTextEncoder ?? "None";
+            SetTextEncoderFromSavedValue(savedTextEncoder);
         }
     }
 
@@ -345,8 +361,8 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
         Scheduler = defaultSettings.Scheduler;
 
         var profile = GenerationProfile.GetDefault(SelectedModelType);
-        Vae = AvailableVaes.FirstOrDefault(v => !string.IsNullOrEmpty(profile.DefaultVae) && v.Contains(profile.DefaultVae, StringComparison.OrdinalIgnoreCase)) ?? "Automatic";
-        TextEncoder = AvailableTextEncoders.FirstOrDefault(v => !string.IsNullOrEmpty(profile.DefaultTextEncoder) && v.Contains(profile.DefaultTextEncoder, StringComparison.OrdinalIgnoreCase)) ?? "None";
+        Vae = ModelResourceHelper.FindMatch(AvailableVaes, profile.DefaultVae) ?? "Automatic";
+        TextEncoder = ModelResourceHelper.FindMatch(AvailableTextEncoders, profile.DefaultTextEncoder) ?? "None";
 
         Seed = defaultSettings.Seed.ToString();
         Steps = defaultSettings.Steps.ToString();
@@ -481,30 +497,35 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
             {
                 if (_settings.Vae != null)
                 {
-                    Vae = _settings.Vae;
+                    Vae = ModelResourceHelper.FindMatch(AvailableVaes, _settings.Vae) ?? "Automatic";
                 }
-                else if (Preferences.Default.ContainsKey($"Vae_{Model.Key}"))
+                else if (TryGetPreference($"Vae_{Model.Key}", "Automatic", out var savedVae))
                 {
-                    Vae = Preferences.Default.Get($"Vae_{Model.Key}", "Automatic");
+                    Vae = ModelResourceHelper.FindMatch(AvailableVaes, savedVae) ?? "Automatic";
                 }
                 else
                 {
                     var profile = GenerationProfile.GetDefault(_settings.ModelType);
-                    Vae = AvailableVaes.FirstOrDefault(v => !string.IsNullOrEmpty(profile.DefaultVae) && v.Contains(profile.DefaultVae, StringComparison.OrdinalIgnoreCase)) ?? "Automatic";
+                    Vae = ModelResourceHelper.FindMatch(AvailableVaes, profile.DefaultVae) ?? "Automatic";
                 }
 
                 if (_settings.TextEncoder != null)
                 {
-                    TextEncoder = _settings.TextEncoder;
+                    var currentTextEncoder = ModelResourceHelper.FindMatch(AvailableTextEncoders, _settings.TextEncoder);
+                    var isKreaModel = _settings.ModelType is ModelType.Krea2Turbo or ModelType.Krea2Raw;
+                    TextEncoder = currentTextEncoder != null &&
+                        (!isKreaModel || ModelResourceHelper.IsKreaTextEncoder(currentTextEncoder))
+                            ? currentTextEncoder
+                            : "None";
                 }
-                else if (Preferences.Default.ContainsKey($"TextEncoder_{Model.Key}"))
+                else if (TryGetPreference($"TextEncoder_{Model.Key}", "None", out var savedTextEncoder))
                 {
-                    TextEncoder = Preferences.Default.Get($"TextEncoder_{Model.Key}", "None");
+                    TextEncoder = ModelResourceHelper.FindMatch(AvailableTextEncoders, savedTextEncoder) ?? "None";
                 }
                 else
                 {
                     var profile = GenerationProfile.GetDefault(_settings.ModelType);
-                    TextEncoder = AvailableTextEncoders.FirstOrDefault(v => !string.IsNullOrEmpty(profile.DefaultTextEncoder) && v.Contains(profile.DefaultTextEncoder, StringComparison.OrdinalIgnoreCase)) ?? "None";
+                    TextEncoder = ModelResourceHelper.FindMatch(AvailableTextEncoders, profile.DefaultTextEncoder) ?? "None";
                 }
             }
             else
@@ -515,6 +536,7 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
 
             Seed = _settings.Seed.ToString();
             SelectedModelType = _settings.ModelType;
+            UpdateResourceVisibility(SelectedModelType);
             Steps = _settings.Steps.ToString();
             Upscaler = _settings.Upscaler?.ToString();
             UpscaleLevel = _settings.UpscaleLevel == 0 ? "2" : _settings.UpscaleLevel.ToString();
@@ -695,6 +717,75 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
         _settings.Scheduler = Scheduler;
         _settings.Vae = Vae;
         _settings.TextEncoder = TextEncoder;
+    }
+
+    private void UpdateResourceVisibility(ModelType modelType)
+    {
+        var profile = GenerationProfile.GetDefault(modelType);
+        IsVaeVisible = CurrentCapabilities.SupportsVaes &&
+            !string.IsNullOrWhiteSpace(profile.DefaultVae);
+        IsTextEncoderVisible = CurrentCapabilities.SupportsTextEncoders &&
+            !string.IsNullOrWhiteSpace(profile.DefaultTextEncoder);
+    }
+
+    private void SetTextEncoderFromSavedValue(string savedTextEncoder)
+    {
+        var savedTextEncoderMatch = ModelResourceHelper.FindMatch(AvailableTextEncoders, savedTextEncoder);
+        var isKreaModel = SelectedModelType is ModelType.Krea2Turbo or ModelType.Krea2Raw;
+        TextEncoder = savedTextEncoderMatch != null &&
+            (!isKreaModel || ModelResourceHelper.IsKreaTextEncoder(savedTextEncoderMatch))
+                ? savedTextEncoderMatch
+                : ModelResourceHelper.FindMatch(AvailableTextEncoders, GenerationProfile.GetDefault(SelectedModelType).DefaultTextEncoder) ?? "None";
+    }
+
+    private static bool TryGetPreference(string key, string defaultValue, out string value)
+    {
+        try
+        {
+            if (Preferences.Default.ContainsKey(key))
+            {
+                value = Preferences.Default.Get(key, defaultValue);
+                return true;
+            }
+        }
+        catch (NotImplementedException)
+        {
+            // MAUI's portable reference assembly does not implement Preferences.
+        }
+
+        value = defaultValue;
+        return false;
+    }
+
+    private IModelViewModel? FindModelForType(ModelType modelType)
+    {
+        if (AvailableModelValues.Count == 0)
+        {
+            return modelType is ModelType.ZImageTurbo or ModelType.Flux or ModelType.Krea2Turbo or ModelType.Krea2Raw
+                ? null
+                : Model;
+        }
+
+        return AvailableModelValues.FirstOrDefault(model => IsModelForType(model, modelType));
+    }
+
+    private static bool IsModelForType(IModelViewModel model, ModelType modelType)
+    {
+        var identity = $"{model.Key} {model.DisplayName}";
+        return modelType switch
+        {
+            ModelType.SD15 => ContainsAny(identity, "sd15", "sd1.5", "v1-5"),
+            ModelType.SDXL => ContainsAny(identity, "sdxl", "sd_xl"),
+            ModelType.ZImageTurbo => ContainsAny(identity, "zimage", "z_image"),
+            ModelType.Flux => identity.Contains("flux", StringComparison.OrdinalIgnoreCase),
+            ModelType.Krea2Turbo or ModelType.Krea2Raw => identity.Contains("krea", StringComparison.OrdinalIgnoreCase),
+            _ => false
+        };
+    }
+
+    private static bool ContainsAny(string value, params string[] candidates)
+    {
+        return candidates.Any(candidate => value.Contains(candidate, StringComparison.OrdinalIgnoreCase));
     }
 
 }

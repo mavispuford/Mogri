@@ -119,17 +119,17 @@
                                 HorizontalOptions="End"/>
                     </ScrollView>
 
-                    <Image Grid.Row="9" WidthRequest="32" IsVisible="{Binding CurrentCapabilities.SupportsVaes}">
+                    <Image Grid.Row="9" WidthRequest="32" IsVisible="{Binding IsVaeVisible}">
                         <Image.Source>
                             <FontImageSource Glyph="&#xe3b8;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                         </Image.Source>
                     </Image>
-                    <Label Grid.Row="9" Grid.Column="1" Text="VAE:" Style="{StaticResource SettingLabel}" IsVisible="{Binding CurrentCapabilities.SupportsVaes}"/>
+                    <Label Grid.Row="9" Grid.Column="1" Text="VAE:" Style="{StaticResource SettingLabel}" IsVisible="{Binding IsVaeVisible}"/>
                     <ScrollView 
                         Grid.Row="9" Grid.Column="2"
                         Orientation="Horizontal"
                         HorizontalOptions="End"
-                        IsVisible="{Binding CurrentCapabilities.SupportsVaes}">
+                        IsVisible="{Binding IsVaeVisible}">
                         <Picker Title="VAE" 
                                 ItemsSource="{Binding AvailableVaes}"
                                 SelectedItem="{Binding Vae}" 
@@ -138,17 +138,17 @@
                                 HorizontalOptions="End"/>
                     </ScrollView>
 
-                    <Image Grid.Row="10" WidthRequest="32" IsVisible="{Binding CurrentCapabilities.SupportsTextEncoders}">
+                    <Image Grid.Row="10" WidthRequest="32" IsVisible="{Binding IsTextEncoderVisible}">
                         <Image.Source>
                             <FontImageSource Glyph="&#xe86f;" FontFamily="{StaticResource IconFontRegular}" Size="32" Color="{StaticResource Tertiary}" />
                         </Image.Source>
                     </Image>
-                    <Label Grid.Row="10" Grid.Column="1" Text="Text Encoder:" Style="{StaticResource SettingLabel}" IsVisible="{Binding CurrentCapabilities.SupportsTextEncoders}"/>
+                    <Label Grid.Row="10" Grid.Column="1" Text="Text Encoder:" Style="{StaticResource SettingLabel}" IsVisible="{Binding IsTextEncoderVisible}"/>
                     <ScrollView 
                         Grid.Row="10" Grid.Column="2"
                         Orientation="Horizontal"
                         HorizontalOptions="End"
-                        IsVisible="{Binding CurrentCapabilities.SupportsTextEncoders}">
+                        IsVisible="{Binding IsTextEncoderVisible}">
                         <Picker Title="Text Encoder" 
                                 ItemsSource="{Binding AvailableTextEncoders}"
                                 SelectedItem="{Binding TextEncoder}" 

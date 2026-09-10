@@ -11,6 +11,7 @@ public class GenerationProfile
     public string? DefaultScheduler { get; set; }
     public string? DefaultVae { get; set; }
     public string? DefaultTextEncoder { get; set; }
+    public string? DefaultTextEncoderSecondary { get; set; }
     public double DefaultWidth { get; set; }
     public double DefaultHeight { get; set; }
 
@@ -39,6 +40,7 @@ public class GenerationProfile
                 DefaultScheduler = "beta",
                 DefaultVae = "ae.safetensors",
                 DefaultTextEncoder = "t5xxl",
+                DefaultTextEncoderSecondary = "clip_l",
                 DefaultWidth = 1024,
                 DefaultHeight = 1024
             },
@@ -50,7 +52,7 @@ public class GenerationProfile
                 DefaultSampler = "Euler",
                 DefaultScheduler = "Simple",
                 DefaultVae = "Qwen2D_VAE.safetensors",
-                DefaultTextEncoder = "qwen3vl",
+                DefaultTextEncoder = "qwen3vl_4b",
                 DefaultWidth = 1024,
                 DefaultHeight = 1024
             },
@@ -62,7 +64,7 @@ public class GenerationProfile
                 DefaultSampler = "Euler",
                 DefaultScheduler = "Simple",
                 DefaultVae = "Qwen2D_VAE.safetensors",
-                DefaultTextEncoder = "qwen3vl",
+                DefaultTextEncoder = "qwen3vl_4b",
                 DefaultWidth = 1024,
                 DefaultHeight = 1024
             },

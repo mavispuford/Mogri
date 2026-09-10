@@ -119,6 +119,11 @@ public class PromptSettings
     public string? TextEncoder { get; set; }
 
     /// <summary>
+    /// An optional second text encoder used by backends that require a dual-encoder pipeline.
+    /// </summary>
+    public string? TextEncoderSecondary { get; set; }
+
+    /// <summary>
     /// Generic intent for tiled/seamless generation.
     /// </summary>
     public bool EnableTiling { get; set; }
@@ -181,6 +186,7 @@ public class PromptSettings
             Scheduler = Scheduler,
             Vae = Vae,
             TextEncoder = TextEncoder,
+            TextEncoderSecondary = TextEncoderSecondary,
             EnableTiling = EnableTiling,
             Seed = Seed,
             Upscaler = Upscaler,

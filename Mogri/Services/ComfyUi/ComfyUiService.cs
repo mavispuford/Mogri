@@ -34,8 +34,12 @@ public class ComfyUiService : IImageGenerationBackend
     
     // Cached resources
     private List<IModelViewModel> _models = new();
+    private List<string> _checkpointModels = new();
+    private List<string> _diffusionModels = new();
     private Dictionary<string, string> _samplers = new();
     private List<string> _schedulers = new();
+    private List<string> _vaes = new();
+    private List<string> _textEncoders = new();
     private List<ILoraViewModel> _loras = new();
 
     public virtual string Name => "ComfyUI";
@@ -48,7 +52,9 @@ public class ComfyUiService : IImageGenerationBackend
         SupportsSamplerList = true,
         SupportsCancellation = true,
         SupportsLoras = true,
-        SupportsSchedulers = true
+        SupportsSchedulers = true,
+        SupportsVaes = true,
+        SupportsTextEncoders = true
     };
 
     public ComfyUiService(IHttpClientFactory httpClientFactory, IServiceProvider serviceProvider)
@@ -148,8 +154,10 @@ public class ComfyUiService : IImageGenerationBackend
 
             var json = JObject.Parse(content);
 
-            // Models (CheckpointLoaderSimple)
+            // Models from integrated checkpoints and standalone diffusion models.
             _models.Clear();
+            _checkpointModels.Clear();
+            _diffusionModels.Clear();
             if (json["CheckpointLoaderSimple"]?["input"]?["required"]?["ckpt_name"] is JArray modelList)
             {
                 // Enum values are usually the first element of the array [[values], default]
@@ -158,10 +166,34 @@ public class ComfyUiService : IImageGenerationBackend
                     foreach (var model in models)
                     {
                         var name = model.ToString();
+                        _checkpointModels.Add(name);
                         _models.Add(new ModelViewModel 
                         { 
                             DisplayName = name, 
                             Key = name,
+                        });
+                    }
+                }
+            }
+
+            if (json["UNETLoader"]?["input"]?["required"]?["unet_name"] is JArray diffusionModelList &&
+                diffusionModelList.First is JArray diffusionModels)
+            {
+                foreach (var diffusionModel in diffusionModels)
+                {
+                    var name = diffusionModel.ToString();
+                    if (string.IsNullOrWhiteSpace(name))
+                    {
+                        continue;
+                    }
+
+                    _diffusionModels.Add(name);
+                    if (!_models.Any(model => string.Equals(model.Key, name, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        _models.Add(new ModelViewModel
+                        {
+                            DisplayName = name,
+                            Key = name
                         });
                     }
                 }
@@ -190,6 +222,40 @@ public class ComfyUiService : IImageGenerationBackend
                     foreach (var s in schedulers)
                     {
                         _schedulers.Add(s.ToString());
+                    }
+                }
+            }
+
+            // VAEs (VAELoader)
+            _vaes.Clear();
+            if (json["VAELoader"]?["input"]?["required"]?["vae_name"] is JArray vaeList)
+            {
+                if (vaeList.First is JArray vaes)
+                {
+                    foreach (var vae in vaes)
+                    {
+                        var name = vae.ToString();
+                        if (!string.IsNullOrWhiteSpace(name))
+                        {
+                            _vaes.Add(name);
+                        }
+                    }
+                }
+            }
+
+            // Text encoders (CLIPLoader)
+            _textEncoders.Clear();
+            if (json["CLIPLoader"]?["input"]?["required"]?["clip_name"] is JArray textEncoderList)
+            {
+                if (textEncoderList.First is JArray textEncoders)
+                {
+                    foreach (var textEncoder in textEncoders)
+                    {
+                        var name = textEncoder.ToString();
+                        if (!string.IsNullOrWhiteSpace(name))
+                        {
+                            _textEncoders.Add(name);
+                        }
                     }
                 }
             }
@@ -242,6 +308,9 @@ public class ComfyUiService : IImageGenerationBackend
         if (!Initialized || _httpClient == null || _client == null || _baseUrl == null)
             throw new InvalidOperationException("ComfyUiService not initialized");
 
+        ResolveModelResources(settings);
+        ResolveSamplingSettings(settings);
+
         string? imageFilename = null;
         string? maskFilename = null;
         string mode = "txt2img";
@@ -256,7 +325,7 @@ public class ComfyUiService : IImageGenerationBackend
             if (!string.IsNullOrEmpty(settings.Mask))
             {
                 mode = "inpaint";
-                maskFilename = await UploadImageAsync(settings.Mask, cancellationToken, isMask: true);
+                maskFilename = await UploadImageAsync(settings.Mask, cancellationToken);
             }
         }
 
@@ -265,15 +334,22 @@ public class ComfyUiService : IImageGenerationBackend
         long seed = -1;
         if (mode == "inpaint" && imageFilename != null && maskFilename != null)
         {
-            (workflow, seed) = ComfyUiWorkflowBuilder.BuildInpaintingWorkflow(settings, imageFilename, maskFilename);
+            (workflow, seed) = ComfyUiWorkflowBuilder.BuildInpaintingWorkflow(
+                settings,
+                imageFilename,
+                maskFilename,
+                _diffusionModels);
         }
         else if (mode == "img2img" && imageFilename != null)
         {
-            (workflow, seed) = ComfyUiWorkflowBuilder.BuildImageToImageWorkflow(settings, imageFilename);
+            (workflow, seed) = ComfyUiWorkflowBuilder.BuildImageToImageWorkflow(
+                settings,
+                imageFilename,
+                _diffusionModels);
         }
         else
         {
-            (workflow, seed) = ComfyUiWorkflowBuilder.BuildTextToImageWorkflow(settings);
+            (workflow, seed) = ComfyUiWorkflowBuilder.BuildTextToImageWorkflow(settings, _diffusionModels);
         }
 
         // 3. Connect to WebSocket
@@ -370,7 +446,176 @@ public class ComfyUiService : IImageGenerationBackend
         }
     }
 
-    private async Task<string> UploadImageAsync(string base64Image, CancellationToken cancellationToken, bool isMask = false)
+    private void ResolveModelResources(PromptSettings settings)
+    {
+        switch (settings.ModelType)
+        {
+            case ModelType.Krea2Turbo:
+            case ModelType.Krea2Raw:
+                ResolveKreaResources(settings);
+                return;
+            case ModelType.ZImageTurbo:
+                ResolveZImageResources(settings);
+                return;
+            case ModelType.Flux:
+                ResolveFluxResources(settings);
+                return;
+        }
+
+        if (HasConcreteResource(settings.Vae))
+        {
+            settings.Vae = ModelResourceHelper.FindMatch(_vaes, settings.Vae)
+                ?? throw new InvalidOperationException($"ComfyUI does not expose the selected VAE '{settings.Vae}'.");
+        }
+    }
+
+    private void ResolveSamplingSettings(PromptSettings settings)
+    {
+        if (_samplers.Count > 0)
+        {
+            settings.Sampler = ComfyUiSamplingHelper.FindSampler(_samplers.Keys, settings.Sampler)
+                ?? _samplers.Keys.First();
+        }
+        else if (string.IsNullOrWhiteSpace(settings.Sampler))
+        {
+            settings.Sampler = "euler";
+        }
+
+        if (_schedulers.Count > 0)
+        {
+            settings.Scheduler = ComfyUiSamplingHelper.FindScheduler(_schedulers, settings.Scheduler)
+                ?? _schedulers.First();
+        }
+        else if (string.IsNullOrWhiteSpace(settings.Scheduler))
+        {
+            settings.Scheduler = "normal";
+        }
+    }
+
+    private void ResolveKreaResources(PromptSettings settings)
+    {
+        EnsureStandaloneModelIfNeeded(settings);
+
+        var textEncoder = ModelResourceHelper.FindMatch(_textEncoders, settings.TextEncoder);
+        if (!ModelResourceHelper.IsKreaTextEncoder(textEncoder))
+        {
+            textEncoder = _textEncoders.FirstOrDefault(ModelResourceHelper.IsKreaTextEncoder);
+        }
+
+        if (textEncoder == null)
+        {
+            throw new InvalidOperationException(
+                "ComfyUI has no compatible Krea text encoder. Refresh the server resources and select a Qwen3-VL 4B encoder.");
+        }
+
+        var vae = _vaes.FirstOrDefault(value =>
+            string.Equals(value, "qwen_image_vae.safetensors", StringComparison.OrdinalIgnoreCase));
+        if (vae == null)
+        {
+            throw new InvalidOperationException(
+                "ComfyUI has no compatible Krea VAE. Install qwen_image_vae.safetensors and refresh the server resources.");
+        }
+
+        settings.TextEncoder = textEncoder;
+        settings.Vae = vae;
+    }
+
+    private void ResolveZImageResources(PromptSettings settings)
+    {
+        EnsureModelIsAvailable(settings);
+
+        settings.TextEncoder = _textEncoders.FirstOrDefault(ModelResourceHelper.IsZImageTextEncoder)
+            ?? throw new InvalidOperationException(
+                "ComfyUI has no compatible Z-Image Qwen3 4B text encoder. Refresh the server resources and select one.");
+        settings.Vae = ModelResourceHelper.FindMatch(_vaes, "ae.safetensors")
+            ?? ModelResourceHelper.FindMatch(_vaes, settings.Vae)
+            ?? throw new InvalidOperationException(
+                "ComfyUI has no compatible Z-Image VAE. Refresh the server resources and select ae.safetensors.");
+    }
+
+    private void ResolveFluxResources(PromptSettings settings)
+    {
+        EnsureModelIsAvailable(settings);
+
+        var profile = GenerationProfile.GetDefault(ModelType.Flux);
+
+        var primaryTextEncoder = ModelResourceHelper.FindMatch(_textEncoders, settings.TextEncoder);
+        if (!ModelResourceHelper.IsFluxT5TextEncoder(primaryTextEncoder))
+        {
+            primaryTextEncoder = ModelResourceHelper.FindMatch(_textEncoders, "t5xxl");
+        }
+
+        var secondaryTextEncoder = ModelResourceHelper.FindMatch(_textEncoders, settings.TextEncoderSecondary);
+        if (!ModelResourceHelper.IsFluxClipLTextEncoder(secondaryTextEncoder))
+        {
+            secondaryTextEncoder = ModelResourceHelper.FindMatch(_textEncoders, profile.DefaultTextEncoderSecondary);
+        }
+
+        settings.TextEncoder = primaryTextEncoder
+            ?? throw new InvalidOperationException(
+                "ComfyUI has no compatible Flux T5 text encoder. Refresh the server resources and select one.");
+        settings.TextEncoderSecondary = secondaryTextEncoder
+            ?? throw new InvalidOperationException(
+                "ComfyUI has no compatible Flux CLIP-L text encoder. Refresh the server resources and select one.");
+        settings.Vae = ModelResourceHelper.FindMatch(_vaes, "ae.safetensors")
+            ?? throw new InvalidOperationException(
+                "ComfyUI has no compatible Flux VAE. Refresh the server resources and select one.");
+    }
+
+    private void EnsureStandaloneModelIfNeeded(PromptSettings settings)
+    {
+        if (settings.ModelType is ModelType.Krea2Turbo or ModelType.Krea2Raw &&
+            IsStandaloneKreaModel(settings.Model?.Key))
+        {
+            EnsureStandaloneModel(settings);
+        }
+    }
+
+    private void EnsureModelIsAvailable(PromptSettings settings)
+    {
+        var modelKey = settings.Model?.Key;
+        if (_diffusionModels.Any(model => string.Equals(model, modelKey, StringComparison.OrdinalIgnoreCase)) ||
+            _checkpointModels.Any(model => string.Equals(model, modelKey, StringComparison.OrdinalIgnoreCase)))
+        {
+            return;
+        }
+
+        throw new InvalidOperationException(
+            $"ComfyUI does not expose '{modelKey}' as a checkpoint or diffusion model. Refresh the server resources and verify the model path configuration.");
+    }
+
+    private void EnsureStandaloneModel(PromptSettings settings)
+    {
+        var modelKey = settings.Model?.Key;
+        var diffusionModel = _diffusionModels.FirstOrDefault(model =>
+            string.Equals(model, modelKey, StringComparison.OrdinalIgnoreCase));
+
+        if (diffusionModel == null)
+        {
+            throw new InvalidOperationException(
+                $"ComfyUI does not expose '{modelKey}' through UNETLoader. Register the model under diffusion_models and refresh resources.");
+        }
+
+        settings.Model!.Key = diffusionModel;
+    }
+
+    private static bool IsStandaloneKreaModel(string? modelKey)
+    {
+        return !string.IsNullOrWhiteSpace(modelKey) &&
+            (modelKey.Contains("krea2_turbo_", StringComparison.OrdinalIgnoreCase) ||
+             modelKey.Contains("krea2turbo_", StringComparison.OrdinalIgnoreCase) ||
+             modelKey.Contains("krea2_raw_", StringComparison.OrdinalIgnoreCase) ||
+             modelKey.Contains("krea2raw_", StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static bool HasConcreteResource(string? resource)
+    {
+        return !string.IsNullOrWhiteSpace(resource) &&
+            !string.Equals(resource, "Automatic", StringComparison.OrdinalIgnoreCase) &&
+            !string.Equals(resource, "None", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private async Task<string> UploadImageAsync(string base64Image, CancellationToken cancellationToken)
     {
         string extension = "png";
         string mimeType = "image/png";
@@ -420,12 +665,9 @@ public class ComfyUiService : IImageGenerationBackend
         // API expects "image" field
         var filename = $"upload_{Guid.NewGuid()}.{extension}";
         content.Add(imageContent, "image", filename);
-        content.Add(new StringContent(isMask ? "mask" : "input"), "type");
-        // Note: For masks, some workflows expect 'input' type but use the image as a mask. 
-        // Using 'mask' type uploads to the 'input' folder anyway but might be treated differently by the mask editor.
-        // Let's stick to 'input' type based on testing unless specifically needing mask editor features.
-        // Actually, let's keep 'input' for now as previously decided to be safe.
-        // Reverting 'type' to 'input' for consistency.
+        // ComfyUI's upload endpoint accepts input/temp/output directories; the workflow
+        // determines whether an uploaded image is used as a source image or a mask.
+        content.Add(new StringContent("input"), "type");
         
         var uploadResponse = await _httpClient!.PostAsync("/api/upload/image", content, cancellationToken);
         
@@ -505,10 +747,10 @@ public class ComfyUiService : IImageGenerationBackend
         => Task.FromResult(_schedulers);
 
     public Task<List<string>> GetVaesAsync(CancellationToken cancellationToken = default) 
-        => Task.FromResult(new List<string>());
+        => Task.FromResult(_vaes);
 
     public Task<List<string>> GetTextEncodersAsync(CancellationToken cancellationToken = default) 
-        => Task.FromResult(new List<string>());
+        => Task.FromResult(_textEncoders);
 
     public Task<List<IModelViewModel>> GetModelsAsync(CancellationToken cancellationToken = default) 
         => Task.FromResult(_models);
