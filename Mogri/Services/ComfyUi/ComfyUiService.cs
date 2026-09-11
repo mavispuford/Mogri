@@ -42,6 +42,12 @@ public class ComfyUiService : IImageGenerationBackend
     private List<string> _textEncoders = new();
     private List<ILoraViewModel> _loras = new();
 
+    private readonly object _softMaskCacheSync = new();
+    private readonly SemaphoreSlim _softMaskProcessingGate = new(1, 1);
+    private string? _softMaskCacheKey;
+    private int _softMaskCacheBlurRadius;
+    private byte[]? _softMaskCacheBytes;
+
     public virtual string Name => "ComfyUI";
     public bool Initialized { get; private set; }
     
@@ -325,7 +331,7 @@ public class ComfyUiService : IImageGenerationBackend
             if (!string.IsNullOrEmpty(settings.Mask))
             {
                 mode = "inpaint";
-                maskFilename = await UploadImageAsync(settings.Mask, cancellationToken);
+                maskFilename = await UploadImageAsync(settings.Mask, cancellationToken, settings.MaskBlur);
             }
         }
 
@@ -615,8 +621,9 @@ public class ComfyUiService : IImageGenerationBackend
             !string.Equals(resource, "None", StringComparison.OrdinalIgnoreCase);
     }
 
-    private async Task<string> UploadImageAsync(string base64Image, CancellationToken cancellationToken)
+    private async Task<string> UploadImageAsync(string base64Image, CancellationToken cancellationToken, int? maskBlurRadius = null)
     {
+        var maskCacheKey = base64Image;
         string extension = "png";
         string mimeType = "image/png";
 
@@ -658,6 +665,21 @@ public class ComfyUiService : IImageGenerationBackend
              throw new Exception("Invalid Base64 image data.");
         }
 
+        if (maskBlurRadius is > 0)
+        {
+            var softenedMaskBytes = await GetSoftMaskBytesAsync(
+                maskCacheKey,
+                bytes,
+                maskBlurRadius.Value,
+                cancellationToken);
+            if (softenedMaskBytes != null)
+            {
+                bytes = softenedMaskBytes;
+                extension = "png";
+                mimeType = "image/png";
+            }
+        }
+
         using var content = new MultipartFormDataContent();
         using var imageContent = new ByteArrayContent(bytes);
         imageContent.Headers.ContentType = new MediaTypeHeaderValue(mimeType);
@@ -680,6 +702,55 @@ public class ComfyUiService : IImageGenerationBackend
         var result = JObject.Parse(json);
         
         return result["name"]?.ToString() ?? throw new Exception("Upload failed: no filename returned");
+    }
+
+    private async Task<byte[]?> GetSoftMaskBytesAsync(
+        string cacheKey,
+        byte[] imageBytes,
+        int blurRadius,
+        CancellationToken cancellationToken)
+    {
+        lock (_softMaskCacheSync)
+        {
+            if (string.Equals(_softMaskCacheKey, cacheKey, StringComparison.Ordinal) &&
+                _softMaskCacheBlurRadius == blurRadius)
+            {
+                return _softMaskCacheBytes;
+            }
+        }
+
+        await _softMaskProcessingGate.WaitAsync(cancellationToken);
+        try
+        {
+            lock (_softMaskCacheSync)
+            {
+                if (string.Equals(_softMaskCacheKey, cacheKey, StringComparison.Ordinal) &&
+                    _softMaskCacheBlurRadius == blurRadius)
+                {
+                    return _softMaskCacheBytes;
+                }
+            }
+
+            var softenedMaskBytes = await Task.Run(
+                () => ComfyUiMaskHelper.CreateSoftMaskPng(imageBytes, blurRadius),
+                cancellationToken);
+
+            if (softenedMaskBytes != null)
+            {
+                lock (_softMaskCacheSync)
+                {
+                    _softMaskCacheKey = cacheKey;
+                    _softMaskCacheBlurRadius = blurRadius;
+                    _softMaskCacheBytes = softenedMaskBytes;
+                }
+            }
+
+            return softenedMaskBytes;
+        }
+        finally
+        {
+            _softMaskProcessingGate.Release();
+        }
     }
 
     private async Task<string?> DownloadImageAsBase64Async(string filename, CancellationToken cancellationToken)

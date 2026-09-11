@@ -73,7 +73,7 @@ public class ComfyUiWorkflowBuilderTests
     }
 
     [Fact]
-    public void BuildInpaintingWorkflow_UsesDistinctMaskAndEncoderNodes()
+    public void BuildInpaintingWorkflow_PreservesSourceLatentAndAppliesInvertedNoiseMask()
     {
         // Arrange
         var settings = CreateKreaSettings("Krea2Turbo.safetensors");
@@ -87,9 +87,13 @@ public class ComfyUiWorkflowBuilderTests
         // Assert
         Assert.Equal("LoadImage", GetClassType(workflow, "6"));
         Assert.Equal("LoadImage", GetClassType(workflow, "7"));
-        Assert.Equal("VAEEncodeForInpaint", GetClassType(workflow, "8"));
-        Assert.Equal(new object[] { "6", 0 }, GetInput(workflow, "8", "pixels"));
+        Assert.Equal("InvertMask", GetClassType(workflow, "8"));
         Assert.Equal(new object[] { "7", 1 }, GetInput(workflow, "8", "mask"));
+        Assert.Equal("VAEEncode", GetClassType(workflow, "9"));
+        Assert.Equal(new object[] { "6", 0 }, GetInput(workflow, "9", "pixels"));
+        Assert.Equal("SetLatentNoiseMask", GetClassType(workflow, "10"));
+        Assert.Equal(new object[] { "9", 0 }, GetInput(workflow, "10", "samples"));
+        Assert.Equal(new object[] { "8", 0 }, GetInput(workflow, "10", "mask"));
     }
 
     [Fact]

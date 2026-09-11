@@ -215,14 +215,27 @@ public static class ComfyUiWorkflowBuilder
                  });
                  nodeIdCounter++;
 
-                 latentNodeId = nodeIdCounter.ToString();
+                 var invertMaskNodeId = nodeIdCounter.ToString();
+                 AddNode(workflow, invertMaskNodeId, "InvertMask", new Dictionary<string, object>
+                 {
+                     ["mask"] = new object[] { loadMaskNodeId, 1 }
+                 });
+                 nodeIdCounter++;
+
+                 var encodedLatentNodeId = nodeIdCounter.ToString();
                  
-                 AddNode(workflow, latentNodeId, "VAEEncodeForInpaint", new Dictionary<string, object>
+                 AddNode(workflow, encodedLatentNodeId, "VAEEncode", new Dictionary<string, object>
                  {
                      ["pixels"] = new object[] { loadImageNodeId, 0 },
-                     ["vae"] = new object[] { vaeOutput[0], vaeOutput[1] },
-                     ["mask"] = new object[] { loadMaskNodeId, 1 },
-                     ["grow_mask_by"] = settings.MaskBlur
+                     ["vae"] = new object[] { vaeOutput[0], vaeOutput[1] }
+                 });
+                 nodeIdCounter++;
+
+                 latentNodeId = nodeIdCounter.ToString();
+                 AddNode(workflow, latentNodeId, "SetLatentNoiseMask", new Dictionary<string, object>
+                 {
+                     ["samples"] = new object[] { encodedLatentNodeId, 0 },
+                     ["mask"] = new object[] { invertMaskNodeId, 0 }
                  });
             }
             else
