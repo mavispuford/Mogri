@@ -213,8 +213,8 @@
                     <Switch Grid.Row="15" Grid.Column="2" IsToggled="{Binding EnableUpscaling}" IsVisible="{Binding CurrentCapabilities.SupportsUpscaling}" HorizontalOptions="End" />
                     <Label Grid.Row="16" Grid.Column="1" Text="Upscaler:" Style="{StaticResource SettingLabel}" IsVisible="{Binding CurrentCapabilities.SupportsUpscaling}"/>
                     <Picker Grid.Row="16" Grid.Column="2" Title="Upscaler" ItemsSource="{Binding AvailableUpscalerValues}" SelectedItem="{Binding Upscaler}" FontSize="16" HorizontalTextAlignment="End" IsVisible="{Binding CurrentCapabilities.SupportsUpscaling}"/>
-                    <Label Grid.Row="17" Grid.Column="1" Text="Upscale Lvl:" Style="{StaticResource SettingLabel}" IsVisible="{Binding CurrentCapabilities.SupportsUpscaling}"/>
-                    <Picker Grid.Row="17" Grid.Column="2" Title="Level" ItemsSource="{Binding AvailableUpscaleLevelValues}" SelectedItem="{Binding UpscaleLevel}" FontSize="16" HorizontalTextAlignment="End" IsVisible="{Binding CurrentCapabilities.SupportsUpscaling}"/>
+                    <Label Grid.Row="17" Grid.Column="1" Text="Upscale Lvl:" Style="{StaticResource SettingLabel}" IsVisible="{Binding CurrentCapabilities.SupportsConfigurableUpscaleScale}"/>
+                    <Picker Grid.Row="17" Grid.Column="2" Title="Level" ItemsSource="{Binding AvailableUpscaleLevelValues}" SelectedItem="{Binding UpscaleLevel}" FontSize="16" HorizontalTextAlignment="End" IsVisible="{Binding CurrentCapabilities.SupportsConfigurableUpscaleScale}"/>
 
                     <Label Grid.Row="18" Grid.Column="1" Text="Hires Fix Steps:" Style="{StaticResource SettingLabel}" IsVisible="{Binding IsHiresFixStepsVisible}"/>
                     <Entry Grid.Row="18" Grid.Column="2" Placeholder="{Binding UpscaleStepsPlaceholder}" Text="{Binding UpscaleSteps}" Keyboard="Numeric" FontSize="16" HorizontalTextAlignment="End" IsVisible="{Binding IsHiresFixStepsVisible}"/>

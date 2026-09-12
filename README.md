@@ -101,11 +101,13 @@ Resource names can include backend-specific suffixes.
 
 #### SD Forge Neo
 
-To listen for connections on the local network with SD Forge Neo, launch with the `--listen` argument.  You can also set the port using the `--port` argument. These arguments can be added to `set COMMANDLINE_ARGS=` line in your `webui-user.bat` file.
+For setup instructions, supported workflows, resource discovery, and Forge-specific upscaling details, see [SdForgeNeo.md](Docs/SdForgeNeo.md).
 
 #### ComfyUI
 
 To listen for connections on the local network in ComfyUI, [follow their official guide here](https://comfyui-wiki.com/en/faq/how-to-access-comfyui-on-lan).
+
+For setup instructions, supported workflows, resource discovery, and native upscaling details, see [ComfyUI.md](Docs/ComfyUI.md).
 
 ## Architecture
 

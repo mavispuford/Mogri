@@ -73,6 +73,158 @@ public class ComfyUiWorkflowBuilderTests
     }
 
     [Fact]
+    public void BuildTextToImageWorkflow_WithUpscaling_AddsNativeUpscalerChain()
+    {
+        // Arrange
+        var settings = CreateUpscaledSettings();
+
+        // Act
+        var (workflow, _) = ComfyUiWorkflowBuilder.BuildTextToImageWorkflow(settings);
+
+        // Assert
+        Assert.Equal("UpscaleModelLoader", GetClassType(workflow, "7"));
+        Assert.Equal("4x-UltraSharp.pth", GetInput(workflow, "7", "model_name"));
+        Assert.Equal("ImageUpscaleWithModel", GetClassType(workflow, "8"));
+        Assert.Equal(new object[] { "7", 0 }, GetInput(workflow, "8", "upscale_model"));
+        Assert.Equal(new object[] { "6", 0 }, GetInput(workflow, "8", "image"));
+        Assert.Equal("SaveImage", GetClassType(workflow, "9"));
+        Assert.Equal(new object[] { "8", 0 }, GetInput(workflow, "9", "images"));
+    }
+
+    [Fact]
+    public void BuildImageToImageWorkflow_WithPositiveDenoiseUpscaling_ConnectsDecodedOutput()
+    {
+        // Arrange
+        var settings = CreateUpscaledSettings();
+        settings.DenoisingStrength = 0.5;
+
+        // Act
+        var (workflow, _) = ComfyUiWorkflowBuilder.BuildImageToImageWorkflow(
+            settings,
+            "source.png");
+
+        // Assert
+        Assert.Equal("VAEDecode", GetClassType(workflow, "7"));
+        Assert.Equal("UpscaleModelLoader", GetClassType(workflow, "8"));
+        Assert.Equal(new object[] { "8", 0 }, GetInput(workflow, "9", "upscale_model"));
+        Assert.Equal(new object[] { "7", 0 }, GetInput(workflow, "9", "image"));
+        Assert.Equal(new object[] { "9", 0 }, GetInput(workflow, "10", "images"));
+    }
+
+    [Fact]
+    public void BuildInpaintingWorkflow_WithPositiveDenoiseUpscaling_ConnectsDecodedOutput()
+    {
+        // Arrange
+        var settings = CreateKreaSettings("Krea2Turbo.safetensors");
+        settings.EnableUpscaling = true;
+        settings.Upscaler = "4x-UltraSharp.pth";
+        settings.UpscaleLevel = 0;
+        settings.UpscaleSteps = 0;
+
+        // Act
+        var (workflow, _) = ComfyUiWorkflowBuilder.BuildInpaintingWorkflow(
+            settings,
+            "source.png",
+            "mask.png");
+
+        // Assert
+        Assert.Equal("VAEDecode", GetClassType(workflow, "12"));
+        Assert.Equal("UpscaleModelLoader", GetClassType(workflow, "13"));
+        Assert.Equal(new object[] { "13", 0 }, GetInput(workflow, "14", "upscale_model"));
+        Assert.Equal(new object[] { "12", 0 }, GetInput(workflow, "14", "image"));
+        Assert.Equal(new object[] { "14", 0 }, GetInput(workflow, "15", "images"));
+    }
+
+    [Fact]
+    public void BuildImageToImageWorkflow_WithZeroDenoiseAndUpscaling_UsesDirectSource()
+    {
+        // Arrange
+        var settings = CreateUpscaledSettings();
+        settings.DenoisingStrength = 0;
+
+        // Act
+        var (workflow, seed) = ComfyUiWorkflowBuilder.BuildImageToImageWorkflow(
+            settings,
+            "source.png");
+
+        // Assert
+        Assert.Equal(-1, seed);
+        Assert.Equal(4, workflow.Count);
+        Assert.Equal("LoadImage", GetClassType(workflow, "1"));
+        Assert.Equal("UpscaleModelLoader", GetClassType(workflow, "2"));
+        Assert.Equal(new object[] { "2", 0 }, GetInput(workflow, "3", "upscale_model"));
+        Assert.Equal(new object[] { "1", 0 }, GetInput(workflow, "3", "image"));
+        Assert.Equal(new object[] { "3", 0 }, GetInput(workflow, "4", "images"));
+        Assert.False(ContainsClassType(workflow, "CheckpointLoaderSimple"));
+        Assert.False(ContainsClassType(workflow, "CLIPTextEncode"));
+        Assert.False(ContainsClassType(workflow, "VAELoader"));
+        Assert.False(ContainsClassType(workflow, "VAEEncode"));
+        Assert.False(ContainsClassType(workflow, "KSampler"));
+    }
+
+    [Fact]
+    public void BuildInpaintingWorkflow_WithZeroDenoiseAndUpscaling_IgnoresMaskAndUsesDirectSource()
+    {
+        // Arrange
+        var settings = CreateUpscaledSettings();
+        settings.DenoisingStrength = 0;
+
+        // Act
+        var (workflow, seed) = ComfyUiWorkflowBuilder.BuildInpaintingWorkflow(
+            settings,
+            "source.png",
+            "mask.png");
+
+        // Assert
+        Assert.Equal(-1, seed);
+        Assert.Equal(4, workflow.Count);
+        Assert.Equal("source.png", GetInput(workflow, "1", "image"));
+        Assert.Equal("ImageUpscaleWithModel", GetClassType(workflow, "3"));
+        Assert.Equal(new object[] { "3", 0 }, GetInput(workflow, "4", "images"));
+        Assert.False(ContainsClassType(workflow, "InvertMask"));
+        Assert.False(ContainsClassType(workflow, "SetLatentNoiseMask"));
+        Assert.False(ContainsClassType(workflow, "KSampler"));
+    }
+
+    [Fact]
+    public void BuildImageToImageWorkflow_WithZeroDenoiseAndDisabledUpscaling_SavesSourceDirectly()
+    {
+        // Arrange
+        var settings = CreateStandardSettings();
+        settings.DenoisingStrength = 0;
+
+        // Act
+        var (workflow, seed) = ComfyUiWorkflowBuilder.BuildImageToImageWorkflow(
+            settings,
+            "source.png");
+
+        // Assert
+        Assert.Equal(-1, seed);
+        Assert.Equal(2, workflow.Count);
+        Assert.Equal("LoadImage", GetClassType(workflow, "1"));
+        Assert.Equal("SaveImage", GetClassType(workflow, "2"));
+        Assert.Equal(new object[] { "1", 0 }, GetInput(workflow, "2", "images"));
+        Assert.False(ContainsClassType(workflow, "KSampler"));
+    }
+
+    [Fact]
+    public void BuildTextToImageWorkflow_WithoutUpscaling_SavesDecodedOutput()
+    {
+        // Arrange
+        var settings = CreateStandardSettings();
+
+        // Act
+        var (workflow, _) = ComfyUiWorkflowBuilder.BuildTextToImageWorkflow(settings);
+
+        // Assert
+        Assert.Equal(7, workflow.Count);
+        Assert.Equal("SaveImage", GetClassType(workflow, "7"));
+        Assert.Equal(new object[] { "6", 0 }, GetInput(workflow, "7", "images"));
+        Assert.False(ContainsClassType(workflow, "UpscaleModelLoader"));
+        Assert.False(ContainsClassType(workflow, "ImageUpscaleWithModel"));
+    }
+
+    [Fact]
     public void BuildInpaintingWorkflow_PreservesSourceLatentAndAppliesInvertedNoiseMask()
     {
         // Arrange
@@ -183,6 +335,28 @@ public class ComfyUiWorkflowBuilderTests
         };
     }
 
+    private static PromptSettings CreateStandardSettings()
+    {
+        return new PromptSettings
+        {
+            ModelType = ModelType.SDXL,
+            Model = CreateModel("sd_xl_base_1.0.safetensors"),
+            Prompt = "a mountain lake",
+            NegativePrompt = "blurry",
+            Seed = 42
+        };
+    }
+
+    private static PromptSettings CreateUpscaledSettings()
+    {
+        var settings = CreateStandardSettings();
+        settings.EnableUpscaling = true;
+        settings.Upscaler = "4x-UltraSharp.pth";
+        settings.UpscaleLevel = 0;
+        settings.UpscaleSteps = 0;
+        return settings;
+    }
+
     private static IModelViewModel CreateModel(string key)
     {
         var model = new Mock<IModelViewModel>();
@@ -213,5 +387,12 @@ public class ComfyUiWorkflowBuilderTests
     private static Dictionary<string, object> GetNode(Dictionary<string, object> workflow, string nodeId)
     {
         return (Dictionary<string, object>)workflow[nodeId];
+    }
+
+    private static bool ContainsClassType(Dictionary<string, object> workflow, string classType)
+    {
+        return workflow.Values
+            .Cast<Dictionary<string, object>>()
+            .Any(node => string.Equals(node["class_type"].ToString(), classType, StringComparison.Ordinal));
     }
 }

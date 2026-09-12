@@ -17,6 +17,11 @@ public record BackendCapabilities
     public bool SupportsUpscaling { get; init; }
 
     /// <summary>
+    /// Gets whether the backend supports selecting a configurable upscale scale.
+    /// </summary>
+    public bool SupportsConfigurableUpscaleScale { get; init; }
+
+    /// <summary>
     /// Gets whether the backend supports Hires Fix upscaling.
     /// </summary>
     public bool SupportsHiresFix { get; init; }
@@ -57,6 +62,7 @@ public record BackendCapabilities
     {
         SupportsSeamless = true,
         SupportsUpscaling = true,
+        SupportsConfigurableUpscaleScale = true,
         SupportsHiresFix = true,
         SupportsSamplerList = true,
         SupportsCancellation = true,

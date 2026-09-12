@@ -40,6 +40,7 @@ public class ComfyUiService : IImageGenerationBackend
     private List<string> _schedulers = new();
     private List<string> _vaes = new();
     private List<string> _textEncoders = new();
+    private List<string> _upscalerModels = new();
     private List<ILoraViewModel> _loras = new();
 
     private readonly object _softMaskCacheSync = new();
@@ -54,7 +55,9 @@ public class ComfyUiService : IImageGenerationBackend
     public BackendCapabilities Capabilities => new()
     {
         SupportsSeamless = false,
-        SupportsUpscaling = false,
+        SupportsUpscaling = true,
+        SupportsConfigurableUpscaleScale = false,
+        SupportsHiresFix = false,
         SupportsSamplerList = true,
         SupportsCancellation = true,
         SupportsLoras = true,
@@ -266,6 +269,9 @@ public class ComfyUiService : IImageGenerationBackend
                 }
             }
 
+            _upscalerModels.Clear();
+            _upscalerModels.AddRange(ComfyUiResourceHelper.ParseUpscalerModelNames(content));
+
             // LoRAs (LoraLoader)
             _loras.Clear();
             if (json["LoraLoader"]?["input"]?["required"]?["lora_name"] is JArray loraList)
@@ -314,21 +320,30 @@ public class ComfyUiService : IImageGenerationBackend
         if (!Initialized || _httpClient == null || _client == null || _baseUrl == null)
             throw new InvalidOperationException("ComfyUiService not initialized");
 
-        ResolveModelResources(settings);
-        ResolveSamplingSettings(settings);
+        var isDirectSourceRequest = IsDirectSourceRequest(settings);
+        if (settings.EnableUpscaling)
+        {
+            ResolveUpscaler(settings);
+        }
+
+        if (!isDirectSourceRequest)
+        {
+            ResolveModelResources(settings);
+            ResolveSamplingSettings(settings);
+        }
 
         string? imageFilename = null;
         string? maskFilename = null;
         string mode = "txt2img";
 
         // 1. Upload Init Image if needed
-        if (!string.IsNullOrEmpty(settings.InitImage))
+        if (!string.IsNullOrWhiteSpace(settings.InitImage))
         {
             mode = "img2img";
             imageFilename = await UploadImageAsync(settings.InitImage, cancellationToken);
             
             // Upload Mask if needed
-            if (!string.IsNullOrEmpty(settings.Mask))
+            if (!isDirectSourceRequest && !string.IsNullOrWhiteSpace(settings.Mask))
             {
                 mode = "inpaint";
                 maskFilename = await UploadImageAsync(settings.Mask, cancellationToken, settings.MaskBlur);
@@ -450,6 +465,30 @@ public class ComfyUiService : IImageGenerationBackend
         {
             throw new Exception("Connection closed unexpectedly before generation completed.");
         }
+    }
+
+    private void ResolveUpscaler(PromptSettings settings)
+    {
+        if (string.IsNullOrWhiteSpace(settings.Upscaler))
+        {
+            throw new InvalidOperationException(
+                "ComfyUI upscaling is enabled, but no upscaler model is selected. Select an upscaler before submitting.");
+        }
+
+        var requestedUpscaler = settings.Upscaler;
+        var resolvedUpscaler = ComfyUiResourceHelper.FindUpscalerModelName(_upscalerModels, requestedUpscaler);
+        if (resolvedUpscaler == null)
+        {
+            throw new InvalidOperationException(
+                $"ComfyUI upscaler '{requestedUpscaler}' is not available. Refresh resources and verify the model is installed under the ComfyUI upscale_models folder or server configuration.");
+        }
+
+        settings.Upscaler = resolvedUpscaler;
+    }
+
+    private static bool IsDirectSourceRequest(PromptSettings settings)
+    {
+        return !string.IsNullOrWhiteSpace(settings.InitImage) && settings.DenoisingStrength <= 0;
     }
 
     private void ResolveModelResources(PromptSettings settings)
@@ -829,8 +868,15 @@ public class ComfyUiService : IImageGenerationBackend
     public Task<List<ILoraViewModel>> GetLorasAsync(CancellationToken cancellationToken = default) 
         => Task.FromResult(_loras);
 
-    public Task<List<IUpscalerViewModel>> GetUpscalersAsync(CancellationToken cancellationToken = default) 
-        => Task.FromResult(new List<IUpscalerViewModel>());
+    public Task<List<IUpscalerViewModel>> GetUpscalersAsync(CancellationToken cancellationToken = default)
+        => Task.FromResult(_upscalerModels
+            .Select(name => (IUpscalerViewModel)new UpscalerViewModel
+            {
+                Name = name,
+                ModelName = name,
+                Scale = 1.0
+            })
+            .ToList());
 
     public async Task<IModelViewModel?> GetSelectedModelAsync(CancellationToken cancellationToken = default)
     {

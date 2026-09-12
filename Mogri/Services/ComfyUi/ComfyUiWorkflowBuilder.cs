@@ -39,6 +39,11 @@ public static class ComfyUiWorkflowBuilder
         string? maskFilename = null,
         IReadOnlyCollection<string>? diffusionModels = null)
     {
+        if (IsDirectSourceWorkflow(settings, mode, imageFilename))
+        {
+            return BuildDirectSourceWorkflow(settings, imageFilename!);
+        }
+
         var workflow = new Dictionary<string, object>();
         var nodeIdCounter = 1;
         var usesSeparateModel = UsesSeparateModel(settings, diffusionModels);
@@ -280,15 +285,89 @@ public static class ComfyUiWorkflowBuilder
         });
         nodeIdCounter++;
 
-        // Save Image
+        var outputNodeId = vaeDecodeNodeId;
+        if (IsComfyUiUpscalingEnabled(settings))
+        {
+            outputNodeId = AddUpscalerNodes(workflow, ref nodeIdCounter, outputNodeId, settings.Upscaler!);
+        }
+
+        AddSaveImageNode(workflow, ref nodeIdCounter, outputNodeId);
+
+        return (workflow, seed);
+    }
+
+    private static (Dictionary<string, object> Workflow, long Seed) BuildDirectSourceWorkflow(
+        PromptSettings settings,
+        string imageFilename)
+    {
+        var workflow = new Dictionary<string, object>();
+        var nodeIdCounter = 1;
+        var loadImageNodeId = nodeIdCounter.ToString();
+
+        AddNode(workflow, loadImageNodeId, "LoadImage", new Dictionary<string, object>
+        {
+            ["image"] = imageFilename
+        });
+        nodeIdCounter++;
+
+        var outputNodeId = loadImageNodeId;
+        if (IsComfyUiUpscalingEnabled(settings))
+        {
+            outputNodeId = AddUpscalerNodes(workflow, ref nodeIdCounter, outputNodeId, settings.Upscaler!);
+        }
+
+        AddSaveImageNode(workflow, ref nodeIdCounter, outputNodeId);
+
+        return (workflow, -1);
+    }
+
+    private static string AddUpscalerNodes(
+        Dictionary<string, object> workflow,
+        ref int nodeIdCounter,
+        string imageNodeId,
+        string upscalerName)
+    {
+        var upscalerLoaderNodeId = nodeIdCounter.ToString();
+        AddNode(workflow, upscalerLoaderNodeId, "UpscaleModelLoader", new Dictionary<string, object>
+        {
+            ["model_name"] = upscalerName
+        });
+        nodeIdCounter++;
+
+        var imageUpscaleNodeId = nodeIdCounter.ToString();
+        AddNode(workflow, imageUpscaleNodeId, "ImageUpscaleWithModel", new Dictionary<string, object>
+        {
+            ["upscale_model"] = new object[] { upscalerLoaderNodeId, 0 },
+            ["image"] = new object[] { imageNodeId, 0 }
+        });
+        nodeIdCounter++;
+
+        return imageUpscaleNodeId;
+    }
+
+    private static void AddSaveImageNode(
+        Dictionary<string, object> workflow,
+        ref int nodeIdCounter,
+        string imageNodeId)
+    {
         var saveImageNodeId = nodeIdCounter.ToString();
         AddNode(workflow, saveImageNodeId, "SaveImage", new Dictionary<string, object>
         {
             ["filename_prefix"] = "Mogri",
-            ["images"] = new object[] { vaeDecodeNodeId, 0 }
+            ["images"] = new object[] { imageNodeId, 0 }
         });
+    }
 
-        return (workflow, seed);
+    private static bool IsDirectSourceWorkflow(PromptSettings settings, string mode, string? imageFilename)
+    {
+        return mode is "img2img" or "inpaint" &&
+               !string.IsNullOrWhiteSpace(imageFilename) &&
+               settings.DenoisingStrength <= 0;
+    }
+
+    private static bool IsComfyUiUpscalingEnabled(PromptSettings settings)
+    {
+        return settings.EnableUpscaling && !string.IsNullOrWhiteSpace(settings.Upscaler);
     }
 
     private static bool IsStandaloneKreaModel(string modelKey)
