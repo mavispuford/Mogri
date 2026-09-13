@@ -44,15 +44,35 @@ public class ImageGenerationCoordinator : IImageGenerationCoordinator
 
     public Task<bool> CheckServerAsync(CancellationToken cancellationToken = default) => ActiveBackend.CheckServerAsync(cancellationToken);
 
-    public IAsyncEnumerable<ApiResponse> SubmitImageRequestAsync(PromptSettings settings, CancellationToken cancellationToken = default) => ActiveBackend.SubmitImageRequestAsync(settings, cancellationToken);
+    public IAsyncEnumerable<ApiResponse> SubmitImageRequestAsync(PromptSettings settings, CancellationToken cancellationToken = default)
+    {
+        var backend = ActiveBackend;
+        settings.NormalizeForBackend(backend.Capabilities);
+        return backend.SubmitImageRequestAsync(settings, cancellationToken);
+    }
 
     public Task<byte[]> GetImageBytesAsync(string url, CancellationToken cancellationToken = default) => ActiveBackend.GetImageBytesAsync(url, cancellationToken);
 
     public async Task<PromptSettings?> GetImageInfoAsync(string base64EncodedImage, CancellationToken cancellationToken = default)
     {
-        var result = await ActiveBackend.GetImageInfoAsync(base64EncodedImage, cancellationToken);
+        var backend = ActiveBackend;
+        var result = await backend.GetImageInfoAsync(base64EncodedImage, cancellationToken);
         if (result != null)
         {
+            result.NormalizeForBackend(backend.Capabilities);
+            return result;
+        }
+
+        return null;
+    }
+
+    public async Task<PromptSettings?> GetImageInfoAsync(Stream imageStream, CancellationToken cancellationToken = default)
+    {
+        var backend = ActiveBackend;
+        var result = await backend.GetImageInfoAsync(imageStream, cancellationToken);
+        if (result != null)
+        {
+            result.NormalizeForBackend(backend.Capabilities);
             return result;
         }
 
@@ -85,7 +105,12 @@ public class ImageGenerationCoordinator : IImageGenerationCoordinator
 
     public Task<ModelType> GetCurrentModelTypeAsync(CancellationToken cancellationToken = default) => ActiveBackend.GetCurrentModelTypeAsync(cancellationToken);
 
-    public Task SaveSettingsAsync(PromptSettings settings, CancellationToken cancellationToken = default) => ActiveBackend.SaveSettingsAsync(settings, cancellationToken);
+    public Task SaveSettingsAsync(PromptSettings settings, CancellationToken cancellationToken = default)
+    {
+        var backend = ActiveBackend;
+        settings.NormalizeForBackend(backend.Capabilities);
+        return backend.SaveSettingsAsync(settings, cancellationToken);
+    }
 
     public Task<bool> CancelAsync(CancellationToken cancellationToken = default) => ActiveBackend.CancelAsync(cancellationToken);
 }

@@ -35,9 +35,11 @@ The model family selected in Mogri determines which ComfyUI loaders are used. Th
 | Model family | ComfyUI behavior |
 | --- | --- |
 | Stable Diffusion 1.5 and SDXL | Uses `CheckpointLoaderSimple` and the checkpoint's model, CLIP, and VAE outputs. |
-| Z-Image Turbo | Uses `UNETLoader` when the model is exposed as a standalone diffusion model, a `CLIPLoader` with the `lumina2` type, and a compatible VAE such as `ae.safetensors`. Checkpoint-backed installations are also supported. |
-| FLUX | Uses `UNETLoader` when appropriate, `DualCLIPLoader` with the `flux` type, a T5 text encoder, a CLIP-L text encoder, and a compatible VAE such as `ae.safetensors`. Checkpoint-backed installations are also supported. |
-| Krea 2 Turbo and Krea 2 Raw | Supports checkpoint-backed models and standalone diffusion models. Uses a `CLIPLoader` with the `krea2` type, a compatible Qwen3-VL text encoder, and `qwen_image_vae.safetensors`. |
+| Z-Image Turbo | Uses `UNETLoader` when the model is exposed as a standalone diffusion model, a `CLIPLoader` with the `lumina2` type, a compatible VAE such as `ae.safetensors`, and model sampling Shift. Checkpoint-backed installations are also supported. |
+| FLUX | Uses `UNETLoader` when appropriate, `DualCLIPLoader` with the `flux` type, `CLIPTextEncodeFlux` for the model's guidance value, a T5 text encoder, a CLIP-L text encoder, and a compatible VAE such as `ae.safetensors`. Checkpoint-backed installations are also supported. |
+| Krea 2 Turbo and Krea 2 Raw | Supports checkpoint-backed models and standalone diffusion models. Uses a `CLIPLoader` with the `krea2` type, a compatible Qwen3-VL text encoder, and `qwen_image_vae.safetensors`. Krea 2 Turbo also applies model sampling Shift; Krea 2 Raw uses its model default. |
+
+For model families that expose the Shift control in Mogri, the same user-facing value is translated to the native ComfyUI mechanism: `CLIPTextEncodeFlux.guidance` for Flux and `ModelSamplingAuraFlow.shift` for Z-Image Turbo and Krea 2 Turbo. It is kept separate from the regular CFG value sent to `KSampler`.
 
 Model files are not included with Mogri. The selected model must be visible to the ComfyUI loader used by the generated workflow. If a model can be loaded either as a checkpoint or a standalone diffusion model, Mogri follows the resource shape reported by ComfyUI.
 

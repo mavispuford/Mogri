@@ -58,6 +58,7 @@ public class ComfyUiService : IImageGenerationBackend
         SupportsUpscaling = true,
         SupportsConfigurableUpscaleScale = false,
         SupportsHiresFix = false,
+        SupportsDistilledCfgScale = true,
         SupportsSamplerList = true,
         SupportsCancellation = true,
         SupportsLoras = true,
@@ -493,6 +494,14 @@ public class ComfyUiService : IImageGenerationBackend
 
     private void ResolveModelResources(PromptSettings settings)
     {
+        if (settings.ModelType is ModelType.SD15 or ModelType.SDXL)
+        {
+            settings.Vae = null;
+            settings.TextEncoder = null;
+            settings.TextEncoderSecondary = null;
+            return;
+        }
+
         switch (settings.ModelType)
         {
             case ModelType.Krea2Turbo:
@@ -841,7 +850,29 @@ public class ComfyUiService : IImageGenerationBackend
             
             var bytes = Convert.FromBase64String(base64Data);
             using var stream = new MemoryStream(bytes);
-            return await PngMetadataHelper.ReadSettingsFromStreamAsync(stream);
+            return await GetImageInfoAsync(stream, cancellationToken);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public async Task<PromptSettings?> GetImageInfoAsync(Stream imageStream, CancellationToken cancellationToken = default)
+    {
+        if (imageStream == null)
+        {
+            return null;
+        }
+
+        try
+        {
+            if (imageStream.CanSeek)
+            {
+                imageStream.Position = 0;
+            }
+
+            return await PngMetadataHelper.ReadSettingsFromStreamAsync(imageStream);
         }
         catch
         {

@@ -18,6 +18,8 @@ public interface IImageGenerationService
 
     Task<PromptSettings?> GetImageInfoAsync(string base64EncodedImage, CancellationToken cancellationToken = default);
 
+    Task<PromptSettings?> GetImageInfoAsync(Stream imageStream, CancellationToken cancellationToken = default);
+
     Task InitializeAsync(CancellationToken cancellationToken = default);
 
     Task RefreshResourcesAsync(CancellationToken cancellationToken = default);

@@ -149,6 +149,74 @@ public class GenerationSettingsPageViewModelTests
         Assert.Null(viewModel.Model);
     }
 
+    [Fact]
+    public async Task ConfirmSettings_IntegratedModel_DoesNotSaveAuxiliaryResources()
+    {
+        // Arrange
+        var backend = new Mock<IImageGenerationCoordinator>();
+        var model = CreateModel("sd_xl_base_1.0.safetensors");
+        var settings = new PromptSettings
+        {
+            ModelType = ModelType.SDXL,
+            Model = model,
+            Vae = "Qwen2D_VAE.safetensors",
+            TextEncoder = "qwen_3_4b.safetensors"
+        };
+        backend.SetupGet(service => service.Capabilities).Returns(BackendCapabilities.Full);
+        backend.Setup(service => service.GetSamplersAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Dictionary<string, string>());
+        backend.Setup(service => service.GetUpscalersAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<IUpscalerViewModel>());
+        backend.Setup(service => service.GetModelsAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<IModelViewModel> { model });
+        backend.Setup(service => service.GetSchedulersAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<string>());
+        backend.Setup(service => service.GetVaesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<string> { "Qwen2D_VAE.safetensors" });
+        backend.Setup(service => service.GetTextEncodersAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<string> { "qwen_3_4b.safetensors" });
+        backend.Setup(service => service.GetSelectedModelAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(model);
+        backend.Setup(service => service.SaveSettingsAsync(It.IsAny<PromptSettings>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        var popupService = new Mock<IPopupService>();
+        var navigationService = new Mock<INavigationService>();
+        navigationService.Setup(service => service.GoBackAsync(It.IsAny<IDictionary<string, object>>()))
+            .Returns(Task.CompletedTask);
+        var loadingCoordinator = new Mock<ILoadingCoordinator>();
+        loadingCoordinator.Setup(service => service.ShowAsync(It.IsAny<string?>()))
+            .Returns(Task.CompletedTask);
+        loadingCoordinator.Setup(service => service.HideAsync())
+            .Returns(Task.CompletedTask);
+        var presetService = new Mock<IPresetService>();
+        presetService.Setup(service => service.GetPresetsAsync())
+            .ReturnsAsync(new List<string>());
+
+        var viewModel = new GenerationSettingsPageViewModel(
+            backend.Object,
+            popupService.Object,
+            navigationService.Object,
+            loadingCoordinator.Object,
+            presetService.Object);
+        viewModel.ApplyQueryAttributes(new Dictionary<string, object>
+        {
+            { NavigationParams.PromptSettings, settings }
+        });
+        await viewModel.OnNavigatedToAsync();
+
+        // Act
+        await viewModel.ConfirmSettingsCommand.ExecuteAsync(null);
+
+        // Assert
+        backend.Verify(service => service.SaveSettingsAsync(
+            It.Is<PromptSettings>(saved =>
+                saved.Vae == null &&
+                saved.TextEncoder == null &&
+                saved.TextEncoderSecondary == null),
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
+
     private static GenerationSettingsPageViewModel CreateViewModel(
         PromptSettings settings,
         BackendCapabilities capabilities,

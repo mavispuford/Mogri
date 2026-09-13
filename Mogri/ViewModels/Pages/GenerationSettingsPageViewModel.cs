@@ -205,9 +205,8 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
             }
 
             UpdateResourceVisibility(value);
-            IsDistilledCfgScaleVisible = value == ModelType.ZImageTurbo ||
-                value == ModelType.Flux ||
-                value == ModelType.Krea2Turbo;
+            IsDistilledCfgScaleVisible = CurrentCapabilities.SupportsDistilledCfgScale &&
+                GenerationProfile.GetDefault(value).DefaultDistilledCfg.HasValue;
             IsSeamlessVisible = CurrentCapabilities.SupportsSeamless && value == ModelType.SDXL;
         }
         catch (Exception ex)
@@ -412,15 +411,26 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
 
             if (_settings.Model != null)
             {
-                if (!string.IsNullOrEmpty(_settings.Vae))
+                if (UsesAuxiliaryModelResources(_settings.ModelType) && !string.IsNullOrEmpty(_settings.Vae))
                 {
                     Preferences.Default.Set($"Vae_{_settings.Model.Key}", _settings.Vae);
                 }
-                if (!string.IsNullOrEmpty(_settings.TextEncoder))
+                else if (!UsesAuxiliaryModelResources(_settings.ModelType))
+                {
+                    removePreference($"Vae_{_settings.Model.Key}");
+                }
+
+                if (UsesAuxiliaryModelResources(_settings.ModelType) && !string.IsNullOrEmpty(_settings.TextEncoder))
                 {
                     Preferences.Default.Set($"TextEncoder_{_settings.Model.Key}", _settings.TextEncoder);
                 }
+                else if (!UsesAuxiliaryModelResources(_settings.ModelType))
+                {
+                    removePreference($"TextEncoder_{_settings.Model.Key}");
+                }
             }
+
+            _settings.NormalizeForBackend(CurrentCapabilities);
 
             await _stableDiffusionService.SaveSettingsAsync(_settings);
 
@@ -546,9 +556,8 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
                 string.IsNullOrEmpty(_settings.InitImage);
             Width = _settings.Width.ToString();
 
-            IsDistilledCfgScaleVisible = SelectedModelType == ModelType.ZImageTurbo ||
-                SelectedModelType == ModelType.Flux ||
-                SelectedModelType == ModelType.Krea2Turbo;
+            IsDistilledCfgScaleVisible = CurrentCapabilities.SupportsDistilledCfgScale &&
+                GenerationProfile.GetDefault(SelectedModelType).DefaultDistilledCfg.HasValue;
             IsSeamlessVisible = CurrentCapabilities.SupportsSeamless && SelectedModelType == ModelType.SDXL;
         }
         finally
@@ -715,8 +724,17 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
 
         _settings.ModelType = SelectedModelType;
         _settings.Scheduler = Scheduler;
-        _settings.Vae = Vae;
-        _settings.TextEncoder = TextEncoder;
+        if (UsesAuxiliaryModelResources(_settings.ModelType))
+        {
+            _settings.Vae = Vae;
+            _settings.TextEncoder = TextEncoder;
+        }
+        else
+        {
+            _settings.Vae = null;
+            _settings.TextEncoder = null;
+            _settings.TextEncoderSecondary = null;
+        }
     }
 
     private void UpdateResourceVisibility(ModelType modelType)
@@ -755,6 +773,23 @@ public partial class GenerationSettingsPageViewModel : PageViewModel, IGeneratio
 
         value = defaultValue;
         return false;
+    }
+
+    private static bool UsesAuxiliaryModelResources(ModelType modelType)
+    {
+        return modelType is not ModelType.SD15 and not ModelType.SDXL;
+    }
+
+    private static void removePreference(string key)
+    {
+        try
+        {
+            Preferences.Default.Remove(key);
+        }
+        catch (NotImplementedException)
+        {
+            // MAUI's portable reference assembly does not implement Preferences.
+        }
     }
 
     private IModelViewModel? FindModelForType(ModelType modelType)

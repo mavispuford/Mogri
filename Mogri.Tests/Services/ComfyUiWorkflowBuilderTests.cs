@@ -29,8 +29,10 @@ public class ComfyUiWorkflowBuilderTests
         Assert.Equal("Qwen2D_VAE.safetensors", GetInput(workflow, "3", "vae_name"));
         Assert.Equal("LoraLoaderModelOnly", GetClassType(workflow, "4"));
         Assert.Equal(new object[] { "1", 0 }, GetInput(workflow, "4", "model"));
-        Assert.Equal(new object[] { "2", 0 }, GetInput(workflow, "5", "clip"));
-        Assert.Equal(new object[] { "3", 0 }, GetInput(workflow, "9", "vae"));
+        Assert.Equal("ModelSamplingAuraFlow", GetClassType(workflow, "5"));
+        Assert.Equal(1.15, GetInput(workflow, "5", "shift"));
+        Assert.Equal(new object[] { "2", 0 }, GetInput(workflow, "6", "clip"));
+        Assert.Equal(new object[] { "3", 0 }, GetInput(workflow, "10", "vae"));
     }
 
     [Fact]
@@ -47,8 +49,10 @@ public class ComfyUiWorkflowBuilderTests
         Assert.Equal("Krea2Turbo.safetensors", GetInput(workflow, "1", "ckpt_name"));
         Assert.Equal("CLIPLoader", GetClassType(workflow, "2"));
         Assert.Equal("VAELoader", GetClassType(workflow, "3"));
-        Assert.Equal(new object[] { "2", 0 }, GetInput(workflow, "4", "clip"));
-        Assert.Equal(new object[] { "3", 0 }, GetInput(workflow, "8", "vae"));
+        Assert.Equal("ModelSamplingAuraFlow", GetClassType(workflow, "4"));
+        Assert.Equal(1.15, GetInput(workflow, "4", "shift"));
+        Assert.Equal(new object[] { "2", 0 }, GetInput(workflow, "5", "clip"));
+        Assert.Equal(new object[] { "3", 0 }, GetInput(workflow, "9", "vae"));
     }
 
     [Fact]
@@ -69,6 +73,21 @@ public class ComfyUiWorkflowBuilderTests
         // Assert
         Assert.Equal("CheckpointLoaderSimple", GetClassType(workflow, "1"));
         Assert.Equal(new object[] { "1", 1 }, GetInput(workflow, "2", "clip"));
+        Assert.Equal(new object[] { "1", 2 }, GetInput(workflow, "6", "vae"));
+    }
+
+    [Fact]
+    public void BuildTextToImageWorkflow_StandardModelWithStaleExternalVae_UsesCheckpointVae()
+    {
+        // Arrange
+        var settings = CreateStandardSettings();
+        settings.Vae = "Qwen2D_VAE.safetensors";
+
+        // Act
+        var (workflow, _) = ComfyUiWorkflowBuilder.BuildTextToImageWorkflow(settings);
+
+        // Assert
+        Assert.False(ContainsClassType(workflow, "VAELoader"));
         Assert.Equal(new object[] { "1", 2 }, GetInput(workflow, "6", "vae"));
     }
 
@@ -128,11 +147,11 @@ public class ComfyUiWorkflowBuilderTests
             "mask.png");
 
         // Assert
-        Assert.Equal("VAEDecode", GetClassType(workflow, "12"));
-        Assert.Equal("UpscaleModelLoader", GetClassType(workflow, "13"));
-        Assert.Equal(new object[] { "13", 0 }, GetInput(workflow, "14", "upscale_model"));
-        Assert.Equal(new object[] { "12", 0 }, GetInput(workflow, "14", "image"));
-        Assert.Equal(new object[] { "14", 0 }, GetInput(workflow, "15", "images"));
+        Assert.Equal("VAEDecode", GetClassType(workflow, "13"));
+        Assert.Equal("UpscaleModelLoader", GetClassType(workflow, "14"));
+        Assert.Equal(new object[] { "14", 0 }, GetInput(workflow, "15", "upscale_model"));
+        Assert.Equal(new object[] { "13", 0 }, GetInput(workflow, "15", "image"));
+        Assert.Equal(new object[] { "15", 0 }, GetInput(workflow, "16", "images"));
     }
 
     [Fact]
@@ -237,15 +256,15 @@ public class ComfyUiWorkflowBuilderTests
             "mask.png");
 
         // Assert
-        Assert.Equal("LoadImage", GetClassType(workflow, "6"));
         Assert.Equal("LoadImage", GetClassType(workflow, "7"));
-        Assert.Equal("InvertMask", GetClassType(workflow, "8"));
-        Assert.Equal(new object[] { "7", 1 }, GetInput(workflow, "8", "mask"));
-        Assert.Equal("VAEEncode", GetClassType(workflow, "9"));
-        Assert.Equal(new object[] { "6", 0 }, GetInput(workflow, "9", "pixels"));
-        Assert.Equal("SetLatentNoiseMask", GetClassType(workflow, "10"));
-        Assert.Equal(new object[] { "9", 0 }, GetInput(workflow, "10", "samples"));
-        Assert.Equal(new object[] { "8", 0 }, GetInput(workflow, "10", "mask"));
+        Assert.Equal("LoadImage", GetClassType(workflow, "8"));
+        Assert.Equal("InvertMask", GetClassType(workflow, "9"));
+        Assert.Equal(new object[] { "8", 1 }, GetInput(workflow, "9", "mask"));
+        Assert.Equal("VAEEncode", GetClassType(workflow, "10"));
+        Assert.Equal(new object[] { "7", 0 }, GetInput(workflow, "10", "pixels"));
+        Assert.Equal("SetLatentNoiseMask", GetClassType(workflow, "11"));
+        Assert.Equal(new object[] { "10", 0 }, GetInput(workflow, "11", "samples"));
+        Assert.Equal(new object[] { "9", 0 }, GetInput(workflow, "11", "mask"));
     }
 
     [Fact]
@@ -258,6 +277,7 @@ public class ComfyUiWorkflowBuilderTests
             Model = CreateModel("z_image_turbo_bf16.safetensors"),
             TextEncoder = "qwen_3_4b.safetensors",
             Vae = "ae.safetensors",
+            DistilledCfgScale = 3.5,
             Prompt = "a mountain lake"
         };
 
@@ -269,6 +289,8 @@ public class ComfyUiWorkflowBuilderTests
         Assert.Equal("CLIPLoader", GetClassType(workflow, "2"));
         Assert.Equal("lumina2", GetInput(workflow, "2", "type"));
         Assert.Equal("VAELoader", GetClassType(workflow, "3"));
+        Assert.Equal("ModelSamplingAuraFlow", GetClassType(workflow, "4"));
+        Assert.Equal(3.5, GetInput(workflow, "4", "shift"));
     }
 
     [Fact]
@@ -282,6 +304,8 @@ public class ComfyUiWorkflowBuilderTests
             TextEncoder = "t5xxl_fp16.safetensors",
             TextEncoderSecondary = "clip_l.safetensors",
             Vae = "ae.safetensors",
+            GuidanceScale = 1,
+            DistilledCfgScale = 3.5,
             Prompt = "a mountain lake"
         };
 
@@ -295,6 +319,11 @@ public class ComfyUiWorkflowBuilderTests
         Assert.Equal("t5xxl_fp16.safetensors", GetInput(workflow, "2", "clip_name2"));
         Assert.Equal("flux", GetInput(workflow, "2", "type"));
         Assert.Equal("VAELoader", GetClassType(workflow, "3"));
+        Assert.Equal("CLIPTextEncodeFlux", GetClassType(workflow, "4"));
+        Assert.Equal("a mountain lake", GetInput(workflow, "4", "clip_l"));
+        Assert.Equal("a mountain lake", GetInput(workflow, "4", "t5xxl"));
+        Assert.Equal(3.5, GetInput(workflow, "4", "guidance"));
+        Assert.Equal(1d, GetInput(workflow, "7", "cfg"));
     }
 
     [Fact]
@@ -329,6 +358,7 @@ public class ComfyUiWorkflowBuilderTests
             Model = CreateModel(modelKey),
             TextEncoder = "Qwen3-VL-4B.safetensors",
             Vae = "Qwen2D_VAE.safetensors",
+            DistilledCfgScale = 1.15,
             Prompt = "a mountain lake",
             NegativePrompt = "blurry",
             Seed = 42

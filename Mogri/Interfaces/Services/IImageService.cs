@@ -5,6 +5,7 @@ namespace Mogri.Interfaces.Services;
 public interface IImageService
 {
     SKBitmap? GetSkBitmapFromStream(Stream? stream);
+    (int Width, int Height)? GetImageDimensionsFromStream(Stream? stream);
     Task<MemoryStream?> GetStreamFromContentTypeStringAsync(string? imageString, CancellationToken token);
     Task<ImageSource?> GetImageSourceFromContentTypeStringAsync(string? imageString, CancellationToken token);
     (byte[]? Bytes, int ActualWidth, int ActualHeight) GetResizedImageStreamBytes(Stream? stream, int width, int height, bool forceExactSize = false, bool filterImage = false, bool onlyIfLarger = false);

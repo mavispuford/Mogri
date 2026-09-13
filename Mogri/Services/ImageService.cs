@@ -113,6 +113,27 @@ public class ImageService : IImageService
         }
     }
 
+    public (int Width, int Height)? GetImageDimensionsFromStream(Stream? stream)
+    {
+        if (stream == null)
+        {
+            return null;
+        }
+
+        try
+        {
+            using var codec = SKCodec.Create(stream);
+            return codec == null
+                ? null
+                : (codec.Info.Width, codec.Info.Height);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to read image dimensions from stream");
+            return null;
+        }
+    }
+
     public SKBitmap? GetResizedSKBitmap(SKBitmap? bitmap, int width, int height, bool forceExactSize = false, bool filterImage = false, bool onlyIfLarger = false)
     {
         if (bitmap == null)

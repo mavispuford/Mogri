@@ -4,6 +4,7 @@ using Mogri.Interfaces.Services;
 using Mogri.Interfaces.ViewModels;
 using Mogri.Models;
 using Mogri.ViewModels;
+using SkiaSharp;
 using Xunit;
 
 namespace Mogri.Tests.ViewModels;
@@ -86,6 +87,232 @@ public class ViewModelFrameworkAdapterTests
                 true),
             Times.Once);
         toastService.Verify(service => service.ShowAsync("Image saved."), Times.Once);
+    }
+
+    [Fact]
+    public async Task ImageInfo_WithUpscaledImage_ShowsActualResolution()
+    {
+        // Arrange
+        var popupService = new Mock<IPopupService>();
+        var fileService = new Mock<IFileService>();
+        var historyService = new Mock<IHistoryService>();
+        var imageService = new Mock<IImageService>();
+        var imageGenerationService = new Mock<IImageGenerationCoordinator>();
+        var toastService = new Mock<IToastService>();
+        var mainThreadService = CreateMainThreadService();
+        var historyItem = CreateHistoryItem("history.png");
+        historyItem.SetupProperty(item => item.Settings, new PromptSettings
+        {
+            Width = 1024,
+            Height = 1024,
+            ActualWidth = 2048,
+            ActualHeight = 2048
+        });
+
+        popupService
+            .Setup(service => service.DisplayAlertAsync("Image Info", It.IsAny<string>(), "Copy to clipboard", "Close"))
+            .ReturnsAsync(false);
+
+        var viewModel = new HistoryItemPopupViewModel(
+            popupService.Object,
+            fileService.Object,
+            historyService.Object,
+            imageService.Object,
+            imageGenerationService.Object,
+            toastService.Object,
+            mainThreadService.Object)
+        {
+            HistoryItem = historyItem.Object
+        };
+
+        // Act
+        await viewModel.ImageInfoCommand.ExecuteAsync(null);
+
+        // Assert
+        popupService.Verify(
+            service => service.DisplayAlertAsync(
+                "Image Info",
+                It.Is<string>(message => message.Contains("Size: 1024x1024 (Actual: 2048x2048)", StringComparison.Ordinal)),
+                "Copy to clipboard",
+                "Close"),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task ImageInfo_WithNativeUpscaler_OmitsUnsupportedScaleSettings()
+    {
+        // Arrange
+        var popupService = new Mock<IPopupService>();
+        var fileService = new Mock<IFileService>();
+        var historyService = new Mock<IHistoryService>();
+        var imageService = new Mock<IImageService>();
+        var imageGenerationService = new Mock<IImageGenerationCoordinator>();
+        var toastService = new Mock<IToastService>();
+        var mainThreadService = CreateMainThreadService();
+        var historyItem = CreateHistoryItem("history.png");
+        historyItem.SetupProperty(item => item.Settings, new PromptSettings
+        {
+            EnableUpscaling = true,
+            Upscaler = "4x-UltraSharp.pth",
+            UpscaleLevel = 0,
+            UpscaleSteps = 0
+        });
+
+        popupService
+            .Setup(service => service.DisplayAlertAsync("Image Info", It.IsAny<string>(), "Copy to clipboard", "Close"))
+            .ReturnsAsync(false);
+
+        var viewModel = new HistoryItemPopupViewModel(
+            popupService.Object,
+            fileService.Object,
+            historyService.Object,
+            imageService.Object,
+            imageGenerationService.Object,
+            toastService.Object,
+            mainThreadService.Object)
+        {
+            HistoryItem = historyItem.Object
+        };
+
+        // Act
+        await viewModel.ImageInfoCommand.ExecuteAsync(null);
+
+        // Assert
+        popupService.Verify(
+            service => service.DisplayAlertAsync(
+                "Image Info",
+                It.Is<string>(message =>
+                    message.Contains("Upscaler: 4x-UltraSharp.pth", StringComparison.Ordinal) &&
+                    !message.Contains("Upscale Level:", StringComparison.Ordinal) &&
+                    !message.Contains("Upscale Steps:", StringComparison.Ordinal)),
+                "Copy to clipboard",
+                "Close"),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task HistoryItemLoad_UsesStreamImageInfoPath()
+    {
+        // Arrange
+        var popupService = new Mock<IPopupService>();
+        var fileService = new Mock<IFileService>();
+        var historyService = new Mock<IHistoryService>();
+        var imageService = new Mock<IImageService>();
+        var imageGenerationService = new Mock<IImageGenerationCoordinator>();
+        var toastService = new Mock<IToastService>();
+        var mainThreadService = new Mock<IMainThreadService>();
+        var settingsLoaded = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var historyItem = CreateHistoryItem("history.png");
+        historyItem.SetupProperty(item => item.Settings);
+
+        fileService
+            .Setup(service => service.GetFileStreamFromInternalStorageAsync("history.png"))
+            .ReturnsAsync(() => new MemoryStream([1, 2, 3]));
+        imageService
+            .Setup(service => service.GetSkBitmapFromStream(It.IsAny<Stream>()))
+            .Returns((SKBitmap?)null);
+        imageGenerationService
+            .Setup(service => service.GetImageInfoAsync(It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new PromptSettings());
+        mainThreadService
+            .Setup(service => service.InvokeOnMainThreadAsync(It.IsAny<Action>()))
+            .Returns<Action>(action =>
+            {
+                action();
+                if (historyItem.Object.Settings != null)
+                {
+                    settingsLoaded.TrySetResult(true);
+                }
+
+                return Task.CompletedTask;
+            });
+
+        var viewModel = new HistoryItemPopupViewModel(
+            popupService.Object,
+            fileService.Object,
+            historyService.Object,
+            imageService.Object,
+            imageGenerationService.Object,
+            toastService.Object,
+            mainThreadService.Object)
+        {
+            HistoryItem = historyItem.Object
+        };
+
+        // Act
+        await settingsLoaded.Task.WaitAsync(TimeSpan.FromSeconds(2));
+
+        // Assert
+        imageGenerationService.Verify(
+            service => service.GetImageInfoAsync(It.IsAny<Stream>(), It.IsAny<CancellationToken>()),
+            Times.Once);
+        imageGenerationService.Verify(
+            service => service.GetImageInfoAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task ImageInfo_WithoutActualResolution_UsesDimensionsFromDisplayLoad()
+    {
+        // Arrange
+        var popupService = new Mock<IPopupService>();
+        var fileService = new Mock<IFileService>();
+        var historyService = new Mock<IHistoryService>();
+        var imageService = new Mock<IImageService>();
+        var imageGenerationService = new Mock<IImageGenerationCoordinator>();
+        var toastService = new Mock<IToastService>();
+        var mainThreadService = CreateMainThreadService();
+        var historyItem = CreateHistoryItem("history.png");
+        var settings = new PromptSettings
+        {
+            Width = 1024,
+            Height = 1024
+        };
+        var originalBitmap = new SKBitmap(3000, 1500);
+        var displayBitmap = new SKBitmap(2048, 1024);
+        historyItem.SetupProperty(item => item.Settings, settings);
+
+        fileService
+            .Setup(service => service.GetFileStreamFromInternalStorageAsync("history.png"))
+            .ReturnsAsync(new MemoryStream([1, 2, 3]));
+        imageService
+            .Setup(service => service.GetSkBitmapFromStream(It.IsAny<Stream>()))
+            .Returns(originalBitmap);
+        imageService
+            .Setup(service => service.GetResizedSKBitmap(It.IsAny<SKBitmap>(), 2048, 2048, true, true))
+            .Returns(displayBitmap);
+        popupService
+            .Setup(service => service.DisplayAlertAsync("Image Info", It.IsAny<string>(), "Copy to clipboard", "Close"))
+            .ReturnsAsync(false);
+
+        var viewModel = new HistoryItemPopupViewModel(
+            popupService.Object,
+            fileService.Object,
+            historyService.Object,
+            imageService.Object,
+            imageGenerationService.Object,
+            toastService.Object,
+            mainThreadService.Object)
+        {
+            HistoryItem = historyItem.Object
+        };
+
+        // Act
+        await viewModel.ImageInfoCommand.ExecuteAsync(null);
+
+        // Assert
+        Assert.Equal(3000, settings.ActualWidth);
+        Assert.Equal(1500, settings.ActualHeight);
+        imageService.Verify(service => service.GetSkBitmapFromStream(It.IsAny<Stream>()), Times.Once);
+        popupService.Verify(
+            service => service.DisplayAlertAsync(
+                "Image Info",
+                It.Is<string>(message => message.Contains("Size: 1024x1024 (Actual: 3000x1500)", StringComparison.Ordinal)),
+                "Copy to clipboard",
+                "Close"),
+            Times.Once);
+
+        displayBitmap.Dispose();
     }
 
     [Fact]

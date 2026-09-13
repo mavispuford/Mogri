@@ -29,6 +29,8 @@ public class PngMetadataDtoTests
         Assert.Equal(settings.Seed, dto.Seed);
         Assert.Equal(settings.Width, dto.Width);
         Assert.Equal(settings.Height, dto.Height);
+        Assert.Equal(settings.ActualWidth, dto.ActualWidth);
+        Assert.Equal(settings.ActualHeight, dto.ActualHeight);
         Assert.Equal(settings.DenoisingStrength, dto.DenoisingStrength);
         Assert.Equal(settings.ModelType.ToString(), dto.ModelType);
         Assert.Equal(settings.Model?.DisplayName, dto.ModelName);
@@ -70,6 +72,8 @@ public class PngMetadataDtoTests
             Seed = 987654,
             Width = 896,
             Height = 1152,
+            ActualWidth = 1792,
+            ActualHeight = 2304,
             DenoisingStrength = 0.55,
             ModelType = "Flux",
             ModelName = "FluxModel",
@@ -100,6 +104,8 @@ public class PngMetadataDtoTests
         Assert.Equal(dto.Seed, settings.Seed);
         Assert.Equal(dto.Width, settings.Width);
         Assert.Equal(dto.Height, settings.Height);
+        Assert.Equal(dto.ActualWidth, settings.ActualWidth);
+        Assert.Equal(dto.ActualHeight, settings.ActualHeight);
         Assert.Equal(dto.DenoisingStrength, settings.DenoisingStrength);
         Assert.Equal(ModelType.Flux, settings.ModelType);
         Assert.NotNull(settings.Model);
@@ -141,6 +147,8 @@ public class PngMetadataDtoTests
         Assert.Equal(original.Seed, roundTripped.Seed);
         Assert.Equal(original.Width, roundTripped.Width);
         Assert.Equal(original.Height, roundTripped.Height);
+        Assert.Equal(original.ActualWidth, roundTripped.ActualWidth);
+        Assert.Equal(original.ActualHeight, roundTripped.ActualHeight);
         Assert.Equal(original.DenoisingStrength, roundTripped.DenoisingStrength);
         Assert.Equal(original.ModelType, roundTripped.ModelType);
         Assert.NotNull(roundTripped.Model);
@@ -298,6 +306,8 @@ public class PngMetadataDtoTests
             Upscaler = "ESRGAN",
             UpscaleLevel = 4,
             UpscaleSteps = 15,
+            ActualWidth = 1024,
+            ActualHeight = 1536,
             EnableTiling = true,
             Loras =
             [

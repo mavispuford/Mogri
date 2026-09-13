@@ -151,6 +151,17 @@ public class PromptSettings
     /// Target image width in pixels.
     /// </summary>
     public double Width { get; set; } = 1024;
+
+    /// <summary>
+    /// Actual width of the generated image in pixels, when available from image metadata.
+    /// </summary>
+    public int? ActualWidth { get; set; }
+
+    /// <summary>
+    /// Actual height of the generated image in pixels, when available from image metadata.
+    /// </summary>
+    public int? ActualHeight { get; set; }
+
     /// <summary>
     /// List of LoRA networks to apply.
     /// </summary>
@@ -160,6 +171,55 @@ public class PromptSettings
     /// List of predefined prompt styles to apply.
     /// </summary>
     public List<IPromptStyleViewModel> PromptStyles { get; set; } = new();
+
+    /// <summary>
+    /// Removes settings that the active backend would ignore before a request is persisted as image metadata.
+    /// </summary>
+    public void NormalizeForBackend(BackendCapabilities capabilities)
+    {
+        if (ModelType is ModelType.SD15 or ModelType.SDXL)
+        {
+            Vae = null;
+            TextEncoder = null;
+            TextEncoderSecondary = null;
+        }
+
+        if (!capabilities.SupportsUpscaling)
+        {
+            EnableUpscaling = false;
+        }
+
+        if (!capabilities.SupportsUpscaling || !EnableUpscaling)
+        {
+            Upscaler = null;
+            UpscaleLevel = 0;
+            UpscaleSteps = 0;
+        }
+        else
+        {
+            if (!capabilities.SupportsConfigurableUpscaleScale)
+            {
+                UpscaleLevel = 0;
+            }
+
+            if (!capabilities.SupportsHiresFix || !string.IsNullOrEmpty(InitImage))
+            {
+                UpscaleSteps = 0;
+            }
+        }
+
+        if (!capabilities.SupportsSeamless)
+        {
+            EnableTiling = false;
+        }
+
+        if (!capabilities.SupportsDistilledCfgScale ||
+            GenerationProfile.GetDefault(ModelType).DefaultDistilledCfg is null)
+        {
+            DistilledCfgScale = null;
+        }
+    }
+
     public PromptSettings Clone()
     {
         return new PromptSettings
@@ -193,6 +253,8 @@ public class PromptSettings
             UpscaleLevel = UpscaleLevel,
             UpscaleSteps = UpscaleSteps,
             Width = Width,
+            ActualWidth = ActualWidth,
+            ActualHeight = ActualHeight,
             Loras = new List<ILoraViewModel>(Loras),
             PromptStyles = new List<IPromptStyleViewModel>(PromptStyles),
         };

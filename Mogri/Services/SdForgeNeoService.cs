@@ -661,8 +661,27 @@ namespace Mogri.Services
 
                 var bytes = Convert.FromBase64String(base64Data);
                 using var stream = new MemoryStream(bytes);
-                
-                var settings = await PngMetadataHelper.ReadSettingsFromStreamAsync(stream);
+                return await GetImageInfoAsync(stream, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to parse image info locally: {ex}");
+                return null;
+            }
+        }
+
+        public async Task<PromptSettings?> GetImageInfoAsync(Stream imageStream, CancellationToken cancellationToken = default)
+        {
+            if (imageStream == null) return null;
+
+            try
+            {
+                if (imageStream.CanSeek)
+                {
+                    imageStream.Position = 0;
+                }
+
+                var settings = await PngMetadataHelper.ReadSettingsFromStreamAsync(imageStream);
 
                 if (settings != null)
                 {

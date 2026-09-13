@@ -19,6 +19,7 @@ public interface IFileService
 public interface IImageService
 {
     SKBitmap? GetSkBitmapFromStream(Stream? stream);
+    (int Width, int Height)? GetImageDimensionsFromStream(Stream? stream);
 
     Task<MemoryStream?> GetStreamFromContentTypeStringAsync(string? imageString, CancellationToken token);
 

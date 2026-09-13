@@ -48,7 +48,8 @@ public static class ComfyUiWorkflowBuilder
         var nodeIdCounter = 1;
         var usesSeparateModel = UsesSeparateModel(settings, diffusionModels);
         var usesDedicatedTextEncoder = settings.ModelType is ModelType.ZImageTurbo or ModelType.Flux or ModelType.Krea2Turbo or ModelType.Krea2Raw;
-        var usesExternalVae = usesDedicatedTextEncoder || HasConcreteResource(settings.Vae);
+        var usesExternalVae = usesDedicatedTextEncoder ||
+            (settings.ModelType is not ModelType.SD15 and not ModelType.SDXL && HasConcreteResource(settings.Vae));
         var modelKey = settings.Model?.Key ?? "v1-5-pruned-emaonly.ckpt";
 
         if (usesDedicatedTextEncoder && string.IsNullOrWhiteSpace(settings.TextEncoder))
@@ -166,25 +167,51 @@ public static class ComfyUiWorkflowBuilder
             }
         }
 
+        if (UsesConfigurableModelShift(settings))
+        {
+            var modelSamplingNodeId = nodeIdCounter.ToString();
+            AddNode(workflow, modelSamplingNodeId, "ModelSamplingAuraFlow", new Dictionary<string, object>
+            {
+                ["model"] = new object[] { currentModelOutput[0], currentModelOutput[1] },
+                ["shift"] = GetDistilledCfgScale(settings)!.Value
+            });
+            currentModelOutput = new object[] { modelSamplingNodeId, 0 };
+            nodeIdCounter++;
+        }
+
         // 2. Prompts
         var positivePromptNodeId = nodeIdCounter.ToString();
         var (positivePrompt, _) = settings.GetCombinedPromptAndPromptStyles();
-        
-        AddNode(workflow, positivePromptNodeId, "CLIPTextEncode", new Dictionary<string, object>
+
+        if (settings.ModelType == ModelType.Flux)
         {
-            ["text"] = positivePrompt ?? string.Empty,
-            ["clip"] = new object[] { currentClipOutput[0], currentClipOutput[1] }
-        });
+            AddFluxTextEncodeNode(workflow, positivePromptNodeId, currentClipOutput, positivePrompt, GetDistilledCfgScale(settings));
+        }
+        else
+        {
+            AddNode(workflow, positivePromptNodeId, "CLIPTextEncode", new Dictionary<string, object>
+            {
+                ["text"] = positivePrompt ?? string.Empty,
+                ["clip"] = new object[] { currentClipOutput[0], currentClipOutput[1] }
+            });
+        }
         nodeIdCounter++;
 
         var negativePromptNodeId = nodeIdCounter.ToString();
         var (_, negativePrompt) = settings.GetCombinedPromptAndPromptStyles();
-        
-        AddNode(workflow, negativePromptNodeId, "CLIPTextEncode", new Dictionary<string, object>
+
+        if (settings.ModelType == ModelType.Flux)
         {
-            ["text"] = negativePrompt ?? string.Empty,
-            ["clip"] = new object[] { currentClipOutput[0], currentClipOutput[1] }
-        });
+            AddFluxTextEncodeNode(workflow, negativePromptNodeId, currentClipOutput, negativePrompt, GetDistilledCfgScale(settings));
+        }
+        else
+        {
+            AddNode(workflow, negativePromptNodeId, "CLIPTextEncode", new Dictionary<string, object>
+            {
+                ["text"] = negativePrompt ?? string.Empty,
+                ["clip"] = new object[] { currentClipOutput[0], currentClipOutput[1] }
+            });
+        }
         nodeIdCounter++;
 
         // Latent Source
@@ -368,6 +395,32 @@ public static class ComfyUiWorkflowBuilder
     private static bool IsComfyUiUpscalingEnabled(PromptSettings settings)
     {
         return settings.EnableUpscaling && !string.IsNullOrWhiteSpace(settings.Upscaler);
+    }
+
+    private static bool UsesConfigurableModelShift(PromptSettings settings)
+    {
+        return settings.ModelType is ModelType.ZImageTurbo or ModelType.Krea2Turbo;
+    }
+
+    private static double? GetDistilledCfgScale(PromptSettings settings)
+    {
+        return settings.DistilledCfgScale ?? GenerationProfile.GetDefault(settings.ModelType).DefaultDistilledCfg;
+    }
+
+    private static void AddFluxTextEncodeNode(
+        Dictionary<string, object> workflow,
+        string nodeId,
+        object[] clipOutput,
+        string? prompt,
+        double? guidance)
+    {
+        AddNode(workflow, nodeId, "CLIPTextEncodeFlux", new Dictionary<string, object>
+        {
+            ["clip"] = new object[] { clipOutput[0], clipOutput[1] },
+            ["clip_l"] = prompt ?? string.Empty,
+            ["t5xxl"] = prompt ?? string.Empty,
+            ["guidance"] = guidance ?? 0
+        });
     }
 
     private static bool IsStandaloneKreaModel(string modelKey)

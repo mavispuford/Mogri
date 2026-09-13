@@ -21,6 +21,7 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
     private readonly IMainThreadService _mainThreadService;
 
     private IList<IHistoryItemViewModel>? _historyItems;
+    private Task _imageLoadTask = Task.CompletedTask;
 
     [ObservableProperty]
     public partial IHistoryItemViewModel? HistoryItem { get; set; }
@@ -82,23 +83,19 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
 
     partial void OnHistoryItemChanged(IHistoryItemViewModel? value)
     {
-        _ = LoadImageAsync();
+        _imageLoadTask = value == null ? Task.CompletedTask : LoadImageAsync(value);
     }
 
-    private async Task LoadImageAsync()
+    private async Task LoadImageAsync(IHistoryItemViewModel currentItem)
     {
-        var currentItem = HistoryItem;
-        if (currentItem == null)
-        {
-            return;
-        }
-
         // Delay to allow the UI to settle (e.g. keyboard hiding, popup animation)
         await Task.Delay(100);
 
         if (!string.IsNullOrEmpty(currentItem.FileName))
         {
             SKBitmapImageSource? imageSource = null;
+            int? actualWidth = null;
+            int? actualHeight = null;
 
             await Task.Run(async () =>
             {
@@ -110,7 +107,24 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
                 }
 
                 var originalBitmap = _imageService.GetSkBitmapFromStream(fileStream);
+                if (originalBitmap == null)
+                {
+                    return;
+                }
+
+                actualWidth = originalBitmap.Width;
+                actualHeight = originalBitmap.Height;
                 var resizedBitmap = _imageService.GetResizedSKBitmap(originalBitmap, (int)Constants.MaximumDisplayWidthHeight, (int)Constants.MaximumDisplayWidthHeight, filterImage: true, onlyIfLarger: true);
+                if (resizedBitmap == null)
+                {
+                    originalBitmap.Dispose();
+                    return;
+                }
+
+                if (!ReferenceEquals(originalBitmap, resizedBitmap))
+                {
+                    originalBitmap.Dispose();
+                }
 
                 imageSource = new SKBitmapImageSource
                 {
@@ -120,35 +134,54 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
 
             await _mainThreadService.InvokeOnMainThreadAsync(() =>
             {
-                if (HistoryItem == currentItem && imageSource != null)
+                if (HistoryItem == currentItem)
                 {
-                    FullImageSource = imageSource;
+                    ApplyActualDimensions(currentItem.Settings, actualWidth, actualHeight);
+
+                    if (imageSource != null)
+                    {
+                        FullImageSource = imageSource;
+                    }
                 }
             });
+
+            if (currentItem.Settings == null)
+            {
+                _ = Task.Run(async () =>
+                {
+                    using var imageFileStream = await _fileService.GetFileStreamFromInternalStorageAsync(currentItem.FileName);
+                    if (imageFileStream == null) return;
+
+                    var imageInfoSettings = await _stableDiffusionService.GetImageInfoAsync(imageFileStream);
+                    ApplyActualDimensions(imageInfoSettings, actualWidth, actualHeight);
+
+                    await _mainThreadService.InvokeOnMainThreadAsync(() =>
+                    {
+                        currentItem.Settings = imageInfoSettings;
+
+                        // On iOS, we have to manually call this for the binding to pick up the change
+                        OnPropertyChanged(nameof(HistoryItem));
+                    });
+                });
+            }
+        }
+    }
+
+    private static void ApplyActualDimensions(PromptSettings? settings, int? actualWidth, int? actualHeight)
+    {
+        if (settings == null)
+        {
+            return;
         }
 
-        if (currentItem.Settings == null)
+        if (actualWidth.HasValue)
         {
-            _ = Task.Run(async () =>
-            {
-                using var imageFileStream = await _fileService.GetFileStreamFromInternalStorageAsync(currentItem.FileName);
-                if (imageFileStream == null) return;
+            settings.ActualWidth ??= actualWidth.Value;
+        }
 
-                using var memoryStream = new MemoryStream();
-                await imageFileStream.CopyToAsync(memoryStream);
-                var imageString = Convert.ToBase64String(memoryStream.ToArray());
-                var formattedImageString = string.Format(Constants.ImageDataFormat, "image/png", imageString);
-
-                var imageInfoSettings = await _stableDiffusionService.GetImageInfoAsync(formattedImageString);
-
-                await _mainThreadService.InvokeOnMainThreadAsync(() =>
-                {
-                    currentItem.Settings = imageInfoSettings;
-                    
-                    // On iOS, we have to manually call this for the binding to pick up the change
-                    OnPropertyChanged(nameof(HistoryItem));
-                });
-            });
+        if (actualHeight.HasValue)
+        {
+            settings.ActualHeight ??= actualHeight.Value;
         }
     }
 
@@ -240,22 +273,42 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
     [RelayCommand]
     private async Task ImageInfo()
     {
-        if (HistoryItem?.Settings == null)
+        var currentItem = HistoryItem;
+        var settings = currentItem?.Settings;
+        if (settings == null)
         {
             await _popupService.DisplayAlertAsync("No Image Info", "Unable to retrieve image info. Please try again later.", "Close");
 
             return;
         }
 
-        var settings = HistoryItem.Settings;
+        if (!settings.ActualWidth.HasValue || !settings.ActualHeight.HasValue)
+        {
+            await _imageLoadTask;
+
+            if (!ReferenceEquals(HistoryItem, currentItem))
+            {
+                return;
+            }
+        }
+
         var (prompt, negativePrompt) = settings.GetCombinedPromptAndPromptStyles();
+        var actualWidth = settings.ActualWidth;
+        var actualHeight = settings.ActualHeight;
+
+        var size = $"{settings.Width}x{settings.Height}";
+        if (actualWidth.HasValue && actualHeight.HasValue &&
+            (actualWidth.Value != settings.Width || actualHeight.Value != settings.Height))
+        {
+            size += $" (Actual: {actualWidth.Value}x{actualHeight.Value})";
+        }
 
         var message = $"Prompt: {prompt}\n\n" +
             $"Negative Prompt: {negativePrompt}\n\n" +
             $"Steps: {settings.Steps}, Sampler: {settings.Sampler}\n" +
             $"Guidance Scale (Cfg): {settings.GuidanceScale}\n" +
             $"Seed: {settings.Seed}\n" +
-            $"Size: {settings.Width}x{settings.Height}\n" +
+            $"Size: {size}\n" +
             $"Denoising Strength: {settings.DenoisingStrength}\n" +
             $"Model: {settings.Model?.DisplayName ?? "Unknown"}";
 
@@ -269,14 +322,19 @@ public partial class HistoryItemPopupViewModel : PopupBaseViewModel, IHistoryIte
             message += $"\nDistilled CFG Scale: {settings.DistilledCfgScale}";
         }
 
-        if (settings.EnableUpscaling &&
-            !string.IsNullOrEmpty(settings.Upscaler) &&
-            settings.UpscaleLevel > 0 &&
-            settings.UpscaleSteps > 0)
+        if (settings.EnableUpscaling && !string.IsNullOrEmpty(settings.Upscaler))
         {
-            message += $"\nUpscaler: {settings.Upscaler}\n" +
-                $"Upscale Level: {settings.UpscaleLevel}\n" +
-                $"Upscale Steps: {settings.UpscaleSteps}\n";
+            message += $"\nUpscaler: {settings.Upscaler}";
+
+            if (settings.UpscaleLevel > 0)
+            {
+                message += $"\nUpscale Level: {settings.UpscaleLevel}";
+            }
+
+            if (settings.UpscaleSteps > 0)
+            {
+                message += $"\nUpscale Steps: {settings.UpscaleSteps}";
+            }
         }
 
         var result = await _popupService.DisplayAlertAsync("Image Info", message, "Copy to clipboard", "Close");

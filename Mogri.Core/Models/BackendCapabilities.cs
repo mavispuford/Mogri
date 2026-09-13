@@ -27,6 +27,11 @@ public record BackendCapabilities
     public bool SupportsHiresFix { get; init; }
 
     /// <summary>
+    /// Gets whether the backend workflow can apply model-specific distilled CFG or Shift settings.
+    /// </summary>
+    public bool SupportsDistilledCfgScale { get; init; }
+
+    /// <summary>
     /// Gets whether the backend can provide a list of samplers.
     /// </summary>
     public bool SupportsSamplerList { get; init; }
@@ -64,6 +69,7 @@ public record BackendCapabilities
         SupportsUpscaling = true,
         SupportsConfigurableUpscaleScale = true,
         SupportsHiresFix = true,
+        SupportsDistilledCfgScale = true,
         SupportsSamplerList = true,
         SupportsCancellation = true,
         SupportsLoras = true,
