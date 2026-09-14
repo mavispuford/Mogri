@@ -16,3 +16,4 @@ applyTo: "**/Services/**"
 - Consume Clients for API communication — never expose Client objects or raw DTOs to ViewModels
 - Use `CancellationToken` for all async operations
 - Do not assume the main thread unless the service itself is the approved main-thread adapter
+- After making a complete set of changes to a Service, make sure its user-facing documentation is still accurate in the `Docs` folder (for example, `SdForgeNeo.md` or `ComfyUI.md`). If there is no documentation around the new set of changes and they are important enough for the user to know about, feel free to add to the docs.

@@ -54,6 +54,8 @@ public class PngMetadataHelperTests
         Assert.Equal(settings.Seed, result.Seed);
         Assert.Equal(settings.Width, result.Width);
         Assert.Equal(settings.Height, result.Height);
+        Assert.Equal(settings.ActualWidth, result.ActualWidth);
+        Assert.Equal(settings.ActualHeight, result.ActualHeight);
         Assert.Equal(settings.DenoisingStrength, result.DenoisingStrength);
         Assert.Equal(settings.ModelType, result.ModelType);
         Assert.Equal(settings.EnableUpscaling, result.EnableUpscaling);
@@ -125,6 +127,41 @@ public class PngMetadataHelperTests
         var result = PngMetadataHelper.WriteSettings(original, new PromptSettings());
 
         Assert.Same(original, result);
+    }
+
+    [Fact]
+    public void WriteSettings_WithUnsupportedCapabilities_OmitsUnsupportedMetadata()
+    {
+        // Arrange
+        var settings = new PromptSettings
+        {
+            EnableUpscaling = true,
+            Upscaler = "4x-UltraSharp.pth",
+            UpscaleLevel = 4,
+            UpscaleSteps = 20,
+            DistilledCfgScale = 3.5,
+            EnableTiling = true,
+            ModelType = ModelType.Flux
+        };
+        settings.NormalizeForBackend(new BackendCapabilities
+        {
+            SupportsUpscaling = true,
+            SupportsConfigurableUpscaleScale = false,
+            SupportsHiresFix = false,
+            SupportsDistilledCfgScale = false,
+            SupportsSeamless = false
+        });
+
+        // Act
+        var written = PngMetadataHelper.WriteSettings(CreateMinimalPng(), settings);
+        var serializedPng = Encoding.Latin1.GetString(written);
+
+        // Assert
+        Assert.Contains("\"upscaler\":\"4x-UltraSharp.pth\"", serializedPng);
+        Assert.DoesNotContain("\"upscaleLevel\"", serializedPng);
+        Assert.DoesNotContain("\"upscaleSteps\"", serializedPng);
+        Assert.DoesNotContain("\"distilledCfg\"", serializedPng);
+        Assert.DoesNotContain("\"enableTiling\"", serializedPng);
     }
 
     [Fact]

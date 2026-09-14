@@ -47,6 +47,14 @@ public class PngMetadataDto
     [JsonPropertyName("height")]
     public double Height { get; set; }
 
+    [JsonPropertyName("actualWidth")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? ActualWidth { get; set; }
+
+    [JsonPropertyName("actualHeight")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? ActualHeight { get; set; }
+
     [JsonPropertyName("denoising")]
     public double DenoisingStrength { get; set; }
 
@@ -107,6 +115,8 @@ public class PngMetadataDto
             Seed = settings.Seed,
             Width = settings.Width,
             Height = settings.Height,
+            ActualWidth = settings.ActualWidth,
+            ActualHeight = settings.ActualHeight,
             DenoisingStrength = settings.DenoisingStrength,
             ModelType = settings.ModelType.ToString(),
             ModelName = settings.Model?.DisplayName,
@@ -135,6 +145,8 @@ public class PngMetadataDto
             Seed = this.Seed,
             Width = this.Width,
             Height = this.Height,
+            ActualWidth = this.ActualWidth,
+            ActualHeight = this.ActualHeight,
             DenoisingStrength = this.DenoisingStrength,
             EnableUpscaling = this.EnableUpscaling,
             Upscaler = this.Upscaler,

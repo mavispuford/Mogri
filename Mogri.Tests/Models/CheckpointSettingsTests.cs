@@ -22,6 +22,7 @@ public class CheckpointSettingsTests
         Assert.Equal(settings.Scheduler, checkpoint.Scheduler);
         Assert.Equal(settings.Vae, checkpoint.Vae);
         Assert.Equal(settings.TextEncoder, checkpoint.TextEncoder);
+        Assert.Equal(settings.TextEncoderSecondary, checkpoint.TextEncoderSecondary);
         Assert.Equal(settings.Width, checkpoint.Width);
         Assert.Equal(settings.Height, checkpoint.Height);
         Assert.Equal(settings.BatchCount, checkpoint.BatchCount);
@@ -75,6 +76,7 @@ public class CheckpointSettingsTests
         Assert.Equal(checkpoint.Scheduler, destination.Scheduler);
         Assert.Equal(checkpoint.Vae, destination.Vae);
         Assert.Equal(checkpoint.TextEncoder, destination.TextEncoder);
+        Assert.Equal(checkpoint.TextEncoderSecondary, destination.TextEncoderSecondary);
         Assert.Equal(checkpoint.Width, destination.Width);
         Assert.Equal(checkpoint.Height, destination.Height);
         Assert.Equal(checkpoint.BatchCount, destination.BatchCount);
@@ -116,6 +118,7 @@ public class CheckpointSettingsTests
         Assert.Equal(source.Scheduler, destination.Scheduler);
         Assert.Equal(source.Vae, destination.Vae);
         Assert.Equal(source.TextEncoder, destination.TextEncoder);
+        Assert.Equal(source.TextEncoderSecondary, destination.TextEncoderSecondary);
         Assert.Equal(source.Width, destination.Width);
         Assert.Equal(source.Height, destination.Height);
         Assert.Equal(source.BatchCount, destination.BatchCount);
@@ -135,6 +138,7 @@ public class CheckpointSettingsTests
             Scheduler = "karras",
             Vae = "auto",
             TextEncoder = "clip",
+            TextEncoderSecondary = "clip_l",
             Width = 768,
             Height = 512,
             BatchCount = 2,
@@ -155,6 +159,7 @@ public class CheckpointSettingsTests
             Scheduler = "karras",
             Vae = "vae.safetensors",
             TextEncoder = "t5xxl",
+            TextEncoderSecondary = "clip_l",
             Width = 960,
             Height = 640,
             BatchCount = 4,

@@ -41,6 +41,7 @@
     <Compile Include="..\Mogri\Interfaces\Coordinators\IImageGenerationCoordinator.cs" Link="Shared\Interfaces\Coordinators\IImageGenerationCoordinator.cs" />
     <Compile Include="..\Mogri\Interfaces\Coordinators\ILoadingCoordinator.cs" Link="Shared\Interfaces\Coordinators\ILoadingCoordinator.cs" />
     <Compile Include="..\Mogri\Interfaces\Services\IPresetService.cs" Link="Shared\Interfaces\Services\IPresetService.cs" />
+    <Compile Include="..\Mogri\Services\ComfyUi\ComfyUiWorkflowBuilder.cs" Link="Shared\Services\ComfyUi\ComfyUiWorkflowBuilder.cs" />
     <Compile Include="..\Mogri\Services\HistoryService.cs" Link="Shared\Services\HistoryService.cs" />
     <Compile Include="..\Mogri\Coordinators\CanvasWorkflowCoordinator.cs" Link="Shared\Coordinators\CanvasWorkflowCoordinator.cs" />
     <Compile Include="..\Mogri\Models\CanvasSegmentationImageStateChangedEventArgs.cs" Link="Shared\Models\CanvasSegmentationImageStateChangedEventArgs.cs" />

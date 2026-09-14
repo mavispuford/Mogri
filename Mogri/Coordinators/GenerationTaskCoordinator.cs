@@ -63,6 +63,14 @@ public class GenerationTaskCoordinator : IGenerationTaskCoordinator
                             var imageSettings = request.Settings.Clone();
                             imageSettings.Seed = generationResponse.Seeds?.ElementAtOrDefault(imageNumber - 1) ?? request.Settings.Seed + (imageNumber - 1);
 
+                            using var imageStream = new MemoryStream(imageBytes);
+                            var dimensions = _imageService.GetImageDimensionsFromStream(imageStream);
+                            if (dimensions.HasValue)
+                            {
+                                imageSettings.ActualWidth = dimensions.Value.Width;
+                                imageSettings.ActualHeight = dimensions.Value.Height;
+                            }
+
                             imageBytes = PngMetadataHelper.WriteSettings(imageBytes, imageSettings);
 
                             var fileName = $"{request.SanitizedPrompt}-{imageSettings.Seed}-{DateTime.Now.Ticks}-{imageNumber}.png";

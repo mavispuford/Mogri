@@ -74,7 +74,7 @@ public class GenerationProfileTests
 
         // Assert
         Assert.Equal("Qwen2D_VAE.safetensors", profile.DefaultVae);
-        Assert.Equal("qwen3vl", profile.DefaultTextEncoder);
+        Assert.Equal("qwen3vl_4b", profile.DefaultTextEncoder);
     }
 
     [Fact]
@@ -87,7 +87,7 @@ public class GenerationProfileTests
 
         // Assert
         Assert.Equal("Qwen2D_VAE.safetensors", profile.DefaultVae);
-        Assert.Equal("qwen3vl", profile.DefaultTextEncoder);
+        Assert.Equal("qwen3vl_4b", profile.DefaultTextEncoder);
     }
 
     [Fact]
