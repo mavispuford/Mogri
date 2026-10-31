@@ -275,7 +275,18 @@ public class SegmentationService : ISegmentationService, IDisposable
                     pointCoordsScaled.Add(point.X * _scaleX);
                     pointCoordsScaled.Add(point.Y * _scaleY);
 
-                    labels.Add(i + 2);
+                    if (points.Length == 2)
+                    {
+                        // 2 points represents a gesture bounding box [topLeft, bottomRight]
+                        // 2.0 = box top-left, 3.0 = box bottom-right
+                        labels.Add(i + 2);
+                    }
+                    else
+                    {
+                        // Single tap or discrete point click(s)
+                        // 1.0 = positive/foreground click
+                        labels.Add(1.0f);
+                    }
                 }
 
                 // Add padding coordinate and batch index
@@ -441,9 +452,8 @@ public class SegmentationService : ISegmentationService, IDisposable
                 for (var x = 0; x < _imageWidth; x++)
                 {
                     var arrayValue = maskArray[pixelIndex++];
-                    var transformed = (byte)(arrayValue * 255f);
 
-                    if (transformed > 0)
+                    if (arrayValue > 0.0f)
                     {
                         var pixelPtr = pixels + y * pixelStride + x * 4; // Assuming 32-bit RGBA format
                         pixelPtr[0] = MaskColor.Red;    // Red
