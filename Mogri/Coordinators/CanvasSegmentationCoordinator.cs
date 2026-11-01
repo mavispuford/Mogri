@@ -19,6 +19,8 @@ public sealed class CanvasSegmentationCoordinator : ICanvasSegmentationCoordinat
     private int _setSegmentationImageVersion;
     private int _doingSegmentation;
     private bool _hasSegmentationImage;
+    private readonly object _rawMaskLock = new();
+    private SKBitmap? _rawSegmentationBitmap;
 
     public CanvasSegmentationCoordinator(ICanvasBitmapService canvasBitmapService, ISegmentationService segmentationService)
     {
@@ -46,6 +48,11 @@ public sealed class CanvasSegmentationCoordinator : ICanvasSegmentationCoordinat
             currentSetSegmentationImageCancellationTokenSource = new CancellationTokenSource();
             _setSegmentationImageCancellationTokenSource = currentSetSegmentationImageCancellationTokenSource;
             _hasSegmentationImage = false;
+            lock (_rawMaskLock)
+            {
+                _rawSegmentationBitmap?.Dispose();
+                _rawSegmentationBitmap = null;
+            }
         }
 
         RaiseImageStateChanged(isSettingImage: true, hasSegmentationImage: false);
@@ -130,23 +137,40 @@ public sealed class CanvasSegmentationCoordinator : ICanvasSegmentationCoordinat
                 return null;
             }
 
-            if (request.CurrentSegmentationBitmap == null)
+            SKBitmap paddedBitmap;
+            lock (_rawMaskLock)
             {
-                return new CanvasSegmentationMaskUpdateResult(maskBitmap);
+                if (_rawSegmentationBitmap == null && request.CurrentSegmentationBitmap != null)
+                {
+                    _rawSegmentationBitmap = request.CurrentSegmentationBitmap.Copy();
+                }
+
+                if (_rawSegmentationBitmap == null)
+                {
+                    _rawSegmentationBitmap = maskBitmap;
+                }
+                else
+                {
+                    using var ownedMaskBitmap = maskBitmap;
+                    var mergedBitmap = new SKBitmap(_rawSegmentationBitmap.Info);
+
+                    using (var combineCanvas = new SKCanvas(mergedBitmap))
+                    using (var paint = new SKPaint { BlendMode = SKBlendMode.SrcOver })
+                    {
+                        combineCanvas.DrawBitmap(_rawSegmentationBitmap, 0, 0, SKSamplingOptions.Default, paint);
+                        paint.BlendMode = request.SegmentationAdd ? SKBlendMode.SrcOver : SKBlendMode.DstOut;
+                        combineCanvas.DrawBitmap(maskBitmap, 0, 0, SKSamplingOptions.Default, paint);
+                    }
+
+                    _rawSegmentationBitmap.Dispose();
+                    _rawSegmentationBitmap = mergedBitmap;
+                }
+
+                paddedBitmap = _canvasBitmapService.ApplyMaskPadding(_rawSegmentationBitmap, request.Padding)
+                    ?? _rawSegmentationBitmap.Copy();
             }
 
-            using var ownedMaskBitmap = maskBitmap;
-            var mergedBitmap = new SKBitmap(request.CurrentSegmentationBitmap.Info);
-
-            using (var combineCanvas = new SKCanvas(mergedBitmap))
-            using (var paint = new SKPaint { BlendMode = SKBlendMode.SrcOver })
-            {
-                combineCanvas.DrawBitmap(request.CurrentSegmentationBitmap, 0, 0, SKSamplingOptions.Default, paint);
-                paint.BlendMode = request.SegmentationAdd ? SKBlendMode.SrcOver : SKBlendMode.DstOut;
-                combineCanvas.DrawBitmap(maskBitmap, 0, 0, SKSamplingOptions.Default, paint);
-            }
-
-            return new CanvasSegmentationMaskUpdateResult(mergedBitmap);
+            return new CanvasSegmentationMaskUpdateResult(paddedBitmap);
         }
         finally
         {
@@ -154,30 +178,73 @@ public sealed class CanvasSegmentationCoordinator : ICanvasSegmentationCoordinat
         }
     }
 
+    public Task<SKBitmap?> ApplyPaddingAsync(int padding)
+    {
+        SKBitmap? rawCopy;
+        lock (_rawMaskLock)
+        {
+            if (_rawSegmentationBitmap == null)
+            {
+                return Task.FromResult<SKBitmap?>(null);
+            }
+
+            rawCopy = _rawSegmentationBitmap.Copy();
+        }
+
+        return Task.Run<SKBitmap?>(() =>
+        {
+            using (rawCopy)
+            {
+                return _canvasBitmapService.ApplyMaskPadding(rawCopy, padding)
+                    ?? rawCopy.Copy();
+            }
+        });
+    }
+
     public Task<CanvasSegmentationMaskUpdateResult?> InvertMaskAsync(CanvasSegmentationInvertRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        if (request.CurrentSegmentationBitmap == null)
+        lock (_rawMaskLock)
         {
-            if (request.SourceImageInfo == null)
+            if (_rawSegmentationBitmap == null && request.CurrentSegmentationBitmap == null)
             {
-                return Task.FromResult<CanvasSegmentationMaskUpdateResult?>(null);
+                if (request.SourceImageInfo == null)
+                {
+                    return Task.FromResult<CanvasSegmentationMaskUpdateResult?>(null);
+                }
+
+                var fullMask = new SKBitmap(request.SourceImageInfo.Value);
+                using var canvas = new SKCanvas(fullMask);
+                canvas.Clear(_segmentationService.MaskColor);
+
+                _rawSegmentationBitmap = fullMask.Copy();
+                var paddedFull = _canvasBitmapService.ApplyMaskPadding(_rawSegmentationBitmap, request.Padding)
+                    ?? _rawSegmentationBitmap.Copy();
+
+                return Task.FromResult<CanvasSegmentationMaskUpdateResult?>(new CanvasSegmentationMaskUpdateResult(paddedFull));
             }
-
-            var fullMask = new SKBitmap(request.SourceImageInfo.Value);
-            using var canvas = new SKCanvas(fullMask);
-            canvas.Clear(_segmentationService.MaskColor);
-
-            return Task.FromResult<CanvasSegmentationMaskUpdateResult?>(new CanvasSegmentationMaskUpdateResult(fullMask));
         }
 
         return Task.Run<CanvasSegmentationMaskUpdateResult?>(() =>
         {
-            var invertedBitmap = _segmentationService.InvertMask(request.CurrentSegmentationBitmap);
-            _segmentationService.Reset();
+            SKBitmap invertedBitmap;
+            SKBitmap padded;
 
-            return new CanvasSegmentationMaskUpdateResult(invertedBitmap);
+            lock (_rawMaskLock)
+            {
+                var sourceToInvert = _rawSegmentationBitmap ?? request.CurrentSegmentationBitmap;
+                invertedBitmap = _segmentationService.InvertMask(sourceToInvert!);
+                _segmentationService.Reset();
+
+                _rawSegmentationBitmap?.Dispose();
+                _rawSegmentationBitmap = invertedBitmap.Copy();
+
+                padded = _canvasBitmapService.ApplyMaskPadding(_rawSegmentationBitmap, request.Padding)
+                    ?? _rawSegmentationBitmap.Copy();
+            }
+
+            return new CanvasSegmentationMaskUpdateResult(padded);
         });
     }
 
@@ -189,6 +256,11 @@ public sealed class CanvasSegmentationCoordinator : ICanvasSegmentationCoordinat
 
     public void Reset()
     {
+        lock (_rawMaskLock)
+        {
+            _rawSegmentationBitmap?.Dispose();
+            _rawSegmentationBitmap = null;
+        }
         _segmentationService.Reset();
     }
 

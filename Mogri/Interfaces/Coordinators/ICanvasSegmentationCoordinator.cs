@@ -16,6 +16,8 @@ public interface ICanvasSegmentationCoordinator
 
     Task<CanvasSegmentationMaskUpdateResult?> InvertMaskAsync(CanvasSegmentationInvertRequest request);
 
+    Task<SKBitmap?> ApplyPaddingAsync(int padding);
+
     Task<SKBitmap?> CreateMaskBitmapFromSegmentationAsync(SKBitmap segmentationBitmap);
 
     void Reset();

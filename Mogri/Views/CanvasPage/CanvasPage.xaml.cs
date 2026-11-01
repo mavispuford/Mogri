@@ -57,6 +57,12 @@ public partial class CanvasPage : BasePage
         set => SetValue(CurrentBrushSizeProperty, value);
     }
 
+    public int SegmentationPadding
+    {
+        get => (int)GetValue(SegmentationPaddingProperty);
+        set => SetValue(SegmentationPaddingProperty, value);
+    }
+
     public IPaintingToolViewModel CurrentTool
     {
         get => (IPaintingToolViewModel)GetValue(CurrentToolProperty);
@@ -149,6 +155,11 @@ public partial class CanvasPage : BasePage
     public static BindableProperty CurrentBrushSizeProperty = BindableProperty.Create(nameof(CurrentBrushSize), typeof(double), typeof(CanvasPage), 10d, propertyChanged: (bindable, oldValue, newValue) =>
     {
         ((CanvasPage)bindable).AutoHideBrushSizeSlider();
+    });
+
+    public static BindableProperty SegmentationPaddingProperty = BindableProperty.Create(nameof(SegmentationPadding), typeof(int), typeof(CanvasPage), 2, propertyChanged: (bindable, oldValue, newValue) =>
+    {
+        ((CanvasPage)bindable).AutoHideMaskPaddingSlider();
     });
 
     public static BindableProperty CurrentAlphaProperty = BindableProperty.Create(nameof(CurrentAlpha), typeof(double), typeof(CanvasPage), .5d, propertyChanged: (bindable, oldValue, newValue) =>
@@ -406,6 +417,7 @@ public partial class CanvasPage : BasePage
         this.SetBinding(ShowMaskLayerProperty, nameof(ICanvasPageViewModel.ShowMaskLayer), BindingMode.TwoWay);
         this.SetBinding(DoSegmentationCommandProperty, nameof(ICanvasPageViewModel.DoSegmentationCommand), BindingMode.OneWay);
         this.SetBinding(SegmentationBitmapProperty, nameof(ICanvasPageViewModel.SegmentationBitmap), BindingMode.TwoWay);
+        this.SetBinding(SegmentationPaddingProperty, nameof(ICanvasPageViewModel.SegmentationPadding), BindingMode.TwoWay);
         this.SetBinding(ShowActionsProperty, nameof(ICanvasPageViewModel.ShowActions), BindingMode.OneWay);
         this.SetBinding(ResetZoomCommandProperty, nameof(ICanvasPageViewModel.ResetZoomCommand), BindingMode.OneWayToSource);
         this.SetBinding(FlipSelectedTextHorizontallyCommandProperty, nameof(ICanvasPageViewModel.FlipSelectedTextHorizontallyCommand), BindingMode.OneWayToSource);

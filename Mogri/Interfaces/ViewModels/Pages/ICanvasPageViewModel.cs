@@ -44,6 +44,8 @@ public interface ICanvasPageViewModel : IPageViewModel
 
     SKBitmap? SegmentationBitmap { get; set; }
 
+    int SegmentationPadding { get; set; }
+
     bool SettingSegmentationImage { get; set; }
 
     bool HasSegmentationImage { get; set; }

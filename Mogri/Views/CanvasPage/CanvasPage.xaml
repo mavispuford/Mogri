@@ -298,6 +298,32 @@
                     </ContentView>
                 </Border>
 
+                <Border x:Name="MaskPaddingButton"
+                        Style="{StaticResource ContextButtonStyle}">
+                    <ContentView>
+                        <ContentView.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="Mask_Padding_Button_Clicked" />
+                        </ContentView.GestureRecognizers>
+
+                        <Grid>
+                            <Image HorizontalOptions="Center" Margin="0,0,0,16" InputTransparent="True">
+                                <Image.Source>
+                                    <FontImageSource Glyph="&#xe56b;" FontFamily="{StaticResource IconFontRegular}" Size="26" Color="White" />
+                                </Image.Source>
+                            </Image>
+
+                            <Label Text="{Binding Path=SegmentationPadding, StringFormat='{0:+#;-#;0}'}"
+                                   HorizontalTextAlignment="Center"
+                                   VerticalTextAlignment="End"
+                                   TextColor="White"
+                                   FontFamily="ComfortaaBold"
+                                   FontSize="11"
+                                   Margin="0,0,0,6"
+                                   InputTransparent="True"/>
+                        </Grid>
+                    </ContentView>
+                </Border>
+
                 <Border x:Name="AlphaButton"
                         Style="{StaticResource ContextButtonStyle}">
                     <ContentView>
@@ -424,6 +450,22 @@
                                 Minimum="1"
                                 Maximum="50"
                                 Value="{Binding CurrentBrushSize}" />
+
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border x:Name="MaskPaddingSliderContainer"
+                        Style="{StaticResource SliderContainerStyle}"
+                        HorizontalOptions="Start">
+                    <VerticalStackLayout Spacing="0" Padding="15">
+
+                        <Label Style="{StaticResource ContextSliderLabelStyle}"
+                               Text="{Binding SegmentationPadding, StringFormat='Padding: {0:+#;-#;0} px'}" />
+
+                        <Slider Style="{StaticResource ContextSliderStyle}"
+                                Minimum="-5"
+                                Maximum="15"
+                                Value="{Binding SegmentationPadding}" />
 
                     </VerticalStackLayout>
                 </Border>

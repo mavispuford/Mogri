@@ -13,6 +13,8 @@ public interface ICanvasBitmapService
 
     SKBitmap? CreateMaskedBitmap(SKBitmap? sourceBitmap, SKBitmap? maskBitmap);
 
+    SKBitmap? ApplyMaskPadding(SKBitmap? maskBitmap, int paddingPixels);
+
     SKBitmap? GetCroppedBitmap(SKBitmap? bitmap, SKRect cropRect, double cropScale, float cropSize);
 
     SKBitmap? StitchBitmapIntoSource(SKBitmap? bitmap, SKBitmap? bitmapToStitchIn, SKRect rect, double rectScale);

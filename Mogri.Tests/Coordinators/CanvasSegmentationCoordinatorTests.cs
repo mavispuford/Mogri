@@ -158,6 +158,56 @@ public class CanvasSegmentationCoordinatorTests
         segmentationService.Verify(service => service.Reset(), Times.Once);
     }
 
+    [Fact]
+    public async Task ApplyPadding_WhenNoSegmentationDone_ReturnsNull()
+    {
+        // Arrange
+        var canvasBitmapService = new Mock<ICanvasBitmapService>();
+        var segmentationService = new Mock<ISegmentationService>();
+        var coordinator = new CanvasSegmentationCoordinator(canvasBitmapService.Object, segmentationService.Object);
+
+        // Act
+        var result = await coordinator.ApplyPaddingAsync(3);
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task ApplyPadding_WhenMaskExists_DelegatesToCanvasBitmapService()
+    {
+        // Arrange
+        var canvasBitmapService = new Mock<ICanvasBitmapService>();
+        var segmentationService = new Mock<ISegmentationService>();
+        using var deltaBitmap = CreateMaskBitmap();
+        using var paddedBitmap = CreateMaskBitmap();
+
+        segmentationService
+            .Setup(service => service.DoSegmentation(It.IsAny<SKPoint[]>(), false))
+            .ReturnsAsync(deltaBitmap.Copy());
+
+        canvasBitmapService
+            .Setup(service => service.ApplyMaskPadding(It.IsAny<SKBitmap>(), 3))
+            .Returns(paddedBitmap.Copy());
+
+        var coordinator = new CanvasSegmentationCoordinator(canvasBitmapService.Object, segmentationService.Object);
+        var request = new CanvasSegmentationRequest
+        {
+            Points = [new SKPoint(1, 1)],
+            Padding = 2
+        };
+
+        // Do initial segmentation
+        await coordinator.DoSegmentationAsync(request);
+
+        // Act
+        using var result = await coordinator.ApplyPaddingAsync(3);
+
+        // Assert
+        Assert.NotNull(result);
+        canvasBitmapService.Verify(service => service.ApplyMaskPadding(It.IsAny<SKBitmap>(), 3), Times.Once);
+    }
+
     private static SKBitmap CreateBitmap(SKColor color)
     {
         var bitmap = new SKBitmap(2, 2);

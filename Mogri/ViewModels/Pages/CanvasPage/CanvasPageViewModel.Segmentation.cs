@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mogri.Enums;
 using Mogri.Models;
@@ -10,8 +11,63 @@ namespace Mogri.ViewModels;
 /// </summary>
 public partial class CanvasPageViewModel
 {
+    private int _targetPadding;
+    private bool _isPaddingWorkerRunning;
+    private int _segmentationSessionId;
+
+    [ObservableProperty]
+    public partial int SegmentationPadding { get; set; } = 2;
+
+    partial void OnSegmentationPaddingChanged(int value)
+    {
+        _targetPadding = value;
+
+        if (!_isPaddingWorkerRunning)
+        {
+            _isPaddingWorkerRunning = true;
+            _ = processPaddingUpdatesAsync();
+        }
+    }
+
+    private async Task processPaddingUpdatesAsync()
+    {
+        var sessionId = _segmentationSessionId;
+
+        try
+        {
+            while (sessionId == _segmentationSessionId)
+            {
+                int currentTarget = _targetPadding;
+
+                var updatedBitmap = await _canvasSegmentationCoordinator.ApplyPaddingAsync(currentTarget);
+
+                if (sessionId != _segmentationSessionId)
+                {
+                    updatedBitmap?.Dispose();
+                    break;
+                }
+
+                if (updatedBitmap != null)
+                {
+                    SegmentationBitmap?.Dispose();
+                    SegmentationBitmap = updatedBitmap;
+                }
+
+                if (_targetPadding == currentTarget)
+                {
+                    break;
+                }
+            }
+        }
+        finally
+        {
+            _isPaddingWorkerRunning = false;
+        }
+    }
+
     private async Task updateSegmentationImageAsync(SKBitmap bitmap)
     {
+        _segmentationSessionId++;
         await _canvasSegmentationCoordinator.SetImageAsync(bitmap);
     }
 
@@ -48,12 +104,14 @@ public partial class CanvasPageViewModel
         try
         {
             IsBusy = true;
+            _segmentationSessionId++;
 
             var segmentationResult = await _canvasSegmentationCoordinator.DoSegmentationAsync(new CanvasSegmentationRequest
             {
                 Points = points,
                 CurrentSegmentationBitmap = SegmentationBitmap,
-                SegmentationAdd = SegmentationAdd
+                SegmentationAdd = SegmentationAdd,
+                Padding = SegmentationPadding
             });
 
             if (segmentationResult != null)
@@ -84,11 +142,13 @@ public partial class CanvasPageViewModel
         try
         {
             IsBusy = true;
+            _segmentationSessionId++;
 
             var invertResult = await _canvasSegmentationCoordinator.InvertMaskAsync(new CanvasSegmentationInvertRequest
             {
                 CurrentSegmentationBitmap = SegmentationBitmap,
-                SourceImageInfo = SourceBitmap?.Info
+                SourceImageInfo = SourceBitmap?.Info,
+                Padding = SegmentationPadding
             });
 
             if (invertResult != null)
@@ -155,6 +215,7 @@ public partial class CanvasPageViewModel
     [RelayCommand]
     private void ClearSegmentationMask()
     {
+        _segmentationSessionId++;
         SegmentationBitmap?.Dispose();
         SegmentationBitmap = null;
         _canvasSegmentationCoordinator.Reset();

@@ -11,6 +11,7 @@ public partial class CanvasPage
     private Timer? _brushSizeTimer;
     private Timer? _alphaTimer;
     private Timer? _noiseTimer;
+    private Timer? _maskPaddingTimer;
 
     // Page-level chrome state.
     private bool _hapticsEnabled = false;
@@ -60,6 +61,7 @@ public partial class CanvasPage
         vibrate(HapticFeedbackType.Click);
 
         ShowHideAlphaSlider(false);
+        ShowHideMaskPaddingSlider(false);
         ShowHideBrushSizeSlider(!BrushSizeSliderContainer.IsVisible);
         ShowHideNoiseSlider(false);
     }
@@ -69,6 +71,7 @@ public partial class CanvasPage
         vibrate(HapticFeedbackType.Click);
 
         ShowHideBrushSizeSlider(false);
+        ShowHideMaskPaddingSlider(false);
         ShowHideAlphaSlider(!AlphaSliderContainer.IsVisible);
         ShowHideNoiseSlider(false);
     }
@@ -79,7 +82,64 @@ public partial class CanvasPage
 
         ShowHideBrushSizeSlider(false);
         ShowHideAlphaSlider(false);
+        ShowHideMaskPaddingSlider(false);
         ShowHideNoiseSlider(!NoiseSliderContainer.IsVisible);
+    }
+
+    private void Mask_Padding_Button_Clicked(object? sender, EventArgs e)
+    {
+        vibrate(HapticFeedbackType.Click);
+
+        ShowHideBrushSizeSlider(false);
+        ShowHideAlphaSlider(false);
+        ShowHideNoiseSlider(false);
+        ShowHideMaskPaddingSlider(!MaskPaddingSliderContainer.IsVisible);
+    }
+
+    private void ShowHideMaskPaddingSlider(bool show)
+    {
+        if (show)
+        {
+            MaskPaddingSliderContainer.Opacity = 0f;
+            MaskPaddingSliderContainer.IsVisible = true;
+        }
+
+        MaskPaddingSliderContainer.AbortAnimation("FadeInOutMaskPadding");
+        MaskPaddingSliderContainer.Animate("FadeInOutMaskPadding", value =>
+        {
+            MaskPaddingSliderContainer.Opacity = value;
+        }, MaskPaddingSliderContainer.Opacity, show ? 1 : 0, easing: Easing.CubicInOut, finished: (value, canceled) =>
+        {
+            if (canceled)
+            {
+                return;
+            }
+
+            MaskPaddingSliderContainer.IsVisible = show;
+
+            if (MaskPaddingSliderContainer.IsVisible)
+            {
+                AutoHideMaskPaddingSlider();
+            }
+        });
+    }
+
+    private void AutoHideMaskPaddingSlider()
+    {
+        if (_maskPaddingTimer == null)
+        {
+            _maskPaddingTimer = new Timer(delegate
+            {
+                Dispatcher.Dispatch(() =>
+                {
+                    ShowHideMaskPaddingSlider(false);
+                });
+            }, null, 3000, -1);
+        }
+        else
+        {
+            _maskPaddingTimer.Change(3000, -1);
+        }
     }
 
     private void ShowHideAlphaSlider(bool show)
@@ -225,6 +285,7 @@ public partial class CanvasPage
         AlphaSliderContainer.IsVisible = false;
         BrushSizeSliderContainer.IsVisible = false;
         NoiseSliderContainer.IsVisible = false;
+        MaskPaddingSliderContainer.IsVisible = false;
     }
 
     private void UpdateMaskLayer()
@@ -281,6 +342,7 @@ public partial class CanvasPage
         ShowHideBrushSizeSlider(false);
         ShowHideAlphaSlider(false);
         ShowHideNoiseSlider(false);
+        ShowHideMaskPaddingSlider(false);
 
         BrushSizeButton.IsVisible = false;
         AlphaButton.IsVisible = false;
@@ -289,6 +351,7 @@ public partial class CanvasPage
         AddRemoveButton.IsVisible = false;
         ResetZoomButton.IsVisible = false;
         NoiseButton.IsVisible = false;
+        MaskPaddingButton.IsVisible = false;
 
         foreach (var contextButton in CurrentTool.ContextButtons)
         {
@@ -314,6 +377,9 @@ public partial class CanvasPage
                     break;
                 case ContextButtonType.Noise:
                     NoiseButton.IsVisible = true;
+                    break;
+                case ContextButtonType.MaskPadding:
+                    MaskPaddingButton.IsVisible = true;
                     break;
                 default:
                     break;
