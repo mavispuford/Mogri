@@ -17,10 +17,11 @@ public class SegmentationService : ISegmentationService, IDisposable
 
     private int _imageWidth;
     private int _imageHeight;
+    private int _resizedWidth;
+    private int _resizedHeight;
     private float _scaleX;
     private float _scaleY;
     private Tensor<float>? _imageEmbeddings;
-    private Tensor<float>? _lowResMasks;
 
     public SKColor MaskColor => SKColors.Red;
 
@@ -53,7 +54,6 @@ public class SegmentationService : ISegmentationService, IDisposable
 
     public void Reset()
     {
-        _lowResMasks = null;
     }
 
     public SKBitmap InvertMask(SKBitmap currentMask)
@@ -117,23 +117,26 @@ public class SegmentationService : ISegmentationService, IDisposable
             sessionOptions.AppendExecutionProvider_CoreML();
 #endif
 
+            // Clean up legacy MobileSAM cached models if present
+            cleanUpLegacyModels();
+
             // Set up encoder...
-            var encoderPath = Path.Combine(FileSystem.CacheDirectory, "mobile_sam.encoder.onnx");
+            var encoderPath = Path.Combine(FileSystem.CacheDirectory, "edge_sam_3x_encoder.onnx");
             if (!File.Exists(encoderPath))
             {
                 Console.WriteLine("[SegmentationService] Extracting encoder to cache...");
-                using var stream = await FileSystem.OpenAppPackageFileAsync("mobile_sam.encoder.onnx");
+                using var stream = await FileSystem.OpenAppPackageFileAsync("edge_sam_3x_encoder.onnx");
                 using var fileStream = File.Create(encoderPath);
                 await stream.CopyToAsync(fileStream);
             }
             _encoderSession = new InferenceSession(encoderPath, sessionOptions);
 
             // Set up decoder...
-            var decoderPath = Path.Combine(FileSystem.CacheDirectory, "mobile_sam.decoder.onnx");
+            var decoderPath = Path.Combine(FileSystem.CacheDirectory, "edge_sam_3x_decoder.onnx");
             if (!File.Exists(decoderPath))
             {
                 Console.WriteLine("[SegmentationService] Extracting decoder to cache...");
-                using var stream = await FileSystem.OpenAppPackageFileAsync("mobile_sam.decoder.onnx");
+                using var stream = await FileSystem.OpenAppPackageFileAsync("edge_sam_3x_decoder.onnx");
                 using var fileStream = File.Create(decoderPath);
                 await stream.CopyToAsync(fileStream);
             }
@@ -143,6 +146,30 @@ public class SegmentationService : ISegmentationService, IDisposable
         {
             Debug.WriteLine($"Error initializing SegmentationService: {ex}");
             // Consider rethrowing or handling appropriately depending on app requirements
+        }
+    }
+
+    private static void cleanUpLegacyModels()
+    {
+        try
+        {
+            var legacyEncoder = Path.Combine(FileSystem.CacheDirectory, "mobile_sam.encoder.onnx");
+            if (File.Exists(legacyEncoder))
+            {
+                File.Delete(legacyEncoder);
+                Console.WriteLine("[SegmentationService] Cleaned up legacy mobile_sam.encoder.onnx from cache.");
+            }
+
+            var legacyDecoder = Path.Combine(FileSystem.CacheDirectory, "mobile_sam.decoder.onnx");
+            if (File.Exists(legacyDecoder))
+            {
+                File.Delete(legacyDecoder);
+                Console.WriteLine("[SegmentationService] Cleaned up legacy mobile_sam.decoder.onnx from cache.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[SegmentationService] Could not clean up legacy cached models: {ex.Message}");
         }
     }
 
@@ -178,7 +205,7 @@ public class SegmentationService : ISegmentationService, IDisposable
 
             token.ThrowIfCancellationRequested();
 
-            var encoderInputs = new NamedOnnxValue[] { NamedOnnxValue.CreateFromTensor("input_image", imageDataTensor) };
+            var encoderInputs = new NamedOnnxValue[] { NamedOnnxValue.CreateFromTensor("image", imageDataTensor) };
 
             if (_encoderSession == null)
             {
@@ -207,9 +234,10 @@ public class SegmentationService : ISegmentationService, IDisposable
                 _imageEmbeddings = encoderResult.First().AsTensor<float>();
                 _imageWidth = bitmap.Width;
                 _imageHeight = bitmap.Height;
+                _resizedWidth = processedBitmap.Width;
+                _resizedHeight = processedBitmap.Height;
                 _scaleX = scaleX;
                 _scaleY = scaleY;
-                _lowResMasks = null; // Reset mask state for new image
             }
         }
         catch (OperationCanceledException)
@@ -225,9 +253,10 @@ public class SegmentationService : ISegmentationService, IDisposable
             _imageEmbeddings = null;
             _imageWidth = 0;
             _imageHeight = 0;
+            _resizedWidth = 0;
+            _resizedHeight = 0;
             _scaleX = 0;
             _scaleY = 0;
-            _lowResMasks = null;
             return false;
         }
         finally
@@ -289,39 +318,14 @@ public class SegmentationService : ISegmentationService, IDisposable
                     }
                 }
 
-                // Add padding coordinate and batch index
-                pointCoordsScaled.Add(0);
-                pointCoordsScaled.Add(0);
-                labels.Add(-1);
-
-                var pointCoords = new DenseTensor<float>(pointCoordsScaled.ToArray(), new int[] { 1, pointCoordsScaled.Count / 2, 2 });
-                var pointLabels = new DenseTensor<float>(labels.ToArray(), new int[] { 1, labels.Count });
-
-                // Determine mask input
-                Tensor<float> maskInput;
-                Tensor<float> hasMask;
-
-                if (!reset && _lowResMasks != null)
-                {
-                    maskInput = _lowResMasks;
-                    hasMask = new DenseTensor<float>(new float[] { 1.0f }, new int[] { 1 });
-                }
-                else
-                {
-                    maskInput = new DenseTensor<float>(new float[256 * 256], new int[] { 1, 1, 256, 256 });
-                    hasMask = new DenseTensor<float>(new float[] { 0.0f }, new int[] { 1 });
-                }
-
-                var originalImageSize = new DenseTensor<float>(new float[] { _imageHeight, _imageWidth }, new int[] { 2 });
+                var pointCoords = new DenseTensor<float>(pointCoordsScaled.ToArray(), new int[] { 1, points.Length, 2 });
+                var pointLabels = new DenseTensor<float>(labels.ToArray(), new int[] { 1, points.Length });
 
                 var decoderInputs = new NamedOnnxValue[]
                 {
                     NamedOnnxValue.CreateFromTensor("image_embeddings", _imageEmbeddings),
                     NamedOnnxValue.CreateFromTensor("point_coords", pointCoords),
-                    NamedOnnxValue.CreateFromTensor("point_labels", pointLabels),
-                    NamedOnnxValue.CreateFromTensor("mask_input", maskInput),
-                    NamedOnnxValue.CreateFromTensor("has_mask_input", hasMask),
-                    NamedOnnxValue.CreateFromTensor("orig_im_size", originalImageSize)
+                    NamedOnnxValue.CreateFromTensor("point_labels", pointLabels)
                 };
 
                 // STEP -  Run decoder using inputs
@@ -333,15 +337,23 @@ public class SegmentationService : ISegmentationService, IDisposable
                     _stopwatch.Stop();
                     Console.WriteLine($"Decoder: {_stopwatch.Elapsed.TotalMilliseconds}ms");
 
-                    // Retrieve the output tensor(s)
+                    var scoresTensor = results.First(r => r.Name == "scores").AsTensor<float>();
                     var maskTensor = results.First(r => r.Name == "masks").AsTensor<float>();
-                    var iouPredictionsTensor = results.First(r => r.Name == "iou_predictions").AsTensor<float>();
 
-                    // Cache low res masks for next iteration
-                    var lowResMasksTensor = results.First(r => r.Name == "low_res_masks").AsTensor<float>();
-                    _lowResMasks = new DenseTensor<float>(lowResMasksTensor.ToArray(), lowResMasksTensor.Dimensions);
+                    int bestIndex = 0;
+                    float bestScore = float.NegativeInfinity;
+                    int numMasks = scoresTensor.Dimensions[1];
+                    for (int i = 0; i < numMasks; i++)
+                    {
+                        float score = scoresTensor[0, i];
+                        if (score > bestScore)
+                        {
+                            bestScore = score;
+                            bestIndex = i;
+                        }
+                    }
 
-                    return GetImageFromMaskTensorPointer(maskTensor);
+                    return GetImageFromMaskTensor(maskTensor, bestIndex);
                 }
             }
             catch (Exception)
@@ -395,37 +407,44 @@ public class SegmentationService : ISegmentationService, IDisposable
     {
         _stopwatch.Restart();
 
+        const int targetSize = 1024;
+        const int channelSize = targetSize * targetSize;
         int width = image.Width;
         int height = image.Height;
-        int channelCount = 3; // RGB channels
-        int pixelCount = width * height;
 
-        float[] rgbArray = new float[pixelCount * channelCount];
+        // ImageNet normalization constants expected by EdgeSAM
+        const float meanR = 123.675f;
+        const float meanG = 116.28f;
+        const float meanB = 103.53f;
+        const float stdR = 58.395f;
+        const float stdG = 57.12f;
+        const float stdB = 57.375f;
 
-        // Get a pointer to the pixel data
+        // Allocate 1x3x1024x1024 array (initialized to 0.0f for padding)
+        float[] chwArray = new float[3 * channelSize];
+
         byte* pixels = (byte*)image.GetPixels().ToPointer();
-
-        int pixelIndex = 0;
+        int pixelStride = image.RowBytes;
 
         for (int y = 0; y < height; y++)
         {
+            byte* rowPtr = pixels + y * pixelStride;
+            int rowOffset = y * targetSize;
+
             for (int x = 0; x < width; x++)
             {
-                byte pixelR = pixels[pixelIndex++];
-                byte pixelG = pixels[pixelIndex++];
-                byte pixelB = pixels[pixelIndex++];
-                pixelIndex++; // Skip the alpha channel
+                int pixelOffset = rowOffset + x;
+                byte pixelR = rowPtr[x * 4];
+                byte pixelG = rowPtr[x * 4 + 1];
+                byte pixelB = rowPtr[x * 4 + 2];
 
-                int arrayIndex = (y * width + x) * channelCount;
-
-                // Store the RGB values directly in the array
-                rgbArray[arrayIndex] = pixelR;
-                rgbArray[arrayIndex + 1] = pixelG;
-                rgbArray[arrayIndex + 2] = pixelB;
+                chwArray[0 * channelSize + pixelOffset] = (pixelR - meanR) / stdR;
+                chwArray[1 * channelSize + pixelOffset] = (pixelG - meanG) / stdG;
+                chwArray[2 * channelSize + pixelOffset] = (pixelB - meanB) / stdB;
             }
         }
 
-        var imageDataTensor = new DenseTensor<float>(rgbArray, new int[] { image.Height, image.Width, 3 });
+        var imageDataTensor = new DenseTensor<float>(chwArray, new int[] { 1, 3, targetSize, targetSize });
 
         _stopwatch.Stop();
         Console.WriteLine($"ImageToDenseTensor: {_stopwatch.Elapsed.TotalMilliseconds}ms");
@@ -433,40 +452,73 @@ public class SegmentationService : ISegmentationService, IDisposable
         return imageDataTensor;
     }
 
-
-    private unsafe SKBitmap GetImageFromMaskTensorPointer(Tensor<float> tensor)
+    private unsafe SKBitmap GetImageFromMaskTensor(Tensor<float> tensor, int maskIndex)
     {
         _stopwatch.Restart();
 
+        const int lowResSize = 256;
         var maskArray = tensor.ToArray();
-        var pixelIndex = 0;
+        int maskOffset = maskIndex * lowResSize * lowResSize;
+
+        // Create 256x256 Alpha8 bitmap containing the sigmoid probability map
+        using var lowResBitmap = new SKBitmap(lowResSize, lowResSize, SKColorType.Alpha8, SKAlphaType.Premul);
+        byte* lowResPixels = (byte*)lowResBitmap.GetPixels().ToPointer();
+
+        for (int i = 0; i < lowResSize * lowResSize; i++)
+        {
+            float logit = maskArray[maskOffset + i];
+            float prob = 1.0f / (1.0f + MathF.Exp(-logit));
+            lowResPixels[i] = (byte)(prob * 255.0f);
+        }
+
+        // Upscale the valid (unpadded) region of the low-res mask back to original image dimensions
+        using var upscaledAlpha = new SKBitmap(_imageWidth, _imageHeight, SKColorType.Alpha8, SKAlphaType.Premul);
+        using (var canvas = new SKCanvas(upscaledAlpha))
+        {
+            canvas.Clear(SKColors.Transparent);
+            var srcRect = new SKRect(0, 0, (float)_resizedWidth / 4.0f, (float)_resizedHeight / 4.0f);
+            var dstRect = new SKRect(0, 0, _imageWidth, _imageHeight);
+            canvas.DrawBitmap(lowResBitmap, srcRect, dstRect, new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.None));
+        }
+
         var result = new SKBitmap(_imageWidth, _imageHeight, SKColorType.Rgba8888, SKAlphaType.Premul);
+        var maskColor = MaskColor;
 
         using (var pixmap = result.PeekPixels())
         {
-            var pixels = (byte*)pixmap.GetPixels();
-            var pixelStride = pixmap.Info.RowBytes;
+            byte* dstPixels = (byte*)pixmap.GetPixels().ToPointer();
+            int dstStride = pixmap.Info.RowBytes;
+            byte* alphaPixels = (byte*)upscaledAlpha.GetPixels().ToPointer();
+            int alphaStride = upscaledAlpha.RowBytes;
 
             for (var y = 0; y < _imageHeight; y++)
             {
+                byte* alphaRow = alphaPixels + y * alphaStride;
+                byte* dstRow = dstPixels + y * dstStride;
+
                 for (var x = 0; x < _imageWidth; x++)
                 {
-                    var arrayValue = maskArray[pixelIndex++];
-
-                    if (arrayValue > 0.0f)
+                    int pixelOffset = x * 4;
+                    if (alphaRow[x] >= 128)
                     {
-                        var pixelPtr = pixels + y * pixelStride + x * 4; // Assuming 32-bit RGBA format
-                        pixelPtr[0] = MaskColor.Red;    // Red
-                        pixelPtr[1] = MaskColor.Green;  // Green
-                        pixelPtr[2] = MaskColor.Blue;   // Blue
-                        pixelPtr[3] = MaskColor.Alpha;  // Alpha
+                        dstRow[pixelOffset] = maskColor.Red;
+                        dstRow[pixelOffset + 1] = maskColor.Green;
+                        dstRow[pixelOffset + 2] = maskColor.Blue;
+                        dstRow[pixelOffset + 3] = maskColor.Alpha;
+                    }
+                    else
+                    {
+                        dstRow[pixelOffset] = 0;
+                        dstRow[pixelOffset + 1] = 0;
+                        dstRow[pixelOffset + 2] = 0;
+                        dstRow[pixelOffset + 3] = 0;
                     }
                 }
             }
         }
 
         _stopwatch.Stop();
-        Console.WriteLine($"GetImageFromMaskTensorPointer: {_stopwatch.Elapsed.TotalMilliseconds}ms");
+        Console.WriteLine($"GetImageFromMaskTensor: {_stopwatch.Elapsed.TotalMilliseconds}ms");
 
         return result;
     }

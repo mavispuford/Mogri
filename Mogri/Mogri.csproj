@@ -91,8 +91,8 @@
 	  <None Remove="Resources\Fonts\MaterialSymbolsRounded400.ttf" />
 	  <None Remove="Resources\Fonts\MaterialSymbolsRounded700.ttf" />
 	  <None Remove="Resources\Images\circle_fill_48.svg" />
-	  <None Remove="Resources\Raw\mobile_sam.decoder.onnx" />
-	  <None Remove="Resources\Raw\mobile_sam.encoder.onnx" />
+	  <None Remove="Resources\Raw\edge_sam_3x_decoder.onnx" />
+	  <None Remove="Resources\Raw\edge_sam_3x_encoder.onnx" />
 	</ItemGroup>
 
 	<ItemGroup>
