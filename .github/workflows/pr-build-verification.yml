@@ -52,7 +52,7 @@ jobs:
         retention-days: 3
 
   verify-ios:
-    runs-on: macos-27
+    runs-on: xcode-27
 
     steps:
     - name: Checkout Code
