@@ -12,4 +12,6 @@ public sealed class CanvasSegmentationRequest
     public SKBitmap? CurrentSegmentationBitmap { get; init; }
 
     public bool SegmentationAdd { get; init; }
+
+    public int Padding { get; init; } = 2;
 }

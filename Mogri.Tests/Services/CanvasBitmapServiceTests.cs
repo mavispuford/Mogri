@@ -109,6 +109,92 @@ public class CanvasBitmapServiceTests
         Assert.Equal(SKColors.Black, result.GetPixel(2, 2));
     }
 
+    [Fact]
+    public void ApplyMaskPadding_WithPositivePadding_DilatesMask()
+    {
+        // Arrange
+        using var bitmap = CreateBitmap(5, 5, SKColors.Transparent);
+        bitmap.SetPixel(2, 2, SKColors.Red);
+        var service = CreateService();
+
+        // Act
+        using var result = service.ApplyMaskPadding(bitmap, 1);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal((byte)255, result!.GetPixel(2, 2).Alpha);
+        Assert.Equal((byte)255, result.GetPixel(2, 1).Alpha);
+        Assert.Equal((byte)255, result.GetPixel(2, 3).Alpha);
+        Assert.Equal((byte)255, result.GetPixel(1, 2).Alpha);
+        Assert.Equal((byte)255, result.GetPixel(3, 2).Alpha);
+        Assert.Equal((byte)0, result.GetPixel(0, 0).Alpha);
+    }
+
+    [Fact]
+    public void ApplyMaskPadding_WithNegativePadding_ErodesMask()
+    {
+        // Arrange
+        using var bitmap = CreateBitmap(5, 5, SKColors.Red);
+        var service = CreateService();
+
+        // Act
+        using var result = service.ApplyMaskPadding(bitmap, -1);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal((byte)255, result!.GetPixel(2, 2).Alpha);
+        Assert.Equal((byte)0, result.GetPixel(0, 0).Alpha);
+        Assert.Equal((byte)0, result.GetPixel(4, 4).Alpha);
+    }
+
+    [Fact]
+    public void ApplyMaskPadding_WithZeroPadding_ReturnsCopy()
+    {
+        // Arrange
+        using var bitmap = CreateBitmap(2, 2, SKColors.Red);
+        var service = CreateService();
+
+        // Act
+        using var result = service.ApplyMaskPadding(bitmap, 0);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.NotSame(bitmap, result);
+        Assert.Equal(SKColors.Red, result!.GetPixel(0, 0));
+    }
+
+    [Fact]
+    public void ApplyMaskPadding_WithNull_ReturnsNull()
+    {
+        // Arrange
+        var service = CreateService();
+
+        // Act
+        var result = service.ApplyMaskPadding(null, 2);
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public void ApplyMaskPadding_WithLargeBitmap_DilatesUsingDownscaledPath()
+    {
+        // Arrange: 1000x1000 bitmap (above 512px threshold)
+        using var bitmap = CreateBitmap(1000, 1000, SKColors.Transparent);
+        bitmap.SetPixel(500, 500, SKColors.Red);
+        var service = CreateService();
+
+        // Act
+        using var result = service.ApplyMaskPadding(bitmap, 4);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(1000, result!.Width);
+        Assert.Equal(1000, result.Height);
+        Assert.True(result.GetPixel(500, 500).Alpha > 0);
+        Assert.Equal((byte)0, result.GetPixel(0, 0).Alpha);
+    }
+
     private static ICanvasBitmapService CreateService()
     {
         return new CanvasBitmapService();

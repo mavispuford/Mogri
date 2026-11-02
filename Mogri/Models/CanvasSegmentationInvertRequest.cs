@@ -10,4 +10,6 @@ public sealed class CanvasSegmentationInvertRequest
     public SKBitmap? CurrentSegmentationBitmap { get; init; }
 
     public SKImageInfo? SourceImageInfo { get; init; }
+
+    public int Padding { get; init; } = 2;
 }

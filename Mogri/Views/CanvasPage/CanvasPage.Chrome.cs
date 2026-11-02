@@ -8,9 +8,18 @@ namespace Mogri.Views;
 public partial class CanvasPage
 {
     // Auto-hide UI chrome.
-    private Timer? _brushSizeTimer;
-    private Timer? _alphaTimer;
-    private Timer? _noiseTimer;
+    private enum ContextSliderType
+    {
+        None,
+        BrushSize,
+        MaskPadding,
+        Alpha,
+        Noise
+    }
+
+    private ContextSliderType _activeSliderType = ContextSliderType.None;
+    private bool _isConfiguringSlider;
+    private Timer? _sliderTimer;
 
     // Page-level chrome state.
     private bool _hapticsEnabled = false;
@@ -41,7 +50,7 @@ public partial class CanvasPage
         else
         {
             // Calculate height dynamically
-            double translation = (ActionsContainer.Height / 4);
+            var translation = (ActionsContainer.Height / 4);
             if (translation <= 0) translation = 200; // fallback if not measured
 
             if (animate)
@@ -57,174 +66,195 @@ public partial class CanvasPage
 
     private void Brush_Size_Button_Clicked(object? sender, EventArgs e)
     {
-        vibrate(HapticFeedbackType.Click);
+        ToggleSlider(ContextSliderType.BrushSize, BrushSizeButton);
+    }
 
-        ShowHideAlphaSlider(false);
-        ShowHideBrushSizeSlider(!BrushSizeSliderContainer.IsVisible);
-        ShowHideNoiseSlider(false);
+    private void Mask_Padding_Button_Clicked(object? sender, EventArgs e)
+    {
+        ToggleSlider(ContextSliderType.MaskPadding, MaskPaddingButton);
     }
 
     private void Alpha_Button_Clicked(object? sender, EventArgs e)
     {
-        vibrate(HapticFeedbackType.Click);
-
-        ShowHideBrushSizeSlider(false);
-        ShowHideAlphaSlider(!AlphaSliderContainer.IsVisible);
-        ShowHideNoiseSlider(false);
+        ToggleSlider(ContextSliderType.Alpha, AlphaButton);
     }
 
     private void Noise_Button_Clicked(object? sender, EventArgs e)
     {
+        ToggleSlider(ContextSliderType.Noise, NoiseButton);
+    }
+
+    private async void ToggleSlider(ContextSliderType type, VisualElement anchorButton)
+    {
         vibrate(HapticFeedbackType.Click);
 
-        ShowHideBrushSizeSlider(false);
-        ShowHideAlphaSlider(false);
-        ShowHideNoiseSlider(!NoiseSliderContainer.IsVisible);
-    }
-
-    private void ShowHideAlphaSlider(bool show)
-    {
-        if (show)
+        if (_activeSliderType == type && ActiveSliderContainer.IsVisible)
         {
-            AlphaSliderContainer.Opacity = 0f;
-            AlphaSliderContainer.IsVisible = true;
+            ShowHideActiveSlider(false);
+            return;
         }
 
-        AlphaSliderContainer.AbortAnimation("FadeInOutAlpha");
-        AlphaSliderContainer.Animate("FadeInOutAlpha", value =>
+        _activeSliderType = type;
+        ConfigureActiveSlider(type);
+
+        var sliderWidth = ActiveSliderContainer.Width > 0 ? ActiveSliderContainer.Width : 230;
+        var targetX = calculateSliderTargetX(anchorButton, sliderWidth);
+
+        if (!ActiveSliderContainer.IsVisible)
         {
-            AlphaSliderContainer.Opacity = value;
-        }, AlphaSliderContainer.Opacity, show ? 1 : 0, easing: Easing.CubicInOut, finished: (value, canceled) =>
-        {
-            if (canceled)
-            {
-                return;
-            }
-
-            AlphaSliderContainer.IsVisible = show;
-
-            if (AlphaSliderContainer.IsVisible)
-            {
-                AutoHideAlphaSlider();
-            }
-        });
-    }
-
-    private void ShowHideBrushSizeSlider(bool show)
-    {
-        if (show)
-        {
-            BrushSizeSliderContainer.Opacity = 0f;
-            BrushSizeSliderContainer.IsVisible = true;
-        }
-
-        BrushSizeSliderContainer.AbortAnimation("FadeInOutBrushSize");
-        BrushSizeSliderContainer.Animate("FadeInOutBrushSize", value =>
-        {
-            BrushSizeSliderContainer.Opacity = value;
-        }, BrushSizeSliderContainer.Opacity, show ? 1 : 0, easing: Easing.CubicInOut, finished: (value, canceled) =>
-        {
-            if (canceled)
-            {
-                return;
-            }
-
-            BrushSizeSliderContainer.IsVisible = show;
-
-            if (BrushSizeSliderContainer.IsVisible)
-            {
-                AutoHideBrushSizeSlider();
-            }
-        });
-    }
-
-    private void ShowHideNoiseSlider(bool show)
-    {
-        if (show)
-        {
-            NoiseSliderContainer.Opacity = 0f;
-            NoiseSliderContainer.IsVisible = true;
-        }
-
-        NoiseSliderContainer.AbortAnimation("FadeInOutNoise");
-        NoiseSliderContainer.Animate("FadeInOutNoise", value =>
-        {
-            NoiseSliderContainer.Opacity = value;
-        }, NoiseSliderContainer.Opacity, show ? 1 : 0, easing: Easing.CubicInOut, finished: (value, canceled) =>
-        {
-            if (canceled)
-            {
-                return;
-            }
-
-            NoiseSliderContainer.IsVisible = show;
-
-            if (NoiseSliderContainer.IsVisible)
-            {
-                AutoHideNoiseSlider();
-            }
-        });
-    }
-
-    private void AutoHideBrushSizeSlider()
-    {
-        if (_brushSizeTimer == null)
-        {
-            _brushSizeTimer = new Timer(delegate
-            {
-                Dispatcher.Dispatch(() =>
-                {
-                    ShowHideBrushSizeSlider(false);
-                });
-            }, null, 3000, -1);
+            ActiveSliderContainer.TranslationX = targetX;
+            ShowHideActiveSlider(true);
         }
         else
         {
-            _brushSizeTimer.Change(3000, -1);
+            ResetSliderTimer();
+            ActiveSliderContainer.AbortAnimation("SlideToX");
+            await ActiveSliderContainer.TranslateToAsync(targetX, 0, 180, Easing.CubicOut);
         }
     }
 
-    private void AutoHideAlphaSlider()
+    private double calculateSliderTargetX(VisualElement button, double sliderWidth)
     {
-        if (_alphaTimer == null)
+        var buttonCenter = ContextButtonsLayout.X + button.X + (button.Width / 2);
+        var targetX = buttonCenter - (sliderWidth / 2);
+        var minX = 10 - getTotalHeirarchicalSidePadding(ContextButtonsLayout, true);
+        var totalRightPadding = getTotalHeirarchicalSidePadding(ContextButtonsLayout, false);
+        var maxX = Math.Max(minX, Width - sliderWidth - 10 - totalRightPadding);
+
+        return Math.Clamp(targetX, minX, maxX);
+    }
+
+    private double getTotalHeirarchicalSidePadding(Layout? layout, bool left, double currentTotal = 0, int iteration = 0)
+    {
+        if (layout == null || iteration > 10)
         {
-            _alphaTimer = new Timer(delegate
-            {
-                Dispatcher.Dispatch(() =>
-                {
-                    ShowHideAlphaSlider(false);
-                });
-            }, null, 3000, -1);
+            return currentTotal;
         }
-        else
+
+        currentTotal += left ? layout.Padding.Left : layout.Padding.Right;
+
+        return getTotalHeirarchicalSidePadding(layout.Parent as Layout, left, currentTotal, iteration + 1);
+    }
+
+    private void ConfigureActiveSlider(ContextSliderType type)
+    {
+        _isConfiguringSlider = true;
+        try
         {
-            _alphaTimer.Change(3000, -1);
+            switch (type)
+            {
+                case ContextSliderType.BrushSize:
+                    ActiveSlider.Minimum = 1;
+                    ActiveSlider.Maximum = 50;
+                    ActiveSlider.Value = CurrentBrushSize;
+                    ActiveSliderLabel.Text = $"Size: {CurrentBrushSize:F0}";
+                    break;
+
+                case ContextSliderType.MaskPadding:
+                    ActiveSlider.Minimum = -5;
+                    ActiveSlider.Maximum = 15;
+                    ActiveSlider.Value = SegmentationPadding;
+                    ActiveSliderLabel.Text = $"Padding: {SegmentationPadding:+#;-#;0} px";
+                    break;
+
+                case ContextSliderType.Alpha:
+                    ActiveSlider.Minimum = 0.01;
+                    ActiveSlider.Maximum = 1.0;
+                    ActiveSlider.Value = CurrentAlpha;
+                    ActiveSliderLabel.Text = $"Alpha: {CurrentAlpha:F2}";
+                    break;
+
+                case ContextSliderType.Noise:
+                    ActiveSlider.Minimum = 0;
+                    ActiveSlider.Maximum = 1;
+                    ActiveSlider.Value = CurrentNoise;
+                    ActiveSliderLabel.Text = $"Noise: {CurrentNoise:P0}";
+                    break;
+            }
+        }
+        finally
+        {
+            _isConfiguringSlider = false;
         }
     }
 
-    private void AutoHideNoiseSlider()
+    private void ActiveSlider_ValueChanged(object? sender, ValueChangedEventArgs e)
     {
-        if (_noiseTimer == null)
+        if (_isConfiguringSlider)
         {
-            _noiseTimer = new Timer(delegate
-            {
-                Dispatcher.Dispatch(() =>
-                {
-                    ShowHideNoiseSlider(false);
-                });
-            }, null, 3000, -1);
+            return;
+        }
+
+        switch (_activeSliderType)
+        {
+            case ContextSliderType.BrushSize:
+                CurrentBrushSize = e.NewValue;
+                ActiveSliderLabel.Text = $"Size: {e.NewValue:F0}";
+                break;
+
+            case ContextSliderType.MaskPadding:
+                var intVal = (int)Math.Round(e.NewValue);
+                SegmentationPadding = intVal;
+                ActiveSliderLabel.Text = $"Padding: {intVal:+#;-#;0} px";
+                break;
+
+            case ContextSliderType.Alpha:
+                CurrentAlpha = e.NewValue;
+                ActiveSliderLabel.Text = $"Alpha: {e.NewValue:F2}";
+                break;
+
+            case ContextSliderType.Noise:
+                CurrentNoise = e.NewValue;
+                ActiveSliderLabel.Text = $"Noise: {e.NewValue:P0}";
+                break;
+        }
+
+        ResetSliderTimer();
+    }
+
+    private void ShowHideActiveSlider(bool show)
+    {
+        if (show)
+        {
+            ActiveSliderContainer.Opacity = 1;
+            ActiveSliderContainer.IsVisible = true;
+            ResetSliderTimer();
         }
         else
         {
-            _noiseTimer.Change(3000, -1);
+            ActiveSliderContainer.Opacity = 0;
+            ActiveSliderContainer.IsVisible = false;
+            _activeSliderType = ContextSliderType.None;
         }
     }
+
+    public void ResetSliderTimer()
+    {
+        if (_sliderTimer == null)
+        {
+            _sliderTimer = new Timer(delegate
+            {
+                Dispatcher.Dispatch(() =>
+                {
+                    ShowHideActiveSlider(false);
+                });
+            }, null, 5000, -1);
+        }
+        else
+        {
+            _sliderTimer.Change(5000, -1);
+        }
+    }
+
+    public void AutoHideBrushSizeSlider() => ResetSliderTimer();
+    public void AutoHideAlphaSlider() => ResetSliderTimer();
+    public void AutoHideNoiseSlider() => ResetSliderTimer();
+    public void AutoHideMaskPaddingSlider() => ResetSliderTimer();
 
     private void HideSliders()
     {
-        AlphaSliderContainer.IsVisible = false;
-        BrushSizeSliderContainer.IsVisible = false;
-        NoiseSliderContainer.IsVisible = false;
+        ActiveSliderContainer.IsVisible = false;
+        _activeSliderType = ContextSliderType.None;
     }
 
     private void UpdateMaskLayer()
@@ -278,9 +308,7 @@ public partial class CanvasPage
             });
         }
 
-        ShowHideBrushSizeSlider(false);
-        ShowHideAlphaSlider(false);
-        ShowHideNoiseSlider(false);
+        HideSliders();
 
         BrushSizeButton.IsVisible = false;
         AlphaButton.IsVisible = false;
@@ -289,6 +317,7 @@ public partial class CanvasPage
         AddRemoveButton.IsVisible = false;
         ResetZoomButton.IsVisible = false;
         NoiseButton.IsVisible = false;
+        MaskPaddingButton.IsVisible = false;
 
         foreach (var contextButton in CurrentTool.ContextButtons)
         {
@@ -315,6 +344,9 @@ public partial class CanvasPage
                 case ContextButtonType.Noise:
                     NoiseButton.IsVisible = true;
                     break;
+                case ContextButtonType.MaskPadding:
+                    MaskPaddingButton.IsVisible = true;
+                    break;
                 default:
                     break;
             }
@@ -325,13 +357,7 @@ public partial class CanvasPage
 
     private void disposeTimers()
     {
-        _brushSizeTimer?.Dispose();
-        _brushSizeTimer = null;
-
-        _alphaTimer?.Dispose();
-        _alphaTimer = null;
-
-        _noiseTimer?.Dispose();
-        _noiseTimer = null;
+        _sliderTimer?.Dispose();
+        _sliderTimer = null;
     }
 }

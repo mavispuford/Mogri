@@ -60,6 +60,85 @@ public sealed class CanvasBitmapService : ICanvasBitmapService
         return resultBitmap;
     }
 
+    public SKBitmap? ApplyMaskPadding(SKBitmap? maskBitmap, int paddingPixels)
+    {
+        if (maskBitmap == null)
+        {
+            return null;
+        }
+
+        if (paddingPixels == 0)
+        {
+            return maskBitmap.Copy();
+        }
+
+        const int maxProcessingDimension = 512;
+        int maxDim = Math.Max(maskBitmap.Width, maskBitmap.Height);
+
+        // For images within 512px, apply morphological filter directly at full resolution
+        if (maxDim <= maxProcessingDimension)
+        {
+            var directResult = new SKBitmap(maskBitmap.Info);
+
+            using (var canvas = new SKCanvas(directResult))
+            {
+                canvas.Clear(SKColors.Transparent);
+
+                using var imageFilter = paddingPixels > 0
+                    ? SKImageFilter.CreateDilate(paddingPixels, paddingPixels)
+                    : SKImageFilter.CreateErode(-paddingPixels, -paddingPixels);
+
+                using var paint = new SKPaint
+                {
+                    ImageFilter = imageFilter
+                };
+
+                canvas.DrawBitmap(maskBitmap, 0, 0, SKSamplingOptions.Default, paint);
+            }
+
+            return directResult;
+        }
+
+        // For larger images (1000px-4000px+), downscale to 512px to keep morphological filtering fast (<20ms)
+        float scale = (float)maxProcessingDimension / maxDim;
+        int scaledWidth = Math.Max(1, (int)Math.Round(maskBitmap.Width * scale));
+        int scaledHeight = Math.Max(1, (int)Math.Round(maskBitmap.Height * scale));
+        int scaledRadius = Math.Max(1, (int)Math.Round(Math.Abs(paddingPixels) * scale));
+
+        using var smallBitmap = new SKBitmap(scaledWidth, scaledHeight, maskBitmap.ColorType, maskBitmap.AlphaType);
+        using (var canvasSmall = new SKCanvas(smallBitmap))
+        {
+            canvasSmall.Clear(SKColors.Transparent);
+            canvasSmall.DrawBitmap(maskBitmap, maskBitmap.Info.Rect, smallBitmap.Info.Rect, SKSamplingOptions.Default, null);
+        }
+
+        using var dilatedSmall = new SKBitmap(smallBitmap.Info);
+        using (var canvasDilated = new SKCanvas(dilatedSmall))
+        {
+            canvasDilated.Clear(SKColors.Transparent);
+
+            using var imageFilter = paddingPixels > 0
+                ? SKImageFilter.CreateDilate(scaledRadius, scaledRadius)
+                : SKImageFilter.CreateErode(scaledRadius, scaledRadius);
+
+            using var paint = new SKPaint
+            {
+                ImageFilter = imageFilter
+            };
+
+            canvasDilated.DrawBitmap(smallBitmap, 0, 0, SKSamplingOptions.Default, paint);
+        }
+
+        var resultBitmap = new SKBitmap(maskBitmap.Info);
+        using (var canvasFinal = new SKCanvas(resultBitmap))
+        {
+            canvasFinal.Clear(SKColors.Transparent);
+            canvasFinal.DrawBitmap(dilatedSmall, dilatedSmall.Info.Rect, resultBitmap.Info.Rect, new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.None), null);
+        }
+
+        return resultBitmap;
+    }
+
     /// <summary>
     /// Composites the rendered mask layer over the source bitmap using standard alpha blending.
     /// This delegates to SkiaSharp's canvas compositing (SrcOver) so premultiplied alpha from the

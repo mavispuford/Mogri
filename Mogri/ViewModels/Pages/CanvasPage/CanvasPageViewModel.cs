@@ -238,6 +238,7 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
                 ContextButtonType.Alpha,
                 ContextButtonType.ColorPicker,
                 ContextButtonType.AddRemove,
+                ContextButtonType.MaskPadding,
                 ContextButtonType.Noise
             ]
         });
