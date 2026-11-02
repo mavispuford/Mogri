@@ -124,7 +124,7 @@ public partial class CanvasPage
         return Math.Clamp(targetX, minX, maxX);
     }
 
-    private double getTotalHeirarchicalSidePadding(Layout layout, bool left, double currentTotal = 0, int iteration = 0)
+    private double getTotalHeirarchicalSidePadding(Layout? layout, bool left, double currentTotal = 0, int iteration = 0)
     {
         if (layout == null || iteration > 10)
         {
@@ -133,7 +133,7 @@ public partial class CanvasPage
 
         currentTotal += left ? layout.Padding.Left : layout.Padding.Right;
 
-        return getTotalHeirarchicalSidePadding(layout.Parent as Layout, left, currentTotal, iteration++);
+        return getTotalHeirarchicalSidePadding(layout.Parent as Layout, left, currentTotal, iteration + 1);
     }
 
     private void ConfigureActiveSlider(ContextSliderType type)
