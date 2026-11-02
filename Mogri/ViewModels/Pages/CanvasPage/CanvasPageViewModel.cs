@@ -235,10 +235,10 @@ public partial class CanvasPageViewModel : PageViewModel, ICanvasPageViewModel
             Type = ToolType.MagicWand,
             ContextButtons =
             [
-                ContextButtonType.MaskPadding,
                 ContextButtonType.Alpha,
                 ContextButtonType.ColorPicker,
                 ContextButtonType.AddRemove,
+                ContextButtonType.MaskPadding,
                 ContextButtonType.Noise
             ]
         });
