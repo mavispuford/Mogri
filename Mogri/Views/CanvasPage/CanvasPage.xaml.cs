@@ -231,6 +231,7 @@ public partial class CanvasPage : BasePage
     public static BindableProperty ShowActionsProperty = BindableProperty.Create(nameof(ShowActions), typeof(bool), typeof(CanvasPage), false, propertyChanged: (bindable, oldValue, newValue) =>
     {
         ((CanvasPage)bindable).AnimateActionsContainer((bool)newValue);
+        ((CanvasPage)bindable).ShowHideActiveSlider(false);
     });
 
     public bool ShowActions
